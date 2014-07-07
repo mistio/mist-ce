@@ -170,7 +170,10 @@ define( 'app', [
 
             App.set('isJQMInitialized',true);
 
-            Socket('/mist', initSocket);
+            Mist.set('socket', Socket({
+                namespace: '/mist',
+                onInit: initSocket,
+            }));
 
         });
 
@@ -647,95 +650,6 @@ define( 'app', [
     }
 
 
-    /**
-     *
-     *  Socket wrapper constructor
-     *
-     */
-
-    function Socket (namespace, initCallback) {
-
-        var socket;
-        var initialized = false;
-
-        function init () {
-            if (!initialized) {
-                info(namespace, 'initializing');
-                handleDisconneciton();
-                addDebuggingWrapper();
-                initCallback(socket);
-            }
-            socket.emit('ready');
-            initialized = true;
-        };
-
-        function connect () {
-
-            if (socket === undefined) {
-                socket = io.connect(namespace);
-                reconnect();
-            } else if (socket.socket.connected) {
-                info(namespace, 'connected');
-                init();
-            } else if (socket.socket.connecting) {
-                info(namespace, 'connecting');
-                reconnect();
-            } else {
-                socket.socket.connect();
-                reconnect();
-            }
-        }
-
-        function reconnect () {
-            setTimeout(connect, 500);
-        }
-
-        function handleDisconneciton () {
-
-            // Reconnect if connection fails
-            socket.on('disconnect', function () {
-                warn(namespace, 'disconnected');
-                reconnect();
-            });
-        }
-
-        function addDebuggingWrapper () {
-
-            // This process basically overrides the .on()
-            // function to enable debugging info on every
-            // response received by the client
-
-            // 1. keep a copy of the original socket.on() function
-            var sockon = socket.on;
-
-            // 2. overide the socket's .on() function
-            socket.on = function (event, callback)  {
-
-                // i. keep a copy of the original callback
-                // This is the function written by us to handle
-                // the response data
-                var cb = callback;
-
-                // ii. overide callback to first print the debugging
-                // information and then call the original callback function
-                // (which is saved in cb variabled)
-                callback = function (data) {
-                    if (Mist.debugSocket)
-                        info(Mist.prettyTime(new Date()),
-                            ' | ', namespace + '/' + event, data);
-                    cb(data);
-                };
-
-                // iii. Call the original .on() function using the modified
-                // callback function
-                sockon.apply(socket, arguments);
-            };
-        }
-
-        connect();
-    }
-
-
     var allImgs = [],
         imgUrls = [],
         thisSheetRules;
@@ -841,6 +755,103 @@ define( 'app', [
     preloadImages(initialize);
 });
 
+/**
+ *
+ *  Socket wrapper constructor
+ *
+ */
+
+function Socket (args) {
+
+    var namespace = args.namespace;
+    var initCallback = args.onInit;
+    var keepAlive = args.keepAlive !== undefined ? keepAlive : true;
+
+    var socket;
+    var initialized = false;
+
+    function init () {
+        if (!initialized) {
+            info(namespace, 'initializing');
+            handleDisconneciton();
+            addDebuggingWrapper();
+            if (typeof initCallback === 'function')
+                initCallback(socket);
+        }
+        socket.emit('ready');
+        initialized = true;
+    };
+
+    function connect () {
+
+        if (socket === undefined) {
+            socket = io.connect(namespace);
+            reconnect();
+        } else if (socket.socket.connected) {
+            info(namespace, 'connected');
+            init();
+        } else if (socket.socket.connecting) {
+            info(namespace, 'connecting');
+            reconnect();
+        } else {
+            socket.socket.connect();
+            reconnect();
+        }
+    }
+
+    function reconnect () {
+        setTimeout(connect, 500);
+    }
+
+    function handleDisconneciton () {
+
+        if (keepAlive) {
+            // Reconnect if connection fails
+            socket.on('disconnect', function () {
+                warn(namespace, 'disconnected');
+                reconnect();
+            });
+        }
+    }
+
+    function addDebuggingWrapper () {
+
+        // This process basically overrides the .on()
+        // function to enable debugging info on every
+        // response received by the client
+
+        // 1. keep a copy of the original socket.on() function
+        var sockon = socket.on;
+
+        // 2. overide the socket's .on() function
+        socket.on = function (event, callback)  {
+
+            // i. keep a copy of the original callback
+            // This is the function written by us to handle
+            // the response data
+            var cb = callback;
+
+            // ii. overide callback to first print the debugging
+            // information and then call the original callback function
+            // (which is saved in cb variabled)
+            callback = function (data) {
+                if (Mist.debugSocket)
+                    info(Mist.prettyTime(new Date()),
+                        ' | ', namespace + '/' + event, data);
+                cb(data);
+            };
+
+            // iii. Call the original .on() function using the modified
+            // callback function
+            sockon.apply(socket, arguments);
+        };
+    }
+
+    connect();
+
+    return socket;
+}
+
 //LOGLEVEL comes from home python view and home.pt
 function log() {
     try {
@@ -904,7 +915,6 @@ function completeShell(ret, command_id) {
 
 function initSocket(sock) {
 
-    Mist.set('socket', sock);
     Mist.keysController.load();
     Mist.backendsController.load();
     Mist.socket.on('probe', onProbe);
