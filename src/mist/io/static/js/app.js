@@ -873,7 +873,7 @@ function initSocket() {
         if (data.message) {
             warn(data);
             Mist.notificationController.set('msgHeader', data.title);
-            Mist.notificationController.set('msgPart1', data.message);
+            Mist.notificationController.set('msgCmd', data.message);
             Mist.notificationController.showMessagebox();
         } else {
             Mist.notificationController.notify(data.title);
