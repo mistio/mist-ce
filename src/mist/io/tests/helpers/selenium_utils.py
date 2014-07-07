@@ -1,7 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from mist.io.tests.settings import selenium_hub, LOCAL, CHROMEDRIVER_PATH, PHANTOMJS_PATH
+try:
+    from mist.io.tests.settings import selenium_hub, LOCAL, CHROMEDRIVER_PATH, PHANTOMJS_PATH
+except ImportError:
+    pass
 
 
 def choose_driver(flavor="chrome"):
