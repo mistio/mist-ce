@@ -126,7 +126,7 @@ class Shell(object):
 
         """
         # FIXME
-        stdout, stderr = self.command("which sudo", pty=False)
+        stdout, stderr, channel = self.command("which sudo", pty=False)
         if not stderr:
             self.sudo = True
             return True
@@ -144,7 +144,7 @@ class Shell(object):
             channel.get_pty()
         # command starts being executed in the background
         channel.exec_command(cmd)
-        return stdout, stderr
+        return stdout, stderr, channel
 
     def command(self, cmd, pty=True):
         """Run command and return output.
@@ -157,11 +157,25 @@ class Shell(object):
 
         """
         log.info("running command: '%s'", cmd)
-        stdout, stderr = self._command(cmd, pty)
+        stdout, stderr, channel = self._command(cmd, pty)
+        line = stdout.readline()
+        out = ''
+        while line:
+            out += line
+            line = stdout.readline()
+            
         if pty:
-            return stdout.read()
+            retval = channel.recv_exit_status()
+            return retval, out
         else:
-            return stdout.read(), stderr.read()
+            line = stderr.readline()
+            err = ''
+            while line:
+                err += line
+                line = stderr.readline()
+            retval = channel.recv_exit_status()
+
+            return retval, out, err
 
     def command_stream(self, cmd):
         """Run command and stream output line by line.
@@ -171,7 +185,7 @@ class Shell(object):
 
         """
         log.info("running command: '%s'", cmd)
-        stdout, stderr = self._command(cmd)
+        stdout, stderr, channel = self._command(cmd)
         line = stdout.readline()
         while line:
             yield line
@@ -270,7 +284,7 @@ class Shell(object):
                 # This hack tries to identify when such a thing is happening
                 # and then tries to connect with the username suggested in
                 # the prompt.
-                resp = self.command('uptime')
+                retval, resp = self.command('uptime')
                 new_ssh_user = None
                 if 'Please login as the user ' in resp:
                     new_ssh_user = resp.split()[5].strip('"')

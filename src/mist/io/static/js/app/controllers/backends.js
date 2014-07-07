@@ -23,7 +23,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             checkedMonitoring: false,
             checkingMonitoring: false,
 
-            loading: false,
+            loading: true,
             loadingImages: false,
             loadingMachines: false,
 
@@ -34,18 +34,12 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
              */
 
             load: function() {
-                var that = this;
-                this.set('loading', true);
-                Mist.ajax.GET('/backends', {
-                }).success(function(backends) {
-                    that._setContent(backends);
-                }).error(function() {
-                    that._reload();
-                }).complete(function() {
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
-            }.on('init'),
+                this._handleBackendsUpdates();
+                this._handleSizesUpdates();
+                this._handleImagesUpdates();
+                this._handleMachinesUpdates();
+                this._handleLocationsUpdates();
+            },
 
 
             /**
@@ -74,7 +68,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'machine_ip'  : apiKey,    // For bare-metal
                     'machine_user': apiSecret  // For bare-metal
                 }).success(function(backend) {
-                    that._addBackend(backend, key);
+                    //that._addBackend(backend, key);
                 }).error(function(message) {
                     Mist.notificationController.notify('Failed to add backend: ' + message);
                 }).complete(function(success, backend) {
@@ -133,23 +127,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
 
             probeMachine: function(machine, keyId, callback) {
-
                 // TODO: This should be moved inside machines controller
-
-                function loadToColor(load, cores) {
-                    var weightedLoad = load / cores;
-                    if (weightedLoad > 1.2) {
-                        return 'hot';
-                    } else if (weightedLoad > 0.8) {
-                        return 'warm';
-                    } else if (weightedLoad > 0.4) {
-                        return 'eco';
-                    } else if (weightedLoad > 0.1) {
-                        return 'cool';
-                    } else {
-                        return 'cold';
-                    }
-                }
 
                 if (!machine.id || machine.id == -1) return;
                 if (!machine.state == 'running') return;
@@ -169,52 +147,18 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/probe', {
                     'host': host,
                     'key': keyId
-                }).success(function(data) {
-                    if (!machine.backend || !machine.backend.enabled) return;
-                    if (data.uptime) {
-                        uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
-                        machine.set('uptimeChecked', Date.now());
-                        machine.set('uptimeFromServer', uptime);
-                        machine.set('probed', true);
-                    } else {
-                        machine.set('uptimeChecked', -Date.now());
-                    }
-                    machine.set('cores', data.cores);
-                    machine.set('users', data.users);
-                    if (data.pub_ips) {
-                        data.pub_ips.forEach(function (ip) {
-                            if (machine.public_ips instanceof Array)
-                                machine.public_ips.addObject(ip);
-                        });
-                        machine.notifyPropertyChange('public_ips');
-                    }
-                    if (data.priv_ips) {
-                        data.priv_ips.forEach(function (ip) {
-                            if (machine.private_ips instanceof Array)
-                                machine.private_ips.addObject(ip);
-                        });
-                        machine.notifyPropertyChange('private_ips');
-                    }
-                    if (data.loadavg) {
-                        machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
-                        machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
-                        machine.set('loadavg15', loadToColor(data.loadavg[2], data.cores));
-                    }
-                    machine.set('loadavg', data.loadavg);
-                    machine.set('loss', data.packets_loss);
-                    machine.set('latency', Math.floor(data.rtt_avg));
-                    that.trigger('onMachineProbe', machine, keyId);
+                }).success(function (data) {
+                    machine.probeSuccess(data);
                 }).error(function(message) {
                     if (!machine.backend || !machine.backend.enabled) return;
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success, data) {
                     if (!machine.backend || !machine.backend.enabled) return;
-                    if (key) {
+                    if (key)
                         key.set('probing', false);
-                    }
                     machine.set('probing', false);
                     that.trigger('onMachineProbe');
-                    if (callback) callback(!!uptime, data);
+                    if (callback) callback(!!data.uptime, data);
                 });
             },
 
@@ -289,20 +233,12 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
              *
              */
 
-            _reload: function() {
-                Ember.run.later(this, function() {
-                    this.load();
-                }, 2000);
-            },
-
 
             _setContent: function(backends) {
                 var that = this;
                 Ember.run(function() {
                     that.set('content', []);
                     backends.forEach(function(backend) {
-                        if (backend.provider == 'bare_metal')
-                            backend.isBareMetal = true;
                         that.content.pushObject(Backend.create(backend));
                     });
                     that.trigger('onBackendListChange');
@@ -405,6 +341,65 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     });
                     this.set('selectedMachines', newSelectedMachines);
                     this.trigger('onSelectedMachinesChange');
+                });
+            },
+
+
+            _handleBackendsUpdates: function () {
+                var that = this;
+                Mist.socket.on('list_backends', function (backends) {
+                    that._setContent(backends);
+                    that.set('loading', false);
+                    $('#splash').fadeOut(650); // TODO: Move this outa here
+                });
+            },
+
+
+            _handleSizesUpdates: function () {
+                var that = this;
+                Mist.socket.on('list_sizes', function (data) {
+                    var backend = that.getBackend(data.backend_id);
+                    if (backend) {
+                        backend.sizes._setContent(data.sizes);
+                        backend.sizes.set('loading', false);
+                    }
+                });
+            },
+
+
+            _handleImagesUpdates: function () {
+                var that = this;
+                Mist.socket.on('list_locations', function (data) {
+                    var backend = that.getBackend(data.backend_id);
+                    if (backend) {
+                        backend.locations._setContent(data.locations);
+                        backend.locations.set('loading', false);
+                        backend.set('loadingLocations', false);
+                    }
+                });
+            },
+
+
+            _handleMachinesUpdates: function () {
+                var that = this;
+                Mist.socket.on('list_images', function (data) {
+                    var backend = that.getBackend(data.backend_id);
+                    if (backend) {
+                        backend.images._setContent(data.images);
+                        backend.images.set('loading', false);
+                    }
+                });
+            },
+
+
+            _handleLocationsUpdates: function () {
+                var that = this;
+                Mist.socket.on('list_machines', function (data) {
+                    var backend = that.getBackend(data.backend_id);
+                    if (backend) {
+                        backend.machines._updateContent(data.machines);
+                        backend.machines.set('loading', false);
+                    }
                 });
             },
 

@@ -11,10 +11,12 @@ require.config({
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         sha256: 'lib/sha256',
+        socketio: 'lib/socket.io',
+        term: 'lib/term'
     },
     shim: {
         'ember': {
-            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256']
+            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term']
         },
         'd3': {
             deps: ['jquery']
@@ -152,11 +154,12 @@ define( 'app', [
 
     function initialize() {
 
+        warn('Init');
 
         // JQM init event
 
         $(document).bind('mobileinit', function() {
-            $('#splash').fadeOut(650);
+            warn('Mobile Init');
             $.mobile.ajaxEnabled = false;
             $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
@@ -166,8 +169,20 @@ define( 'app', [
             $('body').css('overflow','auto');
 
             App.set('isJQMInitialized',true);
-        });
 
+            initSocket();
+            setInterval(function() {
+                if (Mist.socket == undefined){
+                    warn('socket undefined! Initializing...');
+                    initSocket();
+                } else if (!Mist.socket.socket.connected){
+                    warn('Socket not connected! Connecting...');
+                    Mist.socket.socket.connect();
+                    // Emit ready in a little while
+                    setTimeout("Mist.socket.emit('ready')", 500);
+                }
+            }, 1000);
+        });
 
         // Hide error boxes on page unload
 
@@ -187,6 +202,7 @@ define( 'app', [
 
         // Globals
 
+        App.set('debugSocket', false);
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
         App.set('ajax', new AJAX(CSRF_TOKEN));
@@ -361,6 +377,14 @@ define( 'app', [
             ]
         });
 
+
+        App.TextArea = Ember.TextArea.extend({
+            autocapitalize: 'off',
+            attributeBindings: [
+                'data-theme',
+                'autocapitalize'
+            ]
+        });
         App.Checkbox = Ember.Checkbox.extend({
             attributeBindings: [
                 'data-mini'
@@ -462,7 +486,7 @@ define( 'app', [
         };
 
         App.isScrolledToBottom = function(){
-            var distanceToTop = $(document).height() - $(window).height()
+            var distanceToTop = $(document).height() - $(window).height();
             var top = $(document).scrollTop();
             return distanceToTop - top < 20;
         };
@@ -789,3 +813,94 @@ function completeShell(ret, command_id) {
     $('iframe#' + command_id).remove();
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
+
+function getTemplate(name) {
+    if (JS_BUILD || true) { // The "|| true" part is just for debuging as for now
+        //info('Getting precompiled template for: ' + name);
+        // Return precompiled template
+        return Ember.TEMPLATES[name + '/html'];
+    } else {
+        info('Compiling template for: ' + name);
+        return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
+    }
+};
+
+function initSocket() {
+    warn('Socket init');
+    var sock = undefined, retry = 0;
+    while (!sock) {
+        sock = io.connect('/mist');
+        retry += 1;
+        if (retry > 5){
+            alert('failed to connect after ' + retry + ' retries');
+            return false;
+        }
+    }
+
+    Mist.set('socket', sock);
+
+    Mist.socket.emit('ready');
+
+    var sockon = Mist.socket.on;
+    Mist.socket.on = function (event, callback)  {
+        var cb = callback;
+        callback = function (data) {
+            if (Mist.debugSocket)
+                info(data);
+            cb(data);
+        };
+        sockon.apply(Mist.socket, arguments);
+    };
+
+    Mist.keysController.load();
+    Mist.backendsController.load();
+
+    Mist.socket.on('probe', onProbe);
+    Mist.socket.on('ping', onProbe);
+    function onProbe(data) {
+        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        if (machine)
+            machine.probeSuccess(data.result);
+    }
+
+    Mist.socket.on('monitoring',function(data){
+        Mist.monitoringController._updateMonitoringData(data);
+        Mist.monitoringController.trigger('onMonitoringDataUpdate');
+        Mist.backendsController.set('checkedMonitoring', true);
+    });
+
+    Mist.socket.on('notify',function(data){
+        if (data.message) {
+            warn(data);
+            Mist.notificationController.set('msgHeader', data.title);
+            Mist.notificationController.set('msgPart1', data.message);
+            Mist.notificationController.showMessagebox();
+        } else {
+            Mist.notificationController.notify(data.title);
+        }
+
+    });
+
+    Mist.socket.on('stats', function(data){
+        Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop, data.requestID);
+    });
+}
+
+
+var virtualKeyboardHeight = function () {
+    var keyboardHeight = 0;
+
+    if (!Mist.term) return 0;
+
+    if (Mist.term.isIpad || Mist.term.isIphone){
+        var sx = document.body.scrollLeft, sy = document.body.scrollTop;
+        var naturalHeight = window.innerHeight;
+        window.scrollTo(sx, document.body.scrollHeight);
+        keyboardHeight = naturalHeight - window.innerHeight;
+        window.scrollTo(sx, sy);
+    } else if (Mist.term.isAndroid) {
+        keyboardHeight = 0;
+    }
+    return keyboardHeight;
+};
+

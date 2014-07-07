@@ -91,7 +91,7 @@ body {
 
 /* Text fields
 -----------------------------------------------------------------------------------------------------------*/
-#private-key, #manual-monitoring-popup textarea {
+textarea#private-key, #manual-monitoring-popup textarea {
     height: 75px !important;
 }
 
@@ -347,6 +347,27 @@ ul.checkbox-list li label {
     margin-top: 0px;
 }
 
+#message-box-popup {
+    width: auto !important;
+    max-width: 600px;
+}
+
+#message-box-popup h1 {
+    padding: 12px;
+}
+
+#message-box-popup p {
+    white-space: pre;
+    background: #444 !important;
+    color: rgb(240, 240, 240);
+    text-shadow: none;
+    font-family: monospace;
+    overflow: scroll;
+    max-height: 400px !important;
+    padding: 0 10px;
+}
+
+
 /* Confirmation popup
 -----------------------------------------------------------------------------------------------------------*/
 #confirmation-popup {
@@ -356,6 +377,11 @@ ul.checkbox-list li label {
 #confirmation-popup  .ok-cancel a,
 #confirmation-popup  .ok-cancel button {
     width: 127px !important;
+}
+
+.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
+    border-right-width: 2px;
+    margin-left: -1px;
 }
 
 #confirmation-popup p {

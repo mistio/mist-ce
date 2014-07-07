@@ -29,26 +29,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
 
             load: function(callback) {
-
                 if (!Mist.authenticated) {
                     Mist.backendsController.set('checkedMonitoring', true);
                     return;
                 }
-
-                var that = this;
-                this.set('checkingMonitoring', true);
-                Mist.ajax.GET('/monitoring', {
-                }).success(function(data) {
-                    that._updateMonitoringData(data);
-                }).error(function() {
-                    Mist.notificationController.notify(
-                        'Failed to get monitoring data');
-                }).complete(function(success, data) {
-                    that.set('checkingMonitoring', false);
-                    Mist.backendsController.set('checkedMonitoring', true);
-                    that.trigger('onMonitoringDataUpdate');
-                    if (callback) callback(success, data);
-                });
             }.on('init'),
 
 
@@ -264,8 +248,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     // Do the ajax call
 
                     this.requestID++;
-                    this.receiveData(this.timeStart, this.timeStop, this.step,
-                        this.callback);
+                    this.receiveDataFromSocket(this.timeStart, this.timeStop, this.step,
+                        this.callback, this.requestId);
 
                     // Check if Data Updates Are Enabled
                     if (this.updateData && !this.running){
@@ -287,7 +271,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
                             // Do the ajax call
                             self.requestID++;
-                            self.receiveData(self.timeStart, self.timeStop, self.step, self.callback);
+                            self.receiveDataFromSocket(self.timeStart, self.timeStop, self.step, self.callback, self.requestId);
 
                         }, this.step);
                     }
@@ -469,11 +453,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 *   @param {function} callback - The function that will be called when request has finished.
                 */
                 receiveData: function(start, stop, step, callback) {
-
-                    var requestID  = this.requestID;
-                    var controller = Mist.monitoringController;
                     var self = this;
-
                     $.ajax({
                         url: '/backends/' + self.machine.backend.id +
                              '/machines/' + self.machine.id + '/stats',
@@ -488,71 +468,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                         },
                         timeout: 8000,
                         success: function (metrics) {
-
-                            try {
-
-                                if (!Object.keys(metrics).length)
-                                    throw "No Data Received";
-
-                                var receivedData = {};
-                                var hasFirstData = false;
-
-                                for (var metricId in metrics) {
-
-                                    var metric = metrics[metricId];
-                                    var id = metricId;
-                                    metric.id = id;
-                                    metric = Metric.create(metric);
-
-                                    receivedData[id] = [];
-
-                                    metric.datapoints.forEach(function (datapoint) {
-
-                                        if (datapoint[1] > stop)
-                                            return;
-                                        if (datapoint[1] <= start)
-                                            return;
-                                        if (datapoint[0] != null)
-                                            hasFirstData = true;
-
-                                        receivedData[id].push({
-                                            time: new Date(datapoint[1]*1000),
-                                            value: datapoint[0]
-                                        });
-                                    });
-
-                                    metric.datapoints = receivedData[id];
-                                    Mist.monitoringController.graphs.addGraph(metric);
-                                }
-
-                                var metric = Object.keys(receivedData)[0];
-                                var datapoints = receivedData[metric];
-                                self.lastMetrictime = datapoints[datapoints.length - 1].time;
-
-                                if (self.machine.pendingFirstData)
-                                    self.machine.set('pendingFirstData', !hasFirstData);
-
-                                callback({
-                                    status: 'success',
-                                    data  : receivedData
-                                });
-                                $(document).trigger('finishedFetching', [
-                                    requestID,
-                                    'success'
-                                ]);
-
-                            } catch(err) {
-
-                                error(err);
-                                callback({
-                                    status: 'error',
-                                    error: err
-                                });
-                                $(document).trigger('finishedFetching', [
-                                    requestID,
-                                    'failure'
-                                ]);
-                            }
+                            self.updateMetrics(metrics, start, stop, callback);
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
 
@@ -572,7 +488,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                                 error: errorThrown
                             });
                             $(document).trigger('finishedFetching', [
-                                requestID,
+                                self.requestID,
                                 'failure'
                             ]);
                         },
@@ -585,6 +501,88 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     });
                 },
 
+                receiveDataFromSocket: function(start, stop, step, callback, requestID) {
+                    Mist.socket.statsCallback = callback;
+                    Mist.socket.emit('stats', this.machine.backend.id, this.machine.id, start, stop, step, requestID);
+                },
+
+                updateMetrics: function (metrics, start, stop, callback, requestID) {
+
+                    var controller = Mist.monitoringController;
+                    var self = this;
+
+                    if (callback == undefined && Mist.socket.statsCallback)
+                        callback = Mist.socket.statsCallback;
+                    else if (callback == undefined)
+                        callback = function(){};
+                    try {
+                        if (!Object.keys(metrics).length)
+                            throw "No Data Received";
+
+                        var receivedData = {};
+                        var hasFirstData = false;
+
+                        for (var metricId in metrics) {
+
+                            var metric = metrics[metricId];
+                            var id = metricId;
+                            metric.id = id;
+                            metric = Metric.create(metric);
+
+                            receivedData[id] = [];
+
+                            metric.datapoints.forEach(function (datapoint) {
+
+                                if (datapoint[1] > stop)
+                                    return;
+                                if (datapoint[1] <= start)
+                                    return;
+                                if (datapoint[0] != null)
+                                    hasFirstData = true;
+
+                                receivedData[id].push({
+                                    time: new Date(datapoint[1]*1000),
+                                    value: datapoint[0]
+                                });
+                            });
+
+                            metric.datapoints = receivedData[id];
+                            Mist.monitoringController.graphs.addGraph(metric);
+                        }
+
+                        var metric = Object.keys(receivedData)[0];
+                        var datapoints = receivedData[metric];
+                        if (datapoints[datapoints.length - 1] && datapoints[datapoints.length - 1].time)
+                            this.lastMetrictime = datapoints[datapoints.length - 1].time;
+
+                        if (this.machine && this.machine.pendingFirstData)
+                            this.machine.set('pendingFirstData', !hasFirstData);
+
+                        callback({
+                            status: 'success',
+                            data  : receivedData
+                        });
+                        $(document).trigger('finishedFetching', [
+                            requestID,
+                            'success'
+                        ]);
+
+                    } catch(err) {
+                        error(err);
+                        callback({
+                            status: 'error',
+                            error: err
+                        });
+                        $(document).trigger('finishedFetching', [
+                            requestID,
+                            'failure'
+                        ]);
+                    }
+                    if (self.machine) { // machine may not exist
+                        self.machine.set('pendingStats', false);
+                        self.locked = false;
+                    }
+                },
 
                 printInfo: function () {
                     console.log("Time Window    : " + (this.timeWindow / 1000) + " seconds");

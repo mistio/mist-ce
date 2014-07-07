@@ -107,7 +107,7 @@ define('app/models/graph', ['ember'],
                 // If metric doesn't have any datapoints, add one
                 if (!metric.datapoints.length)
                     metric.datapoints =
-                        [new Datapoint(prevTimestamp - step)];
+                        [new Datapoint(prevTimestamp - step)]; // BUG!!!
 
                 var datapoints = metric.datapoints;
                 var step = Mist.monitoringController.request.step;

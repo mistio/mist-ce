@@ -86,7 +86,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                 else
                     $('#single-machine-tags-btn').addClass('ui-state-disabled');
 
-                if (this.machine.probed && this.machine.state == 'running')
+                if (Mist.keysController.getMachineKeysCount(this.machine) && this.machine.state == 'running')
                     $('#single-machine-shell-btn').removeClass('ui-state-disabled');
                 else
                     $('#single-machine-shell-btn').addClass('ui-state-disabled');
@@ -310,7 +310,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                     this.machine.probe(null, function(success) {
                         if (!success)
                             Mist.notificationController.notify('Failed to probe machine');
-                    })
+                    });
                 },
 
 
@@ -439,13 +439,11 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             }.property('machine', 'machine.extra'),
 
-
             //
             //
             //  Observers
             //
             //
-
 
             modelObserver: function() {
                 Ember.run.once(this, 'load');
@@ -471,7 +469,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             checkedMonitoringObserver: function() {
                 Ember.run.once(this, 'updateMonitoringCollapsible');
-            }.observes('Mist.backendsController.checkedMonitoring', 'machine'),
+            }.observes('Mist.backendsController.checkedMonitoring', 'machine')
         });
     }
 );

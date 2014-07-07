@@ -161,3 +161,5 @@ def add_routes(config):
     config.add_route('rule', '/rules/{rule}')
     config.add_route('check_auth', '/auth')
     config.add_route('account', '/account')
+    
+    config.add_route('socketio', '/socket.io/*remaining')
