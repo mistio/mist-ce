@@ -1,7 +1,10 @@
 from behave import *
 from time import time, sleep
 
-from mist.io.tests.settings import CREDENTIALS
+try:
+    from mist.io.tests.settings import CREDENTIALS
+except ImportError:
+    pass
 
 
 @given(u'backends credentials')
