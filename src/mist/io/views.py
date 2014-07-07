@@ -926,7 +926,7 @@ def list_supported_providers(request):
     return {'supported_providers': config.SUPPORTED_PROVIDERS}
 
 
-@view_config(route_name='socketio')
+@view_config(route_name='socketio', renderer='json')
 def socketio(request):
     socketio_manage(request.environ,
                     namespaces={'/mist': MistNamespace,

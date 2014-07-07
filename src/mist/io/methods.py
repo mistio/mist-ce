@@ -35,6 +35,7 @@ from mist.io.exceptions import *
 
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish_user
+from mist.io.tasks import run_deploy_script
 from mist.io.tasks import ssh_command as async_ssh_command
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
@@ -654,7 +655,8 @@ def list_machines(user, backend_id):
 
 @core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
-                   image_id, size_id, script, image_extra, disk, image_name, size_name, location_name):
+                   image_id, size_id, script, image_extra, disk, image_name,
+                   size_name, location_name, ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -681,38 +683,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
 
-    if conn.type is Provider.DOCKER:
-        if key_id and key_id in user.keypairs:
-            keypair = user.keypairs[key_id]
-            public_key = keypair.public
-        else:
-            public_key = None
-
-        node = _create_machine_docker(conn, machine_name, image_id, script, public_key=public_key)
-
-        if key_id and key_id in user.keypairs:
-            node_info = conn.inspect_node(node)
-            try:
-                port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
-            except:
-                port = 22
-            associate_key(user, key_id, backend_id, node.id, port=int(port))
-
-        if script and public_key:
-            host = conn.connection.host
-            #consider public ip of docker server as container's ip too
-            #run script
-            ssh_command(user, backend_id=backend_id, machine_id=node.id, key_id=key_id, host=host,
-                        command=script, port=port)
-
-        return {
-            'id': node.id,
-            'name': node.name,
-            'extra': node.extra,
-            'public_ips': node.public_ips,
-            'private_ips': node.private_ips,
-        }
-
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
@@ -734,7 +704,15 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
 
-    if conn.type in [Provider.RACKSPACE_FIRST_GEN,
+    if conn.type is Provider.DOCKER:
+        node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
+        if key_id and key_id in user.keypairs:
+            node_info = conn.inspect_node(node)
+            try:
+                ssh_port = int(node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort'])
+            except:
+                pass
+    elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
         node = _create_machine_rackspace(conn, public_key, script, machine_name,
                                         image, size, location)
@@ -777,7 +755,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     else:
         raise BadRequestError("Provider unknown.")
 
-    associate_key(user, key_id, backend_id, node.id)
+    associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
     if script:
         from mist.io.tasks import run_deploy_script
@@ -1748,7 +1726,7 @@ def enable_monitoring(user, backend_id, machine_id,
         return ret_dict
     stdout = ''
     if not no_ssh:
-        async_ssh_command.delay(user, backend_id, machine_id, host, command)
+        async_ssh_command.delay(user.email, backend_id, machine_id, host, command)
 
     trigger_session_update(user.email, ['monitoring'])
 
@@ -1813,7 +1791,7 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
         "sleep 2; $sudo kill -9 `cat /opt/mistio-collectd/collectd.pid`"
     )
 
-    return async_ssh_command.delay(user, backend_id, machine_id, host, command)
+    async_ssh_command.delay(user.email, backend_id, machine_id, host, command)
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
@@ -1913,6 +1891,7 @@ def find_public_ips(ips):
 
 
 def notify_admin(title, message=""):
+    """ This will only work on a multi-user setup configured to send emails """
     try:
         from mist.core.helpers import send_email
         send_email(title, message, config.NOTIFICATION_EMAIL)
@@ -1921,14 +1900,16 @@ def notify_admin(title, message=""):
 
 
 def notify_user(user, title, message="", **kwargs):
-    try:
-        from mist.core.helpers import send_email
-        send_email(title, message, user.email)
-    except ImportError:
-        pass
+    # Notify connected user via amqp
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
     amqp_publish_user(user, routing_key='notify', data=payload)
+
+    try: # Send email in multi-user env
+        from mist.core.helpers import send_email
+        send_email("[mist.io] %s" % title, message, user.email)
+    except ImportError:
+        pass
 
 
 def find_metrics(user, backend_id, machine_id):
@@ -2119,7 +2100,7 @@ else
 fi
 if [ ! -f plugins/mist-python/include.conf ]; then
     echo "Generating plugins/mist-python/include.conf"
-    $sudo su -c 'echo -e "# Do not edit this file, unless you're looking for trouble.\n\n<LoadPlugin python>\n    Globals true\n</LoadPlugin>\n\n\n<Plugin python>\n    ModulePath \\"/opt/mistio-collectd/plugins/mist-python/\\"\n    LogTraces true\n    Interactive false\n</Plugin>\n" > plugins/mist-python/include.conf'
+    $sudo su -c 'echo -e "# Do not edit this file, unless you are looking for trouble.\n\n<LoadPlugin python>\n    Globals true\n</LoadPlugin>\n\n\n<Plugin python>\n    ModulePath \\"/opt/mistio-collectd/plugins/mist-python/\\"\n    LogTraces true\n    Interactive false\n</Plugin>\n" > plugins/mist-python/include.conf'
 else
     echo "plugins/mist-python/include.conf already exists, continuing"
 fi

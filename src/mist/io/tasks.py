@@ -1,7 +1,12 @@
 import json
+import functools
+import logging
+
+import libcloud.security
+
 from time import time
 from uuid import uuid4
-import functools
+
 from base64 import b64encode
 
 from memcache import Client as MemcacheClient
@@ -10,10 +15,6 @@ from celery import Task
 
 from amqp import Message
 from amqp.connection import Connection
-
-## from celery import logging
-
-import libcloud.security
 
 from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError
@@ -30,17 +31,19 @@ except ImportError:  # Standalone mist.io
     cert_path = "cacert.pem"
 
 from mist.io.helpers import amqp_publish_user
+from mist.io.helpers import amqp_user_listening
 from mist.io.helpers import amqp_log
 
 # libcloud certificate fix for OS X
 libcloud.security.CA_CERTS_PATH.append(cert_path)
 
-## log = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 @app.task
-def ssh_command(user, backend_id, machine_id, host, command,
+def ssh_command(email, backend_id, machine_id, host, command,
                       key_id=None, username=None, password=None, port=22):
+    user = user_from_email(email)
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
                                            key_id, username, password, port)
@@ -48,7 +51,7 @@ def ssh_command(user, backend_id, machine_id, host, command,
     shell.disconnect()
     if retval:
         from mist.io.methods import notify_user
-        notify_user(user, "[mist.io] Async command failed for machine %s (%s)" % (machine_id, host), output)
+        notify_user(user, "Async command failed for machine %s (%s)" % (machine_id, host), output)
 
 
 @app.task(bind=True, default_retry_delay=3*60)
@@ -81,7 +84,6 @@ def run_deploy_script(self, email, backend_id, machine_id, command,
             shell = Shell(host)
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
                                                    key_id, username, password, port)
-
             start_time = time()
             retval, output = shell.command(command)
             execution_time = time() - start_time
@@ -94,16 +96,18 @@ Output:
 %s""" % (command, retval, execution_time, output)
 
             if retval:
-                notify_user(user, "[mist.io] Deployment script failed for machine %s (%s)" % (node.name, node.id), msg)
+                notify_user(user, "Deployment script failed for machine %s (%s)" % (node.name, node.id), msg)
+                amqp_log("Deployment script failed for user %s machine %s (%s): %s" % (user, node.name, node.id, msg))
             else:
-                notify_user(user, "[mist.io] Deployment script succeeded for machine %s (%s)" % (node.name, node.id), msg)
+                notify_user(user, "Deployment script succeeded for machine %s (%s)" % (node.name, node.id), msg)
+                amqp_log("Deployment script succeeded for user %s machine %s (%s): %s" % (user, node.name, node.id, msg))
 
         except ServiceUnavailableError as exc:
             raise self.retry(exc=exc, countdown=60, max_retries=5)
     except Exception as exc:
         if str(exc).startswith('Retry'):
             return
-        print "Deploy task failed with exception %s" % repr(exc)
+        amqp_log("Deployment script failed for machine %s in backend %s by user %s after 5 retries: %s" % (node.id, backend_id, email, repr(exc)))
         notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
         notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
 
@@ -147,6 +151,17 @@ class UserTask(Task):
         seq_id = kwargs.pop('seq_id', '')
         id_str = json.dumps([self.task_key, args, kwargs])
         cache_key = b64encode(id_str)
+        cached_err = self.memcache.get(cache_key + 'error')
+        if cached_err:
+            # task has been failing recently
+            if seq_id != cached_err['seq_id']:
+                # other sequence of task already handling this error flow
+                return
+        if not amqp_user_listening(email):
+            # noone is waiting for result, stop trying, but flush cached erros
+            if cached_err:
+                self.memcache.delete(cache_key + 'error')
+            return
         # check cache to stop iteration if other sequence has started
         cached = self.memcache.get(cache_key)
         if cached:
@@ -159,12 +174,6 @@ class UserTask(Task):
             elif not seq_id and time() - cached['timestamp'] < self.result_fresh:
                 amqp_log("%s: fresh task submitted with fresh cached result "
                          ", dropping" % id_str)
-                return
-        cached_err = self.memcache.get(cache_key + 'error')
-        if cached_err:
-            # task has been failing recently
-            if seq_id != cached_err['seq_id']:
-                # other sequence of task already handling this error flow
                 return
         if not seq_id:
             # this task is called externally, not a rerun, create a seq_id

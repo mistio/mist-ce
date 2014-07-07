@@ -619,7 +619,7 @@ Terminal.fixIpad = function(document) {
   textarea.spellcheck = 'false';
 
   document.getElementsByTagName('body')[0].appendChild(textarea);
-  
+
   Terminal._textarea = textarea;
 
   setTimeout(function() {
@@ -649,39 +649,39 @@ Terminal.fixAndroid = function(document) {
   textarea.spellcheck = 'false';
 
   document.getElementsByTagName('body')[0].appendChild(textarea);
-  
+
   Terminal._textarea = textarea;
   Terminal.oldValue = '';
 
   setTimeout(function() {
     textarea.focus();
   }, 1000);
-         
+
   on(Terminal._textarea, 'keydown', function(ev){
-      console.log(ev);
+    // console.log(ev);
     if (Terminal._textarea.value == Terminal.oldValue)
       return true;
-        
+
     if (Terminal._textarea.value.length < Terminal.oldValue.length){
         for (var i=0; i<Terminal.oldValue.length-Terminal._textarea.value.length;i++){
-            Mist.term.send('\x08');            
+            Mist.term.send('\x08');
         }
     } else {
         for (var i=0; i<Terminal._textarea.value.length-Terminal.oldValue.length;i++){
             Mist.term.send(Terminal._textarea.value[Terminal.oldValue.length+i]);
-        }                      
+        }
     }
     Terminal.oldValue = Terminal._textarea.value;
-    
+
     // move to the end of the textarea
     var range = Terminal._textarea.createTextRange();
     range.collapse(false);
     range.select();
-    
+
     return true;
-  });   
+  });
 };
-       
+
 /**
  * Insert a default style
  */
@@ -2831,17 +2831,17 @@ Terminal.prototype.resize = function(x, y) {
           if (this.lines.length > y + this.ybase) {
             this.lines.pop();
           }
-          if (this.children.length > y) {             
+          if (this.children.length > y) {
             el = this.children.pop();
             if (!el) continue;
             el.parentNode.removeChild(el);
-          }          
-      } else {        
+          }
+      } else {
           if (this.lines.length > y + this.ybase) {
             this.lines.splice(0,1);
           }
           if (this.children.length > y) {
-              
+
             el = this.children[0];
             if (!el) continue;
             el.parentNode.removeChild(el);
@@ -2849,7 +2849,7 @@ Terminal.prototype.resize = function(x, y) {
           }
           this.y--;
       }
-      
+
     }
   }
   this.rows = y;

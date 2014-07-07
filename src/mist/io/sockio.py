@@ -35,22 +35,30 @@ from mist.io import methods
 from mist.io import tasks
 from mist.io.shell import Shell
 
+import logging
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s.%(msecs)d %(levelname)s %(module)s - %(funcName)s: %(message)s', 
+                    datefmt="%Y-%m-%d %H:%M:%S")
+
+log = logging.getLogger(__name__)
+
 
 class ShellNamespace(BaseNamespace):
     def initialize(self):
         self.user = user_from_request(self.request)
         self.channel = None
-        print "opening shell socket"
+        log.info("opening shell socket")
 
     def on_shell_open(self, data):
-        print "opened shell"
+        log.info("opened shell")
         self.shell = Shell(data['host'])
         key_id, ssh_user = self.shell.autoconfigure(self.user, data['backend_id'], data['machine_id'])
         self.channel = self.shell.ssh.invoke_shell('xterm')
         self.spawn(self.get_ssh_data)
 
     def on_shell_close(self):
-        print "closing shell"
+        log.info("closing shell")
         if self.channel:
             self.channel.close()
 
@@ -71,7 +79,7 @@ class ShellNamespace(BaseNamespace):
 
 class MistNamespace(BaseNamespace):
     def initialize(self):
-        print "init"
+        log.info("init")
         self.user = user_from_request(self.request)
         self.probes = {}
         self.channel = None
@@ -98,7 +106,7 @@ class MistNamespace(BaseNamespace):
         return new
 
     def on_ready(self):
-        print "Ready to go!"
+        log.info("Ready to go!")
         self.update_greenlet = self.spawn(update_subscriber, self)
 
         self.monitoring_greenlet = self.spawn_later(2, check_monitoring_from_socket, self)
@@ -125,7 +133,7 @@ class MistNamespace(BaseNamespace):
 
     def process_update(self, msg):
         routing_key = msg.delivery_info.get('routing_key')
-        print "Got %s" % routing_key
+        log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_machines', 'list_locations', 'ping']):
             self.emit(routing_key, msg.body)

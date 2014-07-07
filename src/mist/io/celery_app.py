@@ -22,10 +22,11 @@ app = Celery(
     include=['mist.io.tasks'],
 )
 
-## app.conf.update(
+app.conf.update(
+    CELERY_TASK_SERIALIZER = "json",
     ## CELERY_TASK_RESULT_EXPIRES=3600,
     ## CELERYD_CONCURRENCY=16,
-## )
+)
 
 if __name__ == '__main__':
     app.start()

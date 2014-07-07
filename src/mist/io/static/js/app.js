@@ -870,7 +870,15 @@ function initSocket() {
     });
 
     Mist.socket.on('notify',function(data){
-        Mist.notificationController.notify(data);
+        if (data.message) {
+            warn(data);
+            Mist.notificationController.set('msgHeader', data.title);
+            Mist.notificationController.set('msgPart1', data.message);
+            Mist.notificationController.showMessagebox();
+        } else {
+            Mist.notificationController.notify(data.title);
+        }
+
     });
 
     Mist.socket.on('stats', function(data){

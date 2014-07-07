@@ -158,11 +158,24 @@ class Shell(object):
         """
         log.info("running command: '%s'", cmd)
         stdout, stderr, channel = self._command(cmd, pty)
-        retval = channel.recv_exit_status()
+        line = stdout.readline()
+        out = ''
+        while line:
+            out += line
+            line = stdout.readline()
+            
         if pty:
-            return retval, stdout.read()
+            retval = channel.recv_exit_status()
+            return retval, out
         else:
-            return retval, stdout.read(), stderr.read()
+            line = stderr.readline()
+            err = ''
+            while line:
+                err += line
+                line = stderr.readline()
+            retval = channel.recv_exit_status()
+
+            return retval, out, err
 
     def command_stream(self, cmd):
         """Run command and stream output line by line.
