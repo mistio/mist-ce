@@ -170,27 +170,8 @@ define( 'app', [
 
             App.set('isJQMInitialized',true);
 
-            initSocket();
-            Mist.socket.on('connect', function () {
-                info('connected');
-            });
-            Mist.socket.on('disconnect', function () {
-                info('disconnected');
-            });
-            Mist.socket.on('connect_failed', function () {
-                info('failed to connect');
-            });
-            setInterval(function() {
-                if (Mist.socket == undefined){
-                    warn('socket undefined! Initializing...');
-                    initSocket();
-                } else if (!Mist.socket.socket.connected){
-                    warn('Socket not connected! Connecting...');
-                    Mist.socket.socket.connect();
-                    // Emit ready in a little while
-                    setTimeout("Mist.socket.emit('ready')", 500);
-                }
-            }, 1000);
+            Socket('/mist', initSocket);
+
         });
 
         // Hide error boxes on page unload
@@ -211,7 +192,7 @@ define( 'app', [
 
         // Globals
 
-        App.set('debugSocket', false);
+        App.set('debugSocket', true);
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
         App.set('ajax', new AJAX(CSRF_TOKEN));
@@ -458,6 +439,15 @@ define( 'app', [
 
         // Mist functions
 
+        App.prettyTime = function(date) {
+            var hour = date.getHours();
+            var min = date.getMinutes();
+            var sec = date.getSeconds();
+            return (hour < 10 ? '0' : '') + hour + ':' +
+                (min < 10 ? '0' : '') + min + ':' +
+                (sec < 10 ? '0' : '') + sec;
+        };
+
         App.getKeyIdByUrl = function() {
             return window.location.href.split('/')[5];
         };
@@ -657,6 +647,73 @@ define( 'app', [
     }
 
 
+    /**
+     *
+     *  Socket wrapper constructor
+     *
+     */
+
+    function Socket (namespace, initCallback) {
+
+        warn(namespace, 'initializing');
+
+        var socket;
+
+        function connect () {
+
+            if (socket !== undefined)
+                // Socket is initialized, but not connected
+                socket.socket.connect();
+            else
+                // Socket is not initialized nor connected
+                socket = io.connect(namespace);
+
+
+            if (socket === undefined) {
+                warn(namespace, 'failed to initialize');
+                reconnect();
+            } else if (!socket.socket.connected) {
+                warn(namespace, 'failed to connect');
+                reconnect();
+            } else {
+                warn(namespace, 'connected');
+                addEventHandlers();
+                addDebuggingWrapper();
+                initCallback(socket);
+            }
+        }
+
+        function addEventHandlers () {
+
+            // Reconnect if connection fails
+            socket.once('disconnect', function () {
+                warn(namepsace, 'disconnected');
+                reconnect();
+            });
+        }
+
+
+        function addDebuggingWrapper () {
+            var sockon = socket.on;
+            socket.on = function (event, callback)  {
+                var cb = callback;
+                callback = function (data) {
+                    if (Mist.debugSocket)
+                        info(Mist.prettyTime(new Date()), ' | ', namespace + '/' + event, data);
+                    cb(data);
+                };
+                sockon.apply(socket, arguments);
+            };
+        }
+
+        function reconnect () {
+            setTimeout(connect, 500);
+        }
+
+        connect();
+    }
+
+
     var allImgs = [],
         imgUrls = [],
         thisSheetRules;
@@ -823,32 +880,10 @@ function completeShell(ret, command_id) {
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
 
-function initSocket() {
-    warn('Socket init');
-    var sock = undefined, retry = 0;
-    while (!sock) {
-        sock = io.connect('/mist');
-        if (++retry > 5){
-            alert('failed to connect after ' + retry + ' retries');
-            return false;
-        }
-    }
+function initSocket(sock) {
 
     Mist.set('socket', sock);
-
     Mist.socket.emit('ready');
-
-    var sockon = Mist.socket.on;
-    Mist.socket.on = function (event, callback)  {
-        var cb = callback;
-        callback = function (data) {
-            if (Mist.debugSocket)
-                info(event, data);
-            cb(data);
-        };
-        sockon.apply(Mist.socket, arguments);
-    };
-
     Mist.keysController.load();
     Mist.backendsController.load();
 
