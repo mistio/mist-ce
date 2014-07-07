@@ -655,49 +655,51 @@ define( 'app', [
 
     function Socket (namespace, initCallback) {
 
-        warn(namespace, 'initializing');
-
         var socket;
         var initialized = false;
 
+        function init () {
+            if (!initialized) {
+                info(namespace, 'initializing');
+                handleDisconneciton();
+                addDebuggingWrapper();
+                initCallback(socket);
+            }
+            socket.emit('ready');
+            initialized = true;
+        };
+
         function connect () {
 
-            if (socket !== undefined)
-                // Socket is initialized, but not connected
-                socket.socket.connect();
-            else
-                // Socket is not initialized nor connected
-                socket = io.connect(namespace);
-
-
             if (socket === undefined) {
-                warn(namespace, 'failed to initialize');
+                socket = io.connect(namespace);
                 reconnect();
-            } else if (!socket.socket.connected) {
-                warn(namespace, 'failed to connect');
+            } else if (socket.socket.connected) {
+                info(namespace, 'connected');
+                init();
+            } else if (socket.socket.connecting) {
+                info(namespace, 'connecting');
                 reconnect();
             } else {
-                warn(namespace, 'connected');
-                addEventHandlers();
-                addDebuggingWrapper();
-                initCallback(socket, initialized);
-                initialized = true;
+                socket.socket.connect();
+                reconnect();
             }
         }
 
-        function addEventHandlers () {
+        function reconnect () {
+            setTimeout(connect, 500);
+        }
+
+        function handleDisconneciton () {
 
             // Reconnect if connection fails
-            socket.once('disconnect', function () {
+            socket.on('disconnect', function () {
                 warn(namespace, 'disconnected');
                 reconnect();
             });
         }
 
-
         function addDebuggingWrapper () {
-
-            if (initialized) return;
 
             // This process basically overrides the .on()
             // function to enable debugging info on every
@@ -728,10 +730,6 @@ define( 'app', [
                 // callback function
                 sockon.apply(socket, arguments);
             };
-        }
-
-        function reconnect () {
-            setTimeout(connect, 500);
         }
 
         connect();
@@ -904,60 +902,35 @@ function completeShell(ret, command_id) {
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
 
-function initSocket(sock, initialized) {
+function initSocket(sock) {
 
-    sock.emit('ready');
-
-    if (!initialized) {
-        Mist.set('socket', sock);
-        Mist.keysController.load();
-        Mist.backendsController.load();
-        Mist.socket.on('probe', onProbe);
-        Mist.socket.on('ping', onProbe);
-        Mist.socket.on('monitoring',function(data){
-            Mist.monitoringController._updateMonitoringData(data);
-            Mist.monitoringController.trigger('onMonitoringDataUpdate');
-            Mist.backendsController.set('checkedMonitoring', true);
-        });
-        Mist.socket.on('notify',function(data){
-            if (data.message) {
-                Mist.notificationController.set('msgHeader', data.title);
-                Mist.notificationController.set('msgPart1', data.message);
-                Mist.notificationController.showMessagebox();
-            } else {
-                Mist.notificationController.notify(data.title);
-            }
-        });
-        Mist.socket.on('stats', function(data){
-            Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop, data.requestID);
-        });
-    }
-    function onProbe(data) {
-        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
-        if (machine)
-            machine.probeSuccess(data.result);
-    }
+    Mist.set('socket', sock);
+    Mist.keysController.load();
+    Mist.backendsController.load();
+    Mist.socket.on('probe', onProbe);
+    Mist.socket.on('ping', onProbe);
     Mist.socket.on('monitoring',function(data){
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
         Mist.backendsController.set('checkedMonitoring', true);
     });
-
     Mist.socket.on('notify',function(data){
         if (data.message) {
-            warn(data);
             Mist.notificationController.set('msgHeader', data.title);
-            Mist.notificationController.set('msgCmd', data.message.substr(1));
+            Mist.notificationController.set('msgPart1', data.message);
             Mist.notificationController.showMessagebox();
         } else {
             Mist.notificationController.notify(data.title);
         }
-
     });
-
     Mist.socket.on('stats', function(data){
         Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop, data.requestID);
     });
+    function onProbe(data) {
+        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        if (machine)
+            machine.probeSuccess(data.result);
+    }
 }
 
 
