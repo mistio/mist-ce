@@ -29,7 +29,7 @@ define('app/views/machine_shell', ['app/views/popup', 'ember'],
 
                 this._super();
 
-                $('.ui-footer').hide(500);
+                $('.ui-footer').slideUp(500);
 
                 $(window).on('resize', function(){
                     var w, h, // Estimated width & height
@@ -82,7 +82,7 @@ define('app/views/machine_shell', ['app/views/popup', 'ember'],
             close: function () {
 
                 this._super();
-                $('.ui-footer').show(500);
+                $('.ui-footer').slideDown(500);
             },
 
 
