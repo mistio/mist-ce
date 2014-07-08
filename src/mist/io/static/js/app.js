@@ -195,7 +195,7 @@ define( 'app', [
 
         // Globals
 
-        App.set('debugSocket', true);
+        App.set('debugSocket', false);
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
         App.set('ajax', new AJAX(CSRF_TOKEN));
@@ -737,7 +737,7 @@ function Socket (args) {
     function init () {
         if (!initialized) {
             info(namespace, 'initializing');
-            handleDisconneciton();
+            handleDisconnection();
             addDebuggingWrapper();
             if (args.onInit instanceof Function)
                 args.onInit(socket);
@@ -767,7 +767,7 @@ function Socket (args) {
         setTimeout(connect, 500);
     }
 
-    function handleDisconneciton () {
+    function handleDisconnection () {
 
         // keep socket connections alive by default
         if (args.keepAlive !== undefined ? args.keepAlive : true) {
@@ -864,7 +864,7 @@ function initSocket(sock) {
     Mist.socket.on('notify',function(data){
         if (data.message) {
             Mist.notificationController.set('msgHeader', data.title);
-            Mist.notificationController.set('msgPart1', data.message);
+            Mist.notificationController.set('msgCmd', data.message.substr(1));
             Mist.notificationController.showMessagebox();
         } else {
             Mist.notificationController.notify(data.title);
