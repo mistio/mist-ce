@@ -90,8 +90,12 @@ CREDENTIALS = {
     'LINODE': {
         'username': "",
         'api_key': ""
+    },
+    'DOCKER': {
+        'host': ""
     }
 }
+
 #--------TEST USERS---------------
 #Email used for the docker mist.core instances
 #CORE_EMAIL = ""

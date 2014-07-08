@@ -20,6 +20,7 @@ Feature: Add second-tier backends
     | Rackspace DFW        | RACKSPACE    |
     | SoftLayer            | SOFTLAYER    |
     | NephoScale           | NEPHOSCALE   |
+    | Docker               | DOCKER       |
     | HP Cloud US East     | HP           |
 
     @backend-actions
