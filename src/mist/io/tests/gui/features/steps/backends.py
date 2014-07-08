@@ -94,6 +94,12 @@ def backend_creds(context, backend):
         username_input.send_keys(context.credentials['NEPHOSCALE']['username'])
         api_key_input = context.browser.find_element_by_id("new-backend-second-field")
         api_key_input.send_keys(context.credentials['NEPHOSCALE']['password'])
+    elif "LINODE" in backend:
+        username_input = context.browser.find_element_by_id("new-backend-first-field")
+        username_input.send_keys(context.credentials['LINODE']['username'])
+        api_key_input = context.browser.find_element_by_id("new-backend-second-field")
+        api_key_input.send_keys(context.credentials['LINODE']['api_key'])
+
 
 @when(u'I rename the backend to "{new_name}"')
 def rename_backend(context, new_name):

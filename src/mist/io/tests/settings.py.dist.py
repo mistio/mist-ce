@@ -82,6 +82,14 @@ CREDENTIALS = {
         'username': "",
         'password': "",
         'tenant': ""
+    },
+    'NEPHOSCALE': {
+        'username': "",
+        'password': ""
+    },
+    'LINODE': {
+        'username': "",
+        'api_key': ""
     }
 }
 #--------TEST USERS---------------
