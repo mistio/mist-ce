@@ -21,6 +21,7 @@
 import os
 from sys import platform as _platform
 
+
 BASE_DIR = os.getcwd()
 TEST_DIR = os.path.join(BASE_DIR, 'src/mist/io/tests')
 
