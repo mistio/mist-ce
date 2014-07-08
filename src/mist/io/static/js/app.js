@@ -195,7 +195,7 @@ define( 'app', [
 
         // Globals
 
-        App.set('debugSocket', true);
+        App.set('debugSocket', false);
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
         App.set('ajax', new AJAX(CSRF_TOKEN));
@@ -925,7 +925,7 @@ function initSocket(sock) {
     Mist.socket.on('notify',function(data){
         if (data.message) {
             Mist.notificationController.set('msgHeader', data.title);
-            Mist.notificationController.set('msgPart1', data.message);
+            Mist.notificationController.set('msgCmd', data.message.substr(1));
             Mist.notificationController.showMessagebox();
         } else {
             Mist.notificationController.notify(data.title);
