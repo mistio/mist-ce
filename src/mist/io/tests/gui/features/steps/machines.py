@@ -9,7 +9,7 @@ from random import randrange
 @when(u'I fill in a random machine name')
 def fill_machine_mame(context):
     textfield = context.browser.find_element_by_id("create-machine-name")
-    random_name = "TESTLIKEAPRO" + str(randrange(10000))
+    random_name = "testlikeapro" + str(randrange(10000))
     for letter in random_name:
         textfield.send_keys(letter)
     context.random_name = random_name
