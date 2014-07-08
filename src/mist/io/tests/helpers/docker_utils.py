@@ -84,12 +84,15 @@ def docker_all_in_one(flavor, environment={}):
 
     image = select_image(node, flavor)
 
+    environment = {
+        'BRANCH': "staging"
+    }
     container = create_container(node, image, environment=environment)
 
     start_container(node, container)
 
     all_in_one = {
-        'URL': get_mist_uri(node, container, port="6543"),
+        'URL': get_mist_uri(node, container, port="8000"),
         'node': node,
         'container': container
     }

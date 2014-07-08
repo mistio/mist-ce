@@ -1,12 +1,28 @@
 from behave import *
 from time import time, sleep
 
+try:
+    from mist.io.tests.settings import LOCAL
+except ImportError:
+    LOCAL = True
+    pass
 
 @when(u'I visit mist.io')
 def visit(context):
-    end_time = time() + 60
-    context.browser.get(context.mist_url)
-    splash_loadout(context)
+    if not LOCAL:
+        end_time = time() + 120
+
+        while time() < end_time:
+            try:
+                context.browser.get(context.mist_url)
+                splash_loadout(context)
+                return
+            except:
+                sleep(5)
+    else:
+        end_time = time() + 60
+        context.browser.get(context.mist_url)
+        splash_loadout(context)
 
 
 @when(u'I wait for {seconds} seconds')

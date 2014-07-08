@@ -34,8 +34,3 @@ Feature: Actions for Keys
     And I click the "Delete" button
     And I click the "Yes" button
     Then "RenamedFirstKey" key should be deleted
-
-  @key-association
-  Scenario: Key association to machine
-    Given backends credentials
-    Given "EC2 AP NORTHEAST" backend added
