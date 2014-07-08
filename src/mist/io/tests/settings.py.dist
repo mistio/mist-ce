@@ -34,6 +34,8 @@ TEST_DIR = os.path.join(BASE_DIR, 'src/mist/io/tests')
 #selenium hub
 LOCAL = True
 DEBUG = False
+BROWSER_LOCAL = True
+
 #If LOCAL == False, you have to provide the selenium-hub
 selenium_hub = ""
 
