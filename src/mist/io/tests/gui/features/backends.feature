@@ -5,7 +5,7 @@ Feature: Add second-tier backends
     Given backends credentials
     When I visit mist.io
 
-  @faseika-backend
+  @all-backends
   Scenario Outline:
     When I click the "Add backend" button
     And I click the button that contains "Select provider"
@@ -18,6 +18,7 @@ Feature: Add second-tier backends
     | provider             | credentials  |
     | Rackspace DFW        | RACKSPACE    |
     | SoftLayer            | SOFTLAYER    |
+    | NephoScale           | NEPHOSCALE   |
     | HP Cloud US East     | HP           |
 
     @backend-actions

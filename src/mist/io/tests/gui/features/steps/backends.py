@@ -41,6 +41,8 @@ def given_backend(context, backend):
         creds = "HP"
     elif "ec2" in backend.lower():
         creds = "EC2"
+    elif "nepho" in backend.lower():
+        creds = "NEPHOSCALE"
     else:
         assert False, u'Could not find credentials for %s' % backend
 
@@ -87,6 +89,11 @@ def backend_creds(context, backend):
         api_key_input.send_keys(context.credentials['EC2']['api_key'])
         api_secret_input = context.browser.find_element_by_id("new-backend-second-field")
         api_secret_input.send_keys(context.credentials['EC2']['api_secret'])
+    elif "NEPHOSCALE" in backend:
+        username_input = context.browser.find_element_by_id("new-backend-first-field")
+        username_input.send_keys(context.credentials['NEPHOSCALE']['username'])
+        api_key_input = context.browser.find_element_by_id("new-backend-second-field")
+        api_key_input.send_keys(context.credentials['NEPHOSCALE']['password'])
 
 @when(u'I rename the backend to "{new_name}"')
 def rename_backend(context, new_name):
