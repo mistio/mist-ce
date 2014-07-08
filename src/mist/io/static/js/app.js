@@ -406,39 +406,6 @@ define( 'app', [
                 }
             }
         });
-        App.ShellTextField = App.TextField.extend({
-
-            keyDown: function(event, view) {
-                var keyCode = event.keyCode;
-                var commandHistoryIndex = Mist.machineShellController.commandHistoryIndex;
-                var commandHistory = Mist.machineShellController.machine.commandHistory;
-                switch (keyCode) {
-                    case 38: // Up
-                        if (commandHistoryIndex < commandHistory.length - 1) {
-                            commandHistoryIndex++;
-                        }
-                        Mist.machineShellController.set('command', commandHistory[commandHistoryIndex].command);
-                        Mist.machineShellController.set('commandHistoryIndex', commandHistoryIndex);
-                        break;
-                    case 40: // Down
-                        if (commandHistoryIndex >= 0) {
-                            commandHistoryIndex--;
-                        }
-                        if (commandHistoryIndex >= 0) {
-                            Mist.machineShellController.set('command', commandHistory[commandHistoryIndex].command);
-                        } else if (commandHistoryIndex == -1) {
-                            Mist.machineShellController.set('command', '');
-                        }
-                        Mist.machineShellController.set('commandHistoryIndex', commandHistoryIndex);
-                        break;
-                    case 13: // Enter
-                        Mist.machineShellController.submit();
-                        break;
-                }
-                if (keyCode == 38 || keyCode == 40 && event.preventDefault) // Up or Down
-                    event.preventDefault();
-            }
-        });
 
         // Mist functions
 
@@ -882,7 +849,6 @@ function error() {
         }
     } catch(err) {console.log(err);}
 }
-
 
 function initSocket(sock) {
 
