@@ -770,7 +770,7 @@ function Socket (args) {
     function init () {
         if (!initialized) {
             info(namespace, 'initializing');
-            handleDisconneciton();
+            handleDisconnection();
             addDebuggingWrapper();
             if (args.onInit instanceof Function)
                 args.onInit(socket);
@@ -800,7 +800,7 @@ function Socket (args) {
         setTimeout(connect, 500);
     }
 
-    function handleDisconneciton () {
+    function handleDisconnection () {
 
         // keep socket connections alive by default
         if (args.keepAlive !== undefined ? keepAlive : true) {
