@@ -37,22 +37,11 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 if (host == '')
                     return false;
 
-                // Open shell socket, give it a few shots
-                var sock = undefined, retry = 0;
-                while (sock == undefined) {
-                    if (retry) {
-                        warn('retry ' + retry);
-                    }
-
-                    sock = io.connect('/shell');
-                    retry += 1;
-                    if (retry > 5){
-                        warn('failed to connect to shell socket after ' + retry + ' retries');
-                        return false;
-                    }
-                }
-
-                Mist.set('shell', sock);
+                // Open shell socket
+                Mist.set('shell', Socket({
+                    namespace: '/shell',
+                    keepAlive: false,
+                }));
 
                 $('.ui-footer').hide(500);
                 $('#machine-shell-popup').on('popupafteropen',
