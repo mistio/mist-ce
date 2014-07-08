@@ -884,33 +884,6 @@ function error() {
 }
 
 
-function appendShell(output, command_id) {
-
-    var machine = Mist.machineShellController.machine;
-
-    if (!machine) return;
-
-    var command = machine.commandHistory.findBy('id', command_id);
-
-    if (!command) return;
-
-    // Replace break with new line
-    var output = output.trim().replace('<br/>', String.fromCharCode(13));
-
-    if (output.length)
-        warn(Date() + ': ' + output);
-
-    command.set('response', command.response + output);
-    Ember.run.next(function(){
-        $('.output').scrollTop(1000000);
-    });
-}
-
-function completeShell(ret, command_id) {
-    $('iframe#' + command_id).remove();
-    Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
-}
-
 function initSocket(sock) {
 
     Mist.keysController.load();
