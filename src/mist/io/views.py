@@ -264,7 +264,7 @@ def toggle_backend(request):
     with user.lock_n_load():
         user.backends[backend_id].enabled = bool(int(new_state))
         user.save()
-    trigger_session_update(user.email, [])
+    trigger_session_update(user.email, ['backends'])
     return OK
 
 
