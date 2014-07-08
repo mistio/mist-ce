@@ -25,7 +25,7 @@ define('app/views/machine_shell', ['app/views/popup', 'ember'],
                         $('#machine-shell').off('blur');
                         $(document).off('focusin');
                     }
-                ).popup( "option", "dismissible", false );
+                );
 
                 this._super();
 
