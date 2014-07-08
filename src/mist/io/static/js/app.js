@@ -803,7 +803,7 @@ function Socket (args) {
     function handleDisconneciton () {
 
         // keep socket connections alive by default
-        if (args.keepAlive !== undefined ? keepAlive : true) {
+        if (args.keepAlive !== undefined ? args.keepAlive : true) {
             // Reconnect if connection fails
             socket.on('disconnect', function () {
                 warn(namespace, 'disconnected');
