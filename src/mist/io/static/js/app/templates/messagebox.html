@@ -1,17 +1,31 @@
+<div id="message-box-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-a"></div>
+<div id="message-box-popup-popup"
+     class="ui-popup-container ui-popup-hidden large-popup ui-body-a ui-corner-all">
 
-    <div id="message-box-popup" class="large-popup" data-role="popup" data-overlay-theme="a" data-transition="flip"
-                                                                                            data-dismissible="false">
-        <div data-role="header">
-            <h1>{{Mist.notificationController.msgHeader}}</h1>
+    <div id="message-box-popup"
+         class="ui-popup ui-corner-all ui-overlay-shadow large-popup"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip"
+         data-dismissible="false">
+
+        <div class="ui-header ui-bar-b">
+            <h1 class="ui-title">{{Mist.notificationController.msgHeader}}</h1>
         </div>
-        <div data-role="content" data-theme="c">
+        <div class="ui-content">
+
             <p>{{Mist.notificationController.msgPart1}}</p>
             <p>{{Mist.notificationController.msgPart2}}</p>
             <p>{{Mist.notificationController.msgPart3}}</p>
+            {{#if Mist.notificationController.msgCmd}}
+            <p id="message-cmd">{{Mist.notificationController.msgCmd}}</p>
+            {{/if}}
             <p id="message-ps">{{Mist.notificationController.msgPart4}}</p>
             <a id="message-link" target="_blank">
                 {{Mist.notificationController.msgLink}}
             </a>
+            <a class="ui-btn ui-btn-a ui-corner-all"
+                {{action "closeMessage" target="view"}}>OK</a>
         </div>
-        <button {{action "closeMessage" target="view"}}>OK</button>
     </div>
+</div>

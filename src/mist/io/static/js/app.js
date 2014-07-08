@@ -178,8 +178,8 @@ define( 'app', [
                 } else if (!Mist.socket.socket.connected){
                     warn('Socket not connected! Connecting...');
                     Mist.socket.socket.connect();
-                    if (Mist.socket.socket.connected)
-                        Mist.socket.emit('ready');
+                    // Emit ready in a little while
+                    setTimeout("Mist.socket.emit('ready')", 500);
                 }
             }, 1000);
         });
@@ -873,7 +873,7 @@ function initSocket() {
         if (data.message) {
             warn(data);
             Mist.notificationController.set('msgHeader', data.title);
-            Mist.notificationController.set('msgPart1', data.message);
+            Mist.notificationController.set('msgCmd', data.message.substr(1));
             Mist.notificationController.showMessagebox();
         } else {
             Mist.notificationController.notify(data.title);
