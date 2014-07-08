@@ -36,13 +36,14 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
                 // Get the first ipv4 public ip to connect to
                 var host = '';
-                for (var i=0;i<machine.public_ips.length;i++){
-                    if (machine.public_ips[i].search(':') == -1){
-                        host = machine.public_ips[i];
-                    }
+                machine.public_ips.forEach(function (ip) {
+                    if (ip.search(':') == -1)
+                        host = ip;
+                });
+                if (!host) {
+                    this.close();
+                    return;
                 }
-                if (host == '')
-                    return false;
 
                 // Open shell socket
                 Mist.set('shell', Socket({
@@ -55,7 +56,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                   rows: 24,
                   screenKeys: true
                 });
-
 
                 term.on('data', function(data) {
                     Mist.shell.emit('shell_data', data);
@@ -102,12 +102,10 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 this.view.close();
                 Mist.shell.emit('shell_close');
                 Mist.term.destroy();
-                Mist.shell.disconnect(); // TODO: Fix me
-                $(window).off('resize');
+                Mist.shell.disconnect();
                 this._clear();
                 if (Terminal._textarea)
                     $(Terminal._textarea).hide();
-
             },
 
 
