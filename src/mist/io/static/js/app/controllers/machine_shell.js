@@ -31,7 +31,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
             open: function (machine) {
                 this._clear();
-                this.view.open();
                 this.set('machine', machine);
 
                 // Get the first ipv4 public ip to connect to
@@ -95,17 +94,20 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                     }
                     $(Terminal._textarea).show();
                 }
+                this.view.open();
             },
 
             close: function () {
                 warn('closing shell');
                 this.view.close();
-                Mist.shell.emit('shell_close');
-                Mist.term.destroy();
-                Mist.shell.disconnect();
-                this._clear();
-                if (Terminal._textarea)
-                    $(Terminal._textarea).hide();
+                Ember.run.later(this, function () {
+                    Mist.shell.emit('shell_close');
+                    Mist.term.destroy();
+                    Mist.shell.disconnect();
+                    this._clear();
+                    if (Terminal._textarea)
+                        $(Terminal._textarea).hide();
+                }, 500);
             },
 
 
