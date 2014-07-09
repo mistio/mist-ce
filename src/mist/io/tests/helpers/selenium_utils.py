@@ -2,15 +2,18 @@ from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 try:
-    from mist.io.tests.settings import selenium_hub, LOCAL, CHROMEDRIVER_PATH, PHANTOMJS_PATH, BROWSER_LOCAL
+    from mist.io.tests.settings import selenium_hub, LOCAL, CHROMEDRIVER_PATH, PHANTOMJS_PATH, BROWSER_LOCAL, BROWSER_FLAVOR
 except ImportError:
     pass
 
 
-def choose_driver(flavor="chrome"):
+def choose_driver(flavor="firefox"):
     """
     Returns an instant of a remote selenium driver
     """
+
+    if BROWSER_FLAVOR:
+        flavor = BROWSER_FLAVOR
 
     if BROWSER_LOCAL:
         if flavor == "firefox":
