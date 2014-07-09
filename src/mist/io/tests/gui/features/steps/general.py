@@ -21,8 +21,13 @@ def visit(context):
                 sleep(5)
     else:
         end_time = time() + 60
-        context.browser.get(context.mist_url)
-        splash_loadout(context)
+        while time() < end_time:
+            try:
+                context.browser.get(context.mist_url)
+                splash_loadout(context)
+                return
+            except:
+                sleep(5)
 
 
 @when(u'I wait for {seconds} seconds')
