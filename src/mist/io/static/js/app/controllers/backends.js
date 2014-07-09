@@ -235,12 +235,34 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
 
             _setContent: function(backends) {
+                this._updateContent(backends);
+            },
+
+
+            _updateContent: function (backends) {
                 var that = this;
-                Ember.run(function() {
-                    that.set('content', []);
-                    backends.forEach(function(backend) {
-                        that.content.pushObject(Backend.create(backend));
-                    });
+                Ember.run(this, function() {
+
+                    // Remove deleted backends
+                    this.content.forEach(function (backend) {
+                        if (!backends.findBy('id', backend.id))
+                            this.content.removeObject(backend);
+                    }, this);
+
+                    backends.forEach(function (backend) {
+
+                        var oldBackend = this.getBackend(backend.id);
+
+                        if (oldBackend)
+                            // Update existing backend properties
+                            forIn(backend, function (value, property) {
+                                oldBackend.set(property, value);
+                            });
+                        else
+                            // Add new backend
+                            this._addBackend(backend);
+                    }, this);
+
                     that.trigger('onBackendListChange');
                 });
             },

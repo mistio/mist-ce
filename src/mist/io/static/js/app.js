@@ -959,3 +959,15 @@ var virtualKeyboardHeight = function () {
     return keyboardHeight;
 };
 
+// forEach like function on objects
+function forIn () {
+
+    var object = arguments[arguments.length - 2];
+    var callback = arguments[arguments.length - 1];
+    var thisArg = arguments.length == 3 ? arguments[0] : undefined;
+
+    var keys = Object.keys(object);
+    var keysLength = keys.length;
+    for (var i = 0; i < keysLength; i++)
+        callback.call(thisArg, object[keys[i]], keys[i]);
+};
