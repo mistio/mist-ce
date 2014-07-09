@@ -33,7 +33,6 @@ define('app/controllers/rule_edit', ['ember'],
                 this.clear();
                 this.set('rule', rule)
                     .set('callback', callback);
-
                 this.view.open(option);
             },
 

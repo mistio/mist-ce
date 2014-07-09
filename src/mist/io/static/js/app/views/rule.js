@@ -46,6 +46,11 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                 },
 
 
+                openAdvancedPopup: function () {
+                    Mist.ruleEditController.open(this.rule, 'advanced');
+                },
+
+
                 deleteRuleClicked: function () {
                     Mist.rulesController.deleteRule(this.rule);
                 },

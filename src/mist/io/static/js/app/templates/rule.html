@@ -29,6 +29,9 @@
             {{actionToTake}}
     </a>
 
+    <a class="ui-btn ui-btn-icon-notext ui-btn-inline ui-icon-gear ui-corner-all"
+        {{action "openAdvancedPopup" target="view"}}>&nbsp;</a>
+
     {{#if pendingAction}}
         <div class="ajax-loader"></div>
     {{else}}
