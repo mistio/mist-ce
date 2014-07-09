@@ -742,7 +742,6 @@ function Socket (args) {
             if (args.onInit instanceof Function)
                 args.onInit(socket);
         }
-        socket.emit('ready');
         initialized = true;
     };
 
@@ -852,6 +851,7 @@ function error() {
 
 function initSocket(sock) {
 
+    socket.emit('ready');
     Mist.keysController.load();
     Mist.backendsController.load();
     Mist.socket.on('probe', onProbe);
