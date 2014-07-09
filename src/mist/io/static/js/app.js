@@ -851,7 +851,7 @@ function error() {
 
 function initSocket(sock) {
 
-    socket.emit('ready');
+    sock.emit('ready');
     Mist.keysController.load();
     Mist.backendsController.load();
     Mist.socket.on('probe', onProbe);
