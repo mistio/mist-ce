@@ -4,7 +4,9 @@ init_vars() {
 BASE_DIR=`pwd`
 BUILD_DIR=${BASE_DIR}/var/tmp/build
 RJS_EXEC=${BUILD_DIR}/r.js/r.js
+CURRENT_BRANCH=$(git branch | awk '/\*/ { print $2; }')
 time_now=`date +"%s"`
+
 }
 
 install_rjs() {
@@ -32,6 +34,8 @@ build_app(){
 cd ${BASE_DIR}
 files=`ls -1tr src/mist/io/static/build/mist-*`
 node ${RJS_EXEC} -o src/mist/io/static/app.build.js out=src/mist/io/static/build/mist-${time_now}.js
+diff src/mist/io/static/build/mist-$time_now.js src/mist/io/static/build/mist.js
+
 }
 
 init_vars
@@ -39,3 +43,5 @@ init_vars
 install_rjs
 
 build_templates
+
+build_app
