@@ -1,107 +1,41 @@
 #!/bin/bash
 
-install_rjs () {
+init_vars() {
+BASE_DIR=`pwd`
+BUILD_DIR=${BASE_DIR}/var/tmp/build
+RJS_EXEC=${BUILD_DIR}/r.js/r.js
+time_now=`date +"%s"`
+}
+
+install_rjs() {
 
 mkdir -p var/tmp/build
-
-cd $BUILD_DIR
+cd ${BUILD_DIR}
 
 if [ -d r.js ]; then
-    echo "already cloned"
+    echo "R.js already cloned"
 else
     git clone https://github.com/jrburke/r.js
 fi
 cd r.js
 node dist.js
-cd $BASE_DIR
-
+cd ${BASE_DIR}
 }
 
-precompile_templates() {
-
+build_templates() {
+cd ${BASE_DIR}
 ./scripts/hcomp.sh $(pwd)
-
+cd ${BASE_DIR}
 }
 
-build_app() {
-
+build_app(){
+cd ${BASE_DIR}
 files=`ls -1tr src/mist/io/static/build/mist-*`
-
-node $RJS_EXEC -o src/mist/io/static/app.build.js out=src/mist/io/static/build/mist-$time_now.js
-diff src/mist/io/static/build/mist-$time_now.js src/mist/io/static/build/mist.js
-
-if [ $? == 0 ]
-then
-    rm src/mist/io/static/build/mist-$time_now.js
-else
-    mv src/mist/io/static/build/mist-$time_now.js src/mist/io/static/build/mist.js
-
-    for x in $files
-    do
-      git rm -f $x | echo "Not added in git repo"
-    done
-
-    cd src/mist/io/static/build/
-    ln -sf mist.js mist-$time_now.js
-    cd -
-fi
+node ${RJS_EXEC} -o src/mist/io/static/app.build.js out=src/mist/io/static/build/mist-${time_now}.js
 }
 
-
-build_css(){
-echo "Uglyfying css"
-files=`ls -1tr src/mist/io/static/mist-*.css`
-
-node $RJS_EXEC -o src/mist/io/static/css.build.js out=src/mist/io/static/mist-$time_now.css
-
-diff src/mist/io/static/mist-$time_now.css src/mist/io/static/mist.css
-
-if [ $? == 0 ]
-then
-    rm src/mist/io/static/mist-$time_now.css
-else
-    mv src/mist/io/static/mist-$time_now.css src/mist/io/static/mist.css
-
-    for x in $files
-    do
-      git rm -f $x | echo "Not added in git repo"
-    done
-
-    cd src/mist/io/static/
-    ln -sf mist.css mist-$time_now.css
-    cd -
-fi
-}
-
-BASE_DIR=`pwd`
-BUILD_DIR=${BASE_DIR}/var/tmp/build
-RJS_EXEC=${BUILD_DIR}/r.js/r.js
-CURRENT_BRANCH=$(git branch | awk '/\*/ { print $2; }')
-time_now=`date +"%s"`
+init_vars
 
 install_rjs
 
-precompile_templates
-
-build_app
-
-build_css
-
-git add src/mist/io/static/build/mist-$time_now.js
-
-git add src/mist/io/static/mist-$time_now.css
-
-git status |grep mist\.
-ret=$?
-echo "ret = $ret"
-if [ x$ret = x'0' ]; then
-
-    sed s/\.\.\\/build\\/mist.*/\.\.\\/build\\/mist-$time_now\"/g -i src/mist/io/templates/home.pt
-    sed s/resources\\/mist.*/resources\\/mist-$time_now\.css\"/g -i src/mist/io/templates/home.pt
-    echo "WILL PUSH"
-    git commit -a -m "Automated build of mist.js & mist.css "
-    git push -u origin $CURRENT_BRANCH
-else
-    echo "Already committed"
-    git stash
-fi
+build_templates
