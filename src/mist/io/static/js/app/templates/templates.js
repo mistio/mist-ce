@@ -2711,18 +2711,10 @@ function program7(depth0,data) {
 Ember.TEMPLATES["machine_shell/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', hashTypes, hashContexts, escapeExpression=this.escapeExpression;
+  var buffer = '', hashContexts, hashTypes, escapeExpression=this.escapeExpression;
 
 
-  data.buffer.push("<div id=\"machine-shell-popup\"\n     class=\"huge-popup\"\n     data-role=\"popup\"\n     data-theme=\"b\"\n     data-overlay-theme=\"b\"\n     data-transition=\"slideup\">\n\n    <div data-role=\"header\">\n        <h1>");
-  hashTypes = {};
-  hashContexts = {};
-  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.machineShellController.machine.user", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("@\n            ");
-  hashTypes = {};
-  hashContexts = {};
-  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.machineShellController.machine.name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</h1>\n    </div>\n\n    <div data-role=\"content\">\n        <div id=\"shell-return\" data-theme=\"a\">\n            <span class=\"fontSizeTest\">-</span>\n\n        </div>\n        <div class=\"ui-grid-a shell-back\">\n            <a data-role=\"button\"\n               data-theme=\"a\"\n               ");
+  data.buffer.push("<div id=\"machine-shell\"\n     class=\"huge-popup\"\n     data-role=\"popup\"\n     data-theme=\"b\"\n     data-dismissible=\"false\"\n     data-overlay-theme=\"b\"\n     data-transition=\"slideup\">\n\n    <div data-role=\"content\">\n        <div id=\"shell-return\" data-theme=\"a\">\n            <span class=\"fontSizeTest\">-</span>\n\n        </div>\n        <div class=\"ui-grid-a shell-back\">\n            <a data-role=\"button\"\n               data-theme=\"a\"\n               ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
