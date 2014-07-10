@@ -1797,6 +1797,9 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     """Ping and SSH to machine and collect various metrics."""
 
+    if not host:
+        raise RequiredParameterMissingError('host')
+
     # start pinging the machine in the background
     log.info("Starting ping in the background for host %s", host)
     ping = subprocess.Popen(

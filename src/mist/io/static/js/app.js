@@ -170,18 +170,11 @@ define( 'app', [
 
             App.set('isJQMInitialized',true);
 
-            initSocket();
-            setInterval(function() {
-                if (Mist.socket == undefined){
-                    warn('socket undefined! Initializing...');
-                    initSocket();
-                } else if (!Mist.socket.socket.connected){
-                    warn('Socket not connected! Connecting...');
-                    Mist.socket.socket.connect();
-                    // Emit ready in a little while
-                    setTimeout("Mist.socket.emit('ready')", 500);
-                }
-            }, 1000);
+            Mist.set('socket', Socket({
+                namespace: '/mist',
+                onInit: initSocket,
+            }));
+
         });
 
         // Hide error boxes on page unload
@@ -448,6 +441,15 @@ define( 'app', [
         });
 
         // Mist functions
+
+        App.prettyTime = function(date) {
+            var hour = date.getHours();
+            var min = date.getMinutes();
+            var sec = date.getSeconds();
+            return (hour < 10 ? '0' : '') + hour + ':' +
+                (min < 10 ? '0' : '') + min + ':' +
+                (sec < 10 ? '0' : '') + sec;
+        };
 
         App.getKeyIdByUrl = function() {
             return window.location.href.split('/')[5];
@@ -753,6 +755,101 @@ define( 'app', [
     preloadImages(initialize);
 });
 
+/**
+ *
+ *  Socket wrapper
+ *
+ */
+
+function Socket (args) {
+
+    var socket = undefined;
+    var initialized = false;
+    var namespace = args.namespace;
+
+    function init () {
+        if (!initialized) {
+            info(namespace, 'initializing');
+            handleDisconnection();
+            addDebuggingWrapper();
+            if (args.onInit instanceof Function)
+                args.onInit(socket);
+        }
+        socket.emit('ready');
+        initialized = true;
+    };
+
+    function connect () {
+
+        if (socket === undefined) {
+            socket = io.connect(namespace);
+            reconnect();
+        } else if (socket.socket.connected) {
+            info(namespace, 'connected');
+            init();
+        } else if (socket.socket.connecting) {
+            info(namespace, 'connecting');
+            reconnect();
+        } else {
+            socket.socket.connect();
+            reconnect();
+        }
+    }
+
+    function reconnect () {
+        setTimeout(connect, 500);
+    }
+
+    function handleDisconnection () {
+
+        // keep socket connections alive by default
+        if (args.keepAlive !== undefined ? keepAlive : true) {
+            // Reconnect if connection fails
+            socket.on('disconnect', function () {
+                warn(namespace, 'disconnected');
+                reconnect();
+            });
+        }
+    }
+
+    function addDebuggingWrapper () {
+
+        // This process basically overrides the .on()
+        // function to enable debugging info on every
+        // response received by the client
+
+        // 1. keep a copy of the original socket.on() function
+        var sockon = socket.on;
+
+        // 2. overide the socket's .on() function
+        socket.on = function (event, callback)  {
+
+            // i. keep a copy of the original callback
+            // This is the function written by us to handle
+            // the response data
+            var cb = callback;
+
+            // ii. overide callback to first print the debugging
+            // information and then call the original callback function
+            // (which is saved in cb variable)
+            callback = function (data) {
+                if (Mist.debugSocket)
+                    info(Mist.prettyTime(new Date()) +
+                        ' | ' + namespace + '/' + event + ' ', data);
+                cb(data);
+            };
+
+            // iii. Call the original .on() function using the modified
+            // callback function
+            sockon.apply(socket, arguments);
+        };
+    }
+
+    connect();
+
+    return socket;
+}
+
 //LOGLEVEL comes from home python view and home.pt
 function log() {
     try {
@@ -814,76 +911,34 @@ function completeShell(ret, command_id) {
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
 
-function getTemplate(name) {
-    if (JS_BUILD || true) { // The "|| true" part is just for debuging as for now
-        //info('Getting precompiled template for: ' + name);
-        // Return precompiled template
-        return Ember.TEMPLATES[name + '/html'];
-    } else {
-        info('Compiling template for: ' + name);
-        return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
-    }
-};
-
-function initSocket() {
-    warn('Socket init');
-    var sock = undefined, retry = 0;
-    while (!sock) {
-        sock = io.connect('/mist');
-        retry += 1;
-        if (retry > 5){
-            alert('failed to connect after ' + retry + ' retries');
-            return false;
-        }
-    }
-
-    Mist.set('socket', sock);
-
-    Mist.socket.emit('ready');
-
-    var sockon = Mist.socket.on;
-    Mist.socket.on = function (event, callback)  {
-        var cb = callback;
-        callback = function (data) {
-            if (Mist.debugSocket)
-                info(data);
-            cb(data);
-        };
-        sockon.apply(Mist.socket, arguments);
-    };
+function initSocket(sock) {
 
     Mist.keysController.load();
     Mist.backendsController.load();
-
     Mist.socket.on('probe', onProbe);
     Mist.socket.on('ping', onProbe);
-    function onProbe(data) {
-        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
-        if (machine)
-            machine.probeSuccess(data.result);
-    }
-
     Mist.socket.on('monitoring',function(data){
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
         Mist.backendsController.set('checkedMonitoring', true);
     });
-
     Mist.socket.on('notify',function(data){
         if (data.message) {
-            warn(data);
             Mist.notificationController.set('msgHeader', data.title);
             Mist.notificationController.set('msgCmd', data.message.substr(1));
             Mist.notificationController.showMessagebox();
         } else {
             Mist.notificationController.notify(data.title);
         }
-
     });
-
     Mist.socket.on('stats', function(data){
         Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop, data.requestID);
     });
+    function onProbe(data) {
+        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        if (machine)
+            machine.probeSuccess(data.result);
+    }
 }
 
 
