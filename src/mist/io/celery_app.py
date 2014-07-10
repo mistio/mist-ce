@@ -24,6 +24,7 @@ app = Celery(
 
 app.conf.update(
     CELERY_TASK_SERIALIZER = "json",
+    CELERYD_MAX_TASKS_PER_CHILD = 128,
     ## CELERY_TASK_RESULT_EXPIRES=3600,
     ## CELERYD_CONCURRENCY=16,
 )

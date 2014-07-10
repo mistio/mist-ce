@@ -241,7 +241,26 @@
                     </td>
                 </tr>
                 {{/if}}
-
+                {{#if view.public_ips}}
+                    <tr>
+                        <td>Public IPs</td>
+                        <td>
+                            {{#each view.public_ips}}
+                                <div class="ip">{{this}}</div>
+                            {{/each}}
+                        </td>
+                    </tr>
+                {{/if}}
+                {{#if view.private_ips}}
+                    <tr>
+                        <td>Private IPs</td>
+                        <td>
+                            {{#each view.private_ips}}
+                                <div class="ip">{{this}}</div>
+                            {{/each}}
+                        </td>
+                    </tr>
+                {{/if}}
                 {{#each view.basicInfo}}
                 <tr>
                     <td>{{key}}</td>
