@@ -1,36 +1,28 @@
-<div class="rule-box" id="{{unbound id}}">
+<div id="{{unbound id}}" class="rule-box">
 
-    <div class="rule-if">if</div>
+    <div class="rule-if rule-text">if</div>
 
-    <a class="rule-button metric ui-btn ui-btn-inline ui-shadow ui-corner-all"
+    <a class="rule-button rule-metric ui-btn ui-btn-inline ui-shadow ui-corner-all"
         {{action "openMetricPopup" target="view"}}>
             {{metric.name}}
     </a>
 
-    <a class="rule-button operator ui-btn ui-btn-inline ui-shadow ui-corner-all"
+    <a class="rule-button rule-operator ui-btn ui-btn-inline ui-shadow ui-corner-all"
         {{action "openOperatorPopup" target="view"}}>
             {{operator.symbol}}
     </a>
 
-    <div class="rule-unit">
-        {{metric.unit}}
-    </div>
+    {{view Mist.TextField class="rule-value" type="number"
+        valueBinding="view.newRuleValue"}}
 
-    <input class="rule-value" data-highlight="true" type="range"
-        {{action "valueChange" on="change" target="view"}}
-        {{bindAttr max="metric.maxValue"}}
-        {{bindAttr min="metric.minValue"}}
-        {{bindAttr value="value"}} />
+    <div class="rule-unit rule-text">{{metric.unit}}</div>
 
-    <div class="rule-then">then</div>
+    <div class="rule-then rule-text">then</div>
 
-    <a class="rule-button action ui-btn ui-btn-inline ui-shadow ui-corner-all"
+    <a class="rule-button rule-action ui-btn ui-btn-inline ui-shadow ui-corner-all"
         {{action "openActionPopup" target="view"}}>
             {{actionToTake}}
     </a>
-
-    <a class="ui-btn ui-btn-icon-notext ui-btn-inline ui-icon-gear ui-corner-all"
-        {{action "openAdvancedPopup" target="view"}}>&nbsp;</a>
 
     {{#if pendingAction}}
         <div class="ajax-loader"></div>
@@ -40,4 +32,5 @@
                     {{action deleteRuleClicked target="view"}}>&nbsp;</a>
         </div>
     {{/if}}
+
 </div>

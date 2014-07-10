@@ -19,7 +19,50 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             rule: null,
+            newRuleValue: null,
             isUpdatingValue: null,
+
+
+            //
+            //
+            //  Initialization
+            //
+            //
+
+
+            load: function () {
+                this.set('newRuleValue', this.rule.value);
+                Ember.run.next(this, function () {
+                    $('#'+this.elementId).trigger('create');
+                })
+            }.on('didInsertElement'),
+
+
+            //
+            //
+            // Methods
+            //
+            //
+
+
+            valueChange: function () {
+
+                // Prevent multiple requests
+                if (this.isUpdatingValue)
+                    return;
+
+                this.set('isUpdatingValue', true);
+                Ember.run.later(this, function () {
+                    this.set('isUpdatingValue', false);
+                    var that = this;
+                    Mist.rulesController.updateRule(
+                        this.rule.id, null, null, this.newRuleValue, null, null,
+                        function (success) {
+                            if (!success)
+                                that.set('newRuleValue', that.rule.value);
+                        });
+                }, 500);
+            },
 
 
             //
@@ -53,26 +96,20 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
                 deleteRuleClicked: function () {
                     Mist.rulesController.deleteRule(this.rule);
-                },
-
-                valueChange: function () {
-
-                    // Prevent multiple requests
-                    if (this.isUpdatingValue)
-                        return;
-
-                    this.set('isUpdatingValue', true);
-                    Ember.run.later(this, function () {
-                        this.set('isUpdatingValue', false);
-
-                        var value = $('#' + this.rule.id)
-                            .find('.ui-slider input').val();
-
-                        Mist.rulesController.updateRule(
-                            this.rule.id, null, null, value);
-                    }, 500);
                 }
-            }
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            newRuleValueObserver: function () {
+                Ember.run.once(this, 'valueChange');
+            }.observes('newRuleValue'),
         });
     }
 );
