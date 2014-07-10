@@ -254,11 +254,6 @@ define('app/controllers/machines', ['app/models/machine'],
                                 old_machine.set(attr, machine[attr]);
                             }
 
-                            // Set machine on probing loop
-                            if (prevState != 'running'
-                                && machine.state == 'running')
-                                    old_machine.probe();
-
                         } else {
 
                             // Add new machine

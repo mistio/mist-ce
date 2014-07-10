@@ -406,39 +406,6 @@ define( 'app', [
                 }
             }
         });
-        App.ShellTextField = App.TextField.extend({
-
-            keyDown: function(event, view) {
-                var keyCode = event.keyCode;
-                var commandHistoryIndex = Mist.machineShellController.commandHistoryIndex;
-                var commandHistory = Mist.machineShellController.machine.commandHistory;
-                switch (keyCode) {
-                    case 38: // Up
-                        if (commandHistoryIndex < commandHistory.length - 1) {
-                            commandHistoryIndex++;
-                        }
-                        Mist.machineShellController.set('command', commandHistory[commandHistoryIndex].command);
-                        Mist.machineShellController.set('commandHistoryIndex', commandHistoryIndex);
-                        break;
-                    case 40: // Down
-                        if (commandHistoryIndex >= 0) {
-                            commandHistoryIndex--;
-                        }
-                        if (commandHistoryIndex >= 0) {
-                            Mist.machineShellController.set('command', commandHistory[commandHistoryIndex].command);
-                        } else if (commandHistoryIndex == -1) {
-                            Mist.machineShellController.set('command', '');
-                        }
-                        Mist.machineShellController.set('commandHistoryIndex', commandHistoryIndex);
-                        break;
-                    case 13: // Enter
-                        Mist.machineShellController.submit();
-                        break;
-                }
-                if (keyCode == 38 || keyCode == 40 && event.preventDefault) // Up or Down
-                    event.preventDefault();
-            }
-        });
 
         // Mist functions
 
@@ -775,7 +742,6 @@ function Socket (args) {
             if (args.onInit instanceof Function)
                 args.onInit(socket);
         }
-        socket.emit('ready');
         initialized = true;
     };
 
@@ -803,7 +769,7 @@ function Socket (args) {
     function handleDisconnection () {
 
         // keep socket connections alive by default
-        if (args.keepAlive !== undefined ? keepAlive : true) {
+        if (args.keepAlive !== undefined ? args.keepAlive : true) {
             // Reconnect if connection fails
             socket.on('disconnect', function () {
                 warn(namespace, 'disconnected');
@@ -881,34 +847,6 @@ function error() {
             return console.error.apply(console, arguments);
         }
     } catch(err) {console.log(err);}
-}
-
-
-function appendShell(output, command_id) {
-
-    var machine = Mist.machineShellController.machine;
-
-    if (!machine) return;
-
-    var command = machine.commandHistory.findBy('id', command_id);
-
-    if (!command) return;
-
-    // Replace break with new line
-    var output = output.trim().replace('<br/>', String.fromCharCode(13));
-
-    if (output.length)
-        warn(Date() + ': ' + output);
-
-    command.set('response', command.response + output);
-    Ember.run.next(function(){
-        $('.output').scrollTop(1000000);
-    });
-}
-
-function completeShell(ret, command_id) {
-    $('iframe#' + command_id).remove();
-    Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
 
 function initSocket(sock) {
