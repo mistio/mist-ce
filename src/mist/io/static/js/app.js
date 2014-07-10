@@ -807,9 +807,7 @@ function Socket (args) {
 
             // iii. Call the original .on() function using the modified
             // callback function
-            sockon.apply(socket, arguments);
-
-            return this;
+            return sockon.apply(socket, arguments);
         };
     }
 
