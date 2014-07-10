@@ -24,11 +24,9 @@ define('app/controllers/images', ['app/models/image'],
              *
              */
 
-            load: function() {
-
+            load: function (images) {
                 if (!this.backend.enabled) return;
-
-                var that = this;
+                this._setContent(images);
                 this.set('loading', true);
             },
 

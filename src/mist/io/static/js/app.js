@@ -195,7 +195,7 @@ define( 'app', [
 
         // Globals
 
-        App.set('debugSocket', false);
+        App.set('debugSocket', true);
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
         App.set('ajax', new AJAX(CSRF_TOKEN));
@@ -808,6 +808,8 @@ function Socket (args) {
             // iii. Call the original .on() function using the modified
             // callback function
             sockon.apply(socket, arguments);
+
+            return this;
         };
     }
 
@@ -849,19 +851,45 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
-function initSocket(sock) {
+function initSocket (socket) {
 
-    sock.emit('ready');
-    Mist.keysController.load();
-    Mist.backendsController.load();
-    Mist.socket.on('probe', onProbe);
-    Mist.socket.on('ping', onProbe);
-    Mist.socket.on('monitoring',function(data){
+    socket
+    .on('list_keys', function (keys) {
+        Mist.keysController.load(keys);
+    })
+    .on('list_backends', function (backends) {
+        Mist.backendsController.load(backends);
+    })
+    .on('list_sizes', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.sizes.load(data.sizes);
+    })
+    .on('list_images', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.images.load(data.images);
+    })
+    .on('list_machines', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.machines.load(data.machines);
+    })
+    .on('list_locations', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.locations.load(data.locations);
+    })
+    .on('monitoring',function(data){
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
         Mist.backendsController.set('checkedMonitoring', true);
-    });
-    Mist.socket.on('notify',function(data){
+    })
+    .on('stats', function(data){
+        Mist.monitoringController.request.updateMetrics(
+            data.metrics, data.start, data.stop, data.requestID);
+    })
+    .on('notify',function(data){
         if (data.message) {
             Mist.notificationController.set('msgHeader', data.title);
             Mist.notificationController.set('msgCmd', data.message.substr(1));
@@ -869,10 +897,11 @@ function initSocket(sock) {
         } else {
             Mist.notificationController.notify(data.title);
         }
-    });
-    Mist.socket.on('stats', function(data){
-        Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop, data.requestID);
-    });
+    })
+    .on('probe', onProbe)
+    .on('ping', onProbe)
+    .emit('ready');
+
     function onProbe(data) {
         var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
         if (machine)

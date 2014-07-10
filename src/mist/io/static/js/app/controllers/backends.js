@@ -33,12 +33,10 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
              *
              */
 
-            load: function() {
-                this._handleBackendsUpdates();
-                this._handleSizesUpdates();
-                this._handleImagesUpdates();
-                this._handleMachinesUpdates();
-                this._handleLocationsUpdates();
+            load: function (backends) {
+                this._setContent(backends);
+                this.set('loading', false);
+                $('#splash').fadeOut(650); // TODO: Move this outa here
             },
 
 
@@ -363,65 +361,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     });
                     this.set('selectedMachines', newSelectedMachines);
                     this.trigger('onSelectedMachinesChange');
-                });
-            },
-
-
-            _handleBackendsUpdates: function () {
-                var that = this;
-                Mist.socket.on('list_backends', function (backends) {
-                    that._setContent(backends);
-                    that.set('loading', false);
-                    $('#splash').fadeOut(650); // TODO: Move this outa here
-                });
-            },
-
-
-            _handleSizesUpdates: function () {
-                var that = this;
-                Mist.socket.on('list_sizes', function (data) {
-                    var backend = that.getBackend(data.backend_id);
-                    if (backend) {
-                        backend.sizes._setContent(data.sizes);
-                        backend.sizes.set('loading', false);
-                    }
-                });
-            },
-
-
-            _handleImagesUpdates: function () {
-                var that = this;
-                Mist.socket.on('list_locations', function (data) {
-                    var backend = that.getBackend(data.backend_id);
-                    if (backend) {
-                        backend.locations._setContent(data.locations);
-                        backend.locations.set('loading', false);
-                        backend.set('loadingLocations', false);
-                    }
-                });
-            },
-
-
-            _handleMachinesUpdates: function () {
-                var that = this;
-                Mist.socket.on('list_images', function (data) {
-                    var backend = that.getBackend(data.backend_id);
-                    if (backend) {
-                        backend.images._setContent(data.images);
-                        backend.images.set('loading', false);
-                    }
-                });
-            },
-
-
-            _handleLocationsUpdates: function () {
-                var that = this;
-                Mist.socket.on('list_machines', function (data) {
-                    var backend = that.getBackend(data.backend_id);
-                    if (backend) {
-                        backend.machines._updateContent(data.machines);
-                        backend.machines.set('loading', false);
-                    }
                 });
             },
 
