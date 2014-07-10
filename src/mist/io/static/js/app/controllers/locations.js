@@ -21,11 +21,9 @@ define('app/controllers/locations', ['app/models/location'],
              *
              */
 
-            load: function() {
-
+            load: function (locations) {
                 if (!this.backend.enabled) return;
-
-                var that = this;
+                this._setContent(locations);
                 this.set('loading', true);
             },
 

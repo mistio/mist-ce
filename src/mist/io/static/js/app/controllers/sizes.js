@@ -21,11 +21,9 @@ define('app/controllers/sizes', ['app/models/size'],
              *
              */
 
-            load: function () {
-
+            load: function (sizes) {
                 if (!this.backend.enabled) return;
-
-                var that = this;
+                this._setContent(sizes);
                 this.set('loading', true);
             },
 

@@ -77,12 +77,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.locations.addObserver('loading', this, function () {
                         Ember.run.once(this, 'loadingLocationsObserver');
                     });
-
-                    // Load data
-                    this.sizes.load();
-                    this.images.load();
-                    this.machines.load();
-                    this.locations.load();
                 });
             }.on('init'),
 

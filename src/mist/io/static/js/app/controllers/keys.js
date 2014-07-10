@@ -32,12 +32,9 @@ define(['app/models/key'],
              */
 
 
-            load: function() {
-                var that = this;
-                Mist.socket.on('list_keys', function (keys) {
-                    that._setContent(keys);
-                    that.set('loading', false);
-                });
+            load: function(keys) {
+                this._setContent(keys);
+                this.set('loading', false);
             },
 
 

@@ -913,8 +913,33 @@ function completeShell(ret, command_id) {
 
 function initSocket(sock) {
 
-    Mist.keysController.load();
-    Mist.backendsController.load();
+    Mist.socket.on('list_keys', function (keys) {
+        Mist.keysController.load(keys);
+    });
+    Mist.socket.on('list_backends', function (backends) {
+        Mist.backendsController.load(backends);
+    });
+    Mist.socket.on('list_sizes', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.sizes.load(data.sizes);
+    });
+    Mist.socket.on('list_images', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.images.load(data.images);
+    });
+    Mist.socket.on('list_machines', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.machines.load(data.machines);
+    });
+    Mist.socket.on('list_locations', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.locations.load(data.locations);
+    });
+
     Mist.socket.on('probe', onProbe);
     Mist.socket.on('ping', onProbe);
     Mist.socket.on('monitoring',function(data){
