@@ -45,6 +45,7 @@ if [ "$APP_CHANGED" ]; then
     done
     ln -sf src/mist/io/static/build/mist.js src/mist/io/static/build/mist-${time_now}.js
     git add src/mist/io/static/build/mist-${time_now}.js
+    sed s/\.\.\\/build\\/mist.*/\.\.\\/build\\/mist-$time_now\"/g -i src/mist/io/templates/home.pt
 else
     rm src/mist/io/static/build/mist-${time_now}.js
 fi
@@ -69,17 +70,19 @@ if [ "$CSS_CHANGED" ]; then
     done
     ln -sf src/mist/io/static/mist.css src/mist/io/static/mist-${time_now}.css
     git add src/mist/io/static/mist-${time_now}.css
+    sed s/resources\\/mist.*/resources\\/mist-$time_now\.css\"/g -i src/mist/io/templates/home.pt
 else
     rm src/mist/io/static/mist-${time_now}.css
 fi
+cd ${BASE_DIR}
 }
 init_vars
 
-#install_rjs
+install_rjs
 
-#build_templates
+build_templates
 
-#build_app
+build_app
 
 build_css
 echo $CHANGED
