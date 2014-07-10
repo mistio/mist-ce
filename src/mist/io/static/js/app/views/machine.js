@@ -380,23 +380,23 @@ define('app/views/machine', ['app/views/mistscreen'],
                 var basicInfo = {};
 
                 if (this.machine.public_ips instanceof Array) {
-                    basicInfo['Public IPs'] = this.machine.public_ips.join();
+                    this.set('public_ips', this.machine.public_ips);
                 } else if (typeof this.machine.public_ips == 'string') {
-                    basicInfo['Public IPs']  = this.machine.public_ips;
+                    this.set('public_ips', [this.machine.public_ips]);
                 }
-                
+
                 if (this.machine.backend.provider != 'docker') {
                     if (this.machine.private_ips instanceof Array) {
-                        basicInfo['Private IPs']  = this.machine.private_ips.join();
-                    } else if (typeof this.machine.private_ips == 'string') {
-                        basicInfo['Private IPs']  = this.machine.private_ips;
+                        this.set('private_ips', this.machine.private_ips);
+                    } else if (typeof this.machine.public_ips == 'string') {
+                        this.set('private_ips', [this.machine.private_ips]);
                     }
                 }
                 if (this.machine.extra) {
                     if (this.machine.backend.provider == 'docker') {
-                        basicInfo['Image'] = this.machine.extra.image;   
+                        basicInfo['Image'] = this.machine.extra.image;
                         basicInfo['Status'] = this.machine.extra.status;
-                        basicInfo['Command'] = this.machine.extra.command;                                                                 
+                        basicInfo['Command'] = this.machine.extra.command;
                     }
                     if (this.machine.extra.dns_name) {
                         basicInfo['DNS Name'] = this.machine.extra.dns_name;
