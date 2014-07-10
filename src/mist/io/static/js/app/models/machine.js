@@ -244,9 +244,6 @@ define('app/models/machine', ['ember'],
                         this.set('state', this.lockState);
                     } else { // Machine action completed
                         this.set('waitState', null);
-                        if (this.state == 'running') {
-                            //Mist.backendsController.probeMachine(this);
-                        }
                     }
                 }
             }.observes('state')
