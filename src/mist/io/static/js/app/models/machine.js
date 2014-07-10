@@ -245,7 +245,7 @@ define('app/models/machine', ['ember'],
                     } else { // Machine action completed
                         this.set('waitState', null);
                         if (this.state == 'running') {
-                            Mist.backendsController.probeMachine(this);
+                            //Mist.backendsController.probeMachine(this);
                         }
                     }
                 }
