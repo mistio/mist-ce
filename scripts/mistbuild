@@ -50,12 +50,12 @@ fi
 cd ${BASE_DIR}
 }
 
-#init_vars
-#
+init_vars
+
 #install_rjs
 
-build_templates
+#build_templates
 
-#build_app
+build_app
 
 echo $CHANGED
