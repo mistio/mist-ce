@@ -34,8 +34,20 @@ build_app(){
 cd ${BASE_DIR}
 files=`ls -1tr src/mist/io/static/build/mist-*`
 node ${RJS_EXEC} -o src/mist/io/static/app.build.js out=src/mist/io/static/build/mist-${time_now}.js
-diff src/mist/io/static/build/mist-$time_now.js src/mist/io/static/build/mist.js
+APP_CHANGED=`diff src/mist/io/static/build/mist-${time_now}.js src/mist/io/static/build/mist.js`
 
+if [ "$APP_CHANGED" ]; then
+    CHANGED="True"
+    for x in $files
+    do
+        git rm -f $x
+    done
+    ln -sf src/mist/io/static/build/mist.js src/mist/io/static/build/mist-${time_now}.js
+else
+    rm src/mist/io/static/build/mist-${time_now}.js
+fi
+
+cd ${BASE_DIR}
 }
 
 init_vars
