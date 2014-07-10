@@ -38,7 +38,7 @@ from mist.io.shell import Shell
 import logging
 
 logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s.%(msecs)d %(levelname)s %(module)s - %(funcName)s: %(message)s', 
+                    format='%(asctime)s.%(msecs)d %(levelname)s %(module)s - %(funcName)s: %(message)s',
                     datefmt="%Y-%m-%d %H:%M:%S")
 
 log = logging.getLogger(__name__)
@@ -81,10 +81,8 @@ class MistNamespace(BaseNamespace):
     def initialize(self):
         log.info("init")
         self.user = user_from_request(self.request)
-        self.probes = {}
-        self.channel = None
-        self._old_machines = set()
         self.update_greenlet = None
+        self.running_machines = set()
 
     def spawn_later(self, delay, fn, *args, **kwargs):
         """Spawn a new process, attached to this Namespace after no less than
@@ -141,13 +139,22 @@ class MistNamespace(BaseNamespace):
                                'list_machines', 'list_locations', 'ping']):
             self.emit(routing_key, msg.body)
             if routing_key == 'list_machines':
-                # probe newly discovered machines
+                # probe newly discovered running machines
                 machines = msg.body['machines']
                 backend_id = msg.body['backend_id']
                 for machine in machines:
-                    if (backend_id, machine['id']) in self._old_machines:
+                    bmid = (backend_id, machine['id'])
+                    if bmid in self.running_machines:
+                        # machine was running
+                        if machine['state'] != 'running':
+                            # machine no longer running
+                            self.running_machines.remove(bmid)
                         continue
-                    self._old_machines.add((backend_id, machine['id']))
+                    if machine['state'] != 'running':
+                        # machine not running
+                        continue
+                    # machine just started running
+                    self.running_machines.add(bmid)
                     ips = filter(lambda ip: ':' not in ip,
                                  machine.get('public_ips', []))
                     if not ips:
