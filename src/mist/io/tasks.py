@@ -312,7 +312,7 @@ class ProbeSSH(UserTask):
 
     def error_rerun_handler(self, exc, errors, *args, **kwargs):
         # Retry in 2, 4, 8, 16, 32, 32, 32, 32, 32, 32 minutes
-        t = 60 * 2 ** (len(errors) + 1)
+        t = 60 * 2 ** len(errors)
         return t if t < 60 * 32 else 60 * 32
 
 

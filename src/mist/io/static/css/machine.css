@@ -20,6 +20,9 @@
 #single-machine-page .info-table tr {
     background-color: #F7F7F7;
 }
+#single-machine-page .info-table .ip {
+    display: inline-block;
+}
 #single-machine-page #monitoring-disabled p {
     text-align: center;
 }
