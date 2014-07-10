@@ -1,21 +1,32 @@
 <div id="{{unbound id}}" class="rule-box">
 
-    <div class="rule-if rule-text">if</div>
+    <div id="basic-condition">
+        <div class="rule-if rule-text">if</div>
 
-    <a class="rule-button rule-metric ui-btn ui-btn-inline ui-shadow ui-corner-all"
-        {{action "openMetricPopup" target="view"}}>
-            {{metric.name}}
+        <a class="rule-button rule-metric ui-btn ui-btn-inline ui-shadow ui-corner-all"
+            {{action "openMetricPopup" target="view"}}>
+                {{metric.name}}
+        </a>
+
+        <a class="rule-button rule-operator ui-btn ui-btn-inline ui-shadow ui-corner-all"
+            {{action "openOperatorPopup" target="view"}}>
+                {{operator.symbol}}
+        </a>
+
+        {{view Mist.TextField class="rule-value" type="number"
+            valueBinding="view.newRuleValue"}}
+
+        <div class="rule-unit rule-text">{{metric.unit}}</div>
+    </div>
+
+    <a class="rule-button rule-more ui-btn ui-btn-inline ui-shadow ui-corner-all"
+        {{action "openAdvancedCondition" target="view"}}>
+        ...
     </a>
 
-    <a class="rule-button rule-operator ui-btn ui-btn-inline ui-shadow ui-corner-all"
-        {{action "openOperatorPopup" target="view"}}>
-            {{operator.symbol}}
-    </a>
-
-    {{view Mist.TextField class="rule-value" type="number"
-        valueBinding="view.newRuleValue"}}
-
-    <div class="rule-unit rule-text">{{metric.unit}}</div>
+    <div class="advanced-condition">
+    advanced
+    </div>
 
     <div class="rule-then rule-text">then</div>
 
@@ -32,5 +43,6 @@
                     {{action deleteRuleClicked target="view"}}>&nbsp;</a>
         </div>
     {{/if}}
+
 
 </div>

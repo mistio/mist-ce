@@ -89,13 +89,17 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                 },
 
 
-                openAdvancedPopup: function () {
-                    Mist.ruleEditController.open(this.rule, 'advanced');
+                deleteRuleClicked: function () {
+                    Mist.rulesController.deleteRule(this.rule);
                 },
 
 
-                deleteRuleClicked: function () {
-                    Mist.rulesController.deleteRule(this.rule);
+                openAdvancedCondition: function () {
+
+                    var that = this;
+                    $('#' + that.elementId + ' .rule-more').fadeOut(200, function () {
+                        $('#' + that.elementId + ' .advanced-condition').fadeIn();
+                    });
                 }
             },
 

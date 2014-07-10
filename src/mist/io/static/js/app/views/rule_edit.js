@@ -31,7 +31,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
             open: function (option) {
 
                 var button = '#' + Mist.ruleEditController.rule.id +
-                    ' .rule-button.' + option;
+                    ' .rule-button.rule-' + option;
 
                 $('#rule-' + option)
                     .popup('option', 'positionTo', button)

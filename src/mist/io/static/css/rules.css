@@ -147,3 +147,11 @@
 .rule-box .ui-input-text {
     margin-top: 12px;
 }
+
+.rule-more {
+    width: 22px;
+}
+
+.rule-box .advanced-condition {
+    display: none;
+}
