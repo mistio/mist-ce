@@ -33,6 +33,7 @@ cd ${BASE_DIR}
 build_app(){
 cd ${BASE_DIR}
 files=`ls -1tr src/mist/io/static/build/mist-*`
+echo "Building app.js"
 node ${RJS_EXEC} -o src/mist/io/static/app.build.js out=src/mist/io/static/build/mist-${time_now}.js
 APP_CHANGED=`diff src/mist/io/static/build/mist-${time_now}.js src/mist/io/static/build/mist.js`
 
@@ -43,6 +44,7 @@ if [ "$APP_CHANGED" ]; then
         git rm -f $x
     done
     ln -sf src/mist/io/static/build/mist.js src/mist/io/static/build/mist-${time_now}.js
+    git add src/mist/io/static/build/mist-${time_now}.js
 else
     rm src/mist/io/static/build/mist-${time_now}.js
 fi
@@ -50,12 +52,34 @@ fi
 cd ${BASE_DIR}
 }
 
+
+build_css() {
+cd ${BASE_DIR}
+files=`ls -1tr src/mist/io/static/mist-*.css`
+
+echo "Uglyfying css"
+node ${RJS_EXEC} -o src/mist/io/static/css.build.js out=src/mist/io/static/mist-$time_now.css
+CSS_CHANGED=`diff src/mist/io/static/mist-$time_now.css src/mist/io/static/mist.css`
+
+if [ "$CSS_CHANGED" ]; then
+    CHANGED="True"
+    for x in $files
+    do
+        git rm -f $x
+    done
+    ln -sf src/mist/io/static/mist.css src/mist/io/static/mist-${time_now}.css
+    git add src/mist/io/static/mist-${time_now}.css
+else
+    rm src/mist/io/static/mist-${time_now}.css
+fi
+}
 init_vars
 
 #install_rjs
 
 #build_templates
 
-build_app
+#build_app
 
+build_css
 echo $CHANGED
