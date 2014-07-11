@@ -16,3 +16,6 @@
 .generate-upload button {
     width: 69px !important;
 }
+#add-key-popup textarea {
+	height: 75px !important;
+}
