@@ -31,7 +31,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
             open: function (option) {
 
                 var button = '#' + Mist.ruleEditController.rule.id +
-                    ' .rule-button.' + option;
+                    ' .rule-button.rule-' + option;
 
                 $('#rule-' + option)
                     .popup('option', 'positionTo', button)
@@ -96,19 +96,6 @@ define('app/views/rule_edit', ['app/views/controlled'],
                     Mist.rulesController.updateRule(
                         Mist.ruleEditController.rule.id, null, null, null,
                             'command', Mist.ruleEditController.command);
-                },
-
-
-                customClicked: function () {
-                    $('#rule-metric').popup('close');
-                    Ember.run.next(function () {
-                        Mist.metricAddController.open(
-                            Mist.ruleEditController.rule.machine, function (metric) {
-                                Mist.rulesController.updateRule(
-                                    Mist.ruleEditController.rule.id, metric.id);
-                            }
-                        );
-                    });
                 },
             },
 
