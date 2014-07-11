@@ -55,7 +55,7 @@
     overflow-y: scroll;
 }
 
-
+/*
 @media only screen and (max-width: 535px) {
 
 
@@ -108,7 +108,7 @@
         margin-right: 12px;
         margin-top: 5px;
     }
-}
+}*/
 
 .rule-if {
     height: 24px;
