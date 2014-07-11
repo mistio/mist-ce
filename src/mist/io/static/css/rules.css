@@ -116,7 +116,7 @@
 }
 
 .rule-metric {
-    width: 160px;
+    width: 130px;
 }
 
 .rule-unit {
@@ -127,7 +127,7 @@
 
 .rule-value {
     height: 35px;
-    width: 70px !important;
+    width: 50px !important;
     text-align: center !important;
 }
 
@@ -154,4 +154,13 @@
 
 .rule-box .advanced-condition {
     display: none;
+}
+
+.rules-container input[type='number'] {
+    -moz-appearance:textfield !important;
+}
+
+.rules-container input::-webkit-outer-spin-button,
+.rules-container input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
 }
