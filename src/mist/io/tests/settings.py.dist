@@ -46,11 +46,11 @@ selenium_hub = ""
 #However you can put in another path OR if you have chrome installed, you can put in
 #the absolute path of your chrome executable (e.g. /usr/bin/google-chrome)
 if 'darwin' in _platform:
-    CHROMEDRIVER_PATH = os.path.join(TEST_DIR, 'addons/chromedriver-mac')
+    CHROMEDRIVER_PATH = os.path.join(BASE_DIR, 'parts/chromedriver-mac/chromedriver-mac')
 else:
-    CHROMEDRIVER_PATH = os.path.join(TEST_DIR, 'addons/chromedriver')
+    CHROMEDRIVER_PATH = os.path.join(BASE_DIR, 'parts/chromedriver/chromedriver')
 
-PHANTOMJS_PATH = os.path.join(TEST_DIR, 'addons/phantomjs')
+PHANTOMJS_PATH = os.path.join(BASE_DIR, 'parts/phantomjs')
 
 #----------DOCKERS---------------
 #DOCKERS is a list of all our docker nodes. It will be used to spawn docker
