@@ -16,7 +16,7 @@ Feature: Add second-tier backends
 
     Examples: Providers
     | provider             | credentials  |
-    | Linode               | LINODE       |
+    | Liinode               | LINODE       |
     | Rackspace DFW        | RACKSPACE    |
     | SoftLayer            | SOFTLAYER    |
     | NephoScale           | NEPHOSCALE   |
