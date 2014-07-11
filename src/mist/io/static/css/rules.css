@@ -16,56 +16,22 @@
 }
 
 .rule-box {
-    height: 60px;
+    min-height: 60px;
 }
 
-.rule-unit {
-    float: left;
-    position: relative;
-    top: 21px;
-    left: 73px;
-    font-size: 14px;
-    font-weight: bold;
-    width: 0px;
-}
-
-.rule-if, .rule-then {
+.rule-text {
     font-size: 20px;
     font-weight: bold;
     padding: 6px;
-    float: left;
     margin-top: 12px;
     height:40px;
+    max-width: 100px;
+    white-space: nowrap;
+    overflow:hidden !important;
+    text-overflow: ellipsis;
 }
 
-.rule-then {
-    margin-left: 30px;
-}
-
-.rule-if, .rule-then, .rule-value {
-    float: left;
-    height: 24px;
-}
-
-.rule-box .ui-slider {
-    float: left;
-    margin: 16px 16px 16px 8px;
-    width: auto;
-}
-
-.rule-box .ui-slider.open {
-    width: 40%;
-}
-
-.rule-box div.ui-slider-track {
-    display: none;
-    width: 80%;
-    position: relative;
-    top: 4px;
-    left: 17px;
-}
-
-.rule-box .rule-button {
+.rule-box * {
     float: left;
 }
 
@@ -89,7 +55,7 @@
     overflow-y: scroll;
 }
 
-
+/*
 @media only screen and (max-width: 535px) {
 
 
@@ -142,5 +108,59 @@
         margin-right: 12px;
         margin-top: 5px;
     }
+}*/
+
+.rule-if {
+    height: 24px;
+    margin-right: 10px;
 }
 
+.rule-metric {
+    width: 130px;
+}
+
+.rule-unit {
+    max-width: 100px;
+    font-size: 15px;
+    margin-top: 15px;
+}
+
+.rule-value {
+    height: 35px;
+    width: 50px !important;
+    text-align: center !important;
+}
+
+.rule-operator {
+    width: 30px;
+}
+
+.rule-button {
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+
+.rule-action {
+    width: 90px;
+}
+
+.rule-box .ui-input-text {
+    margin-top: 12px;
+}
+
+.rule-more {
+    width: 22px;
+}
+
+.rule-box .advanced-condition {
+    display: none;
+}
+
+.rules-container input[type='number'] {
+    -moz-appearance:textfield !important;
+}
+
+.rules-container input::-webkit-outer-spin-button,
+.rules-container input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+}
