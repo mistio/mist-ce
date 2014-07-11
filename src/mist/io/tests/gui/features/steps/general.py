@@ -91,7 +91,6 @@ def click_button_within_panel(context, text, panel_title):
         header = panel.find_element_by_tag_name("h1")
         if panel_title in header.text:
             found_panel = panel
-            import ipdb
             break
 
     if not found_panel:

@@ -29,8 +29,8 @@ def before_all(context):
 def after_step(context, step):
     if step.status == 'failed':
         if DEBUG:
-            import ipdb
-            ipdb.set_trace()
+            import pdb
+            pdb.set_trace()
         else:
             context.browser.get_screenshot_as_file(BASE_DIR + "/test.png")
 

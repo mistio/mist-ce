@@ -13,6 +13,7 @@ def fill_machine_mame(context):
     for letter in random_name:
         textfield.send_keys(letter)
     context.random_name = random_name
+    sleep(1)
 
 
 @when(u'I choose the "{name}" machine')
