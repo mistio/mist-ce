@@ -12,8 +12,8 @@ Feature: Actions for Keys
     And I click the "Generate" button inside the "Add key" popup
     And I wait for 5 seconds
     And I click the "Add" button inside the "Add key" popup
-    And I wait for 5 seconds
-    Then "FirstKey" key should be added within 5 seconds
+    And I wait for 7 seconds
+    Then "FirstKey" key should be added within 15 seconds
 
   @keys-actions
   Scenario: Rename Key
