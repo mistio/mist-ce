@@ -20,6 +20,8 @@ from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
 
+from mist.io.helpers import trigger_session_update
+
 
 log = logging.getLogger(__name__)
 
@@ -163,7 +165,7 @@ class Shell(object):
         while line:
             out += line
             line = stdout.readline()
-            
+
         if pty:
             retval = channel.recv_exit_status()
             return retval, out
@@ -310,17 +312,30 @@ class Shell(object):
                          ssh_user,
                          self.check_sudo(),
                          port]
+                trigger_session_update_flag = False
                 with user.lock_n_load():
                     updated = False
                     for i in range(len(user.keypairs[key_id].machines)):
                         machine = user.keypairs[key_id].machines[i]
                         if [backend_id, machine_id] == machine[:2]:
+                            old_assoc = user.keypairs[key_id].machines[i]
                             user.keypairs[key_id].machines[i] = assoc
                             updated = True
+                            old_ssh_user = None
+                            old_port = None
+                            if len(old_assoc) > 3:
+                                old_ssh_user = old_assoc[3]
+                            if len(old_assoc) > 5:
+                                old_port = old_assoc[5]
+                            if old_ssh_user != ssh_user or old_port != port:
+                                trigger_session_update_flag = True
                     # if association didn't exist, create it!
                     if not updated:
                         user.keypairs[key_id].machines.append(assoc)
+                        trigger_session_update_flag = True
                     user.save()
+                if trigger_session_update_flag:
+                    trigger_session_update(user.email, ['keys'])
                 return key_id, ssh_user
 
         raise MachineUnauthorizedError("%s:%s" % (backend_id, machine_id))
