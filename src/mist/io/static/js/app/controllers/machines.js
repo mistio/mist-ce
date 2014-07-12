@@ -33,10 +33,16 @@ define('app/controllers/machines', ['app/models/machine'],
              *
              */
 
+            init: function () {
+                this._super();
+                this.set('content', []);
+                this.set('loadint', true);
+            },
+
+
             load: function (machines) {
-                if (!this.backend.enabled) return;
                 this._updateContent(machines);
-                this.set('loading', true);
+                this.set('loading', false);
             },
 
 
@@ -179,15 +185,6 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-            clear: function() {
-                Ember.run(this, function() {
-                    this.set('content', []);
-                    this.set('loading', false);
-                    this.trigger('onMachineListChange');
-                });
-            },
-
-
             getMachine: function(machineId) {
                 return this.content.findBy('id', machineId);
             },
@@ -198,18 +195,11 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-
             /**
              *
              *  Pseudo-Private Methods
              *
              */
-
-            _reload: function() {
-                Ember.run.later(this, function() {
-                    this.load();
-                }, this.backend.poll_interval);
-            },
 
 
             _updateContent: function(machines) {
