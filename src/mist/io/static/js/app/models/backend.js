@@ -155,10 +155,12 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.machines.load();
                     this.locations.load();
                 } else {
+                    /*
                     this.sizes.clear();
                     this.images.clear();
                     this.machines.clear();
                     this.locations.clear();
+                    */
                 }
             },
 
