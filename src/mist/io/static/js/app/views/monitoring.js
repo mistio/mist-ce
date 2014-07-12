@@ -61,7 +61,6 @@ define('app/views/monitoring', ['app/views/templated'],
             setUpGraphs: function () {
                 this.renderControls();
                 this.handleWindowResize();
-                Mist.rulesController.redrawRules();
                 Mist.monitoringController.initGraphs({
                     graphs: this.graphs,
                     machineModel: this.machine
