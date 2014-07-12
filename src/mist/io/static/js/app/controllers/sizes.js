@@ -63,7 +63,7 @@ define('app/controllers/sizes', ['app/models/size'],
 
 
             _updateContent: function (sizes) {
-                Ember.run(this, function() {
+                Ember.run(this, function () {
 
                     // Remove deleted sizes
                     this.content.forEach(function (size) {
@@ -91,7 +91,7 @@ define('app/controllers/sizes', ['app/models/size'],
 
 
             _addSize: function (size) {
-                Ember.run(this, function() {
+                Ember.run(this, function () {
                     this.content.pushObject(Size.create(size));
                     this.trigger('onSizeAdd');
                 });
@@ -99,7 +99,7 @@ define('app/controllers/sizes', ['app/models/size'],
 
 
             _deleteSize: function (sizeId) {
-                Ember.run(this, function() {
+                Ember.run(this, function () {
                     this.content.removeObject(this.getSize(sizeId));
                     this.trigger('onSizeDelete');
                 });
