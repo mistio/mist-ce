@@ -4,11 +4,11 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
     //
     //  @returns Class
     //
-    function(Rule) {
+    function (Rule) {
 
         'use strict';
 
-        return Ember.ArrayController.extend({
+        return Ember.ArrayController.extend(Ember.Evented, {
 
             content: [],
             command: null,
@@ -32,19 +32,58 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
 
             setContent: function(rules) {
-                if (!rules) return;
+                this._updateContent(rules);
+            },
+
+
+            _addRule: function (rule) {
+                Ember.run(this, function () {
+                    rule.actionToTake = rule.action;
+                    rule.operator = this.getOperatorByTitle(rule.operator);
+                    rule.metric = Mist.metricsController.getMetric(rule.metric);
+                    rule.machine = Mist.backendsController.getMachine(
+                        rule.machine, rule.backend) || rule.machine;
+                    this.content.pushObject(Rule.create(rule));
+                    this.trigger('onRuleAdd');
+                });
+            },
+
+
+            _updateRule: function (oldRule, newRule) {
+                Ember.run(this, function () {
+                    oldRule.set('actionToTake', newRule.action);
+                    oldRule.set('operator', this.getOperatorByTitle(newRule.operator));
+                    oldRule.set('metric', Mist.metricsController.getMetric(newRule.metric));
+                    oldRule.set('machine', Mist.backendsController.getMachine(
+                        newRule.machine, newRule.backend) || newRule.machine);
+                    this.trigger('onRuleUpdate');
+                });
+            },
+
+
+            _updateContent: function (rules) {
                 Ember.run(this, function() {
-                    var newRules = [];
+
+                    // Remove deleted rules
+                    this.content.forEach(function (rule) {
+                        if (!rules[rule.id])
+                            this._deleteRule(rule);
+                    }, this);
+
                     forIn(this, rules, function (rule, ruleId) {
+
                         rule.id = ruleId;
-                        rule.actionToTake = rule.action;
-                        rule.operator = this.getOperatorByTitle(rule.operator);
-                        rule.metric = Mist.metricsController.getMetric(rule.metric);
-                        rule.machine = Mist.backendsController.getMachine(
-                            rule.machine, rule.backend) || rule.machine;
-                        newRules.push(Rule.create(rule));
+
+                        var oldRule = this.getRuleById(ruleId);
+
+                        if (oldRule)
+                            this._updateRule(oldRule, rule);
+                        else
+                            // Add new rules
+                            this._addRule(rule);
                     });
-                    this.set('content', newRules);
+
+                    this.trigger('onRuleListChange');
                 });
             },
 
@@ -102,13 +141,20 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 rule.set('pendingAction', true);
                 Mist.ajax.DELETE('/rules/' + rule.id, {
                 }).success(function(){
-                    Mist.rulesController.removeObject(rule);
+                    that._deleteRule(rule);
                 }).error(function(message) {
                     Mist.notificationController.notify('Error while deleting rule: ' + message);
                     rule.set('pendingAction', false);
                 });
             },
 
+
+            _deleteRule: function (rule) {
+                Ember.run(this, function () {
+                    this.content.removeObject(rule);
+                    this.trigger('onRuleDelete');
+                });
+            },
 
             updateRule: function(id, metric, operator, value, actionToTake, command, callback) {
 
