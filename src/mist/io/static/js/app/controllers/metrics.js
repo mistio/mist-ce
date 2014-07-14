@@ -121,27 +121,51 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             },
 
 
-            setCustomMetrics: function(metrics) {
+            setCustomMetrics: function (metrics) {
+                this._updateCustomMetrics(metrics);
+            },
+
+
+            _updateCustomMetrics: function (metrics) {
                 Ember.run(this, function() {
-                    for (var metricId in metrics) {
-                        metrics[metricId].id = metricId;
-                        this.customMetrics.pushObject(
-                            Metric.create(metrics[metricId])
-                        );
-                    }
+
+                    // Remove deleted metrics
+                    this.customMetrics.forEach(function (metric) {
+                        if (!metrics[metric.id])
+                            this._deleteMetric(metric);
+                    }, this);
+
+                    forIn(this, metrics, function (metric, metricId) {
+
+                        metric.id = metricId;
+
+                        var oldMetric = this.getMetric(metricId);
+
+                        if (oldMetric)
+                            // Update existing metrics
+                            forIn(metric, function (value, property) {
+                                oldMetric.set(property, value);
+                            });
+                        else
+                            // Add new metrics
+                            this._addMetric(metric);
+                    });
+
                     this.trigger('onMetricListChange');
                 });
             },
 
 
-            setBuiltInMetrics: function(metrics) {
+            setBuiltInMetrics: function (metrics) {
                 Ember.run(this, function() {
+                    var newBuiltInMetrics = [];
                     for (var metricId in metrics) {
                         metrics[metricId].id = metricId;
-                        this.builtInMetrics.pushObject(
+                        newBuiltInMetrics.push(
                             Metric.create(metrics[metricId])
                         );
                     }
+                    this.set('builtInMetrics', newBuiltInMetrics);
                     this.trigger('onMetricListChange');
                 });
             },
@@ -177,7 +201,6 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                 Ember.run(this, function () {
                     this.customMetrics.pushObject(Metric.create(metric));
                     this.trigger('onMetricAdd');
-                    this.trigger('onMetricListChange');
                 });
             },
 
