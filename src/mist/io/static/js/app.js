@@ -369,8 +369,6 @@ define( 'app', [
                 'disabled'
             ]
         });
-
-
         App.TextArea = Ember.TextArea.extend({
             autocapitalize: 'off',
             attributeBindings: [
@@ -739,9 +737,9 @@ function Socket (args) {
             info(namespace, 'initializing');
             handleDisconnection();
             addDebuggingWrapper();
-            if (args.onInit instanceof Function)
-                args.onInit(socket);
         }
+        if (args.onInit instanceof Function)
+            args.onInit(socket, initialized);
         initialized = true;
     };
 
@@ -849,8 +847,9 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
-function initSocket (socket) {
+function initSocket (socket, initialized) {
 
+    if (!initialized)
     socket
     .on('list_keys', function (keys) {
         Mist.keysController.load(keys);
@@ -897,8 +896,9 @@ function initSocket (socket) {
         }
     })
     .on('probe', onProbe)
-    .on('ping', onProbe)
-    .emit('ready');
+    .on('ping', onProbe);
+
+    socket.emit('ready');
 
     function onProbe(data) {
         var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
