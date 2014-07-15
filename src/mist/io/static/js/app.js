@@ -849,54 +849,54 @@ function error() {
 
 function initSocket (socket, initialized) {
 
-    if (!initialized)
-    socket
-    .on('list_keys', function (keys) {
-        Mist.keysController.load(keys);
-    })
-    .on('list_backends', function (backends) {
-        Mist.backendsController.load(backends);
-    })
-    .on('list_sizes', function (data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.sizes.load(data.sizes);
-    })
-    .on('list_images', function (data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.images.load(data.images);
-    })
-    .on('list_machines', function (data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.machines.load(data.machines);
-    })
-    .on('list_locations', function (data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.locations.load(data.locations);
-    })
-    .on('monitoring',function(data){
-        Mist.monitoringController._updateMonitoringData(data);
-        Mist.monitoringController.trigger('onMonitoringDataUpdate');
-        Mist.backendsController.set('checkedMonitoring', true);
-    })
-    .on('stats', function(data){
-        Mist.monitoringController.request.updateMetrics(
-            data.metrics, data.start, data.stop, data.requestID);
-    })
-    .on('notify',function(data){
-        if (data.message) {
-            Mist.notificationController.set('msgHeader', data.title);
-            Mist.notificationController.set('msgCmd', data.message.substr(1));
-            Mist.notificationController.showMessagebox();
-        } else {
-            Mist.notificationController.notify(data.title);
-        }
-    })
-    .on('probe', onProbe)
-    .on('ping', onProbe);
+    if (!initialized) {
+        socket.on('list_keys', function (keys) {
+            Mist.keysController.load(keys);
+        })
+        .on('list_backends', function (backends) {
+            Mist.backendsController.load(backends);
+        })
+        .on('list_sizes', function (data) {
+            var backend = Mist.backendsController.getBackend(data.backend_id);
+            if (backend)
+                backend.sizes.load(data.sizes);
+        })
+        .on('list_images', function (data) {
+            var backend = Mist.backendsController.getBackend(data.backend_id);
+            if (backend)
+                backend.images.load(data.images);
+        })
+        .on('list_machines', function (data) {
+            var backend = Mist.backendsController.getBackend(data.backend_id);
+            if (backend)
+                backend.machines.load(data.machines);
+        })
+        .on('list_locations', function (data) {
+            var backend = Mist.backendsController.getBackend(data.backend_id);
+            if (backend)
+                backend.locations.load(data.locations);
+        })
+        .on('monitoring',function(data){
+            Mist.monitoringController._updateMonitoringData(data);
+            Mist.monitoringController.trigger('onMonitoringDataUpdate');
+            Mist.backendsController.set('checkedMonitoring', true);
+        })
+        .on('stats', function(data){
+            Mist.monitoringController.request.updateMetrics(
+                data.metrics, data.start, data.stop, data.requestID);
+        })
+        .on('notify',function(data){
+            if (data.message) {
+                Mist.notificationController.set('msgHeader', data.title);
+                Mist.notificationController.set('msgCmd', data.message.substr(1));
+                Mist.notificationController.showMessagebox();
+            } else {
+                Mist.notificationController.notify(data.title);
+            }
+        })
+        .on('probe', onProbe)
+        .on('ping', onProbe);
+    }
 
     socket.emit('ready');
 
