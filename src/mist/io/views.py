@@ -832,6 +832,7 @@ def update_rule(request):
     if ret.status_code != 200:
         log.error("Error updating rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
+    trigger_session_update(user.email, ['monitoring'])
     return ret.json()
 
 
@@ -853,7 +854,7 @@ def delete_rule(request):
     if ret.status_code != 200:
         log.error("Error deleting rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
-
+    trigger_session_update(user.email, ['monitoring'])
     return OK
 
 
