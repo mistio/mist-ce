@@ -56,7 +56,7 @@
              class="mist-select">
             <h2>{{Mist.machineAddController.newMachineImage.name}}</h2>
             <ul data-role="listview" data-theme="a">
-                {{#each Mist.machineAddController.newMachineProvider.images}}
+                {{#each Mist.machineAddController.newMachineProvider.images.content}}
                     {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
                         <li data-icon="false">
                             <a {{action "selectImage" this target="view"}}>{{this.name}}</a>
