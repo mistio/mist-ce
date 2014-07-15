@@ -3,7 +3,7 @@ define('app/controllers/images', ['app/models/image'],
     //  Images Controller
     //
     //  @returns Class
-    ///
+    //
     function (Image) {
 
         'use strict';

@@ -246,7 +246,6 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
 
             _updateContent: function (backends) {
-                var that = this;
                 Ember.run(this, function() {
 
                     // Remove deleted backends
@@ -278,7 +277,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 Ember.run(this, function() {
                     var backendModel = Backend.create(backend);
                     this.content.pushObject(backendModel);
-                    // <TODO (gtsop): move this code into machine model
+                    // <TODO (gtsop): move this code into backend model
                     backendModel.one('onMachineListChange', function() {
                         if (backendModel.provider == 'bare_metal') {
                             backendModel.set('isBareMetal', true);

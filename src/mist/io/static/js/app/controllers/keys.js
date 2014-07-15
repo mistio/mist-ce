@@ -340,7 +340,7 @@ define('app/controllers/keys', ['app/models/key'],
 
             /**
              *
-             *  Observers§
+             *  Observers
              *
              */
 
