@@ -58,9 +58,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             //
 
 
-            addBackend: function(title, provider, apiKey, apiSecret, apiUrl,
+            // <TODO (gtsop): THIS IS UGLY! use an args object instead
+            addBackend: function (title, provider, apiKey, apiSecret, apiUrl,
                                  region, tenant, computeEndpoint, dockerUrl,
                                  port, key, callback) {
+            // />
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
