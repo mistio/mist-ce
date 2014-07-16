@@ -9,8 +9,6 @@ be performed inside the corresponding method functions.
 
 """
 
-
-import logging
 from datetime import datetime
 
 import traceback
@@ -40,8 +38,12 @@ from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update
 from mist.io.sockio import MistNamespace, ShellNamespace
 
-
+import logging
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
+
 OK = Response("OK", 200)
 
 

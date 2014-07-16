@@ -1,4 +1,3 @@
-import logging
 import random
 import json
 import requests
@@ -43,10 +42,15 @@ import libcloud.security
 libcloud.security.CA_CERTS_PATH.append('cacert.pem')
 libcloud.security.CA_CERTS_PATH.append('./src/mist.io/cacert.pem')
 
+import logging
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
 HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
 GCE_IMAGES = ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']
+
 
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -678,6 +682,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     through mist.io and those from the Linode interface.
 
     """
+    
+    log.info('Creating machine %s on backend %s' % (machine_name, backend_id))
 
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
@@ -1257,6 +1263,7 @@ def destroy_machine(user, backend_id, machine_id):
 
     """
 
+    log.info('Destroying machine %s in backend %s' % (machine_id, backend_id))
     # if machine has monitoring, disable it. the way we disable depends on
     # whether this is a standalone io installation or not
     disable_monitoring_function = None
@@ -1844,7 +1851,8 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
     )
 
-    log.warn('probing with key %s' % key_id)
+    if key_id:
+        log.warn('probing with key %s' % key_id)
 
     cmd_output = ssh_command(user, backend_id, machine_id,
                              host, command, key_id=key_id)
