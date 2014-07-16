@@ -26,7 +26,6 @@ getOODictField, getFieldsListField, getFieldsDictField, OODict, UserEngine
 
 import os
 import yaml
-import logging
 from time import time, sleep
 
 import abc
@@ -34,9 +33,16 @@ from copy import copy, deepcopy
 from collections import MutableSequence, MutableMapping
 from contextlib import contextmanager
 
+try:
+    from mist.core import config
+except ImportError:
+    from mist.io import config
 
+import logging
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
-
 
 ### Data Access Object ###
 

@@ -1,20 +1,20 @@
 """Routes and wsgi app creation"""
 
-
 import yaml
-import logging
 import os
 import json
 import requests
-
 
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
 
 from mist.io.resources import Root
-import mist.io.config
+from mist.io import config
 
-
+import logging
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
 
@@ -66,52 +66,25 @@ def main(global_config, **settings):
         # settings.yaml doesn't exist, continue
         pass
 
-    ## user = User()   # this automatically loads from db.yaml
-    ## # try to authenticate with mist.io service if email,password are available
-    ## if user.email and user.mist_api_token:
-        ## from mist.io.helpers import get_auth_header
-        ## try:
-            ## ret = requests.post(mist.io.config.CORE_URI + '/auth',
-                                ## headers={'Authorization': get_auth_header(user)},
-                                ## verify=mist.io.config.SSL_VERIFY)
-        ## except requests.exceptions.SSLError as exc:
-            ## log.error("SSL Error when communicating with %s: %s",
-                      ## mist.io.config.CORE_URI, exc)
-        ## else:
-            ## if ret.status_code == 200:
-                ## log.info("Succesfully authenticated to mist.io service.")
-                ## ret = json.loads(ret.content)
-                ## # all these are no longer used. Also settings is not a safe
-                # place to put info since it's worker dependant
-                ## settings['current_plan'] = ret.get('current_plan', {})
-                ## # FIXME: do we really need the following params?
-                ## user_details = ret.get('user_details', {})
-                ## settings['user']['name'] = user_details.get('name', '')
-                ## settings['user']['company_name'] = user_details.get('company_name', '')
-                ## settings['user']['country'] = user_details.get('country', '')
-                ## settings['user']['number_of_servers'] = user_details.get('number_of_servers', '')
-                ## settings['user']['number_of_people'] = user_details.get('number_of_people', '')
-            ## else:
-                ## log.error("Error authenticating to mist.io service. %d: %s", ret.status_code, ret.text)
 
-    config = Configurator(root_factory=Root, settings=settings)
+    configurator = Configurator(root_factory=Root, settings=settings)
 
     # Add custom adapter to the JSON renderer to avoid serialization errors
     json_renderer = JSON()
     def string_adapter(obj, request):
         return str(obj)
     json_renderer.add_adapter(object, string_adapter)
-    config.add_renderer('json', json_renderer)
-    config.add_static_view('resources', 'mist.io:static')
-    config.add_static_view('docs', path='../../../docs/build')
-    config.include(add_routes)
-    config.scan()
-    app = config.make_wsgi_app()
+    configurator.add_renderer('json', json_renderer)
+    configurator.add_static_view('resources', 'mist.io:static')
+    configurator.add_static_view('docs', path='../../../docs/build')
+    configurator.include(add_routes)
+    configurator.scan()
+    app = configurator.make_wsgi_app()
 
     return app
 
 
-def add_routes(config):
+def add_routes(configurator):
     """This function defines pyramid routes.
 
     Takes a Configurator instance as argument and changes it's configuration.
@@ -121,45 +94,45 @@ def add_routes(config):
 
     """
 
-    config.add_route('home', '/')
-    config.add_route('providers', '/providers')
-    config.add_route('backends', '/backends')
-    config.add_route('backend_action', '/backends/{backend}')
+    configurator.add_route('home', '/')
+    configurator.add_route('providers', '/providers')
+    configurator.add_route('backends', '/backends')
+    configurator.add_route('backend_action', '/backends/{backend}')
 
-    config.add_route('machines', '/backends/{backend}/machines')
-    config.add_route('machine', '/backends/{backend}/machines/{machine}')
-    config.add_route('machine_metadata',
+    configurator.add_route('machines', '/backends/{backend}/machines')
+    configurator.add_route('machine', '/backends/{backend}/machines/{machine}')
+    configurator.add_route('machine_metadata',
                      '/backends/{backend}/machines/{machine}/metadata')
-    config.add_route('probe', '/backends/{backend}/machines/{machine}/probe')
-    config.add_route('shell', '/backends/{backend}/machines/{machine}/shell')
+    configurator.add_route('probe', '/backends/{backend}/machines/{machine}/probe')
+    configurator.add_route('shell', '/backends/{backend}/machines/{machine}/shell')
 
-    config.add_route('monitoring', '/monitoring')
-    config.add_route('update_monitoring',
+    configurator.add_route('monitoring', '/monitoring')
+    configurator.add_route('update_monitoring',
                      '/backends/{backend}/machines/{machine}/monitoring')
-    config.add_route('stats', '/backends/{backend}/machines/{machine}/stats')
-    config.add_route('metrics',
+    configurator.add_route('stats', '/backends/{backend}/machines/{machine}/stats')
+    configurator.add_route('metrics',
                      '/backends/{backend}/machines/{machine}/metrics')
-    config.add_route('metric', '/metrics/{metric}')
-    config.add_route('deploy_plugin',
+    configurator.add_route('metric', '/metrics/{metric}')
+    configurator.add_route('deploy_plugin',
                      '/backends/{backend}/machines/{machine}/plugins/{plugin}')
-    config.add_route('loadavg',
+    configurator.add_route('loadavg',
                      '/backends/{backend}/machines/{machine}/loadavg.png')
 
-    config.add_route('images', '/backends/{backend}/images')
-    config.add_route('image', '/backends/{backend}/images/{image:.*}')
-    config.add_route('sizes', '/backends/{backend}/sizes')
-    config.add_route('locations', '/backends/{backend}/locations')
+    configurator.add_route('images', '/backends/{backend}/images')
+    configurator.add_route('image', '/backends/{backend}/images/{image:.*}')
+    configurator.add_route('sizes', '/backends/{backend}/sizes')
+    configurator.add_route('locations', '/backends/{backend}/locations')
 
-    config.add_route('keys', '/keys')
-    config.add_route('key_action', '/keys/{key}')
-    config.add_route('key_public', '/keys/{key}/public')
-    config.add_route('key_private', 'keys/{key}/private')
-    config.add_route('key_association',
-                     '/backends/{backend}/machines/{machine}/keys/{key}')
+    configurator.add_route('keys', '/keys')
+    configurator.add_route('key_action', '/keys/{key}')
+    configurator.add_route('key_public', '/keys/{key}/public')
+    configurator.add_route('key_private', 'keys/{key}/private')
+    configurator.add_route('key_association',
+                           '/backends/{backend}/machines/{machine}/keys/{key}')
 
-    config.add_route('rules', '/rules')
-    config.add_route('rule', '/rules/{rule}')
-    config.add_route('check_auth', '/auth')
-    config.add_route('account', '/account')
+    configurator.add_route('rules', '/rules')
+    configurator.add_route('rule', '/rules/{rule}')
+    configurator.add_route('check_auth', '/auth')
+    configurator.add_route('account', '/account')
     
-    config.add_route('socketio', '/socket.io/*remaining')
+    configurator.add_route('socketio', '/socket.io/*remaining')

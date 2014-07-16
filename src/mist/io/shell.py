@@ -5,15 +5,11 @@ SSH.
 
 """
 
-
-import logging
 from time import time
 from StringIO import StringIO
 
-
 import paramiko
 import socket
-
 
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
@@ -22,7 +18,15 @@ from mist.io.exceptions import ServiceUnavailableError
 
 from mist.io.helpers import trigger_session_update
 
+try:
+    from mist.core import config
+except ImportError:
+    from mist.io import config
 
+import logging
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
 

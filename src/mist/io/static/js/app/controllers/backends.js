@@ -348,6 +348,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             _handleBackendsUpdates: function () {
                 var that = this;
                 Mist.socket.on('list_backends', function (backends) {
+                    warn(backends);
                     that._setContent(backends);
                     that.set('loading', false);
                     $('#splash').fadeOut(650); // TODO: Move this outa here
