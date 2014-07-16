@@ -1,6 +1,5 @@
 import json
 import functools
-import logging
 
 import libcloud.security
 
@@ -37,8 +36,11 @@ from mist.io.helpers import amqp_log
 # libcloud certificate fix for OS X
 libcloud.security.CA_CERTS_PATH.append(cert_path)
 
+import logging
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
-
 
 @app.task
 def ssh_command(email, backend_id, machine_id, host, command,
@@ -280,9 +282,11 @@ class ListMachines(UserTask):
     polling = True
 
     def execute(self, email, backend_id):
+        log.warn('Running list machines for user %s backend %s' % (email, backend_id))
         from mist.io import methods
         user = user_from_email(email)
         machines = methods.list_machines(user, backend_id)
+        log.warn('Returning list machines for user %s backend %s' % (email, backend_id))
         return {'backend_id': backend_id, 'machines': machines}
 
     def error_rerun_handler(self, exc, errors, email, backend_id):
@@ -303,8 +307,8 @@ class ProbeSSH(UserTask):
 
     def execute(self, email, backend_id, machine_id, host):
         user = user_from_email(email)
-        from mist.io import methods
-        res = methods.probe_ssh_only(user, backend_id, machine_id, host)
+        from mist.io.methods import probe_ssh_only
+        res = probe_ssh_only(user, backend_id, machine_id, host)
         return {'backend_id': backend_id,
                 'machine_id': machine_id,
                 'host': host,

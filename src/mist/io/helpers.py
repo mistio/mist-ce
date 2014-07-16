@@ -17,7 +17,15 @@ from amqp.exceptions import NotFound as AmqpNotFound
 
 from mist.io.model import User
 
-
+try:
+    from mist.core import config
+except ImportError:
+    from mist.io import config
+    
+import logging
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
 
