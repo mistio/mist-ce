@@ -56,7 +56,7 @@
              class="mist-select">
             <h2>{{Mist.machineAddController.newMachineImage.name}}</h2>
             <ul data-role="listview" data-theme="a">
-                {{#each Mist.machineAddController.newMachineProvider.images}}
+                {{#each Mist.machineAddController.newMachineProvider.images.content}}
                     {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
                         <li data-icon="false">
                             <a {{action "selectImage" this target="view"}}>{{this.name}}</a>
@@ -82,7 +82,7 @@
              class="mist-select">
             <h2>{{Mist.machineAddController.newMachineSize.name}}</h2>
             <ul data-role="listview" data-theme="a">
-                {{#each Mist.machineAddController.newMachineProvider.sizes}}
+                {{#each Mist.machineAddController.newMachineProvider.sizes.content}}
                 <li data-icon="false">
                     <a {{action "selectSize" this target="view"}}>{{this.name}}
                         <span class="size-decription">
@@ -106,7 +106,7 @@
              class="mist-select">
             <h2>{{Mist.machineAddController.newMachineLocation.name}}</h2>
             <ul data-role="listview" data-theme="a">
-                {{#each Mist.machineAddController.newMachineProvider.locations}}
+                {{#each Mist.machineAddController.newMachineProvider.locations.content}}
                 <li data-icon="false">
                     <a {{action "selectLocation" this target="view"}}>{{this.name}}</a>
                 </li>

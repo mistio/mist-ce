@@ -19,22 +19,22 @@
            data-iconpos="right"
            data-theme="d"
            {{action "createClicked" target="view"}}>Create</a>
-          
+
         <a id="select-machines-btn"
            class="responsive-button"
            data-role="button"
            data-icon="arrow-d"
            {{action "selectClicked" target="view"}}>Select</a>
 
-        <ul id="machines" 
-            data-role="listview" 
-            data-inset="true" 
-            data-filter="true" 
+        <ul id="machines"
+            data-role="listview"
+            data-inset="true"
+            data-filter="true"
             data-filter-placeholder="Filter..."
             data-theme="c"
             class="checkbox-list">
-            {{#each Mist.backendsController}}
-                {{#each this.machines}}
+            {{#each Mist.backendsController.content}}
+                {{#each this.machines.content}}
                     {{view Mist.machineListItemView machineBinding="this" class="checkbox-link"}}
                 {{/each}}
             {{/each}}

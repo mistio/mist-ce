@@ -8,7 +8,12 @@ define('app/models/location', ['ember'],
         return Ember.Object.extend({
             id: null,
             name: null,
-            country: null
+            country: null,
+            init: function () {
+                this._super();
+                if (this.name == '')
+                    this.set('name', 'Default');
+            }
         });
     }
 );
