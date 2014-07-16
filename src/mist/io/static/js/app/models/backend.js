@@ -150,10 +150,12 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             _toggle: function() {
                 if (this.enabled) {
+                    /*
                     this.sizes.load();
                     this.images.load();
                     this.machines.load();
                     this.locations.load();
+                    */
                 } else {
                     /*
                     this.sizes.clear();
