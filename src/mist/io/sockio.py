@@ -36,11 +36,9 @@ from mist.io import tasks
 from mist.io.shell import Shell
 
 import logging
-
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s.%(msecs)d %(levelname)s %(module)s - %(funcName)s: %(message)s',
-                    datefmt="%Y-%m-%d %H:%M:%S")
-
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
 
@@ -138,6 +136,9 @@ class MistNamespace(BaseNamespace):
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_machines', 'list_locations', 'ping']):
             self.emit(routing_key, msg.body)
+            if routing_key == 'probe':
+                log.warn('send probe')
+                
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = msg.body['machines']

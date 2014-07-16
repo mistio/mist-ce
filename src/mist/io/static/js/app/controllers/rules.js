@@ -15,14 +15,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             commandRule: null,
             creationPending: false,
 
-            metricList: [
-                'load',
-                'cpu',
-                'ram',
-                'disk-write',
-                'network-tx'
-            ],
-
             operatorList: [{
                 'title': 'gt',
                 'symbol': '>'
@@ -98,7 +90,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                         'actionToTake': actionToTake,
                     });
                     that.pushObject(rule);
-                    that.redrawRules();
                 }).error(function(message) {
                     Mist.notificationController.notify('Error while creating rule: ' + message);
                     that.set('creationPending', false);
@@ -112,7 +103,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 Mist.ajax.DELETE('/rules/' + rule.id, {
                 }).success(function(){
                     Mist.rulesController.removeObject(rule);
-                    Mist.rulesController.redrawRules();
                 }).error(function(message) {
                     Mist.notificationController.notify('Error while deleting rule: ' + message);
                     rule.set('pendingAction', false);
@@ -120,7 +110,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
-            updateRule: function(id, metric, operator, value, actionToTake, command) {
+            updateRule: function(id, metric, operator, value, actionToTake, command, callback) {
 
                 var rule = this.getRuleById(id);
 
@@ -170,48 +160,10 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 }).error(function(message) {
                     Mist.notificationController.notify('Error while updating rule: ' + message);
                     rule.set('pendingAction', false);
+                }).complete(function (success, data) {
+                    if (callback) callback(success, data);
                 });
-            },
-
-
-            setSliderEventHandlers: function() {
-                function showSlider(event) {
-                    var rule_id = $(event.currentTarget).parent().attr('id');
-                    var rule = Mist.rulesController.getRuleById(rule_id);
-                    if (rule.metric.hasRange) {
-                        $(event.currentTarget).addClass('open');
-                        $(event.currentTarget).find('.ui-slider-track').fadeIn(100);
-                    }
-                }
-                function hideSlider(event) {
-                    $(event.currentTarget).find('.ui-slider-track').fadeOut(100);
-                    $(event.currentTarget).find('.ui-slider').removeClass('open');
-                }
-                $('.rules-container .ui-slider').on('tap', showSlider);
-                $('.rules-container .ui-slider').on('click', showSlider);
-                $('.rules-container .ui-slider').on('mouseover', showSlider);
-                $('#single-machine').on('tap', hideSlider);
-                $('.rules-container .rule-box').on('mouseleave', hideSlider);
-            },
-
-
-            removeSliderEventHandlers: function() {
-                $('.rules-container .ui-slider').off('tap');
-                $('.rules-container .ui-slider').off('click');
-                $('.rules-container .ui-slider').off('mouseover');
-                $('#single-machine').off('tap');
-                $('.rules-container .rule-box').off('mouseleave');
-            },
-
-
-            redrawRules: function() {
-                var that = this;
-                Ember.run.next(function() {
-                    that.removeSliderEventHandlers();
-                    $('.rule-box').trigger('create');
-                    that.setSliderEventHandlers();
-                });
-            },
+            }
         });
     }
 );
