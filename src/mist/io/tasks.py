@@ -156,9 +156,11 @@ class UserTask(Task):
         cached_err = self.memcache.get(cache_key + 'error')
         if cached_err:
             # task has been failing recently
-            if seq_id != cached_err['seq_id']:
+            if seq_id != cached_err['seq_id']: 
                 # other sequence of task already handling this error flow
-                return
+                # This is not working! Passing instead
+                #return
+                pass
         if not amqp_user_listening(email):
             # noone is waiting for result, stop trying, but flush cached erros
             if cached_err:
