@@ -45,23 +45,22 @@ solve this you need to::
 Deployment
 ----------
 
-Mist.io comes with two sets of deployment options, one suited for production
-environments and one for develompent.
+Mist.io comes with supervisor in order to handle all the processes.
 
-To get it up and running for production::
+To get it up and running::
 
-    ./bin/uwsgi-start production.ini
+    ./bin/supervisord
 
-For development mode::
+For development you can tail the logs::
 
-    ./bin/uwsgi-start development.ini
+    tail -f var/log/*.log
 
-Or if you prefer to use paster::
+You can also monitor that all the processes are up and running::
 
-    ./bin/paster serve development.ini --reload
+    ./bin/supervisorctl status
 
-With the --reload flag, whenever there are changes in Python code and templates
-the server will automatically restart to load the new version. Changes in css
-and javascript don't need a restart to show up. To stop it, simply press CTRL+C.  
+Finally, you can start, stop or restart a specific process::
 
-Point your browser to http://127.0.0.1:6543 and you are ready to roll!
+    ./bin/supervisorctl restart uwsgi
+
+Point your browser to http://127.0.0.1:8000 and you are ready to roll!

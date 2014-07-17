@@ -9,6 +9,7 @@ Feature: Actions for Keys
     When I click the button that contains "Keys"
     When I click the "Add" button
     And I fill "FirstKey" as key name
+    And I wait for 2 seconds
     And I click the "Generate" button inside the "Add key" popup
     And I wait for 5 seconds
     And I click the "Add" button inside the "Add key" popup
