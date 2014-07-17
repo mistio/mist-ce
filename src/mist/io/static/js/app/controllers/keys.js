@@ -267,6 +267,7 @@ define('app/controllers/keys', ['app/models/key'],
 
             _addKey: function(key) {
                 Ember.run(this, function() {
+                    if (this.keyExists(key.id)) return;
                     this.content.pushObject(Key.create(key));
                     this.trigger('onKeyAdd');
                 });
@@ -283,12 +284,8 @@ define('app/controllers/keys', ['app/models/key'],
 
             _renameKey: function(keyId, newKeyId) {
                 Ember.run(this, function() {
-                    if (this.keyExists(newKeyId))
-                        return;
                     if (this.keyExists(keyId))
                         this.getKey(keyId).set('id', newKeyId);
-                    else
-                        error('faild to rename', keyId, 'to', newKeyId, 'on the frontend');
                     this.trigger('onKeyRename');
                 });
             },
