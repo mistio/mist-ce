@@ -1,57 +1,80 @@
 define('app/controllers/images', ['app/models/image'],
-    /**
-     *  Images Controller
-     *
-     *  @returns Class
-     */
-    function(Image) {
+    //
+    //  Images Controller
+    //
+    //  @returns Class
+    //
+    function (Image) {
+
+        'use strict';
+
         return Ember.ArrayController.extend(Ember.Evented, {
 
-            /**
-             *  Properties
-             */
 
-            content: [],
+            //
+            //
+            //  Properties
+            //
+            //
+
+
+            content: null,
             loading: null,
             backend: null,
+
+
+            //
+            //
+            //  Computed Properties
+            //
+            //
+
+
             hasStarred: function () {
                 return !!this.content.findBy('star', true);
             }.property('content.@each.star'),
 
-            /**
-             *
-             *  Initialization
-             *
-             */
 
-            load: function() {
+            //
+            //
+            //  Initialization
+            //
+            //
 
-                if (!this.backend.enabled) return;
 
-                var that = this;
+            init: function () {
+                this._super();
+                this.set('content', []);
                 this.set('loading', true);
             },
 
 
+            //
+            //
+            //  Methods
+            //
+            //
 
-            /**
-             *
-             *  Methods
-             *
-             */
 
-            searchImages: function(filter, callback) {
+            load: function (images) {
+                this._updateContent(images);
+                this.set('loading', false);
+            },
+
+
+            searchImages: function (filter, callback) {
                 var that = this;
                 Mist.ajax.POST('/backends/' + this.backend.id + '/images', {
-                    'search_term' : filter
-                }).success(function(images) {
+                    'search_term': filter
+                }).success(function (images) {
 
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to search images on ' + that.backend.title);
-                }).complete(function(success, images) {
+                }).error(function () {
+                    Mist.notificationController.notify(
+                        'Failed to search images on ' + that.backend.title);
+                }).complete(function (success, images) {
                     var imagesToReturn = [];
                     if (success) {
-                        images.forEach(function(image) {
+                        images.forEach(function (image) {
                             image.backend = that.backend;
                             imagesToReturn.push(Image.create(image));
                         });
@@ -61,70 +84,77 @@ define('app/controllers/images', ['app/models/image'],
             },
 
 
-            toggleImageStar: function(image, callback) {
+            toggleImageStar: function (image, callback) {
                 var that = this;
                 Mist.ajax.POST('/backends/' + this.backend.id + '/images/' + image.id, {
-                }).success(function(star) {
-                    if (!that.imageExists(image.id)) {
+                }).success(function (star) {
+                    if (!that.imageExists(image.id))
                         that._addImage(image);
-                    }
                     that._toggleImageStar(image.id, star);
-                }).error(function() {
+                }).error(function () {
                     Mist.notificationController.notify('Failed to (un)star image');
-                }).complete(function(success, star) {
+                }).complete(function (success, star) {
                     if (callback) callback(success, star);
                 });
             },
 
 
-            clear: function() {
-                Ember.run(this, function() {
-                    this.set('content', []);
-                    this.set('loading', false);
-                    this.trigger('onImageListChange');
-                });
-            },
-
-
-            getImage: function(imageId) {
+            getImage: function (imageId) {
                 return this.content.findBy('id', imageId);
             },
 
 
-            imageExists: function(imageId) {
+            imageExists: function (imageId) {
                 return !!this.getImage(imageId);
             },
 
 
+            //
+            //
+            //  Pseudo-Private Methods
+            //
+            //
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
 
-            _addImage: function(image) {
-                Ember.run(this, function() {
-                    this.content.pushObject(Image.create(image));
+            _updateContent: function (images) {
+                Ember.run(this, function () {
+
+                    // Remove deleted images
+                    this.content.forEach(function (image) {
+                        if (!images.findBy('id', image.id))
+                            this.content.removeObject(image);
+                    }, this);
+
+                    images.forEach(function (image) {
+
+                        var oldImage = this.getImage(image.id);
+
+                        if (oldImage)
+                            // Update existing images
+                            forIn(image, function (value, property) {
+                                oldImage.set(property, value);
+                            });
+                        else
+                            // Add new images
+                            this._addImage(image);
+                    }, this);
+
                     this.trigger('onImageListChange');
                 });
             },
 
-            _setContent: function(images) {
-                var that = this;
-                Ember.run(function() {
-                    that.set('content', []);
-                    images.forEach(function(image) {
-                        image.backend = that.backend;
-                        that.content.pushObject(Image.create(image));
-                    });
-                    that.trigger('onImageListChange');
+
+            _addImage: function (image) {
+                Ember.run(this, function () {
+                    image.backend = this.backend;
+                    this.content.pushObject(Image.create(image));
+                    this.trigger('onImageAdd');
                 });
             },
 
 
-            _toggleImageStar: function(imageId, star) {
-                Ember.run(this, function() {
+            _toggleImageStar: function (imageId, star) {
+                Ember.run(this, function () {
                     this.getImage(imageId).set('star', star);
                     this.trigger('onImageStarToggle');
                 });

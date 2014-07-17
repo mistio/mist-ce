@@ -682,7 +682,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     through mist.io and those from the Linode interface.
 
     """
-    
+
     log.info('Creating machine %s on backend %s' % (machine_name, backend_id))
 
     if backend_id not in user.backends:
@@ -1442,7 +1442,7 @@ def list_backends(user):
                     'title': backend.title or backend.provider,
                     'provider': backend.provider,
                     'poll_interval': backend.poll_interval,
-                    'state': 'wait' if backend.enabled else 'offline',
+                    'state': 'online' if backend.enabled else 'offline',
                     # for Provider.RACKSPACE_FIRST_GEN
                     'region': backend.region,
                     # for Provider.RACKSPACE (the new Nova provider)

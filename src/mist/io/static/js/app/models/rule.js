@@ -1,15 +1,22 @@
 define('app/models/rule', ['ember'],
-    /**
-     *  Rule Model
-     *
-     *  @returns Class
-     */
+    //
+    //  Rule Model
+    //
+    //  @returns Class
+    ///
     function () {
+
+        'use strict';
+
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             id: null,
             unit: null,
