@@ -124,12 +124,15 @@ def rename_backend(context, new_name):
 def backend_added(context, backend, seconds):
     end_time = time() + int(seconds)
     while time() < end_time:
-        backends = context.browser.find_element_by_id("backend-buttons")
-        backend_buttons = backends.find_elements_by_class_name("ui-btn")
-        for button in backend_buttons:
-            if backend in button.text:
-                return
-        sleep(2)
+        try:
+            backends = context.browser.find_element_by_id("backend-buttons")
+            backend_buttons = backends.find_elements_by_class_name("ui-btn")
+            for button in backend_buttons:
+                if backend in button.text:
+                    return
+            sleep(2)
+        except:
+            sleep(2)
 
     assert False, u'%s is not added within %s seconds' %(backend, seconds)
 
