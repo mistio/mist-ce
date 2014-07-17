@@ -51,16 +51,16 @@ To get it up and running::
 
     ./bin/supervisord
 
-For development you cak tail the logs::
+For development you can tail the logs::
 
-    tail -f var/log/*
+    tail -f var/log/*.log
 
 You can also monitor that all the processes are up and running::
 
     ./bin/supervisorctl status
 
-Finally, you can handle a specific process::
+Finally, you can start, stop or restart a specific process::
 
-    ./bin/supervisorctl restart/start/stop uwsgi
+    ./bin/supervisorctl restart uwsgi
 
 Point your browser to http://127.0.0.1:8000 and you are ready to roll!
