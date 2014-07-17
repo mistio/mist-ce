@@ -66,7 +66,7 @@ define('app/controllers/keys', ['app/models/key'],
                     'id': keyId,
                     'priv': keyPrivate
                 }).success(function(key) {
-                    that._addKey(key);
+                    //that._addKey(key);
                 }).error(function(message) {
                     Mist.notificationController.notify(message);
                 }).complete(function(success, key) {
