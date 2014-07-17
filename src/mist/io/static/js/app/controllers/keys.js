@@ -66,7 +66,7 @@ define('app/controllers/keys', ['app/models/key'],
                     'id': keyId,
                     'priv': keyPrivate
                 }).success(function(key) {
-                    //that._addKey(key);
+                    //kthat._addKey(key);
                 }).error(function(message) {
                     Mist.notificationController.notify(message);
                 }).complete(function(success, key) {
@@ -83,7 +83,7 @@ define('app/controllers/keys', ['app/models/key'],
                 Mist.ajax.PUT('/keys/' + keyId, {
                     'new_id': newKeyId
                 }).success(function() {
-                    that._renameKey(keyId, newKeyId);
+                    //that._renameKey(keyId, newKeyId);
                 }).error(function() {
                     Mist.notificationController.notify('Failed to rename key');
                 }).complete(function(success) {
