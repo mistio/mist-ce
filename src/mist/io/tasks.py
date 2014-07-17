@@ -23,10 +23,12 @@ from mist.io.helpers import get_auth_header
 try:  # Multi-user environment
     from mist.core.helpers import user_from_email
     from mist.core import config
+    multi_user = True
     cert_path = "src/mist.io/cacert.pem"
 except ImportError:  # Standalone mist.io
     from mist.io.helpers import user_from_email
     from mist.io import config
+    multi_user = False
     cert_path = "cacert.pem"
 
 from mist.io.helpers import amqp_publish_user
@@ -41,6 +43,20 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
+
+
+@app.task
+def update_machine_count(email, backend_id, machine_count):
+    if not multi_user:
+        return
+    
+    user = user_from_email(email)
+    with user.lock_n_load():
+        user.backends[backend_id].machine_count = machine_count
+        user.total_machine_count = sum(
+            [backend.machine_count for backend in user.backends.values()]
+        )
+        user.save()
 
 @app.task
 def ssh_command(email, backend_id, machine_id, host, command,
