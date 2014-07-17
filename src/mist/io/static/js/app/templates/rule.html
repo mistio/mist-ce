@@ -25,7 +25,20 @@
     </a>
 
     <div class="advanced-condition">
-    advanced
+        <div class="rule-within rule-text">within</div>
+        {{view Mist.TextField class="rule-value" type="number"
+            valueBinding="view.newRuleTimeWindow"}}
+        <div class="rule-time-window rule-text">min(s)</div>
+        <div class="rule-for rule-text">for</div>
+        <fieldset data-role="controlgroup" data-type="horizontal">
+            <input name="radio-choice-h-2" id="radio-choice-h-2a" value="on" checked="checked" type="radio">
+            <label class="check any ui-btn-d" for="radio-choice-h-2a" {{action "forClicked" "any" target="view"}}>Any</label>
+            <input name="radio-choice-h-2" id="radio-choice-h-2b" value="off" type="radio">
+            <label class="check every" for="radio-choice-h-2b" {{action "forClicked" "every" target="view"}}>Every</label>
+            <input name="radio-choice-h-2" id="radio-choice-h-2c" value="other" type="radio">
+            <label class="check average" for="radio-choice-h-2c" {{action "forClicked" "average" target="view"}}>Average</label>
+        </fieldset>
+        <div class="rule-for rule-text">value</div>
     </div>
 
     <div class="rule-then rule-text">then</div>

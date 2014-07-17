@@ -95,11 +95,15 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
                 openAdvancedCondition: function () {
-
                     var that = this;
                     $('#' + that.elementId + ' .rule-more').fadeOut(200, function () {
                         $('#' + that.elementId + ' .advanced-condition').fadeIn();
                     });
+                },
+
+                forClicked: function (type) {
+                    $('#' + this.elementId + ' .check').removeClass('ui-btn-d');
+                    $('#' + this.elementId + ' .check.' + type).addClass('ui-btn-d');
                 }
             },
 
