@@ -96,6 +96,10 @@ CREDENTIALS = {
     },
     'DOCKER': {
         'host': ""
+    },
+    'DIGITALOCEAN': {
+        'client_id': "",
+        'api_key': ""
     }
 }
 
