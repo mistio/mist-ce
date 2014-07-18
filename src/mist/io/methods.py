@@ -1081,9 +1081,8 @@ def _create_machine_gce(conn, key_name, private_key, public_key,
     """
     key = public_key.replace('\n', '')
 
-    metadata = {'startup-script': script,
-                'sshKeys': 'user:%s' % key}
-    #metadata for ssh user, ssh key and script to deploy 
+    metadata = {'items': [{'key': 'startup-script', 'value': script},
+                          {'key': 'sshKeys', 'value': 'user:%s' % key}]}
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
