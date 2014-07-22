@@ -49,6 +49,24 @@
     margin-left: -140px;
     margin-top: -140px;
 }
+.mist-progress {
+    border: 1px solid white;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    -webkit-border-radius: 10px;
+    bottom: 3px;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 1);
+    height: 0;
+    position: absolute;
+    width: 0%;
+    left: 0;
+}
+.mist-progress-wrapper {
+    bottom: 58px;
+    position: absolute;
+    width: 96px;
+    left: 92px;
+}
 
 
 /* Page formating
