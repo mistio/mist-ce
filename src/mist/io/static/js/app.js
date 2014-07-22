@@ -35,7 +35,7 @@ require.config({
 });
 var emberInit = false;
 // Load our app
-define( 'app', [
+define( 'app', ['jquery',
     'd3',
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
@@ -99,7 +99,7 @@ define( 'app', [
     'app/views/user_menu',
     'mobile',
     'ember'
-], function(
+], function($
     d3,
     BackendAddController,
     BackendEditController,
