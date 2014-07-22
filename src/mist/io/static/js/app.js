@@ -1,5 +1,3 @@
-var emberInit = function () {};
-
 // Define libraries
 require.config({
     baseUrl: 'resources/js/',
@@ -17,11 +15,6 @@ require.config({
         term: 'lib/term'
     },
     deps: ['text', 'jquery', 'handlebars', 'ember', 'md5', 'sha256', 'socketio', 'term'],
-    callback: function () {
-        emberInit = function () {
-            require(['mobile']);
-        }
-    },
     shim: {
         ember: {
             deps: ['handlebars', 'jquery']
@@ -33,7 +26,7 @@ require.config({
 });
 
 // Load our app
-define( 'app', [
+define('app', [
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
     'app/controllers/backends',
@@ -164,35 +157,35 @@ define( 'app', [
         warn('Init');
 
         // JQM init event
-    $(document).bind('mobileinit', function() {
+        $(document).bind('mobileinit', function() {
 
-        changeLoadProgress(50);
-        warn('Mobile Init');
-        $.mobile.ajaxEnabled = false;
-        $.mobile.pushStateEnabled = false;
-        $.mobile.linkBindingEnabled = false;
-        $.mobile.hashListeningEnabled = false;
-        $.mobile.ignoreContentEnabled = true;
-        $.mobile.autoInitialize = false;
-        $.mobile.panel.prototype._bindUpdateLayout = function(){};
-        $('body').css('overflow','auto');
-                App.set('isJQMInitialized',true);
-        Mist.set('socket', Socket({
-            namespace: '/mist',
-            onInit: initSocket,
-        }));
-    });
+            changeLoadProgress(50);
+            warn('Mobile Init');
+
+            $.mobile.ajaxEnabled = false;
+            $.mobile.pushStateEnabled = false;
+            $.mobile.linkBindingEnabled = false;
+            $.mobile.hashListeningEnabled = false;
+            $.mobile.ignoreContentEnabled = true;
+            $.mobile.panel.prototype._bindUpdateLayout = function(){};
+            $('body').css('overflow','auto');
+
+            App.set('isJQMInitialized',true);
+            Mist.set('socket', Socket({
+                namespace: '/mist',
+                onInit: initSocket,
+            }));
+        });
+
         // Hide error boxes on page unload
-
         window.onbeforeunload = function() {
             $('.ui-loader').hide();
         };
 
 
         // Ember Application
-
         App = Ember.Application.create({
-            ready: emberInit
+            ready: initEmber
         });
 
 
@@ -851,6 +844,12 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
+
+function initEmber () {
+    require(['mobile']);
+}
+
+
 function initSocket (socket, initialized) {
 
     changeLoadProgress(75);
@@ -931,6 +930,7 @@ var virtualKeyboardHeight = function () {
     }
     return keyboardHeight;
 };
+
 
 // forEach like function on objects
 function forIn () {
