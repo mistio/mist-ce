@@ -26,6 +26,15 @@
 
     <div class="advanced-condition">
 
+        <div class="rule-for rule-text">for</div>
+
+        <a class="rule-button rule-aggregate ui-btn ui-btn-inline ui-shadow ui-corner-all"
+            {{action "openAggregatePopup" target="view"}}>
+                {{aggregate}}
+        </a>
+
+        <div class="rule-for rule-text">value</div>
+
         {{#unless view.aggregateIsAny}}
 
             <div class="rule-within rule-text">within</div>
@@ -37,14 +46,6 @@
 
         {{/unless}}
 
-        <div class="rule-for rule-text">for</div>
-
-        <a class="rule-button rule-aggregate ui-btn ui-btn-inline ui-shadow ui-corner-all"
-            {{action "openAggregatePopup" target="view"}}>
-                {{aggregate}}
-        </a>
-
-        <div class="rule-for rule-text">value</div>
     </div>
 
     <div class="rule-then rule-text">then</div>
