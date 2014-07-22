@@ -77,8 +77,9 @@ class ShellNamespace(BaseNamespace):
             self.channel.close()
 
     def disconnect(silent=False):
-        # reload the session, to avoid saving a stale or deleted session
-        self.request.environ['beaker.session'].load()
+        if multi_user:
+            # reload the session, to avoid saving a stale or deleted session
+            self.request.environ['beaker.session'].load()
         return super(ShellNamespace, self).disconnect(silent=silent)
 
 
@@ -200,8 +201,9 @@ class MistNamespace(BaseNamespace):
                                                       self)
 
     def disconnect(silent=False):
-        # reload the session, to avoid saving a stale or deleted session
-        self.request.environ['beaker.session'].load()
+        if multi_user:
+            # reload the session, to avoid saving a stale or deleted session
+            self.request.environ['beaker.session'].load()
         return super(MistNamespace, self).disconnect(silent=silent)
 
 
