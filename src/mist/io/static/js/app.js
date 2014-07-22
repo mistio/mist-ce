@@ -14,29 +14,29 @@ require.config({
         socketio: 'lib/socket.io',
         term: 'lib/term'
     },
-    deps: ['ember', 'handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term'],
+    deps: ['text', 'jquery', 'handlebars', 'ember', 'md5', 'sha256', 'socketio', 'term'],
     callback: function () {
         function req () {
             if (emberInit)
                 require(['mobile']);
             else
-                setTimeout(req, 400);
+                setTimeout(req, 500);
         };
         req();
     },
     shim: {
-        'ember': {
-            exports: 'Ember'
+        ember: {
+            deps: ['handlebars', 'jquery']
         },
-        'd3': {
+        d3: {
             deps: ['jquery']
         }
     }
 });
+
 var emberInit = false;
 // Load our app
-define( 'app', ['jquery',
-    'd3',
+define( 'app', [
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
     'app/controllers/backends',
@@ -97,10 +97,7 @@ define( 'app', ['jquery',
     'app/views/rule',
     'app/views/rule_edit',
     'app/views/user_menu',
-    'mobile',
-    'ember'
-], function($,
-    d3,
+], function(
     BackendAddController,
     BackendEditController,
     BackendsController,
