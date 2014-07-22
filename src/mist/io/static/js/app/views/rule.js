@@ -25,6 +25,18 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
             //
             //
+            //  Computed Properties
+            //
+            //
+
+
+            aggregateIsAny: function () {
+                return this.rule.aggregate == 'any';
+            }.property('rule', 'rule.aggregate'),
+
+
+            //
+            //
             //  Initialization
             //
             //
@@ -89,6 +101,11 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                 },
 
 
+                openAggregatePopup: function () {
+                    Mist.ruleEditController.open(this.rule, 'aggregate');
+                },
+
+
                 deleteRuleClicked: function () {
                     Mist.rulesController.deleteRule(this.rule);
                 },
@@ -100,11 +117,6 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                         $('#' + that.elementId + ' .advanced-condition').fadeIn();
                     });
                 },
-
-                forClicked: function (type) {
-                    $('#' + this.elementId + ' .check').removeClass('ui-btn-d');
-                    $('#' + this.elementId + ' .check.' + type).addClass('ui-btn-d');
-                }
             },
 
 

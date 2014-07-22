@@ -25,6 +25,7 @@ define('app/models/rule', ['ember'],
             cycles: null,
             command: null,
             machine: null,
+            aggregate: null,
             operator: null,
             maxValue: null,
             machineKey: null,
@@ -35,7 +36,14 @@ define('app/models/rule', ['ember'],
             machineScript: null,
             pendingAction: false,
             machineBackend: null,
-            machineLocation: null
+            machineLocation: null,
+
+
+            init: function () {
+                this._super();
+                // TODO: delete. This is temp for debugging only
+                this.set('aggregate', 'any');
+            },
 
         });
     }

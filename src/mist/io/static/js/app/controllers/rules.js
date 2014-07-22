@@ -30,6 +30,11 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 'command'
             ],
 
+            aggregateList: [
+                'any',
+                'every',
+                'average'
+            ],
 
             setContent: function(rules) {
                 this._updateContent(rules);

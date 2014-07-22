@@ -91,6 +91,18 @@ define('app/views/rule_edit', ['app/views/controlled'],
                 },
 
 
+                aggregateClicked: function (aggregate) {
+                    $('#rule-aggregate').popup('close');
+                    // TODO: update rule here
+                    var rule = Mist.ruleEditController.rule;
+                    rule.set('aggregate', aggregate);
+                    Ember.run.next(function () {
+                        $('#' + rule.id + ' .rule-time-window')
+                            .parent().trigger('create');
+                    });
+                },
+
+
                 saveClicked: function () {
                     $('#rule-command').popup('close');
                     Mist.rulesController.updateRule(
