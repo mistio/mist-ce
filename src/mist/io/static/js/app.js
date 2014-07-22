@@ -1,3 +1,5 @@
+var emberInit = function () {};
+
 // Define libraries
 require.config({
     baseUrl: 'resources/js/',
@@ -16,13 +18,9 @@ require.config({
     },
     deps: ['text', 'jquery', 'handlebars', 'ember', 'md5', 'sha256', 'socketio', 'term'],
     callback: function () {
-        function req () {
-            if (emberInit)
-                require(['mobile']);
-            else
-                setTimeout(req, 500);
-        };
-        req();
+        emberInit = function () {
+            require(['mobile']);
+        }
     },
     shim: {
         ember: {
@@ -34,7 +32,6 @@ require.config({
     }
 });
 
-var emberInit = false;
 // Load our app
 define( 'app', [
     'app/controllers/backend_add',
@@ -195,10 +192,7 @@ define( 'app', [
         // Ember Application
 
         App = Ember.Application.create({
-            ready: function() {
-                emberInit = true;
-                //require(['mobile']);
-            }
+            ready: emberInit
         });
 
 
