@@ -24,9 +24,27 @@ require.config({
     }
 });
 
+var $ = null;
+require(['jquery'], function (jq) {
+    $ = jq;
+    $(document).bind('mobileinit', function() {
+
+        changeLoadProgress(50);
+        warn('Mobile Init');
+        $.mobile.ajaxEnabled = false;
+        $.mobile.pushStateEnabled = false;
+        $.mobile.linkBindingEnabled = false;
+        $.mobile.hashListeningEnabled = false;
+        $.mobile.ignoreContentEnabled = true;
+        $.mobile.autoInitialize = false;
+        $.mobile.panel.prototype._bindUpdateLayout = function(){};
+        $('body').css('overflow','auto');
+
+    });
+});
+
 // Load our app
 define( 'app', [
-    'jquery',
     'd3',
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
@@ -88,8 +106,9 @@ define( 'app', [
     'app/views/rule',
     'app/views/rule_edit',
     'app/views/user_menu',
+    'mobile',
     'ember'
-], function($,
+], function(
     d3,
     BackendAddController,
     BackendEditController,
@@ -161,26 +180,6 @@ define( 'app', [
 
         // JQM init event
 
-        $(document).bind('mobileinit', function() {
-            changeLoadProgress(50);
-            warn('Mobile Init');
-            $.mobile.ajaxEnabled = false;
-            $.mobile.pushStateEnabled = false;
-            $.mobile.linkBindingEnabled = false;
-            $.mobile.hashListeningEnabled = false;
-            $.mobile.ignoreContentEnabled = true;
-            $.mobile.panel.prototype._bindUpdateLayout = function(){};
-            $('body').css('overflow','auto');
-
-            App.set('isJQMInitialized',true);
-
-            Mist.set('socket', Socket({
-                namespace: '/mist',
-                onInit: initSocket,
-            }));
-
-        });
-
         // Hide error boxes on page unload
 
         window.onbeforeunload = function() {
@@ -193,7 +192,12 @@ define( 'app', [
         App = Ember.Application.create({
             ready: function() {
                 changeLoadProgress(40);
-                require(['mobile']);
+                //require(['mobile']);
+                App.set('isJQMInitialized',true);
+        Mist.set('socket', Socket({
+            namespace: '/mist',
+            onInit: initSocket,
+        }));
             }
         });
 
