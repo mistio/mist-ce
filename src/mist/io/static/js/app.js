@@ -99,7 +99,7 @@ define( 'app', ['jquery',
     'app/views/user_menu',
     'mobile',
     'ember'
-], function($
+], function($,
     d3,
     BackendAddController,
     BackendEditController,
