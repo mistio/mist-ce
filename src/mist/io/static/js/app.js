@@ -152,17 +152,17 @@ define( 'app', [
     RuleEditView,
     UserMenuView) {
 
-    changeLoadProgress(28.5);
+    changeLoadProgress(20);
 
     function initialize() {
 
-        changeLoadProgress(32.5);
+        changeLoadProgress(30);
         warn('Init');
 
         // JQM init event
 
         $(document).bind('mobileinit', function() {
-            changeLoadProgress(52.5);
+            changeLoadProgress(50);
             warn('Mobile Init');
             $.mobile.ajaxEnabled = false;
             $.mobile.pushStateEnabled = false;
@@ -192,7 +192,7 @@ define( 'app', [
 
         App = Ember.Application.create({
             ready: function() {
-                changeLoadProgress(34.1);
+                changeLoadProgress(40);
                 require(['mobile']);
             }
         });
@@ -855,7 +855,7 @@ function error() {
 
 function initSocket (socket, initialized) {
 
-    changeLoadProgress(68.5);
+    changeLoadProgress(75);
 
     if (!initialized) {
         socket.on('list_keys', function (keys) {
@@ -951,9 +951,10 @@ function forIn () {
 function changeLoadProgress (progress) {
     $('.mist-progress').animate({
         'width': progress + '%'
-    }, 700,
-    function () {
-        if (progress == 100)
-            $('#splash').fadeOut();
-    });
+    }, 500);
+    if (progress == 100)
+        setTimeout(function () {
+            $('#splash').fadeOut(500);
+        }, 300);
+
 };
