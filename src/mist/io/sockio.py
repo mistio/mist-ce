@@ -76,6 +76,12 @@ class ShellNamespace(BaseNamespace):
         finally:
             self.channel.close()
 
+    def disconnect(silent=False):
+        if multi_user:
+            # reload the session, to avoid saving a stale or deleted session
+            self.request.environ['beaker.session'].load()
+        return super(ShellNamespace, self).disconnect(silent=silent)
+
 
 class MistNamespace(BaseNamespace):
     def initialize(self):
@@ -140,7 +146,7 @@ class MistNamespace(BaseNamespace):
             self.emit(routing_key, msg.body)
             if routing_key == 'probe':
                 log.warn('send probe')
-                
+
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = msg.body['machines']
@@ -193,6 +199,12 @@ class MistNamespace(BaseNamespace):
                 self.monitoring_greenlet.kill()
                 self.monitoring_greenlet = self.spawn(check_monitoring_from_socket,
                                                       self)
+
+    def disconnect(silent=False):
+        if multi_user:
+            # reload the session, to avoid saving a stale or deleted session
+            self.request.environ['beaker.session'].load()
+        return super(MistNamespace, self).disconnect(silent=silent)
 
 
 def update_subscriber(namespace):
