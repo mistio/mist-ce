@@ -19,8 +19,9 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             rule: null,
+            isUpdating: null,
             newRuleValue: null,
-            isUpdatingValue: null,
+            newRuleTimeWindow: null,
 
 
             //
@@ -44,6 +45,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
             load: function () {
                 this.set('newRuleValue', this.rule.value);
+                this.set('newRuleTimeWindow', this.rule.timeWindow);
                 Ember.run.next(this, function () {
                     $('#'+this.elementId).trigger('create');
                 })
@@ -57,21 +59,23 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             //
 
 
-            valueChange: function () {
+            update: function () {
 
                 // Prevent multiple requests
-                if (this.isUpdatingValue)
+                if (this.isUpdating)
                     return;
 
-                this.set('isUpdatingValue', true);
+                this.set('isUpdating', true);
                 Ember.run.later(this, function () {
-                    this.set('isUpdatingValue', false);
+                    this.set('isUpdating', false);
                     var that = this;
                     Mist.rulesController.updateRule(
                         this.rule.id, null, null, this.newRuleValue, null, null,
-                        function (success) {
-                            if (!success)
+                        /*this.newRuleTimeWindow,*/ function (success) {
+                            if (!success) {
                                 that.set('newRuleValue', that.rule.value);
+                                that.set('newRuleTimeWindow', that.rule.timeWindow);
+                            }
                         });
                 }, 500);
             },
@@ -127,9 +131,9 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             //
 
 
-            newRuleValueObserver: function () {
-                Ember.run.once(this, 'valueChange');
-            }.observes('newRuleValue'),
+            textValuesObserver: function () {
+                Ember.run.once(this, 'update');
+            }.observes('newRuleValue', 'newRuleTimeWindow'),
         });
     }
 );
