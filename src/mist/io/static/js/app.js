@@ -14,35 +14,26 @@ require.config({
         socketio: 'lib/socket.io',
         term: 'lib/term'
     },
+    deps: ['ember', 'handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term'],
+    callback: function () {
+        function req () {
+            if (emberInit)
+                require(['mobile']);
+            else
+                setTimeout(req, 400);
+        };
+        req();
+    },
     shim: {
         'ember': {
-            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term']
+            exports: 'Ember'
         },
         'd3': {
             deps: ['jquery']
         }
     }
 });
-
-var $ = null;
-require(['jquery'], function (jq) {
-    $ = jq;
-    $(document).bind('mobileinit', function() {
-
-        changeLoadProgress(50);
-        warn('Mobile Init');
-        $.mobile.ajaxEnabled = false;
-        $.mobile.pushStateEnabled = false;
-        $.mobile.linkBindingEnabled = false;
-        $.mobile.hashListeningEnabled = false;
-        $.mobile.ignoreContentEnabled = true;
-        $.mobile.autoInitialize = false;
-        $.mobile.panel.prototype._bindUpdateLayout = function(){};
-        $('body').css('overflow','auto');
-
-    });
-});
-
+var emberInit = false;
 // Load our app
 define( 'app', [
     'd3',
@@ -179,7 +170,24 @@ define( 'app', [
         warn('Init');
 
         // JQM init event
+    $(document).bind('mobileinit', function() {
 
+        changeLoadProgress(50);
+        warn('Mobile Init');
+        $.mobile.ajaxEnabled = false;
+        $.mobile.pushStateEnabled = false;
+        $.mobile.linkBindingEnabled = false;
+        $.mobile.hashListeningEnabled = false;
+        $.mobile.ignoreContentEnabled = true;
+        $.mobile.autoInitialize = false;
+        $.mobile.panel.prototype._bindUpdateLayout = function(){};
+        $('body').css('overflow','auto');
+                App.set('isJQMInitialized',true);
+        Mist.set('socket', Socket({
+            namespace: '/mist',
+            onInit: initSocket,
+        }));
+    });
         // Hide error boxes on page unload
 
         window.onbeforeunload = function() {
@@ -191,13 +199,8 @@ define( 'app', [
 
         App = Ember.Application.create({
             ready: function() {
-                changeLoadProgress(40);
+                emberInit = true;
                 //require(['mobile']);
-                App.set('isJQMInitialized',true);
-        Mist.set('socket', Socket({
-            namespace: '/mist',
-            onInit: initSocket,
-        }));
             }
         });
 
