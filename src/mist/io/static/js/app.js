@@ -14,19 +14,19 @@ require.config({
         socketio: 'lib/socket.io',
         term: 'lib/term'
     },
-    deps: ['text', 'jquery', 'handlebars', 'ember', 'md5', 'sha256', 'socketio', 'term'],
     shim: {
-        ember: {
-            deps: ['handlebars', 'jquery']
+        'ember': {
+            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term']
         },
-        d3: {
+        'd3': {
             deps: ['jquery']
         }
     }
 });
 
 // Load our app
-define('app', [
+define('app', ['jquery',
+    'd3',
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
     'app/controllers/backends',
@@ -87,7 +87,9 @@ define('app', [
     'app/views/rule',
     'app/views/rule_edit',
     'app/views/user_menu',
-], function(
+    'ember'
+], function($,
+    d3,
     BackendAddController,
     BackendEditController,
     BackendsController,
