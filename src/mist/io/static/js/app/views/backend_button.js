@@ -1,7 +1,7 @@
 define('app/views/backend_button', ['ember'],
     /**
      *  Backend Button View
-     * 
+     *
      *  @returns Class
      */
     function() {
@@ -18,9 +18,9 @@ define('app/views/backend_button', ['ember'],
 
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             renderButton: function() {
@@ -49,9 +49,9 @@ define('app/views/backend_button', ['ember'],
 
 
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
 
             click: function() {
@@ -61,9 +61,9 @@ define('app/views/backend_button', ['ember'],
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             stateObserver: function() {

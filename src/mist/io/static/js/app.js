@@ -25,8 +25,7 @@ require.config({
 });
 
 // Load our app
-define( 'app', [
-    'jquery',
+define('app', ['jquery',
     'd3',
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
@@ -160,10 +159,11 @@ define( 'app', [
         warn('Init');
 
         // JQM init event
-
         $(document).bind('mobileinit', function() {
+
             changeLoadProgress(50);
             warn('Mobile Init');
+
             $.mobile.ajaxEnabled = false;
             $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
@@ -173,28 +173,21 @@ define( 'app', [
             $('body').css('overflow','auto');
 
             App.set('isJQMInitialized',true);
-
             Mist.set('socket', Socket({
                 namespace: '/mist',
                 onInit: initSocket,
             }));
-
         });
 
         // Hide error boxes on page unload
-
         window.onbeforeunload = function() {
             $('.ui-loader').hide();
         };
 
 
         // Ember Application
-
         App = Ember.Application.create({
-            ready: function() {
-                changeLoadProgress(40);
-                require(['mobile']);
-            }
+            ready: initEmber
         });
 
 
@@ -853,6 +846,12 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
+
+function initEmber () {
+    require(['mobile']);
+}
+
+
 function initSocket (socket, initialized) {
 
     changeLoadProgress(75);
@@ -933,6 +932,7 @@ var virtualKeyboardHeight = function () {
     }
     return keyboardHeight;
 };
+
 
 // forEach like function on objects
 function forIn () {
