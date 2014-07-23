@@ -152,13 +152,17 @@ define( 'app', [
     RuleEditView,
     UserMenuView) {
 
+    changeLoadProgress(20);
+
     function initialize() {
 
+        changeLoadProgress(30);
         warn('Init');
 
         // JQM init event
 
         $(document).bind('mobileinit', function() {
+            changeLoadProgress(50);
             warn('Mobile Init');
             $.mobile.ajaxEnabled = false;
             $.mobile.pushStateEnabled = false;
@@ -188,6 +192,7 @@ define( 'app', [
 
         App = Ember.Application.create({
             ready: function() {
+                changeLoadProgress(40);
                 require(['mobile']);
             }
         });
@@ -720,6 +725,7 @@ define( 'app', [
     preloadImages(initialize);
 });
 
+
 /**
  *
  *  Socket wrapper
@@ -849,12 +855,15 @@ function error() {
 
 function initSocket (socket, initialized) {
 
+    changeLoadProgress(75);
+
     if (!initialized) {
         socket.on('list_keys', function (keys) {
             Mist.keysController.load(keys);
         })
         .on('list_backends', function (backends) {
             Mist.backendsController.load(backends);
+            changeLoadProgress(100);
         })
         .on('list_sizes', function (data) {
             var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -936,4 +945,16 @@ function forIn () {
     var keysLength = keys.length;
     for (var i = 0; i < keysLength; i++)
         callback.call(thisArg, object[keys[i]], keys[i]);
+};
+
+
+function changeLoadProgress (progress) {
+    $('.mist-progress').animate({
+        'width': progress + '%'
+    }, 500);
+    if (progress == 100)
+        setTimeout(function () {
+            $('#splash').fadeOut(500);
+        }, 300);
+
 };

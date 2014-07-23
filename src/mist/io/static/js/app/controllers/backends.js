@@ -45,9 +45,6 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             load: function (backends) {
                 this._updateContent(backends);
                 this.set('loading', false);
-                // <TODO (gtsop): Move this into app.js
-                $('#splash').fadeOut(650);
-                // />
             },
 
 
