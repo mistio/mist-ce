@@ -328,8 +328,16 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             providerIconClass: function() {
-                if (this.machine && this.machine.backend)
-                    return 'provider-' + this.machine.backend.provider;
+
+                if (!this.machine || !this.machine.backend || !this.machine.backend.provider)
+                    return '';
+
+                var providerName = this.machine.backend.provider;
+                if (providerName.indexOf('ec2' == 0)) providerName = 'ec2';
+                if (providerName.indexOf('rackspace') == 0) providerName = 'rackspace';
+                if (providerName.indexOf('bare_metal') == 0) providerName = 'bare-metal';
+                return 'provider-' + providerName;
+
             }.property('machine'),
 
 
