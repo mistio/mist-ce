@@ -155,6 +155,7 @@ define('app', ['jquery',
 
     function initialize() {
 
+
         changeLoadProgress(30);
         warn('Init');
 
@@ -611,113 +612,39 @@ define('app', ['jquery',
             return call.ajax();
         };
     }
-
-
-    var allImgs = [],
-        imgUrls = [],
-        thisSheetRules;
-
-    function parseCSS(sheets, urls) {
-        var w3cImport = false,
-            imported = [],
-            importedSrc = [],
-            baseURL;
-        var sheetIndex = sheets.length;
-        while(sheetIndex--){//loop through each stylesheet
-
-            var cssPile = '';//create large string of all css rules in sheet
-
-            if(urls && urls[sheetIndex]){
-                baseURL = urls[sheetIndex];
-            } else {
-                var csshref = (sheets[sheetIndex].href) ? sheets[sheetIndex].href : 'window.location.href';
-                var baseURLarr = csshref.split('/');//split href at / to make array
-                baseURLarr.pop();//remove file path from baseURL array
-                baseURL = baseURLarr.join('/');//create base url for the images in this sheet (css file's dir)
-                if (baseURL) {
-                    baseURL += '/'; //tack on a / if needed
-                }
-            }
-            if(sheets[sheetIndex].cssRules || sheets[sheetIndex].rules){
-                thisSheetRules = (sheets[sheetIndex].cssRules) ? //->>> http://www.quirksmode.org/dom/w3c_css.html
-                    sheets[sheetIndex].cssRules : //w3
-                    sheets[sheetIndex].rules; //ie
-                var ruleIndex = thisSheetRules.length;
-                while(ruleIndex--){
-                    if(thisSheetRules[ruleIndex].style && thisSheetRules[ruleIndex].style.cssText){
-                        var text = thisSheetRules[ruleIndex].style.cssText;
-                        if(text.toLowerCase().indexOf('url') != -1){ // only add rules to the string if you can assume, to find an image, speed improvement
-                            cssPile += text; // thisSheetRules[ruleIndex].style.cssText instead of thisSheetRules[ruleIndex].cssText is a huge speed improvement
-                        }
-                    } else if(thisSheetRules[ruleIndex].styleSheet) {
-                        imported.push(thisSheetRules[ruleIndex].styleSheet);
-                        w3cImport = true;
-                    }
-
-                }
-            }
-            //parse cssPile for image urls
-            var tmpImage = cssPile.match(/[^\("]+\.(gif|jpg|jpeg|png)/g);//reg ex to get a string of between a "(" and a ".filename" / '"' for opera-bugfix
-            if(tmpImage){
-                var i = tmpImage.length;
-                while(i--){ // handle baseUrl here for multiple stylesheets in different folders bug
-                    var imgSrc = (tmpImage[i].charAt(0) == '/' || tmpImage[i].match('://')) ? // protocol-bug fixed
-                        tmpImage[i] :
-                        baseURL + tmpImage[i];
-
-                    if(jQuery.inArray(imgSrc, imgUrls) == -1){
-                        imgUrls.push(imgSrc);
-                    }
-                }
-            }
-
-            if(!w3cImport && sheets[sheetIndex].imports && sheets[sheetIndex].imports.length) {
-                for(var iImport = 0, importLen = sheets[sheetIndex].imports.length; iImport < importLen; iImport++){
-                    var iHref = sheets[sheetIndex].imports[iImport].href;
-                    iHref = iHref.split('/');
-                    iHref.pop();
-                    iHref = iHref.join('/');
-                    if (iHref) {
-                        iHref += '/'; //tack on a / if needed
-                    }
-                    var iSrc = (iHref.charAt(0) == '/' || iHref.match('://')) ? // protocol-bug fixed
-                        iHref :
-                        baseURL + iHref;
-
-                    importedSrc.push(iSrc);
-                    imported.push(sheets[sheetIndex].imports[iImport]);
-                }
-            }
-        }//loop
-        if(imported.length){
-            parseCSS(imported, importedSrc);
-            return false;
-        }
-    }
-
-    function preloadImages(callback) {
-        var start = Date.now();
-        var imgs = [];
-        parseCSS([document.styleSheets[0]]);
-        var img;
-        var remaining = imgUrls.length;
-        for (var i = 0; i < imgUrls.length; i++) {
-            img = new Image();
-            img.onload = function() {
-                --remaining;
-                if (remaining <= 0) {
-                    alert(Date.now()-start);
-                    callback();
-                }
-            };
-            img.src = imgUrls[i];
-            imgs.push(img);
-        }
-    }
-
     preloadImages(initialize);
 });
 
+
+function preloadImages (callback) {
+
+    var start = Date.now();
+
+    // Hardcode images not on the spritesheet,
+    // including the spritesheet itself
+    var images = [
+        'resources/images/ajax-loader.gif',
+        'resources/images/spinner.gif',
+        'resources/images/staroff.png',
+        'resources/images/staron.png',
+        'resources/images/icon-sprite.png',
+    ];
+    var remaining = images.length;
+
+    // Load 'em!
+    for (var i = 0; i < images.length; i++) {
+        var img = new Image();
+        img.onload = onImageLoad;
+        img.src = images[i];
+    }
+
+    function onImageLoad () {
+        if (--remaining == 0) {
+            alert(Date.now() - start);
+            callback();
+        }
+    }
+}
 
 /**
  *
