@@ -13,6 +13,7 @@
 @import url("css/key_add.css");
 @import url("css/key_list.css");
 @import url("css/providers.css");
+@import url("css/metric_add.css");
 @import url("css/monitoring.css");
 @import url("css/file_upload.css");
 @import url("css/backend_add.css");
@@ -24,6 +25,7 @@
 @import url("css/machine_power.css");
 @import url("css/machine_shell.css");
 @import url("css/backend_button.css");
+@import url("css/metric_add_custom.css");
 
 
 /* Splash
@@ -46,6 +48,28 @@
     top: 50%;
     margin-left: -140px;
     margin-top: -140px;
+}
+.mist-progress {
+    border: 1px solid white;
+    border-radius: 25px;
+    bottom: 3px;
+    height: 0;
+    left: 0;
+    margin-top: 19px;
+    position: absolute;
+    top: -19px;
+    max-width: 98%;
+}
+.mist-progress-wrapper {
+    border: 1px solid white;
+    border-radius: 15px;
+    bottom: 58px;
+    box-shadow: 0 0 2px rgba(255, 255, 255, 1);
+    height: 2px;
+    left: 92px;
+    padding: 0;
+    position: absolute;
+    width: 96px;
 }
 
 
@@ -89,7 +113,7 @@ body {
 
 /* Text fields
 -----------------------------------------------------------------------------------------------------------*/
-textarea {
+textarea#private-key, #manual-monitoring-popup textarea {
     height: 75px !important;
 }
 
@@ -345,6 +369,34 @@ ul.checkbox-list li label {
     margin-top: 0px;
 }
 
+#message-box-popup {
+    width: auto !important;
+    max-width: 600px;
+}
+
+#message-box-popup h1 {
+    padding: 12px;
+}
+
+#message-box-popup .ui-btn {
+    width: 100%;
+    margin: 0px;
+    padding: 0.7em 0;
+}
+
+#message-box-popup #message-cmd {
+    min-height: 100px;
+    white-space: pre;
+    background: #444 !important;
+    color: rgb(240, 240, 240);
+    text-shadow: none;
+    font-family: monospace;
+    overflow: scroll;
+    max-height: 400px !important;
+    padding: 0 10px;
+}
+
+
 /* Confirmation popup
 -----------------------------------------------------------------------------------------------------------*/
 #confirmation-popup {
@@ -354,6 +406,11 @@ ul.checkbox-list li label {
 #confirmation-popup  .ok-cancel a,
 #confirmation-popup  .ok-cancel button {
     width: 127px !important;
+}
+
+.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
+    border-right-width: 2px;
+    margin-left: -1px;
 }
 
 #confirmation-popup p {

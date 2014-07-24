@@ -65,6 +65,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                 // Add event listeners
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
+                Mist.backendsController.on('onImageListChange', this, 'renderFields');
 
                 // Connect view with machineAddController
                 var viewId = $('#create-machine-panel').parent().attr('id');
@@ -77,6 +78,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                 // Remove event listeners
                 Mist.keysController.off('onKeyListChange', this, 'renderFields');
+                Mist.backendsController.off('onImageListChange', this, 'renderFields');
 
              }.on('willDestroyElement'),
 

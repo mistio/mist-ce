@@ -27,9 +27,11 @@ SSL_VERIFY = settings.get("SSL_VERIFY", True)
 JS_BUILD = settings.get("JS_BUILD", False)
 CSS_BUILD = settings.get("CSS_BUILD", False)
 JS_LOG_LEVEL = settings.get("JS_LOG_LEVEL", 3)
+PY_LOG_LEVEL = settings.get("PY_LOG_LEVEL", logging.INFO)
+PY_LOG_FORMAT = settings.get("PY_LOG_FORMAT", '%(asctime)s %(levelname)s %(threadName)s %(module)s - %(funcName)s: %(message)s')
+PY_LOG_FORMAT_DATE = settings.get("PY_LOG_FORMAT_DATE", "%Y-%m-%d %H:%M:%S")
 GOOGLE_ANALYTICS_ID = settings.get("GOOGLE_ANALYTICS_ID", "")
 COMMAND_TIMEOUT = settings.get("COMMAND_TIMEOUT", 20)
-
 
 # App constants
 

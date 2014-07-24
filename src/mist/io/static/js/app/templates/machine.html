@@ -29,16 +29,20 @@
 
         <span class="ui-btn-right" id="mist-manage-keys">
             {{#if pendingCreation}}
-                <a class="ui-state-disabled" data-role="button" data-icon="plus" data-iconpos="right">Add key</a>
+                <a class="ui-btn ui-btn-icon-right ui-icon-plus
+                    ui-corner-all ui-state-disabled">
+                        Add key
+                </a>
             {{else}} {{#if keysCount}}
-                <a data-role="button" {{action "manageKeysClicked" target="view"}}>{{keysCount}} keys</a>
+                <a class="ui-btn ui-shadow ui-corner-all"
+                    {{action "manageKeysClicked" target="view"}}>
+                        {{keysCount}} keys
+                </a>
             {{else}}
-                <a data-role="button"
-                   data-theme="d"
-                   data-icon="plus"
-                   data-iconpos="right"
-                   data-mini="false"
-                   {{action "addKeyClicked" target="view"}}>Add key</a>
+                <a class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
+                    {{action "addKeyClicked" target="view"}}>
+                        Add key
+                </a>
             {{/if}}{{/if}}
         </span>
     </div>
@@ -111,18 +115,23 @@
                 </div>
 
                 <div id="monitoring-bottom-btns">
-                <div data-rule="ui-grid-a">
-                    <div class="ui-block-a">
-                        <a id="add-rule-button"
-                            class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
-                            {{action "addRuleClicked" target="view"}}>Add Rule</a>
+                    <div data-rule="ui-grid-a">
+                        <div class="ui-block-a">
+                            <a id="add-rule-button"
+                                class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
+                                {{action "addRuleClicked" target="view"}}>Add Rule</a>
+                        </div>
+                        <!--div class="ui-block-b">
+                            <a id="add-metric-btn"
+                                class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
+                                {{action "addMetricClicked" target="view"}}>Add Metric</a>
+                        </div-->
+                        <div class="ui-block-b">
+                            <a id="disable-monitor-btn"
+                            class="ui-btn ui-corner-all ui-btn-b ui-btn-icon-left ui-icon-delete"
+                                {{action "disableMonitoringClicked" target="view"}}>Disable</a>
+                        </div>
                     </div>
-                    <div class="ui-block-b">
-                        <a id="disable-monitor-btn"
-                        class="ui-btn ui-corner-all ui-btn-b ui-btn-icon-left ui-icon-delete"
-                            {{action "disableMonitoringClicked" target="view"}}>Disable</a>
-                    </div>
-                </div>
                 </div>
 
             {{/unless}}
@@ -166,10 +175,12 @@
                              probing... <div class="ajax-loader"></div>
                          {{else}}
                              {{view.lastProbe}}
-                             <button id="machine-probe-btn"
-                                    data-theme="a"
-                                    data-mini="true"
-                                    {{action "probeClicked" target="view"}}>Probe</button>
+                             <a id="machine-probe-btn"
+                                class="ui-btn ui-shadow ui-corner-all"
+                                data-mini="true"
+                                {{action "probeClicked" target="view"}}>
+                                    Probe
+                            </a>
                          {{/if}}
                     </td>
                 </tr>
@@ -230,7 +241,26 @@
                     </td>
                 </tr>
                 {{/if}}
-
+                {{#if view.public_ips}}
+                    <tr>
+                        <td>Public IPs</td>
+                        <td>
+                            {{#each view.public_ips}}
+                                <div class="ip">{{this}}</div>
+                            {{/each}}
+                        </td>
+                    </tr>
+                {{/if}}
+                {{#if view.private_ips}}
+                    <tr>
+                        <td>Private IPs</td>
+                        <td>
+                            {{#each view.private_ips}}
+                                <div class="ip">{{this}}</div>
+                            {{/each}}
+                        </td>
+                    </tr>
+                {{/if}}
                 {{#each view.basicInfo}}
                 <tr>
                     <td>{{key}}</td>
@@ -261,7 +291,9 @@
 
     </div>
 
-    {{view Mist.messageboxView}}
+    {{view Mist.ruleEditView}}
+
+    {{view Mist.metricAddView}}
 
     {{view Mist.machineKeysView}}
 
@@ -289,62 +321,6 @@
             <a data-role="button" {{action "closeManualMonitoringPopup" target="view"}}>Back</a>
         </div>
     </div>
-
-    <!--
-       TODO: These should be in monitoring view
-    -->
-
-    <div class="rule-metric-popup"data-role="popup">
-        <ul data-role="listview">
-            {{#each Mist.rulesController.metricList}}
-            <li data-icon="false">
-                <a {{bind-attr title="this"}}>{{this}}</a>
-            </li>
-            {{/each}}
-        </ul>
-    </div>
-
-    <div class="rule-operator-popup" data-role="popup">
-        <ul data-role="listview">
-            {{#each Mist.rulesController.operatorList}}
-            <li data-icon="false">
-                <a {{bind-attr title="this.title"}}>{{this.symbol}}</a>
-            </li>
-            {{/each}}
-        </ul>
-    </div>
-
-    <div class="rule-action-popup" data-role="popup">
-        <ul data-role="listview">
-            {{#each Mist.rulesController.actionList}}
-            <li data-icon="false">
-                <a {{bind-attr title="this"}}>{{this}}</a>
-            </li>
-            {{/each}}
-            <li class="ui-state-disabled" data-icon="false">
-                <a>launch</a>
-            </li>
-        </ul>
-    </div>
-
-    <div class="rule-command-popup large-popup" data-role="popup">
-        <div data-role="header">
-            <h1>Command</h1>
-        </div>
-        <div data-role="content">
-            {{view Ember.TextArea
-                valueBinding="Mist.rulesController.command"
-                name="rule-command-content"}}
-            <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-                <a data-role="button" data-theme="c" data-rel="back">Back</a>
-                <a data-role="button" data-theme="b" {{action saveCommand target="Mist.rulesController"}}>Save</a>
-            </div>
-        </div>
-    </div>
-
-    <!--
-       These ^^^^^^^
-    -->
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>

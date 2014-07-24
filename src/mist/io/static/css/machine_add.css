@@ -35,3 +35,7 @@
     margin-bottom: 10px;
     text-align: center;
 }
+#create-machine-script {
+    height: auto !important;
+}
+}

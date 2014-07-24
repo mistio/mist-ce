@@ -1,9 +1,11 @@
 bin
+dist
 parts
 develop-eggs
 eggs
 include
 /lib
+var
 .mr.developer.cfg
 .installed.cfg
 *.pyc
@@ -19,3 +21,4 @@ src/paramiko
 /.pydevproject
 settings.py
 local/
+.settings

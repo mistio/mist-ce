@@ -4,17 +4,19 @@ require.config({
     waitSeconds: 200,
     paths: {
         text: 'lib/require/text',
-        ember: 'lib/ember-1.4.1.min',
-        jquery: 'lib/jquery-2.1.0.min',
-        mobile: 'lib/jquery.mobile-1.4.1.min',
+        ember: 'lib/ember-1.5.1.min',
+        jquery: 'lib/jquery-2.1.1.min',
+        mobile: 'lib/jquery.mobile-1.4.2.min',
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         sha256: 'lib/sha256',
+        socketio: 'lib/socket.io',
+        term: 'lib/term'
     },
     shim: {
         'ember': {
-            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256']
+            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term']
         },
         'd3': {
             deps: ['jquery']
@@ -23,154 +25,175 @@ require.config({
 });
 
 // Load our app
-define( 'app', [
-    'jquery',
+define('app', ['jquery',
     'd3',
-    'app/templates/templates',
-    'app/controllers/login',
-    'app/controllers/backends',
-    'app/controllers/confirmation',
-    'app/controllers/notification',
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
-    'app/controllers/machine_add',
-    'app/controllers/machine_keys',
-    'app/controllers/machine_power',
-    'app/controllers/monitoring',
+    'app/controllers/backends',
+    'app/controllers/confirmation',
+    'app/controllers/file_upload',
+    'app/controllers/image_search',
     'app/controllers/key_add',
     'app/controllers/key_edit',
     'app/controllers/keys',
-    'app/controllers/machine_tags',
-    'app/controllers/machine_shell',
+    'app/controllers/login',
+    'app/controllers/machine_add',
+    'app/controllers/machine_keys',
     'app/controllers/machine_manual_monitoring',
-    'app/controllers/image_search',
+    'app/controllers/machine_power',
+    'app/controllers/machine_shell',
+    'app/controllers/machine_tags',
+    'app/controllers/metric_add',
+    'app/controllers/metric_add_custom',
+    'app/controllers/metrics',
+    'app/controllers/monitoring',
+    'app/controllers/notification',
+    'app/controllers/rule_edit',
     'app/controllers/rules',
-    'app/controllers/file_upload',
-    'app/views/templated',
-    'app/views/home',
-    'app/views/login',
-    'app/views/backend_button',
+    'app/templates/templates',
     'app/views/backend_add',
+    'app/views/backend_button',
     'app/views/backend_edit',
-    'app/views/monitoring',
-    'app/views/machine_list_item',
-    'app/views/image_list_item',
-    'app/views/machine_add',
-    'app/views/machine',
-    'app/views/messagebox',
-    'app/views/machine_list',
     'app/views/confirmation_dialog',
-    'app/views/machine_shell',
-    'app/views/machine_shell_list_item',
+    'app/views/file_upload',
+    'app/views/graph',
+    'app/views/graph_button',
+    'app/views/home',
     'app/views/image_list',
-    'app/views/machine_power',
-    'app/views/machine_tags',
-    'app/views/machine_keys',
-    'app/views/machine_keys_list_item',
-    'app/views/machine_tags_list_item',
-    'app/views/machine_manual_monitoring',
-    'app/views/key_list_item',
-    'app/views/key_list',
+    'app/views/image_list_item',
     'app/views/key',
     'app/views/key_add',
     'app/views/key_edit',
+    'app/views/key_list',
+    'app/views/key_list_item',
+    'app/views/login',
+    'app/views/machine',
+    'app/views/machine_add',
+    'app/views/machine_keys',
+    'app/views/machine_keys_list_item',
+    'app/views/machine_list',
+    'app/views/machine_list_item',
+    'app/views/machine_manual_monitoring',
+    'app/views/machine_power',
+    'app/views/machine_shell',
+    'app/views/machine_shell_list_item',
+    'app/views/machine_tags',
+    'app/views/machine_tags_list_item',
+    'app/views/messagebox',
+    'app/views/metric_add',
+    'app/views/metric_add_custom',
+    'app/views/metric_node',
+    'app/views/monitoring',
     'app/views/rule',
+    'app/views/rule_edit',
     'app/views/user_menu',
-    'app/views/list_item',
-    'app/views/file_upload',
     'ember'
-    ], function($,
-                d3,
-                TemplatesBuild,
-                LoginController,
-                BackendsController,
-                ConfirmationController,
-                NotificationController,
-                BackendAddController,
-                BackendEditController,
-                MachineAddController,
-                MachineKeysController,
-                MachinePowerController,
-                MonitoringController,
-                KeyAddController,
-                KeyEditController,
-                KeysController,
-                MachineTagsController,
-                MachineShellController,
-                MachineManualMonitoringController,
-                ImageSearchController,
-                RulesController,
-                FileUploadController,
-                TemplatedView,
-                Home,
-                LoginView,
-                BackendButton,
-                BackendAdd,
-                BackendEdit,
-                MonitoringView,
-                MachineListItem,
-                ImageListItem,
-                MachineAddDialog,
-                SingleMachineView,
-                MessageBoxView,
-                MachineListView,
-                ConfirmationDialog,
-                MachineShellView,
-                MachineShellListItemView,
-                ImageListView,
-                MachinePowerView,
-                MachineTagsView,
-                MachineKeysView,
-                MachineKeysListItemView,
-                MachineTagsListItemView,
-                MachineManualMonitoringView,
-                KeyListItemView,
-                KeyListView,
-                SingleKeyView,
-                KeyAddView,
-                KeyEditDialog,
-                RuleView,
-                UserMenuView,
-                ListItemView,
-                FileUploadView
-                ) {
+], function($,
+    d3,
+    BackendAddController,
+    BackendEditController,
+    BackendsController,
+    ConfirmationController,
+    FileUploadController,
+    ImageSearchController,
+    KeyAddController,
+    KeyEditController,
+    KeysController,
+    LoginController,
+    MachineAddController,
+    MachineKeysController,
+    MachineManualMonitoringController,
+    MachinePowerController,
+    MachineShellController,
+    MachineTagsController,
+    MetricAddController,
+    MetricAddCustomController,
+    MetricsController,
+    MonitoringController,
+    NotificationController,
+    RuleEditController,
+    RulesController,
+    TemplatesBuild,
+    BackendAdd,
+    BackendButton,
+    BackendEdit,
+    ConfirmationDialog,
+    FileUploadView,
+    GraphView,
+    GraphButtonView,
+    Home,
+    ImageListView,
+    ImageListItem,
+    SingleKeyView,
+    KeyAddView,
+    KeyEditDialog,
+    KeyListView,
+    KeyListItemView,
+    LoginView,
+    SingleMachineView,
+    MachineAddDialog,
+    MachineKeysView,
+    MachineKeysListItemView,
+    MachineListView,
+    MachineListItem,
+    MachineManualMonitoringView,
+    MachinePowerView,
+    MachineShellView,
+    MachineShellListItemView,
+    MachineTagsView,
+    MachineTagsListItemView,
+    MessageBoxView,
+    MetricAddView,
+    MetricAddCustomView,
+    MetricNodeView,
+    MonitoringView,
+    RuleView,
+    RuleEditView,
+    UserMenuView) {
+
+    changeLoadProgress(20);
 
     function initialize() {
 
+        changeLoadProgress(30);
+        warn('Init');
 
         // JQM init event
-
         $(document).bind('mobileinit', function() {
-            $('#splash').fadeOut(650);
+
+            changeLoadProgress(50);
+            warn('Mobile Init');
+
             $.mobile.ajaxEnabled = false;
             $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
             $.mobile.hashListeningEnabled = false;
+            $.mobile.ignoreContentEnabled = true;
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
 
             App.set('isJQMInitialized',true);
+            Mist.set('socket', Socket({
+                namespace: '/mist',
+                onInit: initSocket,
+            }));
         });
 
-
         // Hide error boxes on page unload
-
         window.onbeforeunload = function() {
             $('.ui-loader').hide();
         };
 
 
         // Ember Application
-
         App = Ember.Application.create({
-            ready: function() {
-                require(['mobile']);
-            }
+            ready: initEmber
         });
 
 
         // Globals
 
+        App.set('debugSocket', false);
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
         App.set('ajax', new AJAX(CSRF_TOKEN));
@@ -272,14 +295,17 @@ define( 'app', [
 
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
+        App.set('graphView', GraphView);
         App.set('loginView', LoginView);
         App.set('keyAddView', KeyAddView);
         App.set('keyView', SingleKeyView);
+        App.set('metricNodeView', MetricNodeView);
         App.set('keyListView', KeyListView);
-        App.set('listItemView', ListItemView);
         App.set('userMenuView', UserMenuView);
         App.set('keyEditView', KeyEditDialog);
         App.set('backendAddView', BackendAdd);
+        App.set('ruleEditView', RuleEditView);
+        App.set('metricAddView', MetricAddView);
         App.set('backendEditView', BackendEdit);
         App.set('imageListView', ImageListView);
         App.set('fileUploadView', FileUploadView);
@@ -293,10 +319,12 @@ define( 'app', [
         App.set('imageListItemView', ImageListItem);
         App.set('machineAddView', MachineAddDialog);
         App.set('backendButtonView', BackendButton);
+        App.set('graphButtonView', GraphButtonView);
         App.set('machinePowerView', MachinePowerView);
         App.set('machineShellView', MachineShellView);
         App.set('machineListItemView', MachineListItem);
         App.set('confirmationDialog', ConfirmationDialog);
+        App.set('metricAddCustomView', MetricAddCustomView);
         App.set('machineKeysListItemView', MachineKeysListItemView);
         App.set('machineTagsListItemView', MachineTagsListItemView);
         App.set('machineShellListItemView', MachineShellListItemView);
@@ -308,8 +336,11 @@ define( 'app', [
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
+        App.set('metricsController', MetricsController.create());
         App.set('keyEditController', KeyEditController.create());
+        App.set('ruleEditController', RuleEditController.create());
         App.set('backendsController', BackendsController.create());
+        App.set('metricAddController', MetricAddController.create());
         App.set('fileUploadController', FileUploadController.create());
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
@@ -322,8 +353,8 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
+        App.set('metricAddCustomController', MetricAddCustomController.create());
         App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
-
 
         // Ember custom widgets
 
@@ -336,12 +367,23 @@ define( 'app', [
                 'disabled'
             ]
         });
-
-        App.Checkbox = Ember.Checkbox;
+        App.TextArea = Ember.TextArea.extend({
+            autocapitalize: 'off',
+            attributeBindings: [
+                'data-theme',
+                'autocapitalize'
+            ]
+        });
+        App.Checkbox = Ember.Checkbox.extend({
+            attributeBindings: [
+                'data-mini'
+            ]
+        });
         App.TextField = Ember.TextField.extend({
             autocapitalize: 'off',
             attributeBindings: [
                 'data-theme',
+                'placeholder',
                 'autocapitalize'
             ],
             keyUp: function(e) {
@@ -360,54 +402,16 @@ define( 'app', [
                 }
             }
         });
-        App.ShellTextField = App.TextField.extend({
-
-            keyDown: function(event, view) {
-                var keyCode = event.keyCode;
-                var commandHistoryIndex = Mist.machineShellController.commandHistoryIndex;
-                var commandHistory = Mist.machineShellController.machine.commandHistory;
-                switch (keyCode) {
-                    case 38: // Up
-                        if (commandHistoryIndex < commandHistory.length - 1) {
-                            commandHistoryIndex++;
-                        }
-                        Mist.machineShellController.set('command', commandHistory[commandHistoryIndex].command);
-                        Mist.machineShellController.set('commandHistoryIndex', commandHistoryIndex);
-                        break;
-                    case 40: // Down
-                        if (commandHistoryIndex >= 0) {
-                            commandHistoryIndex--;
-                        }
-                        if (commandHistoryIndex >= 0) {
-                            Mist.machineShellController.set('command', commandHistory[commandHistoryIndex].command);
-                        } else if (commandHistoryIndex == -1) {
-                            Mist.machineShellController.set('command', '');
-                        }
-                        Mist.machineShellController.set('commandHistoryIndex', commandHistoryIndex);
-                        break;
-                    case 13: // Enter
-                        Mist.machineShellController.submit();
-                        break;
-                }
-                if (keyCode == 38 || keyCode == 40 && event.preventDefault) // Up or Down
-                    event.preventDefault();
-            }
-        });
 
         // Mist functions
 
-        App.isScrolledToBottom = function(){
-            var distanceToTop = $(document).height() - $(window).height()
-            var top = $(document).scrollTop();
-            return distanceToTop - top < 20;
-        };
-        App.selectElementContents = function(elementId) {
-            var el = document.getElementById(elementId);
-            var range = document.createRange();
-            range.selectNodeContents(el);
-            var sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
+        App.prettyTime = function(date) {
+            var hour = date.getHours();
+            var min = date.getMinutes();
+            var sec = date.getSeconds();
+            return (hour < 10 ? '0' : '') + hour + ':' +
+                (min < 10 ? '0' : '') + min + ':' +
+                (sec < 10 ? '0' : '') + sec;
         };
 
         App.getKeyIdByUrl = function() {
@@ -418,21 +422,121 @@ define( 'app', [
             return window.location.href.split('/')[5];
         };
 
+        App.getViewName = function (view) {
+            return view.constructor.toString().split('.')[1].split('View')[0];
+        };
+
+        App.capitalize = function (string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+
+        App.decapitalize = function (string) {
+            return string.charAt(0).toLowerCase() + string.slice(1);
+        };
+
+        App.capitalizeArray = function (array) {
+            var newArray = [];
+            array.forEach(function(string) {
+                newArray.push(App.capitalize(string));
+            });
+            return newArray;
+        };
+
+        App.decapitalizeArray = function (array) {
+            var newArray = [];
+            array.forEach(function(string) {
+                newArray.push(App.decapitalize(string));
+            });
+            return newArray;
+        };
+
+        App.isScrolledToBottom = function(){
+            var distanceToTop = $(document).height() - $(window).height();
+            var top = $(document).scrollTop();
+            return distanceToTop - top < 20;
+        };
+
+        App.selectElementContents = function(elementId) {
+            var el = document.getElementById(elementId);
+            var range = document.createRange();
+            range.selectNodeContents(el);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        };
+
+        App.smoothScroll = function (scrollTo, timeout) {
+
+            timeout = timeout || 100;
+
+            var startingTop = $(window).scrollTop();
+
+            var distance = Math.abs(startingTop - scrollTo);
+
+            var scrollTimes;
+            if (distance < 10)
+                scrollTimes = 1;
+            else if (distance < 100)
+                scrollTimes = 10;
+            else
+                scrollTimes = 100;
+
+            var scrollCounter = scrollTimes;
+            var scrollInterval = timeout / scrollTimes;
+
+            var scrollChunks = distance / scrollTimes;
+            var sign = startingTop < scrollTo ? +1 : -1;
+
+            function partialScroll () {
+                if (Math.abs($(window).scrollTop() - scrollTo) < 10 ||
+                    scrollCounter == 0) {
+                    window.scrollTo(0, scrollTo);
+                } else {
+                    scrollCounter--;
+                    window.scrollTo(0, $(window).scrollTop() + (sign * scrollChunks));
+                    setTimeout(function () {
+                        partialScroll();
+                    }, scrollInterval);
+                }
+            };
+
+            partialScroll();
+        };
+
+        App.switchElementVisibility = function(elementSelector) {
+            var element = $('#' + elementSelector);
+            if (element.css('display') == 'none')
+                element.slideDown();
+            else
+                element.slideUp();
+        };
+
         App.arrayToListString = function(array, attribute) {
-
-            if (! array instanceof Array )
-                return '';
-
             var listString = '';
             array.forEach(function(item, index) {
                 listString += item[attribute];
                 if (index < array.length - 1)
                     listString += ', ';
             });
-
             return listString;
         };
 
+        App.splitWords = function (string) {
+            if (string.indexOf('-') > -1)
+                return string.split('-');
+            else if (string.indexOf('_') > -1)
+                return string.split('_');
+            else if (string.indexOf(' ') > -1)
+                return string.split(' ');
+            else if (string.match(/([a-z])([A-Z])/g)) {
+                var wordJoints = string.match(/([a-z])([A-Z])/g);
+                wordJoints.forEach(function(joint) {
+                    string = string.replace(joint, joint[0] + '_' + joint[1]);
+                });
+                return App.splitWords(string);
+            }
+            return [string];
+        };
 
         return App;
     }
@@ -477,16 +581,11 @@ define( 'app', [
             };
             call.ajax = function() {
 
-//                if (type != 'GET') {
-//                    if (data) { data.csrf_token = csrfToken; }
-//                    else { data = {'csrf_token': csrfToken}; }
-//                }
-
                 var ajaxObject = {
                     url: url,
                     type: type,
                     headers: {
-                        'Csrf-Token': csrfToken
+                        'Csrf-Token': csrfToken,
                     },
                     data: JSON.stringify(data),
                     complete: function(jqXHR) {
@@ -619,6 +718,101 @@ define( 'app', [
     preloadImages(initialize);
 });
 
+
+/**
+ *
+ *  Socket wrapper
+ *
+ */
+
+function Socket (args) {
+
+    var socket = undefined;
+    var initialized = false;
+    var namespace = args.namespace;
+
+    function init () {
+        if (!initialized) {
+            info(namespace, 'initializing');
+            handleDisconnection();
+            addDebuggingWrapper();
+        }
+        if (args.onInit instanceof Function)
+            args.onInit(socket, initialized);
+        initialized = true;
+    };
+
+    function connect () {
+
+        if (socket === undefined) {
+            socket = io.connect(namespace);
+            reconnect();
+        } else if (socket.socket.connected) {
+            info(namespace, 'connected');
+            init();
+        } else if (socket.socket.connecting) {
+            info(namespace, 'connecting');
+            reconnect();
+        } else {
+            socket.socket.connect();
+            reconnect();
+        }
+    }
+
+    function reconnect () {
+        setTimeout(connect, 500);
+    }
+
+    function handleDisconnection () {
+
+        // keep socket connections alive by default
+        if (args.keepAlive !== undefined ? args.keepAlive : true) {
+            // Reconnect if connection fails
+            socket.on('disconnect', function () {
+                warn(namespace, 'disconnected');
+                reconnect();
+            });
+        }
+    }
+
+    function addDebuggingWrapper () {
+
+        // This process basically overrides the .on()
+        // function to enable debugging info on every
+        // response received by the client
+
+        // 1. keep a copy of the original socket.on() function
+        var sockon = socket.on;
+
+        // 2. overide the socket's .on() function
+        socket.on = function (event, callback)  {
+
+            // i. keep a copy of the original callback
+            // This is the function written by us to handle
+            // the response data
+            var cb = callback;
+
+            // ii. overide callback to first print the debugging
+            // information and then call the original callback function
+            // (which is saved in cb variable)
+            callback = function (data) {
+                if (Mist.debugSocket)
+                    info(Mist.prettyTime(new Date()) +
+                        ' | ' + namespace + '/' + event + ' ', data);
+                cb(data);
+            };
+
+            // iii. Call the original .on() function using the modified
+            // callback function
+            return sockon.apply(socket, arguments);
+        };
+    }
+
+    connect();
+
+    return socket;
+}
+
 //LOGLEVEL comes from home python view and home.pt
 function log() {
     try {
@@ -652,43 +846,115 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
-var collectd_install_target = false, collectd_uninstall_target = false, collectd_lastlog="";
 
-function appendShell(output, command_id) {
-
-    var machine = Mist.machineShellController.machine;
-
-    if (!machine) return;
-
-    var command = machine.commandHistory.findBy('id', command_id);
-
-    if (!command) return;
-
-    // Replace break with new line
-    var output = output.trim().replace('<br/>', String.fromCharCode(13));
-
-    if (output.length)
-        warn(Date() + ': ' + output);
-
-    command.set('response', command.response + output);
-    Ember.run.next(function(){
-        $('.output').scrollTop(1000000);
-    });
+function initEmber () {
+    require(['mobile']);
 }
 
-function completeShell(ret, command_id) {
-    $('iframe#' + command_id).remove();
-    Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
-}
 
-function getTemplate(name) {
-    if (JS_BUILD || true) { // The "|| true" part is just for debuging as for now
-        //info('Getting precompiled template for: ' + name);
-        // Return precompiled template
-        return Ember.TEMPLATES[name + '/html'];
-    } else {
-        info('Compiling template for: ' + name);
-        return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
+function initSocket (socket, initialized) {
+
+    changeLoadProgress(75);
+
+    if (!initialized) {
+        socket.on('list_keys', function (keys) {
+            Mist.keysController.load(keys);
+        })
+        .on('list_backends', function (backends) {
+            Mist.backendsController.load(backends);
+            changeLoadProgress(100);
+        })
+        .on('list_sizes', function (data) {
+            var backend = Mist.backendsController.getBackend(data.backend_id);
+            if (backend)
+                backend.sizes.load(data.sizes);
+        })
+        .on('list_images', function (data) {
+            var backend = Mist.backendsController.getBackend(data.backend_id);
+            if (backend)
+                backend.images.load(data.images);
+        })
+        .on('list_machines', function (data) {
+            var backend = Mist.backendsController.getBackend(data.backend_id);
+            if (backend)
+                backend.machines.load(data.machines);
+        })
+        .on('list_locations', function (data) {
+            var backend = Mist.backendsController.getBackend(data.backend_id);
+            if (backend)
+                backend.locations.load(data.locations);
+        })
+        .on('monitoring',function(data){
+            Mist.monitoringController._updateMonitoringData(data);
+            Mist.monitoringController.trigger('onMonitoringDataUpdate');
+            Mist.backendsController.set('checkedMonitoring', true);
+        })
+        .on('stats', function(data){
+            Mist.monitoringController.request.updateMetrics(
+                data.metrics, data.start, data.stop, data.requestID);
+        })
+        .on('notify',function(data){
+            if (data.message) {
+                Mist.notificationController.set('msgHeader', data.title);
+                Mist.notificationController.set('msgCmd', data.message.substr(1));
+                Mist.notificationController.showMessagebox();
+            } else {
+                Mist.notificationController.notify(data.title);
+            }
+        })
+        .on('probe', onProbe)
+        .on('ping', onProbe);
     }
+
+    socket.emit('ready');
+
+    function onProbe(data) {
+        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        if (machine)
+            machine.probeSuccess(data.result);
+    }
+}
+
+
+var virtualKeyboardHeight = function () {
+    var keyboardHeight = 0;
+
+    if (!Mist.term) return 0;
+
+    if (Mist.term.isIpad || Mist.term.isIphone){
+        var sx = document.body.scrollLeft, sy = document.body.scrollTop;
+        var naturalHeight = window.innerHeight;
+        window.scrollTo(sx, document.body.scrollHeight);
+        keyboardHeight = naturalHeight - window.innerHeight;
+        window.scrollTo(sx, sy);
+    } else if (Mist.term.isAndroid) {
+        keyboardHeight = 0;
+    }
+    return keyboardHeight;
 };
 
+
+// forEach like function on objects
+function forIn () {
+
+    var object = arguments[arguments.length - 2];
+    var callback = arguments[arguments.length - 1];
+    var thisArg = arguments.length == 3 ? arguments[0] : undefined;
+
+    var keys = Object.keys(object);
+    var keysLength = keys.length;
+    for (var i = 0; i < keysLength; i++)
+        callback.call(thisArg, object[keys[i]], keys[i]);
+};
+
+
+function changeLoadProgress (progress) {
+    $('.mist-progress').animate({
+        'width': progress + '%'
+    }, 500);
+    if (progress == 100)
+        setTimeout(function () {
+            $('#splash').fadeOut(500);
+        }, 300);
+
+};

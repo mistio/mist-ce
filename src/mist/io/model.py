@@ -43,7 +43,15 @@ except ImportError:
     from mist.io.dal import User as DalUser
 from mist.io import exceptions
 
+try:
+    from mist.core import config
+except ImportError:
+    from mist.io import config
 
+import logging
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
 
@@ -130,14 +138,16 @@ class Keypair(OODict):
 
     def generate(self):
         """Generates a new RSA keypair and assignes to self."""
-
-        key = RSA.generate(2048, os.urandom)
+        from Crypto import Random
+        Random.atfork()
+        key = RSA.generate(2048)
         self.private = key.exportKey()
         self.public = key.exportKey('OpenSSH')
 
     def isvalid(self):
         """Checks if self is a valid RSA keypair."""
-
+        from Crypto import Random
+        Random.atfork()
         message = 'Message 1234567890'
         if 'ssh-rsa' in self.public:
             public_key_container = RSA.importKey(self.public)
@@ -153,7 +163,8 @@ class Keypair(OODict):
         Only works for RSA.
 
         """
-
+        from Crypto import Random
+        Random.atfork()
         if 'RSA' in self.private:
             try:
                 key = RSA.importKey(self.private)

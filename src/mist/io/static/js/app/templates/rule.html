@@ -1,49 +1,48 @@
-<div class="rule-box" id="{{unbound id}}">
-    <div class="rule-if">if</div>
+<div id="{{unbound id}}" class="rule-box">
 
-    <a href="#"
-        class="rule-button metric"
-        data-role="button"
-        data-iconpos="right"
-        data-inline="true"
-        {{action "openMetricPopup" target="view"}}>{{metric}}</a>
+    <div id="basic-condition">
+        <div class="rule-if rule-text">if</div>
 
-    <a href="#"
-        class="rule-button operator"
-        data-role="button"
-        data-icon="false"
-        data-inline="true"
-        {{action "openOperatorPopup" target="view"}}>{{operator.symbol}}</a>
+        <a class="rule-button rule-metric ui-btn ui-btn-inline ui-shadow ui-corner-all"
+            {{action "openMetricPopup" target="view"}}>
+                {{metric.name}}
+        </a>
 
-    <div class="rule-unit">{{unit}}</div>
-    <input type="number"
-        data-type="range"
-        data-highlight="true"
-        class="rule-value"
-        {{bindAttr value="value"}}
-        min="0"
-        {{bindAttr max="maxValue"}} />
+        <a class="rule-button rule-operator ui-btn ui-btn-inline ui-shadow ui-corner-all"
+            {{action "openOperatorPopup" target="view"}}>
+                {{operator.symbol}}
+        </a>
 
-    <div class="rule-then">then</div>
+        {{view Mist.TextField class="rule-value" type="number"
+            valueBinding="view.newRuleValue"}}
 
-    <a href="#"
-        class="rule-button action"
-        data-role="button"
-        data-icon="false"
-        data-inline="true"
-        {{action "openActionPopup" target="view"}}>{{actionToTake}}</a>
+        <div class="rule-unit rule-text">{{metric.unit}}</div>
+    </div>
+
+    <!--a class="rule-button rule-more ui-btn ui-btn-inline ui-shadow ui-corner-all"
+        {{!action "openAdvancedCondition" target="view"}}>
+        ...
+    </a>
+
+    <div class="advanced-condition">
+    advanced
+    </div-->
+
+    <div class="rule-then rule-text">then</div>
+
+    <a class="rule-button rule-action ui-btn ui-btn-inline ui-shadow ui-corner-all"
+        {{action "openActionPopup" target="view"}}>
+            {{actionToTake}}
+    </a>
 
     {{#if pendingAction}}
-    <div class="ajax-loader"></div>
+        <div class="ajax-loader"></div>
     {{else}}
-    <div class="delete-rule-container">
-        <button class="delete-rule-button"
-                data-role="button"
-                data-icon="delete"
-                data-iconpos="notext"
-                data-mini="true"
-                {{action deleteRuleClicked target="view"}}>&nbsp;</button>
-    </div>
+        <div class="delete-rule-container">
+            <a class="delete-rule-button ui-btn ui-btn-icon-notext ui-icon-delete ui-corner-all"
+                    {{action deleteRuleClicked target="view"}}>&nbsp;</a>
+        </div>
     {{/if}}
+
 
 </div>

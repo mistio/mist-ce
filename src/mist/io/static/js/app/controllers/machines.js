@@ -21,7 +21,7 @@ define('app/controllers/machines', ['app/models/machine'],
             rebootingMachine: null,
             destroyingMachine: null,
             shutingdownMachine: null,
-            
+
             /* Let's disable sorting for now
             sortAscending: true,
             sortProperties: ['hasMonitoring', 'probed'],
@@ -33,36 +33,16 @@ define('app/controllers/machines', ['app/models/machine'],
              *
              */
 
-            load: function() {
+            init: function () {
+                this._super();
+                this.set('content', []);
+                this.set('loadint', true);
+            },
 
-                if (!this.backend.enabled) return;
 
-                var that = this;
-                this.set('loading', true);
-                Mist.ajax.GET('/backends/' + this.backend.id + '/machines', {
-                }).success(function(machines) {
-                    if (!that.backend.enabled) return;
-                    that.set('failCounter', 0);
-                    that._updateContent(machines);
-                    that._reload();
-                }).error(function() {
-                    if (!that.backend.enabled) return;
-                    Mist.notificationController.notify('Failed to load machines for ' + that.backend.title);
-
-                    // Increase machine load fail counter
-                    // If counter reaches 5, disable backend
-                    that.set('failCounter', that.failCounter + 1);
-                    if (that.failCounter == 5) {
-                        that.set('failCounter', 0);
-                        that.backend.set('enabled', false);
-                    } else {
-                        that._reload();
-                    }
-                }).complete(function(success) {
-                    if (!that.backend.enabled) return;
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
+            load: function (machines) {
+                this._updateContent(machines);
+                this.set('loading', false);
             },
 
 
@@ -88,11 +68,13 @@ define('app/controllers/machines', ['app/models/machine'],
 
                 this.addObject(dummyMachine);
 
+                // Don't send dummy key text
+                key = Mist.keysController.keyExists(key.id) ? key : null;
                 var that = this;
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
                         'name': name,
-                        'key': key.id,
+                        'key': key ? key.id : null,
                         'size': size.id,
                         'script': script,
                         'image': image.id,
@@ -144,7 +126,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('terminated');
                 machine.lockOn('pending');
                 this.set('destroyingMachine', true);
-                machine.set("beingDestroyed",true);
+                machine.set('beingDestroyed', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {
@@ -203,15 +185,6 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-            clear: function() {
-                Ember.run(this, function() {
-                    this.set('content', []);
-                    this.set('loading', false);
-                    this.trigger('onMachineListChange');
-                });
-            },
-
-
             getMachine: function(machineId) {
                 return this.content.findBy('id', machineId);
             },
@@ -222,18 +195,11 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-
             /**
              *
              *  Pseudo-Private Methods
              *
              */
-
-            _reload: function() {
-                Ember.run.later(this, function() {
-                    this.load();
-                }, this.backend.poll_interval);
-            },
 
 
             _updateContent: function(machines) {
@@ -277,11 +243,6 @@ define('app/controllers/machines', ['app/models/machine'],
                                 if (attr == 'pubic_ips') continue;
                                 old_machine.set(attr, machine[attr]);
                             }
-
-                            // Set machine on probing loop
-                            if (prevState != 'running'
-                                && machine.state == 'running')
-                                    old_machine.probe();
 
                         } else {
 
@@ -334,18 +295,30 @@ define('app/controllers/machines', ['app/models/machine'],
                         Mist.monitored_machines.some(function(machine_tuple){
                             backend_id = machine_tuple[0];
                             machine_id = machine_tuple[1];
-                            if (machine.backend.id == backend_id && machine.id == machine_id && !machine.hasMonitoring) {
-                                that.getMachine(machine_id, backend_id).set('hasMonitoring', true);
-                                return true;
+                            if (!machine.hasMonitoring &&
+                                machine.id == machine_id &&
+                                machine.backend.id == backend_id) {
+                                    that.getMachine(machine_id, backend_id)
+                                        .set('hasMonitoring', true);
+                                    return true;
                             }
                         });
 
                         Mist.rulesController.content.forEach(function(rule) {
-                            if (!rule.machine.id) {
-                                if (rule.machine == machine.id && rule.backend == machine.backend.id) {
+                            if (rule.machine.id) return;
+                            if (rule.machine == machine.id &&
+                                rule.backend == machine.backend.id)
                                     rule.set('machine', machine);
-                                }
-                            }
+                        });
+
+                        Mist.metricsController.customMetrics.forEach(function(metric) {
+                            metric.machines.forEach(function(metricMachine, index) {
+                                if (metricMachine[1] == machine.id &&
+                                    metricMachine[0] == machine.backend.id) {
+                                        metric.machines[index] = machine;
+                                        Mist.metricsController.trigger('onMetricListChange');
+                                    }
+                            });
                         });
                     });
                 }

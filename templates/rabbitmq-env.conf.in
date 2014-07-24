@@ -1,0 +1,5 @@
+RABBITMQ_PLUGINS_DIR=${buildout:directory}/parts/rabbitmq/plugins
+RABBITMQ_ENABLED_PLUGINS_FILE=${buildout:directory}/templates/rabbitmq-plugins
+export RABBITMQ_NODENAME=rabbit@localhost
+export RABBITMQ_NODE_IP_ADDRESS=127.0.0.1
+export ERL_EPMD_ADDRESS=127.0.0.1
