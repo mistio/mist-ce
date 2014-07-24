@@ -640,7 +640,7 @@ function preloadImages (callback) {
 
     function onImageLoad () {
         if (--remaining == 0) {
-            alert(Date.now() - start);
+            warn('Loaded images', Date.now() - start);
             callback();
         }
     }
