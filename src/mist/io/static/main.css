@@ -3,7 +3,7 @@
 -----------------------------------------------------------------------------------------------------------*/
 
 @import url('theme.css');
-@import url('images/build-output/sprites.css');
+@import url('images/sprites-build/sprites.css');
 @import url('jquery.mobile.structure-1.4.0.min.css');
 
 @import url("css/key.css");

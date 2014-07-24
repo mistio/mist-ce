@@ -1,4 +1,3 @@
 [path]
-inputPath=src/mist/io/static/images/build-input
-outputPath=src/mist/io/static/images/build-output
-recursiveDiscovery=False
+inputPath=src/mist/io/static/images/sprite-images
+outputPath=src/mist/io/static/images/sprite-build

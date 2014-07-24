@@ -1,0 +1,22 @@
+ilb { display: inline-block; }  .provider-ec2 { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .provider-ec2 { background-position: -0px -0px; } 
+.image-ibm { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-ibm { background-position: -0px -48px; } 
+.image-opensolaris { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-opensolaris { background-position: -0px -96px; } 
+.image-gentoo { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-gentoo { background-position: -0px -144px; } 
+.image-redhat { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-redhat { background-position: -0px -192px; } 
+.provider-openstack { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .provider-openstack { background-position: -0px -240px; } 
+.user { background-image: url('icon-sprite.png'); width: 40px; height: 40px; } .user { background-position: -0px -288px; } 
+.image-canonical { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-canonical { background-position: -0px -328px; } 
+.image-windows { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-windows { background-position: -0px -376px; } 
+.provider-docker { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .provider-docker { background-position: -0px -424px; } 
+.provider-nephoscale { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .provider-nephoscale { background-position: -0px -472px; } 
+.provider-baremetal { background-image: url('icon-sprite.png'); width: 18px; height: 18px; } .provider-baremetal { background-position: -0px -520px; } 
+.provider-linode { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .provider-linode { background-position: -0px -538px; } 
+.image-debian { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-debian { background-position: -0px -586px; } 
+.provider-digitalocean { background-image: url('icon-sprite.png'); width: 48px; height: 27px; } .provider-digitalocean { background-position: -0px -634px; } 
+.provider-rackspace { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .provider-rackspace { background-position: -0px -661px; } 
+.provider-softlayer { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .provider-softlayer { background-position: -0px -709px; } 
+.image-fedora { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-fedora { background-position: -0px -757px; } 
+.image-oracle { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-oracle { background-position: -0px -805px; } 
+.image-ubuntu { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-ubuntu { background-position: -0px -853px; } 
+.provider-gce { background-image: url('icon-sprite.png'); width: 54px; height: 48px; } .provider-gce { background-position: -0px -901px; } 
+.image-suse { background-image: url('icon-sprite.png'); width: 48px; height: 48px; } .image-suse { background-position: -0px -949px; } 
