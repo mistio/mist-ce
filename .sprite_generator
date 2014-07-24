@@ -1,0 +1,4 @@
+[path]
+inputPath=src/mist/io/static/images/build-input
+outputPath=src/mist/io/static/images/build-output
+recursiveDiscovery=False
