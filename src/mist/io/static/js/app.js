@@ -698,6 +698,7 @@ define('app', ['jquery',
     }
 
     function preloadImages(callback) {
+        var start = Date.now();
         var imgs = [];
         parseCSS([document.styleSheets[0]]);
         var img;
@@ -707,6 +708,7 @@ define('app', ['jquery',
             img.onload = function() {
                 --remaining;
                 if (remaining <= 0) {
+                    alert(Date.now()-start);
                     callback();
                 }
             };
