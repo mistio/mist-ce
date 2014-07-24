@@ -687,8 +687,6 @@ define('app', ['jquery',
                     importedSrc.push(iSrc);
                     imported.push(sheets[sheetIndex].imports[iImport]);
                 }
-
-
             }
         }//loop
         if(imported.length){
