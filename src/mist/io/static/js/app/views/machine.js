@@ -328,19 +328,26 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             providerIconClass: function() {
-
                 if (!this.machine || !this.machine.backend || !this.machine.backend.provider)
                     return '';
-
-                var providerName = this.machine.backend.provider;
-                if (providerName.indexOf('ec2') == 0) providerName = 'ec2';
-                if (providerName.indexOf('openstack') == 0) providerName = 'openstack';
-                if (providerName.indexOf('rackspace') == 0) providerName = 'rackspace';
-                if (providerName.indexOf('bare_metal') == 0) providerName = 'baremetal';
-
-                return 'provider-' + providerName;
-
+                return 'provider-' + this.machine.backend.getSimpleProvider();
             }.property('machine', 'machine.backend.provider'),
+
+
+            imageIconClass: function () {
+
+                if (!this.machine || !this.machine.extra ||
+                    !this.machine.backend || !this.machine.backend.provider)
+                    return 'image-generic';
+
+                var imageId = '';
+                var providerName = this.machine.backend.getSimpleProvider();
+                if (providerName == 'ec2') imageId = this.machine.extra.image_id;
+                if (providerName == 'rackspace') imageId = this.machine.extra.imageId;
+
+                return 'image-' + this.machine.backend.images.getImageOS(imageId);
+
+            }.property('machine', 'machine.extra'),
 
 
             upFor: function() {

@@ -15,8 +15,10 @@
         <span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon" {{bind-attr class="view.providerIconClass"}}></span>
         </span>
-        <span {{bind-attr class=":single-view-icon-wrapper image.type"}}>
-            <span id="single-view-image-icon"></span>
+        <span {{bind-attr class=":single-view-icon-wrapper"}}>
+            <span id="single-view-image-icon"
+                {{bind-attr class="view.imageIconClass"}}>
+            </span>
         </span>
 
         <h1 {{bind-attr class="view.machine.state"}}>{{state}}</h1>
