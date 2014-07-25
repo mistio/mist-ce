@@ -109,35 +109,38 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
 
             _updateFormReady: function () {
+
+                // Filter out the "Select provider" dummy provider
+                if (! ('provider' in this.newBackendProvider)) {
+                    this.set('formReady', false);
+                    return;
+                }
+
                 var ready = false;
-                if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
 
-                    if (this.newBackendProvider.provider == 'docker') {
-
-                        if (this.newBackendDockerURL && this.newBackendPort) {
-                            ready = true;
-                        }
-
-                    } else if (this.newBackendFirstField && this.newBackendSecondField) {
-
+                if (this.newBackendProvider.provider == 'docker') {
+                    if (this.newBackendDockerURL && this.newBackendPort) {
                         ready = true;
+                    }
+                } else if (this.newBackendFirstField && this.newBackendSecondField) {
 
-                        if (this.newBackendProvider.provider == 'openstack') { // Pure Openstack
-                            if (!this.newBackendOpenStackURL) {
-                                ready = false;
-                            }
-                        } else if (this.newBackendProvider.provider.indexOf('openstack') > -1) { // HpCloud
-                            if (!(this.newBackendOpenStackURL && this.newBackendOpenStackTenant)) {
-                                ready = false;
-                            }
-                        } else if (this.newBackendProvider.provider == 'bare_metal') { // Baremetal
-                            if (!Mist.keysController.keyExists(this.newBackendKey.id)) {
-                                ready = false;
-                            }
-                        } else if (this.newBackendProvider.provider == 'gce') { // Google Compute Engine
-                            if (!this.newBackendProjectName) {
-                                ready = false;
-                            }
+                    ready = true;
+
+                    if (this.newBackendProvider.provider == 'openstack') { // Openstack
+                        if (!this.newBackendOpenStackURL || !this.newBackendOpenStackTenant) {
+                            ready = false;
+                        }
+                    } else if (this.newBackendProvider.provider.indexOf('hpcloud') > -1) { // HpCloud
+                        if (!this.newBackendOpenStackTenant) {
+                            ready = false;
+                        }
+                    } else if (this.newBackendProvider.provider == 'bare_metal') { // Baremetal
+                        if (!Mist.keysController.keyExists(this.newBackendKey.id)) {
+                            ready = false;
+                        }
+                    } else if (this.newBackendProvider.provider == 'gce') { // Google Compute Engine
+                        if (!this.newBackendProjectName) {
+                            ready = false;
                         }
                     }
                 }

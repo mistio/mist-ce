@@ -33,6 +33,11 @@
     background-image: url(../images/nephoscale_sm.png);
 }
 
+/* HP Cloud Helion */
+#single-view-provider-icon.provider-hpcloud  {
+    background-image: url(../images/hpcloud.png);
+}
+
 /* Docker */
 #single-view-provider-icon.provider-docker  {
     background-image: url(../images/docker_sm.png);
