@@ -340,14 +340,10 @@ define('app/views/machine', ['app/views/mistscreen'],
                     !this.machine.backend || !this.machine.backend.provider)
                     return 'image-generic';
 
-                var imageId = '';
-                var providerName = this.machine.backend.getSimpleProvider();
-                if (providerName == 'ec2') imageId = this.machine.extra.image_id;
-                if (providerName == 'rackspace') imageId = this.machine.extra.imageId;
-
+                var imageId = this.machine.extra.image_id || this.machine.extra.imageId;
                 return 'image-' + this.machine.backend.images.getImageOS(imageId);
 
-            }.property('machine', 'machine.extra'),
+            }.property('machine', 'machine.extra', 'machine.extra.@each'),
 
 
             upFor: function() {
