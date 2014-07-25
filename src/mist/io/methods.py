@@ -1022,7 +1022,7 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                 console_key=console_key,
                 ssh_key=tmp_key_path,
                 connect_attempts=20,
-                nowait=True,
+                ex_wait=True,
                 deploy=deploy_script
             )
         except Exception as e:
