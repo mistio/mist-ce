@@ -14,6 +14,10 @@ require.config({
         socketio: 'lib/socket.io',
         term: 'lib/term'
     },
+    deps: ['jquery', 'ember', 'handlebars', 'socketio'],
+    callback: function () {
+        loadManager.libsLoaded();
+    },
     shim: {
         'ember': {
             deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term']
@@ -24,72 +28,157 @@ require.config({
     }
 });
 
-// Load our app
-define('app', ['jquery',
-    'd3',
-    'app/controllers/backend_add',
-    'app/controllers/backend_edit',
-    'app/controllers/backends',
-    'app/controllers/confirmation',
-    'app/controllers/file_upload',
-    'app/controllers/image_search',
-    'app/controllers/key_add',
-    'app/controllers/key_edit',
-    'app/controllers/keys',
-    'app/controllers/login',
-    'app/controllers/machine_add',
-    'app/controllers/machine_keys',
-    'app/controllers/machine_manual_monitoring',
-    'app/controllers/machine_power',
-    'app/controllers/machine_shell',
-    'app/controllers/machine_tags',
-    'app/controllers/metric_add',
-    'app/controllers/metric_add_custom',
-    'app/controllers/metrics',
-    'app/controllers/monitoring',
-    'app/controllers/notification',
-    'app/controllers/rule_edit',
-    'app/controllers/rules',
-    'app/templates/templates',
-    'app/views/backend_add',
-    'app/views/backend_button',
-    'app/views/backend_edit',
-    'app/views/confirmation_dialog',
-    'app/views/file_upload',
-    'app/views/graph',
-    'app/views/graph_button',
-    'app/views/home',
-    'app/views/image_list',
-    'app/views/image_list_item',
-    'app/views/key',
-    'app/views/key_add',
-    'app/views/key_edit',
-    'app/views/key_list',
-    'app/views/key_list_item',
-    'app/views/login',
-    'app/views/machine',
-    'app/views/machine_add',
-    'app/views/machine_keys',
-    'app/views/machine_keys_list_item',
-    'app/views/machine_list',
-    'app/views/machine_list_item',
-    'app/views/machine_manual_monitoring',
-    'app/views/machine_power',
-    'app/views/machine_shell',
-    'app/views/machine_shell_list_item',
-    'app/views/machine_tags',
-    'app/views/machine_tags_list_item',
-    'app/views/messagebox',
-    'app/views/metric_add',
-    'app/views/metric_add_custom',
-    'app/views/metric_node',
-    'app/views/monitoring',
-    'app/views/rule',
-    'app/views/rule_edit',
-    'app/views/user_menu',
-    'ember'
-], function($,
-    d3,
+var loadManager = {
+
+    // Stuff to load:
+    // libraries
+    // app files
+    // jqm
+    // images
+    // socket
+
+    librariesLoaded: false,
+    appFilesLoaded: false,
+    imagesLoaded: false,
+    socketLoaded: false,
+    JQMLoaded: false,
+    progress: 0,
+
+    load: function () {
+        loadApp();
+        loadImages();
+        if (this.librariesLoaded)
+            loadSocket();
+    },
+
+    libsLoaded: function () {
+        this.librariesLoaded = true;
+        if (this.files) {
+            if (!this.templatesLoad)
+                this.files[0]();
+        }
+        if (!this.socket)
+            loadSocket();
+    },
+
+    appLoaded: function () {
+        var that = loadManager;
+        that.progress += 10;
+        that.files = arguments;
+        if (that.librariesLoaded) {
+            info('in here'),
+            info(io),
+            that.templatesload = true;
+            arguments[0]();
+        }
+    },
+
+    templatesLoaded: function () {
+        this.progress += 10;
+        initApp.apply(null, this.files);
+    },
+
+    appInitialized: function () {
+        this.progress += 10;
+        this.appDidInit = true;
+        if (!Mist.socket) {
+            if (this.socket){
+                Mist.set('socket', this.socket);
+                setupSocketEvents.apply(null, arguments);
+                this.socket.emit('ready');
+            }
+        }
+        //loadJQM();
+    },
+
+    imagesLoaded: function () {
+        this.progress += 10;
+    },
+
+    JQMLoaded: function () {
+        this.progress += 10;
+    },
+
+    socketLoaded: function () {
+        this.progress += 10;
+        this.socket = arguments[0];
+        if (this.appDidInit) {
+            Mist.set('socket', this.socket);
+            setupSocketEvents.apply(null, arguments);
+            this.socket.emit('ready');
+        }
+    }
+}
+
+loadManager.load();
+
+function loadApp () {
+    require([
+        'app/templates/templates',
+        'app/controllers/backend_add',
+        'app/controllers/backend_edit',
+        'app/controllers/backends',
+        'app/controllers/confirmation',
+        'app/controllers/file_upload',
+        'app/controllers/image_search',
+        'app/controllers/key_add',
+        'app/controllers/key_edit',
+        'app/controllers/keys',
+        'app/controllers/login',
+        'app/controllers/machine_add',
+        'app/controllers/machine_keys',
+        'app/controllers/machine_manual_monitoring',
+        'app/controllers/machine_power',
+        'app/controllers/machine_shell',
+        'app/controllers/machine_tags',
+        'app/controllers/metric_add',
+        'app/controllers/metric_add_custom',
+        'app/controllers/metrics',
+        'app/controllers/monitoring',
+        'app/controllers/notification',
+        'app/controllers/rule_edit',
+        'app/controllers/rules',
+        'app/views/backend_add',
+        'app/views/backend_button',
+        'app/views/backend_edit',
+        'app/views/confirmation_dialog',
+        'app/views/file_upload',
+        'app/views/graph',
+        'app/views/graph_button',
+        'app/views/home',
+        'app/views/image_list',
+        'app/views/image_list_item',
+        'app/views/key',
+        'app/views/key_add',
+        'app/views/key_edit',
+        'app/views/key_list',
+        'app/views/key_list_item',
+        'app/views/login',
+        'app/views/machine',
+        'app/views/machine_add',
+        'app/views/machine_keys',
+        'app/views/machine_keys_list_item',
+        'app/views/machine_list',
+        'app/views/machine_list_item',
+        'app/views/machine_manual_monitoring',
+        'app/views/machine_power',
+        'app/views/machine_shell',
+        'app/views/machine_shell_list_item',
+        'app/views/machine_tags',
+        'app/views/machine_tags_list_item',
+        'app/views/messagebox',
+        'app/views/metric_add',
+        'app/views/metric_add_custom',
+        'app/views/metric_node',
+        'app/views/monitoring',
+        'app/views/rule',
+        'app/views/rule_edit',
+        'app/views/user_menu',
+    ], loadManager.appLoaded);
+}
+
+function initApp (
+    TemplatesBuild,
     BackendAddController,
     BackendEditController,
     BackendsController,
@@ -113,7 +202,6 @@ define('app', ['jquery',
     NotificationController,
     RuleEditController,
     RulesController,
-    TemplatesBuild,
     BackendAdd,
     BackendButton,
     BackendEdit,
@@ -151,474 +239,461 @@ define('app', ['jquery',
     RuleEditView,
     UserMenuView) {
 
-    changeLoadProgress(20);
+    changeLoadProgress(30);
+    warn('Init');
 
-    function initialize() {
+    // JQM init event
+    $(document).bind('mobileinit', function() {
+
+        changeLoadProgress(50);
+        warn('Mobile Init');
+
+        $.mobile.ajaxEnabled = false;
+        $.mobile.pushStateEnabled = false;
+        $.mobile.linkBindingEnabled = false;
+        $.mobile.hashListeningEnabled = false;
+        $.mobile.ignoreContentEnabled = true;
+        $.mobile.panel.prototype._bindUpdateLayout = function(){};
+        $('body').css('overflow','auto');
+
+        App.set('isJQMInitialized',true);
+    });
+
+    // Hide error boxes on page unload
+    window.onbeforeunload = function() {
+        $('.ui-loader').hide();
+    };
 
 
-        changeLoadProgress(30);
-        warn('Init');
+    // Ember Application
+    App = Ember.Application.create({
+        ready: initEmber
+    });
 
-        // JQM init event
-        $(document).bind('mobileinit', function() {
 
-            changeLoadProgress(50);
-            warn('Mobile Init');
+    // Globals
 
-            $.mobile.ajaxEnabled = false;
-            $.mobile.pushStateEnabled = false;
-            $.mobile.linkBindingEnabled = false;
-            $.mobile.hashListeningEnabled = false;
-            $.mobile.ignoreContentEnabled = true;
-            $.mobile.panel.prototype._bindUpdateLayout = function(){};
-            $('body').css('overflow','auto');
+    App.set('debugSocket', false);
+    App.set('isCore', !!IS_CORE);
+    App.set('authenticated', AUTH || IS_CORE);
+    App.set('ajax', new AJAX(CSRF_TOKEN));
+    App.set('email', EMAIL);
+    App.set('password', '');
+    App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
+    App.set('isJQMInitialized', false);
+    window.Mist = App;
 
-            App.set('isJQMInitialized',true);
-            Mist.set('socket', Socket({
-                namespace: '/mist',
-                onInit: initSocket,
-            }));
+    CSRF_TOKEN = null;
+
+    // Ember routes and routers
+
+    App.Router.map(function() {
+        this.route('machines');
+        this.route('images');
+        this.route('machine', {
+            path : '/machines/:machine_id',
         });
-
-        // Hide error boxes on page unload
-        window.onbeforeunload = function() {
-            $('.ui-loader').hide();
-        };
-
-
-        // Ember Application
-        App = Ember.Application.create({
-            ready: initEmber
+        this.route('keys');
+        this.route('key', {
+            path : '/keys/:key_id'
         });
+    });
 
-
-        // Globals
-
-        App.set('debugSocket', false);
-        App.set('isCore', !!IS_CORE);
-        App.set('authenticated', AUTH || IS_CORE);
-        App.set('ajax', new AJAX(CSRF_TOKEN));
-        App.set('email', EMAIL);
-        App.set('password', '');
-        App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
-        App.set('isJQMInitialized', false);
-        window.Mist = App;
-
-        CSRF_TOKEN = null;
-
-        // Ember routes and routers
-
-        App.Router.map(function() {
-            this.route('machines');
-            this.route('images');
-            this.route('machine', {
-                path : '/machines/:machine_id',
+    App.ImagesRoute = Ember.Route.extend({
+        activate: function() {
+            Ember.run.next(function() {
+                document.title = 'mist.io - images';
             });
-            this.route('keys');
-            this.route('key', {
-                path : '/keys/:key_id'
+        }
+    });
+
+    App.MachinesRoute = Ember.Route.extend({
+        activate: function() {
+            Ember.run.next(function() {
+                document.title = 'mist.io - machines';
             });
-        });
-
-        App.ImagesRoute = Ember.Route.extend({
-            activate: function() {
-                Ember.run.next(function() {
-                    document.title = 'mist.io - images';
+        },
+        exit: function() {
+            Mist.backendsController.forEach(function(backend) {
+                backend.machines.forEach(function(machine) {
+                    machine.set('selected', false);
                 });
-            }
-        });
-
-        App.MachinesRoute = Ember.Route.extend({
-            activate: function() {
-                Ember.run.next(function() {
-                    document.title = 'mist.io - machines';
-                });
-            },
-            exit: function() {
-                Mist.backendsController.forEach(function(backend) {
-                    backend.machines.forEach(function(machine) {
-                        machine.set('selected', false);
-                    });
-                });
-            }
-        });
-
-        App.MachineRoute = Ember.Route.extend({
-            activate: function() {
-                Ember.run.next(function() {
-                    var id = Mist.getMachineIdByUrl();
-                    var machine = Mist.backendsController.getMachine(id);
-                    document.title = 'mist.io - ' + (machine ? machine.name : id);
-                });
-            },
-            redirect: function() {
-                Mist.backendsController.set('machineRequest', Mist.getMachineIdByUrl());
-            },
-            model: function() {
-                if (Mist.backendsController.loading || Mist.backendsController.loadingMachines) {
-                    return {id: '', backend: {}};
-                }
-                return Mist.backendsController.getMachine(Mist.getMachineIdByUrl());
-            }
-        });
-
-        App.KeysRoute = Ember.Route.extend({
-            activate: function() {
-                Ember.run.next(function() {
-                    document.title = 'mist.io - keys';
-                });
-            },
-            exit: function() {
-                Mist.keysController.content.forEach(function(key){
-                     key.set('selected', false);
-                });
-            }
-        });
-
-        App.KeyRoute = Ember.Route.extend({
-            activate: function() {
-                Ember.run.next(function() {
-                    document.title = 'mist.io - ' + Mist.getKeyIdByUrl();
-                });
-            },
-            redirect: function() {
-                Mist.keysController.set('keyRequest', Mist.getKeyIdByUrl());
-            },
-            model: function() {
-                if (Mist.keysController.loading) {
-                    return {machines: []};
-                }
-                return Mist.keysController.getKey(Mist.getKeyIdByUrl());
-            }
-        });
-
-        // Ember views
-
-        App.set('homeView', Home);
-        App.set('ruleView', RuleView);
-        App.set('graphView', GraphView);
-        App.set('loginView', LoginView);
-        App.set('keyAddView', KeyAddView);
-        App.set('keyView', SingleKeyView);
-        App.set('metricNodeView', MetricNodeView);
-        App.set('keyListView', KeyListView);
-        App.set('userMenuView', UserMenuView);
-        App.set('keyEditView', KeyEditDialog);
-        App.set('backendAddView', BackendAdd);
-        App.set('ruleEditView', RuleEditView);
-        App.set('metricAddView', MetricAddView);
-        App.set('backendEditView', BackendEdit);
-        App.set('imageListView', ImageListView);
-        App.set('fileUploadView', FileUploadView);
-        App.set('messageboxView', MessageBoxView);
-        App.set('monitoringView', MonitoringView);
-        App.set('machineView', SingleMachineView);
-        App.set('machineKeysView', MachineKeysView);
-        App.set('machineTagsView', MachineTagsView);
-        App.set('keyListItemView', KeyListItemView);
-        App.set('machineListView', MachineListView);
-        App.set('imageListItemView', ImageListItem);
-        App.set('machineAddView', MachineAddDialog);
-        App.set('backendButtonView', BackendButton);
-        App.set('graphButtonView', GraphButtonView);
-        App.set('machinePowerView', MachinePowerView);
-        App.set('machineShellView', MachineShellView);
-        App.set('machineListItemView', MachineListItem);
-        App.set('confirmationDialog', ConfirmationDialog);
-        App.set('metricAddCustomView', MetricAddCustomView);
-        App.set('machineKeysListItemView', MachineKeysListItemView);
-        App.set('machineTagsListItemView', MachineTagsListItemView);
-        App.set('machineShellListItemView', MachineShellListItemView);
-        App.set('machineManualMonitoringView', MachineManualMonitoringView);
-
-        // Ember controllers
-
-        App.set('keysController', KeysController.create());
-        App.set('loginController', LoginController.create());
-        App.set('rulesController', RulesController.create());
-        App.set('keyAddController', KeyAddController.create());
-        App.set('metricsController', MetricsController.create());
-        App.set('keyEditController', KeyEditController.create());
-        App.set('ruleEditController', RuleEditController.create());
-        App.set('backendsController', BackendsController.create());
-        App.set('metricAddController', MetricAddController.create());
-        App.set('fileUploadController', FileUploadController.create());
-        App.set('machineAddController', MachineAddController.create());
-        App.set('backendAddController', BackendAddController.create());
-        App.set('monitoringController', MonitoringController.create());
-        App.set('backendEditController', BackendEditController.create());
-        App.set('machineTagsController', MachineTagsController.create());
-        App.set('machineKeysController', MachineKeysController.create());
-        App.set('imageSearchController', ImageSearchController.create());
-        App.set('machineShellController', MachineShellController.create());
-        App.set('confirmationController', ConfirmationController.create());
-        App.set('notificationController', NotificationController.create());
-        App.set('machinePowerController', MachinePowerController.create());
-        App.set('metricAddCustomController', MetricAddCustomController.create());
-        App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
-
-        // Ember custom widgets
-
-        App.Select = Ember.Select.extend({
-            attributeBindings: [
-                'name',
-                'data-theme',
-                'data-icon',
-                'data-native-menu',
-                'disabled'
-            ]
-        });
-        App.TextArea = Ember.TextArea.extend({
-            autocapitalize: 'off',
-            attributeBindings: [
-                'data-theme',
-                'autocapitalize'
-            ]
-        });
-        App.Checkbox = Ember.Checkbox.extend({
-            attributeBindings: [
-                'data-mini'
-            ]
-        });
-        App.TextField = Ember.TextField.extend({
-            autocapitalize: 'off',
-            attributeBindings: [
-                'data-theme',
-                'placeholder',
-                'autocapitalize'
-            ],
-            keyUp: function(e) {
-                if(this.get('parentView').keyUp) {
-                    this.get('parentView').keyUp(e);
-                }
-            },
-            click: function(e) {
-                if(this.get('parentView').inputClicked) {
-                    this.get('parentView').inputClicked(e);
-                }
-            },
-            focusIn: function(e) {
-                if(this.get('parentView').inputClicked) {
-                    this.get('parentView').inputClicked(e);
-                }
-            }
-        });
-
-        // Mist functions
-
-        App.prettyTime = function(date) {
-            var hour = date.getHours();
-            var min = date.getMinutes();
-            var sec = date.getSeconds();
-            return (hour < 10 ? '0' : '') + hour + ':' +
-                (min < 10 ? '0' : '') + min + ':' +
-                (sec < 10 ? '0' : '') + sec;
-        };
-
-        App.getKeyIdByUrl = function() {
-            return window.location.href.split('/')[5];
-        };
-
-        App.getMachineIdByUrl = function() {
-            return window.location.href.split('/')[5];
-        };
-
-        App.getViewName = function (view) {
-            return view.constructor.toString().split('.')[1].split('View')[0];
-        };
-
-        App.capitalize = function (string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        };
-
-        App.decapitalize = function (string) {
-            return string.charAt(0).toLowerCase() + string.slice(1);
-        };
-
-        App.capitalizeArray = function (array) {
-            var newArray = [];
-            array.forEach(function(string) {
-                newArray.push(App.capitalize(string));
             });
-            return newArray;
-        };
+        }
+    });
 
-        App.decapitalizeArray = function (array) {
-            var newArray = [];
-            array.forEach(function(string) {
-                newArray.push(App.decapitalize(string));
+    App.MachineRoute = Ember.Route.extend({
+        activate: function() {
+            Ember.run.next(function() {
+                var id = Mist.getMachineIdByUrl();
+                var machine = Mist.backendsController.getMachine(id);
+                document.title = 'mist.io - ' + (machine ? machine.name : id);
             });
-            return newArray;
-        };
-
-        App.isScrolledToBottom = function(){
-            var distanceToTop = $(document).height() - $(window).height();
-            var top = $(document).scrollTop();
-            return distanceToTop - top < 20;
-        };
-
-        App.selectElementContents = function(elementId) {
-            var el = document.getElementById(elementId);
-            var range = document.createRange();
-            range.selectNodeContents(el);
-            var sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-        };
-
-        App.smoothScroll = function (scrollTo, timeout) {
-
-            timeout = timeout || 100;
-
-            var startingTop = $(window).scrollTop();
-
-            var distance = Math.abs(startingTop - scrollTo);
-
-            var scrollTimes;
-            if (distance < 10)
-                scrollTimes = 1;
-            else if (distance < 100)
-                scrollTimes = 10;
-            else
-                scrollTimes = 100;
-
-            var scrollCounter = scrollTimes;
-            var scrollInterval = timeout / scrollTimes;
-
-            var scrollChunks = distance / scrollTimes;
-            var sign = startingTop < scrollTo ? +1 : -1;
-
-            function partialScroll () {
-                if (Math.abs($(window).scrollTop() - scrollTo) < 10 ||
-                    scrollCounter == 0) {
-                    window.scrollTo(0, scrollTo);
-                } else {
-                    scrollCounter--;
-                    window.scrollTo(0, $(window).scrollTop() + (sign * scrollChunks));
-                    setTimeout(function () {
-                        partialScroll();
-                    }, scrollInterval);
-                }
-            };
-
-            partialScroll();
-        };
-
-        App.switchElementVisibility = function(elementSelector) {
-            var element = $('#' + elementSelector);
-            if (element.css('display') == 'none')
-                element.slideDown();
-            else
-                element.slideUp();
-        };
-
-        App.arrayToListString = function(array, attribute) {
-            var listString = '';
-            array.forEach(function(item, index) {
-                listString += item[attribute];
-                if (index < array.length - 1)
-                    listString += ', ';
-            });
-            return listString;
-        };
-
-        App.splitWords = function (string) {
-            if (string.indexOf('-') > -1)
-                return string.split('-');
-            else if (string.indexOf('_') > -1)
-                return string.split('_');
-            else if (string.indexOf(' ') > -1)
-                return string.split(' ');
-            else if (string.match(/([a-z])([A-Z])/g)) {
-                var wordJoints = string.match(/([a-z])([A-Z])/g);
-                wordJoints.forEach(function(joint) {
-                    string = string.replace(joint, joint[0] + '_' + joint[1]);
-                });
-                return App.splitWords(string);
+        },
+        redirect: function() {
+            Mist.backendsController.set('machineRequest', Mist.getMachineIdByUrl());
+        },
+        model: function() {
+            if (Mist.backendsController.loading || Mist.backendsController.loadingMachines) {
+                return {id: '', backend: {}};
             }
-            return [string];
+            return Mist.backendsController.getMachine(Mist.getMachineIdByUrl());
+        }
+    });
+
+    App.KeysRoute = Ember.Route.extend({
+        activate: function() {
+            Ember.run.next(function() {
+                document.title = 'mist.io - keys';
+            });
+        },
+        exit: function() {
+            Mist.keysController.content.forEach(function(key){
+                 key.set('selected', false);
+            });
+        }
+    });
+
+    App.KeyRoute = Ember.Route.extend({
+        activate: function() {
+            Ember.run.next(function() {
+                document.title = 'mist.io - ' + Mist.getKeyIdByUrl();
+            });
+        },
+        redirect: function() {
+            Mist.keysController.set('keyRequest', Mist.getKeyIdByUrl());
+        },
+        model: function() {
+            if (Mist.keysController.loading) {
+                return {machines: []};
+            }
+            return Mist.keysController.getKey(Mist.getKeyIdByUrl());
+        }
+    });
+
+    // Ember views
+
+    App.set('homeView', Home);
+    App.set('ruleView', RuleView);
+    App.set('graphView', GraphView);
+    App.set('loginView', LoginView);
+    App.set('keyAddView', KeyAddView);
+    App.set('keyView', SingleKeyView);
+    App.set('metricNodeView', MetricNodeView);
+    App.set('keyListView', KeyListView);
+    App.set('userMenuView', UserMenuView);
+    App.set('keyEditView', KeyEditDialog);
+    App.set('backendAddView', BackendAdd);
+    App.set('ruleEditView', RuleEditView);
+    App.set('metricAddView', MetricAddView);
+    App.set('backendEditView', BackendEdit);
+    App.set('imageListView', ImageListView);
+    App.set('fileUploadView', FileUploadView);
+    App.set('messageboxView', MessageBoxView);
+    App.set('monitoringView', MonitoringView);
+    App.set('machineView', SingleMachineView);
+    App.set('machineKeysView', MachineKeysView);
+    App.set('machineTagsView', MachineTagsView);
+    App.set('keyListItemView', KeyListItemView);
+    App.set('machineListView', MachineListView);
+    App.set('imageListItemView', ImageListItem);
+    App.set('machineAddView', MachineAddDialog);
+    App.set('backendButtonView', BackendButton);
+    App.set('graphButtonView', GraphButtonView);
+    App.set('machinePowerView', MachinePowerView);
+    App.set('machineShellView', MachineShellView);
+    App.set('machineListItemView', MachineListItem);
+    App.set('confirmationDialog', ConfirmationDialog);
+    App.set('metricAddCustomView', MetricAddCustomView);
+    App.set('machineKeysListItemView', MachineKeysListItemView);
+    App.set('machineTagsListItemView', MachineTagsListItemView);
+    App.set('machineShellListItemView', MachineShellListItemView);
+    App.set('machineManualMonitoringView', MachineManualMonitoringView);
+
+    // Ember controllers
+
+    App.set('keysController', KeysController.create());
+    App.set('loginController', LoginController.create());
+    App.set('rulesController', RulesController.create());
+    App.set('keyAddController', KeyAddController.create());
+    App.set('metricsController', MetricsController.create());
+    App.set('keyEditController', KeyEditController.create());
+    App.set('ruleEditController', RuleEditController.create());
+    App.set('backendsController', BackendsController.create());
+    App.set('metricAddController', MetricAddController.create());
+    App.set('fileUploadController', FileUploadController.create());
+    App.set('machineAddController', MachineAddController.create());
+    App.set('backendAddController', BackendAddController.create());
+    App.set('monitoringController', MonitoringController.create());
+    App.set('backendEditController', BackendEditController.create());
+    App.set('machineTagsController', MachineTagsController.create());
+    App.set('machineKeysController', MachineKeysController.create());
+    App.set('imageSearchController', ImageSearchController.create());
+    App.set('machineShellController', MachineShellController.create());
+    App.set('confirmationController', ConfirmationController.create());
+    App.set('notificationController', NotificationController.create());
+    App.set('machinePowerController', MachinePowerController.create());
+    App.set('metricAddCustomController', MetricAddCustomController.create());
+    App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
+
+    // Ember custom widgets
+
+    App.Select = Ember.Select.extend({
+        attributeBindings: [
+            'name',
+            'data-theme',
+            'data-icon',
+            'data-native-menu',
+            'disabled'
+        ]
+    });
+    App.TextArea = Ember.TextArea.extend({
+        autocapitalize: 'off',
+        attributeBindings: [
+            'data-theme',
+            'autocapitalize'
+        ]
+    });
+    App.Checkbox = Ember.Checkbox.extend({
+        attributeBindings: [
+            'data-mini'
+        ]
+    });
+    App.TextField = Ember.TextField.extend({
+        autocapitalize: 'off',
+        attributeBindings: [
+            'data-theme',
+            'placeholder',
+            'autocapitalize'
+        ],
+        keyUp: function(e) {
+            if(this.get('parentView').keyUp) {
+                this.get('parentView').keyUp(e);
+            }
+        },
+        click: function(e) {
+            if(this.get('parentView').inputClicked) {
+                this.get('parentView').inputClicked(e);
+            }
+        },
+        focusIn: function(e) {
+            if(this.get('parentView').inputClicked) {
+                this.get('parentView').inputClicked(e);
+            }
+        }
+    });
+
+    // Mist functions
+
+    App.prettyTime = function(date) {
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        var sec = date.getSeconds();
+        return (hour < 10 ? '0' : '') + hour + ':' +
+            (min < 10 ? '0' : '') + min + ':' +
+            (sec < 10 ? '0' : '') + sec;
+    };
+
+    App.getKeyIdByUrl = function() {
+        return window.location.href.split('/')[5];
+    };
+
+    App.getMachineIdByUrl = function() {
+        return window.location.href.split('/')[5];
+    };
+
+    App.getViewName = function (view) {
+        return view.constructor.toString().split('.')[1].split('View')[0];
+    };
+
+    App.capitalize = function (string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    };
+
+    App.decapitalize = function (string) {
+        return string.charAt(0).toLowerCase() + string.slice(1);
+    };
+
+    App.capitalizeArray = function (array) {
+        var newArray = [];
+        array.forEach(function(string) {
+            newArray.push(App.capitalize(string));
+        });
+        return newArray;
+    };
+
+    App.decapitalizeArray = function (array) {
+        var newArray = [];
+        array.forEach(function(string) {
+            newArray.push(App.decapitalize(string));
+        });
+        return newArray;
+    };
+
+    App.isScrolledToBottom = function(){
+        var distanceToTop = $(document).height() - $(window).height();
+        var top = $(document).scrollTop();
+        return distanceToTop - top < 20;
+    };
+
+    App.selectElementContents = function(elementId) {
+        var el = document.getElementById(elementId);
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    };
+
+    App.smoothScroll = function (scrollTo, timeout) {
+
+        timeout = timeout || 100;
+
+        var startingTop = $(window).scrollTop();
+
+        var distance = Math.abs(startingTop - scrollTo);
+
+        var scrollTimes;
+        if (distance < 10)
+            scrollTimes = 1;
+        else if (distance < 100)
+            scrollTimes = 10;
+        else
+            scrollTimes = 100;
+
+        var scrollCounter = scrollTimes;
+        var scrollInterval = timeout / scrollTimes;
+
+        var scrollChunks = distance / scrollTimes;
+        var sign = startingTop < scrollTo ? +1 : -1;
+
+        function partialScroll () {
+            if (Math.abs($(window).scrollTop() - scrollTo) < 10 ||
+                scrollCounter == 0) {
+                window.scrollTo(0, scrollTo);
+            } else {
+                scrollCounter--;
+                window.scrollTo(0, $(window).scrollTop() + (sign * scrollChunks));
+                setTimeout(function () {
+                    partialScroll();
+                }, scrollInterval);
+            }
         };
 
-        return App;
-    }
+        partialScroll();
+    };
+
+    App.switchElementVisibility = function(elementSelector) {
+        var element = $('#' + elementSelector);
+        if (element.css('display') == 'none')
+            element.slideDown();
+        else
+            element.slideUp();
+    };
+
+    App.arrayToListString = function(array, attribute) {
+        var listString = '';
+        array.forEach(function(item, index) {
+            listString += item[attribute];
+            if (index < array.length - 1)
+                listString += ', ';
+        });
+        return listString;
+    };
+
+    App.splitWords = function (string) {
+        if (string.indexOf('-') > -1)
+            return string.split('-');
+        else if (string.indexOf('_') > -1)
+            return string.split('_');
+        else if (string.indexOf(' ') > -1)
+            return string.split(' ');
+        else if (string.match(/([a-z])([A-Z])/g)) {
+            var wordJoints = string.match(/([a-z])([A-Z])/g);
+            wordJoints.forEach(function(joint) {
+                string = string.replace(joint, joint[0] + '_' + joint[1]);
+            });
+            return App.splitWords(string);
+        }
+        return [string];
+    };
+
+    loadManager.appInitialized();
+}
 
 
-    /**
-     *
-     *  Ajax wrapper constructor
-     *
-     */
+/**
+ *
+ *  Ajax wrapper constructor
+ *
+ */
 
-    function AJAX (csrfToken) {
+function AJAX (csrfToken) {
 
-        this.GET = function(url, data) {
-            return this.ajax('GET', url, data);
+    this.GET = function(url, data) {
+        return this.ajax('GET', url, data);
+    };
+    this.PUT = function(url, data) {
+        return this.ajax('PUT', url, data);
+    };
+    this.POST = function(url, data) {
+        return this.ajax('POST', url, data);
+    };
+    this.DELETE = function(url, data) {
+        return this.ajax('DELETE', url, data);
+    };
+    this.ajax = function(type, url, data) {
+
+        var ret = {};
+        var call = {};
+
+        call.success = function(callback) {
+            ret.success = callback;
+            return call;
         };
-        this.PUT = function(url, data) {
-            return this.ajax('PUT', url, data);
+        call.error = function(callback) {
+            ret.error = callback;
+            return call;
         };
-        this.POST = function(url, data) {
-            return this.ajax('POST', url, data);
+        call.complete = function(callback) {
+            ret.complete = callback;
+            return call;
         };
-        this.DELETE = function(url, data) {
-            return this.ajax('DELETE', url, data);
-        };
-        this.ajax = function(type, url, data) {
+        call.ajax = function() {
 
-            var ret = {};
-            var call = {};
-
-            call.success = function(callback) {
-                ret.success = callback;
-                return call;
-            };
-            call.error = function(callback) {
-                ret.error = callback;
-                return call;
-            };
-            call.complete = function(callback) {
-                ret.complete = callback;
-                return call;
-            };
-            call.ajax = function() {
-
-                var ajaxObject = {
-                    url: url,
-                    type: type,
-                    headers: {
-                        'Csrf-Token': csrfToken,
-                    },
-                    data: JSON.stringify(data),
-                    complete: function(jqXHR) {
-                        if (jqXHR.status == 200) {
-                            if (ret.success)
-                                ret.success(jqXHR.responseJSON);
-                        } else if (ret.error) {
-                            ret.error(jqXHR.responseText, jqXHR.status);
-                        }
-                        if (ret.complete)
-                            ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
+            var ajaxObject = {
+                url: url,
+                type: type,
+                headers: {
+                    'Csrf-Token': csrfToken,
+                },
+                data: JSON.stringify(data),
+                complete: function(jqXHR) {
+                    if (jqXHR.status == 200) {
+                        if (ret.success)
+                            ret.success(jqXHR.responseJSON);
+                    } else if (ret.error) {
+                        ret.error(jqXHR.responseText, jqXHR.status);
                     }
-                };
-
-                if (Object.keys(data).length === 0) {
-                    delete ajaxObject.data;
+                    if (ret.complete)
+                        ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
                 }
-
-                $.ajax(ajaxObject);
-
-                return call;
             };
-            return call.ajax();
+
+            if (Object.keys(data).length === 0) {
+                delete ajaxObject.data;
+            }
+
+            $.ajax(ajaxObject);
+
+            return call;
         };
-    }
-    preloadImages(initialize);
-});
+        return call.ajax();
+    };
+};
 
 
-function preloadImages (callback) {
-
-    var start = Date.now();
+function loadImages () {
 
     // Hardcode images not on the spritesheet,
     // including the spritesheet itself
@@ -639,12 +714,23 @@ function preloadImages (callback) {
     }
 
     function onImageLoad () {
-        if (--remaining == 0) {
-            warn('Loaded images', Date.now() - start);
-            callback();
-        }
+        if (--remaining == 0)
+            loadManager.imagesLoaded();
     }
 }
+
+function loadSocket () {
+    Socket({
+        namespace: '/mist',
+        onInit: function (socket) {
+            if (loadManager)
+                loadManager.socketLoaded.apply(loadManager, arguments);
+            else
+                socket.emit('ready');
+        }
+    })
+};
+
 
 /**
  *
@@ -779,7 +865,7 @@ function initEmber () {
 }
 
 
-function initSocket (socket, initialized) {
+function setupSocketEvents (socket, initialized) {
 
     changeLoadProgress(75);
 
@@ -832,8 +918,6 @@ function initSocket (socket, initialized) {
         .on('probe', onProbe)
         .on('ping', onProbe);
     }
-
-    socket.emit('ready');
 
     function onProbe(data) {
         var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
