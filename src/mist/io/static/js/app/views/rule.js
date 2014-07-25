@@ -22,6 +22,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             isUpdating: null,
             newRuleValue: null,
             newRuleTimeWindow: null,
+            newRuleTimeWindowInMinutes: null,
 
 
             //
@@ -32,7 +33,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             aggregateIsAny: function () {
-                return this.rule.aggregate == 'any';
+                return this.rule.aggregate.value == 'any';
             }.property('rule', 'rule.aggregate'),
 
 
@@ -45,7 +46,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
             load: function () {
                 this.set('newRuleValue', this.rule.value);
-                this.set('newRuleTimeWindow', this.rule.timeWindow);
+                this.set('newRuleTimeWindowInMinutes',  1 + this.rule.timeWindow / 60);
                 Ember.run.next(this, function () {
                     $('#'+this.elementId).trigger('create');
                 })
@@ -71,13 +72,18 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                     var that = this;
                     Mist.rulesController.updateRule(
                         this.rule.id, null, null, this.newRuleValue, null, null,
-                        /*this.newRuleTimeWindow,*/ function (success) {
+                        function (success) {
                             if (!success) {
                                 that.set('newRuleValue', that.rule.value);
-                                that.set('newRuleTimeWindow', that.rule.timeWindow);
+                                that.set('newRuleTimeWindowInMinutes', 1 + that.rule.timeWindow / 60);
                             }
-                        });
+                        }, null, this.newRuleTimeWindow);
                 }, 500);
+            },
+
+
+            convertTimeWindow: function () {
+                this.set('newRuleTimeWindow', (this.newRuleTimeWindowInMinutes - 1) * 60);
             },
 
 
@@ -134,6 +140,11 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             textValuesObserver: function () {
                 Ember.run.once(this, 'update');
             }.observes('newRuleValue', 'newRuleTimeWindow'),
+
+
+            timeWindowInMinutesObserver: function () {
+                Ember.run.once(this, 'convertTimeWindow');
+            }.observes('newRuleTimeWindowInMinutes'),
         });
     }
 );

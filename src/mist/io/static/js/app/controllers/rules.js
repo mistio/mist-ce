@@ -168,7 +168,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
             updateRule: function (id, metric, operator, value, actionToTake,
-                command, callback, aggregate) {
+                command, callback, aggregate, timeWindow) {
 
                 var rule = this.getRuleById(id);
 
@@ -183,6 +183,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 if (!operator) { operator = rule.operator; }
                 if (!actionToTake) { actionToTake = rule.actionToTake; }
                 if (!aggregate) { aggregate = rule.aggregate; }
+                if (!timeWindow) { timeWindow = rule.timeWindow; }
 
                 // Check if anything changed
                 if (value == rule.value &&
@@ -190,7 +191,8 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     command == rule.command &&
                     actionToTake == rule.actionToTake &&
                     operator.title == rule.operator.title &&
-                    aggregate.value == rule.aggregate.value ) {
+                    aggregate.value == rule.aggregate.value &&
+                    timeWindow == rule.timeWindow ) {
                         return false;
                 }
 
@@ -204,6 +206,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     'operator': operator.title,
                     'action': actionToTake,
                     'aggregate': aggregate.value,
+                    'reminder_offset': timeWindow,
                 }).success(function(data) {
                     info('Successfully updated rule ', id);
                     rule.set('pendingAction', false);
@@ -213,6 +216,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     rule.set('operator', operator);
                     rule.set('actionToTake', actionToTake);
                     rule.set('aggregate', aggregate);
+                    rule.set('timeWindow', timeWindow);
 
                     var maxvalue = parseInt(rule.maxValue);
                     var curvalue = parseInt(rule.value);
