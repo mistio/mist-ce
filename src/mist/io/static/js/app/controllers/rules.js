@@ -15,6 +15,17 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             commandRule: null,
             creationPending: false,
 
+            aggregateList: [{
+                'title': 'any',
+                'value': 'any'
+            }, {
+                'title': 'every',
+                'value': 'all'
+            }, {
+                'title': 'average',
+                'value': 'avg'
+            }],
+
             operatorList: [{
                 'title': 'gt',
                 'symbol': '>'
@@ -30,11 +41,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 'command'
             ],
 
-            aggregateList: [
-                'any',
-                'every',
-                'average'
-            ],
 
             setContent: function(rules) {
                 this._updateContent(rules);
@@ -161,7 +167,8 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 });
             },
 
-            updateRule: function(id, metric, operator, value, actionToTake, command, callback) {
+            updateRule: function (id, metric, operator, value, actionToTake,
+                command, callback, aggregate) {
 
                 var rule = this.getRuleById(id);
 
@@ -175,13 +182,15 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 if (!command) { command = rule.command; }
                 if (!operator) { operator = rule.operator; }
                 if (!actionToTake) { actionToTake = rule.actionToTake; }
+                if (!aggregate) { aggregate = rule.aggregate; }
 
                 // Check if anything changed
                 if (value == rule.value &&
                     metric == rule.metric.id &&
                     command == rule.command &&
                     actionToTake == rule.actionToTake &&
-                    operator.title == rule.operator.title ) {
+                    operator.title == rule.operator.title &&
+                    aggregate.value == rule.aggregate.value ) {
                         return false;
                 }
 
@@ -194,6 +203,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     'command': command,
                     'operator': operator.title,
                     'action': actionToTake,
+                    'aggregate': aggregate.value,
                 }).success(function(data) {
                     info('Successfully updated rule ', id);
                     rule.set('pendingAction', false);
@@ -202,6 +212,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     rule.set('command', command);
                     rule.set('operator', operator);
                     rule.set('actionToTake', actionToTake);
+                    rule.set('aggregate', aggregate);
 
                     var maxvalue = parseInt(rule.maxValue);
                     var curvalue = parseInt(rule.value);

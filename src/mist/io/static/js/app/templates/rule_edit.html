@@ -113,7 +113,7 @@
             {{#each Mist.rulesController.aggregateList}}
                 <li data-icon="false">
                     <a {{action "aggregateClicked" this target="view"}}>
-                        {{this}}
+                        {{this.title}}
                     </a>
                 </li>
             {{/each}}
