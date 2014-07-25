@@ -67,6 +67,8 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     oldRule.set('metric', Mist.metricsController.getMetric(newRule.metric));
                     oldRule.set('machine', Mist.backendsController.getMachine(
                         newRule.machine, newRule.backend) || newRule.machine);
+                    oldRule.set('aggregate', this.getAggregateByValue(newRule.aggregate))
+                    oldRule.set('timeWindw', newRule.reminder_offset);
                     this.trigger('onRuleUpdate');
                 });
             },
@@ -108,6 +110,10 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 return this.operatorList.findBy('title', ruleTitle);
             },
 
+
+            getAggregateByValue: function (aggregateValue) {
+                return this.aggregateList.findBy('value', aggregateValue);
+            },
 
             creationPendingObserver: function() {
                 if (this.creationPending)

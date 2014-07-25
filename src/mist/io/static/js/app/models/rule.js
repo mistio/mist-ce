@@ -43,8 +43,8 @@ define('app/models/rule', ['ember'],
             init: function () {
                 this._super();
                 // TODO: delete. This is temp for debugging only
-                this.set('aggregate', this.aggregate || {value:'every'});
-                this.set('timeWindow', this.timeWindow || 60);
+                this.set('aggregate', Mist.rulesController.getAggregateByValue(this.aggregate));
+                this.set('timeWindow', this.reminder_offset);
             }
         });
     }
