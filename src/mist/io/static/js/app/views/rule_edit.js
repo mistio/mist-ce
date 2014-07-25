@@ -96,12 +96,12 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
                     var rule = Mist.ruleEditController.rule;
                     Mist.rulesController.updateRule(rule.id, null, null, null,
-                        null, null, null, aggregate);
-
-                    Ember.run.next(function () {
-                        $('#' + rule.id + ' .rule-time-window')
-                            .parent().trigger('create');
-                    });
+                        null, null, function () {
+                            Ember.run.next(function () {
+                                $('#' + rule.id + ' .rule-time-window')
+                                    .parent().trigger('create');
+                            });
+                        }, aggregate);
                 },
 
 

@@ -43,8 +43,8 @@ define('app/models/rule', ['ember'],
             init: function () {
                 this._super();
                 // TODO: delete. This is temp for debugging only
-                this.set('aggregate', {value:'every'});
-                this.set('timeWindow', 60);
+                this.set('aggregate', this.aggregate || {value:'every'});
+                this.set('timeWindow', this.timeWindow || 60);
             }
         });
     }
