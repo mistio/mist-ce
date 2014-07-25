@@ -328,7 +328,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             providerIconClass: function() {
-                info('hi');
+
                 if (!this.machine || !this.machine.backend || !this.machine.backend.provider)
                     return '';
 
