@@ -328,17 +328,19 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             providerIconClass: function() {
-
+                info('hi');
                 if (!this.machine || !this.machine.backend || !this.machine.backend.provider)
                     return '';
 
                 var providerName = this.machine.backend.provider;
-                if (providerName.indexOf('ec2' == 0)) providerName = 'ec2';
+                if (providerName.indexOf('ec2') == 0) providerName = 'ec2';
+                if (providerName.indexOf('openstack') == 0) providerName = 'openstack';
                 if (providerName.indexOf('rackspace') == 0) providerName = 'rackspace';
-                if (providerName.indexOf('bare_metal') == 0) providerName = 'bare-metal';
+                if (providerName.indexOf('bare_metal') == 0) providerName = 'baremetal';
+
                 return 'provider-' + providerName;
 
-            }.property('machine'),
+            }.property('machine', 'machine.backend.provider'),
 
 
             upFor: function() {
