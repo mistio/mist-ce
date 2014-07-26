@@ -80,18 +80,18 @@
          data-enhanced="true"
          data-transition="flip">
 
-        <div data-role="header">
-            <h1>Command</h1>
+        <div class="ui-header ui-bar-b">
+            <h1 class="ui-title">Command</h1>
         </div>
 
         <div data-role="content">
 
             {{view Ember.TextArea
-                valueBinding="Mist.ruleEditController.command"
+                valueBinding="view.newCommand"
                 name="rule-command-content"}}
 
             <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-                <a class="ui-btn ui-btn-a" data-rel="back">Back</a>
+                <a class="ui-btn ui-btn-a" {{action "backClicked" target="view"}}>Back</a>
                 <a class="ui-btn ui-btn-d" {{action "saveClicked" target="view"}}>Save</a>
             </div>
         </div>
@@ -112,7 +112,7 @@
         <ul data-role="listview">
             {{#each Mist.rulesController.aggregateList}}
                 <li data-icon="false">
-                    <a {{action "aggregateClicked" this target="view"}}>
+                    <a {{action "aggregateClicked" this.value target="view"}}>
                         {{this.title}}
                     </a>
                 </li>

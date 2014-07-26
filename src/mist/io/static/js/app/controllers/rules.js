@@ -68,7 +68,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     oldRule.set('machine', Mist.backendsController.getMachine(
                         newRule.machine, newRule.backend) || newRule.machine);
                     oldRule.set('aggregate', this.getAggregateByValue(newRule.aggregate))
-                    oldRule.set('timeWindw', newRule.reminder_offset);
+                    oldRule.set('timeWindow', newRule.reminder_offset);
                     this.trigger('onRuleUpdate');
                 });
             },

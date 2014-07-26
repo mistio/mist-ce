@@ -18,7 +18,9 @@ define('app/views/rule_edit', ['app/views/controlled'],
             //
 
 
+            rule: null,
             metrics: [],
+            newCommand: null,
 
 
             //
@@ -28,29 +30,47 @@ define('app/views/rule_edit', ['app/views/controlled'],
             //
 
 
-            open: function (option) {
+            open: function (property) {
 
-                var button = '#' + Mist.ruleEditController.rule.id +
-                    ' .rule-button.rule-' + option;
+                this.set('rule', Mist.ruleEditController.rule);
+                this.set('metrics', this._parentView.metrics);
 
-                $('#rule-' + option)
-                    .popup('option', 'positionTo', button)
+                // Get button on which to position the popup
+                var button = '#' + this.rule.id +
+                    ' .rule-button.rule-' + property;
 
+                // Reposition popup on the button
+                $('#rule-' + property)
+                    .popup('option', 'positionTo', button);
+
+                // Open the popup
                 Ember.run.next(function () {
-                   $('#rule-' + option).popup('open');
+                   $('#rule-' + property).popup('open');
                 });
-
-                if (option == 'metric')
-                    this.updateMetrics();
-
-                if (option == 'command')
-                    Mist.ruleEditController.set('command',
-                        Mist.ruleEditController.rule.command);
             },
 
 
-            updateMetrics: function () {
-                this.set('metrics', this._parentView.metrics);
+            close: function (property) {
+                $('#rule-' + property).popup('close');
+                this.set('rule', null);
+                this.set('metrics', null);
+            },
+
+
+            openCommandEditor: function () {
+                this.close('action');
+                Ember.run.later(this, function () {
+                    this.open('command');
+                    this.set('newCommand', this.rule.command);
+                }, 500);
+            },
+
+
+            closeCommandEditor: function () {
+                this.close('command');
+                Ember.run.later(this, function () {
+                    this.open('action');
+                }, 500);
             },
 
 
@@ -64,52 +84,46 @@ define('app/views/rule_edit', ['app/views/controlled'],
             actions: {
 
                 metricClicked: function (metric) {
-                    $('#rule-metric').popup('close');
-                    Mist.rulesController.updateRule(
-                        Mist.ruleEditController.rule.id, metric.id);
+                    Mist.ruleEditController.edit({
+                        metric: metric
+                    });
                 },
 
 
                 operatorClicked: function (operator) {
-                    $('#rule-operator').popup('close');
-                    Mist.rulesController.updateRule(
-                        Mist.ruleEditController.rule.id, null, operator);
-                },
-
-
-                actionClicked: function (action) {
-                    $('#rule-action').popup('close');
-                    var rule = Mist.ruleEditController.rule;
-                    if (action == 'command') {
-                        Ember.run.later(function () {
-                            Mist.ruleEditController.open(rule, 'command');
-                        }, 500);
-                        return;
-                    };
-                    Mist.rulesController.updateRule(
-                        rule.id, null, null, null, action);
+                    Mist.ruleEditController.edit({
+                        operator: operator
+                    });
                 },
 
 
                 aggregateClicked: function (aggregate) {
-                    $('#rule-aggregate').popup('close');
+                    Mist.ruleEditController.edit({
+                        aggregate: aggregate
+                    });
+                },
 
-                    var rule = Mist.ruleEditController.rule;
-                    Mist.rulesController.updateRule(rule.id, null, null, null,
-                        null, null, function () {
-                            Ember.run.next(function () {
-                                $('#' + rule.id + ' .rule-time-window')
-                                    .parent().trigger('create');
-                            });
-                        }, aggregate);
+
+                actionClicked: function (action) {
+                    if (action == 'command')
+                        this.openCommandEditor();
+                    else
+                        Mist.ruleEditController.edit({
+                            action: action
+                        });
                 },
 
 
                 saveClicked: function () {
-                    $('#rule-command').popup('close');
-                    Mist.rulesController.updateRule(
-                        Mist.ruleEditController.rule.id, null, null, null,
-                            'command', Mist.ruleEditController.command);
+                    Mist.ruleEditController.edit({
+                        action: 'command',
+                        command: this.newCommand
+                    });
+                },
+
+
+                backClicked: function () {
+                    this.closeCommandEditor();
                 },
             },
 
@@ -119,6 +133,11 @@ define('app/views/rule_edit', ['app/views/controlled'],
             //  Observers
             //
             //
+            /*
+                            Ember.run.next(function () {
+                                $('#' + rule.id + ' .rule-time-window')
+                                    .parent().trigger('create');
+                            });*/
         });
     }
 );

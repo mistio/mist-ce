@@ -33,7 +33,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             aggregateIsAny: function () {
-                return this.rule.aggregate.value == 'any';
+                if (this.rule.aggregate)
+                    return this.rule.aggregate.value == 'any';
             }.property('rule', 'rule.aggregate'),
 
 
@@ -46,7 +47,6 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
             load: function () {
                 this.set('newRuleValue', this.rule.value);
-                this.set('newRuleTimeWindowInMinutes',  1 + this.rule.timeWindow / 60);
                 Ember.run.next(this, function () {
                     $('#'+this.elementId).trigger('create');
                 })
@@ -140,6 +140,12 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             textValuesObserver: function () {
                 Ember.run.once(this, 'update');
             }.observes('newRuleValue', 'newRuleTimeWindow'),
+
+
+            timeWindowObserver: function () {
+                this.set('newRuleTimeWindowInMinutes',
+                    1 + this.rule.timeWindow / 60);
+            }.observes('rule', 'rule.timeWindow'),
 
 
             timeWindowInMinutesObserver: function () {
