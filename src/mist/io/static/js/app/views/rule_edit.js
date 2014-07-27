@@ -123,19 +123,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
                 backClicked: function () {
                     this.closeCommandEditor();
                 },
-            },
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-            /*
-                            Ember.run.next(function () {
-                                $('#' + rule.id + ' .rule-time-window')
-                                    .parent().trigger('create');
-                            });*/
+            }
         });
     }
 );

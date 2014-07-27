@@ -22,7 +22,6 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             isUpdating: null,
             newRuleValue: null,
             newRuleTimeWindow: null,
-            newRuleTimeWindowInMinutes: null,
 
 
             //
@@ -33,8 +32,16 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             aggregateIsAny: function () {
-                if (this.rule.aggregate)
-                    return this.rule.aggregate.value == 'any';
+                if (this.rule.aggregate) {
+                    var isAny = this.rule.aggregate.value == 'any';
+                    // Bad, but whatever for now...
+                    if (!isAny)
+                        Ember.run.next(this, function () {
+                            $('#' + this.rule.id + ' .rule-time-window')
+                                .parent().trigger('create');
+                        });
+                    return isAny;
+                }
             }.property('rule', 'rule.aggregate'),
 
 
@@ -134,9 +141,9 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
                 openAdvancedCondition: function () {
-                    var that = this;
-                    $('#' + that.elementId + ' .rule-more').fadeOut(200, function () {
-                        $('#' + that.elementId + ' .advanced-condition').fadeIn();
+                    var element = '#' + this.elementId;
+                    $(el + ' .rule-more').fadeOut(200, function () {
+                        $(el + ' .advanced-condition').fadeIn();
                     });
                 },
             },
