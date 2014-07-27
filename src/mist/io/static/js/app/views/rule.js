@@ -46,7 +46,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             load: function () {
-                this.set('newRuleValue', this.rule.value);
+                this.updateTextValues();
                 Ember.run.next(this, function () {
                     $('#'+this.elementId).trigger('create');
                 })
@@ -66,29 +66,36 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                 if (this.isUpdating)
                     return;
 
+                // Check if values actually changed
+                if (this.rule.value == this.newRuleValue &&
+                    1 + this.rule.timeWindow / 60 == this.newRuleTimeWindow)
+                    return;
+
                 this.set('isUpdating', true);
                 Ember.run.later(this, function () {
                     this.set('isUpdating', false);
+
                     var that = this;
                     Mist.rulesController.editRule({
                         rule: this.rule,
                         properties: {
                             value: this.newRuleValue,
-                            reminder_offset: this.newRuleTimeWindow
+                            reminder_offset: (this.newRuleTimeWindow - 1) * 60
                         },
                         callback: function (success) {
-                            if (!success) {
-                                that.set('newRuleValue', that.rule.value);
-                                that.set('newRuleTimeWindowInMinutes', 1 + that.rule.timeWindow / 60);
-                            }
+                            if (!success)
+                                that.updateTextValues();
                         }
                     });
                 }, 500);
             },
 
 
-            convertTimeWindow: function () {
-                this.set('newRuleTimeWindow', (this.newRuleTimeWindowInMinutes - 1) * 60);
+            updateTextValues: function () {
+                this.setProperties({
+                   newRuleTimeWindow: 1 + this.rule.timeWindow / 60,
+                   newRuleValue: this.rule.value
+                });
             },
 
 
@@ -148,14 +155,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             timeWindowObserver: function () {
-                this.set('newRuleTimeWindowInMinutes',
-                    1 + this.rule.timeWindow / 60);
+                Ember.run.once(this, 'updateTextValues');
             }.observes('rule', 'rule.timeWindow'),
-
-
-            timeWindowInMinutesObserver: function () {
-                Ember.run.once(this, 'convertTimeWindow');
-            }.observes('newRuleTimeWindowInMinutes'),
         });
     }
 );

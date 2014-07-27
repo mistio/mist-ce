@@ -96,7 +96,6 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
 
                 aggregateClicked: function (aggregate) {
-                    info(aggregate);
                     Mist.ruleEditController.edit({
                         aggregate: aggregate
                     });
