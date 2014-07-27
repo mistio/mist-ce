@@ -141,7 +141,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
                 openAdvancedCondition: function () {
-                    var element = '#' + this.elementId;
+                    var el = '#' + this.elementId;
                     $(el + ' .rule-more').fadeOut(200, function () {
                         $(el + ' .advanced-condition').fadeIn();
                     });
