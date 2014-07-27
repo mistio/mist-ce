@@ -83,7 +83,7 @@ def backend_creds(context, backend):
         username_input.send_keys(context.credentials['HP']['username'])
         pass_input = context.browser.find_element_by_id("new-backend-second-field")
         pass_input.send_keys(context.credentials['HP']['password'])
-        tenant_input = context.browser.find_element_by_id("new-backend-openstack-tenant")
+        tenant_input = context.browser.find_element_by_id("new-backend-hpcloud-tenant")
         tenant_input.send_keys(context.credentials['HP']['tenant'])
     elif "SOFTLAYER" in backend:
         api_key_input = context.browser.find_element_by_id("new-backend-first-field")

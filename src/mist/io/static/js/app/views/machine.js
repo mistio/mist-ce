@@ -328,17 +328,25 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             providerIconClass: function() {
-
                 if (!this.machine || !this.machine.backend || !this.machine.backend.provider)
                     return '';
+                return 'provider-' + this.machine.backend.getSimpleProvider();
+            }.property('machine', 'machine.backend.provider'),
 
-                var providerName = this.machine.backend.provider;
-                if (providerName.indexOf('ec2' == 0)) providerName = 'ec2';
-                if (providerName.indexOf('rackspace') == 0) providerName = 'rackspace';
-                if (providerName.indexOf('bare_metal') == 0) providerName = 'bare-metal';
-                return 'provider-' + providerName;
 
-            }.property('machine'),
+            imageIconClass: function () {
+
+                if (!this.machine || !this.machine.extra ||
+                    !this.machine.backend || !this.machine.backend.provider)
+                    return 'image-generic';
+
+                var imageId = this.machine.extra.image_id || this.machine.extra.imageId || '';
+
+                // Use .toString() because digital ocean returns
+                // an number instead of a string which breaks the search
+                return 'image-' + this.machine.backend.images.getImageOS(imageId.toString());
+
+            }.property('machine', 'machine.extra', 'machine.extra.@each'),
 
 
             upFor: function() {

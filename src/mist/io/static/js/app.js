@@ -698,11 +698,11 @@ function loadImages () {
     // Hardcode images not on the spritesheet,
     // including the spritesheet itself
     var images = [
+        'resources/images/sprite-build/icon-sprite.png',
         'resources/images/ajax-loader.gif',
         'resources/images/spinner.gif',
         'resources/images/staroff.png',
         'resources/images/staron.png',
-        'resources/images/icon-sprite.png',
     ];
     var remaining = images.length;
 

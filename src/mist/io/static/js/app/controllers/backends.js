@@ -59,6 +59,9 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             addBackend: function (title, provider, apiKey, apiSecret, apiUrl,
                                  region, tenant, computeEndpoint, dockerUrl,
                                  port, key, callback) {
+                                 
+                key = Mist.keysController.keyExists(key) ? key : null;
+
             // />
                 var that = this;
                 this.set('addingBackend', true);
@@ -77,7 +80,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                     'machine_ip'  : apiKey,    // For bare-metal
                     'machine_user': apiSecret  // For bare-metal
                 }).success(function(backend) {
-                    //that._addBackend(backend, key);
+                    that._addBackend(backend, key);
                 }).error(function(message) {
                     Mist.notificationController.notify('Failed to add backend: ' + message);
                 }).complete(function(success, backend) {
@@ -277,12 +280,14 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                     var backendModel = Backend.create(backend);
                     this.content.pushObject(backendModel);
                     // <TODO (gtsop): move this code into backend model
-                    backendModel.one('onMachineListChange', function() {
-                        if (backendModel.provider == 'bare_metal') {
-                            backendModel.set('isBareMetal', true);
-                            Mist.keysController._associateKey(keyId, backendModel.machines.content[0]);
-                        }
-                    });
+                    if (keyId)
+                        backendModel.one('onMachineListChange', function() {
+                            if (backendModel.provider == 'bare_metal') {
+                                backendModel.set('isBareMetal', true);
+                                Mist.keysController._associateKey(keyId,
+                                    backendModel.machines.content[0]);
+                            }
+                        });
                     // />
                     this.trigger('onBackendAdd');
                 });
