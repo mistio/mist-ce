@@ -148,17 +148,15 @@ define('app/controllers/images', ['app/models/image'],
 
 
             getImage: function (imageId) {
-                // Use .toString() because digital ocean returns
-                // an number instead of a string which breaks the search
-                return this.content.findBy('id', imageId.toString());
+                return this.content.findBy('id', imageId);
             },
 
 
             getImageOS: function (imageId) {
 
                 var os = 'generic';
-
                 var image = this.getImage(imageId);
+
                 if (!image) return os;
                 OS_MAP.some(function (pair) {
                     return pair[0].some(function (key) {
