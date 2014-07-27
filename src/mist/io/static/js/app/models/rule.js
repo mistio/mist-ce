@@ -34,9 +34,22 @@ define('app/models/rule', ['ember'],
 
             init: function () {
                 this._super();
-                // TODO: delete. This is temp for debugging only
-                //this.set('aggregate', Mist.rulesController.getAggregateByValue(this.aggregate));
-                //this.set('timeWindow', this.reminder_offset);
+                this.updateFromRawData(this);
+            },
+
+            updateFromRawData: function (data) {
+
+                this.setProperties({
+                    // Rename action attribute because it conflicts with
+                    // handlebar's templating "action" keyword
+                    actionToTake: data.action,
+                    timeWindow: data.reminder_offset,
+                    operator: Mist.rulesController.getOperatorByTitle(data.operator),
+                    metric: Mist.metricsController.getMetric(data.metric),
+                    aggregate: Mist.rulesController.getAggregateByValue(data.aggregate),
+                    machine: Mist.backendsController.getMachine(
+                        data.machine, data.backend) || data.machine
+                });
             }
         });
     }

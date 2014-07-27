@@ -74,7 +74,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                         rule: this.rule,
                         properties: {
                             value: this.newRuleValue,
-                            timeWindow: this.newRuleTimeWindow
+                            reminder_offset: this.newRuleTimeWindow
                         },
                         callback: function (success) {
                             if (!success) {

@@ -10,9 +10,15 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
         return Ember.ArrayController.extend(Ember.Evented, {
 
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
             content: [],
-            command: null,
-            commandRule: null,
             creationPending: false,
 
             aggregateList: [{
@@ -42,37 +48,104 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             ],
 
 
-            setContent: function(rules) {
+            //
+            //
+            //  Initialization
+            //
+            //
+
+
+            load: function(rules) {
                 this._updateContent(rules);
             },
 
 
-            _addRule: function (rule) {
-                Ember.run(this, function () {
-                    rule.actionToTake = rule.action;
-                    rule.operator = this.getOperatorByTitle(rule.operator);
-                    rule.metric = Mist.metricsController.getMetric(rule.metric);
-                    rule.machine = Mist.backendsController.getMachine(
-                        rule.machine, rule.backend) || rule.machine;
-                    this.content.pushObject(Rule.create(rule));
-                    this.trigger('onRuleAdd');
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            newRule: function (machine, callback) {
+
+                var that = this;
+                this.set('creationPending', true);
+                Mist.ajax.POST('/rules', {
+                    'backendId': machine.backend.id,
+                    'machineId': machine.id,
+                    'metric': 'load.shortterm',
+                    'operator': 'gt',
+                    'value': 5,
+                    'action': 'alert'
+                }).error(function(message) {
+                    Mist.notificationController.notify(
+                        'Error while creating rule: ' + message);
+                }).complete(function (success, data) {
+                    that.set('creationPending', false);
+                    if (callback) callback(success, data);
                 });
             },
 
 
-            _updateRule: function (oldRule, newRule) {
-                Ember.run(this, function () {
-                    oldRule.set('actionToTake', newRule.action);
-                    oldRule.set('operator', this.getOperatorByTitle(newRule.operator));
-                    oldRule.set('metric', Mist.metricsController.getMetric(newRule.metric));
-                    oldRule.set('machine', Mist.backendsController.getMachine(
-                        newRule.machine, newRule.backend) || newRule.machine);
-                    info(newRule.aggregate);
-                    oldRule.set('aggregate', this.getAggregateByValue(newRule.aggregate))
-                    oldRule.set('timeWindow', newRule.reminder_offset);
-                    this.trigger('onRuleUpdate');
+            deleteRule: function (rule) {
+                var that = this;
+                rule.set('pendingAction', true);
+                Mist.ajax.DELETE('/rules/' + rule.id, {
+                }).success(function(){
+                    that._deleteRule(rule);
+                }).error(function(message) {
+                    Mist.notificationController.notify(
+                        'Error while deleting rule: ' + message);
+                    rule.set('pendingAction', false);
                 });
             },
+
+
+            editRule: function (args) {
+
+                var payload = {
+                    id: args.rule.id
+                };
+
+                // Construct payload
+                forIn(args.properties, function (value, property) {
+                    payload[property] = value;
+                });
+
+                args.rule.set('pendingAction', true);
+                Mist.ajax.POST('/rules',
+                    payload
+                ).error(function(message) {
+                    Mist.notificationController.notify(
+                        'Error while updating rule: ' + message);
+                }).complete(function (success, data) {
+                    args.rule.set('pendingAction', false);
+                    if (args.callback) args.callback(success, data);
+                });
+            },
+
+
+            getRuleById: function(ruleId) {
+                return this.content.findBy('id', ruleId);
+            },
+
+
+            getOperatorByTitle: function(ruleTitle) {
+                return this.operatorList.findBy('title', ruleTitle);
+            },
+
+
+            getAggregateByValue: function (aggregateValue) {
+                return this.aggregateList.findBy('value', aggregateValue);
+            },
+
+
+            //
+            //
+            //  Pseudo-Private Methods
+            //
+            //
 
 
             _updateContent: function (rules) {
@@ -102,71 +175,20 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
-            getRuleById: function(ruleId) {
-                return this.content.findBy('id', ruleId);
-            },
-
-
-            getOperatorByTitle: function(ruleTitle) {
-                return this.operatorList.findBy('title', ruleTitle);
-            },
-
-
-            getAggregateByValue: function (aggregateValue) {
-                return this.aggregateList.findBy('value', aggregateValue);
-            },
-
-            creationPendingObserver: function() {
-                if (this.creationPending)
-                    $('#add-rule-button').addClass('ui-state-disabled');
-                else
-                    $('#add-rule-button').removeClass('ui-state-disabled');
-            }.observes('creationPending'),
-
-
-            newRule: function(machine, metric, operator, value, actionToTake) {
-                this.set('creationPending', true);
-                var that = this;
-                Mist.ajax.POST('/rules', {
-                    'backendId': machine.backend.id,
-                    'machineId': machine.id,
-                    'metric': metric.id,
-                    'operator': operator.title,
-                    'value': value,
-                    'action': actionToTake
-                }).success(function(data) {
-                    info('Successfully created rule ', data.id);
-                    that.set('creationPending', false);
-                    var rule = Rule.create({
-                        'id': data.id,
-                        'value': value,
-                        'metric': metric,
-                        'machine': machine,
-                        'operator': operator,
-                        'maxValue': data.max_value,
-                        'actionToTake': actionToTake,
-                    });
-                    that.pushObject(rule);
-                }).error(function(message) {
-                    Mist.notificationController.notify('Error while creating rule: ' + message);
-                    that.set('creationPending', false);
+            _addRule: function (rule) {
+                Ember.run(this, function () {
+                    this.content.pushObject(Rule.create(rule));
+                    this.trigger('onRuleAdd');
                 });
             },
 
 
-            deleteRule: function (rule) {
-                var that = this;
-                rule.set('pendingAction', true);
-                Mist.ajax.DELETE('/rules/' + rule.id, {
-                }).success(function(){
-                    that._deleteRule(rule);
-                }).error(function(message) {
-                    Mist.notificationController.notify(
-                        'Error while deleting rule: ' + message);
-                    rule.set('pendingAction', false);
+            _updateRule: function (rule, data) {
+                Ember.run(this, function () {
+                    rule.updateFromRawData(data);
+                    this.trigger('onRuleUpdate');
                 });
             },
-
 
             _deleteRule: function (rule) {
                 Ember.run(this, function () {
@@ -176,28 +198,20 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
-            editRule: function (args) {
+            //
+            //
+            //  Observers
+            //
+            //
 
-                var payload = {
-                    id: args.rule.id
-                };
 
-                // Construct payload
-                forIn(args.properties, function (value, property) {
-                    payload[property] = value;
-                });
+            creationPendingObserver: function() {
+                if (this.creationPending)
+                    $('#add-rule-button').addClass('ui-state-disabled');
+                else
+                    $('#add-rule-button').removeClass('ui-state-disabled');
+            }.observes('creationPending'),
 
-                args.rule.set('pendingAction', true);
-                Mist.ajax.POST('/rules',
-                    payload
-                ).error(function(message) {
-                    Mist.notificationController.notify(
-                        'Error while updating rule: ' + message);
-                }).complete(function (success, data) {
-                    args.rule.set('pendingAction', false);
-                    if (args.callback) args.callback(success, data);
-                });
-            }
         });
     }
 );
