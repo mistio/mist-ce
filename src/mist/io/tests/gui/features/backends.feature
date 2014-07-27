@@ -22,7 +22,8 @@ Feature: Add second-tier backends
     | SoftLayer            | SOFTLAYER    |
     | NephoScale           | NEPHOSCALE   |
     | Docker               | DOCKER       |
-    | HP Cloud US East     | HP           |
+    | HP Helion Cloud - US East     | HP           |
+    | HP Helion Cloud - US West     | HP           |
 
     @backend-actions
     Scenario: Backend Actions

@@ -59,6 +59,9 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             addBackend: function (title, provider, apiKey, apiSecret, apiUrl,
                                  region, tenant, computeEndpoint, dockerUrl,
                                  port, key, callback) {
+                                 
+                key = Mist.keysController.keyExists(key) ? key : null;
+
             // />
                 var that = this;
                 this.set('addingBackend', true);
