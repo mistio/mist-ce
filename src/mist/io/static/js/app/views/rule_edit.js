@@ -52,24 +52,22 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
             close: function (property) {
                 $('#rule-' + property).popup('close');
-                this.set('rule', null);
-                this.set('metrics', null);
             },
 
 
             openCommandEditor: function () {
-                this.close('action');
+                Mist.ruleEditController.close('action');
                 Ember.run.later(this, function () {
-                    this.open('command');
+                    Mist.ruleEditController.open(this.rule, 'command');
                     this.set('newCommand', this.rule.command);
                 }, 500);
             },
 
 
             closeCommandEditor: function () {
-                this.close('command');
+                Mist.ruleEditController.close('command');
                 Ember.run.later(this, function () {
-                    this.open('action');
+                    Mist.ruleEditController.open(this.rule, 'action');
                 }, 500);
             },
 
@@ -98,6 +96,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
 
                 aggregateClicked: function (aggregate) {
+                    info(aggregate);
                     Mist.ruleEditController.edit({
                         aggregate: aggregate
                     });

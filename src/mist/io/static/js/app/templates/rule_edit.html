@@ -11,7 +11,7 @@
         <ul data-role="listview">
             {{#each view.metrics}}
             <li data-icon="false">
-                <a class="ui-btn" {{action "metricClicked" this target="view"}}>
+                <a class="ui-btn" {{action "metricClicked" this.id target="view"}}>
                     {{this.name}}
                 </a>
             </li>
@@ -34,7 +34,7 @@
         <ul data-role="listview">
             {{#each Mist.rulesController.operatorList}}
                 <li data-icon="false">
-                    <a {{action "operatorClicked" this target="view"}}>
+                    <a {{action "operatorClicked" this.title target="view"}}>
                         {{this.symbol}}
                     </a>
                 </li>

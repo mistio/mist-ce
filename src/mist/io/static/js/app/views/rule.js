@@ -70,14 +70,19 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                 Ember.run.later(this, function () {
                     this.set('isUpdating', false);
                     var that = this;
-                    Mist.rulesController.updateRule(
-                        this.rule.id, null, null, this.newRuleValue, null, null,
-                        function (success) {
+                    Mist.rulesController.editRule({
+                        rule: this.rule,
+                        properties: {
+                            value: this.newRuleValue,
+                            timeWindow: this.newRuleTimeWindow
+                        },
+                        callback: function (success) {
                             if (!success) {
                                 that.set('newRuleValue', that.rule.value);
                                 that.set('newRuleTimeWindowInMinutes', 1 + that.rule.timeWindow / 60);
                             }
-                        }, null, this.newRuleTimeWindow);
+                        }
+                    });
                 }, 500);
             },
 

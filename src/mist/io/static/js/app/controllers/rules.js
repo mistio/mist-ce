@@ -67,6 +67,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     oldRule.set('metric', Mist.metricsController.getMetric(newRule.metric));
                     oldRule.set('machine', Mist.backendsController.getMachine(
                         newRule.machine, newRule.backend) || newRule.machine);
+                    info(newRule.aggregate);
                     oldRule.set('aggregate', this.getAggregateByValue(newRule.aggregate))
                     oldRule.set('timeWindow', newRule.reminder_offset);
                     this.trigger('onRuleUpdate');
@@ -160,7 +161,8 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 }).success(function(){
                     that._deleteRule(rule);
                 }).error(function(message) {
-                    Mist.notificationController.notify('Error while deleting rule: ' + message);
+                    Mist.notificationController.notify(
+                        'Error while deleting rule: ' + message);
                     rule.set('pendingAction', false);
                 });
             },
@@ -173,67 +175,27 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 });
             },
 
-            updateRule: function (id, metric, operator, value, actionToTake,
-                command, callback, aggregate, timeWindow) {
 
-                var rule = this.getRuleById(id);
+            editRule: function (args) {
 
-                if (!rule) {
-                    return false;
-                }
+                var payload = {
+                    id: args.rule.id
+                };
 
-                // Make sure parameters are not null
-                if (!value) { value = rule.value; }
-                if (!metric) { metric = rule.metric.id; }
-                if (!command) { command = rule.command; }
-                if (!operator) { operator = rule.operator; }
-                if (!actionToTake) { actionToTake = rule.actionToTake; }
-                if (!aggregate) { aggregate = rule.aggregate; }
-                if (!timeWindow) { timeWindow = rule.timeWindow; }
+                // Construct payload
+                forIn(args.properties, function (value, property) {
+                    payload[property] = value;
+                });
 
-                // Check if anything changed
-                if (value == rule.value &&
-                    metric == rule.metric.id &&
-                    command == rule.command &&
-                    actionToTake == rule.actionToTake &&
-                    operator.title == rule.operator.title &&
-                    aggregate.value == rule.aggregate.value &&
-                    timeWindow == rule.timeWindow ) {
-                        return false;
-                }
-
-                var that = this;
-                rule.set('pendingAction', true);
-                Mist.ajax.POST('/rules', {
-                    'id': id,
-                    'value': value,
-                    'metric': metric,
-                    'command': command,
-                    'operator': operator.title,
-                    'action': actionToTake,
-                    'aggregate': aggregate.value,
-                    'reminder_offset': timeWindow,
-                }).success(function(data) {
-                    info('Successfully updated rule ', id);
-                    rule.set('pendingAction', false);
-                    rule.set('value', value);
-                    rule.set('metric', Mist.metricsController.getMetric(metric));
-                    rule.set('command', command);
-                    rule.set('operator', operator);
-                    rule.set('actionToTake', actionToTake);
-                    rule.set('aggregate', aggregate);
-                    rule.set('timeWindow', timeWindow);
-
-                    var maxvalue = parseInt(rule.maxValue);
-                    var curvalue = parseInt(rule.value);
-                    if (curvalue > maxvalue) {
-                        rule.set('value', maxvalue);
-                    }
-                }).error(function(message) {
-                    Mist.notificationController.notify('Error while updating rule: ' + message);
-                    rule.set('pendingAction', false);
+                args.rule.set('pendingAction', true);
+                Mist.ajax.POST('/rules',
+                    payload
+                ).error(function(message) {
+                    Mist.notificationController.notify(
+                        'Error while updating rule: ' + message);
                 }).complete(function (success, data) {
-                    if (callback) callback(success, data);
+                    args.rule.set('pendingAction', false);
+                    if (args.callback) args.callback(success, data);
                 });
             }
         });
