@@ -109,22 +109,24 @@ var appLoader = {
 
         // Update progress bar
         this.progress += this.progressStep;
-        changeLoadProgress(Math.ceil(this.progress));
+        var that =this;
+        changeLoadProgress(Math.ceil(this.progress), function () {
 
-        // Update other steps
-        forIn(this.steps, function (step, stepName) {
+            // Update other steps
+            forIn(that.steps, function (step, stepName) {
 
-            // Check if "completedStep" is a dependency of "step"
-            var index = step.before.indexOf(completedStep);
+                // Check if "completedStep" is a dependency of "step"
+                var index = step.before.indexOf(completedStep);
 
-            if (index == -1) return;
+                if (index == -1) return;
 
-            // Remove dependency from array
-            step.before.splice(index, 1);
+                // Remove dependency from array
+                step.before.splice(index, 1);
 
-            // If "step" has no more dependencies, execute it
-            if (step.before.length == 0)
-                step.exec();
+                // If "step" has no more dependencies, execute it
+                if (step.before.length == 0)
+                    step.exec();
+            });
         });
     },
 
@@ -184,7 +186,7 @@ var appLoader = {
             }
         },
         'load jqm': {
-            before: ['load ember'],
+            before: ['init app'],
             exec: function () {
                 require(['jqm'], function () {
                     appLoader.complete('load jqm');
@@ -227,10 +229,17 @@ var appLoader = {
             exec: function () {
                 Mist.set('ajax', appLoader.buffer.ajax);
                 Mist.set('socket', appLoader.buffer.socket);
-                setupSocketEvents(appLoader.buffer.socket, false);
                 appLoader.complete('init socket events');
             }
-        }
+        },
+        'fetch first data': {
+            before: ['init socket events'],
+            exec: function () {
+                setupSocketEvents(Mist.socket, function () {
+                    appLoader.complete('fetch first data');
+                });
+            }
+        },
     }
 };
 
@@ -761,13 +770,16 @@ var handleMobileInit = function () {
 };
 
 
-var setupSocketEvents = function (socket) {
+var setupSocketEvents = function (socket, callback) {
 
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);
     })
     .on('list_backends', function (backends) {
         Mist.backendsController.load(backends);
+        if (callback)
+            callback();
+        callback = null;
     })
     .on('list_sizes', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -818,16 +830,17 @@ var setupSocketEvents = function (socket) {
 };
 
 
-var changeLoadProgress = function (progress) {
+var changeLoadProgress = function (progress, callback) {
     $('.mist-progress').animate({
         'width': progress + '%'
-    }, 300);
-    if (progress >= 100)
-        setTimeout(function () {
+    }, 500, function () {
+        if (progress >= 100) {
             $('body').css('overflow','auto');
             $('#splash').fadeOut(300);
             appLoader.finish();
-        }, 300);
+        }
+    });
+    callback();
 };
 
 
