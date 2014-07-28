@@ -890,7 +890,7 @@ function Ajax (csrfToken) {
                     }
                 };
 
-                if (Object.keys(data).length != 0)
+                if (data && Object.keys(data).length != 0)
                     ajaxObject.data = JSON.stringify(data)
 
                 $.ajax(ajaxObject);
