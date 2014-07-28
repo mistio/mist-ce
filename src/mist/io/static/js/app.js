@@ -6,21 +6,32 @@ require.config({
         text: 'lib/require/text',
         ember: 'lib/ember-1.5.1.min',
         jquery: 'lib/jquery-2.1.1.min',
-        mobile: 'lib/jquery.mobile-1.4.2.min',
+        jqm: 'lib/jquery.mobile-1.4.2.min',
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         sha256: 'lib/sha256',
-        socketio: 'lib/socket.io',
+        socket: 'lib/socket.io',
         term: 'lib/term'
     },
-    deps: ['jquery', 'ember', 'handlebars', 'socketio'],
+    deps: ['md5', 'jquery'],
     callback: function () {
-        loadManager.libsLoaded();
+        $(document).bind('mobileinit', function() {
+
+            warn('Mobile Init');
+
+            $.mobile.ajaxEnabled = false;
+            $.mobile.pushStateEnabled = false;
+            $.mobile.linkBindingEnabled = false;
+            $.mobile.hashListeningEnabled = false;
+            $.mobile.ignoreContentEnabled = true;
+            $.mobile.panel.prototype._bindUpdateLayout = function(){};
+        });
+        appLoader.init();
     },
     shim: {
         'ember': {
-            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term']
+            deps: ['jquery', 'handlebars']
         },
         'd3': {
             deps: ['jquery']
@@ -28,91 +39,205 @@ require.config({
     }
 });
 
-var loadManager = {
 
-    // Stuff to load:
-    // libraries
-    // app files
-    // jqm
-    // images
-    // socket
+//
+//  Application Loader
+//
+//
+//  Problem: Before hidding the splash screen (the black screen with the logo
+//      that appears when the app loads) a series of steps must be completed.
+//      Due to the many dependencies of mist.io and the serial loading
+//      approach (all steps get executed one by one) the loading time skyrokets.
+//
+//
+//  Solution: A parallel step execution mechanism. Each step gets executed
+//      when only it's own dependencies (which are steps) are completed.
+//
+//
+//  More info: Into the "appLoader" object are defined the steps that need
+//      to be completed in order to hide the splash screen.
+//
+//      Every step defines an "exec" function which is called once all of the
+//      steps in it's "before" array are executed and completed.
+//
 
-    librariesLoaded: false,
-    appFilesLoaded: false,
-    imagesLoaded: false,
-    socketLoaded: false,
-    JQMLoaded: false,
-    progress: 0,
 
-    load: function () {
-        loadApp();
-        loadImages();
-        if (this.librariesLoaded)
-            loadSocket();
+var appLoader = {
+
+
+    //
+    //
+    //  Properties
+    //
+    //
+
+
+    buffer: null,
+    progress: null,
+    startTime: null,
+    progressStep: null,
+
+
+    //
+    //
+    //  Initialization
+    //
+    //
+
+
+    init: function () {
+        this.buffer = {};
+        this.progress = 0;
+        this.startTime = Date.now();
+        this.progressStep = 100 / 9; // 9 steps
+        this.start();
     },
 
-    libsLoaded: function () {
-        this.librariesLoaded = true;
-        if (this.files) {
-            if (!this.templatesLoad)
-                this.files[0]();
-        }
-        if (!this.socket)
-            loadSocket();
+
+    //
+    //
+    //  Methods
+    //
+    //
+
+
+    start: function () {
+        forIn(this.steps, function (step) {
+            if (step.before.length == 0)
+                step.exec();
+        });
     },
 
-    appLoaded: function () {
-        var that = loadManager;
-        that.progress += 10;
-        that.files = arguments;
-        if (that.librariesLoaded) {
-            info('in here'),
-            info(io),
-            that.templatesload = true;
-            arguments[0]();
-        }
+
+    complete: function (completedStep) {
+
+        // Log progress
+        info('Step completed: "' + completedStep + '" |',
+            'time:', Date.now() - this.startTime, 'ms');
+
+        // Update progress bar
+        this.progress += this.progressStep;
+        changeLoadProgress(Math.ceil(this.progress));
+
+        // Update other steps
+        forIn(this.steps, function (step, stepName) {
+
+            // Check if "completedStep" is a dependency of "step"
+            var index = step.before.indexOf(completedStep);
+
+            if (index == -1) return;
+
+            // Remove dependency from array
+            step.before.splice(index, 1);
+
+            // If "step" has no more dependencies, execute it
+            if (step.before.length == 0)
+                step.exec();
+        });
     },
 
-    templatesLoaded: function () {
-        this.progress += 10;
-        initApp.apply(null, this.files);
+
+    end: function () {
+
     },
 
-    appInitialized: function () {
-        this.progress += 10;
-        this.appDidInit = true;
-        if (!Mist.socket) {
-            if (this.socket){
-                Mist.set('socket', this.socket);
-                setupSocketEvents.apply(null, arguments);
-                this.socket.emit('ready');
+    stepCompleted: function () {
+
+    },
+
+
+    //
+    //
+    //  Steps
+    //
+    //
+
+
+    steps: {
+        'load ember': {
+            before: [],
+            exec: function () {
+                require(['ember'], function () {
+                    appLoader.complete('load ember');
+                });
+            },
+        },
+        'load files': {
+            before: [],
+            exec: function () {
+                loadFiles(function () {
+                    appLoader.buffer.files = Array.prototype.slice.call(arguments);
+                    appLoader.complete('load files');
+                });
+            }
+        },
+        'load images': {
+            before: [],
+            exec: function () {
+                loadImages(function () {
+                    appLoader.complete('load images');
+                });
+            }
+        },
+        'load socket': {
+            before: [],
+            exec: function () {
+                require(['socket'], function () {
+                    appLoader.complete('load socket');
+                });
+            }
+        },
+        'load jqm': {
+            before: ['load ember'],
+            exec: function () {
+                require(['jqm'], function () {
+                    appLoader.complete('load jqm');
+                });
+            }
+        },
+        'load templates': {
+            before: ['load ember', 'load files'],
+            exec: function () {
+                appLoader.buffer.files[0](function () {
+                    appLoader.complete('load templates');
+                });
+            }
+        },
+        'init app': {
+            before: ['load ember', 'load templates'],
+            exec: function () {
+                loadApp.apply(null, appLoader.buffer.files.concat([function () {
+                    appLoader.complete('init app');
+                }]));
+            }
+        },
+        'init connections': {
+            before: ['load socket'],
+            exec: function () {
+                appLoader.buffer.ajax = Ajax(CSRF_TOKEN);
+                appLoader.buffer.socket = Socket({
+                    namespace: '/mist',
+                    onInit: function () {
+                        appLoader.complete('init connections');
+                    },
+                });
+            }
+        },
+        'init socket events': {
+            before: ['init connections', 'init app'],
+            exec: function () {
+                Mist.set('ajax', appLoader.buffer.ajax);
+                Mist.set('socket', appLoader.buffer.socket);
+                setupSocketEvents(appLoader.buffer.socket, false);
+                appLoader.complete('init socket events');
             }
         }
-        //loadJQM();
     },
+};
 
-    imagesLoaded: function () {
-        this.progress += 10;
-    },
 
-    JQMLoaded: function () {
-        this.progress += 10;
-    },
 
-    socketLoaded: function () {
-        this.progress += 10;
-        this.socket = arguments[0];
-        if (this.appDidInit) {
-            Mist.set('socket', this.socket);
-            setupSocketEvents.apply(null, arguments);
-            this.socket.emit('ready');
-        }
-    }
-}
-
-loadManager.load();
-
-function loadApp () {
+function loadFiles (callback) {
     require([
         'app/templates/templates',
         'app/controllers/backend_add',
@@ -174,10 +299,10 @@ function loadApp () {
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/user_menu',
-    ], loadManager.appLoaded);
+    ], callback);
 }
 
-function initApp (
+function loadApp (
     TemplatesBuild,
     BackendAddController,
     BackendEditController,
@@ -237,27 +362,13 @@ function initApp (
     MonitoringView,
     RuleView,
     RuleEditView,
-    UserMenuView) {
+    UserMenuView,
+    callback) {
 
-    changeLoadProgress(30);
     warn('Init');
 
     // JQM init event
-    $(document).bind('mobileinit', function() {
 
-        changeLoadProgress(50);
-        warn('Mobile Init');
-
-        $.mobile.ajaxEnabled = false;
-        $.mobile.pushStateEnabled = false;
-        $.mobile.linkBindingEnabled = false;
-        $.mobile.hashListeningEnabled = false;
-        $.mobile.ignoreContentEnabled = true;
-        $.mobile.panel.prototype._bindUpdateLayout = function(){};
-        $('body').css('overflow','auto');
-
-        App.set('isJQMInitialized',true);
-    });
 
     // Hide error boxes on page unload
     window.onbeforeunload = function() {
@@ -267,7 +378,7 @@ function initApp (
 
     // Ember Application
     App = Ember.Application.create({
-        ready: initEmber
+        ready: callback
     });
 
 
@@ -276,11 +387,13 @@ function initApp (
     App.set('debugSocket', false);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
-    App.set('ajax', new AJAX(CSRF_TOKEN));
+    App.set('ajax', Ajax(CSRF_TOKEN));
     App.set('email', EMAIL);
     App.set('password', '');
-    App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
-    App.set('isJQMInitialized', false);
+    App.set('isClientMobile',
+        (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
+        .test(navigator.userAgent)
+    );
     window.Mist = App;
 
     CSRF_TOKEN = null;
@@ -617,126 +730,89 @@ function initApp (
         }
         return [string];
     };
-
-    loadManager.appInitialized();
 }
 
 
-/**
- *
- *  Ajax wrapper constructor
- *
- */
+//
+//
+//  Ajax wrapper
+//
+//
 
-function AJAX (csrfToken) {
 
-    this.GET = function(url, data) {
-        return this.ajax('GET', url, data);
-    };
-    this.PUT = function(url, data) {
-        return this.ajax('PUT', url, data);
-    };
-    this.POST = function(url, data) {
-        return this.ajax('POST', url, data);
-    };
-    this.DELETE = function(url, data) {
-        return this.ajax('DELETE', url, data);
-    };
-    this.ajax = function(type, url, data) {
+function Ajax (csrfToken) {
 
-        var ret = {};
-        var call = {};
+    return new function () {
 
-        call.success = function(callback) {
-            ret.success = callback;
-            return call;
+        this.GET = function(url, data) {
+            return this.ajax('GET', url, data);
         };
-        call.error = function(callback) {
-            ret.error = callback;
-            return call;
+        this.PUT = function(url, data) {
+            return this.ajax('PUT', url, data);
         };
-        call.complete = function(callback) {
-            ret.complete = callback;
-            return call;
+        this.POST = function(url, data) {
+            return this.ajax('POST', url, data);
         };
-        call.ajax = function() {
+        this.DELETE = function(url, data) {
+            return this.ajax('DELETE', url, data);
+        };
+        this.ajax = function(type, url, data) {
 
-            var ajaxObject = {
-                url: url,
-                type: type,
-                headers: {
-                    'Csrf-Token': csrfToken,
-                },
-                data: JSON.stringify(data),
-                complete: function(jqXHR) {
-                    if (jqXHR.status == 200) {
-                        if (ret.success)
-                            ret.success(jqXHR.responseJSON);
-                    } else if (ret.error) {
-                        ret.error(jqXHR.responseText, jqXHR.status);
-                    }
-                    if (ret.complete)
-                        ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
-                }
+            var ret = {};
+            var call = {};
+
+            call.success = function(callback) {
+                ret.success = callback;
+                return call;
             };
+            call.error = function(callback) {
+                ret.error = callback;
+                return call;
+            };
+            call.complete = function(callback) {
+                ret.complete = callback;
+                return call;
+            };
+            call.ajax = function() {
 
-            if (Object.keys(data).length === 0) {
-                delete ajaxObject.data;
-            }
+                var ajaxObject = {
+                    url: url,
+                    type: type,
+                    headers: {
+                        'Csrf-Token': csrfToken,
+                    },
+                    complete: function(jqXHR) {
+                        var success = (jqXHR.status == 200);
+                        if (success)
+                            if (ret.success)
+                                ret.success(jqXHR.responseJSON);
+                        else
+                            if (ret.error)
+                                ret.error(jqXHR.responseText, jqXHR.status);
+                        if (ret.complete)
+                            ret.complete(success, jqXHR.responseJSON);
+                    }
+                };
 
-            $.ajax(ajaxObject);
+                if (Object.keys(data).length != 0)
+                    ajaxObject.data = JSON.stringify(data)
 
-            return call;
+                $.ajax(ajaxObject);
+
+                return call;
+            };
+            return call.ajax();
         };
-        return call.ajax();
-    };
+    }
 };
 
 
-function loadImages () {
+//
+//
+//  Socket wrapper
+//
+//
 
-    // Hardcode images not on the spritesheet,
-    // including the spritesheet itself
-    var images = [
-        'resources/images/sprite-build/icon-sprite.png',
-        'resources/images/ajax-loader.gif',
-        'resources/images/spinner.gif',
-        'resources/images/staroff.png',
-        'resources/images/staron.png',
-    ];
-    var remaining = images.length;
-
-    // Load 'em!
-    for (var i = 0; i < images.length; i++) {
-        var img = new Image();
-        img.onload = onImageLoad;
-        img.src = images[i];
-    }
-
-    function onImageLoad () {
-        if (--remaining == 0)
-            loadManager.imagesLoaded();
-    }
-}
-
-function loadSocket () {
-    Socket({
-        namespace: '/mist',
-        onInit: function (socket) {
-            if (loadManager)
-                loadManager.socketLoaded.apply(loadManager, arguments);
-            else
-                socket.emit('ready');
-        }
-    })
-};
-
-
-/**
- *
- *  Socket wrapper
- *
- */
 
 function Socket (args) {
 
@@ -749,9 +825,11 @@ function Socket (args) {
             info(namespace, 'initializing');
             handleDisconnection();
             addDebuggingWrapper();
+            if (args.onInit instanceof Function)
+                args.onInit(socket);
         }
-        if (args.onInit instanceof Function)
-            args.onInit(socket, initialized);
+        if (args.onConnect instanceof Function)
+            args.onConnect(socket);
         initialized = true;
     };
 
@@ -826,6 +904,34 @@ function Socket (args) {
     return socket;
 }
 
+
+function loadImages (callback) {
+
+    // Hardcode images not on the spritesheet,
+    // including the spritesheet itself
+    var images = [
+        'resources/images/sprite-build/icon-sprite.png',
+        'resources/images/ajax-loader.gif',
+        'resources/images/spinner.gif',
+        'resources/images/staroff.png',
+        'resources/images/staron.png',
+    ];
+    var remaining = images.length;
+
+    // Load 'em!
+    for (var i = 0; i < images.length; i++) {
+        var img = new Image();
+        img.onload = onImageLoad;
+        img.src = images[i];
+    }
+
+    function onImageLoad () {
+        if (--remaining == 0)
+            callback();
+    }
+}
+
+
 //LOGLEVEL comes from home python view and home.pt
 function log() {
     try {
@@ -860,14 +966,7 @@ function error() {
 }
 
 
-function initEmber () {
-    require(['mobile']);
-}
-
-
 function setupSocketEvents (socket, initialized) {
-
-    changeLoadProgress(75);
 
     if (!initialized) {
         socket.on('list_keys', function (keys) {
@@ -875,7 +974,6 @@ function setupSocketEvents (socket, initialized) {
         })
         .on('list_backends', function (backends) {
             Mist.backendsController.load(backends);
-            changeLoadProgress(100);
         })
         .on('list_sizes', function (data) {
             var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -944,7 +1042,6 @@ var virtualKeyboardHeight = function () {
     return keyboardHeight;
 };
 
-
 // forEach like function on objects
 function forIn () {
 
@@ -962,10 +1059,10 @@ function forIn () {
 function changeLoadProgress (progress) {
     $('.mist-progress').animate({
         'width': progress + '%'
-    }, 500);
-    if (progress == 100)
+    }, 300);
+    if (progress >= 100)
         setTimeout(function () {
-            $('#splash').fadeOut(500);
+            $('body').css('overflow','auto');
+            $('#splash').fadeOut(300);
         }, 300);
-
 };

@@ -1,4 +1,4 @@
-define('app/views/user_menu', ['app/views/templated','ember'],
+define('app/views/user_menu', ['app/views/templated'],
     /**
      *  User Menu View
      *
@@ -19,9 +19,9 @@ define('app/views/user_menu', ['app/views/templated','ember'],
 
 
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
 
             actions: {

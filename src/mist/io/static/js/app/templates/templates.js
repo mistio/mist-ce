@@ -1,6 +1,6 @@
 define('app/templates/templates', ['ember'], function() {
 
-return function () {
+return function (callback) {
 
 if (!JS_BUILD) {
   require([
@@ -76,7 +76,7 @@ if (!JS_BUILD) {
     Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[32]);
     Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[33]);
     Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[34]);
-    loadManager.templatesLoaded();
+    callback();
   });
   return;
 }
@@ -3486,6 +3486,6 @@ function program9(depth0,data) {
   return buffer;
 
 });
-loadManager.templatesLoaded();
+callback();
 }
 });

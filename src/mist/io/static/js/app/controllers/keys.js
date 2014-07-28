@@ -1,4 +1,4 @@
-define('app/controllers/keys', ['app/models/key'],
+define('app/controllers/keys', ['app/models/key' , 'ember'],
     //
     //  Keys Controller
     //
