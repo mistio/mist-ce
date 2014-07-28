@@ -1,4 +1,4 @@
-define('app/controllers/machine_shell', ['app/models/command', 'ember'],
+define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term'],
     //
     //  Machine Shell Controller
     //
@@ -30,6 +30,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
 
             open: function (machine) {
+                //info(Terminal);
                 this._clear();
                 this.set('machine', machine);
 

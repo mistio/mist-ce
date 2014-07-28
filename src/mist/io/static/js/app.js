@@ -14,19 +14,9 @@ require.config({
         socket: 'lib/socket.io',
         term: 'lib/term'
     },
-    deps: ['md5', 'jquery'],
+    deps: ['jquery'],
     callback: function () {
-        $(document).bind('mobileinit', function() {
-
-            warn('Mobile Init');
-
-            $.mobile.ajaxEnabled = false;
-            $.mobile.pushStateEnabled = false;
-            $.mobile.linkBindingEnabled = false;
-            $.mobile.hashListeningEnabled = false;
-            $.mobile.ignoreContentEnabled = true;
-            $.mobile.panel.prototype._bindUpdateLayout = function(){};
-        });
+        handleMobileInit();
         appLoader.init();
     },
     shim: {
@@ -88,8 +78,8 @@ var appLoader = {
     init: function () {
         this.buffer = {};
         this.progress = 0;
+        this.progressStep = 100 / 9;
         this.startTime = Date.now();
-        this.progressStep = 100 / 9; // 9 steps
         this.start();
     },
 
@@ -137,12 +127,16 @@ var appLoader = {
     },
 
 
-    end: function () {
+    finish: function () {
 
-    },
-
-    stepCompleted: function () {
-
+        // Clean up variables to save up some memory
+        loadApp = null;
+        loadFiles = null;
+        loadImages = null;
+        handleMobileInit = null;
+        setupSocketEvents = null;
+        changeLoadProgress = null;
+        appLoader = null;
     },
 
 
@@ -220,6 +214,9 @@ var appLoader = {
                     onInit: function () {
                         appLoader.complete('init connections');
                     },
+                    onConnect: function (socket) {
+                        socket.emit('ready');
+                    },
                 });
             }
         },
@@ -232,12 +229,12 @@ var appLoader = {
                 appLoader.complete('init socket events');
             }
         }
-    },
+    }
 };
 
 
 
-function loadFiles (callback) {
+var loadFiles = function (callback) {
     require([
         'app/templates/templates',
         'app/controllers/backend_add',
@@ -300,9 +297,9 @@ function loadFiles (callback) {
         'app/views/rule_edit',
         'app/views/user_menu',
     ], callback);
-}
+};
 
-function loadApp (
+var loadApp = function (
     TemplatesBuild,
     BackendAddController,
     BackendEditController,
@@ -365,29 +362,20 @@ function loadApp (
     UserMenuView,
     callback) {
 
-    warn('Init');
-
-    // JQM init event
-
-
     // Hide error boxes on page unload
     window.onbeforeunload = function() {
         $('.ui-loader').hide();
     };
-
 
     // Ember Application
     App = Ember.Application.create({
         ready: callback
     });
 
-
     // Globals
-
     App.set('debugSocket', false);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
-    App.set('ajax', Ajax(CSRF_TOKEN));
     App.set('email', EMAIL);
     App.set('password', '');
     App.set('isClientMobile',
@@ -395,8 +383,6 @@ function loadApp (
         .test(navigator.userAgent)
     );
     window.Mist = App;
-
-    CSRF_TOKEN = null;
 
     // Ember routes and routers
 
@@ -730,7 +716,117 @@ function loadApp (
         }
         return [string];
     };
-}
+};
+
+
+
+var loadImages = function (callback) {
+
+    // Hardcode images not on the spritesheet,
+    // including the spritesheet itself
+    var images = [
+        'resources/images/sprite-build/icon-sprite.png',
+        'resources/images/ajax-loader.gif',
+        'resources/images/spinner.gif',
+        'resources/images/staroff.png',
+        'resources/images/staron.png',
+    ];
+    var remaining = images.length;
+
+    // Load 'em!
+    for (var i = 0; i < images.length; i++) {
+        var img = new Image();
+        img.onload = onImageLoad;
+        img.src = images[i];
+    }
+
+    function onImageLoad () {
+        if (--remaining == 0)
+            callback();
+    }
+};
+
+
+var handleMobileInit = function () {
+    $(document).one('mobileinit', function() {
+        $.mobile.ajaxEnabled = false;
+        $.mobile.pushStateEnabled = false;
+        $.mobile.linkBindingEnabled = false;
+        $.mobile.hashListeningEnabled = false;
+        $.mobile.ignoreContentEnabled = true;
+        $.mobile.panel.prototype._bindUpdateLayout = function(){};
+    });
+};
+
+
+var setupSocketEvents = function (socket) {
+
+    socket.on('list_keys', function (keys) {
+        Mist.keysController.load(keys);
+    })
+    .on('list_backends', function (backends) {
+        Mist.backendsController.load(backends);
+    })
+    .on('list_sizes', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.sizes.load(data.sizes);
+    })
+    .on('list_images', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.images.load(data.images);
+    })
+    .on('list_machines', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.machines.load(data.machines);
+    })
+    .on('list_locations', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.locations.load(data.locations);
+    })
+    .on('monitoring',function(data){
+        Mist.monitoringController._updateMonitoringData(data);
+        Mist.monitoringController.trigger('onMonitoringDataUpdate');
+        Mist.backendsController.set('checkedMonitoring', true);
+    })
+    .on('stats', function(data){
+        Mist.monitoringController.request.updateMetrics(
+            data.metrics, data.start, data.stop, data.requestID);
+    })
+    .on('notify',function(data){
+        if (data.message) {
+            Mist.notificationController.set('msgHeader', data.title);
+            Mist.notificationController.set('msgCmd', data.message.substr(1));
+            Mist.notificationController.showMessagebox();
+        } else {
+            Mist.notificationController.notify(data.title);
+        }
+    })
+    .on('probe', onProbe)
+    .on('ping', onProbe);
+
+    function onProbe(data) {
+        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        if (machine)
+            machine.probeSuccess(data.result);
+    }
+};
+
+
+var changeLoadProgress = function (progress) {
+    $('.mist-progress').animate({
+        'width': progress + '%'
+    }, 300);
+    if (progress >= 100)
+        setTimeout(function () {
+            $('body').css('overflow','auto');
+            $('#splash').fadeOut(300);
+            appLoader.finish();
+        }, 300);
+};
 
 
 //
@@ -905,127 +1001,7 @@ function Socket (args) {
 }
 
 
-function loadImages (callback) {
-
-    // Hardcode images not on the spritesheet,
-    // including the spritesheet itself
-    var images = [
-        'resources/images/sprite-build/icon-sprite.png',
-        'resources/images/ajax-loader.gif',
-        'resources/images/spinner.gif',
-        'resources/images/staroff.png',
-        'resources/images/staron.png',
-    ];
-    var remaining = images.length;
-
-    // Load 'em!
-    for (var i = 0; i < images.length; i++) {
-        var img = new Image();
-        img.onload = onImageLoad;
-        img.src = images[i];
-    }
-
-    function onImageLoad () {
-        if (--remaining == 0)
-            callback();
-    }
-}
-
-
-//LOGLEVEL comes from home python view and home.pt
-function log() {
-    try {
-        if (LOGLEVEL > 3) {
-            return console.log.apply(console, arguments);
-        }
-    } catch(err) {console.log(err);}
-}
-
-function info() {
-    try {
-        if (LOGLEVEL > 2) {
-            return console.info.apply(console, arguments);
-        }
-    } catch(err) {console.log(err);}
-}
-
-function warn() {
-    try {
-        if (LOGLEVEL > 1) {
-            return console.warn.apply(console, arguments);
-        }
-    } catch(err) {console.log(err);}
-}
-
-function error() {
-    try {
-        if (LOGLEVEL > 0) {
-            return console.error.apply(console, arguments);
-        }
-    } catch(err) {console.log(err);}
-}
-
-
-function setupSocketEvents (socket, initialized) {
-
-    if (!initialized) {
-        socket.on('list_keys', function (keys) {
-            Mist.keysController.load(keys);
-        })
-        .on('list_backends', function (backends) {
-            Mist.backendsController.load(backends);
-        })
-        .on('list_sizes', function (data) {
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend)
-                backend.sizes.load(data.sizes);
-        })
-        .on('list_images', function (data) {
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend)
-                backend.images.load(data.images);
-        })
-        .on('list_machines', function (data) {
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend)
-                backend.machines.load(data.machines);
-        })
-        .on('list_locations', function (data) {
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend)
-                backend.locations.load(data.locations);
-        })
-        .on('monitoring',function(data){
-            Mist.monitoringController._updateMonitoringData(data);
-            Mist.monitoringController.trigger('onMonitoringDataUpdate');
-            Mist.backendsController.set('checkedMonitoring', true);
-        })
-        .on('stats', function(data){
-            Mist.monitoringController.request.updateMetrics(
-                data.metrics, data.start, data.stop, data.requestID);
-        })
-        .on('notify',function(data){
-            if (data.message) {
-                Mist.notificationController.set('msgHeader', data.title);
-                Mist.notificationController.set('msgCmd', data.message.substr(1));
-                Mist.notificationController.showMessagebox();
-            } else {
-                Mist.notificationController.notify(data.title);
-            }
-        })
-        .on('probe', onProbe)
-        .on('ping', onProbe);
-    }
-
-    function onProbe(data) {
-        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
-        if (machine)
-            machine.probeSuccess(data.result);
-    }
-}
-
-
-var virtualKeyboardHeight = function () {
+function virtualKeyboardHeight () {
     var keyboardHeight = 0;
 
     if (!Mist.term) return 0;
@@ -1042,6 +1018,7 @@ var virtualKeyboardHeight = function () {
     return keyboardHeight;
 };
 
+
 // forEach like function on objects
 function forIn () {
 
@@ -1056,13 +1033,24 @@ function forIn () {
 };
 
 
-function changeLoadProgress (progress) {
-    $('.mist-progress').animate({
-        'width': progress + '%'
-    }, 300);
-    if (progress >= 100)
-        setTimeout(function () {
-            $('body').css('overflow','auto');
-            $('#splash').fadeOut(300);
-        }, 300);
-};
+// Console aliases
+// LOGLEVEL comes from home python view and home.pt
+function log() {
+    if (LOGLEVEL > 3)
+        console.log.apply(console, arguments);
+}
+
+function info() {
+    if (LOGLEVEL > 2)
+        console.info.apply(console, arguments);
+}
+
+function warn() {
+    if (LOGLEVEL > 1)
+        console.warn.apply(console, arguments);
+}
+
+function error() {
+    if (LOGLEVEL > 0)
+        console.error.apply(console, arguments);
+}
