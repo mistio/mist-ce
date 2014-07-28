@@ -1,3 +1,5 @@
+var start = Date.now();
+
 // Define libraries
 require.config({
     baseUrl: 'resources/js/',
@@ -78,8 +80,8 @@ var appLoader = {
     init: function () {
         this.buffer = {};
         this.progress = 0;
-        this.progressStep = 100 / 9;
-        this.startTime = Date.now();
+        this.progressStep = 100 / Object.keys(this.steps).length;
+        this.startTime = start;
         this.start();
     },
 
@@ -198,7 +200,7 @@ var appLoader = {
             }
         },
         'init app': {
-            before: ['load ember', 'load templates'],
+            before: ['load templates'],
             exec: function () {
                 loadApp.apply(null, appLoader.buffer.files.concat([function () {
                     appLoader.complete('init app');
@@ -879,12 +881,10 @@ function Ajax (csrfToken) {
                     },
                     complete: function(jqXHR) {
                         var success = (jqXHR.status == 200);
-                        if (success)
-                            if (ret.success)
-                                ret.success(jqXHR.responseJSON);
-                        else
-                            if (ret.error)
-                                ret.error(jqXHR.responseText, jqXHR.status);
+                        if (success && ret.success)
+                            ret.success(jqXHR.responseJSON);
+                        if (!success && ret.error)
+                            ret.error(jqXHR.responseText, jqXHR.status);
                         if (ret.complete)
                             ret.complete(success, jqXHR.responseJSON);
                     }
