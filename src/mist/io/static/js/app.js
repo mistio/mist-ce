@@ -109,24 +109,22 @@ var appLoader = {
 
         // Update progress bar
         this.progress += this.progressStep;
-        var that =this;
-        changeLoadProgress(Math.ceil(this.progress), function () {
+        changeLoadProgress(Math.ceil(this.progress))
 
-            // Update other steps
-            forIn(that.steps, function (step, stepName) {
+        // Update other steps
+        forIn(this.steps, function (step, stepName) {
 
-                // Check if "completedStep" is a dependency of "step"
-                var index = step.before.indexOf(completedStep);
+            // Check if "completedStep" is a dependency of "step"
+            var index = step.before.indexOf(completedStep);
 
-                if (index == -1) return;
+            if (index == -1) return;
 
-                // Remove dependency from array
-                step.before.splice(index, 1);
+            // Remove dependency from array
+            step.before.splice(index, 1);
 
-                // If "step" has no more dependencies, execute it
-                if (step.before.length == 0)
-                    step.exec();
-            });
+            // If "step" has no more dependencies, execute it
+            if (step.before.length == 0)
+                step.exec();
         });
     },
 
@@ -186,7 +184,7 @@ var appLoader = {
             }
         },
         'load jqm': {
-            before: ['init app'],
+            before: ['load ember'],
             exec: function () {
                 require(['jqm'], function () {
                     appLoader.complete('load jqm');
@@ -830,7 +828,7 @@ var setupSocketEvents = function (socket, callback) {
 };
 
 
-var changeLoadProgress = function (progress, callback) {
+var changeLoadProgress = function (progress) {
     $('.mist-progress').animate({
         'width': progress + '%'
     }, 300, function () {
@@ -840,7 +838,6 @@ var changeLoadProgress = function (progress, callback) {
             appLoader.finish();
         }
     });
-    callback();
 };
 
 
