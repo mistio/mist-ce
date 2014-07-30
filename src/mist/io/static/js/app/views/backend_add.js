@@ -79,7 +79,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     $('#hpcloud-bundle').hide();
                     $('#non-hp-cloud').hide();
 
-                    if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
+                    if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('softlayer') > -1 || provider.provider.indexOf('linode') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'API Key');
                     } else if (provider.provider.indexOf('nephoscale') > -1) {
