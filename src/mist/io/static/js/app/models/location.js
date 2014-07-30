@@ -11,9 +11,10 @@ define('app/models/location', ['ember'],
             country: null,
             init: function () {
                 this._super();
-                if (this.name == '')
-                    this.set('name', 'Default');
-            }
+            },
+            nameObserver: function () {
+                this.set('name', this.name || 'Default');
+            }.observes('name');
         });
     }
 );
