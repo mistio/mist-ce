@@ -170,7 +170,15 @@ function program7(depth0,data) {
   hashContexts = {};
   stack1 = helpers['if'].call(depth0, "view.secondFieldLabel", {hash:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            </div>\n        </div>\n\n        <!--\n\n            OPENSTACK\n\n        -->\n\n        <div id=\"openstack-bundle\" data-theme=\"a\">\n            <label for=\"new-backend-openstack-url\">4. Auth URL:</label>\n            ");
+  data.buffer.push("\n            </div>\n        </div>\n\n        <!--\n\n           HP Cloud\n\n        -->\n\n        <div id=\"hpcloud-bundle\" data-theme=\"a\">\n            <label for=\"new-backend-hpcloud-tenant\">4. Tenant Name:</label>\n            ");
+  hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
+  hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'id': ("new-backend-hpcloud-tenant"),
+    'data-theme': ("a"),
+    'valueBinding': ("Mist.backendAddController.newBackendOpenStackTenant")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n        </div>\n\n        <!--\n\n            OPENSTACK\n\n        -->\n\n        <div id=\"openstack-bundle\" data-theme=\"a\">\n            <label for=\"new-backend-openstack-url\">4. Auth URL:</label>\n            ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{

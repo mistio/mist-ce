@@ -38,3 +38,7 @@
 #add-backend-panel #docker-bundle {
     display: none;
 }
+
+#add-backend-panel #hpcloud-bundle {
+    display: none;
+}

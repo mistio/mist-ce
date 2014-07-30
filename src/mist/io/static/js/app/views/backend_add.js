@@ -76,9 +76,10 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     $('#openstack-bundle').hide();
                     $('#baremetal-bundle').hide();
                     $('#docker-bundle').hide();
+                    $('#hpcloud-bundle').hide();
                     $('#non-hp-cloud').hide();
 
-                    if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
+                    if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('softlayer') > -1 || provider.provider.indexOf('linode') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'API Key');
                     } else if (provider.provider.indexOf('nephoscale') > -1) {
@@ -97,18 +98,15 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         $('#common-bundle').hide();
                         $('#docker-bundle').show();
                         Mist.backendAddController.set('newBackendPort', 4243);
+                    } else if (provider.provider.indexOf('hpcloud') > -1) {
+                        this.set('firstFieldLabel', 'Username');
+                        this.set('secondFieldLabel', 'Password');
+                        $('#hpcloud-bundle').show();
                     } else if (provider.provider.indexOf('openstack') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');
-
-                        //This is for HP Cloud specific
-                        if (provider.provider.indexOf('region-') > -1) {
-                            Mist.backendAddController.set('newBackendOpenStackURL', 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens');
-                        } else {
-                            $('#opentack-advanced-wrapper').show();
-                        }
+                        $('#opentack-advanced-wrapper').show();
                         $('#openstack-bundle').show();
-
                     } else if (provider.provider.indexOf('bare_metal') > -1) {
                         this.set('firstFieldLabel', 'Hostname');
                         this.set('secondFieldLabel', 'User');
