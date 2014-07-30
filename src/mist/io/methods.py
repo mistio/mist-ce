@@ -1039,9 +1039,22 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
 
     """
 
-    key = SSHKeyDeployment(public_key)
-    deploy_script = ScriptDeployment(script)
-    msd = MultiStepDeployment([key, deploy_script])
+    key = str(public_key).replace('\n','')
+    try:
+        server_key = ''
+        keys = conn.list_key_pairs()
+        for k in keys:
+            if key == k.key:
+                server_key = k.id
+                break
+        if not server_key:
+            server_key = conn.create_key_pair(machine_name, key)
+            server_key = server_key.id
+    except:
+        server_key = conn.create_key_pair('mistio'+str(random.randint(1,100000)), key)
+        server_key = server_key.id
+
+
     if '.' in machine_name:
         domain = '.'.join(machine_name.split('.')[1:])
         name = machine_name.split('.')[0]
@@ -1057,7 +1070,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
                 image=image,
                 size=size,
                 location=location,
-                ssh_key=tmp_key_path
+                sshKeys=server_key
             )
         except Exception as e:
             raise MachineCreationError("Softlayer, got exception %s" % e)
