@@ -54,8 +54,6 @@ setupPaths(){
 #  Parameters: None
 generateScript(){
 
-    echo "Step 1:"
-
     # Define templates file and require ember.js
     echo "define('app/templates/templates', ['ember'], function() {" > $OUT_PATH
 
@@ -72,7 +70,7 @@ generateScript(){
     for f in $TEMPLATES_DIR"/"*.html
     do
         i=$((i + 1))
-        echo -ne "\r  Generating require parameters ($i/$FILE_COUNT)"
+        echo -ne "\rGenerating require parameters ($i/$FILE_COUNT)"
         echo "        'text!app/templates/""$(basename $f)""'," >> $OUT_PATH
     done
 
@@ -84,11 +82,11 @@ generateScript(){
     for f in $TEMPLATES_DIR"/"*.html
     do
         i=$((i + 1))
-        echo -ne "\r  Generating compilation statements ($i/$FILE_COUNT)"
+        echo -ne "\rGenerating compilation statements ($i/$FILE_COUNT)"
         filename=$(basename "$f")
         filename="${filename%.*}"
         var="Ember.TEMPLATES['$filename/html']"
-        value="Ember.Handlebars.compile(arguments[$i]);"
+        value="Ember.Handlebars.compile(arguments[$((i-1))]);"
         echo "        $var = $value" >> $OUT_PATH
     done
 
@@ -108,20 +106,18 @@ generateScript(){
 #  Parameters: None
 compileTemplates(){
 
-    echo "Step 2:"
-
     # Compile templates
     i=0
     for f in $TEMPLATES_DIR"/"*.html
     do
         i=$((i + 1))
-        echo -ne "\r  Compiling template: ($i/$FILE_COUNT)"
+        echo -ne "\rCompiling templates ($i/$FILE_COUNT)"
         ember-precompile "$f" >> $OUT_PATH
     done
 
     # Terminate file
-    echo "callback();
-}
+    echo "    callback();
+  }
 });" >> $OUT_PATH
 
     echo ""
@@ -132,6 +128,7 @@ main(){
     setupPaths $@
     generateScript
     compileTemplates
+    echo "Done"
 }
 
 main $@
