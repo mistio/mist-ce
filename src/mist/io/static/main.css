@@ -3,6 +3,7 @@
 -----------------------------------------------------------------------------------------------------------*/
 
 @import url('theme.css');
+@import url('images/sprite-build/sprites.css');
 @import url('jquery.mobile.structure-1.4.0.min.css');
 
 @import url("css/key.css");
@@ -462,8 +463,14 @@ ul.checkbox-list li label {
     margin-right: 6px;
 }
 
-#me-btn img {
+#me-btn .gravatar-image {
     border-radius: 2em;
+}
+
+#me-btn .user {
+    width: 36px;
+    height: 36px;
+    margin-right: 7px;
 }
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {

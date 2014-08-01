@@ -142,6 +142,15 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
+            getSimpleProvider: function () {
+                if (this.provider.indexOf('ec2') == 0) return 'ec2';
+                if (this.provider.indexOf('hpcloud') == 0) return 'hpcloud';
+                if (this.provider.indexOf('openstack') == 0) return 'openstack';
+                if (this.provider.indexOf('rackspace') == 0) return 'rackspace';
+                if (this.provider.indexOf('bare_metal') == 0) return 'baremetal';
+                return this.provider;
+            },
+
             /**
              *
              *  Pseudo-Private Methods
