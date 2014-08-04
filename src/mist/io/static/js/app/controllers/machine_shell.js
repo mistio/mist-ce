@@ -32,23 +32,27 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
 
             open: function (machine) {
+
                 this._clear();
                 this.set('machine', machine);
+
                 // Get the first ipv4 public ip to connect to
-                var host = '';
                 machine.public_ips.forEach(function (ip) {
                     if (ip.search(':') == -1)
-                        host = ip;
+                        this.set('host', ip);
                 }, this);
-                this.set('host', host);
-                if (!host)
-                    this.close();
-                else
+
+                if (this.host)
                     this.view.open();
+                else
+                    this.close();
+
             },
 
 
             connect: function () {
+
+                this.set('connected', true);
 
                 // Open shell socket
                 Mist.set('shell', Socket({
@@ -87,6 +91,16 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
                 term.write('Connecting to ' + this.host + '...\r\n');
                 Mist.set('term', term);
+
+                if (!Terminal._textarea)
+                    $('.terminal').focus();
+
+                // Make the hidden textfield focusable on android
+                if (Mist.term && Mist.term.isAndroid) {
+                    $(Terminal._textarea).css('top', 0).css('left', 0).css('right', 0)
+                    $(Terminal._textarea).width('100%');
+                    $(Terminal._textarea).height($('#shell-return').height() + 60);
+                }
 
                 if (Terminal._textarea) {
 
@@ -129,6 +143,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                     this.set('cols', null);
                     this.set('rows', null);
                     this.set('machine', null);
+                    this.set('connected', null);
                 });
             },
 

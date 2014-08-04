@@ -1,4 +1,7 @@
 var start = Date.now();
+navigator.__defineGetter__('userAgent', function(){
+    return 'Android' // customized user agent
+});
 
 // Define libraries
 require.config({
@@ -1039,6 +1042,7 @@ function forIn () {
     for (var i = 0; i < keysLength; i++)
         callback.call(thisArg, object[keys[i]], keys[i]);
 }
+
 
 // Calculates maximum chars that can be displayed into a fixed width
 function maxCharsInWidth (fontSize, width) {
