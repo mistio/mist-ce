@@ -26,7 +26,6 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/machine_manual_monitoring.html',
         'text!app/templates/machine_power.html',
         'text!app/templates/machine_shell.html',
-        'text!app/templates/machine_shell_list_item.html',
         'text!app/templates/machine_tags.html',
         'text!app/templates/machine_tags_list_item.html',
         'text!app/templates/messagebox.html',
@@ -62,17 +61,16 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['machine_manual_monitoring/html'] = Ember.Handlebars.compile(arguments[21]);
         Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[22]);
         Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[23]);
-        Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[24]);
-        Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[25]);
-        Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[26]);
-        Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[27]);
-        Ember.TEMPLATES['metric_add/html'] = Ember.Handlebars.compile(arguments[28]);
-        Ember.TEMPLATES['metric_add_custom/html'] = Ember.Handlebars.compile(arguments[29]);
-        Ember.TEMPLATES['metric_node/html'] = Ember.Handlebars.compile(arguments[30]);
-        Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[31]);
-        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[32]);
-        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[33]);
-        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[34]);
+        Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[24]);
+        Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[25]);
+        Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[26]);
+        Ember.TEMPLATES['metric_add/html'] = Ember.Handlebars.compile(arguments[27]);
+        Ember.TEMPLATES['metric_add_custom/html'] = Ember.Handlebars.compile(arguments[28]);
+        Ember.TEMPLATES['metric_node/html'] = Ember.Handlebars.compile(arguments[29]);
+        Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[30]);
+        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[31]);
+        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[32]);
+        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[33]);
         callback();
       });
       return;
@@ -2727,45 +2725,13 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', hashContexts, hashTypes, escapeExpression=this.escapeExpression;
 
 
-  data.buffer.push("<div id=\"machine-shell\"\n     class=\"huge-popup\"\n     data-role=\"popup\"\n     data-theme=\"b\"\n     data-dismissible=\"false\"\n     data-overlay-theme=\"b\"\n     data-transition=\"slideup\">\n\n    <div data-role=\"content\">\n        <div id=\"shell-return\" data-theme=\"a\">\n            <span class=\"fontSizeTest\">-</span>\n\n        </div>\n        <div class=\"ui-grid-a shell-back\">\n            <a data-role=\"button\"\n               data-theme=\"a\"\n               ");
+  data.buffer.push("<div id=\"machine-shell\"\n     data-role=\"popup\"\n     data-theme=\"b\"\n     data-dismissible=\"false\"\n     data-overlay-theme=\"b\"\n     data-transition=\"slideup\">\n\n    <div data-role=\"content\">\n        <div id=\"shell-return\" data-theme=\"a\">\n            <span class=\"fontSizeTest\">-</span>\n\n        </div>\n        <div class=\"ui-grid-a shell-back\">\n            <a data-role=\"button\"\n               data-theme=\"a\"\n               ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push(">Back</a>\n        </div>\n\n    </div>\n</div>\n");
-  return buffer;
-  
-});
-Ember.TEMPLATES["machine_shell_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
-this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, hashContexts, hashTypes, options, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
-
-
-  data.buffer.push("<h3 ");
-  hashContexts = {'id': depth0,'class': depth0};
-  hashTypes = {'id': "STRING",'class': "STRING"};
-  options = {hash:{
-    'id': ("view.command.id"),
-    'class': (":command :ui-alt-icon view.command.pendingResponse")
-  },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
-  data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push("\n    ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "toggleCommand", {hash:{
-    'target': ("view")
-  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n    data-theme=\"c\">\n    # ");
-  hashTypes = {};
-  hashContexts = {};
-  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.command.command", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n    <div class=\"shell-li-arrow ui-icon-carat-d ui-btn-icon-notext\"></div>\n</h3>\n<div class=\"output\">\n    <pre>");
-  hashTypes = {};
-  hashContexts = {};
-  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.command.response", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</pre>\n</div>");
   return buffer;
   
 });

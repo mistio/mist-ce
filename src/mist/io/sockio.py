@@ -54,7 +54,7 @@ class ShellNamespace(BaseNamespace):
         log.info("opened shell")
         self.shell = Shell(data['host'])
         key_id, ssh_user = self.shell.autoconfigure(self.user, data['backend_id'], data['machine_id'])
-        self.channel = self.shell.ssh.invoke_shell('xterm')
+        self.channel = self.shell.ssh.invoke_shell('xterm', data['cols'], data['rows'])
         self.spawn(self.get_ssh_data)
 
     def on_shell_close(self):

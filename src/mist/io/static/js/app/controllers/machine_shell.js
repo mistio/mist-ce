@@ -19,6 +19,8 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
 
             view: null,
+            cols: null,
+            rows: null,
             machine: null,
 
 
@@ -30,20 +32,23 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
 
             open: function (machine) {
-                //info(Terminal);
                 this._clear();
                 this.set('machine', machine);
-
                 // Get the first ipv4 public ip to connect to
                 var host = '';
                 machine.public_ips.forEach(function (ip) {
                     if (ip.search(':') == -1)
                         host = ip;
-                });
-                if (!host) {
+                }, this);
+                this.set('host', host);
+                if (!host)
                     this.close();
-                    return;
-                }
+                else
+                    this.view.open();
+            },
+
+
+            connect: function () {
 
                 // Open shell socket
                 Mist.set('shell', Socket({
@@ -52,54 +57,54 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 }));
 
                 var term = new Terminal({
-                  cols: 80,
-                  rows: 24,
+                  cols: this.cols,
+                  rows: this.rows,
                   screenKeys: true
                 });
 
-                term.on('data', function(data) {
+                term.on('data', function (data) {
                     Mist.shell.emit('shell_data', data);
                 });
 
                 term.open(document.getElementById('shell-return'));
 
-                var payload = {'backend_id': machine.backend.id,
-                               'machine_id': machine.id,
-                               'host': host
-                               };
-                Mist.shell.emit('shell_open', payload);
+                Mist.shell.emit('shell_open', {
+                    backend_id: this.machine.backend.id,
+                    machine_id: this.machine.id,
+                    host: this.host,
+                    cols: this.cols,
+                    rows: this.rows,
+                });
+
                 Mist.shell.firstData = true;
-                Mist.shell.on('shell_data', function(data){
+                Mist.shell.on('shell_data', function (data) {
                     term.write(data);
-                    if (Mist.shell.firstData){
+                    if (Mist.shell.firstData) {
                         $('.terminal').focus();
                         Mist.shell.firstData = false;
                     }
                 });
-                term.write('Connecting to ' + host + '...\r\n');
+
+                term.write('Connecting to ' + this.host + '...\r\n');
                 Mist.set('term', term);
 
-                Ember.run.next(function(){
-                    $(window).trigger('resize');
-                });
+                if (Terminal._textarea) {
 
-                if(Terminal._textarea) {
                     // iOS virtual keyboard focus fix
                     $(document).off('focusin');
 
                     // Tap should trigger resize on Android for virtual keyboard to appear
                     if (Mist.term && Mist.term.isAndroid){
-                        $('#shell-return').bind('tap',function(){
+                        $('#shell-return').bind('tap', function() {
                             $(window).trigger('resize');
                         });
                     }
                     $(Terminal._textarea).show();
                 }
-                this.view.open();
             },
 
+
             close: function () {
-                warn('closing shell');
                 this.view.close();
                 Ember.run.later(this, function () {
                     Mist.shell.emit('shell_close');
@@ -121,6 +126,8 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
             _clear: function () {
                 Ember.run(this, function () {
+                    this.set('cols', null);
+                    this.set('rows', null);
                     this.set('machine', null);
                 });
             },

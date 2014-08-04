@@ -470,10 +470,8 @@ Terminal.prototype.initGlobal = function() {
 
   Terminal.bindCopy(document);
 
-  if (this.isIpad || this.isIphone) {
-    Terminal.fixIpad(document);
-  } else if (this.isAndroid) {
-    Terminal.fixAndroid(document);
+  if (this.isMobile) {
+    this.fixMobile(document);
   }
 
   if (this.useStyle) {
@@ -600,10 +598,12 @@ Terminal.bindCopy = function(document) {
 };
 
 /**
- * Fix iPad - no idea if this works
+ * Fix Mobile
  */
 
-Terminal.fixIpad = function(document) {
+Terminal.prototype.fixMobile = function(document) {
+  var self = this;
+
   var textarea = document.createElement('textarea');
   textarea.style.position = 'absolute';
   textarea.style.left = '-32000px';
@@ -616,7 +616,6 @@ Terminal.fixIpad = function(document) {
   textarea.style.outlineStyle = 'none';
   textarea.autocapitalize = 'none';
   textarea.autocorrect = 'off';
-  textarea.spellcheck = 'false';
 
   document.getElementsByTagName('body')[0].appendChild(textarea);
 
@@ -625,61 +624,15 @@ Terminal.fixIpad = function(document) {
   setTimeout(function() {
     textarea.focus();
   }, 1000);
-};
 
-/**
- * Fix Android - no idea if this works either
- */
-
-Terminal.fixAndroid = function(document) {
-  var textarea = document.createElement('input');
-  textarea.type = 'email';
-  textarea.style.position = 'absolute';
-  textarea.style.left = '0px';
-  textarea.style.top = '0px';
-  textarea.style.width = '0px';
-  textarea.style.height = '0px';
-  textarea.style.opacity = '0';
-  textarea.style.backgroundColor = 'transparent';
-  textarea.style.borderStyle = 'none';
-  textarea.style.outlineStyle = 'none';
-  textarea.autocapitalize = 'none';
-  textarea.autocorrect = 'off';
-  textarea.autocomplete = 'off';
-  textarea.spellcheck = 'false';
-
-  document.getElementsByTagName('body')[0].appendChild(textarea);
-
-  Terminal._textarea = textarea;
-  Terminal.oldValue = '';
-
-  setTimeout(function() {
-    textarea.focus();
-  }, 1000);
-
-  on(Terminal._textarea, 'keydown', function(ev){
-    // console.log(ev);
-    if (Terminal._textarea.value == Terminal.oldValue)
-      return true;
-
-    if (Terminal._textarea.value.length < Terminal.oldValue.length){
-        for (var i=0; i<Terminal.oldValue.length-Terminal._textarea.value.length;i++){
-            Mist.term.send('\x08');
-        }
-    } else {
-        for (var i=0; i<Terminal._textarea.value.length-Terminal.oldValue.length;i++){
-            Mist.term.send(Terminal._textarea.value[Terminal.oldValue.length+i]);
-        }
-    }
-    Terminal.oldValue = Terminal._textarea.value;
-
-    // move to the end of the textarea
-    var range = Terminal._textarea.createTextRange();
-    range.collapse(false);
-    range.select();
-
-    return true;
-  });
+  if (this.isAndroid) {
+    on(textarea, 'change', function() {
+      var value = textarea.textContent || textarea.value;
+      textarea.value = '';
+      textarea.textContent = '';
+      self.send(value + '\r');
+    });
+  }
 };
 
 /**
@@ -752,8 +705,9 @@ Terminal.prototype.open = function(parent) {
   if (this.context.navigator && this.context.navigator.userAgent) {
     this.isMac = !!~this.context.navigator.userAgent.indexOf('Mac');
     this.isIpad = !!~this.context.navigator.userAgent.indexOf('iPad');
-    this.isAndroid = !!~this.context.navigator.userAgent.indexOf('Android');
     this.isIphone = !!~this.context.navigator.userAgent.indexOf('iPhone');
+    this.isAndroid = !!~this.context.navigator.userAgent.indexOf('Android');
+    this.isMobile = this.isIpad || this.isIphone || this.isAndroid;
     this.isMSIE = !!~this.context.navigator.userAgent.indexOf('MSIE');
   }
 
@@ -792,7 +746,7 @@ Terminal.prototype.open = function(parent) {
   // to focus and paste behavior.
   on(this.element, 'focus', function() {
     self.focus();
-    if (self.isIpad || self.isIphone || self.isAndroid) {
+    if (self.isMobile) {
       Terminal._textarea.focus();
     }
   });
@@ -2827,29 +2781,14 @@ Terminal.prototype.resize = function(x, y) {
     }
   } else if (j > y) {
     while (j-- > y) {
-      if (this.y < y ){
-          if (this.lines.length > y + this.ybase) {
-            this.lines.pop();
-          }
-          if (this.children.length > y) {
-            el = this.children.pop();
-            if (!el) continue;
-            el.parentNode.removeChild(el);
-          }
-      } else {
-          if (this.lines.length > y + this.ybase) {
-            this.lines.splice(0,1);
-          }
-          if (this.children.length > y) {
-
-            el = this.children[0];
-            if (!el) continue;
-            el.parentNode.removeChild(el);
-            this.children.splice(0,1);
-          }
-          this.y--;
+      if (this.lines.length > y + this.ybase) {
+        this.lines.pop();
       }
-
+      if (this.children.length > y) {
+        el = this.children.pop();
+        if (!el) continue;
+        el.parentNode.removeChild(el);
+      }
     }
   }
   this.rows = y;

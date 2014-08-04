@@ -294,7 +294,6 @@ var loadFiles = function (callback) {
         'app/views/machine_manual_monitoring',
         'app/views/machine_power',
         'app/views/machine_shell',
-        'app/views/machine_shell_list_item',
         'app/views/machine_tags',
         'app/views/machine_tags_list_item',
         'app/views/messagebox',
@@ -358,7 +357,6 @@ var loadApp = function (
     MachineManualMonitoringView,
     MachinePowerView,
     MachineShellView,
-    MachineShellListItemView,
     MachineTagsView,
     MachineTagsListItemView,
     MessageBoxView,
@@ -515,7 +513,6 @@ var loadApp = function (
     App.set('metricAddCustomView', MetricAddCustomView);
     App.set('machineKeysListItemView', MachineKeysListItemView);
     App.set('machineTagsListItemView', MachineTagsListItemView);
-    App.set('machineShellListItemView', MachineShellListItemView);
     App.set('machineManualMonitoringView', MachineManualMonitoringView);
 
     // Ember controllers
@@ -818,7 +815,8 @@ var setupSocketEvents = function (socket, callback) {
         }
     })
     .on('probe', onProbe)
-    .on('ping', onProbe);
+    .on('ping', onProbe)
+    .emit('ready');
 
     function onProbe(data) {
         var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
@@ -1026,7 +1024,7 @@ function virtualKeyboardHeight () {
         keyboardHeight = 0;
     }
     return keyboardHeight;
-};
+}
 
 
 // forEach like function on objects
@@ -1040,7 +1038,39 @@ function forIn () {
     var keysLength = keys.length;
     for (var i = 0; i < keysLength; i++)
         callback.call(thisArg, object[keys[i]], keys[i]);
-};
+}
+
+// Calculates maximum chars that can be displayed into a fixed width
+function maxCharsInWidth (fontSize, width) {
+
+    var fontTest = $('#font-test')
+        .css('font-size', fontSize);
+
+    var testString = '';
+    var textWidth = 0;
+    for (var charCount = 0; textWidth < width; charCount++) {
+        testString += 't';
+        textWidth = fontTest.text(testString).width();
+    };
+    return charCount;
+}
+
+
+// Calculates maximum lines that can be displayed into a fixed height
+function maxLinesInHeight (fontSize, height) {
+
+    var fontTest = $('#font-test')
+        .css('font-size', fontSize)
+        .css('line-height', fontSize);
+
+    var testString = '';
+    var textHeight = 0
+    for (var lineCount = 0; textHeight < height; lineCount++) {
+        testString += '<div>t</div>';
+        textHeight = fontTest.html(testString).height();
+    };
+    return lineCount;
+}
 
 
 // Console aliases
