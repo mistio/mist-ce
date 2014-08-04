@@ -217,7 +217,8 @@ var appLoader = {
                         appLoader.complete('init connections');
                     },
                     onConnect: function (socket) {
-                        socket.emit('ready');
+                        if (!appLoader)
+                            socket.emit('ready');
                     },
                 });
             }
