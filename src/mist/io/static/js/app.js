@@ -217,7 +217,8 @@ var appLoader = {
                         appLoader.complete('init connections');
                     },
                     onConnect: function (socket) {
-                        socket.emit('ready');
+                        if (!appLoader)
+                            socket.emit('ready');
                     },
                 });
             }
@@ -818,7 +819,8 @@ var setupSocketEvents = function (socket, callback) {
         }
     })
     .on('probe', onProbe)
-    .on('ping', onProbe);
+    .on('ping', onProbe)
+    .emit('ready');
 
     function onProbe(data) {
         var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
