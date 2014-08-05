@@ -5,7 +5,7 @@
 #machine-shell-popup #shell-return {
 
     color: #efeff1;
-    background: #363636;
+    background-color: #000;
 
     border: 1px solid #AAA;
     border-radius: 4px;
@@ -45,7 +45,7 @@ span.terminal-cursor {
 ---------------------------*/
 
 #machine-shell-popup.desktop {
-    opacity: 0.9;
+    opacity: 0.8;
 }
 
 #machine-shell-popup.desktop #shell-return {
@@ -68,7 +68,7 @@ span.terminal-cursor {
     left: 0;
     right: 0;
     bottom: 0;
-    position: absolute;
+    position: fixed;
     max-width: 100% !important;
 }
 
@@ -77,9 +77,16 @@ span.terminal-cursor {
 ---------------------------*/
 
 #machine-shell-popup.mobile {
-    position: fixed;
     top: 1% !important;
     max-height: 98% !important;
+}
+
+#machine-shell-popup.mobile .ui-btn {
+    margin: 0;
+}
+
+#machine-shell-popup.mobile .ui-content {
+    padding: 0;
 }
 
 #machine-shell-popup.mobile #shell-return {

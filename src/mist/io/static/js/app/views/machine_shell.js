@@ -1,10 +1,10 @@
-define('app/views/machine_shell', ['app/views/popup', 'term'],
+define('app/views/machine_shell', ['app/views/popup'],
     //
     //  Machine Shell View
     //
     //  @returns Class
     //
-    function (PopupView, Term) {
+    function (PopupView) {
 
         'use strict';
 
@@ -22,12 +22,18 @@ define('app/views/machine_shell', ['app/views/popup', 'term'],
 
 
             load: function () {
-                this.handlePopupOpen();
+                $(this.popupId)
+                    .on('popupafteropen', afterOpenHandler)
+                    .on('popupbeforeposition', beforeOpenHandler)
+                    .parent()
+                    .addClass(Mist.isClientMobile ? 'mobile' : 'desktop');
             }.on('didInsertElement'),
 
 
             unload: function () {
-                this.unhandlePopupOpen();
+                $(this.popupId)
+                    .off('popupafteropen', afterOpenHandler)
+                    .off('popupbeforeposition', beforeOpenHandler);
             }.on('willDestroyElement'),
 
 
@@ -39,53 +45,28 @@ define('app/views/machine_shell', ['app/views/popup', 'term'],
 
 
             open: function () {
-                this.setClientSpecificClass();
-                this.handleWindowResize();
-                $('.ui-footer').slideUp(500);
-                // Disable page scroll
-                $('.ui-page-active')
-                    .css('height', '100%')
-                    .css('overflow-y', 'hidden');
+                this.setUpUI();
                 this._super();
             },
 
 
             close: function () {
                 this._super();
-                this.unhandleWindowResize();
-                $('.ui-footer').slideDown(500);
-                // Re-enable page scroll
-                $('.ui-page-active')
-                    .css('height', 'auto')
-                    .css('overflow-y', 'auto');
+                this.cleanUpUI();
             },
 
 
-            handlePopupOpen: function () {
-                $(this.popupId).on('popupafteropen', popupOpenHandler);
-            },
-
-
-            unhandlePopupOpen: function () {
-                $(this.popupId).off('popupafteropen', popupOpenHandler);
-            },
-
-
-            handleWindowResize: function () {
+            setUpUI: function () {
+                lockScroll();
+                $('.ui-footer').slideUp(200);
                 $(window).on('resize', windowResizeHandler);
             },
 
 
-            unhandleWindowResize: function () {
+            cleanUpUI: function () {
+                unlockScroll();
+                $('.ui-footer').slideDown(400);
                 $(window).off('resize', windowResizeHandler);
-            },
-
-
-            setClientSpecificClass: function () {
-                if (Mist.isClientMobile)
-                    $('#machine-shell-popup').addClass('mobile');
-                else
-                    $('#machine-shell-popup').addClass('desktop');
             },
 
 
@@ -107,29 +88,52 @@ define('app/views/machine_shell', ['app/views/popup', 'term'],
 
         var resizeLock;
         function windowResizeHandler () {
-            // Prevent shell recalibration if user hasn't
-            // stopped resizing the window
+
+            // Resize popup only when client is on mobile, which means
+            // terminal resolution is fixed to the minimum standards.
+            // If we resized the popup on desktop clients, we would need to
+            // open a new shell session using the new resolution
+            if (!Mist.isClientMobile) return;
+
+            // Prevent shell recalibration if user hasn't stopped resizing the
+            // window, which is most probably device rotation or the appearance
+            // of the on screen keyboard
             clearTimeout(resizeLock);
-            resizeLock = setTimeout(calibrateShell, 500);
-        };
-
-
-        function popupOpenHandler (e) {
-            $(e.currentTarget).off('blur');
-            $(document).off('focusin');
-            Ember.run.next(function () {
-                calibrateShell();
-                Mist.machineShellController.connect();
-            }, 100)
+            resizeLock = setTimeout(mobileCalibration, 500);
         }
 
 
-        function calibrateShell () {
+        function afterOpenHandler (e) {
+
+            $(e.currentTarget).off('blur');
+            $(document).off('focusin');
+
+            // Initialize shell after popup opens when user is on desktop
+            // because dekstop calibration is performance intensive and will
+            // delay the popup's appearance, making it look unresponsibe
+            Ember.run.next(function () {
+                if (!Mist.isClientMobile) initShell();
+            });
+        }
+
+
+        function beforeOpenHandler (e) {
+
+            // Initialize shell before popup opens when user is on mobile.
+            // Else, the shell will be resized and repositioned while visible
+            // and will appear glitchy
+            if (Mist.isClientMobile) initShell();
+        }
+
+
+        function initShell () {
 
             if (Mist.isClientMobile)
                 mobileCalibration();
             else
                 desktopCalibration();
+
+            Mist.machineShellController.connect();
         }
 
 
@@ -224,11 +228,9 @@ define('app/views/machine_shell', ['app/views/popup', 'term'],
                 .css('font-size', fontSize + 'px')
                 .css('line-height', fontSize + 'px');
 
-            Ember.run.next(function () {
-                // Place popup in the center
-                var popup = $('#machine-shell-popup')
-                popup.css('left', ((window.innerWidth - popup.width()) / 2) + 'px');
-            });
+            // Place popup in the center
+            var popup = $('#machine-shell-popup');
+            popup.css('left', ((window.innerWidth - popup.width()) / 2) + 'px');
 
             Mist.machineShellController.set('cols', MIN_TERM_COLUMNS);
             Mist.machineShellController.set('rows', MIN_TERM_ROWS);

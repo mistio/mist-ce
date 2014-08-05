@@ -1,7 +1,7 @@
 var start = Date.now();
-navigator.__defineGetter__('userAgent', function(){
-    return 'Android' // customized user agent
-});
+//navigator.__defineGetter__('userAgent', function(){
+//    return 'Android' // customized user agent
+//});
 
 // Define libraries
 require.config({
@@ -1074,6 +1074,19 @@ function maxLinesInHeight (fontSize, height) {
         textHeight = fontTest.html(testString).height();
     };
     return lineCount;
+}
+
+
+function lockScroll(){
+    $('body').data('y-scroll', self.pageYOffset)
+             .css('overflow', 'hidden');
+    window.scrollTo(null, self.pageYOffset);
+}
+
+
+function unlockScroll(){
+      $('body').css('overflow', 'auto');
+      window.scrollTo(null, $('body').data('y-scroll'))
 }
 
 

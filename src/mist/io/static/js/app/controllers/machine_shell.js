@@ -52,6 +52,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
             connect: function () {
 
+                if (this.connected) return;
                 this.set('connected', true);
 
                 // Open shell socket
@@ -93,26 +94,22 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 Mist.set('term', term);
 
                 if (!Terminal._textarea)
+
                     $('.terminal').focus();
 
-                // Make the hidden textfield focusable on android
-                if (Mist.term && Mist.term.isAndroid) {
-                    $(Terminal._textarea).css('top', 0).css('left', 0).css('right', 0)
-                    $(Terminal._textarea).width('100%');
-                    $(Terminal._textarea).height($('#shell-return').height() + 60);
-                }
-
-                if (Terminal._textarea) {
+                else {
 
                     // iOS virtual keyboard focus fix
                     $(document).off('focusin');
 
-                    // Tap should trigger resize on Android for virtual keyboard to appear
-                    if (Mist.term && Mist.term.isAndroid){
-                        $('#shell-return').bind('tap', function() {
-                            $(window).trigger('resize');
-                        });
-                    }
+                    // Make the hidden textfield focusable on android
+                    if (Mist.term && Mist.term.isAndroid)
+                        $(Terminal._textarea)
+                            .css('top', '1%')
+                            .css('left', 0)
+                            .width('100%')
+                            .height($('#shell-return').height());
+
                     $(Terminal._textarea).show();
                 }
             },
