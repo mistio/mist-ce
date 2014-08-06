@@ -264,7 +264,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     machine = Machine.create(machine);
                     if (machine.state == 'stopped')
                         machine.set('state', 'pending');
-                    this.content.pushObject(machine);
+                    this.content.addObject(machine);
                     this.content.removeObject(dummyMachine);
                     Mist.keysController._associateKey(key.id, machine);
                     this.trigger('onMachineListChange');
