@@ -92,7 +92,7 @@ define('app/controllers/locations', ['app/models/location'],
 
             _addLocation: function (location) {
                 Ember.run(this, function () {
-                    this.content.pushObject(Location.create(location));
+                    this.content.addObject(Location.create(location));
                     this.trigger('onLocationAdd');
                 });
             },
