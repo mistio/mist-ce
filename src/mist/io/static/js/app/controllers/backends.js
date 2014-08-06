@@ -59,10 +59,10 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             addBackend: function (title, provider, apiKey, apiSecret, apiUrl,
                                  region, tenant, computeEndpoint, dockerUrl,
                                  port, key, callback) {
-                                 
+            // />
+
                 key = Mist.keysController.keyExists(key) ? key : null;
 
-            // />
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
@@ -278,7 +278,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             _addBackend: function(backend, keyId) {
                 Ember.run(this, function() {
                     var backendModel = Backend.create(backend);
-                    this.content.pushObject(backendModel);
+                    this.content.addObject(backendModel);
                     // <TODO (gtsop): move this code into backend model
                     if (keyId)
                         backendModel.one('onMachineListChange', function() {

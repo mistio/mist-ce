@@ -199,7 +199,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
 
             _addMetric: function (metric, machine) {
                 Ember.run(this, function () {
-                    this.customMetrics.pushObject(Metric.create(metric));
+                    this.customMetrics.addObject(Metric.create(metric));
                     this.trigger('onMetricAdd');
                 });
             },
