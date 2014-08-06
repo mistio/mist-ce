@@ -44,7 +44,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     rule.metric = Mist.metricsController.getMetric(rule.metric);
                     rule.machine = Mist.backendsController.getMachine(
                         rule.machine, rule.backend) || rule.machine;
-                    this.content.pushObject(Rule.create(rule));
+                    this.content.addObject(Rule.create(rule));
                     this.trigger('onRuleAdd');
                 });
             },
