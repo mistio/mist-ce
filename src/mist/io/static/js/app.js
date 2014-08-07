@@ -1,4 +1,4 @@
-var start = Date.now();
+startTimer();
 
 // Define libraries
 require.config({
@@ -66,7 +66,6 @@ var appLoader = {
 
     buffer: null,
     progress: null,
-    startTime: null,
     progressStep: null,
 
 
@@ -81,7 +80,6 @@ var appLoader = {
         this.buffer = {};
         this.progress = 0;
         this.progressStep = 100 / Object.keys(this.steps).length;
-        this.startTime = start;
         this.start();
     },
 
@@ -102,10 +100,6 @@ var appLoader = {
 
 
     complete: function (completedStep) {
-
-        // Log progress
-        info('Step completed: "' + completedStep + '" |',
-            'time:', Date.now() - this.startTime, 'ms');
 
         // Update progress bar
         this.progress += this.progressStep;
@@ -139,6 +133,8 @@ var appLoader = {
         setupSocketEvents = null;
         changeLoadProgress = null;
         appLoader = null;
+
+        info('Loaded in', getTime(), 'ms');
     },
 
 
@@ -1045,8 +1041,18 @@ function forIn () {
 };
 
 
+// Simple timer tool for performance measurements
+var startTime;
+function startTimer () {
+    startTime = Date.now();
+};
+
+function getTime () {
+    return Date.now() - startTime;
+};
+
+
 // Console aliases
-// LOGLEVEL comes from home python view and home.pt
 function log() {
     if (LOGLEVEL > 3)
         console.log.apply(console, arguments);
