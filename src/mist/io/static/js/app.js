@@ -404,6 +404,14 @@ var loadApp = function (
         });
     });
 
+    App.IndexRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - home';
+            });
+        }
+    });
+
     App.ImagesRoute = Ember.Route.extend({
         activate: function() {
             Ember.run.next(function() {
