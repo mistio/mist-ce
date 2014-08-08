@@ -8,6 +8,54 @@ define('app/controllers/images', ['app/models/image'],
 
         'use strict';
 
+        var OS_MAP = [
+            [
+                ['rhel', 'redhat', 'red hat'], 'redhat'
+            ],
+            [
+                ['ubuntu'], 'ubuntu'
+            ],
+            [
+                ['ibm'], 'ibm'
+            ],
+            [
+                ['canonical'], 'canonical'
+            ],
+            [
+                ['sles', 'suse'], 'suse'
+            ],
+            [
+                ['oracle'], 'oracle'
+            ],
+            [
+                ['karmic'], 'karmic'
+            ],
+            [
+                ['opensolaris'], 'opensolaris'
+            ],
+            [
+                ['gentoo'], 'gentoo'
+            ],
+            [
+                ['opensuse'], 'opensuse'
+            ],
+            [
+                ['fedora'], 'fedora'
+            ],
+            [
+                ['centos'], 'centos'
+            ],
+            [
+                ['fedora'], 'fedora'
+            ],
+            [
+                ['debian'], 'debian'
+            ],
+            [
+                ['amazon'], 'amazon'
+            ]
+        ]
+
         return Ember.ArrayController.extend(Ember.Evented, {
 
 
@@ -104,6 +152,22 @@ define('app/controllers/images', ['app/models/image'],
             },
 
 
+            getImageOS: function (imageId) {
+
+                var os = 'generic';
+                var image = this.getImage(imageId);
+
+                if (!image) return os;
+                OS_MAP.some(function (pair) {
+                    return pair[0].some(function (key) {
+                        if (image.name.toLowerCase().indexOf(key) > -1)
+                            return os = pair[1];
+                    });
+                });
+                return os;
+            },
+
+
             imageExists: function (imageId) {
                 return !!this.getImage(imageId);
             },
@@ -147,7 +211,7 @@ define('app/controllers/images', ['app/models/image'],
             _addImage: function (image) {
                 Ember.run(this, function () {
                     image.backend = this.backend;
-                    this.content.pushObject(Image.create(image));
+                    this.content.addObject(Image.create(image));
                     this.trigger('onImageAdd');
                 });
             },

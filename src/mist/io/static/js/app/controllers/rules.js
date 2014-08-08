@@ -126,6 +126,11 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
+            ruleExists: function (ruleId) {
+                return !!this.getRuleById(ruleId);
+            },
+
+
             getRuleById: function(ruleId) {
                 return this.content.findBy('id', ruleId);
             },
@@ -189,6 +194,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     this.trigger('onRuleUpdate');
                 });
             },
+
 
             _deleteRule: function (rule) {
                 Ember.run(this, function () {

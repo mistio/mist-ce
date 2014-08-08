@@ -3,6 +3,7 @@
 -----------------------------------------------------------------------------------------------------------*/
 
 @import url('theme.css');
+@import url('images/sprite-build/sprites.css');
 @import url('jquery.mobile.structure-1.4.0.min.css');
 
 @import url("css/key.css");
@@ -30,6 +31,10 @@
 
 /* Splash
 -----------------------------------------------------------------------------------------------------------*/
+.ui-mobile-rendering > * {
+    visibility: visible !important;
+}
+
 #splash {
     width: 100%;
     height: 100%;
@@ -48,6 +53,28 @@
     top: 50%;
     margin-left: -140px;
     margin-top: -140px;
+}
+.mist-progress {
+    border: 1px solid white;
+    border-radius: 25px;
+    bottom: 3px;
+    height: 0;
+    left: 0;
+    margin-top: 19px;
+    position: absolute;
+    top: -19px;
+    max-width: 98%;
+}
+.mist-progress-wrapper {
+    border: 1px solid white;
+    border-radius: 15px;
+    bottom: 58px;
+    box-shadow: 0 0 2px rgba(255, 255, 255, 1);
+    height: 2px;
+    left: 92px;
+    padding: 0;
+    position: absolute;
+    width: 96px;
 }
 
 
@@ -440,8 +467,14 @@ ul.checkbox-list li label {
     margin-right: 6px;
 }
 
-#me-btn img {
+#me-btn .gravatar-image {
     border-radius: 2em;
+}
+
+#me-btn .user {
+    width: 36px;
+    height: 36px;
+    margin-right: 7px;
 }
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {

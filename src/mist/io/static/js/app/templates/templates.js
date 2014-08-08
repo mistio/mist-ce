@@ -1,84 +1,82 @@
 define('app/templates/templates', ['ember'], function() {
-
-if (!JS_BUILD) {
-  require([
-    'text!app/templates/backend_add.html',
-    'text!app/templates/backend_edit.html',
-    'text!app/templates/confirmation_dialog.html',
-    'text!app/templates/file_upload.html',
-    'text!app/templates/graph_button.html',
-    'text!app/templates/graph.html',
-    'text!app/templates/home.html',
-    'text!app/templates/image_list.html',
-    'text!app/templates/image_list_item.html',
-    'text!app/templates/key_add.html',
-    'text!app/templates/key_edit.html',
-    'text!app/templates/key.html',
-    'text!app/templates/key_list.html',
-    'text!app/templates/key_list_item.html',
-    'text!app/templates/login.html',
-    'text!app/templates/machine_add.html',
-    'text!app/templates/machine.html',
-    'text!app/templates/machine_keys.html',
-    'text!app/templates/machine_keys_list_item.html',
-    'text!app/templates/machine_list.html',
-    'text!app/templates/machine_list_item.html',
-    'text!app/templates/machine_manual_monitoring.html',
-    'text!app/templates/machine_power.html',
-    'text!app/templates/machine_shell.html',
-    'text!app/templates/machine_shell_list_item.html',
-    'text!app/templates/machine_tags.html',
-    'text!app/templates/machine_tags_list_item.html',
-    'text!app/templates/messagebox.html',
-    'text!app/templates/metric_add_custom.html',
-    'text!app/templates/metric_add.html',
-    'text!app/templates/metric_node.html',
-    'text!app/templates/monitoring.html',
-    'text!app/templates/rule_edit.html',
-    'text!app/templates/rule.html',
-    'text!app/templates/user_menu.html',
-    'ember'],
-  function() {
-    Ember.TEMPLATES['backend_add/html'] = Ember.Handlebars.compile(arguments[0]);
-    Ember.TEMPLATES['backend_edit/html'] = Ember.Handlebars.compile(arguments[1]);
-    Ember.TEMPLATES['confirmation_dialog/html'] = Ember.Handlebars.compile(arguments[2]);
-    Ember.TEMPLATES['file_upload/html'] = Ember.Handlebars.compile(arguments[3]);
-    Ember.TEMPLATES['graph_button/html'] = Ember.Handlebars.compile(arguments[4]);
-    Ember.TEMPLATES['graph/html'] = Ember.Handlebars.compile(arguments[5]);
-    Ember.TEMPLATES['home/html'] = Ember.Handlebars.compile(arguments[6]);
-    Ember.TEMPLATES['image_list/html'] = Ember.Handlebars.compile(arguments[7]);
-    Ember.TEMPLATES['image_list_item/html'] = Ember.Handlebars.compile(arguments[8]);
-    Ember.TEMPLATES['key_add/html'] = Ember.Handlebars.compile(arguments[9]);
-    Ember.TEMPLATES['key_edit/html'] = Ember.Handlebars.compile(arguments[10]);
-    Ember.TEMPLATES['key/html'] = Ember.Handlebars.compile(arguments[11]);
-    Ember.TEMPLATES['key_list/html'] = Ember.Handlebars.compile(arguments[12]);
-    Ember.TEMPLATES['key_list_item/html'] = Ember.Handlebars.compile(arguments[13]);
-    Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[14]);
-    Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[15]);
-    Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[16]);
-    Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[17]);
-    Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[18]);
-    Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[19]);
-    Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[20]);
-    Ember.TEMPLATES['machine_manual_monitoring/html'] = Ember.Handlebars.compile(arguments[21]);
-    Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[22]);
-    Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[23]);
-    Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[24]);
-    Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[25]);
-    Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[26]);
-    Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[27]);
-    Ember.TEMPLATES['metric_add_custom/html'] = Ember.Handlebars.compile(arguments[28]);
-    Ember.TEMPLATES['metric_add/html'] = Ember.Handlebars.compile(arguments[29]);
-    Ember.TEMPLATES['metric_node/html'] = Ember.Handlebars.compile(arguments[30]);
-    Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[31]);
-    Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[32]);
-    Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[33]);
-    Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[34]);
-  });
-  return;
-}
-
-
+  return function (callback) {
+    if (!JS_BUILD) {
+      require([
+        'text!app/templates/backend_add.html',
+        'text!app/templates/backend_edit.html',
+        'text!app/templates/confirmation_dialog.html',
+        'text!app/templates/file_upload.html',
+        'text!app/templates/graph_button.html',
+        'text!app/templates/graph.html',
+        'text!app/templates/home.html',
+        'text!app/templates/image_list.html',
+        'text!app/templates/image_list_item.html',
+        'text!app/templates/key_add.html',
+        'text!app/templates/key_edit.html',
+        'text!app/templates/key.html',
+        'text!app/templates/key_list.html',
+        'text!app/templates/key_list_item.html',
+        'text!app/templates/login.html',
+        'text!app/templates/machine_add.html',
+        'text!app/templates/machine.html',
+        'text!app/templates/machine_keys.html',
+        'text!app/templates/machine_keys_list_item.html',
+        'text!app/templates/machine_list.html',
+        'text!app/templates/machine_list_item.html',
+        'text!app/templates/machine_manual_monitoring.html',
+        'text!app/templates/machine_power.html',
+        'text!app/templates/machine_shell.html',
+        'text!app/templates/machine_shell_list_item.html',
+        'text!app/templates/machine_tags.html',
+        'text!app/templates/machine_tags_list_item.html',
+        'text!app/templates/messagebox.html',
+        'text!app/templates/metric_add_custom.html',
+        'text!app/templates/metric_add.html',
+        'text!app/templates/metric_node.html',
+        'text!app/templates/monitoring.html',
+        'text!app/templates/rule_edit.html',
+        'text!app/templates/rule.html',
+        'text!app/templates/user_menu.html',
+      ], function () {
+        Ember.TEMPLATES['backend_add/html'] = Ember.Handlebars.compile(arguments[0]);
+        Ember.TEMPLATES['backend_edit/html'] = Ember.Handlebars.compile(arguments[1]);
+        Ember.TEMPLATES['confirmation_dialog/html'] = Ember.Handlebars.compile(arguments[2]);
+        Ember.TEMPLATES['file_upload/html'] = Ember.Handlebars.compile(arguments[3]);
+        Ember.TEMPLATES['graph_button/html'] = Ember.Handlebars.compile(arguments[4]);
+        Ember.TEMPLATES['graph/html'] = Ember.Handlebars.compile(arguments[5]);
+        Ember.TEMPLATES['home/html'] = Ember.Handlebars.compile(arguments[6]);
+        Ember.TEMPLATES['image_list/html'] = Ember.Handlebars.compile(arguments[7]);
+        Ember.TEMPLATES['image_list_item/html'] = Ember.Handlebars.compile(arguments[8]);
+        Ember.TEMPLATES['key_add/html'] = Ember.Handlebars.compile(arguments[9]);
+        Ember.TEMPLATES['key_edit/html'] = Ember.Handlebars.compile(arguments[10]);
+        Ember.TEMPLATES['key/html'] = Ember.Handlebars.compile(arguments[11]);
+        Ember.TEMPLATES['key_list/html'] = Ember.Handlebars.compile(arguments[12]);
+        Ember.TEMPLATES['key_list_item/html'] = Ember.Handlebars.compile(arguments[13]);
+        Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[14]);
+        Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[15]);
+        Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[16]);
+        Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[17]);
+        Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[18]);
+        Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[19]);
+        Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[20]);
+        Ember.TEMPLATES['machine_manual_monitoring/html'] = Ember.Handlebars.compile(arguments[21]);
+        Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[22]);
+        Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[23]);
+        Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[24]);
+        Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[25]);
+        Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[26]);
+        Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[27]);
+        Ember.TEMPLATES['metric_add_custom/html'] = Ember.Handlebars.compile(arguments[28]);
+        Ember.TEMPLATES['metric_add/html'] = Ember.Handlebars.compile(arguments[29]);
+        Ember.TEMPLATES['metric_node/html'] = Ember.Handlebars.compile(arguments[30]);
+        Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[31]);
+        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[32]);
+        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[33]);
+        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[34]);
+        callback();
+      });
+      return;
+    }
 Ember.TEMPLATES["backend_add/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
@@ -170,7 +168,15 @@ function program7(depth0,data) {
   hashContexts = {};
   stack1 = helpers['if'].call(depth0, "view.secondFieldLabel", {hash:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            </div>\n        </div>\n\n        <!--\n\n            OPENSTACK\n\n        -->\n\n        <div id=\"openstack-bundle\" data-theme=\"a\">\n            <label for=\"new-backend-openstack-url\">4. Auth URL:</label>\n            ");
+  data.buffer.push("\n            </div>\n        </div>\n\n        <!--\n\n           HP Cloud\n\n        -->\n\n        <div id=\"hpcloud-bundle\" data-theme=\"a\">\n            <label for=\"new-backend-hpcloud-tenant\">4. Tenant Name:</label>\n            ");
+  hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
+  hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'id': ("new-backend-hpcloud-tenant"),
+    'data-theme': ("a"),
+    'valueBinding': ("Mist.backendAddController.newBackendOpenStackTenant")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n        </div>\n\n        <!--\n\n            OPENSTACK\n\n        -->\n\n        <div id=\"openstack-bundle\" data-theme=\"a\">\n            <label for=\"new-backend-openstack-url\">4. Auth URL:</label>\n            ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -1421,7 +1427,7 @@ function program16(depth0,data) {
   data.buffer.push("</h2>\n            <ul data-role=\"listview\" data-theme=\"a\">\n                ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.images", {hash:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.images.content", {hash:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            </ul>\n        </div>\n\n        <!-- Select Size -->\n\n        <label>4. Size:</label>\n        <div id=\"create-machine-size\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h2>");
   hashTypes = {};
@@ -1430,7 +1436,7 @@ function program16(depth0,data) {
   data.buffer.push("</h2>\n            <ul data-role=\"listview\" data-theme=\"a\">\n                ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.sizes", {hash:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.sizes.content", {hash:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            </ul>\n        </div>\n\n        <!-- Select Location -->\n\n        <label>5. Location:</label>\n        <div id=\"create-machine-location\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h2>");
   hashTypes = {};
@@ -1439,7 +1445,7 @@ function program16(depth0,data) {
   data.buffer.push("</h2>\n            <ul data-role=\"listview\" data-theme=\"a\">\n                ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.locations", {hash:{},inverse:self.noop,fn:self.program(12, program12, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.locations.content", {hash:{},inverse:self.noop,fn:self.program(12, program12, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            </ul>\n        </div>\n\n        <!-- Select Key -->\n\n        <label>6. Key:</label>\n        <div id=\"create-machine-key\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h2>");
   hashTypes = {};
@@ -1917,10 +1923,17 @@ function program51(depth0,data) {
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
-    'class': (":single-view-icon-wrapper image.type")
+    'class': (":single-view-icon-wrapper")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push(">\n            <span id=\"single-view-image-icon\"></span>\n        </span>\n\n        <h1 ");
+  data.buffer.push(">\n            <span id=\"single-view-image-icon\"\n                ");
+  hashContexts = {'class': depth0};
+  hashTypes = {'class': "STRING"};
+  options = {hash:{
+    'class': ("view.imageIconClass")
+  },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
+  data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
+  data.buffer.push(">\n            </span>\n        </span>\n\n        <h1 ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
@@ -2261,7 +2274,7 @@ function program1(depth0,data) {
   data.buffer.push("\n                ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers.each.call(depth0, "machines", {hash:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers.each.call(depth0, "machines.content", {hash:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            ");
   return buffer;
@@ -2307,16 +2320,16 @@ function program4(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "createClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Create</a>\n          \n        <a id=\"select-machines-btn\"\n           class=\"responsive-button\"\n           data-role=\"button\"\n           data-icon=\"arrow-d\"\n           ");
+  data.buffer.push(">Create</a>\n\n        <a id=\"select-machines-btn\"\n           class=\"responsive-button\"\n           data-role=\"button\"\n           data-icon=\"arrow-d\"\n           ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "selectClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Select</a>\n\n        <ul id=\"machines\" \n            data-role=\"listview\" \n            data-inset=\"true\" \n            data-filter=\"true\" \n            data-filter-placeholder=\"Filter...\"\n            data-theme=\"c\"\n            class=\"checkbox-list\">\n            ");
+  data.buffer.push(">Select</a>\n\n        <ul id=\"machines\"\n            data-role=\"listview\"\n            data-inset=\"true\"\n            data-filter=\"true\"\n            data-filter-placeholder=\"Filter...\"\n            data-theme=\"c\"\n            class=\"checkbox-list\">\n            ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers.each.call(depth0, "Mist.backendsController", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    ");
   hashTypes = {};
@@ -3378,7 +3391,7 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   
-  data.buffer.push("\n        <img class=\"gravatar-image\" src=\"resources/images/user.png\" />\n\n    ");
+  data.buffer.push("\n        <div class=\"gravatar-image user\"></div>\n    ");
   }
 
 function program5(depth0,data) {
@@ -3475,4 +3488,6 @@ function program9(depth0,data) {
   return buffer;
   
 });
+    callback();
+  }
 });

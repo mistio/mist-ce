@@ -497,6 +497,8 @@ def connect_provider(backend):
     if backend.provider != 'bare_metal':
         driver = get_driver(backend.provider)
     if backend.provider == Provider.OPENSTACK:
+        #keep this for backend compatibility, however we now use HPCLOUD
+        #as separate provider
         if 'hpcloudsvc' in backend.apiurl:
             conn = driver(
                 backend.apikey,
@@ -517,6 +519,9 @@ def connect_provider(backend):
                 ex_force_service_region=backend.region,
                 ex_force_base_url=backend.compute_endpoint,
             )
+    elif backend.provider == Provider.HPCLOUD:
+        conn = driver(backend.apikey, backend.apisecret, backend.tenant_name,
+                      region=backend.region)
     elif backend.provider == Provider.LINODE:
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
@@ -725,6 +730,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key, script, machine_name,
                                         image, size, location)
+    elif conn.type is Provider.HPCLOUD:
+        node = _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
+                                        image, size, location)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
         for loc in locations:
@@ -853,6 +861,50 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
 
+def _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
+                             image, size, location):
+    """Create a machine in HP Cloud.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = SSHKeyDeployment(str(public_key))
+    deploy_script = ScriptDeployment(script)
+    msd = MultiStepDeployment([key, deploy_script])
+    key = str(public_key).replace('\n','')
+
+    try:
+        server_key = ''
+        keys = conn.ex_list_keypairs()
+        for k in keys:
+            if key == k.public_key:
+                server_key = k.name
+                break
+        if not server_key:
+            server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
+            server_key = server_key.name
+    except:
+        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
+        server_key = server_key.name
+
+    #FIXME: Neutron API not currently supported by libcloud
+    #need to pass the network on create node - can only omitted if one network only exists
+
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.create_node(name=machine_name,
+                image=image,
+                size=size,
+                location=location,
+                ssh_key=tmp_key_path,
+                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                max_tries=1,
+                ex_keyname=server_key)
+        except Exception as e:
+            raise MachineCreationError("HP Cloud, got exception %s" % e)
+    return node
+
 
 def _create_machine_ec2(conn, key_name, private_key, public_key, script,
                        machine_name, image, size, location):
@@ -970,7 +1022,7 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                 console_key=console_key,
                 ssh_key=tmp_key_path,
                 connect_attempts=20,
-                nowait=True,
+                ex_wait=True,
                 deploy=deploy_script
             )
         except Exception as e:
@@ -987,9 +1039,22 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
 
     """
 
-    key = SSHKeyDeployment(public_key)
-    deploy_script = ScriptDeployment(script)
-    msd = MultiStepDeployment([key, deploy_script])
+    key = str(public_key).replace('\n','')
+    try:
+        server_key = ''
+        keys = conn.list_key_pairs()
+        for k in keys:
+            if key == k.key:
+                server_key = k.id
+                break
+        if not server_key:
+            server_key = conn.create_key_pair(machine_name, key)
+            server_key = server_key.id
+    except:
+        server_key = conn.create_key_pair('mistio'+str(random.randint(1,100000)), key)
+        server_key = server_key.id
+
+
     if '.' in machine_name:
         domain = '.'.join(machine_name.split('.')[1:])
         name = machine_name.split('.')[0]
@@ -1005,7 +1070,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
                 image=image,
                 size=size,
                 location=location,
-                ssh_key=tmp_key_path
+                sshKeys=server_key
             )
         except Exception as e:
             raise MachineCreationError("Softlayer, got exception %s" % e)
@@ -1081,8 +1146,10 @@ def _create_machine_gce(conn, key_name, private_key, public_key,
     """
     key = public_key.replace('\n', '')
 
-    metadata = {'items': [{'key': 'startup-script', 'value': script},
-                          {'key': 'sshKeys', 'value': 'user:%s' % key}]}
+    metadata = {'startup-script': script,
+                'sshKeys': 'user:%s' % key}
+    #metadata for ssh user, ssh key and script to deploy 
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(

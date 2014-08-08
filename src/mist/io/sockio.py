@@ -22,10 +22,12 @@ try:
     from mist.core.helpers import user_from_request
     from mist.core import config
     from mist.core.methods import get_stats
+    multi_user = True
 except ImportError:
     from mist.io.helpers import user_from_request
     from mist.io import config
     from mist.io.methods import get_stats
+    multi_user = False
 
 from mist.io.helpers import amqp_subscribe_user
 from mist.io.helpers import amqp_log
@@ -73,6 +75,12 @@ class ShellNamespace(BaseNamespace):
                 self.emit('shell_data', data)
         finally:
             self.channel.close()
+
+    def disconnect(silent=False):
+        if multi_user:
+            # reload the session, to avoid saving a stale or deleted session
+            self.request.environ['beaker.session'].load()
+        return super(ShellNamespace, self).disconnect(silent=silent)
 
 
 class MistNamespace(BaseNamespace):
@@ -138,11 +146,18 @@ class MistNamespace(BaseNamespace):
             self.emit(routing_key, msg.body)
             if routing_key == 'probe':
                 log.warn('send probe')
-                
+
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = msg.body['machines']
                 backend_id = msg.body['backend_id']
+                # update backend machine count in multi-user setups
+                try:
+                    if multi_user and len(machines) != self.user.backends[backend_id].machine_count:
+                        tasks.update_machine_count.delay(self.user.email, backend_id, len(machines))
+                        log.info('Updated machine count for user %s' % self.user.email)
+                except Exception as e:
+                    log.error('Cannot update machine count for user %s: %r' % (self.user.email, e))
                 for machine in machines:
                     bmid = (backend_id, machine['id'])
                     if bmid in self.running_machines:
@@ -184,6 +199,12 @@ class MistNamespace(BaseNamespace):
                 self.monitoring_greenlet.kill()
                 self.monitoring_greenlet = self.spawn(check_monitoring_from_socket,
                                                       self)
+
+    def disconnect(silent=False):
+        if multi_user:
+            # reload the session, to avoid saving a stale or deleted session
+            self.request.environ['beaker.session'].load()
+        return super(MistNamespace, self).disconnect(silent=silent)
 
 
 def update_subscriber(namespace):

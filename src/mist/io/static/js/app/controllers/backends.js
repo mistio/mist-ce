@@ -45,9 +45,6 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             load: function (backends) {
                 this._updateContent(backends);
                 this.set('loading', false);
-                // <TODO (gtsop): Move this into app.js
-                $('#splash').fadeOut(650);
-                // />
             },
 
 
@@ -63,6 +60,9 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                                  region, tenant, computeEndpoint, dockerUrl,
                                  port, key, callback) {
             // />
+
+                key = Mist.keysController.keyExists(key) ? key : null;
+
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
@@ -80,7 +80,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                     'machine_ip'  : apiKey,    // For bare-metal
                     'machine_user': apiSecret  // For bare-metal
                 }).success(function(backend) {
-                    //that._addBackend(backend, key);
+                    that._addBackend(backend, key);
                 }).error(function(message) {
                     Mist.notificationController.notify('Failed to add backend: ' + message);
                 }).complete(function(success, backend) {
@@ -278,14 +278,16 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             _addBackend: function(backend, keyId) {
                 Ember.run(this, function() {
                     var backendModel = Backend.create(backend);
-                    this.content.pushObject(backendModel);
+                    this.content.addObject(backendModel);
                     // <TODO (gtsop): move this code into backend model
-                    backendModel.one('onMachineListChange', function() {
-                        if (backendModel.provider == 'bare_metal') {
-                            backendModel.set('isBareMetal', true);
-                            Mist.keysController._associateKey(keyId, backendModel.machines.content[0]);
-                        }
-                    });
+                    if (keyId)
+                        backendModel.one('onMachineListChange', function() {
+                            if (backendModel.provider == 'bare_metal') {
+                                backendModel.set('isBareMetal', true);
+                                Mist.keysController._associateKey(keyId,
+                                    backendModel.machines.content[0]);
+                            }
+                        });
                     // />
                     this.trigger('onBackendAdd');
                 });

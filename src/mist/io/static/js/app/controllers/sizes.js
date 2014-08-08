@@ -92,7 +92,7 @@ define('app/controllers/sizes', ['app/models/size'],
 
             _addSize: function (size) {
                 Ember.run(this, function () {
-                    this.content.pushObject(Size.create(size));
+                    this.content.addObject(Size.create(size));
                     this.trigger('onSizeAdd');
                 });
             },

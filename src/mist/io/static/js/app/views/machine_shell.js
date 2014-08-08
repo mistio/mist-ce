@@ -1,10 +1,10 @@
-define('app/views/machine_shell', ['app/views/popup', 'ember'],
+define('app/views/machine_shell', ['app/views/popup', 'term'],
     //
     //  Machine Shell View
     //
     //  @returns Class
     //
-    function(PopupView) {
+    function (PopupView, Term) {
 
         'use strict';
 
