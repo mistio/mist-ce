@@ -1,77 +1,109 @@
 define('app/controllers/backend_edit', ['ember'],
-    /**
-     *  Backend Edit Controller
-     *
-     *  @returns Class
-     */
-    function() {
+    //
+    //  Backend Edit Controller
+    //
+    //  @returns Class
+    //
+    function () {
+
+        'use strict';
+
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             backend: null,
-            callback: null,
-            newBackendTitle: null,
+            newTitle: null,
+            newState: null,
 
 
-            /**
-             * 
-             *  Methods
-             * 
-             */
+            //
+            //
+            //  Methods
+            //
+            //
 
-            open: function(backend, callback) {
-                this.set('backend', backend);
-                this.set('callback', callback);
-                this.set('newBackendTitle', backend.title);
-                $('#monitoring-message').hide();
-                $('#backend-delete-confirm').hide();
-                $('#backend-toggle option[value=1]')[0].selected = backend.enabled;
-                $('#backend-toggle').slider('refresh');
-                $('#edit-backend-popup').popup('open', {transition: 'pop'});
+
+            open: function (backend) {
+                this._clear();
+                this.setProperties({
+                    backend: backend,
+                    newTitle: backend.title,
+                    newState: backend.state,
+                });
+                this.view.open();
             },
 
 
-            close: function() {
-                
+            close: function () {
+                this._clear();
+                this.view.close();
             },
 
 
-            _clear: function() {
-                this.set('backend', null);
-                this.set('callback', null);
-                this.set('newBackendTitle', null);
+            rename: function () {
+                if (this.newTitle == this.backend.title) return;
+                Mist.backendsController.renameBackend({
+                    backend: this.backend,
+                    newTitle: this.newTitle,
+                });
             },
 
 
-            rename: function() {
-                if (! this.newBackendTitle) return;
-                Mist.backendsController.renameBackend(this.backend.id, this.newBackendTitle, this.callback);
+            toggle: function (callback) {
+                if (this.newState == this.backend.state) return;
+                Mist.backendsController.toggleBackend({
+                    backend: this.backend,
+                    newState: this.newState
+                });
             },
 
 
-            deleteBackend: function(callback) {
-                Mist.backendsController.deleteBackend(this.backend.id, callback);
+            delete: function () {
+                Mist.backendsController.deleteBackend({
+                    backend: this.backend,
+                    callback: this.close,
+                });
             },
 
 
-            toggleBackend: function(callback) {
-                var newState = $('#backend-toggle').val() == '1' ? true : false;
-                Mist.backendsController.toggleBackend(this.backend.id, newState, callback);
+            //
+            //
+            //  Pseudo-Private Methods
+            //
+            //
+
+
+            _clear: function () {
+                this.setProperties({
+                    backend: null,
+                    newTitle: null,
+                    newState: null,
+                })
             },
 
 
-            /**
-             *  
-             *  Observers
-             * 
-             */
+            //
+            //
+            //  Observers
+            //
+            //
 
-            backendTitleOBserver: function() {
+
+            newTitleObserver: function () {
                 Ember.run.once(this, 'rename');
-            }.observes('newBackendTitle'),
+            }.observes('newTitle'),
+
+
+            newStateObserver: function () {
+                Ember.run.once(this, 'toggle');
+            }.observes('newState'),
         });
     }
 );
