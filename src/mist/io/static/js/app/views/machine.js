@@ -210,6 +210,14 @@ define('app/views/machine', ['app/views/mistscreen'],
             },
 
 
+            renderMetadata: function () {
+                Ember.run.next(function() {
+                    if ($('#single-machine-metadata').collapsible)
+                        $('#single-machine-metadata').collapsible();
+                });
+            },
+
+
             //
             //
             //  Actions
@@ -426,40 +434,40 @@ define('app/views/machine', ['app/views/mistscreen'],
                 }
 
                 var ret = [];
-                for (var item in basicInfo) {
-                    if (typeof basicInfo[item] == 'string') {
-                        ret.push({key:item, value: basicInfo[item]});
-                    }
-                }
+                forIn(basicInfo, function (value, key) {
+                    if (typeof value == 'string')
+                        ret.push({key:key, value: value});
+                });
+
+                sortInfo(ret);
                 return ret;
+
             }.property('machine', 'machine.public_ips', 'machine.private_ips'),
 
 
             metadata: function() {
+
                 if (!this.machine || !this.machine.extra) return;
+
                 var ret = [];
-
-                for (var item in this.machine.extra) {
-                    var value = this.machine.extra[item];
-                    if (typeof value == 'string' || typeof value == 'number') {
-                        ret.push({key:item, value: value});
-                    }
-                }
-
-                Ember.run.next(function() {
-                    if ($('#single-machine-metadata').collapsible) {
-                        $('#single-machine-metadata').collapsible();
-                    }
+                forIn(this.machine.extra, function (value, key) {
+                    if (typeof value == 'string' || typeof value == 'number')
+                        ret.push({key:key, value: value});
                 });
+
+                this.renderMetadata();
+                sortInfo(ret);
                 return ret;
 
             }.property('machine', 'machine.extra'),
+
 
             //
             //
             //  Observers
             //
             //
+
 
             modelObserver: function() {
                 Ember.run.once(this, 'load');
@@ -487,5 +495,13 @@ define('app/views/machine', ['app/views/mistscreen'],
                 Ember.run.once(this, 'updateMonitoringCollapsible');
             }.observes('Mist.backendsController.checkedMonitoring', 'machine')
         });
+
+        function sortInfo (array) {
+            array.sort(function (a, b) {
+                if (a.key > b.key) return 1;
+                if (b.key < a.key) return -1;
+                return 0;
+            });
+        }
     }
 );
