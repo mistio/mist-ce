@@ -34,7 +34,7 @@ define('app/views/backend_button', ['app/views/templated'],
             }.on('didInsertElement'),
 
 
-            unload: function() {
+            unload: function () {
                 this.renderBackends();
             }.on('willDestroyElement'),
 
@@ -47,7 +47,7 @@ define('app/views/backend_button', ['app/views/templated'],
 
 
             renderBackends: function () {
-                Ember.run.next(function() {
+                Ember.run.next(function () {
                     if ($('#backend-buttons').controlgroup)
                         $('#backend-buttons').controlgroup('refresh');
                 });
@@ -63,7 +63,7 @@ define('app/views/backend_button', ['app/views/templated'],
 
             actions: {
 
-                buttonClicked: function() {
+                buttonClicked: function () {
                     $('#edit-backend-popup').popup('option',
                         'positionTo', '#' + this.elementId);
                     Mist.backendEditController.open(this.backend);
@@ -78,7 +78,7 @@ define('app/views/backend_button', ['app/views/templated'],
             //
 
 
-            stateObserver: function() {
+            stateObserver: function () {
 
                 var btn = $('#' + this.elementId + ' a');
                 btn.addClass('ui-btn-icon-left')
