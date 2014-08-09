@@ -42,6 +42,7 @@ define('app/models/rule', ['ember'],
                 this.setProperties({
                     // Rename action attribute because it conflicts with
                     // handlebar's templating "action" keyword
+                    value: data.value,
                     actionToTake: data.action,
                     timeWindow: data.reminder_offset,
                     operator: Mist.rulesController.getOperatorByTitle(data.operator),
