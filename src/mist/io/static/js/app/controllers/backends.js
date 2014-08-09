@@ -55,37 +55,34 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             //
 
 
-            // <TODO (gtsop): THIS IS UGLY! use an args object instead
-            addBackend: function (title, provider, apiKey, apiSecret, apiUrl,
-                                 region, tenant, computeEndpoint, dockerUrl,
-                                 port, key, callback) {
-            // />
+            addBackend: function (args) {
 
-                key = Mist.keysController.keyExists(key) ? key : null;
+                var key = Mist.keysController.keyExists(args.key) ? args.key : null;
 
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
-                    'title'       : title,
-                    'provider'    : provider,
-                    'apikey'      : apiKey,
-                    'apisecret'   : apiSecret,
-                    'apiurl'      : apiUrl || dockerUrl,
-                    'tenant_name' : tenant,
-                    'region'      : region,
+                    'title'       : args.title,
+                    'provider'    : args.provider,
+                    'apikey'      : args.APIKey,
+                    'apisecret'   : args.APISecret,
+                    'apiurl'      : args.APIURL || args.dockerURL,
+                    'tenant_name' : args.tenant,
+                    'region'      : args.region,
                     'machine_key' : key,
-                    'compute_endpoint' : computeEndpoint,
-                    'docker_port' : port,
-                    'machine_port': port,      // For bare-metal
-                    'machine_ip'  : apiKey,    // For bare-metal
-                    'machine_user': apiSecret  // For bare-metal
-                }).success(function(backend) {
+                    'compute_endpoint' : args.computeEndpoint,
+                    'docker_port' : args.port,
+                    'machine_port': args.port,      // For bare-metal
+                    'machine_ip'  : args.APIKey,    // For bare-metal
+                    'machine_user': args.APISecret  // For bare-metal
+                }).success(function (backend) {
                     that._addBackend(backend, key);
-                }).error(function(message) {
-                    Mist.notificationController.notify('Failed to add backend: ' + message);
-                }).complete(function(success, backend) {
+                }).error(function (message) {
+                    Mist.notificationController.notify(
+                        'Failed to add backend: ' + message);
+                }).complete(function (success, backend) {
                     that.set('addingBackend', false);
-                    if (callback) callback(success, backend);
+                    if (args.callback) args.callback(success, backend);
                 });
             },
 

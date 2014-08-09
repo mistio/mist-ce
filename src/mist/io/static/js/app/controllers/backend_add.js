@@ -58,27 +58,29 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
 
             add: function () {
+
                 var that = this;
                 var projectName = this.newBackendOpenStackTenant || this.newBackendProjectName;
-                Mist.backendsController.addBackend(
-                    this.newBackendProvider.title,
-                    this.newBackendProvider.provider,
-                    this.newBackendFirstField,
-                    this.newBackendSecondField,
-                    this.newBackendOpenStackURL,
-                    this.newBackendOpenStackRegion,
-                    projectName,
-                    this.newBackendOpenStackComputeEndpoint,
-                    this.newBackendDockerURL,
-                    this.newBackendPort,
-                    this.newBackendKey.id,
-                    function (success, backend) {
+
+                Mist.backendsController.addBackend({
+
+                    APIKey: this.newBackendFirstField,
+                    APISecret: this.newBackendSecondField,
+                    title: this.newBackendProvider.title,
+                    provider: this.newBackendProvider.provider,
+                    APIURL: this.newBackendOpenStackURL,
+                    region: this.newBackendOpenStackRegion,
+                    tenant: projectName,
+                    computeEndpont: this.newBackendOpenStackComputeEndpoint,
+                    dockerURL: this.newBackendDockerURL,
+                    port: this.newBackendPort,
+                    key: this.newBackendKey.id,
+
+                    callback: function (success, backend) {
                         that._giveCallback(success, backend);
-                        if (success) {
-                            that.close();
-                        }
+                        if (success) that.close();
                     }
-                );
+                });
             },
 
 
