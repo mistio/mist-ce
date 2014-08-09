@@ -1,35 +1,26 @@
-define('app/views/home', ['app/views/mistscreen', 'ember'],
-    /**
-     *  Home View
-     *
-     *  @returns Class
-     */
-    function(MistScreen) {
+define('app/views/home', ['app/views/mistscreen'],
+    //
+    //  Home View
+    //
+    //  @returns Class
+    //
+    function (MistScreen) {
+
+        'use strict';
+
         return MistScreen.extend({
 
-            /**
-             * 
-             *  Initialization
-             * 
-             */
-            
-            load: function() {
-                Ember.run.next(function() {
-                    document.title = 'mist.io - home';
-                });
-            }.on('didInsertElement'),
 
+            //
+            //
+            //  Actions
+            //
+            //
 
-            /**
-             * 
-             *  Actions
-             * 
-             */
 
             actions: {
 
-
-                addBackend: function() {
+                addBackend: function () {
                     Mist.backendAddController.open();
                 }
             }
