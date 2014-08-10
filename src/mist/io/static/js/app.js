@@ -742,8 +742,6 @@ var loadImages = function (callback) {
         'resources/images/sprite-build/icon-sprite.png',
         'resources/images/ajax-loader.gif',
         'resources/images/spinner.gif',
-        'resources/images/staroff.png',
-        'resources/images/staron.png',
     ];
     var remaining = images.length;
 
