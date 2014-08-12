@@ -1,21 +1,27 @@
 
 /* Key Add View
 -----------------------------------------------------------------------------------------------------------*/
-#add-key-upload {
+
+#key-add-upload {
     display: none;
 }
-#add-key-popup .add-key-loader {
+
+#key-add-popup .key-add-loader {
     display: inline;
     float: right;
 }
-#add-key-popup-screen {
+
+#key-add-popup-screen {
     height: 100%;
     position: fixed;
     top: 0;
 }
-.generate-upload button {
+
+#key-add-popup .generate-upload a {
     width: 69px !important;
+    overflow: visible;
 }
-#add-key-popup textarea {
+
+#key-add-popup textarea {
 	height: 75px !important;
 }

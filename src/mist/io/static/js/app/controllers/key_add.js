@@ -1,124 +1,152 @@
 define('app/controllers/key_add', ['ember'],
-    /**
-     *  Key Add Controller
-     *
-     *  @returns Class
-     */
+    //
+    //  Key Add Controller
+    //
+    //  @returns Class
+    //
     function () {
+
+        'use strict';
+
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
 
-            newKeyId: null,
+            //
+            //
+            //  Properties
+            //
+            //
+
+
+            view: null,
             callback: null,
             formReady: null,
+
+            keyId: null,
+            keyPrivate: null,
+
+            addingKey: null,
             uploadingKey: null,
-            newKeyPrivate: null,
+            generatingKey: null,
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //
+            //  Methods
+            //
+            //
+
 
             open: function (callback) {
-                $('#add-key-popup').popup('open');
                 this._clear();
-                this._updateFormReady();
+                this.view.open();
                 this.set('callback', callback);
             },
 
 
             close: function () {
-                $('#add-key-popup').popup('close');
                 this._clear();
+                this.view.close();
             },
 
 
             add: function () {
-
-                if (Mist.keysController.keyExists(this.newKeyId)) {
-                    Mist.notificationController.notify('Key name exists already');
-                    this._giveCallback(false);
-                    return;
-                }
-
-                var that = this;
-                Mist.keysController.addKey(this.newKeyId, this.newKeyPrivate,
-                    function (success, newKeyId) {
-                        that._giveCallback(success, newKeyId);
-                        if (success)
-                            that.close();
-                    }
-                );
+                this.set('addingKey', true);
+                Mist.keysController.addKey({
+                    keyId: this.keyId,
+                    keyPrivate: this.keyPrivate,
+                    callback: this._add,
+                });
             },
 
 
-            uploadKey: function (file) {
-
-                var that = this;
-                var reader = new FileReader();
-
-                reader.onloadend = function (e) {
-
-                    if (e.target.readyState == FileReader.DONE) {
-                        that.set('newKeyPrivate', e.target.result);
-                    } else {
-                        Mist.notificationsController.notify('Failed to upload file');
-                    }
-
-                    that.set('uploadingKey', false);
-                };
-
+            upload: function () {
                 this.set('uploadingKey', true);
-                reader.readAsText(file, 'UTF-8');
+                Mist.fileUploadController.uploadFile({
+                    file: this.view.fileInput[0].files[0],
+                    callback: this._upload
+                });
             },
 
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
+            generate: function () {
+                this.set('generatingKey', true);
+                Mist.keysController.generateKey({
+                    callback: this._generate
+                });
+            },
+
+
+            //
+            //
+            //  Pseudo-Private Methods
+            //
+            //
+
 
             _clear: function () {
-                this.set('callback', null)
-                    .set('newKeyId', null)
-                    .set('formReady', null)
-                    .set('newKeyPrivate', null);
+                this.setProperties({
+                    callback: null,
+                    keyId: null,
+                    keyPrivate: null,
+                });
             },
 
 
-            _giveCallback: function (success, newKeyId) {
-                if (this.callback) this.callback(success, newKeyId);
+            _add: function (success, key) {
+                var that = Mist.keyAddController;
+                that.set('addingKey', false);
+                if (that.callback)
+                    that.callback(success, key);
+                if (success)
+                    that.close();
+            },
+
+
+            _upload: function (success, keyPrivate) {
+                var that = Mist.keyAddController;
+                that.set('uploadingKey', false);
+                if (success)
+                    that.set('keyPrivate', keyPrivate);
+            },
+
+
+            _generate: function (success, keyPrivate) {
+                var that = Mist.keyAddController;
+                that.set('generatingKey', false);
+                if (success)
+                    that.set('keyPrivate', keyPrivate);
+            },
+
+
+            _sanitizeFields: function () {
+
+                // Remove non alphanumeric chars
+                if (this.keyId)
+                    this.set('keyId', this.keyId.replace(/\W/g, ''));
+
+                // Remove extra spaces and new lines
+                if (this.keyPrivate)
+                    this.set('keyPrivate', this.keyPrivate.trim());
             },
 
 
             _updateFormReady: function () {
-                if (this.newKeyId) {
-                    // Remove non alphanumeric chars from key id
-                    this.set('newKeyId', this.newKeyId.replace(/\W/g, ''));
-                }
-                if (this.newKeyPrivate) {
-                    this.set('newKeyPrivate', this.newKeyPrivate.trim());
-                }
-
-                this.set('formReady', !!this.newKeyId && !!this.newKeyPrivate);
+                this.set('formReady', this.keyId && this.keyPrivate);
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //
+            //  Observers
+            //
+            //
+
 
             formObserver: function () {
+                Ember.run.once(this, '_sanitizeFields');
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newKeyId', 'newKeyPrivate'),
+            }.observes('keyId', 'keyPrivate'),
         });
     }
 );

@@ -1,41 +1,87 @@
-<div id="edit-backend-popup" 
-     class="mid-popup" 
-     data-role="popup" 
-     data-theme="a" 
-     data-overlay-theme="b"
-     data-transition="pop">
+<!-- Popup Overlay -->
 
-    <div data-role="header" data-theme="b">
-        <h1>Edit backend</h1>
-    </div>
+<div id="backend-edit-screen"
+    class="ui-popup-screen
+        ui-overlay-b
+        ui-screen-hidden">
+</div>
 
-    <div data-role="content" data-theme="a">
+<!-- Popup Wrapper -->
+<div id="backend-edit-popup"
+     class="pop
+        ui-popup-container
+        ui-popup-hidden
+        ui-popup-truncate">
 
-        {{view Mist.TextField valueBinding="Mist.backendEditController.newBackendTitle"}}
+    <!-- Popup -->
 
-        <div data-role="fieldcontain">
-            <select id="backend-toggle" data-role="slider" {{action "stateToggleSwitched" target="view" on="change"}}>
-                <option value="0">Disabled</option>
-                <option value="1">Enabled</option>
-            </select>
-            <span class="state">{{Mist.backendEditController.backend.state}}</span>
+    <div id="backend-edit"
+         class="mid-popup
+            ui-popup
+            ui-body-a
+            ui-overlay-shadow
+            ui-corner-all"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip">
+
+         <!-- Header -->
+
+        <div class="ui-header ui-bar-b">
+
+            <h1 class="ui-title">Edit backend</h1>
+
         </div>
 
-        <input type="button" value="Delete" {{action "deleteClicked" target="view" on="click"}} />
+        <!-- Body -->
 
-        <div id="backend-delete-confirm">
-            <label>Confirm backend removal?</label>
-            <label id="monitoring-message">There are monitored machines.<br />Monitoring for these will be disabled</label>
-            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                <a data-role="button" id="button-confirm-disable" {{action "yesClicked" target="view"}}>Yes</a>
-                <a data-role="button" data-theme="d" {{action "noClicked" target="view"}}>No</a>
+        <div role="main" class="ui-content" data-theme="a">
+
+            <!-- New backend title text field -->
+
+            {{view Mist.TextField valueBinding="Mist.backendEditController.newTitle"}}
+
+            <!-- Backend state toggle switch -->
+
+            <div data-role="fieldcontain">
+                <select id="backend-toggle" data-role="slider"
+                    {{action "stateToggleSwitched" target="view" on="change"}}>
+                        <option value="0">Disabled</option>
+                        <option value="1">Enabled</option>
+                </select>
+                <span class="state">{{Mist.backendEditController.backend.state}}</span>
             </div>
+
+            <!-- Delete button -->
+
+            <a class="ui-btn ui-shadow ui-corner-all"
+                {{action "deleteClicked" target="view" on="click"}}>
+                Delete
+            </a>
+
+            <!-- Delete confirmation -->
+
+            <div id="backend-delete-confirm">
+                <label>Confirm backend removal?</label>
+                <label id="monitoring-message">There are monitored machines.
+                    <br />Monitoring for these will be disabled
+                </label>
+                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                    <a class="ui-btn ui-shadow ui-corner-all" id="button-confirm-disable"
+                        {{action "yesClicked" target="view"}}>Yes</a>
+                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+                        {{action "noClicked" target="view"}}>No</a>
+                </div>
+            </div>
+
+            {{#if Mist.backendsController.deletingBackend}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+
+            <!-- Back button -->
+
+            <a class="ui-btn ui-shadow ui-corner-all button-back"
+                {{action "backClicked" target="view"}}>Back</a>
         </div>
-
-        {{#if Mist.backendsController.deletingBackend}}
-        <div class="ajax-loader"></div>
-        {{/if}}
-
-        <a href="#" data-role="button" class="button-back" {{action "backClicked" target="view"}}>Back</a>
     </div>
 </div>

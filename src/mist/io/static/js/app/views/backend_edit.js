@@ -1,89 +1,86 @@
-define('app/views/backend_edit', ['app/views/templated', 'ember'],
-    /**
-     *  Backend Edit View
-     * 
-     *  @returns Class
-     */
-    function(TemplatedView) {
-        return TemplatedView.extend({
+define('app/views/backend_edit', ['app/views/popup'],
+    //
+    //  Backend Edit View
+    //
+    //  @returns Class
+    //
+    function (PopupView) {
 
-            /**
-             * 
-             *  Methods
-             * 
-             */
+        'use strict';
 
-            updateEnabledState: function() {
-                if ($('#backend-toggle').slider) {
-                    if (Mist.backendEditController.backend) {
-                        var currentValue = $('#backend-toggle').val();
-                        var newValue = Mist.backendEditController.backend.enabled ? '1' : '0';
-                        if (currentValue != newValue) {
-                            $('#backend-toggle').val(newValue).slider('refresh');
-                        }
-                    }
-                }
+        return PopupView.extend({
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            open: function () {
+                this._super();
+                $('#monitoring-message').hide();
+                $('#backend-delete-confirm').hide();
             },
 
 
-            /**
-             * 
-             *  Observers
-             * 
-             */
-
-            stateObserver: function() {
-                Ember.run.once(this, 'updateEnabledState');
-            }.observes('Mist.backendsController.togglingBackend', 'Mist.backendEditController.backend.state'),
+            updateStateSlider: function () {
+                var newState = Mist.backendEditController.newState ? '1' : '0';
+                $('#backend-toggle').val(newState).slider('refresh');
+            },
 
 
+            //
+            //
+            //  Actions
+            //
+            //
 
-            /**
-             * 
-             *  Actions
-             * 
-             */
 
             actions: {
 
-
-                stateToggleSwitched: function() {
-                    Mist.backendEditController.toggleBackend();
+                stateToggleSwitched: function () {
+                    var newState = parseInt($('#backend-toggle').val());
+                    Mist.backendEditController.set('newState', newState);
                 },
 
 
-                deleteClicked: function(){
-                    if (Mist.backendEditController.backend.getMonitoredMachines.length) {
+                deleteClicked: function () {
+                    if (Mist.backendEditController.backend.getMonitoredMachines.length)
                         $('#monitoring-message').show();
-                    } else {
+                    else
                         $('#monitoring-message').hide();
-                    }
                     $('#backend-delete-confirm').slideDown();
                 },
 
 
+                yesClicked: function () {
+                    Mist.backendEditController.delete();
+                },
+
+
+                noClicked: function () {
+                    $('#backend-delete-confirm').slideUp();
+                },
+
+
                 backClicked: function() {
-                    $('#backend-delete-confirm').slideUp();
-                    $('#edit-backend-popup').popup('close');
+                    Mist.backendEditController.close();
                 },
+            },
 
 
-                yesClicked: function() {
-                    $('#button-confirm-disable').addClass('ui-state-disabled');
-                    Mist.backendEditController.deleteBackend(function(success) {
-                        if (success) {
-                            $('#edit-backend-popup').popup('close');
-                            $('#backend-delete-confirm').slideUp();
-                        }
-                        $('#button-confirm-disable').removeClass('ui-state-disabled');
-                    });
-                },
+            //
+            //
+            //  Observers
+            //
+            //
 
 
-                noClicked: function() {
-                    $('#backend-delete-confirm').slideUp();
-                }
-            }
+            newStateObserver: function () {
+                Ember.run.once(this, 'updateStateSlider');
+            }.observes('Mist.backendEditController.newState')
         });
     }
 );

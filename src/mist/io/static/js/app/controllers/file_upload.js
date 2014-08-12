@@ -60,24 +60,25 @@ define('app/controllers/file_upload', ['ember'],
             },
 
 
-            uploadFile: function (file) {
+            uploadFile: function (args) {
 
                 var that = this;
                 var reader = new FileReader();
 
                 reader.onloadend = function (e) {
 
-                    if (e.target.readyState == FileReader.DONE) {
+                    if (e.target.readyState == FileReader.DONE)
                         that.set('file', e.target.result);
-                    } else {
+                    else
                         Mist.notificationsController.notify('Failed to upload file');
-                    }
-
                     that.set('uploadingFile', false);
+
+                    if (args.callback)
+                        args.callback(success, that.file);
                 };
 
                 this.set('uploadingFile', true);
-                reader.readAsText(file, 'UTF-8');
+                reader.readAsText(args.file, 'UTF-8');
             }
         });
     }

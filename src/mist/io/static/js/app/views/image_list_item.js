@@ -1,24 +1,44 @@
 define('app/views/image_list_item', ['app/views/list_item'],
-    /**
-     *  Image List Item View
-     *
-     *  @returns Class
-     */
+    //
+    //  Image List Item View
+    //
+    //  @returns Class
+    //
     function (ListItemView) {
+
+        'use strict';
+
         return ListItemView.extend({
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             image: null,
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //
+            //  Computed Properties
+            //
+            //
+
+
+            starClass: function () {
+                return this.image.star ? 'staron' : 'staroff';
+            }.property('image.star'),
+
+
+            //
+            //
+            //  Actions
+            //
+            //
+
 
             actions: {
 
