@@ -4,11 +4,15 @@
 #backend-buttons {
     display: block;
 }
-#backend-buttons .ui-controlgroup-controls .ui-btn a {
-    padding: 10px 10px 10px 40px !important;
+#backend-buttons .ui-controlgroup-controls a {
+    padding: 13px 10px 10px 40px !important;
     color: black;
     position: relative;
-    top: 1px;
+}
+@-moz-document url-prefix() {
+    #backend-buttons .ui-controlgroup-controls a  {
+        top: 1px;
+    }
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn {
     padding: 10px 0 9px !important;
