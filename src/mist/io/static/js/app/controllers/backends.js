@@ -55,85 +55,84 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             //
 
 
-            // <TODO (gtsop): THIS IS UGLY! use an args object instead
-            addBackend: function (title, provider, apiKey, apiSecret, apiUrl,
-                                 region, tenant, computeEndpoint, dockerUrl,
-                                 port, key, callback) {
-            // />
+            addBackend: function (args) {
 
-                key = Mist.keysController.keyExists(key) ? key : null;
+                var key = Mist.keysController.keyExists(args.key) ? args.key : null;
 
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
-                    'title'       : title,
-                    'provider'    : provider,
-                    'apikey'      : apiKey,
-                    'apisecret'   : apiSecret,
-                    'apiurl'      : apiUrl || dockerUrl,
-                    'tenant_name' : tenant,
-                    'region'      : region,
+                    'title'       : args.title,
+                    'provider'    : args.provider,
+                    'apikey'      : args.APIKey,
+                    'apisecret'   : args.APISecret,
+                    'apiurl'      : args.APIURL || args.dockerURL,
+                    'tenant_name' : args.tenant,
+                    'region'      : args.region,
                     'machine_key' : key,
-                    'compute_endpoint' : computeEndpoint,
-                    'docker_port' : port,
-                    'machine_port': port,      // For bare-metal
-                    'machine_ip'  : apiKey,    // For bare-metal
-                    'machine_user': apiSecret  // For bare-metal
-                }).success(function(backend) {
+                    'compute_endpoint' : args.computeEndpoint,
+                    'docker_port' : args.port,
+                    'machine_port': args.port,      // For bare-metal
+                    'machine_ip'  : args.APIKey,    // For bare-metal
+                    'machine_user': args.APISecret  // For bare-metal
+                }).success(function (backend) {
                     that._addBackend(backend, key);
-                }).error(function(message) {
-                    Mist.notificationController.notify('Failed to add backend: ' + message);
-                }).complete(function(success, backend) {
+                }).error(function (message) {
+                    Mist.notificationController.notify(
+                        'Failed to add backend: ' + message);
+                }).complete(function (success, backend) {
                     that.set('addingBackend', false);
-                    if (callback) callback(success, backend);
+                    if (args.callback) args.callback(success, backend);
                 });
             },
 
 
-            renameBackend: function(backendId, newTitle, callback) {
+            renameBackend: function (args) {
                 var that = this;
                 this.set('renamingBackend', true);
-                Mist.ajax.PUT('/backends/' + backendId, {
-                    'new_name': newTitle
-                }).success(function() {
-                    that._renameBackend(backendId, newTitle);
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to rename backend');
-                }).complete(function(success) {
+                Mist.ajax.PUT('/backends/' + args.backend.id, {
+                    'new_name': args.newTitle
+                }).success(function () {
+                    that._renameBackend(args.backend, args.newTitle);
+                }).error(function () {
+                    Mist.notificationController.notify(
+                        'Failed to rename backend');
+                }).complete(function (success) {
                     that.set('renamingBackend', false);
-                    if (callback) callback(success);
+                    if (args.callback) args.callback(success);
                 });
             },
 
 
-            deleteBackend: function(backendId, callback) {
+            deleteBackend: function(args) {
                 var that = this;
                 this.set('deletingBackend', true);
-                Mist.ajax.DELETE('/backends/' + backendId, {
+                Mist.ajax.DELETE('/backends/' + args.backend.id, {
                 }).success(function() {
-                    that._deleteBackend(backendId);
+                    that._deleteBackend(args.backend);
                 }).error(function() {
-                    Mist.notificationController.notify('Failed to delete backend');
+                    Mist.notificationController.notify(
+                        'Failed to delete backend');
                 }).complete(function(success) {
                     that.set('deletingBackend', false);
-                    if (callback) callback(success);
+                    if (args.callback) args.callback(success);
                 });
             },
 
 
-            toggleBackend: function(backendId, newState, callback) {
+            toggleBackend: function(args) {
                 var that = this;
                 this.set('togglingBackend', true);
-                Mist.ajax.POST('/backends/' + backendId, {
-                    'new_state': newState ? '1' : '0'
-                }).success(function() {
-                    that._toggleBackend(backendId, newState);
-                }).error(function() {
-                    Mist.notificationController.notify("Failed to change backend's state");
-                    that._toggleBackend(backendId, !newState);
-                }).complete(function(success) {
+                Mist.ajax.POST('/backends/' + args.backend.id, {
+                    'new_state': args.newState.toString()
+                }).success(function () {
+                    that._toggleBackend(args.backend, args.newState);
+                }).error(function () {
+                    Mist.notificationController.notify(
+                        "Failed to change backend's state");
+                }).complete(function (success) {
                     that.set('togglingBackend', false);
-                    if (callback) callback(success);
+                    if (args.callback) args.callback(success);
                 });
             },
 
@@ -294,25 +293,25 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
-            _deleteBackend: function(id) {
+            _deleteBackend: function(backend) {
                 Ember.run(this, function() {
-                    this.content.removeObject(this.getBackend(id));
+                    this.content.removeObject(backend);
                     this.trigger('onBackendDelete');
                 });
             },
 
 
-            _renameBackend: function(id, newTitle) {
+            _renameBackend: function(backend, newTitle) {
                 Ember.run(this, function() {
-                    this.getBackend(id).set('title', newTitle);
+                    backend.set('title', newTitle);
                     this.trigger('onBackendRename');
                 });
             },
 
 
-            _toggleBackend: function(id, newState) {
+            _toggleBackend: function(backend, newState) {
                 Ember.run(this, function() {
-                    this.getBackend(id).set('enabled', newState);
+                    backend.set('enabled', newState);
                     this.trigger('onBackendToggle');
                 });
             },

@@ -57,9 +57,9 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine'],
                 // dummy model will be passed to the view so
                 // that things won't brake. This model doesn't
                 // have an "id" attribute.
-                if (this.key.id) {
+                if (Mist.keysController.keyExists(this.key.id)) {
                     this.updateMachines();
-                    Ember.run.next(this, 'showPublicKey');
+                    this.showPublicKey();
                 }
             },
 
