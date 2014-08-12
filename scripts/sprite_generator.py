@@ -3,11 +3,11 @@
 #
 #   Sprite Generator
 #       This is a script that we have been using internally to support the asset
-#       to web production flow inside our company. It lets designers focus on 
+#       to web production flow inside our company. It lets designers focus on
 #       generating icon assets without worrying about how they will be used and
 #       automates the sprite and CSS file generation process.
 #
-#       It's best called from a hook to automatically generate the production 
+#       It's best called from a hook to automatically generate the production
 #       sprite when the source assets are updated.
 #
 #       (c) 2013 - frog design - dennis.schaaf@frogdesign.com
@@ -38,7 +38,7 @@ def getRootPath(path):
         return path
     # is at root
     elif (os.path.abspath(os.path.join(path, '..')) == path):
-        return None 
+        return None
     # search in parent
     else:
         return getRootPath(os.path.join(path, '..'))
@@ -61,8 +61,8 @@ if(rootPath):
 
     backgroundPrefix = config.get('generator', 'backgroundPrefix')
     findCommonRoot = config.getboolean('generator','findCommonRoot')
-    
-    inputPath = os.path.join(rootPath, *inputPathAr) 
+
+    inputPath = os.path.join(rootPath, *inputPathAr)
     outputPath = os.path.join(rootPath, *outputPathAr)
 
     outputImage = os.path.join(outputPath, "icon-sprite.png")
@@ -73,7 +73,7 @@ if(rootPath):
     print 'input: ', inputPath
     print 'output: ', outputPath
 
-else: 
+else:
     print ""
     print " *** ERROR ***"
     print ""
@@ -117,17 +117,17 @@ def getImage(fileSelector, filePath) :
     lastDot = suffix.rfind('.')
     lastColon = suffix.rfind(':')
 
-    # check if root checking is disabled, also 
+    # check if root checking is disabled, also
     # a selector with a '^' at the end does not get a root
-    # eg. .attachment_bar:after^ 
+    # eg. .attachment_bar:after^
     if findCommonRoot==False:
-        root = prefix + suffix 
+        root = prefix + suffix
         lastDot = 0
         lastColon = 0
 
     if suffix[-1] == "^" :
         suffix = suffix[:-1]
-        root = prefix + suffix 
+        root = prefix + suffix
         lastDot = 0
         lastColon = 0
 
@@ -155,16 +155,16 @@ def ProcessFile(dirname, filename, selector):
 
         if(filename.startswith(backgroundPrefix)):
             backgroundObjects.append(obj)
-        else:  
-            if rootObjects.has_key(obj['root']): 
+        else:
+            if rootObjects.has_key(obj['root']):
                 rootObjects[obj['root']].append(obj)
                 w = obj['size'][0]
                 h = obj['size'][1]
                 for ro in rootObjects[obj['root']]:
                     if(ro['size'][0] != w or ro['size'][1] != h):
-                        raise "SIZES DON'T MATCH: ", filePath
+                        raise "SIZES DON'T MATCH: ", fislePath
 
-                
+
                 global imageWidth
                 imageWidth = max(imageWidth, (w + padding) * len(rootObjects[obj['root']]))
             else :
@@ -191,10 +191,10 @@ def ProcessFolder(dirname, selector):
     for entry in entries:
         if os.path.isdir(os.path.join(dirname, entry)):
             dirnames.append(entry)
-            
+
         elif os.path.isfile(os.path.join(dirname, entry)):
             filenames.append(entry)
-            
+
     if recursiveDiscovery:
         for subdirname in dirnames:
             subdirSelector =  selector + " ." + subdirname
@@ -203,15 +203,15 @@ def ProcessFolder(dirname, selector):
             if subdirname[0] == '&':
                 subdirSelector =  selector + subdirname[1:]
 
-        
+
             ProcessFolder(subdirPath, subdirSelector)
 
     for filename in filenames:
         ProcessFile(dirname, filename, selector)
-        
 
 
-# Start processing the folder 
+
+# Start processing the folder
 ProcessFolder(inputPath, '')
 print 'Sprite Size: ' , imageWidth, ',', imageHeight
 
@@ -237,27 +237,27 @@ for root in rootObjects:
     print "Root Object:", root
     index = 0
     size = rootObjects[root][0]['size']
-    Css("%s { background-image: url('%s'); width: %spx; height: %spx; } " % (root, "icon-sprite.png", size[0], size[1]))
-    
+    Css("%s { background-image: url('%s') !important; width: %spx; height: %spx; } " % (root, "icon-sprite.png", size[0], size[1]))
+
     for obj in rootObjects[root]:
         left = index*size[0]
         Css("%s { background-position: -%spx -%spx; } \n" % (obj['selector'], left, top)  )
 
         newImage = Image.open(obj['file']);
         image.paste(newImage, (left, top))
-        
+
         index = index + 1
-        
+
     top = top + size[1]
 
 # The Background objects
 for obj in backgroundObjects:
     basename = os.path.basename(obj['file'])
     # copy file
-    shutil.copy(obj['file'], os.path.join(outputPath, basename)) 
+    shutil.copy(obj['file'], os.path.join(outputPath, basename))
     # add to css
     Css("%s { background-image: url('%s');} " % (obj['selector'], basename))
-    
+
 
 
 print "   Saving"
