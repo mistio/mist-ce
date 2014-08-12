@@ -117,14 +117,14 @@ def backend_creds(context, backend):
 
 @when(u'I rename the backend to "{new_name}"')
 def rename_backend(context, new_name):
-    popup = context.browser.find_element_by_id("edit-backend-popup")
+    popup = context.browser.find_element_by_id("backend-edit")
     textfield = popup.find_element_by_class_name("ui-input-text").find_element_by_tag_name("input")
     for i in range(20):
         textfield.send_keys(u'\ue003')
 
     for letter in new_name:
         textfield.send_keys(letter)
-        sleep(1)
+        sleep(0.7)
 
 
 @then(u'the "{backend}" backend should be added within {seconds} seconds')
