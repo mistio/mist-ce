@@ -19,8 +19,30 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             rule: null,
+            isUpdating: null,
             newRuleValue: null,
-            isUpdatingValue: null,
+            newRuleTimeWindow: null,
+
+
+            //
+            //
+            //  Computed Properties
+            //
+            //
+
+
+            aggregateIsAny: function () {
+                if (this.rule.aggregate) {
+                    var isAny = this.rule.aggregate.value == 'any';
+                    // Bad, but whatever for now...
+                    if (!isAny)
+                        Ember.run.next(this, function () {
+                            $('#' + this.rule.id + ' .rule-time-window')
+                                .parent().trigger('create');
+                        });
+                    return isAny;
+                }
+            }.property('rule', 'rule.aggregate'),
 
 
             //
@@ -31,7 +53,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             load: function () {
-                this.set('newRuleValue', this.rule.value);
+                this.showAdvancedCondition();
+                this.updateTextValues();
                 Ember.run.next(this, function () {
                     $('#'+this.elementId).trigger('create');
                 })
@@ -45,23 +68,70 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             //
 
 
-            valueChange: function () {
+            update: function () {
 
                 // Prevent multiple requests
-                if (this.isUpdatingValue)
+                if (this.isUpdating)
                     return;
 
-                this.set('isUpdatingValue', true);
+                // Check if values actually changed
+                if (this.rule.value == this.newRuleValue &&
+                    1 + this.rule.timeWindow / 60 == this.newRuleTimeWindow)
+                    return;
+
+                this.set('isUpdating', true);
                 Ember.run.later(this, function () {
-                    this.set('isUpdatingValue', false);
+                    this.set('isUpdating', false);
+
                     var that = this;
-                    Mist.rulesController.updateRule(
-                        this.rule.id, null, null, this.newRuleValue, null, null,
-                        function (success) {
+                    Mist.rulesController.editRule({
+                        rule: this.rule,
+                        properties: {
+                            value: this.newRuleValue,
+                            reminder_offset: (this.newRuleTimeWindow - 1) * 60
+                        },
+                        callback: function (success) {
                             if (!success)
-                                that.set('newRuleValue', that.rule.value);
-                        });
+                                that.updateTextValues();
+                        }
+                    });
                 }, 500);
+            },
+
+
+            updateTextValues: function () {
+                this.setProperties({
+                   newRuleTimeWindow: 1 + this.rule.timeWindow / 60,
+                   newRuleValue: this.rule.value
+                });
+            },
+
+
+            showAdvancedCondition: function (userClicked) {
+
+                var el = '#' + this.elementId;
+
+                // If user clicked the button to show the advanced condition,
+                // use fade in and fade out for a smooth transition
+                if (userClicked) {
+                    $(el + ' .rule-more').fadeOut(200, function () {
+                        $(el + ' .advanced-condition').fadeIn();
+                    });
+                    return;
+                }
+
+                // Show advanced condition if rule does not have the default values
+                // Defaults:
+                // "aggregate": "all"
+                // "timeWindow": "0"
+
+                var isDefault = this.rule.aggregate.value == 'all' &&
+                                this.rule.timeWindow == 0;
+
+                if (!isDefault) {
+                    $(el + ' .rule-more').hide(0);
+                    $(el + ' .advanced-condition').show(0);
+                }
             },
 
 
@@ -89,18 +159,19 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                 },
 
 
+                openAggregatePopup: function () {
+                    Mist.ruleEditController.open(this.rule, 'aggregate');
+                },
+
+
                 deleteRuleClicked: function () {
                     Mist.rulesController.deleteRule(this.rule);
                 },
 
 
                 openAdvancedCondition: function () {
-
-                    var that = this;
-                    $('#' + that.elementId + ' .rule-more').fadeOut(200, function () {
-                        $('#' + that.elementId + ' .advanced-condition').fadeIn();
-                    });
-                }
+                    this.showAdvancedCondition(true);
+                },
             },
 
 
@@ -111,9 +182,14 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             //
 
 
-            newRuleValueObserver: function () {
-                Ember.run.once(this, 'valueChange');
-            }.observes('newRuleValue'),
+            textValuesObserver: function () {
+                Ember.run.once(this, 'update');
+            }.observes('newRuleValue', 'newRuleTimeWindow'),
+
+
+            timeWindowObserver: function () {
+                Ember.run.once(this, 'updateTextValues');
+            }.observes('rule', 'rule.timeWindow'),
         });
     }
 );

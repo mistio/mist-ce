@@ -125,7 +125,7 @@
     margin-top: 15px;
 }
 
-.rule-value {
+.rule-value, .rule-time-window {
     height: 35px;
     width: 50px !important;
     text-align: center !important;
@@ -140,7 +140,7 @@
     padding-right: 0.3em;
 }
 
-.rule-action {
+.rule-action, .rule-aggregate {
     width: 90px;
 }
 

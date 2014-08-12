@@ -19,14 +19,34 @@
         <div class="rule-unit rule-text">{{metric.unit}}</div>
     </div>
 
-    <!--a class="rule-button rule-more ui-btn ui-btn-inline ui-shadow ui-corner-all"
-        {{!action "openAdvancedCondition" target="view"}}>
+    <a class="rule-button rule-more ui-btn ui-btn-inline ui-shadow ui-corner-all"
+        {{action "openAdvancedCondition" target="view"}}>
         ...
     </a>
 
     <div class="advanced-condition">
-    advanced
-    </div-->
+
+        <div class="rule-for rule-text">for</div>
+
+        <a class="rule-button rule-aggregate ui-btn ui-btn-inline ui-shadow ui-corner-all"
+            {{action "openAggregatePopup" target="view"}}>
+                {{aggregate.title}}
+        </a>
+
+        <div class="rule-for rule-text">value</div>
+
+        {{#unless view.aggregateIsAny}}
+
+            <div class="rule-within rule-text">within</div>
+
+            {{view Mist.TextField class="rule-time-window" type="number"
+                valueBinding="view.newRuleTimeWindow"}}
+
+            <div class="rule-mins rule-text">min(s)</div>
+
+        {{/unless}}
+
+    </div>
 
     <div class="rule-then rule-text">then</div>
 
@@ -43,6 +63,5 @@
                     {{action deleteRuleClicked target="view"}}>&nbsp;</a>
         </div>
     {{/if}}
-
 
 </div>
