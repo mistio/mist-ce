@@ -15,6 +15,8 @@
 
 
 # Define globals
+TMP_DIR=""
+TMP_FILE=""
 ROOT_DIR=""
 OUT_PATH=""
 FILE_COUNT=""
@@ -29,7 +31,7 @@ TEMPLATES_DIR="src/mist/io/static/js/app/templates"
 #    $1 -> Explicitly define the root directory of mist.io project (optional)
 setupPaths(){
 
-    if [ "$1" ]
+    if [ "$1" -a "$1" != "--script" ]
     then
         ROOT_DIR="$1"
     else
@@ -45,6 +47,8 @@ setupPaths(){
     TEMPLATES_DIR="$ROOT_DIR/$TEMPLATES_DIR"
     OUT_PATH="$TEMPLATES_DIR/templates.js"
     FILE_COUNT=`eval ls -l $TEMPLATES_DIR | grep .html | wc -l | tr -d ' '`
+    TMP_DIR="$ROOT_DIR/.dtmp"
+    TMP_FILE="$ROOT_DIR/.ftmp"
 }
 
 
@@ -74,6 +78,8 @@ generateScript(){
         echo "        'text!app/templates/""$(basename $f)""'," >> $OUT_PATH
     done
 
+    echo -ne "\rGenerating require parameters ($FILE_COUNT/$FILE_COUNT) DONE"
+
     # Generate template compilation statements
     echo ""
     echo "      ], function () {" >> $OUT_PATH
@@ -85,7 +91,7 @@ generateScript(){
         echo -ne "\rGenerating compilation statements ($i/$FILE_COUNT)"
         filename=$(basename "$f")
         filename="${filename%.*}"
-        var="Ember.TEMPLATES['$filename/html']"
+        var="Ember.TEMPLATES['$filename/js']"
         value="Ember.Handlebars.compile(arguments[$((i-1))]);"
         echo "        $var = $value" >> $OUT_PATH
     done
@@ -96,39 +102,118 @@ generateScript(){
       return;
     }" >> $OUT_PATH
 
+    echo -ne "\rGenerating compilation statements ($FILE_COUNT/$FILE_COUNT) DONE"
     echo ""
 }
 
 
 ################################################################################
-#  Function: generateScript
+#  Function: compressTemplates
+#  Description: Removes useless characters from the templates
+#  Parameters: None
+compressTemplates(){
+
+
+    # Skip this step if user only wants the script
+    if [ $# -gt 0 ]
+    then
+        if [ "${@: -1}" == "--script" ]
+        then
+            echo "Compressing templates (0/$FILE_COUNT) SKIPPED"
+            return -1
+        fi
+    fi
+
+    # Make a temporary folder to store compressed templates
+    mkdir -p $TMP_DIR
+    touch $TMP_FILE
+
+    cd $TMP_DIR
+
+    # Compress templates
+    i=0
+    for f in $TEMPLATES_DIR"/"*.html
+    do
+        i=$((i + 1))
+        echo -ne "\rCompressing templates ($i/$FILE_COUNT)"
+
+        filename=$(basename "$f")
+        filename="${filename%.*}"
+        output="$TMP_DIR/$filename.js"
+
+        # Remove new lines
+        tr -d "\n" < $f > $TMP_FILE
+
+        # 1) Remove comments
+        # 2) Remove extra whitespace
+        # 3) Remove whitespace bettween tags
+        # 4,5,6) Remove whitespace betweeen handlebars and html tags
+        # 7) Remove whitespace between handlebars
+        sed -e "s/<\!--[^-->]*-->//g"\
+            -e "s/  */ /g"\
+            -e "s/> </></g"\
+            -e "s/> {{/>{{/g"\
+            -e "s/}} </}}</g"\
+            -e "s/}} >/}}>/g"\
+            -e "s/}} {{/}}{{/g" $TMP_FILE > $output
+    done
+
+    echo -ne "\rCompressing templates ($FILE_COUNT/$FILE_COUNT) DONE"
+    echo ""
+}
+
+
+################################################################################
+#  Function: compileTemplates
 #  Description: Implements step 2, as described in the header of this file
 #  Parameters: None
 compileTemplates(){
 
+
+    # Skip this step if user only wants the script
+    if [ $# -gt 0 ]
+    then
+        if [ "${@: -1}" == "--script" ]
+        then
+            echo "Compiling templates (0/$FILE_COUNT) SKIPPED"
+            return -1
+        fi
+    fi
+
     # Compile templates
     i=0
-    for f in $TEMPLATES_DIR"/"*.html
+    for f in $TMP_DIR"/"*
     do
         i=$((i + 1))
         echo -ne "\rCompiling templates ($i/$FILE_COUNT)"
         ember-precompile "$f" >> $OUT_PATH
     done
 
+    echo -ne "\rCompiling templates ($FILE_COUNT/$FILE_COUNT) DONE"
+    echo ""
+}
+
+
+finish() {
+
     # Terminate file
     echo "    callback();
   }
 });" >> $OUT_PATH
 
-    echo ""
+    # Clean up
+    rm -rf $TMP_DIR
+    rm -f $TMP_FILE
 }
 
 
 main(){
     setupPaths $@
-    generateScript
-    compileTemplates
-    echo "Done"
+    generateScript $@
+    compressTemplates $@
+    compileTemplates $@
+    finish $@
 }
+
 
 main $@
