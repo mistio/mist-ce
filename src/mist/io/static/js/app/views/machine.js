@@ -303,14 +303,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
                 addRuleClicked: function() {
-                    var operator = {'title': 'gt', 'symbol': '>'};
-                    Mist.rulesController.newRule(
-                        this.machine,
-                        Mist.metricsController.getMetric('load.shortterm'),
-                        operator,
-                        5,
-                        'alert'
-                    );
+                    Mist.rulesController.newRule(this.machine);
                 },
 
 

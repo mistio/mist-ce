@@ -1,4 +1,4 @@
-<div id="home-page" class="ui-page-active ui-page ui-page-theme-a">
+<div id="home-page" data-role="page" class="ui-page-active ui-page ui-page-theme-a">
 
     <!-- Page header -->
 
@@ -28,12 +28,8 @@
             class="ui-controlgroup ui-controlgroup-horizontal ui-corner-all">
 
             {{#each Mist.backendsController.content}}
-
-                {{view Mist.backendButtonView
-                       backendBinding="this"
-                       classBinding="state"
-                       data-icon="check"}}
-
+                {{view Mist.backendButtonView backendBinding="this"
+                       class="ui-btn ui-input-btn ui-corner-all ui-shadow"}}
             {{/each}}
 
         </div>

@@ -30,7 +30,9 @@ define('app/views/file_upload', ['app/views/templated', 'ember'],
 
 
                 uploadInputChanged: function () {
-                    Mist.fileUploadController.uploadFile($('#file-upload-input')[0].files[0]);
+                    Mist.fileUploadController.uploadFile({
+                        file: $('#file-upload-input')[0].files[0]
+                    });
                 },
 
 

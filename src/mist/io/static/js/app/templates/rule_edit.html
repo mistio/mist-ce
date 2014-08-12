@@ -11,16 +11,11 @@
         <ul data-role="listview">
             {{#each view.metrics}}
             <li data-icon="false">
-                <a class="ui-btn" {{action "metricClicked" this target="view"}}>
+                <a class="ui-btn" {{action "metricClicked" this.id target="view"}}>
                     {{this.name}}
                 </a>
             </li>
             {{/each}}
-            <!--li data-icon="false">
-                <a class="ui-btn ui-btn-d" {{action "customClicked" target="view"}}>
-                    Custom
-                </a>
-            </li-->
         </ul>
     </div>
 </div>
@@ -39,7 +34,7 @@
         <ul data-role="listview">
             {{#each Mist.rulesController.operatorList}}
                 <li data-icon="false">
-                    <a {{action "operatorClicked" this target="view"}}>
+                    <a {{action "operatorClicked" this.title target="view"}}>
                         {{this.symbol}}
                     </a>
                 </li>
@@ -85,18 +80,18 @@
          data-enhanced="true"
          data-transition="flip">
 
-        <div data-role="header">
-            <h1>Command</h1>
+        <div class="ui-header ui-bar-b">
+            <h1 class="ui-title">Command</h1>
         </div>
 
         <div data-role="content">
 
             {{view Ember.TextArea
-                valueBinding="Mist.ruleEditController.command"
+                valueBinding="view.newCommand"
                 name="rule-command-content"}}
 
             <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-                <a class="ui-btn ui-btn-a" data-rel="back">Back</a>
+                <a class="ui-btn ui-btn-a" {{action "backClicked" target="view"}}>Back</a>
                 <a class="ui-btn ui-btn-d" {{action "saveClicked" target="view"}}>Save</a>
             </div>
         </div>
@@ -104,26 +99,24 @@
 </div>
 
 
-<div id="rule-advanced-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
-<div id="rule-advanced-popup"
-     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow ui-corner-all large-popup">
+<div id="rule-aggregate-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
+<div id="rule-aggregate-popup"
+     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow">
 
-    <div id="rule-advanced"
-         class="ui-popup ui-corner-all"
+    <div id="rule-aggregate"
+         class="ui-popup"
          data-role="popup"
          data-enhanced="true"
          data-transition="flip">
 
-        <div class="ui-header ui-bar-b">
-            <h1 class="ui-title">Advanced Options</h1>
-        </div>
-
-        <div data-role="content">
-
-            <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-                <a class="ui-btn ui-btn-a" data-rel="back">Back</a>
-                <a class="ui-btn ui-btn-d" {{action "doneClicked" target="view"}}>Done</a>
-            </div>
-        </div>
+        <ul data-role="listview">
+            {{#each Mist.rulesController.aggregateList}}
+                <li data-icon="false">
+                    <a {{action "aggregateClicked" this.value target="view"}}>
+                        {{this.title}}
+                    </a>
+                </li>
+            {{/each}}
+        </ul>
     </div>
 </div>

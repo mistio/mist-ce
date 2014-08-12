@@ -1,57 +1,80 @@
-define('app/views/key_add', ['app/views/templated', 'ember'],
-    /**
-     *  Key Add View
-     *
-     *  @returns Class
-     */
-    function (TemplatedView) {
-        return TemplatedView.extend({
+define('app/views/key_add', ['app/views/popup'],
+    //
+    //  Key Add View
+    //
+    //  @returns Class
+    //
+    function (PopupView) {
 
-            /**
-             *
-             *  Methods
-             *
-             */
+        'use strict';
+
+        return PopupView.extend({
+
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
+            addButton: '#key-add-ok',
+            fileInput: '#key-add-upload',
+
+
+            //
+            //
+            //  Initialization
+            //
+            //
+
+
+            load: function () {
+                this.setProperties({
+                    fileInput: $(this.fileInput),
+                    addButton: $(this.addButton),
+                });
+            }.on('didInsertElement'),
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
 
             updateAddButton: function () {
-                if (Mist.keysController.addingKey || !Mist.keyAddController.formReady) {
-                    $('#add-key-ok').addClass('ui-state-disabled');
-                } else {
-                    $('#add-key-ok').removeClass('ui-state-disabled');
-                }
+                if (Mist.keyAddController.addingKey ||
+                    !Mist.keyAddController.formReady)
+
+                    this.addButton.addClass('ui-state-disabled');
+                else
+                    this.addButton.removeClass('ui-state-disabled');
             },
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //
+            //  Actions
+            //
+            //
+
 
             actions: {
 
-
-                generateClicked: function () {
-                    Mist.keysController.generateKey(function (success, key) {
-                        if (success)
-                            Mist.keyAddController.set('newKeyPrivate', key);
-                    });
-                },
-
-
                 uploadClicked: function () {
-                    if (window.File && window.FileReader && window.FileList) {
-                        // Dynamically click the hidden input
-                        // field to present the folder dialog
-                        $('#add-key-upload').click();
-                    } else {
-                        Mist.notificationController.notify('Your browser does not support the HTML5 file API');
-                    }
+                    this.fileInput.click();
                 },
 
 
                 uploadInputChanged: function () {
-                    Mist.keyAddController.uploadKey($('#add-key-upload')[0].files[0]);
+                    Mist.keyAddController.upload();
+                },
+
+
+                generateClicked: function () {
+                    Mist.keyAddController.generate();
                 },
 
 
@@ -66,15 +89,17 @@ define('app/views/key_add', ['app/views/templated', 'ember'],
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //
+            //  Observers
+            //
+            //
 
-            updateDoneButtonObserver: function () {
+
+            updateButtonObserver: function () {
                 Ember.run.once(this, 'updateAddButton');
-            }.observes('Mist.keysController.addingKey', 'Mist.keyAddController.formReady')
+            }.observes('Mist.keyAddController.formReady',
+                'Mist.keyAddController.addingKey'),
         });
     }
 );

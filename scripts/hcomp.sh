@@ -29,7 +29,7 @@ TEMPLATES_DIR="src/mist/io/static/js/app/templates"
 #    $1 -> Explicitly define the root directory of mist.io project (optional)
 setupPaths(){
 
-    if [ "$1" ]
+    if [ "$1" -a "$1" != "--script" ]
     then
         ROOT_DIR="$1"
     else
@@ -74,6 +74,8 @@ generateScript(){
         echo "        'text!app/templates/""$(basename $f)""'," >> $OUT_PATH
     done
 
+    echo -ne "\rGenerating require parameters ($FILE_COUNT/$FILE_COUNT) DONE"
+
     # Generate template compilation statements
     echo ""
     echo "      ], function () {" >> $OUT_PATH
@@ -96,15 +98,27 @@ generateScript(){
       return;
     }" >> $OUT_PATH
 
+    echo -ne "\rGenerating compilation statements ($FILE_COUNT/$FILE_COUNT) DONE"
     echo ""
 }
 
 
 ################################################################################
-#  Function: generateScript
+#  Function: compileTemplates
 #  Description: Implements step 2, as described in the header of this file
 #  Parameters: None
 compileTemplates(){
+
+
+    # Skip this step if user only wants the script
+    if [ $# -gt 0 ]
+    then
+        if [ "${@: -1}" == "--script" ]
+        then
+            echo "Compiling templates (0/$FILE_COUNT) SKIPPED"
+            return -1
+        fi
+    fi
 
     # Compile templates
     i=0
@@ -115,20 +129,27 @@ compileTemplates(){
         ember-precompile "$f" >> $OUT_PATH
     done
 
+    echo -ne "\rCompiling templates ($FILE_COUNT/$FILE_COUNT) DONE"
+    echo ""
+}
+
+
+finish() {
+
     # Terminate file
     echo "    callback();
   }
 });" >> $OUT_PATH
 
-    echo ""
 }
 
 
 main(){
     setupPaths $@
-    generateScript
-    compileTemplates
-    echo "Done"
+    generateScript $@
+    compileTemplates $@
+    finish $@
 }
+
 
 main $@

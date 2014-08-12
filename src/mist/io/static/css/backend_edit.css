@@ -1,26 +1,26 @@
 
 /* Backend Edit Popup CSS
 -----------------------------------------------------------------------------------------------------------*/
-#edit-backend-popup .ui-slider {
+#backend-edit .ui-slider {
     width: 120px;
 }
-#edit-backend-popup .state {
+#backend-edit .state {
     position: relative;
     bottom: 11px;
     left: 24px;
 }
-#edit-backend-popup label {
+#backend-edit label {
     text-align: center;
 }
 
-#edit-backend-popup .ui-field-contain {
+#backend-edit .ui-field-contain {
     overflow: visible;
     height: 50px;
     border-bottom: 1px solid #ddd !important;
     margin: 6px 0;
 }
 
-#edit-backend-popup .button-back {
+#backend-edit .button-back {
     width: 25%;
     margin: 0 auto;
 }

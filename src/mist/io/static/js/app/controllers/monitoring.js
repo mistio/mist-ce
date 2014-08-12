@@ -142,7 +142,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
                 Mist.metricsController.setCustomMetrics(data.custom_metrics);
                 Mist.metricsController.setBuiltInMetrics(data.builtin_metrics);
-                Mist.rulesController.setContent(data.rules);
+                Mist.rulesController.load(data.rules);
 
                 data.machines.forEach(function(machineTuple) {
                     var machine = Mist.backendsController.getMachine(
