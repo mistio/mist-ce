@@ -276,6 +276,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             _addBackend: function(backend, keyId) {
                 Ember.run(this, function() {
+                    if (this.backendExists(backend.id)) return;
                     var backendModel = Backend.create(backend);
                     this.content.addObject(backendModel);
                     // <TODO (gtsop): move this code into backend model
