@@ -76,7 +76,7 @@ class ShellNamespace(BaseNamespace):
         finally:
             self.channel.close()
 
-    def disconnect(silent=False):
+    def disconnect(self, silent=False):
         if multi_user:
             # reload the session, to avoid saving a stale or deleted session
             self.request.environ['beaker.session'].load()
@@ -200,7 +200,7 @@ class MistNamespace(BaseNamespace):
                 self.monitoring_greenlet = self.spawn(check_monitoring_from_socket,
                                                       self)
 
-    def disconnect(silent=False):
+    def disconnect(self, silent=False):
         if multi_user:
             # reload the session, to avoid saving a stale or deleted session
             self.request.environ['beaker.session'].load()
