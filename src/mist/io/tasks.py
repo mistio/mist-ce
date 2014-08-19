@@ -49,7 +49,7 @@ log = logging.getLogger(__name__)
 def update_machine_count(email, backend_id, machine_count):
     if not multi_user:
         return
-    
+
     user = user_from_email(email)
     with user.lock_n_load():
         user.backends[backend_id].machine_count = machine_count
@@ -161,6 +161,12 @@ class UserTask(Task):
         else:
             self.delay(*args, **kwargs)
 
+    def clear_cache(self, *args, **kwargs):
+        id_str = json.dumps([self.task_key, args, kwargs])
+        cache_key = b64encode(id_str)
+        log.info("Clearing cache for '%s'", id_str)
+        return self.memcache.delete(cache_key)
+
     def run(self, *args, **kwargs):
         email = args[0]
         # seq_id is an id for the sequence of periodic tasks, to avoid
@@ -172,7 +178,7 @@ class UserTask(Task):
         cached_err = self.memcache.get(cache_key + 'error')
         if cached_err:
             # task has been failing recently
-            if seq_id != cached_err['seq_id']: 
+            if seq_id != cached_err['seq_id']:
                 # other sequence of task already handling this error flow
                 # This is not working! Passing instead
                 #return
