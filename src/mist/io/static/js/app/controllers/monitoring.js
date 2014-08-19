@@ -880,6 +880,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
                 addGraph: function (metric) {
 
+                    return;
+
                     this.removeDummyGraph(metric.name);
 
                     var graphId = 'graph-' + metric.hashedId;

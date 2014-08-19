@@ -247,6 +247,7 @@ var loadFiles = function (callback) {
         'app/controllers/backend_edit',
         'app/controllers/backends',
         'app/controllers/confirmation',
+        'app/controllers/datasources',
         'app/controllers/file_upload',
         'app/controllers/image_search',
         'app/controllers/key_add',
@@ -311,6 +312,7 @@ var loadApp = function (
     BackendEditController,
     BackendsController,
     ConfirmationController,
+    DatasourcesController,
     FileUploadController,
     ImageSearchController,
     KeyAddController,
@@ -542,6 +544,7 @@ var loadApp = function (
     App.set('machineTagsController', MachineTagsController.create());
     App.set('machineKeysController', MachineKeysController.create());
     App.set('imageSearchController', ImageSearchController.create());
+    App.set('datasourcesController', DatasourcesController.create());
     App.set('machineShellController', MachineShellController.create());
     App.set('confirmationController', ConfirmationController.create());
     App.set('notificationController', NotificationController.create());
@@ -1077,4 +1080,33 @@ function warn() {
 function error() {
     if (LOGLEVEL > 0)
         console.error.apply(console, arguments);
+}
+
+
+
+
+function addGraph() {
+
+    require(['app/models/graph'], function (Graph) {
+
+        // Create a new datasource to use
+        Mist.datasourcesController.addDatasource({
+            machine: Mist.backendsController.getMachine('711b8d9f-2839-4a7e-b6e3-5e8fcc4a1afd'),
+            metric: Mist.metricsController.getMetric('disk.total.disk_octets.read'),
+            callback: function (success, datasource) {
+                Mist.set('datasource', datasource);
+            }
+        });
+
+        // Create a graph to display
+        graph = Graph.create({
+            id: 'graph-' + parseInt(Math.random() * 10000),
+            title: 'My Graph',
+            datasources: [],
+        });
+
+        graph.addDatasource(Mist.datasource);
+
+        Mist.set('graph', graph);
+    });
 }

@@ -3,9 +3,6 @@
     <div class="header">
         <div class="title">
             {{view.graph.title}}
-            {{#if view.graph.unit}}
-                ({{view.graph.unit}})
-            {{/if}}
         </div>
         {{#if view.graph.pendingCreation}}
             <div class="ajax-loader"></div>
@@ -24,21 +21,19 @@
         {{/if}}
     </div>
 
-    {{#if view.graph.metrics.length}}
     <svg>
-    	<g class="grid-x"></g>
-    	<g class="grid-y"></g>
-        <g class="valueArea">
-            <path></path>
-        </g>
-        <g class="valueLine">
-            <path></path>
-        </g>
+        <g class="grid-x"></g>
+        <g class="grid-y"></g>
+        {{#each view.graph.datasources}}
+            <g {{bind-attr class="this.id :valueLine"}}>
+                <path></path>
+            </g>
+        {{/each}}
         <g class="x-axis"></g>
         <rect class="hideAnimeLine"></rect>
         <line class="axisLine x"></line>
         <line class="axisLine y"></line>
         <g class="y-axis"></g>
     </svg>
-    {{/if}}
+
 </div>

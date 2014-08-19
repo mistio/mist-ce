@@ -8,8 +8,6 @@ define('app/models/graph', ['ember'],
 
         'use strict';
 
-        var MAX_BUFFER_DATA = 60;
-
         return Ember.Object.extend(Ember.Evented, {
 
 
@@ -20,24 +18,21 @@ define('app/models/graph', ['ember'],
             //
 
 
-            view: null,
-
             id: null,
-            unit: null,
             title: null,
-            metrics: null,
             isBuiltIn: null,
+            datasources: null,
 
 
             //
             //
-            //  Initialization
+            // Initialization
             //
             //
 
 
             load: function () {
-                this.set('metrics', []);
+                this.set('datasources', []);
             }.on('init'),
 
 
@@ -48,35 +43,22 @@ define('app/models/graph', ['ember'],
             //
 
 
-            getMetric: function(metricId) {
-                return this.metrics.findBy('id', metricId);
-            },
-
-
-            hasMetric: function (metricId) {
-                return !!this.getMetric(metricId);
-            },
-
-
-            addMetric: function (metric) {
+            addDatasource: function (datasource) {
                 Ember.run(this, function () {
-                    this.metrics.pushObject(metric);
-                    this.insertDummyData(metric);
-                    this.trigger('onMetricAdd');
-                    this.trigger('onDataUpdate', metric.datapoints);
+                    this.datasources.addObject(datasource);
+                    this.trigger('onDatasourceAdd');
                 });
             },
 
 
-            removeMetric: function (metricId) {
+            removeDatasource: function (datasource) {
                 Ember.run(this, function () {
-                    this.metrics.removeObject(
-                        this.getMetric(metricId)
-                    );
-                    this.trigger('onMetricRemove');
+                    this.datasources.removeObject(datasource);
+                    this.trigger('onDatasourceRemove');
                 });
             },
 
+/*
 
             updateData: function (data) {
 
@@ -116,12 +98,14 @@ define('app/models/graph', ['ember'],
                     datapoints.unshift(
                         new Datapoint(datapoints[0].time - step));
             },
+            */
         });
 
-
+/*
         function Datapoint(timestamp, value) {
            this.time = new Date(timestamp || null);
            this.value = value || null;
         };
+*/
     }
 );

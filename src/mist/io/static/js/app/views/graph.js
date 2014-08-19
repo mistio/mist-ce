@@ -4,11 +4,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
     //
     //  @returns Class
     //
-    function(TemplatedView, d3) {
+    function (TemplatedView, d3) {
 
         'use strict';
 
-        var MAX_BUFFER_DATA = 60;
+        var DISPLAYED_DATAPOINTS = 60;
 
         return TemplatedView.extend({
 
@@ -52,19 +52,23 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             load: function () {
 
-                Ember.run.next(this, function () {
+                // Add event handlers
+                this.graph.on('onDatasourceAdd', this, 'updateSVG');
+                this.graph.on('onDatasourceRemove', this, 'updateSVG');
 
-                    this.graph.set('view', this);
-                    if (this.graph.pendingCreation)
-                        return;
-                    this.graph.on('onDataUpdate', this, 'updateData');
-
-                    this.setupGraph();
-                    this.setupMouseOver();
-                    this.updateData(this.graph.metrics[0].datapoints);
-                });
+                this.setupGraph();
+                this.setupMouseOver();
 
             }.on('didInsertElement'),
+
+
+            unload: function () {
+
+                // Remove event handlers
+                this.graph.on('onDatasourceAdd', this, 'updateSVG');
+                this.graph.on('onDatasourceRemove', this, 'updateSVG');
+
+            }.on('willDestroyElement'),
 
 
             //
@@ -73,6 +77,15 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             //
             //
 
+
+            updateSVG: function () {
+                this.set('svg', SvgSet(this));
+            },
+
+
+            draw: function () {
+                this.updateView();
+            },
 
             clearData: function () {
                 this.set('data', []);
@@ -107,17 +120,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             changeTimeWindow: function (newTimeWindow) {
                 this.set('timeDisplayed', newTimeWindow / 1000);
                 this.clearData();
-            },
-
-
-            calcValueDistance: function () {
-
-                // Get last 2 data
-                if(this.data.length < 2) return;
-
-                var valueA = this.scale.x(this.data[this.data.length - 1].time);
-                var valueB = this.scale.x(this.data[this.data.length - 2].time);
-                this.valuesDistance = valueA - valueB;
             },
 
 
@@ -198,6 +200,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             * also creates interval for popup value update
             */
             setupMouseOver: function () {
+
+                return;
 
                 var that = this;
 
@@ -355,10 +359,10 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             setupGraph: function () {
 
-                this.width = $('#GraphsArea').width() - 2;
-
                 var id = this.graph.id;
                 this.id = id;
+                this.width = $('#' + this.id).width() - 2;
+
                  // Calculate Aspect Ratio Of Height
                 var fixedHeight = this.width * 0.125; // (160 / 1280)
 
@@ -381,7 +385,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 // valuearea is function that fills the space under the main line
                 this.set('valuearea', ValueArea(this));
 
-                this.set('svg', SvgSet(this));
+                this.updateSVG();
+                return;
 
                 // Set graph visibility
                 var cookies = Mist.monitoringController.cookies;
@@ -389,6 +394,106 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     $('#' + id).hide();
                 else
                     $('#' + id).show();
+            },
+
+
+
+            _setDisplayedDatapoints: function () {
+
+                // Parse each datasource of the graph and get only
+                // the last datapoints of the array (the ones that
+                // will be displayed)
+                //
+                // Then store the displayed datapoints into "displayedData"
+                // object using the id of each datasource as the property key
+
+                this.set('displayedData', {});
+                this.graph.datasources.forEach(function (datasource) {
+                    this.displayedData.set(datasource.id,
+                        datasource.datapoints.slice(DISPLAYED_DATAPOINTS));
+                }, this);
+            },
+
+
+            _setMinMaxValues: function () {
+
+                // Parse the datapoints to be displayed and
+                // callulcate the overal min and max values
+
+                // If min & max == 0 y axis will not display
+                // values. max=1 fixes this.
+                var maxValue = 1;
+                var minValue = 0;
+                forIn(this.displayedData, function (datapoints) {
+                    var max = d3.max(datapoints, getDatapointValue);
+                    var min = d3.min(datapoints, getDatapointValue);
+                    if (max > maxValue) maxValue = max;
+                    if (min < minValue) minValue = min;
+                });
+
+                // If minValue is not negative, use 0 as the min
+                // value because it is visually better
+                if (minValue >= 0) minValue = 0;
+
+                this.set('maxValue', maxValue);
+                this.set('minValue', minValue);
+            },
+
+
+            _setScale: function () {
+
+                // Update x and y scales to fit the data to be displayed
+
+                this.scale.y.domain([this.minValue, this.maxValue]);
+                this.scale.x.domain(d3.extent(this.displayedData, getDatapointTime));
+            },
+
+
+            _setXCoordinates: function () {
+
+                // Parse datapoints to be displayed and construct
+                // arrays of x coordinates for each datasource
+                //
+                // Then store these coordinates into "xCoordinates" object
+                // using the id of each datasource as the property key
+
+                this.set('xCoordinates', {});
+                forIn(this, this.displayedData, function (datapoints, datasourceId) {
+                    this.xCoordinates.set(datasourceId, []);
+                    datapoints.forEach(function (datapoint) {
+                        this.xCoordinates[datasourceId].push(
+                            this.scale.x(datapoint.time));
+                    }, this);
+                });
+            },
+
+
+            _setValueDistance: function () {
+
+                // Get the time of the last two datapoints and calculate
+                // the x scale distance
+                //
+                // It doesn't matter from which datasource we extract
+                // the last two datapoints because the timestamps are
+                // all alligned.
+
+                var datapoints = this.graph.datasources[0].datapoints;
+
+                if (datapoints.length < 2) return;
+
+                var lastDatapoints = datapoints.slice(datapoints.length - 2);
+                this.set('valuesDistance',
+                    this.scale.x(lastDatapoints[0].time) -
+                    this.scale.x(lastDatapoints[1].time));
+            },
+
+
+            _setRange: function () {
+
+                this.scale.x.range([
+                    this.animationEnabled ? -this.valuesDistance : 0,
+                    this.width - this.margin.left - this.margin.right
+                ]);
             },
 
 
@@ -402,71 +507,19 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 if (!this.isVisible())
                     return;
 
-                var that = this;
-                var labelTicksFixed = function(axisInstance,format) {
+                this._setDisplayedDatapoints();
+                this._setMinMaxValues();
+                this._setScale();
+                this._setXCoordinates();
+                this._setValueDistance();
+                this._setRange();
 
-                    // Check Time Displayed
-                    var labelStep;
-                    if(that.timeDisplayed <= 600)           // 10 Minutes (10*60)
-                        axisInstance.ticks(d3.time.minutes,2);
-                    else if(that.timeDisplayed <= 3600)     // 1 Hour (1*60*60)
-                        axisInstance.ticks(d3.time.minutes,12);
-                    else if(that.timeDisplayed <= 86400)    // 1 Day (24*60*60)
-                        axisInstance.ticks(d3.time.hours,6);
-                    else if(that.timeDisplayed <= 604800)   // 1 Week (7*24*60*60)
-                        axisInstance.ticks(d3.time.days,1);
-                    else if(that.timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
-                        axisInstance.ticks(d3.time.days,7);
-
-                    if( typeof format != 'undefined')
-                        axisInstance.tickFormat(d3.time.format(format));
-
-                    return axisInstance;
-                };
-
-
-                this.displayedData = [];
-                this.xCordinates   = [];
-                var num_of_displayed_measurements = 60;
-
-                // Get only data this will be displayed
-                if(this.data.length > num_of_displayed_measurements) {
-
-                    this.displayedData = this.data.slice(this.data.length - num_of_displayed_measurements);
-                }
-                else {
-
-                    this.displayedData = this.data;
-                }
-
-                // If min & max == 0 y axis will not display values. max=1 fixes this.
-                var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
-                var minValue = d3.min(this.displayedData, function(d) { return d.value; });
-                var fixedMaxValue = maxValue || 1;
-                var fixedMinValue = minValue < 0 ? minValue : 0;
-
-                // Set Possible min/max x & y values
-                this.scale.x.domain(d3.extent(this.displayedData , function(d) { return d.time;  }));
-                this.scale.y.domain([fixedMinValue, fixedMaxValue]);
-
-                // Set the range
-                this.calcValueDistance(this.scale.x);
-                if(this.animationEnabled)
-                    this.scale.x.range([-this.valuesDistance, this.width - this.margin.left - this.margin.right]);
-                else
-                    this.scale.x.range([0, this.width - this.margin.left - this.margin.right]);
-
-
-                // Create Array Of Cordinates
-                this.displayedData.forEach(function (d) {
-                    that.xCordinates.push(that.scale.x(d.time));
-                });
-
+                // CHECKPOINT
 
                 // Change grid lines and labels based on time displayed
                 var modelXAxis = d3.svg.axis()
-                                        .scale(this.scale.x)
-                                        .orient('bottom');
+                    .scale(this.scale.x)
+                    .orient('bottom');
 
                 var modelGridX = d3.svg.axis()
                                        .scale(this.scale.x)
@@ -500,14 +553,14 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                   });
 
                 // Timestamp fix for small screens
-                // 1 Week || 1 Month
                 var tLabelFormat = '%I:%M%p';
-                if( (this.width <= 700 && this.timeDisplayed == 604800) ||  (this.width <= 521 && this.timeDisplayed == 2592000) )
-                    tLabelFormat = '%d-%b';
+                if( (this.width <= 700 && this.timeDisplayed == 604800) ||
+                    (this.width <= 521 && this.timeDisplayed == 2592000)) // 1 Week || 1 Month
+                        tLabelFormat = '%d-%b';
                 else if(this.width <= 560 && this.timeDisplayed == 86400) // 1 Day
                     tLabelFormat = '%I:%M%p';
                 else  if (this.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
-                        tLabelFormat = '%d-%m | %I:%M%p';
+                    tLabelFormat = '%d-%m | %I:%M%p';
 
 
                 // Get path values for value line and area
@@ -527,16 +580,18 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     var fps  = 12;
                     var duration = 9;
 
-                    this.svg.value.line.animation
-                                    .select(this.svg.value.line)
-                                    .fps(fps)
-                                    .duration(duration)
-                                    .points(this.valuesDistance,0, 0,0)
-                                    .data(valueLinePath)
-                                    .before(function(data){
-                                        this.d3Selector.attr('d', data);
-                                    })
-                                    .push();
+                    this.svg.value.lines.forEach(function (line) {
+                        line.animation
+                            .select(line)
+                            .fps(fps)
+                            .duration(duration)
+                            .points(this.valuesDistance,0, 0,0)
+                            .data(valueLinePath)
+                            .before(function(data){
+                                this.d3Selector.attr('d', data);
+                            })
+                            .push();
+                    }, this);
 
                     this.svg.value.area.animation
                                     .select(this.svg.value.area)
@@ -556,7 +611,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                     .points(( this.margin.left + this.valuesDistance),(this.height - this.margin.bottom +2), this.margin.left,(this.height - this.margin.bottom +2))
                                     .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: tLabelFormat})
                                     .before(function(data){
-                                        this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat));
+                                        this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat, that.timeDisplayed));
                                         this.d3Selector.selectAll('text')
                                                        .style('text-anchor', 'end')
                                                        .attr('x','-10');
@@ -571,7 +626,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                     .points((this.margin.left + this.valuesDistance),this.height, this.margin.left,this.height)
                                     .data({modelX: modelGridX,modelY: modelGridY})
                                     .before(function(data){
-                                        this.d3Selector.call(labelTicksFixed(data.modelX));
+                                        this.d3Selector.call(labelTicksFixed(data.modelX, null, that.timeDisplayed));
                                         // Y grid should change when x changes
                                         that.svg.grid.y.call(data.modelY);
                                     })
@@ -582,12 +637,12 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     // Update Graph Elements
                     this.svg.value.line.attr('d', valueLinePath);
                     this.svg.value.area.attr('d', valueAreaPath);
-                    this.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,tLabelFormat));
+                    this.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,tLabelFormat, that.timeDisplayed));
                     this.svg.axis.x.legend.selectAll('text')
                            .style('text-anchor', 'end')
                            .attr('x','-10');
                     this.svg.axis.y.legend.call(modelYAxis);
-                    this.svg.grid.x.call(labelTicksFixed(modelGridX));
+                    this.svg.grid.x.call(labelTicksFixed(modelGridX, null, that.timeDisplayed));
                     this.svg.grid.y.call(modelGridY);
 
                     if (this.clearAnimPending) {
@@ -667,36 +722,35 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
         function SvgSet (args) {
 
-            var svg = new Object({
-
-                canvas: Canvas(args),
-
-                grid: new Object({
-                    x: GridX(args),
-                    y: GridY(args)
+            var svg = new Object();
+            svg.canvas = Canvas(args);
+            svg.grid = new Object({
+                x: GridX(args),
+                y: GridY(args)
+            });
+            svg.axis = new Object({
+                x: new Object({
+                    line: AxisLineX(args),
+                    legend: AxisX(args)
                 }),
-
-                value: new Object({
-                    line: Line(args),
-                    area: Area(args),
-                    curtain: Curtain(args)
-                }),
-
-                axis: new Object({
-                    x: new Object({
-                        line: AxisLineX(args),
-                        legend: AxisX(args)
-                    }),
-                    y: new Object({
-                        line: AxisLineY(args),
-                        legend: AxisY(args)
-                    })
+                y: new Object({
+                    line: AxisLineY(args),
+                    legend: AxisY(args)
                 })
+            });
+            svg.value = new Object({
+                lines: [],
+                curtain: Curtain(args)
+            });
+
+            // Popuplate value lines
+            args.graph.datasources.forEach(function (datasource) {
+                var line = Line(args, datasource.id);
+                line.animation = new Animation();
+                svg.value.lines.push(line);
             });
 
             svg.grid.x.animation = new Animation();
-            svg.value.line.animation = new Animation();
-            svg.value.area.animation = new Animation();
             svg.axis.x.legend.animation = new Animation();
 
             return svg;
@@ -718,9 +772,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
         };
 
 
-        function Line (args) {
+        function Line (args, datasource) {
 
-            return d3.select('#' + args.id + ' .valueLine')
+            return d3.select('#' + args.id + ' .' + datasource.id)
                     .attr('transform', 'translate(' +
                         args.margin.left + ',' + args.margin.top + ')')
                     .select('path');
@@ -998,5 +1052,36 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             var buffer = new Buffer(bufferSize); // The buffer that keeps the animation instances
             var current_animation = new _Animation();   // The animation instance where all the changes occur
         };
+
+        function labelTicksFixed (axisInstance, format, timeDisplayed) {
+
+            // Check Time Displayed
+            var labelStep;
+            if(timeDisplayed <= 600)           // 10 Minutes (10*60)
+                axisInstance.ticks(d3.time.minutes,2);
+            else if(timeDisplayed <= 3600)     // 1 Hour (1*60*60)
+                axisInstance.ticks(d3.time.minutes,12);
+            else if(timeDisplayed <= 86400)    // 1 Day (24*60*60)
+                axisInstance.ticks(d3.time.hours,6);
+            else if(timeDisplayed <= 604800)   // 1 Week (7*24*60*60)
+                axisInstance.ticks(d3.time.days,1);
+            else if(timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
+                axisInstance.ticks(d3.time.days,7);
+
+            if( typeof format != 'undefined')
+                axisInstance.tickFormat(d3.time.format(format));
+
+            return axisInstance;
+        };
+
+        // These are some functions that used to be anonymous
+        // and weere passed to d3 functions all the time.
+        // So we cache them to save some cpu usage
+        function getDatapointValue (d) {
+            return d.value;
+        }
+        function getDatapointTime (d) {
+            return d.time;
+        }
     }
 );
