@@ -31,6 +31,12 @@ define('app/models/datasource', ['ember'],
             //
 
 
+            init: function () {
+                this._super();
+                this.set('datapoints', new Array());
+            },
+
+
             //
             //
             //  Methods

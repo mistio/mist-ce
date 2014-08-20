@@ -39,7 +39,7 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
                 // }
 
                 var datasource = {
-                    id: parseInt(Math.random() * 10000),
+                    id: 'dt-' + parseInt(Math.random() * 10000),
                     machine: args.machine,
                     metric: args.metric
                 }

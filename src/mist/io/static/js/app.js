@@ -1092,12 +1092,19 @@ function addGraph() {
         // Create a new datasource to use
         Mist.datasourcesController.addDatasource({
             machine: Mist.backendsController.getMachine('711b8d9f-2839-4a7e-b6e3-5e8fcc4a1afd'),
-            metric: Mist.metricsController.getMetric('disk.total.disk_octets.read'),
+            metric: Mist.metricsController.getMetric('interface.total.if_octets.rx'),
             callback: function (success, datasource) {
-                Mist.set('datasource', datasource);
+                Mist.set('datasource1', datasource);
             }
         });
 
+        Mist.datasourcesController.addDatasource({
+            machine: Mist.backendsController.getMachine('711b8d9f-2839-4a7e-b6e3-5e8fcc4a1afd'),
+            metric: Mist.metricsController.getMetric('interface.total.if_octets.tx'),
+            callback: function (success, datasource) {
+                Mist.set('datasource2', datasource);
+            }
+        });
         // Create a graph to display
         graph = Graph.create({
             id: 'graph-' + parseInt(Math.random() * 10000),
@@ -1105,8 +1112,60 @@ function addGraph() {
             datasources: [],
         });
 
-        graph.addDatasource(Mist.datasource);
+        graph.addDatasource(Mist.datasource1);
+        graph.addDatasource(Mist.datasource2);
 
         Mist.set('graph', graph);
+
+        Ember.run.next(function () {
+            //getData();
+            dummyData();
+
+        });
+    });
+}
+
+function dummyData() {
+    require(['app/models/datapoint'], function (Datapoint) {
+        info('new data asdasd');
+//        data1 = JSON.parse('[{"time":"2014-08-19T23:15:00.000Z","value":0},{"time":"2014-08-19T23:15:10.000Z","value":0},{"time":"2014-08-19T23:15:20.000Z","value":0},{"time":"2014-08-19T23:15:30.000Z","value":0},{"time":"2014-08-19T23:15:40.000Z","value":0},{"time":"2014-08-19T23:15:50.000Z","value":0},{"time":"2014-08-19T23:16:00.000Z","value":0},{"time":"2014-08-19T23:16:10.000Z","value":27852.8},{"time":"2014-08-19T23:16:20.000Z","value":22937.6},{"time":"2014-08-19T23:16:30.000Z","value":0},{"time":"2014-08-19T23:16:40.000Z","value":0},{"time":"2014-08-19T23:16:50.000Z","value":37683.2},{"time":"2014-08-19T23:17:00.000Z","value":0},{"time":"2014-08-19T23:17:10.000Z","value":0},{"time":"2014-08-19T23:17:20.000Z","value":0},{"time":"2014-08-19T23:17:30.000Z","value":0},{"time":"2014-08-19T23:17:40.000Z","value":0},{"time":"2014-08-19T23:17:50.000Z","value":0},{"time":"2014-08-19T23:18:00.000Z","value":0},{"time":"2014-08-19T23:18:10.000Z","value":27852.8},{"time":"2014-08-19T23:18:20.000Z","value":0},{"time":"2014-08-19T23:18:30.000Z","value":21299.2},{"time":"2014-08-19T23:18:40.000Z","value":0},{"time":"2014-08-19T23:18:50.000Z","value":0},{"time":"2014-08-19T23:19:00.000Z","value":0},{"time":"2014-08-19T23:19:10.000Z","value":0},{"time":"2014-08-19T23:19:20.000Z","value":0},{"time":"2014-08-19T23:19:30.000Z","value":0},{"time":"2014-08-19T23:19:40.000Z","value":0},{"time":"2014-08-19T23:19:50.000Z","value":0},{"time":"2014-08-19T23:20:00.000Z","value":0},{"time":"2014-08-19T23:20:10.000Z","value":27852.8},{"time":"2014-08-19T23:20:20.000Z","value":0},{"time":"2014-08-19T23:20:30.000Z","value":6553.6},{"time":"2014-08-19T23:20:40.000Z","value":6553.6},{"time":"2014-08-19T23:20:50.000Z","value":0},{"time":"2014-08-19T23:21:00.000Z","value":0},{"time":"2014-08-19T23:21:10.000Z","value":0},{"time":"2014-08-19T23:21:20.000Z","value":0},{"time":"2014-08-19T23:21:30.000Z","value":0},{"time":"2014-08-19T23:21:40.000Z","value":0},{"time":"2014-08-19T23:21:50.000Z","value":0},{"time":"2014-08-19T23:22:00.000Z","value":0},{"time":"2014-08-19T23:22:10.000Z","value":27852.8},{"time":"2014-08-19T23:22:20.000Z","value":0},{"time":"2014-08-19T23:22:30.000Z","value":0},{"time":"2014-08-19T23:22:40.000Z","value":0},{"time":"2014-08-19T23:22:50.000Z","value":21299.2},{"time":"2014-08-19T23:23:00.000Z","value":0},{"time":"2014-08-19T23:23:10.000Z","value":39321.6},{"time":"2014-08-19T23:23:20.000Z","value":0},{"time":"2014-08-19T23:23:30.000Z","value":0},{"time":"2014-08-19T23:23:40.000Z","value":0},{"time":"2014-08-19T23:23:50.000Z","value":0},{"time":"2014-08-19T23:24:00.000Z","value":0},{"time":"2014-08-19T23:24:10.000Z","value":27852.8},{"time":"2014-08-19T23:24:20.000Z","value":0},{"time":"2014-08-19T23:24:30.000Z","value":0},{"time":"2014-08-19T23:24:40.000Z","value":0},{"time":"2014-08-19T23:24:50.000Z","value":16384},{"time":"2014-08-19T23:25:00.000Z","value":22937.6},{"time":"2014-08-19T23:25:10.000Z","value":37683.2},{"time":"2014-08-19T23:25:20.000Z","value":0},{"time":"2014-08-19T23:25:30.000Z","value":0},{"time":"2014-08-19T23:25:40.000Z","value":0},{"time":"2014-08-19T23:25:50.000Z","value":6553.6},{"time":"2014-08-19T23:26:00.000Z","value":13107.2},{"time":"2014-08-19T23:26:10.000Z","value":36044.8},{"time":"2014-08-19T23:26:20.000Z","value":0},{"time":"2014-08-19T23:26:30.000Z","value":0},{"time":"2014-08-19T23:26:40.000Z","value":0},{"time":"2014-08-19T23:26:50.000Z","value":0},{"time":"2014-08-19T23:27:00.000Z","value":24576},{"time":"2014-08-19T23:27:10.000Z","value":54067.2},{"time":"2014-08-19T23:27:20.000Z","value":0},{"time":"2014-08-19T23:27:30.000Z","value":0},{"time":"2014-08-19T23:27:40.000Z","value":0},{"time":"2014-08-19T23:27:50.000Z","value":0},{"time":"2014-08-19T23:28:00.000Z","value":40960},{"time":"2014-08-19T23:28:10.000Z","value":36044.8},{"time":"2014-08-19T23:28:20.000Z","value":0},{"time":"2014-08-19T23:28:30.000Z","value":0},{"time":"2014-08-19T23:28:40.000Z","value":0},{"time":"2014-08-19T23:28:50.000Z","value":0},{"time":"2014-08-19T23:29:00.000Z","value":0},{"time":"2014-08-19T23:29:10.000Z","value":49152},{"time":"2014-08-19T23:29:20.000Z","value":19660.8},{"time":"2014-08-19T23:29:30.000Z","value":0},{"time":"2014-08-19T23:29:40.000Z","value":0},{"time":"2014-08-19T23:29:50.000Z","value":0},{"time":"2014-08-19T23:30:00.000Z","value":0},{"time":"2014-08-19T23:30:10.000Z","value":19660.8},{"time":"2014-08-19T23:30:20.000Z","value":0},{"time":"2014-08-19T23:30:30.000Z","value":0},{"time":"2014-08-19T23:30:40.000Z","value":39321.6},{"time":"2014-08-19T23:30:50.000Z","value":0},{"time":"2014-08-19T23:31:00.000Z","value":0},{"time":"2014-08-19T23:31:10.000Z","value":0},{"time":"2014-08-19T23:31:20.000Z","value":45875.2},{"time":"2014-08-19T23:31:30.000Z","value":0},{"time":"2014-08-19T23:31:40.000Z","value":0},{"time":"2014-08-19T23:31:50.000Z","value":36044.8},{"time":"2014-08-19T23:32:00.000Z","value":0},{"time":"2014-08-19T23:32:10.000Z","value":0},{"time":"2014-08-19T23:32:20.000Z","value":16384},{"time":"2014-08-19T23:32:30.000Z","value":0},{"time":"2014-08-19T23:32:40.000Z","value":0},{"time":"2014-08-19T23:32:50.000Z","value":0},{"time":"2014-08-19T23:33:00.000Z","value":0},{"time":"2014-08-19T23:33:10.000Z","value":0},{"time":"2014-08-19T23:33:20.000Z","value":0},{"time":"2014-08-19T23:33:30.000Z","value":36044.8},{"time":"2014-08-19T23:33:40.000Z","value":0},{"time":"2014-08-19T23:33:50.000Z","value":0},{"time":"2014-08-19T23:34:00.000Z","value":0},{"time":"2014-08-19T23:34:10.000Z","value":36044.8},{"time":"2014-08-19T23:34:20.000Z","value":52428.8}]');
+        data1 = JSON.parse('[{"time":"2014-08-20T00:15:50.000Z","value":0},{"time":"2014-08-20T00:16:00.000Z","value":9.2},{"time":"2014-08-20T00:16:10.000Z","value":9.2},{"time":"2014-08-20T00:16:20.000Z","value":42.8},{"time":"2014-08-20T00:16:30.000Z","value":0},{"time":"2014-08-20T00:16:40.000Z","value":1201.8},{"time":"2014-08-20T00:16:50.000Z","value":693.2},{"time":"2014-08-20T00:17:00.000Z","value":0},{"time":"2014-08-20T00:17:10.000Z","value":9.2},{"time":"2014-08-20T00:17:20.000Z","value":0},{"time":"2014-08-20T00:17:30.000Z","value":9.2},{"time":"2014-08-20T00:17:40.000Z","value":0},{"time":"2014-08-20T00:17:50.000Z","value":0},{"time":"2014-08-20T00:18:00.000Z","value":0},{"time":"2014-08-20T00:18:10.000Z","value":9.2},{"time":"2014-08-20T00:18:20.000Z","value":9.2},{"time":"2014-08-20T00:18:30.000Z","value":0},{"time":"2014-08-20T00:18:40.000Z","value":9.2},{"time":"2014-08-20T00:18:50.000Z","value":2058.8},{"time":"2014-08-20T00:19:00.000Z","value":0},{"time":"2014-08-20T00:19:10.000Z","value":0},{"time":"2014-08-20T00:19:20.000Z","value":0},{"time":"2014-08-20T00:19:30.000Z","value":0},{"time":"2014-08-20T00:19:40.000Z","value":0},{"time":"2014-08-20T00:19:50.000Z","value":0},{"time":"2014-08-20T00:20:00.000Z","value":0},{"time":"2014-08-20T00:20:10.000Z","value":0},{"time":"2014-08-20T00:20:20.000Z","value":0},{"time":"2014-08-20T00:20:30.000Z","value":9.2},{"time":"2014-08-20T00:20:40.000Z","value":9.2},{"time":"2014-08-20T00:20:50.000Z","value":67.2},{"time":"2014-08-20T00:21:00.000Z","value":2808.4},{"time":"2014-08-20T00:21:10.000Z","value":0},{"time":"2014-08-20T00:21:20.000Z","value":9.2},{"time":"2014-08-20T00:21:30.000Z","value":0},{"time":"2014-08-20T00:21:40.000Z","value":0},{"time":"2014-08-20T00:21:50.000Z","value":0},{"time":"2014-08-20T00:22:00.000Z","value":0},{"time":"2014-08-20T00:22:10.000Z","value":0},{"time":"2014-08-20T00:22:20.000Z","value":0},{"time":"2014-08-20T00:22:30.000Z","value":9.2},{"time":"2014-08-20T00:22:40.000Z","value":0},{"time":"2014-08-20T00:22:50.000Z","value":0},{"time":"2014-08-20T00:23:00.000Z","value":12},{"time":"2014-08-20T00:23:10.000Z","value":2549.4},{"time":"2014-08-20T00:23:20.000Z","value":0},{"time":"2014-08-20T00:23:30.000Z","value":9.2},{"time":"2014-08-20T00:23:40.000Z","value":18.4},{"time":"2014-08-20T00:23:50.000Z","value":0},{"time":"2014-08-20T00:24:00.000Z","value":0},{"time":"2014-08-20T00:24:10.000Z","value":0},{"time":"2014-08-20T00:24:20.000Z","value":0},{"time":"2014-08-20T00:24:30.000Z","value":0},{"time":"2014-08-20T00:24:40.000Z","value":0},{"time":"2014-08-20T00:24:50.000Z","value":0},{"time":"2014-08-20T00:25:00.000Z","value":0},{"time":"2014-08-20T00:25:10.000Z","value":163.8},{"time":"2014-08-20T00:25:20.000Z","value":1277.8},{"time":"2014-08-20T00:25:30.000Z","value":0},{"time":"2014-08-20T00:25:40.000Z","value":0},{"time":"2014-08-20T00:25:50.000Z","value":0},{"time":"2014-08-20T00:26:00.000Z","value":0},{"time":"2014-08-20T00:26:10.000Z","value":0},{"time":"2014-08-20T00:26:20.000Z","value":0},{"time":"2014-08-20T00:26:30.000Z","value":9.2},{"time":"2014-08-20T00:26:40.000Z","value":0}]');
+        data2 = JSON.parse('[{"time":"2014-08-20T00:15:50.000Z","value":206.2},{"time":"2014-08-20T00:16:00.000Z","value":422.6},{"time":"2014-08-20T00:16:10.000Z","value":429.4},{"time":"2014-08-20T00:16:20.000Z","value":431},{"time":"2014-08-20T00:16:30.000Z","value":412.2},{"time":"2014-08-20T00:16:40.000Z","value":1847},{"time":"2014-08-20T00:16:50.000Z","value":1408},{"time":"2014-08-20T00:17:00.000Z","value":401.4},{"time":"2014-08-20T00:17:10.000Z","value":429},{"time":"2014-08-20T00:17:20.000Z","value":406.8},{"time":"2014-08-20T00:17:30.000Z","value":420.2},{"time":"2014-08-20T00:17:40.000Z","value":406.8},{"time":"2014-08-20T00:17:50.000Z","value":204.2},{"time":"2014-08-20T00:18:00.000Z","value":401},{"time":"2014-08-20T00:18:10.000Z","value":419.6},{"time":"2014-08-20T00:18:20.000Z","value":418.6},{"time":"2014-08-20T00:18:30.000Z","value":402.4},{"time":"2014-08-20T00:18:40.000Z","value":427.4},{"time":"2014-08-20T00:18:50.000Z","value":2567.8},{"time":"2014-08-20T00:19:00.000Z","value":408.8},{"time":"2014-08-20T00:19:10.000Z","value":402.4},{"time":"2014-08-20T00:19:20.000Z","value":410.2},{"time":"2014-08-20T00:19:30.000Z","value":402.4},{"time":"2014-08-20T00:19:40.000Z","value":418.6},{"time":"2014-08-20T00:19:50.000Z","value":407.2},{"time":"2014-08-20T00:20:00.000Z","value":410.2},{"time":"2014-08-20T00:20:10.000Z","value":402.4},{"time":"2014-08-20T00:20:20.000Z","value":410.2},{"time":"2014-08-20T00:20:30.000Z","value":402.4},{"time":"2014-08-20T00:20:40.000Z","value":427.4},{"time":"2014-08-20T00:20:50.000Z","value":278.2},{"time":"2014-08-20T00:21:00.000Z","value":3695.2},{"time":"2014-08-20T00:21:10.000Z","value":412.6},{"time":"2014-08-20T00:21:20.000Z","value":427.4},{"time":"2014-08-20T00:21:30.000Z","value":402.4},{"time":"2014-08-20T00:21:40.000Z","value":410.2},{"time":"2014-08-20T00:21:50.000Z","value":407.2},{"time":"2014-08-20T00:22:00.000Z","value":410.2},{"time":"2014-08-20T00:22:10.000Z","value":402.4},{"time":"2014-08-20T00:22:20.000Z","value":410.2},{"time":"2014-08-20T00:22:30.000Z","value":410.8},{"time":"2014-08-20T00:22:40.000Z","value":410.2},{"time":"2014-08-20T00:22:50.000Z","value":199.8},{"time":"2014-08-20T00:23:00.000Z","value":430.6},{"time":"2014-08-20T00:23:10.000Z","value":3350.6},{"time":"2014-08-20T00:23:20.000Z","value":404.8},{"time":"2014-08-20T00:23:30.000Z","value":419.6},{"time":"2014-08-20T00:23:40.000Z","value":444.6},{"time":"2014-08-20T00:23:50.000Z","value":407.2},{"time":"2014-08-20T00:24:00.000Z","value":410.2},{"time":"2014-08-20T00:24:10.000Z","value":402.4},{"time":"2014-08-20T00:24:20.000Z","value":410.2},{"time":"2014-08-20T00:24:30.000Z","value":402.4},{"time":"2014-08-20T00:24:40.000Z","value":418.6},{"time":"2014-08-20T00:24:50.000Z","value":407.2},{"time":"2014-08-20T00:25:00.000Z","value":410.2},{"time":"2014-08-20T00:25:10.000Z","value":876.8},{"time":"2014-08-20T00:25:20.000Z","value":1861.6},{"time":"2014-08-20T00:25:30.000Z","value":406.2},{"time":"2014-08-20T00:25:40.000Z","value":611.2},{"time":"2014-08-20T00:25:50.000Z","value":408},{"time":"2014-08-20T00:26:00.000Z","value":611.2},{"time":"2014-08-20T00:26:10.000Z","value":406.2},{"time":"2014-08-20T00:26:20.000Z","value":611.2},{"time":"2014-08-20T00:26:30.000Z","value":423.4},{"time":"2014-08-20T00:26:40.000Z","value":611.2}]');
+        Mist.datasource1.set('datapoints', new Array());
+        data1.forEach(function (dt) {
+           Mist.datasource1.datapoints.pushObject(Datapoint.create(dt));
+        });
+        Mist.datasource2.set('datapoints', new Array());
+        data2.forEach(function (dt) {
+           Mist.datasource2.datapoints.pushObject(Datapoint.create(dt));
+        });
+        Mist.graph.view.draw();
+    });
+}
+
+function getData () {
+
+    require(['app/models/datapoint'], function (Datapoint) {
+        $.ajax({
+            url: '/backends/' + '36vp27TVyUCarDNNcta1Knsqcr8Z' +
+                 '/machines/' + '711b8d9f-2839-4a7e-b6e3-5e8fcc4a1afd' + '/stats',
+            type: 'GET',
+            data: {
+                start: 1408487120,
+                stop: 1408487160,
+                step: 10000,
+                v: 2,
+            },
+            success: function (metrics) {
+                Mist.set('metrics', metrics);
+                Mist.datasource.set('datapoints', [])
+                Mist.metrics['disk.total.disk_octets.read'].datapoints.forEach(function (datapoint) {
+                    var dt = Datapoint.create(datapoint);
+                    for (var i = 0; i < 80; i++)
+                        Mist.datasource.datapoints.pushObject(dt);
+                });
+                Mist.graph.view.draw();
+            }
+        });
     });
 }
