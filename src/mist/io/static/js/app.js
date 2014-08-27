@@ -808,6 +808,10 @@ var setupSocketEvents = function (socket, callback) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
             backend.machines.load(data.machines);
+        Mist.set('didListMachines', true);
+        if (Mist.didListMonitoring)
+            if (!Mist.didShowGraphs)
+                showGraphs();
     })
     .on('list_locations', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -818,9 +822,12 @@ var setupSocketEvents = function (socket, callback) {
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
         Mist.backendsController.set('checkedMonitoring', true);
-        showGraphs();
+        Mist.set('didListMonitoring', true);
+        if (Mist.didListMachines)
+            if (!Mist.didShowGraphs)
+                showGraphs();
     })
-    .on('stats', function(data){
+    .on('stats', function (data) {
         Mist.monitoringController.request.updateMetrics(
             data.metrics, data.start, data.stop, data.requestID);
     })
@@ -1095,6 +1102,7 @@ function error() {
 
 function showGraphs() {
 
+    Mist.set('didShowGraphs', true);
     require(['app/models/graph', 'app/models/datapoint'], function (Graph, Datapoint) {
 
         info('showing graphs');
@@ -1123,21 +1131,6 @@ function showGraphs() {
             }
         });
 
-        // Fill in dummy Datapoints
-        /*
-        var data1 = JSON.parse('[{"time":"2014-08-20T00:15:50.000Z","value":0},{"time":"2014-08-20T00:16:00.000Z","value":9.2},{"time":"2014-08-20T00:16:10.000Z","value":9.2},{"time":"2014-08-20T00:16:20.000Z","value":42.8},{"time":"2014-08-20T00:16:30.000Z","value":0},{"time":"2014-08-20T00:16:40.000Z","value":1201.8},{"time":"2014-08-20T00:16:50.000Z","value":693.2},{"time":"2014-08-20T00:17:00.000Z","value":0},{"time":"2014-08-20T00:17:10.000Z","value":9.2},{"time":"2014-08-20T00:17:20.000Z","value":0},{"time":"2014-08-20T00:17:30.000Z","value":9.2},{"time":"2014-08-20T00:17:40.000Z","value":0},{"time":"2014-08-20T00:17:50.000Z","value":0},{"time":"2014-08-20T00:18:00.000Z","value":0},{"time":"2014-08-20T00:18:10.000Z","value":9.2},{"time":"2014-08-20T00:18:20.000Z","value":9.2},{"time":"2014-08-20T00:18:30.000Z","value":0},{"time":"2014-08-20T00:18:40.000Z","value":9.2},{"time":"2014-08-20T00:18:50.000Z","value":2058.8},{"time":"2014-08-20T00:19:00.000Z","value":0},{"time":"2014-08-20T00:19:10.000Z","value":0},{"time":"2014-08-20T00:19:20.000Z","value":0},{"time":"2014-08-20T00:19:30.000Z","value":0},{"time":"2014-08-20T00:19:40.000Z","value":0},{"time":"2014-08-20T00:19:50.000Z","value":0},{"time":"2014-08-20T00:20:00.000Z","value":0},{"time":"2014-08-20T00:20:10.000Z","value":0},{"time":"2014-08-20T00:20:20.000Z","value":0},{"time":"2014-08-20T00:20:30.000Z","value":9.2},{"time":"2014-08-20T00:20:40.000Z","value":9.2},{"time":"2014-08-20T00:20:50.000Z","value":67.2},{"time":"2014-08-20T00:21:00.000Z","value":2808.4},{"time":"2014-08-20T00:21:10.000Z","value":0},{"time":"2014-08-20T00:21:20.000Z","value":9.2},{"time":"2014-08-20T00:21:30.000Z","value":0},{"time":"2014-08-20T00:21:40.000Z","value":0},{"time":"2014-08-20T00:21:50.000Z","value":0},{"time":"2014-08-20T00:22:00.000Z","value":0},{"time":"2014-08-20T00:22:10.000Z","value":0},{"time":"2014-08-20T00:22:20.000Z","value":0},{"time":"2014-08-20T00:22:30.000Z","value":9.2},{"time":"2014-08-20T00:22:40.000Z","value":0},{"time":"2014-08-20T00:22:50.000Z","value":0},{"time":"2014-08-20T00:23:00.000Z","value":12},{"time":"2014-08-20T00:23:10.000Z","value":2549.4},{"time":"2014-08-20T00:23:20.000Z","value":0},{"time":"2014-08-20T00:23:30.000Z","value":9.2},{"time":"2014-08-20T00:23:40.000Z","value":18.4},{"time":"2014-08-20T00:23:50.000Z","value":0},{"time":"2014-08-20T00:24:00.000Z","value":0},{"time":"2014-08-20T00:24:10.000Z","value":0},{"time":"2014-08-20T00:24:20.000Z","value":0},{"time":"2014-08-20T00:24:30.000Z","value":0},{"time":"2014-08-20T00:24:40.000Z","value":0},{"time":"2014-08-20T00:24:50.000Z","value":0},{"time":"2014-08-20T00:25:00.000Z","value":0},{"time":"2014-08-20T00:25:10.000Z","value":163.8},{"time":"2014-08-20T00:25:20.000Z","value":1277.8},{"time":"2014-08-20T00:25:30.000Z","value":0},{"time":"2014-08-20T00:25:40.000Z","value":0},{"time":"2014-08-20T00:25:50.000Z","value":0},{"time":"2014-08-20T00:26:00.000Z","value":0},{"time":"2014-08-20T00:26:10.000Z","value":0},{"time":"2014-08-20T00:26:20.000Z","value":0},{"time":"2014-08-20T00:26:30.000Z","value":9.2},{"time":"2014-08-20T00:26:40.000Z","value":0}]');
-        Mist.datasource1.set('datapoints', new Array());
-        data1.forEach(function (dt) {
-           Mist.datasource1.datapoints.pushObject(Datapoint.create(dt));
-        });
-
-        var data2 = JSON.parse('[{"time":"2014-08-20T00:15:50.000Z","value":206.2},{"time":"2014-08-20T00:16:00.000Z","value":422.6},{"time":"2014-08-20T00:16:10.000Z","value":429.4},{"time":"2014-08-20T00:16:20.000Z","value":431},{"time":"2014-08-20T00:16:30.000Z","value":412.2},{"time":"2014-08-20T00:16:40.000Z","value":1847},{"time":"2014-08-20T00:16:50.000Z","value":1408},{"time":"2014-08-20T00:17:00.000Z","value":401.4},{"time":"2014-08-20T00:17:10.000Z","value":429},{"time":"2014-08-20T00:17:20.000Z","value":406.8},{"time":"2014-08-20T00:17:30.000Z","value":420.2},{"time":"2014-08-20T00:17:40.000Z","value":406.8},{"time":"2014-08-20T00:17:50.000Z","value":204.2},{"time":"2014-08-20T00:18:00.000Z","value":401},{"time":"2014-08-20T00:18:10.000Z","value":419.6},{"time":"2014-08-20T00:18:20.000Z","value":418.6},{"time":"2014-08-20T00:18:30.000Z","value":402.4},{"time":"2014-08-20T00:18:40.000Z","value":427.4},{"time":"2014-08-20T00:18:50.000Z","value":2567.8},{"time":"2014-08-20T00:19:00.000Z","value":408.8},{"time":"2014-08-20T00:19:10.000Z","value":402.4},{"time":"2014-08-20T00:19:20.000Z","value":410.2},{"time":"2014-08-20T00:19:30.000Z","value":402.4},{"time":"2014-08-20T00:19:40.000Z","value":418.6},{"time":"2014-08-20T00:19:50.000Z","value":407.2},{"time":"2014-08-20T00:20:00.000Z","value":410.2},{"time":"2014-08-20T00:20:10.000Z","value":402.4},{"time":"2014-08-20T00:20:20.000Z","value":410.2},{"time":"2014-08-20T00:20:30.000Z","value":402.4},{"time":"2014-08-20T00:20:40.000Z","value":427.4},{"time":"2014-08-20T00:20:50.000Z","value":278.2},{"time":"2014-08-20T00:21:00.000Z","value":3695.2},{"time":"2014-08-20T00:21:10.000Z","value":412.6},{"time":"2014-08-20T00:21:20.000Z","value":427.4},{"time":"2014-08-20T00:21:30.000Z","value":402.4},{"time":"2014-08-20T00:21:40.000Z","value":410.2},{"time":"2014-08-20T00:21:50.000Z","value":407.2},{"time":"2014-08-20T00:22:00.000Z","value":410.2},{"time":"2014-08-20T00:22:10.000Z","value":402.4},{"time":"2014-08-20T00:22:20.000Z","value":410.2},{"time":"2014-08-20T00:22:30.000Z","value":410.8},{"time":"2014-08-20T00:22:40.000Z","value":410.2},{"time":"2014-08-20T00:22:50.000Z","value":199.8},{"time":"2014-08-20T00:23:00.000Z","value":430.6},{"time":"2014-08-20T00:23:10.000Z","value":3350.6},{"time":"2014-08-20T00:23:20.000Z","value":404.8},{"time":"2014-08-20T00:23:30.000Z","value":419.6},{"time":"2014-08-20T00:23:40.000Z","value":444.6},{"time":"2014-08-20T00:23:50.000Z","value":407.2},{"time":"2014-08-20T00:24:00.000Z","value":410.2},{"time":"2014-08-20T00:24:10.000Z","value":402.4},{"time":"2014-08-20T00:24:20.000Z","value":410.2},{"time":"2014-08-20T00:24:30.000Z","value":402.4},{"time":"2014-08-20T00:24:40.000Z","value":418.6},{"time":"2014-08-20T00:24:50.000Z","value":407.2},{"time":"2014-08-20T00:25:00.000Z","value":410.2},{"time":"2014-08-20T00:25:10.000Z","value":876.8},{"time":"2014-08-20T00:25:20.000Z","value":1861.6},{"time":"2014-08-20T00:25:30.000Z","value":406.2},{"time":"2014-08-20T00:25:40.000Z","value":611.2},{"time":"2014-08-20T00:25:50.000Z","value":408},{"time":"2014-08-20T00:26:00.000Z","value":611.2},{"time":"2014-08-20T00:26:10.000Z","value":406.2},{"time":"2014-08-20T00:26:20.000Z","value":611.2},{"time":"2014-08-20T00:26:30.000Z","value":423.4},{"time":"2014-08-20T00:26:40.000Z","value":611.2}]');
-        Mist.datasource2.set('datapoints', new Array());
-        data2.forEach(function (dt) {
-           Mist.datasource2.datapoints.pushObject(Datapoint.create(dt));
-        });
-        */
-
         graph.addDatasource(Mist.datasource1);
         graph.addDatasource(Mist.datasource2);
 
@@ -1151,32 +1144,6 @@ function showGraphs() {
 }
 
 
-function getData () {
-
-    require(['app/models/datapoint'], function (Datapoint) {
-        $.ajax({
-            url: '/backends/' + '36vp27TVyUCarDNNcta1Knsqcr8Z' +
-                 '/machines/' + '711b8d9f-2839-4a7e-b6e3-5e8fcc4a1afd' + '/stats',
-            type: 'GET',
-            data: {
-                start: 1408487120,
-                stop: 1408487160,
-                step: 10000,
-                v: 2,
-            },
-            success: function (metrics) {
-                Mist.set('metrics', metrics);
-                Mist.datasource.set('datapoints', [])
-                Mist.metrics['disk.total.disk_octets.read'].datapoints.forEach(function (datapoint) {
-                    var dt = Datapoint.create(datapoint);
-                    for (var i = 0; i < 80; i++)
-                        Mist.datasource.datapoints.pushObject(dt);
-                });
-                Mist.graph.view.draw();
-            }
-        });
-    });
-}
 
 var TIME_MAP = {
     SECOND: 1000,

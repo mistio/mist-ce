@@ -76,9 +76,9 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
             generateStatsRequest: function () {
                 return {
                     datasource: this,
-                    machineId: this.machine.id,
+                    machine: this.machine,
                     metricId: this.metric.id,
-                    from: this.getLastTimestamp(),
+                    start: this.getLastTimestamp(),
                     url: '/backends/' + this.machine.backend.id +
                         '/machines/' + this.machine.id + '/stats',
                 }

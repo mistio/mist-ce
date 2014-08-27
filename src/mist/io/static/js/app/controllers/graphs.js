@@ -57,10 +57,7 @@ define('app/controllers/graphs', ['ember'],
 
             startPolling: function () {
                 this.set('isPolling', true);
-                if (this.pollingMethod == 'XHR')
-                    this._startXHRPolling()
-                else if (this.pollingMethod == 'Socket')
-                    this._startSocketPolling();
+                this._startPolling();
             },
 
 
@@ -86,49 +83,34 @@ define('app/controllers/graphs', ['ember'],
             },
 
 
-            _startSocketPolling: function () {
+            _startPolling: function () {
 
-
-            },
-
-
-            _startXHRPolling: function () {
-
+                // Loop
                 var that = this;
-
-                poll();
 
                 function poll () {
 
-                    if (!that.isPolling) return;
+                    var requests = that._mergeStatsRequests(
+                        that._gotherStatsRequests()
+                    );
 
-                    var requests = that._gotherStatsRequests();
                     var remainingResponses = Object.keys(requests).length;
 
-                    forIn(that, requests, function (request) {
-                        var start = parseInt((request.from - that.config.measurementOffset) / 1000)
-                        var stop = parseInt((Date.now() - that.config.measurementOffset) / 1000)
-                        var data = {
-                            start: start - 50,
-                            stop:  stop + 50,
-                            step: parseInt(that.config.measurementStep / 1000),
-                            v: 2,
-                            metrics: request.metrics
-                        }
-                        info(data);
-                        $.ajax({
-                            url: request.url,
-                            type: 'GET',
-                            async: true,
-                            dataType: 'json',
-                            data: data,
-                            complete: function (jqXHR) {
-                                handleResponse(jqXHR.status == 200, request, jqXHR.responseJSON, start, stop);
-                            }
-                        });
+                    forIn(requests, function (request) {
+                        if (that.pollingMethod == 'Socket')
+                            that._requestStatsFromSocket(request, statsCallback);
+                        if (that.pollingMethod == 'XHR')
+                            that._requestStatsFromXHR(request, statsCallback);
                     });
 
-                    function handleResponse (success, request, response, start, stop) {
+
+                    function statsCallback (response) {
+
+                        var datapoints;
+                        if (that.pollingMethod == 'Socket');
+                            //datapoints = responce.metrics[]
+                        if (that.pollingMethod == 'XHR')
+
 
                         // If the request was successfull, feed the datasouces
                         // with the new data
@@ -155,22 +137,69 @@ define('app/controllers/graphs', ['ember'],
             },
 
 
-            _gotherStatsRequests: function () {
+            _requestStatsFromXHR: function (request, callback) {
+                var data = this._generateRequestData(request);
+                $.ajax({
+                    url: request.url,
+                    data: data,
+                    type: 'GET',
+                    complete: callback,
+                });
+            },
 
-                // Gother requests from each datasource
+
+            _requestStatsFromSocket: function (request, callback) {
+                var data = this._generateRequestData(request);
+                Mist.socket.statsCallback = callback;
+                Mist.socket.emit('stats',
+                    request.machine.backend.id,
+                    request.machine.id,
+                    request.metrics,
+                    data.start,
+                    data.stop,
+                    data.step,
+                );
+            },
+
+
+            _generateRequestData: function (request) {
+
+                var step = this.config.measurementStep / 1000;
+                var stop = (Date.now() - this.config.measurementOffset) / 1000;
+                var start = (request.start - this.config.measurementOffset) / 1000;
+
+                return {
+                    v: 2,
+                    step: parseInt(step),
+                    stop:  parseInt(stop) + 50,
+                    start: parseInt(start) - 50,
+                    metrics: request.metrics
+                };
+            },
+
+
+            _preprocessStatsResponse: function (response) {
+
+            },
+
+
+            _gotherStatsRequests: function () {
                 var requests = [];
                 this.content.forEach(function (graph) {
                     graph.datasources.forEach(function (datasource) {
                         requests.push(datasource.generateStatsRequest());
                     });
                 });
+                return requests;
+            },
 
-                // Merge requests to reduce ajax calls
+
+            _mergeStatsRequests: function (requests) {
                 var mergedRequests = {};
                 requests.forEach(function (request) {
 
-                    var requestFrom =
-                        request.from ? request.from : Date.now() - this.config.timeWindow;
+                    var requestStart =
+                        request.start ? request.start : Date.now() - this.config.timeWindow;
 
                     var mergedRequestKey = request.url + '_' + requestFrom.toString();
 
@@ -178,9 +207,10 @@ define('app/controllers/graphs', ['ember'],
                     if (! (mergedRequestKey in mergedRequests)) {
                         mergedRequests[mergedRequestKey] = {
                             url: request.url,
-                            from: requestFrom,
+                            start: requestStart,
                             metrics: [],
-                            datasources: []
+                            datasources: [],
+                            machine: request.machine,
                         };
                     }
 
@@ -190,7 +220,6 @@ define('app/controllers/graphs', ['ember'],
                         mergedRequest.datasources.push(request.datasource);
                     }
                 }, this);
-
                 return mergedRequests;
             }
         });
