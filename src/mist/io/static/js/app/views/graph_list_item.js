@@ -487,8 +487,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 var lastDatapoints = datapoints.slice(datapoints.length - 2);
 
                 this.set('valuesDistance',
-                    this.scale.x(lastDatapoints[0].time) -
-                    this.scale.x(lastDatapoints[1].time));
+                    this.scale.x(lastDatapoints[1].time) -
+                    this.scale.x(lastDatapoints[0].time));
             },
 
 

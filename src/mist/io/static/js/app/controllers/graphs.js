@@ -130,15 +130,11 @@ define('app/controllers/graphs', ['ember'],
 
                     function handleResponse (success, request, response, start, stop) {
 
-                        info('response', response);
-
                         // If the request was successfull, feed the datasouces
                         // with the new data
                         if (success)
                             request.datasources.forEach(function (datasource) {
-                                info('datasource', datasource);
                                 var newDatapoints = [];
-
                                 response[datasource.metric.id].datapoints.forEach(function (datapoint) {
                                     if (datapoint[1] <= stop && datapoint[1] > start)
                                         newDatapoints.push(datapoint);

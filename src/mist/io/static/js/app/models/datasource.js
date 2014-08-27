@@ -51,12 +51,6 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
 
             update: function (datapoints) {
 
-                var lastTimestamp = this.getLastTimestamp();
-                var firstTimestamp = new Date(datapoints[0][1] * 1000).getTime();
-
-                info('last', lastTimestamp);
-                info('first', firstTimestamp);
-
                 datapoints.forEach(function (datapoint) {
 
                     var dtp = Datapoint.create(datapoint);
@@ -64,16 +58,10 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
 
                     // Override old datapoints
                     var datapointToOverride = this.datapoints.findBy('time', dtp.time);
-                    if (datapointToOverride) {
-                        info('overridding', datapointToOverride.value, 'to',  dtp.value);
+                    if (datapointToOverride)
                         datapointToOverride.value = dtp.value;
-                    }
                     else if (lastTimestamp < dtp.time.getTime()) {
-                        info('pusing', dtp.value);
                         this.datapoints.push(dtp);
-                    }
-                    //else
-                        //info(lastTimestamp + '>' + dtp.time.getTime());
                 }, this);
             },
 
