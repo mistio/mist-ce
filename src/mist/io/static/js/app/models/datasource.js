@@ -60,7 +60,7 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
                     var datapointToOverride = this.datapoints.findBy('time', dtp.time);
                     if (datapointToOverride)
                         datapointToOverride.value = dtp.value;
-                    else if (lastTimestamp < dtp.time.getTime()) {
+                    else if (lastTimestamp < dtp.time.getTime())
                         this.datapoints.push(dtp);
                 }, this);
             },

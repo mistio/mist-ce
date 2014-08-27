@@ -818,6 +818,7 @@ var setupSocketEvents = function (socket, callback) {
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
         Mist.backendsController.set('checkedMonitoring', true);
+        showGraphs();
     })
     .on('stats', function(data){
         Mist.monitoringController.request.updateMetrics(
@@ -1095,6 +1096,8 @@ function error() {
 function showGraphs() {
 
     require(['app/models/graph', 'app/models/datapoint'], function (Graph, Datapoint) {
+
+        info('showing graphs');
 
         // Create a graph to display
         var graph = Graph.create({
