@@ -62,6 +62,11 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
             },
 
 
+            updateDatasource: function (args) {
+
+            },
+
+
             //
             //
             //  Pseudo-Private Methods

@@ -1,0 +1,9 @@
+{{#if Mist.graphsController.isOpen}}
+
+    {{view Mist.graphHistoryView}}
+
+    {{#each Mist.graphsController.content}}
+        {{view Mist.graphListItemView graphBinding="this"}}
+    {{/each}}
+
+{{/if}}

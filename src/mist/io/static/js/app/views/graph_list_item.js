@@ -1,4 +1,4 @@
-define('app/views/graph', ['app/views/templated', 'd3'],
+define('app/views/graph_list_item', ['app/views/templated', 'd3'],
     //
     //  Graph View
     //
@@ -52,6 +52,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             load: function () {
 
+                info('graph list item inserted');
+
                 // Add event handlers
                 this.graph.on('onDatasourceAdd', this, 'updateSVG');
                 this.graph.on('onDatasourceRemove', this, 'updateSVG');
@@ -87,6 +89,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             draw: function () {
                 this.updateView();
             },
+
 
             clearData: function () {
                 this.set('data', []);
@@ -604,7 +607,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                             .points(this.valuesDistance, 0, 0, 0)
                             .data(this.valueLinePaths[line.id])
                             .before(function (data) {
-                                info('data', data)
                                 this.d3Selector.attr('d', data);
                             })
                             .push();
