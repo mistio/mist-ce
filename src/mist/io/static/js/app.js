@@ -818,7 +818,7 @@ var setupSocketEvents = function (socket, callback) {
         if (backend)
             backend.locations.load(data.locations);
     })
-    .on('monitoring',function(data){
+    .on('monitoring',function (data){
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
         Mist.backendsController.set('checkedMonitoring', true);
@@ -828,6 +828,8 @@ var setupSocketEvents = function (socket, callback) {
                 showGraphs();
     })
     .on('stats', function (data) {
+        Mist.graphsController._handleStatsFromSocket(data);
+        return;
         Mist.monitoringController.request.updateMetrics(
             data.metrics, data.start, data.stop, data.requestID);
     })

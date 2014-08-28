@@ -1,10 +1,10 @@
-define('app/controllers/graphs', ['ember'],
+define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
     //
     //  Graphs Controller
     //
     //  @returns Class
     //
-    function () {
+    function (StatsRequest) {
 
         'use strict';
 
@@ -45,7 +45,7 @@ define('app/controllers/graphs', ['ember'],
                     'content': args.graphs,
                     'pollingMethod': args.pollingMethod
                 });
-                this.startPolling();
+                //this.startPolling();
             },
 
 
@@ -61,8 +61,87 @@ define('app/controllers/graphs', ['ember'],
             },
 
 
+            getStats: function (request, callback) {
+
+            },
+
+
             stopPolling: function () {
                 this.set('isPolling', false);
+            },
+
+
+            handleStatsResponse: function () {
+
+            },
+
+
+            pendingRequests: [],
+
+            poll: function () {
+
+            },
+
+            singleRequest: function (args) {
+                this.requestData(
+                    this._generateRequests(args)
+                );
+            },
+
+
+            _generateRequests: function (args) {
+
+                var requests = [];
+                var offset = this.config.measurementOffset;
+                this.content.forEach(function (graph) {
+                    graph.datasources.forEach(function (datasource) {
+
+                        var newRequest = StatsRequest.create({
+                            from: args.from - offset,
+                            until: args.until - offset,
+                            datasources: [datasource],
+                        });
+
+                        // Try to merge this request with another
+                        // one to reduce API calls
+                        var didMerge = false;
+                        requests.some(function (request) {
+                            if (request.canMerge(newRequest)) {
+                                request.merge(newRequest);
+                                return didMerge = true;
+                            }
+                        });
+
+                        if (!didMerge)
+                            requests.push(newRequest);
+                    });
+                });
+                return requests;
+            },
+
+
+            clearPendingRequests: function () {
+                this.set('pendingRequests', []);
+            },
+
+
+            requestData: function (requests) {
+                this.clearPendingRequests();
+                requests.forEach(function (request) {
+                    this.pendingRequests.push(request);
+                    if (this.pollingMethod == 'XHR')
+                        this._requestStatsFromXHR(request);
+                    if (this.pollingMethod == 'Socket')
+                        this._requestStatsFromSocket(request);
+                }, this);
+            },
+
+
+            responseHandler: function (data) {
+                if (this.pollingMethod == 'XHR')
+                    this._requestStatsFromXHR(request);
+                if (this.pollingMethod == 'Socket')
+                    this._requestStatsFromSocket(request);
             },
 
 
@@ -83,25 +162,13 @@ define('app/controllers/graphs', ['ember'],
             },
 
 
+
             _startPolling: function () {
 
                 // Loop
                 var that = this;
 
                 function poll () {
-
-                    var requests = that._mergeStatsRequests(
-                        that._gotherStatsRequests()
-                    );
-
-                    var remainingResponses = Object.keys(requests).length;
-
-                    forIn(requests, function (request) {
-                        if (that.pollingMethod == 'Socket')
-                            that._requestStatsFromSocket(request, statsCallback);
-                        if (that.pollingMethod == 'XHR')
-                            that._requestStatsFromXHR(request, statsCallback);
-                    });
 
 
                     function statsCallback (response) {
@@ -137,20 +204,18 @@ define('app/controllers/graphs', ['ember'],
             },
 
 
-            _requestStatsFromXHR: function (request, callback) {
-                var data = this._generateRequestData(request);
+            _requestStatsFromXHR: function (request) {
                 $.ajax({
                     url: request.url,
-                    data: data,
+                    data: this._generateRequestData(request),
                     type: 'GET',
-                    complete: callback,
+                    complete: this._handleStatsFromXHR
                 });
             },
 
 
-            _requestStatsFromSocket: function (request, callback) {
+            _requestStatsFromSocket: function (request) {
                 var data = this._generateRequestData(request);
-                Mist.socket.statsCallback = callback;
                 Mist.socket.emit('stats',
                     request.machine.backend.id,
                     request.machine.id,
@@ -158,69 +223,58 @@ define('app/controllers/graphs', ['ember'],
                     data.start,
                     data.stop,
                     data.step,
+                    request.id
                 );
+            },
+
+
+            _handleStatsFromXHR: function (jqXHR) {
+                var that = Mist.graphsController;
+                if (jqXHR.status == 200) {
+                    that._handleStats(jqXHR.responseJSON);
+                }
+            },
+
+
+            _handleStatsFromSocket: function (data) {
+                this._handleStats(data);
+            },
+
+
+            _handleStats: function (data) {
+                info('handling stats');
+                var request = this.pendingRequests.findBy('id', parseInt(data.request_id));
+                Mist.set('resp', data);
+                info('request', request);
+                if (request) {
+                    request.datasources.forEach(function (datasource) {
+                        var newDatapoints = [];
+                        data[datasource.metric.id].datapoints.forEach(function (datapoint) {
+                            if (datapoint[1] <= request.from - this.config.measurementOffset
+                                && datapoint[1] - this.config.measurementOffset  > request.until)
+                                newDatapoints.push(datapoint);
+                        }, this);
+                        datasource.update(newDatapoints);
+                    }, this);
+                    this.pendingRequests.removeObject(request);
+                    if (!this.pendingRequests.length)
+                        this.content.forEach(function (graph) {
+                            graph.view.draw();
+                        });
+                }
             },
 
 
             _generateRequestData: function (request) {
 
-                var step = this.config.measurementStep / 1000;
-                var stop = (Date.now() - this.config.measurementOffset) / 1000;
-                var start = (request.start - this.config.measurementOffset) / 1000;
-
                 return {
                     v: 2,
-                    step: parseInt(step),
-                    stop:  parseInt(stop) + 50,
-                    start: parseInt(start) - 50,
+                    request_id: request.id,
+                    start: parseInt(request.from / 1000) - 50,
+                    stop: parseInt(request.until / 1000) + 50,
+                    step: parseInt(this.config.measurementStep / 1000),
                     metrics: request.metrics
                 };
-            },
-
-
-            _preprocessStatsResponse: function (response) {
-
-            },
-
-
-            _gotherStatsRequests: function () {
-                var requests = [];
-                this.content.forEach(function (graph) {
-                    graph.datasources.forEach(function (datasource) {
-                        requests.push(datasource.generateStatsRequest());
-                    });
-                });
-                return requests;
-            },
-
-
-            _mergeStatsRequests: function (requests) {
-                var mergedRequests = {};
-                requests.forEach(function (request) {
-
-                    var requestStart =
-                        request.start ? request.start : Date.now() - this.config.timeWindow;
-
-                    var mergedRequestKey = request.url + '_' + requestFrom.toString();
-
-                    // Create a placeholder for the merged request
-                    if (! (mergedRequestKey in mergedRequests)) {
-                        mergedRequests[mergedRequestKey] = {
-                            url: request.url,
-                            start: requestStart,
-                            metrics: [],
-                            datasources: [],
-                            machine: request.machine,
-                        };
-                    }
-
-                    var mergedRequest = mergedRequests[mergedRequestKey];
-                    if (mergedRequest.metrics.indexOf(request.metricId) == -1) {
-                        mergedRequest.metrics.push(request.metricId);
-                        mergedRequest.datasources.push(request.datasource);
-                    }
-                }, this);
-                return mergedRequests;
             }
         });
     }

@@ -70,18 +70,6 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
                 var length = this.datapoints.length;
                 if (!length) return 0;
                 return this.datapoints[length - 1].time.getTime();
-            },
-
-
-            generateStatsRequest: function () {
-                return {
-                    datasource: this,
-                    machine: this.machine,
-                    metricId: this.metric.id,
-                    start: this.getLastTimestamp(),
-                    url: '/backends/' + this.machine.backend.id +
-                        '/machines/' + this.machine.id + '/stats',
-                }
             }
         });
     }

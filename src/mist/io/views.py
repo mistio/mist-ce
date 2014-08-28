@@ -666,7 +666,8 @@ def get_stats(request):
         request.matchdict['machine'],
         request.params.get('start'),
         request.params.get('stop'),
-        request.params.get('step')
+        request.params.get('step'),
+        request.params.get('request_id')
     )
 
 

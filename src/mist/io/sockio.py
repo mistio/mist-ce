@@ -121,7 +121,7 @@ class MistNamespace(BaseNamespace):
         self.keys_greenlet = self.spawn_later(2, list_keys_from_socket, self)
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
 
-    def on_stats(self, backend_id, machine_id, start, stop, step, requestID):
+    def on_stats(self, backend_id, machine_id, start, stop, step, request_id):
         try:
             data = get_stats(self.user, backend_id, machine_id,
                              start - 50, stop + 50, step / 1000)
@@ -133,7 +133,7 @@ class MistNamespace(BaseNamespace):
             'machine_id': machine_id,
             'start': start,
             'stop': stop,
-            'requestID': requestID,
+            'request_id': request_id,
             'metrics': data,
         }
         self.emit('stats', ret)

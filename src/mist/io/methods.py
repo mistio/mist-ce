@@ -2264,7 +2264,7 @@ $sudo /opt/mistio-collectd/collectd.sh restart
     return {'metric_id': None, 'stdout': stdout}
 
 
-def get_stats(user, backend_id, machine_id, start, stop, step):
+def get_stats(user, backend_id, machine_id, start, stop, step, request_id):
     try:
         resp = requests.get(
             "%s/backends/%s/machines/%s/stats" % (config.CORE_URI,
@@ -2277,7 +2277,9 @@ def get_stats(user, backend_id, machine_id, start, stop, step):
         log.error("%r", exc)
         raise SSLError()
     if resp.status_code == 200:
-        return resp.json()
+        ret = resp.json()
+        ret['request_id'] = request_id
+        return ret
     else:
         log.error("Error getting stats %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
