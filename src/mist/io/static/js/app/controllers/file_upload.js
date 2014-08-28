@@ -33,6 +33,7 @@ define('app/controllers/file_upload', ['ember'],
 
 
             open: function (title, label, callback) {
+                this.clear();
                 this.set('title', title)
                     .set('label', label)
                     .set('callback', callback);
@@ -48,7 +49,8 @@ define('app/controllers/file_upload', ['ember'],
 
 
             clear: function () {
-                this.set('title', null)
+                this.set('file', null)
+                    .set('title', null)
                     .set('label', null)
                     .set('callback', null);
             },
