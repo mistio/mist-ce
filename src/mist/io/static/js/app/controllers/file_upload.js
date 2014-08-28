@@ -67,10 +67,14 @@ define('app/controllers/file_upload', ['ember'],
 
                 reader.onloadend = function (e) {
 
-                    if (e.target.readyState == FileReader.DONE)
+                    var success;
+                    if (e.target.readyState == FileReader.DONE) {
                         that.set('file', e.target.result);
-                    else
+                        success = true;
+                    } else {
                         Mist.notificationsController.notify('Failed to upload file');
+                        success = false
+                    }
                     that.set('uploadingFile', false);
 
                     if (args.callback)
