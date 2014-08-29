@@ -828,10 +828,7 @@ var setupSocketEvents = function (socket, callback) {
                 showGraphs();
     })
     .on('stats', function (data) {
-        Mist.graphsController._handleStatsFromSocket(data);
-        return;
-        Mist.monitoringController.request.updateMetrics(
-            data.metrics, data.start, data.stop, data.requestID);
+        Mist.graphsController._handleSocketResponse(data);
     })
     .on('notify',function(data){
         if (data.message) {
@@ -1107,8 +1104,6 @@ function showGraphs() {
     Mist.set('didShowGraphs', true);
     require(['app/models/graph', 'app/models/datapoint'], function (Graph, Datapoint) {
 
-        info('showing graphs');
-
         // Create a graph to display
         var graph = Graph.create({
             id: 'graph-' + parseInt(Math.random() * 10000),
@@ -1117,34 +1112,24 @@ function showGraphs() {
         });
 
         // Create a new datasources to use
-        Mist.datasourcesController.addDatasource({
-            machine: Mist.backendsController.getMachine('711b8d9f-2839-4a7e-b6e3-5e8fcc4a1afd'),
-            metric: Mist.metricsController.getMetric('interface.total.if_octets.rx'),
-            callback: function (success, datasource) {
-                Mist.set('datasource1', datasource);
-            }
+        Mist.monitored_machines.forEach(function (machineTuple) {
+            var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
+            var metric = Mist.metricsController.getMetric('load.shortterm');
+            if (!machine) return;
+            Mist.datasourcesController.addDatasource({
+                machine: machine,
+                metric: metric,
+                callback: function (success, datasource) {
+                    graph.addDatasource(datasource);
+                }
+            });
         });
-
-        Mist.datasourcesController.addDatasource({
-            machine: Mist.backendsController.getMachine('711b8d9f-2839-4a7e-b6e3-5e8fcc4a1afd'),
-            metric: Mist.metricsController.getMetric('interface.total.if_octets.tx'),
-            callback: function (success, datasource) {
-                Mist.set('datasource2', datasource);
-            }
-        });
-
-        graph.addDatasource(Mist.datasource1);
-        graph.addDatasource(Mist.datasource2);
-
-        Mist.set('graph', graph);
 
         Mist.graphsController.open({
             graphs: [graph],
-            pollingMethod: 'XHR',
         });
     });
 }
-
 
 
 var TIME_MAP = {

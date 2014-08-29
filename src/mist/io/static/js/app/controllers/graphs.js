@@ -22,12 +22,14 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             content: null,
             isPolling: null,
             pollingMethod: null,
+            pendingRequests: [],
 
             config: {
+                requestMethod: 'XHR',
                 timeWindow: 10 * TIME_MAP.MINUTE,
                 measurementStep: 10 * TIME_MAP.SECOND,
                 pollingInterval: 10 * TIME_MAP.SECOND,
-                measurementOffset: 60 * TIME_MAP.SECOND,
+                measurementOffset: 40 * TIME_MAP.SECOND,
             },
 
 
@@ -43,105 +45,28 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this.setProperties({
                     'isOpen': true,
                     'content': args.graphs,
-                    'pollingMethod': args.pollingMethod
                 });
-                //this.startPolling();
+                this.stream();
             },
 
 
             close: function () {
-                this.stopPolling();
+                this.stopStreaming();
                 this._clear();
             },
 
 
-            startPolling: function () {
-                this.set('isPolling', true);
-                this._startPolling();
-            },
-
-
-            getStats: function (request, callback) {
-
-            },
-
-
-            stopPolling: function () {
-                this.set('isPolling', false);
-            },
-
-
-            handleStatsResponse: function () {
-
-            },
-
-
-            pendingRequests: [],
-
-            poll: function () {
-
-            },
-
-            singleRequest: function (args) {
-                this.requestData(
-                    this._generateRequests(args)
-                );
-            },
-
-
-            _generateRequests: function (args) {
-
-                var requests = [];
-                var offset = this.config.measurementOffset;
-                this.content.forEach(function (graph) {
-                    graph.datasources.forEach(function (datasource) {
-
-                        var newRequest = StatsRequest.create({
-                            from: args.from - offset,
-                            until: args.until - offset,
-                            datasources: [datasource],
-                        });
-
-                        // Try to merge this request with another
-                        // one to reduce API calls
-                        var didMerge = false;
-                        requests.some(function (request) {
-                            if (request.canMerge(newRequest)) {
-                                request.merge(newRequest);
-                                return didMerge = true;
-                            }
-                        });
-
-                        if (!didMerge)
-                            requests.push(newRequest);
-                    });
+            stream: function () {
+                this.set('isStreamming', true);
+                this._fetchStats({
+                    from: Date.now() - this.config.timeWindow,
+                    until: Date.now()
                 });
-                return requests;
             },
 
 
-            clearPendingRequests: function () {
-                this.set('pendingRequests', []);
-            },
-
-
-            requestData: function (requests) {
-                this.clearPendingRequests();
-                requests.forEach(function (request) {
-                    this.pendingRequests.push(request);
-                    if (this.pollingMethod == 'XHR')
-                        this._requestStatsFromXHR(request);
-                    if (this.pollingMethod == 'Socket')
-                        this._requestStatsFromSocket(request);
-                }, this);
-            },
-
-
-            responseHandler: function (data) {
-                if (this.pollingMethod == 'XHR')
-                    this._requestStatsFromXHR(request);
-                if (this.pollingMethod == 'Socket')
-                    this._requestStatsFromSocket(request);
+            stopStreaming: function () {
+                this.set('isStreamming', false);
             },
 
 
@@ -156,117 +81,83 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this.setProperties({
                     'isOpen': null,
                     'content': null,
-                    'isPolling': null,
-                    'pollingMethod': null,
+                    'isStreamming': null,
                 });
             },
 
 
 
-            _startPolling: function () {
+            _fetchStats: function (args) {
 
-                // Loop
-                var that = this;
+                this.set('fetchStatsArgs', args);
+                this.set('pendingRequests', []);
 
-                function poll () {
-
-
-                    function statsCallback (response) {
-
-                        var datapoints;
-                        if (that.pollingMethod == 'Socket');
-                            //datapoints = responce.metrics[]
-                        if (that.pollingMethod == 'XHR')
-
-
-                        // If the request was successfull, feed the datasouces
-                        // with the new data
-                        if (success)
-                            request.datasources.forEach(function (datasource) {
-                                var newDatapoints = [];
-                                response[datasource.metric.id].datapoints.forEach(function (datapoint) {
-                                    if (datapoint[1] <= stop && datapoint[1] > start)
-                                        newDatapoints.push(datapoint);
-                                });
-                                datasource.update(newDatapoints);
-                            });
-
-                        // Count down the remaining responses until zero,
-                        // and then request new data
-                        if (! --remainingResponses) {
-                            that.content.forEach(function (graph) {
-                                graph.view.draw();
-                            });
-                            setTimeout(poll, that.config.pollingInterval);
-                        }
-                    }
-                }
+                var requests = this._generateRequests(args);
+                requests.forEach(function (request) {
+                    this.pendingRequests.push(request);
+                    if (this.config.requestMethod == 'XHR')
+                        this._fetchStatsFromXHR(request);
+                    if (this.config.requestMethod == 'Socket')
+                        this._fetchStatsFromSocket(request);
+                }, this);
             },
 
 
-            _requestStatsFromXHR: function (request) {
+            _generateRequests: function (args) {
+
+                var now = Date.now();
+                var requests = [];
+                var offset = this.config.measurementOffset;
+                this.content.forEach(function (graph) {
+                    graph.datasources.forEach(function (datasource) {
+                        var newRequest = StatsRequest.create({
+                            from: (args ? args.from : datasource.getLastTimestamp()) - offset,
+                            until: (args ? args.until : now) - offset,
+                            datasources: [datasource],
+                        });
+                        // Try to merge this request with another
+                        // one to reduce API calls
+                        var didMerge = false;
+                        requests.some(function (request) {
+                            if (request.canMerge(newRequest)) {
+                                request.merge(newRequest);
+                                return didMerge = true;
+                            }
+                        });
+                        if (!didMerge)
+                            requests.push(newRequest);
+                    });
+                });
+                return requests;
+            },
+
+
+            _fetchStatsFromXHR: function (request) {
                 $.ajax({
-                    url: request.url,
-                    data: this._generateRequestData(request),
                     type: 'GET',
-                    complete: this._handleStatsFromXHR
+                    url: request.url,
+                    data: this._generatePayload(request),
+                    complete: this._handleXHRResponse
                 });
             },
 
 
-            _requestStatsFromSocket: function (request) {
-                var data = this._generateRequestData(request);
+            _fetchStatsFromSocket: function (request) {
+                var data = this._generatePayload(request);
+                var machine = request.datasources[0].machine;
                 Mist.socket.emit('stats',
-                    request.machine.backend.id,
-                    request.machine.id,
-                    request.metrics,
+                    machine.backend.id,
+                    machine.id,
                     data.start,
                     data.stop,
                     data.step,
-                    request.id
+                    request.id,
+                    request.metrics
                 );
             },
 
 
-            _handleStatsFromXHR: function (jqXHR) {
-                var that = Mist.graphsController;
-                if (jqXHR.status == 200) {
-                    that._handleStats(jqXHR.responseJSON);
-                }
-            },
-
-
-            _handleStatsFromSocket: function (data) {
-                this._handleStats(data);
-            },
-
-
-            _handleStats: function (data) {
-                info('handling stats');
-                var request = this.pendingRequests.findBy('id', parseInt(data.request_id));
-                Mist.set('resp', data);
-                info('request', request);
-                if (request) {
-                    request.datasources.forEach(function (datasource) {
-                        var newDatapoints = [];
-                        data[datasource.metric.id].datapoints.forEach(function (datapoint) {
-                            if (datapoint[1] <= request.from - this.config.measurementOffset
-                                && datapoint[1] - this.config.measurementOffset  > request.until)
-                                newDatapoints.push(datapoint);
-                        }, this);
-                        datasource.update(newDatapoints);
-                    }, this);
-                    this.pendingRequests.removeObject(request);
-                    if (!this.pendingRequests.length)
-                        this.content.forEach(function (graph) {
-                            graph.view.draw();
-                        });
-                }
-            },
-
-
-            _generateRequestData: function (request) {
-
+            _generatePayload: function (request) {
                 return {
                     v: 2,
                     request_id: request.id,
@@ -275,6 +166,70 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     step: parseInt(this.config.measurementStep / 1000),
                     metrics: request.metrics
                 };
+            },
+
+
+            _handleXHRResponse: function (jqXHR) {
+                var that = Mist.graphsController;
+                if (jqXHR.status == 200) {
+                    var response = jqXHR.responseJSON;
+                    var request = that.pendingRequests.findBy(
+                        'id', parseInt(response.request_id));
+                    if (request)
+                        that._handleResponse(request, response);
+                } else {
+                    that._fetchStats(that.fetchStatsArgs);
+                }
+            },
+
+
+            _handleSocketResponse: function (data) {
+                var that = Mist.graphsController;
+                var request = that.pendingRequests.findBy(
+                    'id', parseInt(data.request_id));
+                if (request)
+                    that._handleResponse(request, data.metrics);
+            },
+
+
+            _handleResponse: function (request, response) {
+
+                var processedDatapoints =
+                request.datasources.forEach(function (datasource) {
+
+                    var datapoints = this._processedDatapoints(request,
+                        response[datasource.metric.id].datapoints);
+
+                    datasource.update(datapoints);
+
+                }, this);
+
+                this.pendingRequests.removeObject(request);
+
+                if (!this.pendingRequests.length)
+                    this._fetchStatsEnded();
+            },
+
+
+            _processedDatapoints: function (request, datapoints) {
+                var newDatapoints = [];
+                datapoints.forEach(function (datapoint) {
+                    if (datapoint[1] >= parseInt(request.from / 1000) &&
+                        datapoint[1] <= parseInt(request.until / 1000))
+                            newDatapoints.push(datapoint);
+                }, this);
+                return newDatapoints;
+            },
+
+
+            _fetchStatsEnded: function () {
+                this.content.forEach(function (graph) {
+                    graph.view.draw();
+                });
+                Ember.run.later(this, function () {
+                    if (this.isStreamming)
+                        this._fetchStats();
+                }, this.config.pollingInterval);
             }
         });
     }
