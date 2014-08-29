@@ -1,6 +1,6 @@
-define('app/views/graph_history', ['app/views/templated'],
+define('app/views/graph_list_control', ['app/views/templated'],
     //
-    //  Graph History View
+    //  Graph List Control View
     //
     //  @returns Class
     //
@@ -31,7 +31,9 @@ define('app/views/graph_history', ['app/views/templated'],
 
 
             renderWidget: function () {
-
+                Ember.run.next(function () {
+                    $('#time-window-control').trigger('create');
+                });
             }
         });
     }

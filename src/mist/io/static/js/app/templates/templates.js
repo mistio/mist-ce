@@ -8,8 +8,8 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/confirmation_dialog.html',
         'text!app/templates/file_upload.html',
         'text!app/templates/graph_button.html',
-        'text!app/templates/graph_history.html',
         'text!app/templates/graph_list.html',
+        'text!app/templates/graph_list_control.html',
         'text!app/templates/graph_list_item.html',
         'text!app/templates/home.html',
         'text!app/templates/image_list.html',
@@ -47,8 +47,8 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['confirmation_dialog/html'] = Ember.Handlebars.compile(arguments[3]);
         Ember.TEMPLATES['file_upload/html'] = Ember.Handlebars.compile(arguments[4]);
         Ember.TEMPLATES['graph_button/html'] = Ember.Handlebars.compile(arguments[5]);
-        Ember.TEMPLATES['graph_history/html'] = Ember.Handlebars.compile(arguments[6]);
-        Ember.TEMPLATES['graph_list/html'] = Ember.Handlebars.compile(arguments[7]);
+        Ember.TEMPLATES['graph_list/html'] = Ember.Handlebars.compile(arguments[6]);
+        Ember.TEMPLATES['graph_list_control/html'] = Ember.Handlebars.compile(arguments[7]);
         Ember.TEMPLATES['graph_list_item/html'] = Ember.Handlebars.compile(arguments[8]);
         Ember.TEMPLATES['home/html'] = Ember.Handlebars.compile(arguments[9]);
         Ember.TEMPLATES['image_list/html'] = Ember.Handlebars.compile(arguments[10]);

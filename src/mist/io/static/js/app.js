@@ -274,8 +274,8 @@ var loadFiles = function (callback) {
         'app/views/confirmation_dialog',
         'app/views/file_upload',
         'app/views/graph_button',
-        'app/views/graph_history',
         'app/views/graph_list',
+        'app/views/graph_list_control',
         'app/views/graph_list_item',
         'app/views/home',
         'app/views/image_list',
@@ -342,8 +342,8 @@ var loadApp = function (
     ConfirmationDialog,
     FileUploadView,
     GraphButtonView,
-    GraphHistoryView,
     GraphListView,
+    GraphListControlView,
     GraphListItemView,
     Home,
     ImageListView,
@@ -512,8 +512,8 @@ var loadApp = function (
     App.set('messageboxView', MessageBoxView);
     App.set('monitoringView', MonitoringView);
     App.set('machineView', SingleMachineView);
-    App.set('graphHistoryView', GraphHistoryView);
     App.set('graphListView', GraphListView);
+    App.set('graphListControlView', GraphListControlView);
     App.set('graphListItemView', GraphListItemView);
     App.set('machineKeysView', MachineKeysView);
     App.set('machineTagsView', MachineTagsView);
@@ -1104,19 +1104,13 @@ function showGraphs() {
     Mist.set('didShowGraphs', true);
     require(['app/models/graph', 'app/models/datapoint'], function (Graph, Datapoint) {
 
-        var ec2Graph = Graph.create({
+        var graph = Graph.create({
             id: 'graph-' + parseInt(Math.random() * 10000),
-            title: 'Network RX for all EC2 servers',
+            title: 'Load for all servers',
             datasources: [],
         });
 
-        var rackGraph = Graph.create({
-            id: 'graph-' + parseInt(Math.random() * 10000),
-            title: 'Network RX for all Rackspace servers',
-            datasources: [],
-        });
-
-        var metric = Mist.metricsController.getMetric('interface.total.if_octets.rx');
+        var metric = Mist.metricsController.getMetric('load.shortterm');
 
         Mist.monitored_machines.forEach(function (machineTuple) {
             var backend = Mist.backendsController.getBackend(machineTuple[0]);
@@ -1127,16 +1121,13 @@ function showGraphs() {
                 machine: machine,
                 metric: metric,
                 callback: function (success, datasource) {
-                    if (backend.provider.indexOf('ec2') > -1)
-                        ec2Graph.addDatasource(datasource);
-                    if (backend.provider.indexOf('rackspace') > -1)
-                        rackGraph.addDatasource(datasource);
+                    graph.addDatasource(datasource);
                 }
             });
         });
 
         Mist.graphsController.open({
-            graphs: [ec2Graph, rackGraph],
+            graphs: [graph],
         });
     });
 }

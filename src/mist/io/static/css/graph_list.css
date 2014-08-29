@@ -1,0 +1,41 @@
+
+/* Graph List View
+-----------------------------------------------------------------------------------------------------------*/
+
+#history-control div {
+    text-align: center;
+}
+
+#history-control a.time {
+    width: 75px;
+    height: 43px;
+    border-radius: 0.3em;
+}
+
+#graph-list-control .align {
+    width: 49%;
+    display: inline-block;
+}
+
+#time-window-control {
+    float: right;
+    margin-right: -10px;
+}
+
+#time-window-control .ui-btn {
+    height: 23px;
+}
+
+#history-control {
+    width: 250px;
+    height: 55px;
+    margin-left: -5px;
+    display: inline-block;
+}
+
+#history-control
+
+#graph-list-control {
+    display: block;
+    width: 100%;
+}
