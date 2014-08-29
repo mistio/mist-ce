@@ -45,7 +45,7 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
 
 
             clear: function () {
-
+                this.set('datapoints', []);
             },
 
 

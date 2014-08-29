@@ -99,7 +99,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             goForward: function () {
 
                 // If user can no longer go forward, start streaming
-                if (Date.now() - this.fetchStatsArgs.until <= this.config.timeWindow) {
+                if (this._isInFuture(this.fetchStatsArgs.until)) {
                     this.stream();
                     return;
                 }
@@ -107,6 +107,50 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this._fetchStats({
                     from: this.fetchStatsArgs.until,
                     until: this.fetchStatsArgs.until + this.config.timeWindow
+                });
+            },
+
+
+            changeTimeWindow: function (newTimeWindow) {
+                info(newTimeWindow);
+                var oldTimeWindow = this.config.timeWindow;
+
+                if (oldTimeWindow == newTimeWindow)
+                    return
+
+                if (newTimeWindow == 'minutes')
+                    this.config.timeWindow = 10 * TIME_MAP.MINUTE;
+                if (newTimeWindow == 'hour')
+                    this.config.timeWindow = TIME_MAP.HOUR;
+                if (newTimeWindow == 'day')
+                    this.config.timeWindow = TIME_MAP.DAY;
+                if (newTimeWindow == 'week')
+                    this.config.timeWindow = TIME_MAP.WEEK;
+                if (newTimeWindow == 'month')
+                    this.config.timeWindow = TIME_MAP.MONTH;
+
+                newTimeWindow = this.config.timeWindow;
+
+                this.content.forEach(function (graph) {
+                    graph.view.changeTimeWindow(newTimeWindow);
+                });
+
+                var oldFrom = this.isStreaming ? this.fetchStatsArgs.until - oldTimeWindow : this.fetchStatsArgs.from;
+                var oldUntil = this.fetchStatsArgs.until;
+
+                // Recalculate time boundaries
+                var middle = oldFrom - ((oldFrom - oldUntil) / 2);
+                var newFrom = middle + (newTimeWindow / 2);
+                var newUntil = middle - (newTimeWindow / 2);
+
+                if (this._isInFuture(newUntil)) {
+                    newUntil = Date.now()
+                    newFrom = Date.now() - newTimeWindow;
+                }
+                this.stopStreaming();
+                this._fetchStats({
+                    from: newFrom,
+                    until: newUntil,
                 });
             },
 
@@ -126,6 +170,10 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 });
             },
 
+
+            _isInFuture: function (until) {
+                return Date.now() - until <= this.config.timeWindow;
+            },
 
 
             _fetchStats: function (args) {

@@ -105,7 +105,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             clearData: function () {
-                this.set('data', []);
+                this.graph.datasources.forEach(function (datasource) {
+                    datasource.clear();
+                });
             },
 
 

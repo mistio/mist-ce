@@ -62,7 +62,9 @@ define('app/views/graph_list_control', ['app/views/templated'],
 
 
                 timeWindowChanged: function () {
-                    Mist.graphsController.changeTimeWindow();
+                    info('yo');
+                    var newTimeWindow = $('#time-window-control select').val();
+                    Mist.graphsController.changeTimeWindow(newTimeWindow);
                 }
             }
         });
