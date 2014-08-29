@@ -1105,28 +1105,58 @@ function showGraphs() {
     require(['app/models/graph', 'app/models/datapoint'], function (Graph, Datapoint) {
 
         // Create a graph to display
-        var graph = Graph.create({
+        var graph1 = Graph.create({
             id: 'graph-' + parseInt(Math.random() * 10000),
-            title: 'My Graph',
+            title: 'Network RX for all EC2 servers',
             datasources: [],
         });
 
         // Create a new datasources to use
         Mist.monitored_machines.forEach(function (machineTuple) {
+            var backend = Mist.backendsController.getBackend(machineTuple[0]);
+            if (backend.provider.indexOf('ec2') == -1) return;
+
             var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
-            var metric = Mist.metricsController.getMetric('load.shortterm');
             if (!machine) return;
+
+            var metric = Mist.metricsController.getMetric('interface.total.if_octets.rx');
+
             Mist.datasourcesController.addDatasource({
                 machine: machine,
                 metric: metric,
                 callback: function (success, datasource) {
-                    graph.addDatasource(datasource);
+                    graph1.addDatasource(datasource);
+                }
+            });
+        });
+
+
+        var graph2 = Graph.create({
+            id: 'graph-' + parseInt(Math.random() * 10000),
+            title: 'Network RX for all Rackspace servers',
+            datasources: [],
+        });
+
+        Mist.monitored_machines.forEach(function (machineTuple) {
+            var backend = Mist.backendsController.getBackend(machineTuple[0]);
+            if (backend.provider.indexOf('rackspace') == -1) return;
+
+            var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
+            if (!machine) return;
+
+            var metric = Mist.metricsController.getMetric('interface.total.if_octets.rx');
+
+            Mist.datasourcesController.addDatasource({
+                machine: machine,
+                metric: metric,
+                callback: function (success, datasource) {
+                    graph2.addDatasource(datasource);
                 }
             });
         });
 
         Mist.graphsController.open({
-            graphs: [graph],
+            graphs: [graph1, graph2],
         });
     });
 }

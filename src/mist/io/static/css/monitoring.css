@@ -209,6 +209,68 @@
     background-color: #eee;
 }
 
+.graph .valueLine.green {
+    stroke: #6CE0BA;
+    stroke-width: 2;
+    fill: none;
+}
+
+.graph .valueLine.orange {
+    stroke: #FF9933;
+    stroke-width: 2;
+    fill: none;
+}
+
+.graph .valueLine.blue {
+    stroke: #0066FF;
+    stroke-width: 2;
+    fill: none;
+}
+
+.graph .valueLine.pink {
+    stroke: #FF99FF;
+    stroke-width: 2;
+    fill: none;
+}
+
+.graph .valueLine.brick {
+    stroke: #990033;
+    stroke-width: 2;
+    fill: none;
+}
+
+
+
+
+.graph .lineLegend.green {
+    background-color: #6CE0BA;
+}
+
+.graph .lineLegend.orange {
+    background-color: #FF9933;
+}
+
+.graph .lineLegend.blue {
+    background-color: #0066FF;
+}
+
+.graph .lineLegend.pink {
+    background-color: #FF99FF;
+}
+
+.graph .lineLegend.brick {
+    background-color: #990033;
+}
+
+.graph .lineLegend {
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+}
+
+.graph .title * {
+    display: inline-block;
+}
 /*
 path {
     stroke: steelblue;

@@ -10,6 +10,14 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
         var DISPLAYED_DATAPOINTS = 60;
 
+        var LINE_COLOR_MAP = {
+            0: 'green',
+            1: 'orange',
+            2: 'blue',
+            3: 'pink',
+            4: 'brick'
+        };
+
         return TemplatedView.extend({
 
 
@@ -83,6 +91,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             updateSVG: function () {
                 this.set('svg', SvgSet(this));
+                var datasources = this.graph.datasources;
+                datasources.forEach(function (datasource) {
+                    $('#' + this.graph.id + ' .title #' + datasource.id)
+                        .addClass(LINE_COLOR_MAP[datasources.indexOf(datasource)]);
+                }, this);
             },
 
 
@@ -163,7 +176,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     return;
 
                 // Create an aspect ratio
-                var newHeight = width * 0.125; // (160 / 1280)
+                //var newHeight = width * 0.125; // (160 / 1280)
+                var newHeight = width * 0.3; // (160 / 1280)
 
                 this.height = (newHeight < 85 ? 85 : newHeight);
                 this.width = width;
@@ -784,9 +798,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
         function Line (args, datasource) {
+            var index = args.graph.datasources.indexOf(datasource);
             return d3.select('#' + args.id + ' .' + datasource.id)
                     .attr('transform', 'translate(' +
                         args.margin.left + ',' + args.margin.top + ')')
+                    .attr('class', 'valueLine ' + LINE_COLOR_MAP[index])
                     .select('path');
         };
 

@@ -89,6 +89,8 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _fetchStats: function (args) {
 
+                if (this.isClosed) return;
+
                 this.set('fetchStatsArgs', args);
                 this.set('pendingRequests', []);
 
@@ -178,7 +180,9 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     if (request)
                         that._handleResponse(request, response);
                 } else {
-                    that._fetchStats(that.fetchStatsArgs);
+                    Ember.run.later(function () {
+                        that._fetchStats(that.fetchStatsArgs);
+                    }, that.config.pollingInterval / 2);
                 }
             },
 

@@ -30,6 +30,11 @@ define('app/views/graph_list', ['app/views/templated'],
             }.on('didInsertElement'),
 
 
+            unload: function () {
+                Mist.graphsController.close();
+            }.on('willDestroyElement'),
+
+
             //
             //
             //  Methods

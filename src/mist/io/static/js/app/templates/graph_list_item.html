@@ -20,12 +20,19 @@
             </a>
         {{/if}}
     </div>
-
+     <div class="header">
+        <div class="title">
+            {{#each view.graph.datasources}}
+                {{this.machine.name}}
+                <div {{bind-attr id="this.id"}} class="lineLegend"></div>
+            {{/each}}
+        </div>
+    </div>
     <svg>
         <g class="grid-x"></g>
         <g class="grid-y"></g>
         {{#each view.graph.datasources}}
-            <g {{bind-attr class="this.id :valueLine"}}>
+            <g {{bind-attr class="this.id"}}>
                 <path></path>
             </g>
         {{/each}}
