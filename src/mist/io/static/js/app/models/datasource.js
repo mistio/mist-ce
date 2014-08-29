@@ -66,6 +66,12 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
             },
 
 
+            overwrite: function (datapoints) {
+                this.set('datapoints', []);
+                this.update(datapoints);
+            },
+
+
             getLastTimestamp: function () {
                 var length = this.datapoints.length;
                 if (!length) return 0;

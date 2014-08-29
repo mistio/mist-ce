@@ -46,7 +46,9 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     'isOpen': true,
                     'content': args.graphs,
                 });
-                this.stream();
+                Ember.run.next(this, function () {
+                    this.stream();
+                });
             },
 
 
@@ -56,17 +58,56 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             },
 
 
+            toggleStreaming: function () {
+                if (this.isStreaming)
+                    this.stopStreaming();
+                else
+                    this.stream();
+            },
+
+
             stream: function () {
-                this.set('isStreamming', true);
+                this.set('isStreaming', true);
                 this._fetchStats({
                     from: Date.now() - this.config.timeWindow,
                     until: Date.now()
+                });
+                this.content.forEach(function (graph) {
+                    graph.view.enableAnimation();
                 });
             },
 
 
             stopStreaming: function () {
-                this.set('isStreamming', false);
+                this.set('pendingRequests', []);
+                this.set('isStreaming', false);
+                this.content.forEach(function (graph) {
+                    graph.view.disableAnimation();
+                });
+            },
+
+
+            goBack: function () {
+                this.stopStreaming();
+                this._fetchStats({
+                    from: this.fetchStatsArgs.from - this.config.timeWindow,
+                    until: this.fetchStatsArgs.from
+                });
+            },
+
+
+            goForward: function () {
+
+                // If user can no longer go forward, start streaming
+                if (Date.now() - this.fetchStatsArgs.until <= this.config.timeWindow) {
+                    this.stream();
+                    return;
+                }
+
+                this._fetchStats({
+                    from: this.fetchStatsArgs.until,
+                    until: this.fetchStatsArgs.until + this.config.timeWindow
+                });
             },
 
 
@@ -81,7 +122,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this.setProperties({
                     'isOpen': null,
                     'content': null,
-                    'isStreamming': null,
+                    'isStreaming': null,
                 });
             },
 
@@ -204,7 +245,10 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     var datapoints = this._processedDatapoints(request,
                         response[datasource.metric.id].datapoints);
 
-                    datasource.update(datapoints);
+                    if (this.isStreaming)
+                        datasource.update(datapoints);
+                    else
+                        datasource.overwrite(datapoints);
 
                 }, this);
 
@@ -231,7 +275,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     graph.view.draw();
                 });
                 Ember.run.later(this, function () {
-                    if (this.isStreamming)
+                    if (this.isStreaming)
                         this._fetchStats();
                 }, this.config.pollingInterval);
             }

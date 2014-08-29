@@ -145,8 +145,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 if (this.graph.pendingCreation)
                     return;
 
-                this.svg.value.line.animation.clearBuffer(stopCurrent);
-                this.svg.value.area.animation.clearBuffer(stopCurrent);
+                this.svg.value.lines.forEach(function (line) {
+                    line.animation.clearBuffer(stopCurrent);
+                });
                 this.svg.axis.x.legend.animation.clearBuffer(stopCurrent);
                 this.svg.grid.x.animation.clearBuffer(stopCurrent);
 
@@ -672,8 +673,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     if (this.clearAnimPending) {
                         // Wait for 50ms for animation to finishes its changes
                         window.setTimeout(function(){
-                            that.svg.value.line.attr('transform', 'translate(' + 0 + ')');
-                            that.svg.value.area.attr('transform', 'translate(' + 0 + ')');
+                            that.svg.value.lines.forEach(function (line) {
+                                line.attr('transform', 'translate(' + 0 + ')');
+                            })
                             that.svg.axis.x.legend.attr('transform', 'translate(' + that.margin.left + ',' + (that.height - that.margin.bottom + 2) + ')');
                             that.svg.grid.x.attr('transform', 'translate(' + that.margin.left + ',' + that.height + ')');
                             that.clearAnimPending = false;

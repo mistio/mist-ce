@@ -34,6 +34,36 @@ define('app/views/graph_list_control', ['app/views/templated'],
                 Ember.run.next(function () {
                     $('#time-window-control').trigger('create');
                 });
+            },
+
+
+            //
+            //
+            //  Actions
+            //
+            //
+
+
+            actions: {
+
+                backClicked: function () {
+                    Mist.graphsController.goBack();
+                },
+
+
+                forwardClicked: function () {
+                    Mist.graphsController.goForward();
+                },
+
+
+                toggleStream: function () {
+                    Mist.graphsController.toggleStreaming();
+                },
+
+
+                timeWindowChanged: function () {
+                    Mist.graphsController.changeTimeWindow();
+                }
             }
         });
     }
