@@ -88,9 +88,15 @@ define('app/controllers/machines', ['app/models/machine'],
                         'location_name': location.name
                 }).success(function (machine) {
                     machine.backend = that.backend;
-                    that._createMachine(machine, key, dummyMachine);
+                    // Nephoscale returns machine id on request success,
+                    // but the machine is not listed on the next list_machines.
+                    // This makes the machine dissappear from the UI.
+                    if (that.backend.provider != 'nephoscale')
+                        that._createMachine(machine, key, dummyMachine);
+                    else
+                        dummyMachine.set('pendingCreation', false);
                 }).error(function (message) {
-                    that.removeObject(dummyMachine);
+                    that.content.removeObject(that.content.findBy('name', name));
                     Mist.notificationController.timeNotify('Failed to create machine: ' + message, 5000);
                 }).complete(function (success, machine) {
                     that.set('addingMachine', false);
