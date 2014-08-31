@@ -33,6 +33,15 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             },
 
 
+            init: function () {
+                this._super();
+                this.stream.setProperties({
+                    parent: this,
+                    interval: this.config.pollingInterval
+                })
+            },
+
+
             //
             //
             //  Methods
@@ -47,7 +56,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     'content': args.graphs,
                 });
                 Ember.run.next(this, function () {
-                    this.stream();
+                    this.stream.start();
                 });
             },
 
@@ -63,27 +72,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     this.stopStreaming();
                 else
                     this.stream();
-            },
-
-
-            stream: function () {
-                this.set('isStreaming', true);
-                this._fetchStats({
-                    from: Date.now() - this.config.timeWindow,
-                    until: Date.now()
-                });
-                this.content.forEach(function (graph) {
-                    graph.view.enableAnimation();
-                });
-            },
-
-
-            stopStreaming: function () {
-                this.set('pendingRequests', []);
-                this.set('isStreaming', false);
-                this.content.forEach(function (graph) {
-                    graph.view.disableAnimation();
-                });
             },
 
 
@@ -147,6 +135,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     newUntil = Date.now()
                     newFrom = Date.now() - newTimeWindow;
                 }
+
                 this.stopStreaming();
                 this._fetchStats({
                     from: newFrom,
@@ -196,14 +185,13 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _generateRequests: function (args) {
 
-                var now = Date.now();
                 var requests = [];
                 var offset = this.config.measurementOffset;
                 this.content.forEach(function (graph) {
                     graph.datasources.forEach(function (datasource) {
                         var newRequest = StatsRequest.create({
-                            from: (args ? args.from : datasource.getLastTimestamp()) - offset,
-                            until: (args ? args.until : now) - offset,
+                            from: args.from - offset,
+                            until: args.until - offset,
                             datasources: [datasource],
                         });
                         // Try to merge this request with another
@@ -293,7 +281,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     var datapoints = this._processedDatapoints(request,
                         response[datasource.metric.id].datapoints);
 
-                    if (this.isStreaming)
+                    if (this.stream.isStreaming)
                         datasource.update(datapoints);
                     else
                         datasource.overwrite(datapoints);
@@ -322,11 +310,109 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this.content.forEach(function (graph) {
                     graph.view.draw();
                 });
-                Ember.run.later(this, function () {
-                    if (this.isStreaming)
-                        this._fetchStats();
-                }, this.config.pollingInterval);
-            }
+                if (this.fetchStatsArgs.callback instanceof Function)
+                    this.fetchStatsArgs.callback();
+            },
+
+
+            //
+            //
+            //  Streaming object
+            //
+            //
+
+
+            stream: Ember.Object.create({
+
+
+                //
+                //
+                //  Properties
+                //
+                //
+
+
+                parent: null,      // Parent object, graphsController
+                interval: null,    // Time interval between two requests
+                firstTime: null,   // Flag indicating if the first request has been made
+                isStreaming: null, // Flag indicating if the object is streaming
+
+                lastRequest: Ember.Object.create({
+                    from: null,
+                    until: null,
+                }),
+
+
+                //
+                //
+                //  Methods
+                //
+                //
+
+
+                start: function () {
+                    this.setProperties({
+                        firstTime: true,
+                        isStreaming: true,
+                    });
+                    this._stream();
+                },
+
+
+                stop: function () {
+                    this.setProperties({
+                        firstTime: false,
+                        isStreaming: false,
+                    });
+                },
+
+
+                //
+                //
+                //  Pseudo-Private Methods
+                //
+                //
+
+
+                _stream: function () {
+
+                    var now = Date.now();
+
+                    // If this is the first time requesting data for streaming
+                    // we need to get enough data to fill the entire graph
+                    //
+                    // Else, we request data from where the previous request left off
+                    var from = this.firstTime ?
+                        now - this.parent.config.timeWindow :
+                        this.lastRequest.until
+
+                    this.parent._fetchStats({
+                        from: from,
+                        until: now,
+                        callback: this._callback,
+                    });
+
+                    // Save request info for later usage
+                    this.lastRequest.setProperties({
+                        from: from,
+                        until: now,
+                    });
+
+                    this.set('firstTime', false);
+                },
+
+
+                _callback: function () {
+                    var that = Mist.graphsController.stream;
+                    if (that.isStreaming)
+                        Ember.run.later(function () {
+                            if (that.isStreaming)
+                                that._stream();
+
+                        // Subtract time ellapsed on previous request
+                        }, that.interval - (Date.now() - that.lastRequest.until));
+                }
+            }),
         });
     }
 );

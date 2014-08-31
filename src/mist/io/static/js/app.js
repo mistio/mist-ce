@@ -1110,7 +1110,7 @@ function showGraphs() {
             datasources: [],
         });
 
-        var metric = Mist.metricsController.getMetric('load.shortterm');
+        var metric = Mist.metricsController.getMetric('mist.python.one_to_five');
 
         Mist.monitored_machines.forEach(function (machineTuple) {
             var backend = Mist.backendsController.getBackend(machineTuple[0]);
