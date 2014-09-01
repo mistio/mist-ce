@@ -8,14 +8,12 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
         'use strict';
 
-        var DISPLAYED_DATAPOINTS = 60;
-
         var LINE_COLOR_MAP = {
             0: 'green',
             1: 'orange',
             2: 'blue',
             3: 'pink',
-            4: 'brick'
+            4: 'brick',
         };
 
         return TemplatedView.extend({
@@ -47,7 +45,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             displayedData: null,
             timeDisplayed: null,
             valuesDistance: null,
-            animationEnabled: true,
+            animationEnabled: null,
             clearAnimPending: null,
 
 
@@ -137,7 +135,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             changeTimeWindow: function (newTimeWindow) {
-                this.set('timeDisplayed', newTimeWindow / 1000);
+                this.set('timeDisplayed', newTimeWindow);
                 this.clearData();
             },
 
@@ -386,7 +384,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 this.height = fixedHeight < 85 ? 85 : fixedHeight;
                 this.margin = {top: 10, right: 0, bottom: 24, left: 52};;
-                this.timeDisplayed    = 600;  // 10 minutes
+                this.timeDisplayed    = Mist.graphsController.config.timeWindow;
                 this.yAxisValueFormat = '';
                 this.displayedData    = [];
                 this.xCoordinates      = [];
@@ -526,12 +524,12 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 // Timestamp fix for small screens
                 var tLabelFormat = '%I:%M%p';
-                if ((this.width <= 700 && this.timeDisplayed == 604800) ||
-                    (this.width <= 521 && this.timeDisplayed == 2592000)) // 1 Week || 1 Month
+                if ((this.width <= 700 && this.timeDisplayed == TIME_MAP.WEEK) ||
+                    (this.width <= 521 && this.timeDisplayed == TIME_MAP.MONTH)) // 1 Week || 1 Month
                         tLabelFormat = '%d-%b';
-                else if (this.width <= 560 && this.timeDisplayed == 86400) // 1 Day
+                else if (this.width <= 560 && this.timeDisplayed == TIME_MAP.DAY) // 1 Day
                     tLabelFormat = '%I:%M%p';
-                else if (this.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
+                else if (this.timeDisplayed >= TIME_MAP.DAY) // 1 Day (24*60*60) >=, should display date as well
                     tLabelFormat = '%d-%m | %I:%M%p';
                 this.set('labelFormat', tLabelFormat);
             },
@@ -744,7 +742,28 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     this.graph.set('pendingRemoval', true);
                     Mist.confirmationController.show();
                 }
-            }
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            isStreamingObserver: function () {
+                if (Mist.graphsController.stream.isStreaming)
+                    this.enableAnimation();
+                else
+                    this.disableAnimation(true);
+            }.observes('Mist.graphsController.stream.isStreaming'),
+
+
+            timeWindowObserver: function () {
+                info('changing time window');
+                this.changeTimeWindow(Mist.graphsController.config.timeWindow);
+            }.observes('Mist.graphsController.config.timeWindow'),
         });
 
 
@@ -1085,17 +1104,16 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             // Check Time Displayed
             var labelStep;
-            if(timeDisplayed <= 600)           // 10 Minutes (10*60)
+            if(timeDisplayed <= 10 * TIME_MAP.MINUTE)
                 axisInstance.ticks(d3.time.minutes,2);
-            else if(timeDisplayed <= 3600)     // 1 Hour (1*60*60)
+            else if(timeDisplayed <= TIME_MAP.HOUR)
                 axisInstance.ticks(d3.time.minutes,12);
-            else if(timeDisplayed <= 86400)    // 1 Day (24*60*60)
+            else if(timeDisplayed <= TIME_MAP.DAY)
                 axisInstance.ticks(d3.time.hours,6);
-            else if(timeDisplayed <= 604800)   // 1 Week (7*24*60*60)
+            else if(timeDisplayed <= TIME_MAP.WEEK)
                 axisInstance.ticks(d3.time.days,1);
-            else if(timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
+            else if(timeDisplayed <= TIME_MAP.MONTH)
                 axisInstance.ticks(d3.time.days,7);
-
             if (format)
                 axisInstance.tickFormat(d3.time.format(format));
 

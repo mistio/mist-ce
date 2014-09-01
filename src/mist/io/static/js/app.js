@@ -611,10 +611,19 @@ var loadApp = function (
     // Mist functions
 
     App.prettyTime = function(date) {
+
+        var showDate = false
+        if (date.getMonth() != new Date().getMonth()) {
+            showDate = true;
+            var day = date.getUTCDate();
+            var month = date.getMonth();
+        }
+
         var hour = date.getHours();
         var min = date.getMinutes();
         var sec = date.getSeconds();
-        return (hour < 10 ? '0' : '') + hour + ':' +
+        return (showDate ? day + '/' + month + ' ': '') +
+            (hour < 10 ? '0' : '') + hour + ':' +
             (min < 10 ? '0' : '') + min + ':' +
             (sec < 10 ? '0' : '') + sec;
     };
@@ -1132,6 +1141,10 @@ function showGraphs() {
     });
 }
 
+
+//  GLOBAL DEFINITIONS
+
+var DISPLAYED_DATAPOINTS = 60;
 
 var TIME_MAP = {
     SECOND: 1000,

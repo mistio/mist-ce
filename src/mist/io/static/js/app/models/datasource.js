@@ -8,6 +8,10 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
 
         'use strict';
 
+        // Limit the amount of datapoints to
+        // preserve memory (especially on mobile)
+        var MAX_DATAPOINTS = 60;
+
         return Ember.Object.extend({
 
 
@@ -76,6 +80,13 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
                 var length = this.datapoints.length;
                 if (!length) return 0;
                 return this.datapoints[length - 1].time.getTime();
+            },
+
+
+            getFirstTimestamp: function () {
+                var length = this.datapoints.length;
+                if (!length) return 0;
+                return this.datapoints[length - MAX_DATAPOINTS].time.getTime();
             }
         });
     }

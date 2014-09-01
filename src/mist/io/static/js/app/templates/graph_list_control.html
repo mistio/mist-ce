@@ -34,18 +34,25 @@
         -->
 
         <div class="ui-block-b">
-            <a id="history-control-stream"
-                class="ui-btn
-                    ui-btn-b
-                    ui-corner-all
-                    ui-btn-inline"
-                {{action "toggleStream" target="view"}}>
-                {{#if Mist.graphsController.isStreaming}}
-                    Pause
-                {{else}}
-                    Reset
-                {{/if}}
-            </a>
+            {{#if Mist.graphsController.stream.isStreaming}}
+                <a id="history-control-stream"
+                    class="ui-btn
+                        ui-btn-b
+                        ui-corner-all
+                        ui-btn-inline"
+                    {{action "pauseClicked" target="view"}}>
+                        Pause
+                </a>
+            {{else}}
+                <a id="history-control-stream"
+                    class="ui-btn
+                        ui-btn-b
+                        ui-corner-all
+                        ui-btn-inline"
+                    {{action "resetClicked" target="view"}}>
+                        Reset
+                </a>
+            {{/if}}
         </div>
 
         <!--

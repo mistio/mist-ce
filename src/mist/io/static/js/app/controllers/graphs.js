@@ -8,6 +8,14 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
         'use strict';
 
+        var TIME_WINDOW_MAP = {
+            minutes: 10 * TIME_MAP.MINUTE,
+            hour: TIME_MAP.HOUR,
+            day: TIME_MAP.DAY,
+            week: TIME_MAP.WEEK,
+            month: TIME_MAP.MONTH,
+        };
+
         return Ember.ArrayController.extend({
 
 
@@ -20,25 +28,22 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             isOpen: null,
             content: null,
-            isPolling: null,
             pollingMethod: null,
             pendingRequests: [],
 
-            config: {
+            config: Ember.Object.create({
                 requestMethod: 'XHR',
                 timeWindow: 10 * TIME_MAP.MINUTE,
                 measurementStep: 10 * TIME_MAP.SECOND,
-                pollingInterval: 10 * TIME_MAP.SECOND,
                 measurementOffset: 40 * TIME_MAP.SECOND,
-            },
+            }),
 
 
             init: function () {
                 this._super();
-                this.stream.setProperties({
-                    parent: this,
-                    interval: this.config.pollingInterval
-                })
+                this.stream.set('parent', this);
+                this.history.set('parent', this);
+                this.resolution.set('parent', this);
             },
 
 
@@ -67,83 +72,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             },
 
 
-            toggleStreaming: function () {
-                if (this.isStreaming)
-                    this.stream.stop();
-                else
-                    this.stream.start();
-            },
-
-
-            goBack: function () {
-                this.stream.stop();
-                this._fetchStats({
-                    from: this.fetchStatsArgs.from - this.config.timeWindow,
-                    until: this.fetchStatsArgs.from
-                });
-            },
-
-
-            goForward: function () {
-
-                // If user can no longer go forward, start streaming
-                if (this._isInFuture(this.fetchStatsArgs.until)) {
-                    this.stream();
-                    return;
-                }
-
-                this._fetchStats({
-                    from: this.fetchStatsArgs.until,
-                    until: this.fetchStatsArgs.until + this.config.timeWindow
-                });
-            },
-
-
-            changeTimeWindow: function (newTimeWindow) {
-                info(newTimeWindow);
-                var oldTimeWindow = this.config.timeWindow;
-
-                if (oldTimeWindow == newTimeWindow)
-                    return
-
-                if (newTimeWindow == 'minutes')
-                    this.config.timeWindow = 10 * TIME_MAP.MINUTE;
-                if (newTimeWindow == 'hour')
-                    this.config.timeWindow = TIME_MAP.HOUR;
-                if (newTimeWindow == 'day')
-                    this.config.timeWindow = TIME_MAP.DAY;
-                if (newTimeWindow == 'week')
-                    this.config.timeWindow = TIME_MAP.WEEK;
-                if (newTimeWindow == 'month')
-                    this.config.timeWindow = TIME_MAP.MONTH;
-
-                newTimeWindow = this.config.timeWindow;
-
-                this.content.forEach(function (graph) {
-                    graph.view.changeTimeWindow(newTimeWindow);
-                });
-
-                var oldFrom = this.isStreaming ? this.fetchStatsArgs.until - oldTimeWindow : this.fetchStatsArgs.from;
-                var oldUntil = this.fetchStatsArgs.until;
-
-                // Recalculate time boundaries
-                var middle = oldFrom - ((oldFrom - oldUntil) / 2);
-                var newFrom = middle + (newTimeWindow / 2);
-                var newUntil = middle - (newTimeWindow / 2);
-
-                if (this._isInFuture(newUntil)) {
-                    newUntil = Date.now()
-                    newFrom = Date.now() - newTimeWindow;
-                }
-
-                this.stream.stop();
-                this._fetchStats({
-                    from: newFrom,
-                    until: newUntil,
-                });
-            },
-
-
             //
             //
             //  Pseudo-Private Methods
@@ -155,19 +83,20 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this.setProperties({
                     'isOpen': null,
                     'content': null,
-                    'isStreaming': null,
                 });
-            },
-
-
-            _isInFuture: function (until) {
-                return Date.now() - until <= this.config.timeWindow;
             },
 
 
             _fetchStats: function (args) {
 
                 if (this.isClosed) return;
+
+                // Log requests
+                info('Requesting stats from: ' +
+                    Mist.prettyTime(new Date(args.from)) +
+                    ' until: ' +
+                    Mist.prettyTime(new Date(args.until)));
+                ////////////////////////////////////////////
 
                 this.set('fetchStatsArgs', args);
                 this.set('pendingRequests', []);
@@ -180,6 +109,11 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     if (this.config.requestMethod == 'Socket')
                         this._fetchStatsFromSocket(request);
                 }, this);
+            },
+
+
+            _clearPendingRequests: function () {
+                this.set('pendingRequests', []);
             },
 
 
@@ -259,7 +193,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 } else {
                     Ember.run.later(function () {
                         that._fetchStats(that.fetchStatsArgs);
-                    }, that.config.pollingInterval / 2);
+                    }, that.config.measurementStep / 2);
                 }
             },
 
@@ -315,9 +249,152 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             },
 
 
+            _restoreFetchStatsArgs: function () {
+
+                // Restores fetch stats args to match currently
+                // displayed datapoints. Used after closing a streaming
+                // session.
+
+                var datasource = this.content[0].datasources[0];
+
+                this.set('fetchStatsArgs', {
+                    from: datasource.getFirstTimestamp() || (Date.now() - this.config.timeWindow),
+                    until: datasource.getLastTimestamp() || Date.now(),
+                });
+            },
+
+
             //
             //
-            //  Streaming object
+            //  Resolution Object
+            //
+            //
+
+
+            resolution: Ember.Object.create({
+
+
+                //
+                //
+                //  Properties
+                //
+                //
+
+
+                parent: null,
+
+
+                //
+                //
+                //  Methods
+                //
+                //
+
+
+                change: function (newTimeWindow) {
+
+                    var newTimeWindow = TIME_WINDOW_MAP[newTimeWindow];
+                    var oldTimeWindow = this.parent.config.timeWindow;
+
+                    if (oldTimeWindow != newTimeWindow) {
+
+                        this.parent.stream.stop();
+                        this.parent.config.setProperties({
+                            timeWindow: newTimeWindow,
+                            measurementStep: newTimeWindow /
+                                DISPLAYED_DATAPOINTS,
+                        });
+
+                        // Calculate new time boundaries
+
+                        var oldFrom = this.parent.fetchStatsArgs.from;
+                        var oldUntil = this.parent.fetchStatsArgs.until;
+
+                        var middle = oldFrom + ((oldUntil - oldFrom) / 2);
+
+                        var newFrom = middle - (newTimeWindow / 2);
+                        var newUntil = middle + (newTimeWindow / 2);
+
+                        if (this.parent.history._isInFuture(newUntil))
+                            this.parent.stream.start();
+                        else
+                            this.parent._fetchStats({
+                                from: newFrom,
+                                until: newUntil,
+                            });
+                    }
+                }
+            }),
+
+
+            //
+            //
+            //  History Object
+            //
+            //
+
+
+            history: Ember.Object.create({
+
+
+                //
+                //
+                //  Properties
+                //
+                //
+
+
+                parent: null,
+
+
+                //
+                //
+                //  Methods
+                //
+                //
+
+
+                goBack: function () {
+                    this.parent.stream.stop();
+                    this.parent._fetchStats({
+                        from: this.parent.fetchStatsArgs.from -
+                            this.parent.config.timeWindow,
+                        until: this.parent.fetchStatsArgs.from
+                    });
+                },
+
+
+                goForward: function () {
+
+                    // If user can no longer go forward, start streaming
+                    if (this._isInFuture(this.parent.fetchStatsArgs.until))
+                        this.parent.stream.start();
+
+                    else
+                        this.parent._fetchStats({
+                            from: this.parent.fetchStatsArgs.until,
+                            until: this.parent.fetchStatsArgs.until +
+                                this.parent.config.timeWindow
+                        });
+                },
+
+
+                //
+                //
+                //  Pseudo-Private Methods
+                //
+                //
+
+
+                _isInFuture: function (until) {
+                    return Date.now() - until <= this.parent.config.timeWindow;
+                },
+            }),
+
+
+            //
+            //
+            //  Streaming Object
             //
             //
 
@@ -346,16 +423,22 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
                 start: function () {
-                    this.set('isStreaming', true);
-                    this._stream(this.currentSessionId, true);
+                    if (!this.isStreaming) {
+                        this.set('isStreaming', true);
+                        this._stream(this.currentSessionId, true);
+                    }
                 },
 
 
                 stop: function () {
-                    this.setProperties({
-                        isStreaming: false,
-                        currentSessionId: this.currentSessionId + 1,
-                    });
+                    if (this.isStreaming) {
+                        this.setProperties({
+                            isStreaming: false,
+                            currentSessionId: this.currentSessionId + 1,
+                        });
+                        this.parent._clearPendingRequests();
+                        this.parent._restoreFetchStatsArgs();
+                    }
                 },
 
 
@@ -372,10 +455,10 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                         var now = Date.now();
 
-                        // If this is the first time requesting data for streaming
-                        // we need to get enough data to fill the entire graph
+                        // If this is the first time requesting stats for streaming
+                        // we need to get enough stats to fill the entire graph
                         //
-                        // Else, we request data from where the previous request
+                        // Else, we request stats from where the previous request
                         // left off
                         var from = firstTime ?
                             now - this.parent.config.timeWindow :
@@ -401,14 +484,14 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 _getNextRequestDelay: function () {
 
-                    // Client should make new data requests every
-                    // <pollingInterval> milliseconds.
+                    // Client should make new stats requests every
+                    // <measurementStep> milliseconds.
                     //
                     // We subtract the time elapsed on the previous
                     // request from the polling interval to make sure
                     // the next request is made on time.
 
-                    return this.parent.config.pollingInterval -
+                    return this.parent.config.measurementStep -
                         (Date.now() - this.timeOfLastRequest);
                 },
 

@@ -47,24 +47,28 @@ define('app/views/graph_list_control', ['app/views/templated'],
             actions: {
 
                 backClicked: function () {
-                    Mist.graphsController.goBack();
+                    Mist.graphsController.history.goBack();
                 },
 
 
                 forwardClicked: function () {
-                    Mist.graphsController.goForward();
+                    Mist.graphsController.history.goForward();
                 },
 
 
-                toggleStream: function () {
-                    Mist.graphsController.toggleStreaming();
+                resetClicked: function () {
+                    Mist.graphsController.stream.start();
+                },
+
+
+                pauseClicked: function () {
+                    Mist.graphsController.stream.stop();
                 },
 
 
                 timeWindowChanged: function () {
-                    info('yo');
                     var newTimeWindow = $('#time-window-control select').val();
-                    Mist.graphsController.changeTimeWindow(newTimeWindow);
+                    Mist.graphsController.resolution.change(newTimeWindow);
                 }
             }
         });
