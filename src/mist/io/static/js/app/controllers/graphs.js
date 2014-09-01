@@ -62,21 +62,21 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             close: function () {
-                this.stopStreaming();
+                this.stream.stop();
                 this._clear();
             },
 
 
             toggleStreaming: function () {
                 if (this.isStreaming)
-                    this.stopStreaming();
+                    this.stream.stop();
                 else
-                    this.stream();
+                    this.stream.start();
             },
 
 
             goBack: function () {
-                this.stopStreaming();
+                this.stream.stop();
                 this._fetchStats({
                     from: this.fetchStatsArgs.from - this.config.timeWindow,
                     until: this.fetchStatsArgs.from
@@ -136,7 +136,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     newFrom = Date.now() - newTimeWindow;
                 }
 
-                this.stopStreaming();
+                this.stream.stop();
                 this._fetchStats({
                     from: newFrom,
                     until: newUntil,
@@ -332,15 +332,10 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 //
 
 
-                parent: null,      // Parent object, graphsController
-                interval: null,    // Time interval between two requests
-                firstTime: null,   // Flag indicating if the first request has been made
-                isStreaming: null, // Flag indicating if the object is streaming
-
-                lastRequest: Ember.Object.create({
-                    from: null,
-                    until: null,
-                }),
+                parent: null,
+                isStreaming: null,
+                currentSessionId: 0,
+                timeOfLastRequest: null,
 
 
                 //
@@ -351,18 +346,15 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
                 start: function () {
-                    this.setProperties({
-                        firstTime: true,
-                        isStreaming: true,
-                    });
-                    this._stream();
+                    this.set('isStreaming', true);
+                    this._stream(this.currentSessionId, true);
                 },
 
 
                 stop: function () {
                     this.setProperties({
-                        firstTime: false,
                         isStreaming: false,
+                        currentSessionId: this.currentSessionId + 1,
                     });
                 },
 
@@ -374,44 +366,56 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 //
 
 
-                _stream: function () {
+                _stream: function (sessionId, firstTime) {
 
-                    var now = Date.now();
+                    if (this._sessionIsAlive(sessionId)) {
 
-                    // If this is the first time requesting data for streaming
-                    // we need to get enough data to fill the entire graph
-                    //
-                    // Else, we request data from where the previous request left off
-                    var from = this.firstTime ?
-                        now - this.parent.config.timeWindow :
-                        this.lastRequest.until
+                        var now = Date.now();
 
-                    this.parent._fetchStats({
-                        from: from,
-                        until: now,
-                        callback: this._callback,
-                    });
+                        // If this is the first time requesting data for streaming
+                        // we need to get enough data to fill the entire graph
+                        //
+                        // Else, we request data from where the previous request
+                        // left off
+                        var from = firstTime ?
+                            now - this.parent.config.timeWindow :
+                            this.timeOfLastRequest
 
-                    // Save request info for later usage
-                    this.lastRequest.setProperties({
-                        from: from,
-                        until: now,
-                    });
+                        this.parent._fetchStats({
+                            from: from,
+                            until: now,
+                            callback: callback
+                        });
 
-                    this.set('firstTime', false);
+                        this.set('timeOfLastRequest', now);
+                    }
+
+                    var that = this;
+                    function callback () {
+                        Ember.run.later(function () {
+                            that._stream(sessionId);
+                        }, that._getNextRequestDelay());
+                    }
                 },
 
 
-                _callback: function () {
-                    var that = Mist.graphsController.stream;
-                    if (that.isStreaming)
-                        Ember.run.later(function () {
-                            if (that.isStreaming)
-                                that._stream();
+                _getNextRequestDelay: function () {
 
-                        // Subtract time ellapsed on previous request
-                        }, that.interval - (Date.now() - that.lastRequest.until));
-                }
+                    // Client should make new data requests every
+                    // <pollingInterval> milliseconds.
+                    //
+                    // We subtract the time elapsed on the previous
+                    // request from the polling interval to make sure
+                    // the next request is made on time.
+
+                    return this.parent.config.pollingInterval -
+                        (Date.now() - this.timeOfLastRequest);
+                },
+
+
+                _sessionIsAlive: function (sessionId) {
+                    return this.currentSessionId == sessionId;
+                },
             }),
         });
     }
