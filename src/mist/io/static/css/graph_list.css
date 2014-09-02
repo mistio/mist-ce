@@ -2,6 +2,27 @@
 /* Graph List View
 -----------------------------------------------------------------------------------------------------------*/
 
+#graph-list-control .align {
+    width: 49%;
+    display: inline-block;
+}
+
+#graph-list-control {
+    display: block;
+    width: 100%;
+}
+
+#history-control {
+    width: 280px;
+    height: 55px;
+    margin-left: -5px;
+    display: inline-block;
+}
+
+#history-control-stream {
+    width: 50px;
+}
+
 #history-control div {
     text-align: center;
 }
@@ -12,11 +33,6 @@
     border-radius: 0.3em;
 }
 
-#graph-list-control .align {
-    width: 49%;
-    display: inline-block;
-}
-
 #time-window-control {
     float: right;
     margin-right: -10px;
@@ -24,18 +40,4 @@
 
 #time-window-control .ui-btn {
     height: 23px;
-}
-
-#history-control {
-    width: 250px;
-    height: 55px;
-    margin-left: -5px;
-    display: inline-block;
-}
-
-#history-control
-
-#graph-list-control {
-    display: block;
-    width: 100%;
 }

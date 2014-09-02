@@ -1141,7 +1141,6 @@ function showGraphs() {
     });
 }
 
-
 //  GLOBAL DEFINITIONS
 
 var DISPLAYED_DATAPOINTS = 60;

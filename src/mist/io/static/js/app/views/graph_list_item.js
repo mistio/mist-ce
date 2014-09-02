@@ -58,8 +58,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             load: function () {
 
-                info('graph list item inserted');
-
                 // Add event handlers
                 this.graph.on('onDatasourceAdd', this, 'updateSVG');
                 this.graph.on('onDatasourceRemove', this, 'updateSVG');
@@ -111,12 +109,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             enableAnimation: function () {
                 this.set('animationEnabled', true);
-            },
-
-
-            updateData: function(newData) {
-                this.data = newData;
-                this.updateView();
             },
 
 
@@ -398,8 +390,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // valueline is function that creates the main line based on data
                 this.set('valueline', ValueLine(this));
 
-                // valuearea is function that fills the space under the main line
-
                 this.updateSVG();
                 return;
 
@@ -470,7 +460,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             _setXCoordinates: function () {
 
                 // Parse datapoints to be displayed and construct
-                // arrays of x coordinates for each datasource
+                // an array of x coordinates for each datasource
                 //
                 // Then store these coordinates into "xCoordinates" object
                 // using the id of each datasource as the property key

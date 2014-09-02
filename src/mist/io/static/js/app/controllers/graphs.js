@@ -39,6 +39,13 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             }),
 
 
+            //
+            //
+            //  Initialization
+            //
+            //
+
+
             init: function () {
                 this._super();
                 this.stream.set('parent', this);
@@ -99,7 +106,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 ////////////////////////////////////////////
 
                 this.set('fetchStatsArgs', args);
-                this.set('pendingRequests', []);
+                this._clearPendingRequests();
 
                 var requests = this._generateRequests(args);
                 requests.forEach(function (request) {
@@ -315,7 +322,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                         var newFrom = middle - (newTimeWindow / 2);
                         var newUntil = middle + (newTimeWindow / 2);
 
-                        if (this.parent.history._isInFuture(newUntil))
+                        if (this.parent.history.isInFuture(newUntil))
                             this.parent.stream.start();
                         else
                             this.parent._fetchStats({
@@ -365,11 +372,8 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
                 goForward: function () {
-
-                    // If user can no longer go forward, start streaming
-                    if (this._isInFuture(this.parent.fetchStatsArgs.until))
+                    if (this.isInFuture(this.parent.fetchStatsArgs.until))
                         this.parent.stream.start();
-
                     else
                         this.parent._fetchStats({
                             from: this.parent.fetchStatsArgs.until,
@@ -379,15 +383,8 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 },
 
 
-                //
-                //
-                //  Pseudo-Private Methods
-                //
-                //
-
-
-                _isInFuture: function (until) {
-                    return Date.now() - until <= this.parent.config.timeWindow;
+                isInFuture: function (until) {
+                    return Date.now() <= until;
                 },
             }),
 
@@ -488,7 +485,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     // <measurementStep> milliseconds.
                     //
                     // We subtract the time elapsed on the previous
-                    // request from the polling interval to make sure
+                    // request from the interval to make sure
                     // the next request is made on time.
 
                     return this.parent.config.measurementStep -
