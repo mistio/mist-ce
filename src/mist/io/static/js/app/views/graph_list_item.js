@@ -150,6 +150,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             },
 
 
+            autoResize: function () {
+                this.changeWidth($('#' + this.id).width() - 2);
+            },
+
+
             /**
             *
             * Changes the width of svg element, sets new scale values
@@ -165,8 +170,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     return;
 
                 // Create an aspect ratio
-                //var newHeight = width * 0.125; // (160 / 1280)
-                var newHeight = width * 0.3; // (160 / 1280)
+                var newHeight = width * 0.125; // (160 / 1280)
 
                 this.height = (newHeight < 85 ? 85 : newHeight);
                 this.width = width;
@@ -189,12 +193,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 this.svg.axis.y.line.attr('y2', this.height - this.margin.bottom + 3);
 
-                // Update mouse over size
-                this.svg.canvas
-                    .select('.selectorLine').attr('y2', this.height - this.margin.bottom + 3);
-
                 this.clearAnimation(true);
-                this.updateView();
+                this.draw();
             },
 
 

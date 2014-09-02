@@ -47,6 +47,10 @@
     width: 150px;
 }
 
+#add-metric-btn {
+    display: inline-block;
+}
+
 /* Conditional for < 400px */
 @media only screen and  (max-width: 400px) {
     .graph-button {

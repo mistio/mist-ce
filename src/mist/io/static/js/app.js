@@ -1141,7 +1141,7 @@ function showGraphs() {
         Mist.graphsController.open({
             graphs: [graph],
             config: {
-                canModify: false,
+                canModify: true,
                 canControl: true,
                 canMinimize: true,
             }

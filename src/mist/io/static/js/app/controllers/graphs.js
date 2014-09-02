@@ -28,6 +28,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             isOpen: null,
             content: null,
+            resizeLock: null,
             pollingMethod: null,
             pendingRequests: [],
 
@@ -81,12 +82,15 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 Ember.run.next(this, function () {
                     this.stream.start();
                 });
+
+                $(window).on('resize', this._handleWindowResize);
             },
 
 
             close: function () {
                 this.stream.stop();
                 this._clear();
+                $(window).on('resize', this._handleWindowResize);
             },
 
 
@@ -279,6 +283,19 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     from: datasource.getFirstTimestamp() || (Date.now() - this.config.timeWindow),
                     until: datasource.getLastTimestamp() || Date.now(),
                 });
+            },
+
+
+            _handleWindowResize: function () {
+
+                var that = Mist.graphsController;
+                clearTimeout(that.resizeLock);
+                that.set('resizeLock', setTimeout(resize, 500));
+                function resize () {
+                    that.content.forEach(function (graph) {
+                        graph.view.autoResize();
+                    });
+                }
             },
 
 

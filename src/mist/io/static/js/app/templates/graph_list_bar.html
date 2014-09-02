@@ -1,0 +1,16 @@
+<div id="graphBar">
+
+    {{#each Mist.graphsController.content}}
+        {{view Mist.graphButtonView graphBinding="this"}}
+    {{/each}}
+
+    {{#if Mist.graphsController.config.canModify}}
+        <div class="graph-button" id="add-metric-btn">
+            <a class="ui-btn ui-btn-icon-left ui-icon-plus ui-corner-all ui-btn-d"
+                {{action "addMetricClicked" target="view"}}>
+                    Add Graph
+            </a>
+        </div>
+    {{/if}}
+
+</div>
