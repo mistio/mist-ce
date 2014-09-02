@@ -33,6 +33,7 @@ define('app/controllers/file_upload', ['ember'],
 
 
             open: function (title, label, callback) {
+                this.clear();
                 this.set('title', title)
                     .set('label', label)
                     .set('callback', callback);
@@ -48,7 +49,8 @@ define('app/controllers/file_upload', ['ember'],
 
 
             clear: function () {
-                this.set('title', null)
+                this.set('file', null)
+                    .set('title', null)
                     .set('label', null)
                     .set('callback', null);
             },
@@ -67,10 +69,14 @@ define('app/controllers/file_upload', ['ember'],
 
                 reader.onloadend = function (e) {
 
-                    if (e.target.readyState == FileReader.DONE)
+                    var success;
+                    if (e.target.readyState == FileReader.DONE) {
                         that.set('file', e.target.result);
-                    else
+                        success = true;
+                    } else {
                         Mist.notificationsController.notify('Failed to upload file');
+                        success = false
+                    }
                     that.set('uploadingFile', false);
 
                     if (args.callback)
