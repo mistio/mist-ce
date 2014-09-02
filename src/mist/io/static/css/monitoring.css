@@ -65,10 +65,7 @@
     padding: 5px 10px 0px;
 }
 
-.graphBtn {
-    display: inline-block;
-    width: 150px;
-}
+
 
 .graphZoomer {
     float: right;
@@ -76,17 +73,6 @@
 
 .graphMover {
     display: inline-block;
-}
-
-/* Conditional for < 600px */
-@media only screen and  (max-width: 400px) {
-    .graphBtn {
-        width: 45%;
-        display: inline-block;
-    }
-    .graphBtn .ui-btn {
-        font-size: 0.7em;
-    }
 }
 
 .graph > .header{

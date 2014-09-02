@@ -31,18 +31,7 @@ define('app/views/graph_button', ['app/views/templated'],
 
 
             load: function () {
-
                 this.set('buttonId', this.graph.id + '-btn');
-
-                // Set button visibility
-                Ember.run.next(this, function () {
-
-                    var cookies = Mist.monitoringController.cookies;
-                    if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].hashedId) > -1)
-                        $('#' + this.buttonId).show();
-                    else
-                        $('#' + this.buttonId).hide();
-                });
             }.on('didInsertElement'),
 
 
@@ -55,10 +44,25 @@ define('app/views/graph_button', ['app/views/templated'],
 
             actions: {
 
-                expandClicked: function () {
-                    Mist.monitoringController.UI.expandPressed(this.graph.id);
+                buttonClicked: function () {
+                    this.graph.view.set('isHidden', false);
                 }
-            }
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            isHiddenObserver: function () {
+                if (this.graph.view.isHidden)
+                    $('#' + this.buttonId).show(400);
+                else
+                    $('#' + this.buttonId).hide(400);
+            }.observes('graph.view.isHidden')
         });
     }
 );

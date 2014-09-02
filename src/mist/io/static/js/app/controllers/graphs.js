@@ -74,6 +74,10 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     'content': args.graphs,
                 });
 
+                forIn(this, args.config, function (value, property) {
+                    this.config.set(property, value);
+                });
+
                 Ember.run.next(this, function () {
                     this.stream.start();
                 });

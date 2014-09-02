@@ -275,6 +275,7 @@ var loadFiles = function (callback) {
         'app/views/file_upload',
         'app/views/graph_button',
         'app/views/graph_list',
+        'app/views/graph_list_bar',
         'app/views/graph_list_control',
         'app/views/graph_list_item',
         'app/views/home',
@@ -343,6 +344,7 @@ var loadApp = function (
     FileUploadView,
     GraphButtonView,
     GraphListView,
+    GraphListBarView,
     GraphListControlView,
     GraphListItemView,
     Home,
@@ -513,6 +515,7 @@ var loadApp = function (
     App.set('monitoringView', MonitoringView);
     App.set('machineView', SingleMachineView);
     App.set('graphListView', GraphListView);
+    App.set('graphListBarView', GraphListBarView);
     App.set('graphListControlView', GraphListControlView);
     App.set('graphListItemView', GraphListItemView);
     App.set('machineKeysView', MachineKeysView);
@@ -1137,6 +1140,11 @@ function showGraphs() {
 
         Mist.graphsController.open({
             graphs: [graph],
+            config: {
+                canModify: false,
+                canControl: true,
+                canMinimize: true,
+            }
         });
     });
 }

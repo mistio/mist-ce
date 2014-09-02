@@ -1,30 +1,27 @@
 {{#if Mist.graphsController.isOpen}}
 
+    <!--
+        Control Widget
+    -->
+
     {{#if Mist.graphsController.config.canControl}}
         {{view Mist.graphListControlView}}
     {{/if}}
+
+    <!--
+        Graphs
+    -->
 
     {{#each Mist.graphsController.content}}
         {{view Mist.graphListItemView graphBinding="this"}}
     {{/each}}
 
+    <!--
+        Minimized graph buttons
+    -->
 
     {{#if Mist.graphsController.config.canMinimize}}
-
-    <div id="graphBar">
-
-        {{#each Mist.graphsController.content}}
-            {{view Mist.graphButtonView graphBinding="this"}}
-        {{/each}}
-
-        {{#if Mist.graphsController.config.canModify}}
-            <div class="graphBtn" id="add-metric-btn">
-                <a class="ui-btn ui-btn-icon-left ui-icon-plus ui-corner-all ui-btn-d"
-                    {{action "addMetricClicked" target="view"}}>
-                        Add Graph
-                </a>
-            </div>
-        {{/if}}
-    </div>
+        {{view Mist.graphListBarView}}
     {{/if}}
+
 {{/if}}

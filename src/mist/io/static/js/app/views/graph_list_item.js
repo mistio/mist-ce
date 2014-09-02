@@ -39,6 +39,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             width: null,
             height: null,
             margin: null,
+            isHidden: null,
             valuearea: null,
             valueline: null,
             xCoordinates: null,
@@ -146,11 +147,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // Reset Transform
                 if (stopCurrent)
                     this.clearAnimPending = true;
-            },
-
-
-            isVisible: function () {
-                return $('#' + this.graph.id).css('display') != 'none';
             },
 
 
@@ -381,6 +377,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.displayedData    = [];
                 this.xCoordinates      = [];
                 this.clearAnimPending = false;
+                this.isHidden = false;
 
                 // Distance of two values in graph (pixels), Important For Animation
                 this.valuesDistance = 0;
@@ -544,7 +541,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             */
             updateView: function () {
 
-                if (!this.isVisible())
+                if (this.isHidden)
                     return;
 
                 this._setDisplayedDatapoints();
@@ -685,7 +682,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             actions: {
 
                 collapseClicked: function () {
-                    Mist.monitoringController.UI.collapsePressed(this.graph.id);
+                    this.set('isHidden', true);
                 },
 
                 removeClicked: function () {
@@ -751,9 +748,17 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             timeWindowObserver: function () {
-                info('changing time window');
                 this.changeTimeWindow(Mist.graphsController.config.timeWindow);
             }.observes('Mist.graphsController.config.timeWindow'),
+
+
+            isVisibleObserver: function () {
+                if (this.isHidden)
+                    $('#' + this.id).parent().hide(400);
+                else
+                    $('#' + this.id).parent().show(400);
+                this.draw();
+            }.observes('isHidden'),
         });
 
 

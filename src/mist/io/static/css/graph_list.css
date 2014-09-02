@@ -41,3 +41,18 @@
 #time-window-control .ui-btn {
     height: 23px;
 }
+
+.graph-button {
+    display: none;
+    width: 150px;
+}
+
+/* Conditional for < 400px */
+@media only screen and  (max-width: 400px) {
+    .graph-button {
+        width: 45%;
+    }
+    .graph-button .ui-btn {
+        font-size: 0.7em;
+    }
+}
