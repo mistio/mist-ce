@@ -18,8 +18,9 @@ ilb { display: inline-block; }  .provider-ec2 { background-image: url('icon-spri
 .provider-digitalocean { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .provider-digitalocean { background-position: -0px -746px; } 
 .provider-rackspace { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .provider-rackspace { background-position: -0px -794px; } 
 .provider-softlayer { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .provider-softlayer { background-position: -0px -842px; } 
-.image-fedora { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .image-fedora { background-position: -0px -890px; } 
-.image-oracle { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .image-oracle { background-position: -0px -938px; } 
-.image-ubuntu { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .image-ubuntu { background-position: -0px -986px; } 
-.provider-gce { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .provider-gce { background-position: -0px -1034px; } 
-.image-suse { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .image-suse { background-position: -0px -1082px; } 
+.image-centos { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .image-centos { background-position: -0px -890px; } 
+.image-fedora { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .image-fedora { background-position: -0px -938px; } 
+.image-oracle { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .image-oracle { background-position: -0px -986px; } 
+.image-ubuntu { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .image-ubuntu { background-position: -0px -1034px; } 
+.provider-gce { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .provider-gce { background-position: -0px -1082px; } 
+.image-suse { background-image: url('icon-sprite.png') !important; width: 48px; height: 48px; } .image-suse { background-position: -0px -1130px; } 
