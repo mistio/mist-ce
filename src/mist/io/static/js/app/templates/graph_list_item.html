@@ -1,26 +1,56 @@
 <div class="graph" {{bind-attr id="view.graph.id"}}>
 
+    <!--
+        Graph Head
+    -->
+
     <div class="header">
+
         <div class="title">
             {{view.graph.title}}
         </div>
+
         {{#if view.graph.pendingCreation}}
+
             <div class="ajax-loader"></div>
+
         {{else}}
+
             {{#if view.graph.pendingRemoval}}
                 <div class="ajax-loader"></div>
             {{/if}}
-            {{#unless view.graph.isBuiltIn}}
-                <a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext"
-                    {{action "removeClicked" target="view"}}>x
+
+
+            <!--
+                Remove button
+            -->
+
+            {{#if Mist.graphsController.config.canModify}}
+                {{#unless view.graph.isBuiltIn}}
+                    <a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext"
+                        {{action "removeClicked" target="view"}}>x
+                    </a>
+                {{/unless}}
+            {{/if}}
+
+            <!--
+                Minimize button
+            -->
+
+            {{#if Mist.graphsController.config.canMinimize}}
+                <a class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-d"
+                    {{action "collapseClicked" target="view"}}>-
                 </a>
-            {{/unless}}
-            <a class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-d"
-                {{action "collapseClicked" target="view"}}>-
-            </a>
+            {{/if}}
+
         {{/if}}
     </div>
-     <div class="header">
+
+    <!--
+        Graph Secondary Legend Header
+    -->
+
+    <div class="header">
         <div class="title">
             {{#each view.graph.datasources}}
                 {{this.machine.name}}
@@ -28,6 +58,11 @@
             {{/each}}
         </div>
     </div>
+
+    <!--
+        Graph Body
+    -->
+
     <svg>
         <g class="grid-x"></g>
         <g class="grid-y"></g>

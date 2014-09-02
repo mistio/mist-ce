@@ -36,6 +36,10 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 timeWindow: 10 * TIME_MAP.MINUTE,
                 measurementStep: 10 * TIME_MAP.SECOND,
                 measurementOffset: 40 * TIME_MAP.SECOND,
+
+                canModify: true,
+                canControl: true,
+                canMinimize: true,
             }),
 
 
@@ -62,11 +66,14 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             open: function (args) {
+
                 this._clear();
+
                 this.setProperties({
                     'isOpen': true,
                     'content': args.graphs,
                 });
+
                 Ember.run.next(this, function () {
                     this.stream.start();
                 });
