@@ -52,7 +52,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                 Mist.backendsController.off('onMachineListChange', this, 'load');
                 Mist.metricsController.off('onMetricListChange', this, 'updateMetrics');
 
-                this.stopPolling();
 
             }.on('willDestroyElement'),
 
@@ -75,6 +74,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                         this.machine.set('keysCount',
                             Mist.keysController.getMachineKeysCount(this.machine)
                         );
+
                 });
             },
 

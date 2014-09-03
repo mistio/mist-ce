@@ -4,7 +4,7 @@
 
         <a href="#/machines" class="responsive-button" data-icon="arrow-l">Machines</a>
 
-        <h1>{{name}}</h1>
+        <h1>{{view.machine.name}}</h1>
 
         {{view Mist.userMenuView}}
 
@@ -21,7 +21,7 @@
             </span>
         </span>
 
-        <h1 {{bind-attr class="view.machine.state"}}>{{state}}</h1>
+        <h1 {{bind-attr class="view.machine.state"}}>{{view.machine.state}}</h1>
 
         {{#unless view.machine.id}}
             {{#if Mist.backendsController.loadingMachines}}
@@ -30,15 +30,15 @@
         {{/unless}}
 
         <span class="ui-btn-right" id="mist-manage-keys">
-            {{#if pendingCreation}}
+            {{#if view.machine.pendingCreation}}
                 <a class="ui-btn ui-btn-icon-right ui-icon-plus
                     ui-corner-all ui-state-disabled">
                         Add key
                 </a>
-            {{else}} {{#if keysCount}}
+            {{else}} {{#if view.machine.keysCount}}
                 <a class="ui-btn ui-shadow ui-corner-all"
                     {{action "manageKeysClicked" target="view"}}>
-                        {{keysCount}} keys
+                        {{view.machine.keysCount}} keys
                 </a>
             {{else}}
                 <a class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
@@ -50,6 +50,7 @@
     </div>
 
     <div data-role="content" data-theme="c">
+
 
         <!--
 
@@ -72,18 +73,13 @@
         </div>
         {{/if}}
 
-        {{#if pendingStats}}
-        <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
-            <span class="ui-icon ui-icon-loading"></span>
-            <h1>Fetching stats...</h1>
-        </div>
-        {{/if}}
 
         <!--
 
              Monitoring collapsible
 
         -->
+
 
         <div data-role="collapsible" id="monitoring-collapsible" data-collapsed="false">
 
@@ -93,11 +89,13 @@
 
         </div>
 
+
         <!--
 
              Information collapsibles
 
         -->
+
 
         <div data-role="collapsible" data-collapsed="false">
 

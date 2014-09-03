@@ -1,43 +1,79 @@
 define('app/views/messagebox', ['app/views/templated', 'ember'],
-    /**
-     * Message Box Dialog
-     *
-     * @returns Class
-     */
-    function(TemplatedView) {
+    //
+    //  Message Box View
+    //
+    // @returns Class
+    //
+    function (TemplatedView) {
+
+        'use strict';
+
         return TemplatedView.extend({
 
-            actions: {
-                
-                
-                closeMessage: function() {
-                    
-                    $('#message-box-popup').popup('close');
-                    var controller = Mist.notificationController;
-                    if (controller.msgCallback) {
-                        controller.msgCallback();
-                    }
-                    controller.set('msgHeader', '');
-                    controller.set('msgPart1', '');
-                    controller.set('msgPart2', '');
-                    controller.set('msgPart3', '');
-                    controller.set('msgPart4', '');
-                    controller.set('msgLink', '');
-                    controller.set('msgHref', '');
-                    controller.set('msgCallback', null);
-                },
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
+            popup: '#message-box',
+
+
+            //
+            //
+            //  Initialization
+            //
+            //
+
+
+            load: function () {
+                this.set('popup', $(this.popup));
+                Mist.notificationController.messageBox.set('view', this);
+            }.on('didInsertElement'),
+
+
+            unload: function () {
+                Mist.notificationController.messageBox.set('view', null);
+            }.on('willDestroyElement'),
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            open: function () {
+                Ember.run.later(this, function () {
+                    this.popup.popup('reposition', {positionTo: 'window'});
+                    Ember.run.next(this, function () {
+                        this.popup.popup('open');
+                    });
+                }, 400);
             },
 
-            /**
-             * 
-             *  Observers
-             * 
-             */
-            
-            hrefObserver: function() {
-                // Baaaaad :(
-                $('#message-box-popup #message-link').attr('href', Mist.notificationController.msgHref);
-            }.observes('Mist.notificationController.msgHref')
+
+            close: function () {
+                this.popup.popup('close');
+            },
+
+
+            //
+            //
+            //  Actions
+            //
+            //
+
+
+            actions: {
+
+                okClicked: function() {
+                    Mist.notificationController.messageBox.close();
+                },
+            }
         });
     }
 );
