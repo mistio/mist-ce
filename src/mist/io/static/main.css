@@ -15,7 +15,7 @@
 @import url("css/key_list.css");
 @import url("css/providers.css");
 @import url("css/metric_add.css");
-@import url("css/monitoring.css");
+@import url("css/machine_monitoring.css");
 @import url("css/file_upload.css");
 @import url("css/backend_add.css");
 @import url("css/machine_add.css");
@@ -480,13 +480,8 @@ ul.checkbox-list li label {
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
     padding: 15px;
-    background: #e0e0e1;
-    border-radius: inherit;
-    text-align: center;
 }
-.monitoring-dialog-container div {
-    margin-bottom: 5px;
-}
+
 .ui-collapsible-inset .ui-collapsible-content {
     padding-top: 0px;
     margin-top: -1px;

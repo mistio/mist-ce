@@ -23,13 +23,6 @@
 #single-machine-page .info-table .ip {
     display: inline-block;
 }
-#single-machine-page #monitoring-disabled p {
-    text-align: center;
-}
-#single-machine-page #monitoring-disabled a {
-    width: 165px;
-    margin: 0 auto;
-}
 #single-machine-page #mist-manage-keys a {
     margin-top: 4px;
     margin-right: 5px;

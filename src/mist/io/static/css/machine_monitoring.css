@@ -262,3 +262,18 @@ circle.mark{
     fill: #fff;
 }
 */
+
+#machine-monitoring #machine-monitoring-disabled {
+    background: #E1E7F0;
+    border-radius: 0 0 5px 5px;
+    padding: 30px 10px 30px 10px;
+}
+
+#machine-monitoring #enable-monitoring-label{
+    text-align: center;
+}
+
+#machine-monitoring #enable-monitoring-btn {
+    width: 165px;
+    margin: 20px auto auto auto;
+}

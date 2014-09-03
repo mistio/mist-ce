@@ -294,6 +294,7 @@ var loadFiles = function (callback) {
         'app/views/machine_list',
         'app/views/machine_list_item',
         'app/views/machine_manual_monitoring',
+        'app/views/machine_monitoring',
         'app/views/machine_power',
         'app/views/machine_shell',
         'app/views/machine_shell_list_item',
@@ -303,7 +304,6 @@ var loadFiles = function (callback) {
         'app/views/metric_add',
         'app/views/metric_add_custom',
         'app/views/metric_node',
-        'app/views/monitoring',
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/user_menu',
@@ -363,6 +363,7 @@ var loadApp = function (
     MachineListView,
     MachineListItem,
     MachineManualMonitoringView,
+    MachineMonitoringView,
     MachinePowerView,
     MachineShellView,
     MachineShellListItemView,
@@ -372,7 +373,6 @@ var loadApp = function (
     MetricAddView,
     MetricAddCustomView,
     MetricNodeView,
-    MonitoringView,
     RuleView,
     RuleEditView,
     UserMenuView,
@@ -512,7 +512,7 @@ var loadApp = function (
     App.set('imageListView', ImageListView);
     App.set('fileUploadView', FileUploadView);
     App.set('messageboxView', MessageBoxView);
-    App.set('monitoringView', MonitoringView);
+    App.set('machineMonitoringView', MachineMonitoringView);
     App.set('machineView', SingleMachineView);
     App.set('graphListView', GraphListView);
     App.set('graphListBarView', GraphListBarView);
@@ -820,10 +820,6 @@ var setupSocketEvents = function (socket, callback) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
             backend.machines.load(data.machines);
-        Mist.set('didListMachines', true);
-        if (Mist.didListMonitoring)
-            if (!Mist.didShowGraphs)
-                showGraphs();
     })
     .on('list_locations', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -834,10 +830,6 @@ var setupSocketEvents = function (socket, callback) {
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
         Mist.backendsController.set('checkedMonitoring', true);
-        Mist.set('didListMonitoring', true);
-        if (Mist.didListMachines)
-            if (!Mist.didShowGraphs)
-                showGraphs();
     })
     .on('stats', function (data) {
         Mist.graphsController._handleSocketResponse(data);
@@ -1110,7 +1102,7 @@ function error() {
         console.error.apply(console, arguments);
 }
 
-
+/*
 function showGraphs() {
 
     Mist.set('didShowGraphs', true);
@@ -1148,6 +1140,7 @@ function showGraphs() {
         });
     });
 }
+*/
 
 //  GLOBAL DEFINITIONS
 

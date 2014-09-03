@@ -1,0 +1,36 @@
+<div id="machine-monitoring">
+
+    {{#if view.machine.hasMonitoring}}
+
+
+
+
+    {{else}}
+
+        <div id="machine-monitoring-disabled">
+
+            <!--div>Monitoring is currently disabled</div-->
+
+            <label id="enable-monitoring-label">
+                View real time server analytics, get alerts
+                and set up automated actions.
+            </label>
+
+            <a id="enable-monitoring-btn"
+                class="ui-btn
+                    ui-corner-all
+                    ui-btn-d
+                    ui-btn-icon-left
+                    ui-icon-star"
+                {{action "enableMonitoringClicked" target="view"}}>
+                    Enable Monitoring
+            </a>
+
+           {{#if Mist.machineManualMonitoringController.gettingCommand}}
+                <div class="ajax-loader"></div>
+           {{/if}}
+       </div>
+
+    {{/if}}
+
+</div>

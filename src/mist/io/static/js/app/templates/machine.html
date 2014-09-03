@@ -59,12 +59,10 @@
 
 
         {{#if enablingMonitoring}}
-        {{#unless pendingMonitoring}}
         <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
             <span class="ui-icon ui-icon-loading"></span>
             <h1>Enabling monitoring. Please wait</h1>
         </div>
-        {{/unless}}
         {{/if}}
 
         {{#if disablingMonitoring}}
@@ -91,72 +89,7 @@
 
             <h3>Monitoring</h3>
 
-            {{#if hasMonitoring}}
-
-            {{#unless pendingMonitoring}}
-
-                {{#if pendingFirstData}}
-                <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
-                    <span class="ui-icon ui-icon-loading"></span>
-                    <h1>Waiting for data</h1>
-                </div>
-                {{/if}}
-
-                {{view Mist.monitoringView}}
-
-                <div class="rules-container" data-role="listview">
-                    {{#each view.rules}}
-                        {{view Mist.ruleView ruleBinding="this"}}
-                    {{/each}}
-
-                    {{#if Mist.rulesController.creationPending}}
-                    <div class="rule-box" id="creation-rule">
-                        <div class="ajax-loader"></div>
-                    </div>
-                    {{/if}}
-                </div>
-
-                <div id="monitoring-bottom-btns">
-                    <div data-rule="ui-grid-a">
-                        <div class="ui-block-a">
-                            <a id="add-rule-button"
-                                class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
-                                {{action "addRuleClicked" target="view"}}>Add Rule</a>
-                        </div>
-                        <!--div class="ui-block-b">
-                            <a id="add-metric-btn"
-                                class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
-                                {{action "addMetricClicked" target="view"}}>Add Metric</a>
-                        </div-->
-                        <div class="ui-block-b">
-                            <a id="disable-monitor-btn"
-                            class="ui-btn ui-corner-all ui-btn-b ui-btn-icon-left ui-icon-delete"
-                                {{action "disableMonitoringClicked" target="view"}}>Disable</a>
-                        </div>
-                    </div>
-                </div>
-
-            {{/unless}}
-
-            {{else}}
-
-                <div class="monitoring-dialog-container" id="monitoring-disabled">
-
-                    <div id="enable-monitoring-bundle">
-                        <div>Monitoring is currently disabled</div>
-
-                        <a id="enable-monitor-btn"
-                           class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-star"
-                           {{action "enableMonitoringClicked" target="view"}}>Enable</a>
-
-                       {{#if Mist.machineManualMonitoringController.gettingCommand}}
-                            <div class="ajax-loader"></div>
-                       {{/if}}
-                    </div>
-
-                </div>
-
-            {{/if}}
+            {{view Mist.machineMonitoringView machineBinding="this"}}
 
         </div>
 
