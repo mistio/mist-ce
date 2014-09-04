@@ -72,7 +72,6 @@ define('app/views/machine_monitoring', ['app/views/templated'],
                         return;
                     }
 
-
                     var machine = this.machine;
                     Mist.confirmationController.set('title', 'Enable monitoring');
                     Mist.confirmationController.set('text',

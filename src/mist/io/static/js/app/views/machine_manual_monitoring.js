@@ -1,18 +1,21 @@
-define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
-    /**
-     *  Machine Manual Monitoring View
-     *
-     *  @returns Class
-     */
-    function (TemplatedView) {
-        return TemplatedView.extend({
+define('app/views/machine_manual_monitoring', ['app/views/popup'],
+    //
+    //  Machine Manual Monitoring View
+    //
+    //  @returns Class
+    //
+    function (PopupView) {
+
+        'use strict';
+
+        return PopupView.extend({
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //
+            //  Actions
+            //
+            //
 
 
             actions: {
