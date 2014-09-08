@@ -86,8 +86,8 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');
                     } else if (provider.provider.indexOf('digitalocean') > -1) {
-                        this.set('firstFieldLabel', 'Token name');
-                        this.set('secondFieldLabel', 'Token');
+                        this.set('firstFieldLabel', 'Client ID');
+                        this.set('secondFieldLabel', 'API Key');
                     } else if (provider.provider.indexOf('gce') > -1) {
                         this.set('firstFieldLabel', 'Email address');
                         this.set('secondFieldLabel', '');
