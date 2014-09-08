@@ -134,7 +134,15 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.region = region
         if provider == 'docker':
             backend.docker_port = docker_port
+        #For digital ocean v2 of the API, only apisecret is needed. 
+        #However, in v1 both api_key and api_secret are needed. In order
+        #for both versions to be supported (existing v1, and new v2 which 
+        #is now the default) we set api_key same to api_secret to 
+        #distinguish digitalocean v2 logins, to avoid adding another 
+        #arguement on digital ocean libcloud driver
 
+        if provider == 'digitalocean':
+            backend.apikey = backend.apisecret
         #OpenStack specific: compute_endpoint is passed only when there is a
         # custom endpoint for the compute/nova-compute service
         backend.compute_endpoint = compute_endpoint
@@ -532,10 +540,14 @@ def connect_provider(backend):
                               Provider.RACKSPACE]:
         conn = driver(backend.apikey, backend.apisecret,
                       region=backend.region)
-    elif backend.provider in [Provider.NEPHOSCALE,
-                              Provider.DIGITAL_OCEAN,
-                              Provider.SOFTLAYER]:
+    elif backend.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(backend.apikey, backend.apisecret)
+    elif backend.provider == Provider.DIGITAL_OCEAN:
+        if backend.apikey == backend.apisecret:  # API v2
+            driver = get_driver('digitalocean2')
+            conn = driver(backend.apisecret)
+        else:   # API v1
+            conn = driver(backend.apikey, backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
     else:
@@ -1102,14 +1114,18 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     sanitized by create_machine.
 
     """
-
     key = public_key.replace('\n', '')
-    deploy_script = ScriptDeployment(script)
-
     try:
-        key = conn.ex_create_ssh_key(machine_name, key)
+        server_key = ''
+        keys = conn.ex_list_ssh_keys()
+        for k in keys:
+            if key == k.pub_key:
+                server_key = k
+                break
+        if not server_key:
+            server_key = conn.ex_create_ssh_key(machine_name, key)
     except:
-        key = conn.ex_create_ssh_key('mist.io', key)
+        server_key = conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1117,7 +1133,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 name=machine_name,
                 image=image,
                 size=size,
-                ex_ssh_key_ids=[str(key.id)],
+                ex_ssh_key_ids=[server_key.id],
                 location=location,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['root']*5,
