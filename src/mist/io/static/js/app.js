@@ -248,6 +248,7 @@ var loadFiles = function (callback) {
         'app/controllers/backends',
         'app/controllers/confirmation',
         'app/controllers/datasources',
+        'app/controllers/dialog',
         'app/controllers/file_upload',
         'app/controllers/graphs',
         'app/controllers/image_search',
@@ -272,6 +273,7 @@ var loadFiles = function (callback) {
         'app/views/backend_button',
         'app/views/backend_edit',
         'app/views/confirmation_dialog',
+        'app/views/dialog',
         'app/views/file_upload',
         'app/views/graph_button',
         'app/views/graph_list',
@@ -317,6 +319,7 @@ var loadApp = function (
     BackendsController,
     ConfirmationController,
     DatasourcesController,
+    DialogController,
     FileUploadController,
     GraphsController,
     ImageSearchController,
@@ -341,6 +344,7 @@ var loadApp = function (
     BackendButton,
     BackendEdit,
     ConfirmationDialog,
+    DialogView,
     FileUploadView,
     GraphButtonView,
     GraphListView,
@@ -521,6 +525,7 @@ var loadApp = function (
     App.set('machineKeysView', MachineKeysView);
     App.set('machineTagsView', MachineTagsView);
     App.set('keyListItemView', KeyListItemView);
+    App.set('dialogView', DialogView);
     App.set('machineListView', MachineListView);
     App.set('imageListItemView', ImageListItem);
     App.set('machineAddView', MachineAddDialog);
@@ -560,6 +565,7 @@ var loadApp = function (
     App.set('machineShellController', MachineShellController.create());
     App.set('confirmationController', ConfirmationController.create());
     App.set('notificationController', NotificationController.create());
+    App.set('dialogController', DialogController.create());
     App.set('machinePowerController', MachinePowerController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
     App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
@@ -674,7 +680,11 @@ var loadApp = function (
     };
 
     App.selectElementContents = function(elementId) {
-        var el = document.getElementById(elementId);
+        var el;
+        if (elementId instanceof HTMLElement)
+            el = elementId
+        else
+            el = document.getElementById(elementId);
         var range = document.createRange();
         range.selectNodeContents(el);
         var sel = window.getSelection();
@@ -1153,4 +1163,12 @@ var TIME_MAP = {
     DAY: 24 * 60 * 60 * 1000,
     WEEK: 7 * 24 * 60 * 60 * 1000,
     MONTH: 30 * 24 * 60 * 60 * 1000,
-}
+};
+
+var DIALOG_TYPES = {
+    OK: 0,
+    OK_CANCEL: 1,
+    YES_NO: 2,
+    DONE_BACK: 3,
+};
+
