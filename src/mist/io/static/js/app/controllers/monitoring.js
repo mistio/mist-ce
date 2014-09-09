@@ -157,6 +157,31 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
             },
 
 
+            getMonitoringCommand: function (machine, callback) {
+
+                var url = '/backends/' + machine.backend.id +
+                    '/machines/' + machine.id + '/monitoring';
+
+                var that = this;
+                this.set('gettingCommand', true);
+                Mist.ajax.POST(url, {
+                    'action': 'enable',
+                    'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
+                    'public_ips': machine.public_ips ? machine.public_ips : [],
+                    'name': machine.name ? machine.name : machine.id,
+                    'no_ssh': true,
+                    'dry': true,
+                }).success(function (data) {
+                    that.set('command', data.command);
+                }).error(function (message) {
+                    Mist.notificationController.notify(
+                        'Failed to enable monitoring: ' + message);
+                }).complete(function (success, data) {
+                    that.set('gettingCommand', false);
+                    if (callback) callback(success, data);
+                });
+            },
+
 
             //
             //

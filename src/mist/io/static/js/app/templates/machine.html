@@ -238,23 +238,6 @@
 
     {{view Mist.confirmationDialog}}
 
-    {{view Mist.machineManualMonitoringView}}
-
-    <div id="manual-monitoring-popup" class="mid-popup" data-role="popup" data-transition="popp"
-         data-overlay-theme="b" data-disimissible="false">
-
-        <div data-role="header" data-theme="b">
-            <h1>Manual collectd installation</h1>
-        </div>
-
-        <div data-role="content" data-theme="c">
-
-            <p>Run these commands on your server:</p>
-            <textarea>Command here...</textarea>
-            <a data-role="button" {{action "closeManualMonitoringPopup" target="view"}}>Back</a>
-        </div>
-    </div>
-
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
             <a id="single-machine-tags-btn" data-role="button" data-icon="grid"{{action "tagsClicked" target="view"}}>Tags</a>

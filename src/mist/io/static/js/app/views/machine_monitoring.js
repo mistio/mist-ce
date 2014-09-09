@@ -19,6 +19,7 @@ define('app/views/machine_monitoring', ['app/views/templated'],
 
 
             machine: null,
+            gettingCommand: null,
 
 
             //
@@ -42,50 +43,118 @@ define('app/views/machine_monitoring', ['app/views/templated'],
 
             actions: {
 
-
                 enableMonitoringClicked: function () {
 
                     // Make sure user is logged in
-                    if (!Mist.authenticated) {
+                    if (!Mist.authenticated)
                         Mist.loginController.open();
-                        return;
-                    }
 
-                    // Make sure user has a monitoring plan
-                    if (!Mist.current_plan) {
-                        Mist.notificationController.messageBox.open({
-                            title: 'No plan',
-                            paragraphs: [
-                                'In order to use our monitoring service' +
-                                ' you have to purchase a plan',
+                    // Make sure user has purchased a plan
+                    else if (!Mist.current_plan)
+                        this._showMissingPlanMessage();
 
-                                'You can do that in the Account page, which can ' +
-                                'be accessed from the menu button on the top right corner'
-                            ]
-                        });
-                        return;
-                    }
+                    // Make sure machine has a key
+                    else if (!this.machine.probed)
+                        this._showManualMonitoringCommand();
 
-                    // Check if sure has a key on the machine
-                    if (!this.machine.probed) {
-                        Mist.machineManualMonitoringController.open(this.machine);
-                        return;
-                    }
-
-                    var machine = this.machine;
-                    Mist.confirmationController.set('title', 'Enable monitoring');
-                    Mist.confirmationController.set('text',
-                        'Are you sure you want to enable monitoring for this machine?');
-                    Mist.confirmationController.set('callback', function () {
-                        Mist.monitoringController.changeMonitoring(machine);
-                    });
-                    Mist.confirmationController.show();
+                    // Confrim to enable monitoring
+                    else
+                        this._showEnableMonitoringConfirmation();
                 },
 
 
                 addMetricClicked: function () {
                     Mist.metricAddController.open(this.machine);
                 }
+            },
+
+
+            //
+            //
+            //  Pseudo-Private Methods
+            //
+            //
+
+
+            _showMissingPlanMessage: function () {
+                Mist.dialogController.open({
+                    type: DIALOG_TYPES.OK,
+                    head: 'No plan',
+                    body: [
+                        {
+                            paragraph: 'In order to use our monitoring' +
+                                ' service you have to purchase a plan'
+                        },
+                        {
+                            paragraph: 'You can do that in the Account' +
+                                ' page, which can be accessed from the' +
+                                ' menu button on the top right corner, or' +
+                                ' you can the link bellow:'
+                        },
+                        {
+                            link: 'Account page',
+                            href: 'https://mist.io/account'
+                        }
+                    ]
+                });
+            },
+
+
+            _showManualMonitoringCommand: function () {
+
+                var that = this;
+                this.set('gettingCommand', true);
+                Mist.monitoringController.getMonitoringCommand(
+                    this.machine, function (success, data) {
+                        if (success)
+                            showPopup(data.command);
+                        that.set('gettingCommand', false)
+                });
+
+                function showPopup (command) {
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.OK_CANCEL,
+                        head: 'Enable monitoring',
+                        body: [
+                            {
+                                paragraph: 'Automatic installation of monitoring' +
+                                    ' requires an SSH key'
+                            },
+                            {
+                                paragraph: 'Run this command on your server for' +
+                                    ' manual installation:'
+                            },
+                            {
+                                command: command
+                            },
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm)
+                                Mist.monitoringController.enableMonitoring(
+                                    that.machine, null, true
+                                );
+                        },
+                    });
+                }
+            },
+
+
+            _showEnableMonitoringConfirmation: function () {
+                var machine = this.machine;
+                Mist.dialogController.open({
+                    type: DIALOG_TYPES.YES_NO,
+                    head: 'Enable monitoring',
+                    body: [
+                        {
+                            paragraph: 'Are you sure you want to enable' +
+                                'monitoring for this machine?'
+                        }
+                    ],
+                    callback: function (didConfirm) {
+                        if (didConfirm)
+                            Mist.monitoringController.enableMonitoring(machine);
+                    }
+                });
             },
         });
     }

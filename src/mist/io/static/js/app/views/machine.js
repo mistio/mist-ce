@@ -262,35 +262,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                 },
 
 
-                enableMonitoringClicked: function () {
-
-                    if (Mist.authenticated) {
-                        if (Mist.current_plan) {
-                            if (this.machine.probed) {
-                                var machine = this.machine;
-                                Mist.confirmationController.set('title', 'Enable monitoring');
-                                Mist.confirmationController.set('text', 'Are you sure you want to enable monitoring for this machine?');
-                                Mist.confirmationController.set('callback', function () {
-                                    Mist.monitoringController.changeMonitoring(machine);
-                                });
-                                Mist.confirmationController.show();
-                            } else {
-                                Mist.machineManualMonitoringController.open(this.machine);
-                            }
-                        } else {
-                            Mist.notificationController.set('msgHeader', 'No plan');
-                            Mist.notificationController.set('msgPart1', 'In order to use our monitoring service' +
-                                                                        ' you have to purchase a plan');
-                            Mist.notificationController.set('msgPart2', 'You can do that in the Account page, which can ' +
-                                                                        'be accessed from the menu button on the top right corner');
-                            Mist.notificationController.showMessagebox();
-                        }
-                    } else {
-                        Mist.loginController.open();
-                    }
-                },
-
-
                 disableMonitoringClicked: function() {
                     var machine = this.machine;
                     Mist.confirmationController.set('title', 'Disable monitoring');
@@ -312,11 +283,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                         if (!success)
                             Mist.notificationController.notify('Failed to probe machine');
                     });
-                },
-
-
-                closeManualMonitoringPopup: function() {
-                    $('#manual-monitoring-popup').popup('close');
                 }
             },
 

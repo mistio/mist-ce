@@ -258,7 +258,6 @@ var loadFiles = function (callback) {
         'app/controllers/login',
         'app/controllers/machine_add',
         'app/controllers/machine_keys',
-        'app/controllers/machine_manual_monitoring',
         'app/controllers/machine_power',
         'app/controllers/machine_shell',
         'app/controllers/machine_tags',
@@ -295,7 +294,6 @@ var loadFiles = function (callback) {
         'app/views/machine_keys_list_item',
         'app/views/machine_list',
         'app/views/machine_list_item',
-        'app/views/machine_manual_monitoring',
         'app/views/machine_monitoring',
         'app/views/machine_power',
         'app/views/machine_shell',
@@ -329,7 +327,6 @@ var loadApp = function (
     LoginController,
     MachineAddController,
     MachineKeysController,
-    MachineManualMonitoringController,
     MachinePowerController,
     MachineShellController,
     MachineTagsController,
@@ -366,7 +363,6 @@ var loadApp = function (
     MachineKeysListItemView,
     MachineListView,
     MachineListItem,
-    MachineManualMonitoringView,
     MachineMonitoringView,
     MachinePowerView,
     MachineShellView,
@@ -539,7 +535,6 @@ var loadApp = function (
     App.set('machineKeysListItemView', MachineKeysListItemView);
     App.set('machineTagsListItemView', MachineTagsListItemView);
     App.set('machineShellListItemView', MachineShellListItemView);
-    App.set('machineManualMonitoringView', MachineManualMonitoringView);
 
     // Ember controllers
 
@@ -568,7 +563,6 @@ var loadApp = function (
     App.set('dialogController', DialogController.create());
     App.set('machinePowerController', MachinePowerController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
-    App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
 
     // Ember custom widgets
 
@@ -682,7 +676,7 @@ var loadApp = function (
     App.selectElementContents = function(elementId) {
         var el;
         if (elementId instanceof HTMLElement)
-            el = elementId
+            el = elementId;
         else
             el = document.getElementById(elementId);
         var range = document.createRange();
