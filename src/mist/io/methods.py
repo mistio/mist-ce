@@ -544,9 +544,9 @@ def connect_provider(backend):
         conn = driver(backend.apikey, backend.apisecret)
     elif backend.provider == Provider.DIGITAL_OCEAN:
         if backend.apikey == backend.apisecret:  # API v2
-            driver = get_driver('digitalocean2')
             conn = driver(backend.apisecret)
         else:   # API v1
+            driver = get_driver('digitalocean_first_gen')
             conn = driver(backend.apikey, backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
