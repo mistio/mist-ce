@@ -699,7 +699,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     through mist.io and those from the Linode interface.
 
     """
-
     log.info('Creating machine %s on backend %s' % (machine_name, backend_id))
 
     if backend_id not in user.backends:
@@ -1115,6 +1114,10 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
 
     """
     key = public_key.replace('\n', '')
+
+    #on API v1 list keys returns only ids, without actual public keys
+    #So the check fails. If there's already a key with the same pub key,
+    #create key call will fail!
     try:
         server_key = ''
         keys = conn.ex_list_ssh_keys()
@@ -1133,7 +1136,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 name=machine_name,
                 image=image,
                 size=size,
-                ex_ssh_key_ids=[server_key.id],
+                ex_ssh_key_ids=[str(server_key.id)],
                 location=location,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['root']*5,
