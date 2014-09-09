@@ -147,7 +147,7 @@ define('app/views/machine_monitoring', ['app/views/templated'],
                     body: [
                         {
                             paragraph: 'Are you sure you want to enable' +
-                                'monitoring for this machine?'
+                                ' monitoring for this machine?'
                         }
                     ],
                     callback: function (didConfirm) {
