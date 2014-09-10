@@ -59,13 +59,15 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             load: function () {
 
-                // Add event handlers
-                this.graph.on('onDatasourceAdd', this, 'updateSVG');
-                this.graph.on('onDatasourceRemove', this, 'updateSVG');
+                Ember.run.next(this, function () {
+                    // Add event handlers
+                    this.graph.on('onDatasourceAdd', this, 'updateSVG');
+                    this.graph.on('onDatasourceRemove', this, 'updateSVG');
 
-                this.graph.set('view', this);
-                this.setupGraph();
-                this.setupMouseOver();
+                    this.graph.set('view', this);
+                    this.setupGraph();
+                    this.setupMouseOver();
+                });
 
             }.on('didInsertElement'),
 
@@ -820,7 +822,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             return d3.select('#' + args.id + ' svg .' + datasource.id)
                     .attr('transform', 'translate(' +
                         args.margin.left + ',' + args.margin.top + ')')
-                    .attr('class', 'valueLine ' + LINE_COLOR_MAP[index])
+                    .attr('class', 'valueLine ' + LINE_COLOR_MAP[index] + ' ' + datasource.id)
                     .select('path');
         };
 

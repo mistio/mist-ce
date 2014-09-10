@@ -27,6 +27,19 @@ define('app/models/graph', ['ember'],
 
             //
             //
+            //  Computed Properties
+            //
+            //
+
+
+            unit: function () {
+                return this.datasources.length ?
+                    this.datasources[0].metric.unit : '';
+            }.property('datasources'),
+
+
+            //
+            //
             // Initialization
             //
             //

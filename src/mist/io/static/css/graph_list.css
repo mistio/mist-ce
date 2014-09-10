@@ -42,8 +42,9 @@
     height: 23px;
 }
 
+
 .graph-button {
-    display: none;
+    display: inline-block;
     width: 150px;
 }
 

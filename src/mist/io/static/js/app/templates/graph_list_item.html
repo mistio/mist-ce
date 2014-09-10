@@ -7,7 +7,7 @@
     <div class="header">
 
         <div class="title">
-            {{view.graph.title}}
+            {{view.graph.title}} ({{view.graph.unit}})
         </div>
 
         {{#if view.graph.pendingCreation}}
@@ -50,16 +50,16 @@
         Graph Secondary Legend Header
     -->
 
-    <div class="header">
+    <!--div class="header">
         <div class="title">
-            {{#each view.graph.datasources}}
-                {{this.machine.name}}
+            {{!#each view.graph.datasources}}
+                {{!this.machine.name}}
                 <div class="lineLegend">
-                    <div {{bind-attr class="this.id"}}></div>
+                    <div {{!bind-attr class="this.id"}}></div>
                 </div>
-            {{/each}}
+            {{!/each}}
         </div>
-    </div>
+    </div-->
 
     <!--
         Graph Body
