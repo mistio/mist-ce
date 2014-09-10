@@ -2,8 +2,7 @@
 
     {{#if view.machine.hasMonitoring}}
 
-
-
+        {{view Mist.graphListView}}
 
     {{else}}
 
@@ -15,11 +14,14 @@
             </label>
 
             <a id="enable-monitoring-btn"
-                class="ui-btn
-                    ui-corner-all
-                    ui-btn-d
-                    ui-btn-icon-left
-                    ui-icon-star"
+                {{bind-attr class="
+                    view.machine.enablingMonitoring:ui-state-disabled
+                    view.gettingCommand:ui-state-disabled
+                    :ui-btn
+                    :ui-corner-all
+                    :ui-btn-d
+                    :ui-btn-icon-left
+                    :ui-icon-star"}}
                 {{action "enableMonitoringClicked" target="view"}}>
                     Enable Monitoring
             </a>

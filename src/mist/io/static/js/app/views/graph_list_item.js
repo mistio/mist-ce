@@ -90,7 +90,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.set('svg', SvgSet(this));
                 var datasources = this.graph.datasources;
                 datasources.forEach(function (datasource) {
-                    $('#' + this.graph.id + ' .title #' + datasource.id)
+                    $('#' + this.graph.id + ' .title .' + datasource.id)
                         .addClass(LINE_COLOR_MAP[datasources.indexOf(datasource)]);
                 }, this);
             },
@@ -543,7 +543,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 if (this.isHidden)
                     return;
-
+                info(this.graph.id);
                 this._setDisplayedDatapoints();
                 this._setMinMaxValues();
                 this._setScale();
@@ -817,7 +817,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
         function Line (args, datasource) {
             var index = args.graph.datasources.indexOf(datasource);
-            return d3.select('#' + args.id + ' .' + datasource.id)
+            return d3.select('#' + args.id + ' svg .' + datasource.id)
                     .attr('transform', 'translate(' +
                         args.margin.left + ',' + args.margin.top + ')')
                     .attr('class', 'valueLine ' + LINE_COLOR_MAP[index])

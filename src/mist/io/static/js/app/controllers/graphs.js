@@ -124,6 +124,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this._clearPendingRequests();
 
                 var requests = this._generateRequests(args);
+                info(requests);
                 requests.forEach(function (request) {
                     this.pendingRequests.push(request);
                     if (this.config.requestMethod == 'XHR')

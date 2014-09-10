@@ -1,10 +1,10 @@
-define('app/views/machine_monitoring', ['app/views/templated'],
+define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph'],
     //
     //  Machine Monitoring View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function (TemplatedView, Graph) {
 
         'use strict';
 
@@ -29,9 +29,9 @@ define('app/views/machine_monitoring', ['app/views/templated'],
             //
 
 
-            load: function () {
-                this.set('machine', this.get('controller').get('model'));
-            }.on('didInsertElement'),
+            unload: function () {
+                this._hideGraphs();
+            }.on('willDestroyElement'),
 
 
             //
@@ -156,6 +156,78 @@ define('app/views/machine_monitoring', ['app/views/templated'],
                     }
                 });
             },
+
+
+            _showGraphs: function () {
+
+                var machine = this.machine;
+                var graphs = [];
+
+                // Add built in graphs
+                Mist.metricsController.builtInMetrics.forEach(function (metric) {
+                    Mist.datasourcesController.addDatasource({
+                        machine: machine,
+                        metric: metric,
+                        callback: function (success, datasource) {
+                            graphs.push(Graph.create({
+                                id: 'graph-' + parseInt(Math.random() * 10000),
+                                title: metric.name,
+                                datasources: [datasource],
+                            }));
+                        }
+                    });
+                });
+
+                // Add custom graphs
+                Mist.metricsController.customMetrics.forEach(function (metric) {
+                    metric.machines.some(function (metricMachine) {
+                        if (machine.equals(metricMachine)) {
+                            Mist.datasourcesController.addDatasource({
+                                machine: machine,
+                                metric: metric,
+                                callback: function (success, datasource) {
+                                    graphs.push(Graph.create({
+                                        id: 'graph-' + parseInt(Math.random() * 10000),
+                                        title: metric.name,
+                                        datasources: [datasource],
+                                    }));
+                                }
+                            });
+                            return true;
+                        }
+                    });
+                });
+
+                Mist.graphsController.open({
+                    graphs: graphs,
+                    config: {
+                        canModify: true,
+                        canControl: true,
+                        canMinimize: true,
+                    }
+                });
+            },
+
+
+            _hideGraphs: function () {
+                Mist.graphsController.close();
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            hasMonitoringObserver: function () {
+                if (this.machine.hasMonitoring)
+                    this._showGraphs();
+                else
+                    this._hideGraphs();
+            }.observes('machine.hasMonitoring',
+                'Mist.backendsController.checkedMonitoring')
         });
     }
 );

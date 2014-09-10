@@ -54,7 +54,9 @@
         <div class="title">
             {{#each view.graph.datasources}}
                 {{this.machine.name}}
-                <div {{bind-attr id="this.id"}} class="lineLegend"></div>
+                <div class="lineLegend">
+                    <div {{bind-attr class="this.id"}}></div>
+                </div>
             {{/each}}
         </div>
     </div>

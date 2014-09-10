@@ -1106,7 +1106,7 @@ function error() {
         console.error.apply(console, arguments);
 }
 
-/*
+
 function showGraphs() {
 
     Mist.set('didShowGraphs', true);
@@ -1118,7 +1118,7 @@ function showGraphs() {
             datasources: [],
         });
 
-        var metric = Mist.metricsController.getMetric('mist.python.one_to_five');
+        var metric = Mist.metricsController.getMetric('load.shortterm');
 
         Mist.monitored_machines.forEach(function (machineTuple) {
             var backend = Mist.backendsController.getBackend(machineTuple[0]);
@@ -1144,7 +1144,7 @@ function showGraphs() {
         });
     });
 }
-*/
+
 
 //  GLOBAL DEFINITIONS
 

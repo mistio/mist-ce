@@ -218,27 +218,27 @@
 
 
 
-.graph .lineLegend.green {
+.graph .lineLegend .green {
     background-color: #6CE0BA;
 }
 
-.graph .lineLegend.orange {
+.graph .lineLegend .orange {
     background-color: #FF9933;
 }
 
-.graph .lineLegend.blue {
+.graph .lineLegend .blue {
     background-color: #0066FF;
 }
 
-.graph .lineLegend.pink {
+.graph .lineLegend .pink {
     background-color: #FF99FF;
 }
 
-.graph .lineLegend.brick {
+.graph .lineLegend .brick {
     background-color: #990033;
 }
 
-.graph .lineLegend {
+.graph .lineLegend div {
     width: 10px;
     height: 10px;
     border-radius: 100%;
@@ -247,6 +247,7 @@
 .graph .title * {
     display: inline-block;
 }
+
 /*
 path {
     stroke: steelblue;
