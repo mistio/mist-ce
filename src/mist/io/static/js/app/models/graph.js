@@ -19,6 +19,7 @@ define('app/models/graph', ['ember'],
 
 
             id: null,
+            view: null,
             title: null,
             isBuiltIn: null,
             datasources: null,

@@ -29,12 +29,11 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             isOpen: null,
             content: null,
             resizeLock: null,
-            pollingMethod: null,
             pendingRequests: [],
 
             config: Ember.Object.create({
                 requestMethod: 'XHR',
-                timeWindow: 10 * TIME_MAP.MINUTE,
+                timeWindow: TIME_WINDOW_MAP.minutes,
                 measurementStep: 10 * TIME_MAP.SECOND,
                 measurementOffset: 40 * TIME_MAP.SECOND,
 
@@ -83,7 +82,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     this.stream.start();
                 });
 
-                $(window).on('resize', this._handleWindowResize);
+                $(window).off('resize', this._handleWindowResize);
             },
 
 
@@ -124,7 +123,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this._clearPendingRequests();
 
                 var requests = this._generateRequests(args);
-                info(requests);
                 requests.forEach(function (request) {
                     this.pendingRequests.push(request);
                     if (this.config.requestMethod == 'XHR')
@@ -232,7 +230,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _handleResponse: function (request, response) {
 
-                var processedDatapoints =
                 request.datasources.forEach(function (datasource) {
 
                     var datapoints = this._processedDatapoints(request,

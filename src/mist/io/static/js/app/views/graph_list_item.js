@@ -1116,7 +1116,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         };
 
         // These are some functions that used to be anonymous
-        // and weere passed to d3 functions all the time.
+        // and were passed to d3 functions all the time.
         // So we cache them to save some cpu usage
         function getDatapointValue (d) {
             return d.value;

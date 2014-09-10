@@ -615,7 +615,7 @@ var loadApp = function (
 
     App.prettyTime = function(date) {
 
-        var showDate = false
+        var showDate = false;
         if (date.getMonth() != new Date().getMonth()) {
             showDate = true;
             var day = date.getUTCDate();
