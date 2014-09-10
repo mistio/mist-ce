@@ -5,3 +5,6 @@
 #file-upload #file-upload-input {
 	display: none;
 }
+#file-upload textarea {
+	height: 75px !important;
+}
