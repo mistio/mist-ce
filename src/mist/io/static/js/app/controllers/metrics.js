@@ -1,6 +1,6 @@
 define('app/controllers/metrics', ['app/models/metric', 'ember'],
     //
-    //  Metric Controller
+    //  Metrics Controller
     //
     //  @returns Class
     //
@@ -43,12 +43,8 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                     'machine_id': machine_id,
                     'backend_id': backend_id,
                 }).success(function(data) {
-                    //info(data);
-                    //metric.id = data.metric_id;
-                    //metric.name = metric.newName;
                     metric.machines = machine ? [machine] : [];
                     that._addMetric(metric, machine);
-                    Mist.monitoringController.graphs.addDummyGraph(metric.name);
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Failed to add metric: ' + message);
@@ -200,7 +196,10 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             _addMetric: function (metric, machine) {
                 Ember.run(this, function () {
                     this.customMetrics.addObject(Metric.create(metric));
-                    this.trigger('onMetricAdd');
+                    this.trigger('onMetricAdd', {
+                        metric: metric,
+                        machine: machine,
+                    });
                 });
             },
 

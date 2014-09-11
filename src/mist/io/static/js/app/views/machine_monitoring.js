@@ -30,7 +30,11 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
 
 
             unload: function () {
+
+                // Remove event handlers
+                Mist.metricsController.off('onMetricAdd', this, '_checkNewMetric');
                 this._hideGraphs();
+
             }.on('willDestroyElement'),
 
 
@@ -160,6 +164,9 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
 
             _showGraphs: function () {
 
+                if (Mist.graphsController.isOpen)
+                    return;
+
                 var machine = this.machine;
                 var graphs = [];
 
@@ -206,11 +213,34 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
                         canMinimize: true,
                     }
                 });
+
+                //Mist.metricsController.on('onMetricAdd', this, '_checkNewMetric');
             },
 
 
             _hideGraphs: function () {
                 Mist.graphsController.close();
+            },
+
+
+            _checkNewMetric: function (metric, machine) {
+
+                if (!Mist.graphsController.isOpen)
+                    return;
+
+                Mist.datasourcesController.addDatasource({
+                    machine: machine,
+                    metric: metric,
+                    callback: function (success, datasource) {
+                        if (success) {
+                            Mist.graphsController.content.pushObject(Graph.create({
+                                id: 'graph-' + parseInt(Math.random() * 10000),
+                                title: metric.name,
+                                datasources: [datasource],
+                            }));
+                        }
+                    }
+                });
             },
 
 

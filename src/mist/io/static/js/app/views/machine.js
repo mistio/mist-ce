@@ -142,11 +142,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                 },
 
 
-                addMetricClicked: function () {
-                    Mist.metricAddController.open(this.machine);
-                },
-
-
                 deleteMetric: function (metric) {
                     Mist.metricsController.deleteMetric(metric);
                 },

@@ -38,10 +38,23 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
                 //  metric_id: args.metric.id
                 // }
 
-                var datasource = {
-                    id: 'dt-' + parseInt(Math.random() * 10000),
+                //id: ('dt-' + args.machine.id + args.metric.id).replace(/[^\w]/g, '_'),
+                //id: 'dt-' + parseInt(Math.random() * 10000),
+
+                var datasource = new Object({
+                    id: ('dt-' + args.machine.id + args.metric.id).replace(/[^\w]/g, '_'),
                     machine: args.machine,
                     metric: args.metric
+                });
+                datasource.id = datasource.id.replace(/\.*/g, '');
+
+                //info(datasource);
+
+                if (this.datasourceExists(datasource.id)) {
+                    info('exists')
+                    if (args.callback)
+                        args.callback(false);
+                    return;
                 }
 
                 // on success
@@ -58,12 +71,9 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
 
 
             datasourceExists: function (datasourceId) {
+                info('search for:', datasourceId);
+                info(this.getDatasource(datasourceId));
                 return !!this.getDatasource(datasourceId);
-            },
-
-
-            updateDatasource: function (args) {
-
             },
 
 

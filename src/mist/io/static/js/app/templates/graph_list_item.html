@@ -7,7 +7,10 @@
     <div class="header">
 
         <div class="title">
-            {{view.graph.title}} ({{view.graph.unit}})
+            {{view.graph.title}}
+            {{#if view.graph.unit}}
+                ({{view.graph.unit}})
+            {{/if}}
         </div>
 
         {{#if view.graph.pendingCreation}}

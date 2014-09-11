@@ -545,7 +545,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 if (this.isHidden)
                     return;
-                info(this.graph.id);
+
                 this._setDisplayedDatapoints();
                 this._setMinMaxValues();
                 this._setScale();
