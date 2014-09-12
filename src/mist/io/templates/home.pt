@@ -102,6 +102,9 @@
     <script type="text/x-handlebars" data-template-name="key">
         {{view Mist.keyView}}
     </script>
+    <script type="text/x-handlebars" data-template-name="missing">
+        {{view Mist.missingView}}
+    </script>
 
 </body>
 

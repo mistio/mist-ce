@@ -297,6 +297,7 @@ var loadFiles = function (callback) {
         'app/views/messagebox',
         'app/views/metric_add',
         'app/views/metric_add_custom',
+        'app/views/missing',
         'app/views/metric_node',
         'app/views/monitoring',
         'app/views/rule',
@@ -361,6 +362,7 @@ var loadApp = function (
     MessageBoxView,
     MetricAddView,
     MetricAddCustomView,
+    MissingView,
     MetricNodeView,
     MonitoringView,
     RuleView,
@@ -402,6 +404,7 @@ var loadApp = function (
         this.route('key', {
             path : '/keys/:key_id'
         });
+        this.route('missing', { path: "/*path" });
     });
 
     App.IndexRoute = Ember.Route.extend({
@@ -485,6 +488,14 @@ var loadApp = function (
         }
     });
 
+    App.MissingRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - 404';
+            });
+        },
+    });
+
     // Ember views
 
     App.set('homeView', Home);
@@ -493,6 +504,7 @@ var loadApp = function (
     App.set('loginView', LoginView);
     App.set('keyAddView', KeyAddView);
     App.set('keyView', SingleKeyView);
+    App.set('missingView', MissingView);
     App.set('metricNodeView', MetricNodeView);
     App.set('keyListView', KeyListView);
     App.set('userMenuView', UserMenuView);

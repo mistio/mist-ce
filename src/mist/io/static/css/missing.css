@@ -13,11 +13,15 @@ html, body, #splash {
     position: absolute;
     margin-top: -140px;
     margin-left: -140px;
+}
 
+#missing-page #splash {
+    background: none;
+    z-index: 0;
 }
 
 #logo {
-    background: url("logo_splash.png") center no-repeat;
+    background: url("../logo_splash.png") center no-repeat;
     width: 96px;
     height: 96px;
     background-position: -52px -35px;

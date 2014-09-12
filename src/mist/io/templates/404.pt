@@ -8,7 +8,7 @@
     <title>Mistio - cloud management in your pocket</title>
     <link rel="icon" href="resources/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
-    <link rel="stylesheet" href="resources/404.css"/>
+    <link rel="stylesheet" href="resources/css/missing.css"/>
 </head>
 
 <body>
