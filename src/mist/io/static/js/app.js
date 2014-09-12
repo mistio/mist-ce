@@ -436,51 +436,52 @@ var loadApp = function (
     });
 
     App.MachineRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
-                var id = Mist.getMachineIdByUrl();
+        activate: function () {
+            Ember.run.next(this, function () {
+                var id = this.modelFor('machine')._id;
                 var machine = Mist.backendsController.getMachine(id);
                 document.title = 'mist.io - ' + (machine ? machine.name : id);
             });
         },
-        redirect: function() {
-            Mist.backendsController.set('machineRequest', Mist.getMachineIdByUrl());
+        redirect: function (machine) {
+            Mist.backendsController.set('machineRequest', machine._id);
         },
-        model: function() {
-            if (Mist.backendsController.loading || Mist.backendsController.loadingMachines) {
-                return {id: '', backend: {}};
-            }
-            return Mist.backendsController.getMachine(Mist.getMachineIdByUrl());
+        model: function (args) {
+            var id = args.machine_id;
+            if (Mist.backendsController.loading ||
+                Mist.backendsController.loadingMachines)
+                    return {_id: id, backend: {}};
+            return Mist.backendsController.getMachine(id);
         }
     });
 
     App.KeysRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
+        activate: function () {
+            Ember.run.next(function () {
                 document.title = 'mist.io - keys';
             });
         },
-        exit: function() {
-            Mist.keysController.content.forEach(function(key){
+        exit: function () {
+            Mist.keysController.content.forEach(function (key) {
                  key.set('selected', false);
             });
         }
     });
 
     App.KeyRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
-                document.title = 'mist.io - ' + Mist.getKeyIdByUrl();
+        activate: function () {
+            Ember.run.next(this, function () {
+                document.title = 'mist.io - ' + this.modelFor('key')._id;
             });
         },
-        redirect: function() {
-            Mist.keysController.set('keyRequest', Mist.getKeyIdByUrl());
+        redirect: function (key) {
+            Mist.keysController.set('keyRequest', key._id);
         },
-        model: function() {
-            if (Mist.keysController.loading) {
-                return {machines: []};
-            }
-            return Mist.keysController.getKey(Mist.getKeyIdByUrl());
+        model: function (args) {
+            var id = args.key_id;
+            if (Mist.keysController.loading)
+                return {_id: id, machines: []};
+            return Mist.keysController.getKey(id);
         }
     });
 
@@ -605,14 +606,6 @@ var loadApp = function (
         return (hour < 10 ? '0' : '') + hour + ':' +
             (min < 10 ? '0' : '') + min + ':' +
             (sec < 10 ? '0' : '') + sec;
-    };
-
-    App.getKeyIdByUrl = function() {
-        return window.location.href.split('/')[5];
-    };
-
-    App.getMachineIdByUrl = function() {
-        return window.location.href.split('/')[5];
     };
 
     App.getViewName = function (view) {
