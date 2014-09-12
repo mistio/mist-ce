@@ -307,7 +307,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                     this.getKey(keyId).machines.pushObject([machine.backend.id, machine.id]);
                     machine.setProperties({
                         probed: true,
-                        keysCount: this.getMachineKeysCount(machine))
+                        keysCount: this.getMachineKeysCount(machine),
                     });
                     this.trigger('onKeyAssociate');
                 });
