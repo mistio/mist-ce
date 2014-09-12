@@ -305,7 +305,10 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             _associateKey: function(keyId, machine) {
                 Ember.run(this, function() {
                     this.getKey(keyId).machines.pushObject([machine.backend.id, machine.id]);
-                    machine.set('keysCount', this.getMachineKeysCount(machine));
+                    machine.setProperties({
+                        probed: true,
+                        keysCount: this.getMachineKeysCount(machine),
+                    });
                     this.trigger('onKeyAssociate');
                 });
             },
