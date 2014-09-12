@@ -70,7 +70,8 @@ def exception_handler_mist(exc, request):
     return Response(str(exc), exc.http_code)
 
 
-@view_config(context='pyramid.httpexceptions.HTTPNotFound', renderer='templates/404.pt')
+@view_config(context='pyramid.httpexceptions.HTTPNotFound',
+             renderer='templates/404.pt')
 def not_found(self, request):
     request.response.status = 404
     return {}
