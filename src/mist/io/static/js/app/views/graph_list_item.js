@@ -647,7 +647,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                                     .push();
 
                 } else {
-                    info(this.animationEnabled, this.clearAnimPending);
+
                     // Update Graph Elements
                     this.svg.value.lines.forEach(function (line) {
                         line.attr('d', this.valueLinePaths[line.id]);

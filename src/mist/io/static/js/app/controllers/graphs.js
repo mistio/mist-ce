@@ -276,6 +276,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 // displayed datapoints. Used after closing a streaming
                 // session.
 
+                if (!this.content.length) return;
                 var datasource = this.content[0].datasources[0];
 
                 this.set('fetchStatsArgs', {

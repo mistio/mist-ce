@@ -10,17 +10,6 @@ define('app/views/graph_list', ['app/views/templated'],
 
         return TemplatedView.extend({
 
-
-            //
-            //
-            //  Initialization
-            //
-            //
-
-
-            unload: function () {
-                Mist.graphsController.close();
-            }.on('willDestroyElement')
         });
     }
 );

@@ -38,7 +38,7 @@ define('app/views/machine_monitoring',
 
 
             load: function () {
-                this._clear();
+
             }.on('didInsertElement'),
 
 
@@ -46,6 +46,22 @@ define('app/views/machine_monitoring',
                 this._clear();
                 this._hideGraphs();
             }.on('willDestroyElement'),
+
+
+
+            showMonitoring: function () {
+                this._clear();
+                this._updateRules();
+                this._updateMetrics();
+                this._updateGraphs();
+                this._showGraphs();
+            },
+
+
+            hideMonitoring: function () {
+                this._hideGraphs();
+                this._clear();
+            },
 
 
             //
@@ -219,10 +235,8 @@ define('app/views/machine_monitoring',
 
 
             _showGraphs: function () {
-
                 if (Mist.graphsController.isOpen)
                     return;
-
                 Mist.graphsController.open({
                     graphs: this.graphs,
                     config: {
@@ -235,9 +249,10 @@ define('app/views/machine_monitoring',
 
 
             _hideGraphs: function () {
+                if (!Mist.graphsController.isOpen)
+                    return;
                 Mist.graphsController.close();
             },
-
 
 
             _updateRules: function () {
@@ -280,7 +295,6 @@ define('app/views/machine_monitoring',
                             datasources: [datasource]
                         }));
                 }, this);
-                this._showGraphs();
             },
 
 
@@ -293,11 +307,10 @@ define('app/views/machine_monitoring',
 
             hasMonitoringObserver: function () {
                 if (this.machine.hasMonitoring)
-                    this._showGraphs();
+                    this.showMonitoring();
                 else
-                    this._hideGraphs();
-            }.observes('machine.hasMonitoring',
-                'Mist.backendsController.checkedMonitoring'),
+                    this.hideMonitoring();
+            }.observes('machine.hasMonitoring'),
 
 
             rulesObserver: function () {

@@ -38,6 +38,7 @@ define('app/views/graph_list_bar', ['app/views/templated'],
 
                 this.set('machine',
                     this.get('parentView').get('parentView').get('machine'));
+
             }.on('didInsertElement'),
 
 

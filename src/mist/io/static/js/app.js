@@ -843,9 +843,15 @@ var setupSocketEvents = function (socket, callback) {
     })
     .on('notify',function(data){
         if (data.message) {
-            Mist.notificationController.set('msgHeader', data.title);
-            Mist.notificationController.set('msgCmd', data.message.substr(1));
-            Mist.notificationController.showMessagebox();
+            Mist.dialogController.open({
+                type: DIALOG_TYPES.OK,
+                head: data.title,
+                body: [
+                    {
+                        command: data.message.substr(1)
+                    }
+                ]
+            });
         } else {
             Mist.notificationController.notify(data.title);
         }

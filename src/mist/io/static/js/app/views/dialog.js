@@ -73,9 +73,10 @@ define('app/views/dialog', ['app/views/popup'],
                     $(this.popupId + ' .command-container')
                         .toArray()
                         .some(function (commandElement) {
-                            if (commandElement.textContent.trim() == e.command) {
-                                Mist.selectElementContents(commandElement);
-                                return true;
+                            if (commandElement.textContent.replace(/\s/g, '') ==
+                                e.command.replace(/\s/g, '')) {
+                                    Mist.selectElementContents(commandElement);
+                                    return true;
                             }
                     });
                 },
