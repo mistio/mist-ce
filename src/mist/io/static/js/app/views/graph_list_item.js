@@ -88,6 +88,27 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             //
 
 
+            showFetchingStats: function () {
+                if (!this.svg) return;
+                $('#' + this.id + ' .fetching-stats-loader').fadeIn(400);
+                this.graph.datasources.forEach(function (datasource) {
+                    var line = d3.select('#' + this.id + ' .' + datasource.id);
+                    if (line.attr('class').indexOf('gray') == -1)
+                        line.attr('class', line.attr('class') + ' gray');
+                }, this);
+            },
+
+
+            hideFetchingStats: function () {
+                if (!this.svg) return;
+                $('#' + this.id + ' .fetching-stats-loader').fadeOut(400);
+                this.graph.datasources.forEach(function (datasource) {
+                    var line = d3.select('#' + this.id + ' .' + datasource.id);
+                    line.attr('class', line.attr('class').replace('gray', ''));
+                }, this);
+            },
+
+
             updateSVG: function () {
                 this.set('svg', SvgSet(this));
                 var datasources = this.graph.datasources;
@@ -762,6 +783,20 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     $('#' + this.id).parent().show(400);
                 this.draw();
             }.observes('isHidden'),
+
+
+            fetchingStatsObserver: function () {
+                Ember.run.once(this, function () {
+                    if (Mist.graphsController.fetchingStats &&
+                        (!Mist.graphsController.stream.isStreaming ||
+                        Mist.graphsController.stream.firstStreamingCall))
+                            this.showFetchingStats();
+                    else
+                        this.hideFetchingStats();
+                });
+            }.observes('Mist.graphsController.fetchingStats',
+                'Mist.graphsController.stream.isStreaming',
+                'Mist.graphsController.stream.firstStreamingCall'),
         });
 
 

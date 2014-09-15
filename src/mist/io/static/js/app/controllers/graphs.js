@@ -30,6 +30,8 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             content: null,
             resizeLock: null,
             pendingRequests: [],
+            fetchingStats: null,
+            fetchingStatsArgs: null,
 
             config: Ember.Object.create({
                 requestMethod: 'XHR',
@@ -120,8 +122,11 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     Mist.prettyTime(new Date(args.until)));
                 ////////////////////////////////////////////
 
-                this.set('fetchStatsArgs', args);
                 this._clearPendingRequests();
+                this.setProperties({
+                    fetchingStats: true,
+                    fetchStatsArgs: args
+                });
 
                 var requests = this._generateRequests(args);
                 requests.forEach(function (request) {
@@ -136,6 +141,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _clearPendingRequests: function () {
                 this.set('pendingRequests', []);
+                this.set('fetchingStats', false);
             },
 
 
@@ -243,9 +249,10 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 }, this);
 
+                var hadRequests = this.pendingRequests.length;
                 this.pendingRequests.removeObject(request);
 
-                if (!this.pendingRequests.length)
+                if (!this.pendingRequests.length && hadRequests)
                     this._fetchStatsEnded();
             },
 
@@ -265,6 +272,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this.content.forEach(function (graph) {
                     graph.view.draw();
                 });
+                this.set('fetchingStats', false);
                 if (this.fetchStatsArgs.callback instanceof Function)
                     this.fetchStatsArgs.callback();
             },
@@ -390,6 +398,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
                 goBack: function () {
+                    this.parent._clearPendingRequests();
                     this.parent.stream.stop();
                     this.parent._fetchStats({
                         from: this.parent.fetchStatsArgs.from -
@@ -400,6 +409,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
                 goForward: function () {
+                    this.parent._clearPendingRequests();
                     if (this.isInFuture(this.parent.fetchStatsArgs.until))
                         this.parent.stream.start();
                     else
@@ -438,6 +448,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 isStreaming: null,
                 currentSessionId: 0,
                 timeOfLastRequest: null,
+                firstStreamingCall: null,
 
 
                 //
@@ -449,6 +460,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 start: function () {
                     if (!this.isStreaming) {
+                        this.parent._clearPendingRequests();
                         this.set('isStreaming', true);
                         this._stream(this.currentSessionId, true);
                     }
@@ -457,12 +469,13 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 stop: function () {
                     if (this.isStreaming) {
-                        this.setProperties({
-                            isStreaming: false,
-                            currentSessionId: this.currentSessionId + 1,
-                        });
                         this.parent._clearPendingRequests();
                         this.parent._restoreFetchStatsArgs();
+                        this.setProperties({
+                            isStreaming: false,
+                            firstStreamingCall: false,
+                            currentSessionId: this.currentSessionId + 1,
+                        });
                     }
                 },
 
@@ -495,11 +508,14 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                             callback: callback
                         });
 
+                        if (firstTime)
+                            this.set('firstStreamingCall', true);
                         this.set('timeOfLastRequest', now);
                     }
 
                     var that = this;
                     function callback () {
+                        that.set('firstStreamingCall', false);
                         Ember.run.later(function () {
                             that._stream(sessionId);
                         }, that._getNextRequestDelay());
