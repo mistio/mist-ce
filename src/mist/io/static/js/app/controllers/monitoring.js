@@ -79,6 +79,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
                 var that = this;
                 machine.set('disablingMonitoring', true);
+                machine.set('hasMonitoring', false);
 
                 var url = '/backends/' + machine.backend.id +
                     '/machines/' + machine.id + '/monitoring';
@@ -93,6 +94,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     that._disableMonitoring(machine);
                 }).error(function(message, statusCode) {
 
+                    machine.set('hasMonitoring', true);
                     if (statusCode == 402)
                         Mist.notificationController.timeNotify(message, 5000);
                     else

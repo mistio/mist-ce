@@ -117,14 +117,18 @@ define('app/views/machine_monitoring',
                             }
                         ],
                         callback: function (didConfirm) {
-                            if (didConfirm)
-                                Mist.monitoringController
-                                    .disableMonitoring(machine,
-                                        function (success) {
-                                            if (success)
-                                                Mist.graphsController.close();
-                                        }
-                                    );
+                            if (didConfirm) {
+                                Mist.smoothScroll(0);
+                                Ember.run.later(function () {
+                                    Mist.monitoringController
+                                        .disableMonitoring(machine,
+                                            function (success) {
+                                                if (success)
+                                                    Mist.graphsController.close();
+                                            }
+                                        );
+                                }, 200);
+                            }
                         }
                     });
                 },
