@@ -124,8 +124,8 @@ define('app/views/machine_monitoring',
                         if (!didConfirm) return;
 
                         // Removing a bunch of graphs from the user's face
-                        // clumpsy. So we scroll to top and present a nice
-                        // message while disabling monitoring
+                        // feels clumpsy. So we scroll to top and present a
+                        // nice message while disabling monitoring
 
                         Mist.smoothScroll(0);
 
