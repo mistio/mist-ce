@@ -306,6 +306,7 @@ var loadFiles = function (callback) {
         'app/views/metric_node',
         'app/views/rule',
         'app/views/rule_edit',
+        'app/views/rule_list',
         'app/views/user_menu',
     ], callback);
 };
@@ -375,6 +376,7 @@ var loadApp = function (
     MetricNodeView,
     RuleView,
     RuleEditView,
+    RuleListView,
     UserMenuView,
     callback) {
 
@@ -522,6 +524,7 @@ var loadApp = function (
     App.set('machineTagsView', MachineTagsView);
     App.set('keyListItemView', KeyListItemView);
     App.set('dialogView', DialogView);
+    App.set('ruleListView', RuleListView);
     App.set('machineListView', MachineListView);
     App.set('imageListItemView', ImageListItem);
     App.set('machineAddView', MachineAddDialog);

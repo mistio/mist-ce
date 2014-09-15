@@ -4,6 +4,39 @@
 
         {{view Mist.graphListView}}
 
+        {{view Mist.ruleListView rulesBinding="view.rules"}}
+
+        <div id="monitoring-bottom-btns">
+            <div data-rule="ui-grid-a">
+                <div class="ui-block-a">
+                    <a id="add-rule-button"
+                      {{bind-attr class="
+                            Mist.rulesController.creatingPending:ui-state-disabled
+                            :ui-btn
+                            :ui-corner-all
+                            :ui-btn-d
+                            :ui-btn-icon-left
+                            :ui-icon-plus"}}
+                        {{action "addRuleClicked" target="view"}}>
+                            Add Rule
+                    </a>
+                </div>
+            </div>
+            <div class="ui-block-b">
+                <a id="disable-monitor-btn"
+                    {{bind-attr class="
+                        view.machine.disablingMonitoring:ui-state-disabled
+                        :ui-btn
+                        :ui-corner-all
+                        :ui-btn-b
+                        :ui-btn-icon-left
+                        :ui-icon-delete"}}
+                    {{action "disableMonitoringClicked" target="view"}}>
+                        Disable
+                </a>
+            </div>
+        </div>
+
     {{else}}
 
         <div id="machine-monitoring-disabled">
@@ -29,9 +62,6 @@
            {{#if view.gettingCommand}}
                 <div class="ajax-loader"></div>
            {{/if}}
-
        </div>
-
     {{/if}}
-
 </div>

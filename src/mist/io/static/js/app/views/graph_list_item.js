@@ -379,6 +379,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.displayedData    = [];
                 this.xCoordinates      = [];
                 this.clearAnimPending = false;
+                this.animationEnabled = true;
                 this.isHidden = false;
 
                 // Distance of two values in graph (pixels), Important For Animation
@@ -646,7 +647,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                                     .push();
 
                 } else {
-
+                    info(this.animationEnabled, this.clearAnimPending);
                     // Update Graph Elements
                     this.svg.value.lines.forEach(function (line) {
                         line.attr('d', this.valueLinePaths[line.id]);

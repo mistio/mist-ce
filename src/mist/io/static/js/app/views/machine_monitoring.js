@@ -1,10 +1,15 @@
-define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph'],
+define('app/views/machine_monitoring',
+    [
+        'app/views/templated',
+        'app/models/graph',
+        'app/models/datasource'
+    ],
     //
     //  Machine Monitoring View
     //
     //  @returns Class
     //
-    function (TemplatedView, Graph) {
+    function (TemplatedView, Graph, Datasource) {
 
         'use strict';
 
@@ -18,6 +23,9 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
             //
 
 
+            rules: [],
+            graphs: [],
+            metrics: [],
             machine: null,
             gettingCommand: null,
 
@@ -29,13 +37,27 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
             //
 
 
+            load: function () {
+                this._clear();
+            }.on('didInsertElement'),
+
+
             unload: function () {
-
-                // Remove event handlers
-                Mist.metricsController.off('onMetricAdd', this, '_checkNewMetric');
+                this._clear();
                 this._hideGraphs();
-
             }.on('willDestroyElement'),
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            addGraphClicked: function () {
+                Mist.metricAddController.open(this.machine);
+            },
 
 
             //
@@ -67,9 +89,34 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
                 },
 
 
-                addMetricClicked: function () {
-                    Mist.metricAddController.open(this.machine);
-                }
+                disableMonitoringClicked: function () {
+                    var machine = this.machine;
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Disable monitoring',
+                        body: [
+                            {
+                                paragraph: 'Are you sure you want to disable' +
+                                    'monitoring for this machine?'
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm)
+                                Mist.monitoringController
+                                    .disableMonitoring(machine,
+                                        function (success) {
+                                            if (success)
+                                                Mist.graphsController.close();
+                                        }
+                                    );
+                        }
+                    });
+                },
+
+
+                addRuleClicked: function() {
+                    Mist.rulesController.newRule(this.machine);
+                },
             },
 
 
@@ -78,6 +125,15 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
             //  Pseudo-Private Methods
             //
             //
+
+
+            _clear: function () {
+                this.setProperties({
+                    rules: new Array(),
+                    graphs: new Array(),
+                    metrics: new Array(),
+                });
+            },
 
 
             _showMissingPlanMessage: function () {
@@ -167,54 +223,14 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
                 if (Mist.graphsController.isOpen)
                     return;
 
-                var machine = this.machine;
-                var graphs = [];
-
-                // Add built in graphs
-                Mist.metricsController.builtInMetrics.forEach(function (metric) {
-                    Mist.datasourcesController.addDatasource({
-                        machine: machine,
-                        metric: metric,
-                        callback: function (success, datasource) {
-                            graphs.push(Graph.create({
-                                id: 'graph-' + parseInt(Math.random() * 10000),
-                                title: metric.name,
-                                datasources: [datasource],
-                            }));
-                        }
-                    });
-                });
-
-                // Add custom graphs
-                Mist.metricsController.customMetrics.forEach(function (metric) {
-                    metric.machines.some(function (metricMachine) {
-                        if (machine.equals(metricMachine)) {
-                            Mist.datasourcesController.addDatasource({
-                                machine: machine,
-                                metric: metric,
-                                callback: function (success, datasource) {
-                                    graphs.push(Graph.create({
-                                        id: 'graph-' + parseInt(Math.random() * 10000),
-                                        title: metric.name,
-                                        datasources: [datasource],
-                                    }));
-                                }
-                            });
-                            return true;
-                        }
-                    });
-                });
-
                 Mist.graphsController.open({
-                    graphs: graphs,
+                    graphs: this.graphs,
                     config: {
                         canModify: true,
                         canControl: true,
                         canMinimize: true,
                     }
                 });
-
-                //Mist.metricsController.on('onMetricAdd', this, '_checkNewMetric');
             },
 
 
@@ -223,24 +239,48 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
             },
 
 
-            _checkNewMetric: function (metric, machine) {
 
-                if (!Mist.graphsController.isOpen)
-                    return;
+            _updateRules: function () {
+                Mist.rulesController.content.forEach(function (rule) {
+                    if (this.machine.equals(rule.machine))
+                        if (!this.rules.findBy('id', rule.id))
+                            this.rules.pushObject(rule);
+                }, this);
+            },
 
-                Mist.datasourcesController.addDatasource({
-                    machine: machine,
-                    metric: metric,
-                    callback: function (success, datasource) {
-                        if (success) {
-                            Mist.graphsController.content.pushObject(Graph.create({
-                                id: 'graph-' + parseInt(Math.random() * 10000),
-                                title: metric.name,
-                                datasources: [datasource],
-                            }));
-                        }
+
+            _updateMetrics: function () {
+                Mist.metricsController.builtInMetrics.forEach(function (metric) {
+                    if (!this.metrics.findBy('id', metric.id))
+                        this.metrics.pushObject(metric);
+                }, this);
+                Mist.metricsController.customMetrics.forEach(function (metric) {
+                    if (metric.hasMachine(this.machine) &&
+                        !this.metrics.findBy('id', metric.id)) {
+                            this.metrics.pushObject(metric);
                     }
-                });
+                }, this);
+            },
+
+
+            _updateGraphs: function () {
+                this.metrics.forEach(function (metric) {
+                    var datasource = Datasource.create({
+                        metric: metric,
+                        machine: this.machine
+                    });
+                    var graphExists = false;
+                    this.graphs.some(function (graph) {
+                        if (graph.datasources.findBy('id', datasource.id))
+                            return graphExists = true;
+                    }, this);
+                    if (!graphExists)
+                        this.graphs.pushObject(Graph.create({
+                            title: metric.name,
+                            datasources: [datasource]
+                        }));
+                }, this);
+                this._showGraphs();
             },
 
 
@@ -257,7 +297,19 @@ define('app/views/machine_monitoring', ['app/views/templated', 'app/models/graph
                 else
                     this._hideGraphs();
             }.observes('machine.hasMonitoring',
-                'Mist.backendsController.checkedMonitoring')
+                'Mist.backendsController.checkedMonitoring'),
+
+
+            rulesObserver: function () {
+                Ember.run.once(this, '_updateRules');
+            }.observes('Mist.rulesController.content.@each'),
+
+
+            metricsObsever: function () {
+                Ember.run.once(this, '_updateMetrics');
+                Ember.run.once(this, '_updateGraphs');
+            }.observes('Mist.metricsController.builtInMetrics.@each',
+                'Mist.metricsController.customMetrics.@each'),
         });
     }
 );

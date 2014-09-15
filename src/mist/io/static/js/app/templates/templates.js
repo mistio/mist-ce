@@ -40,6 +40,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/metric_node.html',
         'text!app/templates/rule.html',
         'text!app/templates/rule_edit.html',
+        'text!app/templates/rule_list.html',
         'text!app/templates/user_menu.html',
       ], function () {
         Ember.TEMPLATES['backend_add/html'] = Ember.Handlebars.compile(arguments[0]);
@@ -80,7 +81,8 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['metric_node/html'] = Ember.Handlebars.compile(arguments[35]);
         Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[36]);
         Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[37]);
-        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[38]);
+        Ember.TEMPLATES['rule_list/html'] = Ember.Handlebars.compile(arguments[38]);
+        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[39]);
         callback();
       });
       return;

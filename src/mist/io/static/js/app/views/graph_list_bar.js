@@ -51,7 +51,13 @@ define('app/views/graph_list_bar', ['app/views/templated'],
             actions: {
 
                 addGraphClicked: function () {
-                    Mist.metricAddController.open(this.machine);
+                    // Mother of hacks...
+                    this._parentView. // Can minimize context
+                        _parentView.  // Graphs controller.isOpen context
+                        _parentView.  // Graph list view context
+                        _parentView.  // Machine has monitoring context
+                        _parentView.  // monitoring context
+                        addGraphClicked();
                 }
             }
         });

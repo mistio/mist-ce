@@ -147,22 +147,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                 },
 
 
-                disableMonitoringClicked: function() {
-                    var machine = this.machine;
-                    Mist.confirmationController.set('title', 'Disable monitoring');
-                    Mist.confirmationController.set('text', 'Are you sure you want to disable monitoring for this machine?');
-                    Mist.confirmationController.set('callback', function () {
-                        Mist.monitoringController.changeMonitoring(machine);
-                    });
-                    Mist.confirmationController.show();
-                },
-
-
-                addRuleClicked: function() {
-                    Mist.rulesController.newRule(this.machine);
-                },
-
-
                 probeClicked: function() {
                     this.machine.probe(null, function(success) {
                         if (!success)

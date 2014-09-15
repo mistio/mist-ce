@@ -103,8 +103,9 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             _clear: function () {
                 this.setProperties({
                     'isOpen': null,
-                    'content': null,
+                    'content': [],
                 });
+                this._clearPendingRequests();
             },
 
 

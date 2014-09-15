@@ -37,7 +37,13 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
 
             init: function () {
                 this._super();
-                this.set('datapoints', new Array());
+
+                // Create an id and sanitize it for DOM usage
+                var id = 'dt-' + this.machine.id + this.metric.id;
+                id = id.replace(/[^\w]/g, '_');
+
+                this.set('id', id);
+                this.clear();
             },
 
 
