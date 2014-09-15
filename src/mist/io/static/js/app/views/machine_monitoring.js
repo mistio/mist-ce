@@ -116,21 +116,31 @@ define('app/views/machine_monitoring',
                                     'monitoring for this machine?'
                             }
                         ],
-                        callback: function (didConfirm) {
-                            if (didConfirm) {
-                                Mist.smoothScroll(0);
-                                Ember.run.later(function () {
-                                    Mist.monitoringController
-                                        .disableMonitoring(machine,
-                                            function (success) {
-                                                if (success)
-                                                    Mist.graphsController.close();
-                                            }
-                                        );
-                                }, 200);
-                            }
-                        }
+                        callback: disableMonitoring
                     });
+
+                    function disableMonitoring (didConfirm) {
+
+                        if (!didConfirm) return;
+
+                        // Removing a bunch of graphs from the user's face
+                        // clumpsy. So we scroll to top and present a nice
+                        // message while disabling monitoring
+
+                        Mist.smoothScroll(0);
+
+                        // Disable monitoring after a while to enalbe
+                        // smoothScroll to scroll to top
+                        Ember.run.later(function () {
+                            Mist.monitoringController
+                                .disableMonitoring(machine,
+                                    function (success) {
+                                        if (success)
+                                            Mist.graphsController.close();
+                                    }
+                                );
+                        }, 200);
+                    }
                 },
 
 
