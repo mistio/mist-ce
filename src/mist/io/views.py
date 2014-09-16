@@ -471,7 +471,9 @@ def machine_actions(request):
     user = user_from_request(request)
     params = request.json_body
     action = params.get('action', '')
-    if action in ('start', 'stop', 'reboot', 'destroy'):
+    plan_id = params.get('plan_id', '')
+    #plan_id is the id of the plan to resize
+    if action in ('start', 'stop', 'reboot', 'destroy', 'resize'):
         if action == 'start':
             methods.start_machine(user, backend_id, machine_id)
         elif action == 'stop':
@@ -480,6 +482,8 @@ def machine_actions(request):
             methods.reboot_machine(user, backend_id, machine_id)
         elif action == 'destroy':
             methods.destroy_machine(user, backend_id, machine_id)
+        elif action == 'resize':
+            methods.resize_machine(user, backend_id, machine_id, plan_id)
         ## return OK
         return methods.list_machines(user, backend_id)
     raise BadRequestError()
