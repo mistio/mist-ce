@@ -34,9 +34,13 @@
             data-theme="c"
             class="checkbox-list">
             {{#each Mist.backendsController.content}}
-                {{#each this.machines.content}}
-                    {{view Mist.machineListItemView machineBinding="this" class="checkbox-link"}}
-                {{/each}}
+                {{#if this.enabled}}
+                    {{#each this.machines.content}}
+                        {{view Mist.machineListItemView
+                            machineBinding="this"
+                            class="checkbox-link"}}
+                    {{/each}}
+                {{/if}}
             {{/each}}
         </ul>
 
