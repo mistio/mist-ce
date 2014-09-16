@@ -979,7 +979,6 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
     sanitized by create_machine.
 
     """
-
     machine_name = machine_name[:64].replace(' ', '-')
     # name in NephoScale must start with a letter, can contain mixed
     # alpha-numeric characters, hyphen ('-') and underscore ('_')
@@ -1020,6 +1019,10 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
         console_keys = conn.ex_list_keypairs(key_group=4)
         if console_keys:
             console_key = console_keys[0].id
+    if size.name.startswith('D'):
+        baremetal=True
+    else:
+        baremetal=False
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1032,6 +1035,7 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                 server_key=server_key,
                 console_key=console_key,
                 ssh_key=tmp_key_path,
+                baremetal=baremetal
             )
         except Exception as e:
             raise MachineCreationError("Nephoscale, got exception %s" % e)
@@ -1559,7 +1563,10 @@ def list_sizes(user, backend_id):
             sizes = conn.list_sizes(location='us-central1-a')
             sizes = [s for s in sizes if s.name and not s.name.endswith('-d')]
             #deprecated sizes for GCE
-
+        elif conn.type == Provider.NEPHOSCALE:
+            sizes = conn.list_sizes(baremetal=False)
+            dedicated = conn.list_sizes(baremetal=True)
+            sizes.extend(dedicated)
         else:
             sizes = conn.list_sizes()
     except:
