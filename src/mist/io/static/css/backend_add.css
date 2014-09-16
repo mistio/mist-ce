@@ -42,3 +42,8 @@
 #add-backend-panel #hpcloud-bundle {
     display: none;
 }
+
+#add-backend-panel #tokenonly-bundle {
+    display: none;
+}
+
