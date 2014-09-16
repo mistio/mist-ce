@@ -2265,39 +2265,61 @@ function program1(depth0,data) {
   data.buffer.push("\n                ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers.each.call(depth0, "machines.content", {hash:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers['if'].call(depth0, "enabled", {hash:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            ");
   return buffer;
   }
 function program2(depth0,data) {
   
-  var buffer = '', hashContexts, hashTypes;
+  var buffer = '', stack1, hashTypes, hashContexts;
   data.buffer.push("\n                    ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers.each.call(depth0, "machines.content", {hash:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                ");
+  return buffer;
+  }
+function program3(depth0,data) {
+  
+  var buffer = '', hashContexts, hashTypes;
+  data.buffer.push("\n                        ");
   hashContexts = {'machineBinding': depth0,'class': depth0};
   hashTypes = {'machineBinding': "STRING",'class': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineListItemView", {hash:{
     'machineBinding': ("this"),
     'class': ("checkbox-link")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n                ");
+  data.buffer.push("\n                    ");
   return buffer;
   }
 
-function program4(depth0,data) {
+function program5(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "enabled", {hash:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            ");
+  return buffer;
+  }
+function program6(depth0,data) {
   
   var buffer = '', hashContexts, hashTypes;
-  data.buffer.push("\n            <li data-icon=\"false\">\n                <a ");
+  data.buffer.push("\n                    <li data-icon=\"false\">\n                        <a ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "selectionModeClicked", "title", {hash:{
     'target': ("view")
   },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">");
+  data.buffer.push(">\n                            ");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "title", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</a>\n            </li>\n            ");
+  data.buffer.push("\n                        </a>\n                    </li>\n                ");
   return buffer;
   }
 
@@ -2357,7 +2379,7 @@ function program4(depth0,data) {
   data.buffer.push(">None</a>\n            </li>\n            ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n    </div>\n\n    <div class=\"tri-action-footer\" data-role=\"footer\" data-theme=\"b\">\n        <table><tbody><tr><td>\n            <a id=\"machines-tags-btn\" data-role=\"button\" data-icon=\"grid\" ");
   hashContexts = {'target': depth0};
