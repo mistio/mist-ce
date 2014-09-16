@@ -117,9 +117,10 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if not provider.__class__ is int and ':' in provider:
             provider, region = provider.split(':')[0], provider.split(':')[1]
 
+        #docker url is the only piece needed in docker
         if remove_on_error and provider != 'docker':
-            #docker url is the only piece needed in docker
-            if not apikey:
+            #a few providers need only the apisecret
+            if not apikey and provider not in ['digitalocean', 'linode']:
                 raise RequiredParameterMissingError("apikey")
             if not apisecret:
                 raise RequiredParameterMissingError("apisecret")

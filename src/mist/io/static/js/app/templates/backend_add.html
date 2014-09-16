@@ -59,6 +59,23 @@
 
         <!--
 
+            Token only
+
+        -->
+
+        <div id="tokenonly-bundle">
+            <div data-theme="a">
+                <label for="new-backend-token">2. {{view.secondFieldLabel}}:</label>
+                {{view Mist.TextField
+                       type="password"
+                       id="new-backend-token"
+                       data-theme="a"
+                       valueBinding="Mist.backendAddController.newBackendSecondField"}}
+            </div>
+        </div>
+
+        <!--
+
            HP Cloud
 
         -->
