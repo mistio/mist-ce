@@ -34,9 +34,13 @@
             data-theme="c"
             class="checkbox-list">
             {{#each Mist.backendsController.content}}
-                {{#each this.machines.content}}
-                    {{view Mist.machineListItemView machineBinding="this" class="checkbox-link"}}
-                {{/each}}
+                {{#if this.enabled}}
+                    {{#each this.machines.content}}
+                        {{view Mist.machineListItemView
+                            machineBinding="this"
+                            class="checkbox-link"}}
+                    {{/each}}
+                {{/if}}
             {{/each}}
         </ul>
 
@@ -63,9 +67,13 @@
                 <a {{action "selectionModeClicked" "none" target="view"}}>None</a>
             </li>
             {{#each Mist.backendsController.content}}
-            <li data-icon="false">
-                <a {{action "selectionModeClicked" this.title target="view"}}>{{this.title}}</a>
-            </li>
+                {{#if this.enabled}}
+                    <li data-icon="false">
+                        <a {{action "selectionModeClicked" this.title target="view"}}>
+                            {{this.title}}
+                        </a>
+                    </li>
+                {{/if}}
             {{/each}}
         </ul>
     </div>

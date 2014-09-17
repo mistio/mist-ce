@@ -124,6 +124,14 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     if (this.newBackendDockerURL && this.newBackendPort) {
                         ready = true;
                     }
+                } else if (this.newBackendProvider.provider == 'linode') {
+                    if (this.newBackendSecondField && this.newBackendSecondField) {
+                        ready = true;
+                    }                                    
+                } else if (this.newBackendProvider.provider == 'digitalocean') {
+                    if (this.newBackendSecondField) {
+                        ready = true;
+                    }                                    
                 } else if (this.newBackendFirstField && this.newBackendSecondField) {
 
                     ready = true;
