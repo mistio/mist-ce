@@ -195,7 +195,8 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
 
             _addMetric: function (metric, machine) {
                 Ember.run(this, function () {
-                    this.customMetrics.addObject(Metric.create(metric));
+                    metric = Metric.create(metric);
+                    this.customMetrics.addObject(metric);
                     this.trigger('onMetricAdd', {
                         metric: metric,
                         machine: machine,
@@ -208,29 +209,24 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                 Ember.run(this, function () {
                     metric = this.getMetric(metric.id);
                     metric.machines.removeObject(machine);
-                    this.trigger('onMetricDisassociate');
+                    this.trigger('onMetricDisassociate', {
+                        metric: metric,
+                        machine: machine,
+                    });
                 });
             },
 
 
             _deleteMetric: function (metric) {
                 Ember.run(this, function () {
-                    this.customMetrics.removeObject(
-                        this.customMetrics.findBy('id', metric.id)
-                    );
-                    this.trigger('onMetricDelete');
+                    metric = this.customMetrics.findBy('id', metric.id);
+                    this.customMetrics.removeObject(metric);
+                    this.trigger('onMetricDelete', {
+                        metric: metric
+                    });
                     this.trigger('onMetricListChange');
                 });
             }
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
-
         });
     }
 );

@@ -239,6 +239,8 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 request.datasources.forEach(function (datasource) {
 
+                    if (!response[datasource.metric.id]) return;
+
                     var datapoints = this._processedDatapoints(request,
                         response[datasource.metric.id].datapoints);
 

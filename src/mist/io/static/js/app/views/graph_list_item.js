@@ -714,14 +714,14 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     Mist.confirmationController.set('title', 'Remove graph');
 
-                    var machine = Mist.monitoringController.request.machine;
+                    var machine = this.graph.datasources[0].machine;
                     var graph = this.graph;
 
                     var message = 'Are you sure you want to remove "' +
-                        graph.metrics[0].name + '"';
+                        graph.datasources[0].metric.name + '"';
 
                     var callback = null;
-                    var metric = graph.metrics[0];
+                    var metric = graph.datasources[0].metric;
 
                     if (metric.isPlugin) {
                         message += ' and disable it from server ' + machine.name;
@@ -731,28 +731,40 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     var removeGraph = function (success) {
                         if (success) {
-                            Mist.monitoringController.graphs.removeGraph(graph,
+                            Mist.metricsController.disassociateMetric(
+                                graph.datasources[0].metric,
+                                machine,
                                 function (success) {
                                     if (success)
-                                        that.graph.set('pendingRemoval', false);
-                            });
+                                        Mist.graphsController.content.removeObject(graph);
+                                }
+                            );
                         } else {
                             that.graph.set('pendingRemoval', false);
                         }
                     }
 
                     var that = this;
-                    Mist.confirmationController.set('text', message);
-                    Mist.confirmationController.set('callback', function () {
-                        if (metric.isPlugin) {
-                            Mist.metricsController.disableMetric(
-                                metric, machine, removeGraph);
-                        } else {
-                            removeGraph(true);
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Remove graph',
+                        body: [
+                            {
+                                paragraph: message
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm) {
+                                graph.set('pendingRemoval', true);
+                                if (metric.isPlugin) {
+                                    Mist.metricsController.disableMetric(
+                                        metric, machine, removeGraph);
+                                } else {
+                                    removeGraph(true);
+                                }
+                            }
                         }
-                    });
-                    this.graph.set('pendingRemoval', true);
-                    Mist.confirmationController.show();
+                    })
                 }
             },
 

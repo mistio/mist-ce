@@ -42,6 +42,9 @@ define('app/views/machine_monitoring',
                 // Add event handlers
                 Mist.rulesController.on('onRuleAdd', this, '_ruleAdded');
                 Mist.rulesController.on('onRuleDelete', this, '_ruleDeleted');
+                Mist.metricsController.on('onMetricAdd', this, '_metricAdded');
+                Mist.metricsController.on('onMetricDelte', this, '_metricDeleted');
+                Mist.metricsController.on('onMetricDisassociate', this, '_metricDeleted');
 
             }.on('didInsertElement'),
 
@@ -51,6 +54,9 @@ define('app/views/machine_monitoring',
                 // Remove event handlers
                 Mist.rulesController.off('onRuleAdd', this, '_ruleAdded');
                 Mist.rulesController.off('onRuleDelete', this, '_ruleDeleted');
+                Mist.metricsController.off('onMetricAdd', this, '_metricAdded');
+                Mist.metricsController.off('onMetricDelte', this, '_metricDeleted');
+                Mist.metricsController.off('onMetricDisassociate', this, '_metricDeleted');
 
                 this._clear();
                 this._hideGraphs();
@@ -307,6 +313,8 @@ define('app/views/machine_monitoring',
 
 
             _updateGraphs: function () {
+                var ctlWasStreaming = Mist.graphsController.stream.isStreaming;
+                var graphWasAdded = false;
                 this.metrics.forEach(function (metric) {
                     var datasource = Datasource.create({
                         metric: metric,
@@ -317,12 +325,17 @@ define('app/views/machine_monitoring',
                         if (graph.datasources.findBy('id', datasource.id))
                             return graphExists = true;
                     }, this);
-                    if (!graphExists)
+                    if (!graphExists) {
+                        graphWasAdded = true;
+                        Mist.graphsController.stream.stop();
                         this.graphs.pushObject(Graph.create({
                             title: metric.name,
                             datasources: [datasource]
                         }));
+                    }
                 }, this);
+                if (ctlWasStreaming && graphWasAdded)
+                    Mist.graphsController.stream.start();
             },
 
 
@@ -335,6 +348,18 @@ define('app/views/machine_monitoring',
             _ruleDeleted: function (event) {
                 if (this.machine.equals(event.rule.machine))
                     this.rules.removeObject(event.rule);
+            },
+
+
+            _metricAdded: function (event) {
+                if (this.machine.equals(event.machine))
+                    this.metrics.pushObject(event.metric);
+            },
+
+
+            _metricDeleted: function (event) {
+                if (this.metrics.findBy('id', event.metric.id))
+                    this.metrics.removeObject(event.metric);
             },
 
 
@@ -354,10 +379,8 @@ define('app/views/machine_monitoring',
 
 
             metricsObsever: function () {
-                Ember.run.once(this, '_updateMetrics');
                 Ember.run.once(this, '_updateGraphs');
-            }.observes('Mist.metricsController.builtInMetrics.@each',
-                'Mist.metricsController.customMetrics.@each'),
+            }.observes('metrics.@each'),
         });
     }
 );
