@@ -2,7 +2,21 @@
 
     {{#if view.machine.hasMonitoring}}
 
-        {{view Mist.graphListView}}
+        {{#if view.pendingFirstStats}}
+            <div id="machine-monitoring-disabled">
+
+                <label id="enable-monitoring-label">
+                    Fetching server stats...
+                </label>
+
+                <div class="ajax-loader"></div>
+            </div>
+        {{/if}}
+
+        <div id="graphs-wrapper"
+            {{bind-attr class="view.pendingFirstStats:hidden"}}>
+                {{view Mist.graphListView}}
+        </div>
 
         {{view Mist.ruleListView rulesBinding="view.rules"}}
 

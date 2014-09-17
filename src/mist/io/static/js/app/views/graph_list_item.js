@@ -75,8 +75,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             unload: function () {
 
                 // Remove event handlers
-                this.graph.on('onDatasourceAdd', this, 'updateSVG');
-                this.graph.on('onDatasourceRemove', this, 'updateSVG');
+                this.graph.off('onDatasourceAdd', this, 'updateSVG');
+                this.graph.off('onDatasourceRemove', this, 'updateSVG');
+                this.set('svg', null);
 
             }.on('willDestroyElement'),
 
@@ -174,7 +175,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             autoResize: function () {
-                this.changeWidth($('#' + this.id).width() - 2);
+                this.changeWidth($('#monitoring-bottom-btns').width() - 2);
             },
 
 
@@ -388,7 +389,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 var id = this.graph.id;
                 this.id = id;
-                this.width = $('#' + this.id).width() - 2;
+                this.width = $('#monitoring-bottom-btns').width() - 2;
 
                  // Calculate Aspect Ratio Of Height
                 var fixedHeight = this.width * 0.125; // (160 / 1280)
@@ -783,6 +784,14 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     $('#' + this.id).parent().show(400);
                 this.draw();
             }.observes('isHidden'),
+
+
+            isEmptyObserver: function () {
+                if (this.graph.isEmpty)
+                    $('#' + this.id).parent().hide(500);
+                else
+                    $('#' + this.id).parent().show(500);
+            }.observes('graph.isEmpty'),
 
 
             fetchingStatsObserver: function () {

@@ -16,7 +16,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             month: TIME_MAP.MONTH,
         };
 
-        return Ember.ArrayController.extend({
+        return Ember.ArrayController.extend(Ember.Evented, {
 
 
             //
@@ -275,6 +275,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this.set('fetchingStats', false);
                 if (this.fetchStatsArgs.callback instanceof Function)
                     this.fetchStatsArgs.callback();
+                this.trigger('onFetchStats');
             },
 
 

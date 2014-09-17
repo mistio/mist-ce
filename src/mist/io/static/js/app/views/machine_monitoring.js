@@ -127,7 +127,7 @@ define('app/views/machine_monitoring',
                         // feels clumpsy. So we scroll to top and present a
                         // nice message while disabling monitoring
 
-                        Mist.smoothScroll(0);
+                        Mist.smoothScroll(0, 50);
 
                         // Disable monitoring after a while to enalbe
                         // smoothScroll to scroll to top
@@ -251,6 +251,7 @@ define('app/views/machine_monitoring',
             _showGraphs: function () {
                 if (Mist.graphsController.isOpen)
                     return;
+                this.set('pendingFirstStats', true);
                 Mist.graphsController.open({
                     graphs: this.graphs,
                     config: {
@@ -258,6 +259,10 @@ define('app/views/machine_monitoring',
                         canControl: true,
                         canMinimize: true,
                     }
+                });
+                var that = this;
+                Mist.graphsController.one('onFetchStats', function () {
+                    that.set('pendingFirstStats', false);
                 });
             },
 

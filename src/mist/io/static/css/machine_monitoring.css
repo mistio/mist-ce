@@ -283,6 +283,10 @@ circle.mark{
     margin: 20px auto auto auto;
 }
 
+#graphs-wrapper.hidden {
+    display: none;
+}
+
 .command-container {
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;

@@ -21,6 +21,7 @@ define('app/models/graph', ['ember'],
             id: null,
             view: null,
             title: null,
+            isEmpty: null,
             isBuiltIn: null,
             datasources: null,
 
@@ -49,6 +50,7 @@ define('app/models/graph', ['ember'],
                 this.set('id', 'graph-' + parseInt(Math.random() * 10000));
                 this.set('datasources',
                     this.datasources.length ? this.datasources : []);
+                this.set('isEmpty', true);
             }.on('init'),
 
 
@@ -72,7 +74,7 @@ define('app/models/graph', ['ember'],
                     this.datasources.removeObject(datasource);
                     this.trigger('onDatasourceRemove');
                 });
-            },
+            }
         });
     }
 );
