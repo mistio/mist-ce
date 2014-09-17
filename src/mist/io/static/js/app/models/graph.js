@@ -22,7 +22,6 @@ define('app/models/graph', ['ember'],
             view: null,
             title: null,
             isEmpty: null,
-            isBuiltIn: null,
             datasources: null,
 
 
@@ -36,6 +35,13 @@ define('app/models/graph', ['ember'],
             unit: function () {
                 return this.datasources && this.datasources.length ?
                     this.datasources[0].metric.unit : '';
+            }.property('datasources'),
+
+
+            isBuiltIn: function () {
+                return this.datasources && this.datasources.length ?
+                    !!Mist.metricsController.builtInMetrics.findBy('id', this.datasources[0].metric.id)
+                    : false;
             }.property('datasources'),
 
 
