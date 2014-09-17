@@ -39,10 +39,19 @@ define('app/views/machine_monitoring',
 
             load: function () {
 
+                // Add event handlers
+                Mist.rulesController.on('onRuleAdd', this, '_ruleAdded');
+                Mist.rulesController.on('onRuleDelete', this, '_ruleDeleted');
+
             }.on('didInsertElement'),
 
 
             unload: function () {
+
+                // Remove event handlers
+                Mist.rulesController.off('onRuleAdd', this, '_ruleAdded');
+                Mist.rulesController.off('onRuleDelete', this, '_ruleDeleted');
+
                 this._clear();
                 this._hideGraphs();
             }.on('willDestroyElement'),
@@ -317,6 +326,18 @@ define('app/views/machine_monitoring',
             },
 
 
+            _ruleAdded: function (event) {
+                if (this.machine.equals(event.rule.machine))
+                    this.rules.pushObject(event.rule);
+            },
+
+
+            _ruleDeleted: function (event) {
+                if (this.machine.equals(event.rule.machine))
+                    this.rules.removeObject(event.rule);
+            },
+
+
             //
             //
             //  Observers
@@ -330,11 +351,6 @@ define('app/views/machine_monitoring',
                 else
                     this.hideMonitoring();
             }.observes('machine.hasMonitoring'),
-
-
-            rulesObserver: function () {
-                Ember.run.once(this, '_updateRules');
-            }.observes('Mist.rulesController.content.@each'),
 
 
             metricsObsever: function () {

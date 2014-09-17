@@ -182,8 +182,11 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
             _addRule: function (rule) {
                 Ember.run(this, function () {
-                    this.content.pushObject(Rule.create(rule));
-                    this.trigger('onRuleAdd');
+                    var newRule = Rule.create(rule);
+                    this.content.pushObject(newRule);
+                    this.trigger('onRuleAdd', {
+                        rule: newRule
+                    });
                 });
             },
 
@@ -191,7 +194,9 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             _updateRule: function (rule, data) {
                 Ember.run(this, function () {
                     rule.updateFromRawData(data);
-                    this.trigger('onRuleUpdate');
+                    this.trigger('onRuleUpdate', {
+                        rule: rule,
+                    });
                 });
             },
 
@@ -199,7 +204,9 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             _deleteRule: function (rule) {
                 Ember.run(this, function () {
                     this.content.removeObject(rule);
-                    this.trigger('onRuleDelete');
+                    this.trigger('onRuleDelete', {
+                        rule: rule
+                    });
                 });
             },
 
