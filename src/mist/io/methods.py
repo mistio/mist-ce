@@ -117,9 +117,10 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if not provider.__class__ is int and ':' in provider:
             provider, region = provider.split(':')[0], provider.split(':')[1]
 
+        #docker url is the only piece needed in docker
         if remove_on_error and provider != 'docker':
-            #docker url is the only piece needed in docker
-            if not apikey:
+            #a few providers need only the apisecret
+            if not apikey and provider not in ['digitalocean', 'linode']:
                 raise RequiredParameterMissingError("apikey")
             if not apisecret:
                 raise RequiredParameterMissingError("apisecret")
@@ -134,7 +135,15 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.region = region
         if provider == 'docker':
             backend.docker_port = docker_port
+        #For digital ocean v2 of the API, only apisecret is needed. 
+        #However, in v1 both api_key and api_secret are needed. In order
+        #for both versions to be supported (existing v1, and new v2 which 
+        #is now the default) we set api_key same to api_secret to 
+        #distinguish digitalocean v2 logins, to avoid adding another 
+        #arguement on digital ocean libcloud driver
 
+        if provider == 'digitalocean':
+            backend.apikey = backend.apisecret
         #OpenStack specific: compute_endpoint is passed only when there is a
         # custom endpoint for the compute/nova-compute service
         backend.compute_endpoint = compute_endpoint
@@ -532,10 +541,14 @@ def connect_provider(backend):
                               Provider.RACKSPACE]:
         conn = driver(backend.apikey, backend.apisecret,
                       region=backend.region)
-    elif backend.provider in [Provider.NEPHOSCALE,
-                              Provider.DIGITAL_OCEAN,
-                              Provider.SOFTLAYER]:
+    elif backend.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(backend.apikey, backend.apisecret)
+    elif backend.provider == Provider.DIGITAL_OCEAN:
+        if backend.apikey == backend.apisecret:  # API v2
+            conn = driver(backend.apisecret)
+        else:   # API v1
+            driver = get_driver('digitalocean_first_gen')
+            conn = driver(backend.apikey, backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
     else:
@@ -687,7 +700,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     through mist.io and those from the Linode interface.
 
     """
-
     log.info('Creating machine %s on backend %s' % (machine_name, backend_id))
 
     if backend_id not in user.backends:
@@ -968,7 +980,6 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
     sanitized by create_machine.
 
     """
-
     machine_name = machine_name[:64].replace(' ', '-')
     # name in NephoScale must start with a letter, can contain mixed
     # alpha-numeric characters, hyphen ('-') and underscore ('_')
@@ -1009,6 +1020,10 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
         console_keys = conn.ex_list_keypairs(key_group=4)
         if console_keys:
             console_key = console_keys[0].id
+    if size.name.startswith('D'):
+        baremetal=True
+    else:
+        baremetal=False
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1021,6 +1036,7 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                 server_key=server_key,
                 console_key=console_key,
                 ssh_key=tmp_key_path,
+                baremetal=baremetal
             )
         except Exception as e:
             raise MachineCreationError("Nephoscale, got exception %s" % e)
@@ -1102,14 +1118,22 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     sanitized by create_machine.
 
     """
-
     key = public_key.replace('\n', '')
-    deploy_script = ScriptDeployment(script)
 
+    #on API v1 list keys returns only ids, without actual public keys
+    #So the check fails. If there's already a key with the same pub key,
+    #create key call will fail!
     try:
-        key = conn.ex_create_ssh_key(machine_name, key)
+        server_key = ''
+        keys = conn.ex_list_ssh_keys()
+        for k in keys:
+            if key == k.pub_key:
+                server_key = k
+                break
+        if not server_key:
+            server_key = conn.ex_create_ssh_key(machine_name, key)
     except:
-        key = conn.ex_create_ssh_key('mist.io', key)
+        server_key = conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1117,7 +1141,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 name=machine_name,
                 image=image,
                 size=size,
-                ex_ssh_key_ids=[str(key.id)],
+                ex_ssh_key_ids=[str(server_key.id)],
                 location=location,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['root']*5,
@@ -1231,15 +1255,15 @@ def _machine_action(user, backend_id, machine_id, action):
                 except KeyError:
                     port = 22
 
-            with user.lock_n_load():
-                machine_uid = [backend_id, machine_id]
-
-                for keypair in user.keypairs:
-                    for machine in user.keypairs[keypair].machines:
-                        if machine[:2] == machine_uid:
-                            key_id = keypair
-                            machine[-1] = int(port)
-                user.save()
+                with user.lock_n_load():
+                    machine_uid = [backend_id, machine_id]
+    
+                    for keypair in user.keypairs:
+                        for machine in user.keypairs[keypair].machines:
+                            if machine[:2] == machine_uid:
+                                key_id = keypair
+                                machine[-1] = int(port)
+                    user.save()
 
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
@@ -1540,7 +1564,10 @@ def list_sizes(user, backend_id):
             sizes = conn.list_sizes(location='us-central1-a')
             sizes = [s for s in sizes if s.name and not s.name.endswith('-d')]
             #deprecated sizes for GCE
-
+        elif conn.type == Provider.NEPHOSCALE:
+            sizes = conn.list_sizes(baremetal=False)
+            dedicated = conn.list_sizes(baremetal=True)
+            sizes.extend(dedicated)
         else:
             sizes = conn.list_sizes()
     except:

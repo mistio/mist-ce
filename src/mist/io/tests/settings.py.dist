@@ -98,8 +98,8 @@ CREDENTIALS = {
         'host': ""
     },
     'DIGITALOCEAN': {
-        'client_id': "",
-        'api_key': ""
+        'token_name': "",
+        'token': ""
     }
 }
 
