@@ -1626,6 +1626,32 @@ def list_locations(user, backend_id):
     return ret
 
 
+def list_networks(user, backend_id):
+    """List networks from each backend.
+
+    Currently NephoScale is supported. For other providers 
+    this returns an empty list
+
+    """
+
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    conn = connect_provider(backend)
+
+    try:
+        networks = conn.ex_list_networks()
+    except:
+        networks = []
+
+    ret = []
+    for network in networks:
+        ret.append({'id': network.id,
+                    'name': network.name,
+                    'extra': network.extra})
+    return ret
+
+
 def set_machine_metadata(user, backend_id, machine_id, tag):
     """Sets metadata for a machine, given the backend and machine id.
 
