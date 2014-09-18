@@ -678,7 +678,7 @@ def list_machines(user, backend_id):
 @core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
-                   size_name, location_name, ssh_port=22):
+                   size_name, location_name, ips, ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -756,7 +756,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type is Provider.NEPHOSCALE:
         node = _create_machine_nephoscale(conn, key_id, private_key, public_key,
                                          script, machine_name, image, size,
-                                         location)
+                                         location, ips)
     elif conn.type is Provider.GCE:
         sizes = conn.list_sizes(location=location_name)
         for size in sizes:
@@ -973,7 +973,7 @@ def _create_machine_ec2(conn, key_name, private_key, public_key, script,
 
 
 def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
-                              machine_name, image, size, location):
+                              machine_name, image, size, location, ips):
     """Create a machine in Nephoscale.
 
     Here there is no checking done, all parameters are expected to be
@@ -1036,7 +1036,8 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                 server_key=server_key,
                 console_key=console_key,
                 ssh_key=tmp_key_path,
-                baremetal=baremetal
+                baremetal=baremetal,
+                ips=ips
             )
         except Exception as e:
             raise MachineCreationError("Nephoscale, got exception %s" % e)
