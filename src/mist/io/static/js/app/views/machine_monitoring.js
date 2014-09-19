@@ -162,6 +162,129 @@ define('app/views/machine_monitoring',
                 addRuleClicked: function() {
                     Mist.rulesController.newRule(this.machine);
                 },
+
+
+                //
+                // Proxy actions for graph list control view
+                //
+
+
+                backClicked: function () {
+                    Mist.graphsController.history.goBack();
+                },
+
+
+                forwardClicked: function () {
+                    Mist.graphsController.history.goForward();
+                },
+
+
+                resetClicked: function () {
+                    Mist.graphsController.stream.start();
+                },
+
+
+                pauseClicked: function () {
+                    Mist.graphsController.stream.stop();
+                },
+
+
+                timeWindowChanged: function () {
+                    var newTimeWindow = $('#time-window-control select').val();
+                    Mist.graphsController.resolution.change(newTimeWindow);
+
+                    // Update cookie
+                    var entry = Mist.cookiesController.getSingleMachineEntry(
+                        this.machine);
+                    entry.timeWindow = newTimeWindow;
+                    Mist.cookiesController.setSingleMachineEntry(
+                        this.machine, entry);
+                },
+
+
+                //
+                //  Proxy actions for graph list bar
+                //
+
+
+                addGraphClicked: function () {
+                    this.addGraphClicked();
+                },
+
+
+                graphButtonClicked: function (graph) {
+                    graph.view.set('isHidden', false);
+
+                    // Update cookie
+                    var entry = Mist.cookiesController.getSingleMachineGraphEntry(
+                        this.machine, graph);
+                    entry.hidden = false;
+                    Mist.cookiesController.setSingleMachineGraphEntry(
+                        this.machine, graph, entry);
+                },
+
+
+                //
+                //  Proxy actions for graph list item
+                //
+
+
+                collapseClicked: function (graph) {
+                    graph.view.set('isHidden', true);
+
+                    // Update cookie
+                    var entry = Mist.cookiesController.getSingleMachineGraphEntry(
+                        this.machine, graph);
+                    entry.hidden = true;
+                    Mist.cookiesController.setSingleMachineGraphEntry(
+                        this.machine, graph, entry);
+                },
+
+                removeClicked: function (graph) {
+
+                    var machine = this.machine;
+                    var message = 'Are you sure you want to remove "' +
+                        graph.datasources[0].metric.name + '"';
+                    var metric = graph.datasources[0].metric;
+
+                    if (metric.isPlugin)
+                        message += ' and disable it from server ' + machine.name;
+                    message += ' ?';
+
+                    function removeGraph (success) {
+                        if (success)
+                            Mist.metricsController.disassociateMetric(
+                                metric,
+                                machine,
+                                function (success) {
+                                    if (success)
+                                        Mist.graphsController.content.removeObject(graph);
+                                }
+                            );
+                        else
+                            graph.set('pendingRemoval', false);
+                    }
+
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Remove graph',
+                        body: [
+                            {
+                                paragraph: message
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm) {
+                                graph.set('pendingRemoval', true);
+                                if (metric.isPlugin)
+                                    Mist.metricsController.disableMetric(
+                                        metric, machine, removeGraph);
+                                else
+                                    removeGraph(true);
+                            }
+                        }
+                    })
+                }
             },
 
 
@@ -281,6 +404,13 @@ define('app/views/machine_monitoring',
                         timeWindow: cookie.timeWindow,
                     }
                 });
+
+                Ember.run.next(function () {
+                    $('#time-window-control select')
+                        .val(cookie.timeWindow)
+                        .trigger('change');
+                });
+
                 var that = this;
                 Mist.graphsController.one('onFetchStats', function () {
                     that.set('pendingFirstStats', false);
@@ -319,6 +449,7 @@ define('app/views/machine_monitoring',
 
 
             _updateGraphs: function () {
+                var that = this;
                 var ctlWasStreaming = Mist.graphsController.stream.isStreaming;
                 var graphWasAdded = false;
                 this.metrics.forEach(function (metric) {
@@ -334,14 +465,22 @@ define('app/views/machine_monitoring',
                     if (!graphExists) {
                         graphWasAdded = true;
                         Mist.graphsController.stream.stop();
-                        this.graphs.pushObject(Graph.create({
+                        var newGraph = Graph.create({
                             title: metric.name,
-                            datasources: [datasource]
-                        }));
+                            datasources: [datasource],
+                        });
+                        newGraph.set('isHidden', getGraphCookie(newGraph).hidden);
+                        this.graphs.pushObject(newGraph);
                     }
                 }, this);
                 if (ctlWasStreaming && graphWasAdded)
                     Mist.graphsController.stream.start();
+
+
+                function getGraphCookie (graph) {
+                    return Mist.cookiesController
+                        .getSingleMachineGraphEntry(that.machine, graph);
+                }
             },
 
 

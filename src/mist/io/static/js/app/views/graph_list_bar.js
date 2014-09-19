@@ -19,6 +19,7 @@ define('app/views/graph_list_bar', ['app/views/templated'],
 
 
             machine: null,
+            actionProxy: null,
 
 
             //
@@ -36,31 +37,9 @@ define('app/views/graph_list_bar', ['app/views/templated'],
                 // a single machine, or even be ONLY in single
                 // machine view.
 
-                this.set('machine',
-                    this.get('parentView').get('parentView').get('machine'));
+                this.set('machine', this.actionProxy.get('machine'));
 
-            }.on('didInsertElement'),
-
-
-            //
-            //
-            //  Actions
-            //
-            //
-
-
-            actions: {
-
-                addGraphClicked: function () {
-                    // Mother of hacks...
-                    this._parentView. // Can minimize context
-                        _parentView.  // Graphs controller.isOpen context
-                        _parentView.  // Graph list view context
-                        _parentView.  // Machine has monitoring context
-                        _parentView.  // monitoring context
-                        addGraphClicked();
-                }
-            }
+            }.on('didInsertElement')
         });
     }
 );

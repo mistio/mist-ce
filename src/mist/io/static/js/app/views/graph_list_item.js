@@ -48,6 +48,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             valuesDistance: null,
             animationEnabled: null,
             clearAnimPending: null,
+            actionProxy: null,
 
 
             //
@@ -413,6 +414,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.set('valueline', ValueLine(this));
 
                 this.updateSVG();
+                this.set('isHidden', this.graph.isHidden);
                 return;
 
                 // Set graph visibility
@@ -693,78 +695,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                             that.clearAnimPending = false;
                         }, 50);
                     }
-                }
-            },
-
-
-            //
-            //
-            //  Actions
-            //
-            //
-
-
-            actions: {
-
-                collapseClicked: function () {
-                    this.set('isHidden', true);
-                },
-
-                removeClicked: function () {
-
-                    Mist.confirmationController.set('title', 'Remove graph');
-
-                    var machine = this.graph.datasources[0].machine;
-                    var graph = this.graph;
-
-                    var message = 'Are you sure you want to remove "' +
-                        graph.datasources[0].metric.name + '"';
-
-                    var callback = null;
-                    var metric = graph.datasources[0].metric;
-
-                    if (metric.isPlugin) {
-                        message += ' and disable it from server ' + machine.name;
-                    }
-
-                    message += ' ?';
-
-                    var removeGraph = function (success) {
-                        if (success) {
-                            Mist.metricsController.disassociateMetric(
-                                graph.datasources[0].metric,
-                                machine,
-                                function (success) {
-                                    if (success)
-                                        Mist.graphsController.content.removeObject(graph);
-                                }
-                            );
-                        } else {
-                            that.graph.set('pendingRemoval', false);
-                        }
-                    }
-
-                    var that = this;
-                    Mist.dialogController.open({
-                        type: DIALOG_TYPES.YES_NO,
-                        head: 'Remove graph',
-                        body: [
-                            {
-                                paragraph: message
-                            }
-                        ],
-                        callback: function (didConfirm) {
-                            if (didConfirm) {
-                                graph.set('pendingRemoval', true);
-                                if (metric.isPlugin) {
-                                    Mist.metricsController.disableMetric(
-                                        metric, machine, removeGraph);
-                                } else {
-                                    removeGraph(true);
-                                }
-                            }
-                        }
-                    })
                 }
             },
 

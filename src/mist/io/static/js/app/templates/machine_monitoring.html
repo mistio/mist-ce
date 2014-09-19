@@ -15,7 +15,8 @@
 
         <div id="graphs-wrapper"
             {{bind-attr class="view.pendingFirstStats:hidden"}}>
-                {{view Mist.graphListView}}
+                {{view Mist.graphListView
+                    actionProxyBinding="view"}}
         </div>
 
         {{view Mist.ruleListView rulesBinding="view.rules"}}

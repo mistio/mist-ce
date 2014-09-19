@@ -5,7 +5,8 @@
     -->
 
     {{#if Mist.graphsController.config.canControl}}
-        {{view Mist.graphListControlView}}
+        {{view Mist.graphListControlView
+            actionProxyBinding="view.actionProxy"}}
     {{/if}}
 
     <!--
@@ -13,7 +14,9 @@
     -->
 
     {{#each Mist.graphsController.content}}
-        {{view Mist.graphListItemView graphBinding="this"}}
+        {{view Mist.graphListItemView
+            graphBinding="this"
+            actionProxyBinding="view.actionProxy"}}
     {{/each}}
 
     <!--
@@ -21,7 +24,8 @@
     -->
 
     {{#if Mist.graphsController.config.canMinimize}}
-        {{view Mist.graphListBarView}}
+        {{view Mist.graphListBarView
+            actionProxyBinding="view.actionProxy"}}
     {{/if}}
 
 {{/if}}

@@ -342,18 +342,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 change: function (newTimeWindow, forceChange) {
 
-                    // Update cookie
-                    // Bad, because it supposes there is only one machine for now
-                    // To fix this, everything that comes from graph list view
-                    // should be proxied to the parent monitoring view, which
-                    // will generally make things a lot cleaner
-                    var entry = Mist.cookiesController.getSingleMachineEntry(
-                        this.parent.content[0].datasources[0].machine);
-                    entry.timeWindow = newTimeWindow;
-                    Mist.cookiesController.setSingleMachineEntry(
-                        this.parent.content[0].datasources[0].machine, entry);
-
-
                     var newTimeWindow = TIME_WINDOW_MAP[newTimeWindow];
                     var oldTimeWindow = this.parent.config.timeWindow;
 
@@ -368,11 +356,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                         if (forceChange) {
                             this.parent.stream.start();
-                            Ember.run.next(function () {
-                                $('#time-window-control select')
-                                    .val(entry.timeWindow)
-                                    .trigger('change');
-                            });
                             return;
                         }
 

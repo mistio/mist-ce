@@ -21,7 +21,7 @@ define('app/views/graph_button', ['app/views/templated'],
             graph: null,
             buttonId: null,
             tagName: 'span',
-
+            actionProxy: null,
 
             //
             //
@@ -33,21 +33,6 @@ define('app/views/graph_button', ['app/views/templated'],
             load: function () {
                 this.set('buttonId', this.graph.id + '-btn');
             }.on('didInsertElement'),
-
-
-            //
-            //
-            //  Actions
-            //
-            //
-
-
-            actions: {
-
-                buttonClicked: function () {
-                    this.graph.view.set('isHidden', false);
-                }
-            },
 
 
             //

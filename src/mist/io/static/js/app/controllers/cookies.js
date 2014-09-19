@@ -99,6 +99,18 @@ define('app/controllers/cookies', ['ember'],
             },
 
 
+            getSingleMachineGraphEntry: function (machine, graph) {
+                return this.getSingleMachineEntry(machine).graphs[graph.id] ||
+                    this._createSingleMachineGraphEntry(machine, graph);
+            },
+
+
+            setSingleMachineGraphEntry: function (machine, graph, entry) {
+                this.cookie.smm[uuidFromMachine(machine)].graphs[graph.id] = entry;
+                this._save();
+            },
+
+
             //
             //
             //  Pseudo-Private Methods
@@ -132,6 +144,17 @@ define('app/controllers/cookies', ['ember'],
                 };
                 this._save();
                 return this.cookie.smm[machine_uuid];
+            },
+
+
+            _createSingleMachineGraphEntry: function (machine, graph) {
+                var machine_uuid = uuidFromMachine(machine);
+                this.cookie.smm[machine_uuid].graphs[graph.id] = {
+                    index: graph.index || 0,
+                    hidden: graph.view ? grpah.view.isHidden : false,
+                };
+                this._save();
+                return this.cookie.smm[machine_uuid].graphs[graph.id];
             },
         });
 
