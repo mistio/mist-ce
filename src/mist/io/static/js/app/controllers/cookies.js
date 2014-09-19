@@ -88,23 +88,13 @@ define('app/controllers/cookies', ['ember'],
 
 
             getSingleMachineEntry: function (machine) {
-                var entry;
-                var machine_uuid = uuidFromMachine(machine);
-
-                // Find entry for this machine
-                forIn(this, this.cookie.smm, function (value, uuid) {
-                    if (uuid == machine_uuid)
-                        entry = value;
-                });
-
-                // If not found, create an entry
-                return entry || this._createSingleMachineEntry(machine);
+                return this.cookie.smm[uuidFromMachine(machine)] ||
+                    this._createSingleMachineEntry(machine);
             },
 
 
             setSingleMachineEntry: function (machine, entry) {
-                var machine_uuid = uuidFromMachine(machine);
-                this.cookie.smm[machine_uuid] = entry;
+                this.cookie.smm[uuidFromMachine(machine)] = entry;
                 this._save();
             },
 
@@ -117,7 +107,7 @@ define('app/controllers/cookies', ['ember'],
 
 
             _clear: function () {
-
+                setCookie(COOKIE_NAME, '', 0);
             },
 
 
@@ -137,7 +127,7 @@ define('app/controllers/cookies', ['ember'],
             _createSingleMachineEntry: function (machine) {
                 var machine_uuid = uuidFromMachine(machine);
                 this.cookie.smm[machine_uuid] = {
-                    timeWindow: 10 * TIME_MAP.MINUTE,
+                    timeWindow: 'minutes',
                     graphs: {}
                 };
                 this._save();
