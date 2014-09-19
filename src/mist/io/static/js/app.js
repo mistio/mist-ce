@@ -247,6 +247,7 @@ var loadFiles = function (callback) {
         'app/controllers/backend_edit',
         'app/controllers/backends',
         'app/controllers/confirmation',
+        'app/controllers/cookies',
         'app/controllers/datasources',
         'app/controllers/dialog',
         'app/controllers/file_upload',
@@ -318,6 +319,7 @@ var loadApp = function (
     BackendEditController,
     BackendsController,
     ConfirmationController,
+    CookiesController,
     DatasourcesController,
     DialogController,
     FileUploadController,
@@ -561,6 +563,7 @@ var loadApp = function (
     App.set('metricsController', MetricsController.create());
     App.set('graphsController', GraphsController.create());
     App.set('keyEditController', KeyEditController.create());
+    App.set('cookiesController', CookiesController.create());
     App.set('ruleEditController', RuleEditController.create());
     App.set('backendsController', BackendsController.create());
     App.set('metricAddController', MetricAddController.create());

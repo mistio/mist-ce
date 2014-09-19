@@ -53,9 +53,13 @@ define('app/models/graph', ['ember'],
 
 
             load: function () {
-                this.set('id', 'graph-' + parseInt(Math.random() * 10000));
+                var dts;
+                if (this.datasources.length);
+                    dts=this.datasources;
+
+                this.set('id', 'graph-' + (dts ? dts[0].id : ''));
                 this.set('datasources',
-                    this.datasources.length ? this.datasources : []);
+                    dts ? dts : []);
                 this.set('isEmpty', true);
             }.on('init'),
 

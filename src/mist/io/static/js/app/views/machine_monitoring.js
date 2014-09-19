@@ -264,8 +264,13 @@ define('app/views/machine_monitoring',
 
 
             _showGraphs: function () {
+
+                var cookie = Mist.cookiesController
+                    .getSingleMachineEntry(this.machine);
+
                 if (Mist.graphsController.isOpen)
                     return;
+
                 this.set('pendingFirstStats', true);
                 Mist.graphsController.open({
                     graphs: this.graphs,
@@ -273,6 +278,7 @@ define('app/views/machine_monitoring',
                         canModify: true,
                         canControl: true,
                         canMinimize: true,
+                        timeWindow: cookie.timeWindow,
                     }
                 });
                 var that = this;
