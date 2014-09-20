@@ -87,6 +87,11 @@ define('app/controllers/cookies', ['ember'],
             //
 
 
+            save: function () {
+                this._save();
+            },
+
+
             getSingleMachineEntry: function (machine) {
                 return this.cookie.smm[uuidFromMachine(machine)] ||
                     this._createSingleMachineEntry(machine);

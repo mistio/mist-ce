@@ -27,12 +27,11 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             isOpen: null,
-            content: null,
+            content: [],
             resizeLock: null,
             pendingRequests: [],
             fetchingStats: null,
             fetchingStatsArgs: null,
-
             config: Ember.Object.create({
                 requestMethod: 'XHR',
                 timeWindow: TIME_WINDOW_MAP.minutes,
@@ -152,7 +151,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 var requests = [];
                 var offset = this.config.measurementOffset;
-                this.content.forEach(function (graph) {
+                this.get('content').forEach(function (graph) {
                     graph.datasources.forEach(function (datasource) {
                         var newRequest = StatsRequest.create({
                             from: args.from - offset,
@@ -274,13 +273,15 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             _fetchStatsEnded: function () {
-                this.content.forEach(function (graph) {
-                    graph.view.draw();
+                Ember.run.next(this, function () {
+                    this.get('content').forEach(function (graph) {
+                        graph.view.draw();
+                    });
+                    this.set('fetchingStats', false);
+                    if (this.fetchStatsArgs.callback instanceof Function)
+                        this.fetchStatsArgs.callback();
+                    this.trigger('onFetchStats');
                 });
-                this.set('fetchingStats', false);
-                if (this.fetchStatsArgs.callback instanceof Function)
-                    this.fetchStatsArgs.callback();
-                this.trigger('onFetchStats');
             },
 
 
@@ -290,8 +291,8 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 // displayed datapoints. Used after closing a streaming
                 // session.
 
-                if (!this.content.length) return;
-                var datasource = this.content[0].datasources[0];
+                if (!this.get('content').length) return;
+                var datasource = this.get('content')[0].datasources[0];
 
                 this.set('fetchStatsArgs', {
                     from: datasource.getFirstTimestamp() || (Date.now() - this.config.timeWindow),

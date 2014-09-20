@@ -217,10 +217,8 @@ define('app/views/machine_monitoring',
 
                     // Update cookie
                     var entry = Mist.cookiesController.getSingleMachineGraphEntry(
-                        this.machine, graph);
-                    entry.hidden = false;
-                    Mist.cookiesController.setSingleMachineGraphEntry(
-                        this.machine, graph, entry);
+                        this.machine, graph).hidden = false;
+                    Mist.cookiesController.save();
                 },
 
 
@@ -233,11 +231,19 @@ define('app/views/machine_monitoring',
                     graph.view.set('isHidden', true);
 
                     // Update cookie
-                    var entry = Mist.cookiesController.getSingleMachineGraphEntry(
-                        this.machine, graph);
-                    entry.hidden = true;
-                    Mist.cookiesController.setSingleMachineGraphEntry(
-                        this.machine, graph, entry);
+                    // shift indexes and let this collapsed graph be
+                    // the last one
+                    var graphs = Mist.cookiesController.getSingleMachineEntry(
+                        this.machine).graphs;
+                    var lastIndex = this.metrics.length - 1;
+                    forIn(graphs, function (entry) {
+                        if (entry.index > graph.index)
+                            entry.index -= 1;
+                        else if (entry.index == graph.index)
+                            entry.index = lastIndex;
+                    });
+                    graph.set('index', lastIndex);
+                    Mist.cookiesController.save();
                 },
 
                 removeClicked: function (graph) {
@@ -452,7 +458,7 @@ define('app/views/machine_monitoring',
                 var that = this;
                 var ctlWasStreaming = Mist.graphsController.stream.isStreaming;
                 var graphWasAdded = false;
-                this.metrics.forEach(function (metric) {
+                this.metrics.forEach(function (metric, index) {
                     var datasource = Datasource.create({
                         metric: metric,
                         machine: this.machine
@@ -467,9 +473,11 @@ define('app/views/machine_monitoring',
                         Mist.graphsController.stream.stop();
                         var newGraph = Graph.create({
                             title: metric.name,
+                            index: index,
                             datasources: [datasource],
                         });
                         newGraph.set('isHidden', getGraphCookie(newGraph).hidden);
+                        newGraph.set('index', getGraphCookie(newGraph).index);
                         this.graphs.pushObject(newGraph);
                     }
                 }, this);
