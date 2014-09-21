@@ -566,6 +566,14 @@ def list_locations(request):
     return methods.list_locations(user, backend_id)
 
 
+@view_config(route_name='networks', request_method='GET', renderer='json')
+def list_networks(request):
+    """List networks from each backend."""
+    backend_id = request.matchdict['backend']
+    user = user_from_request(request)
+    return methods.list_networks(user, backend_id)
+
+
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """Probes a machine using ping and ssh to collect metrics.
