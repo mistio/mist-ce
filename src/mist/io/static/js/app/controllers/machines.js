@@ -52,7 +52,7 @@ define('app/controllers/machines', ['app/models/machine'],
              *
              */
 
-            newMachine: function(name, image, size, location, key, script) {
+            newMachine: function(name, image, size, location, key, script, monitoring) {
 
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -85,7 +85,8 @@ define('app/controllers/machines', ['app/models/machine'],
                         // Gce specific
                         'size_name': size.name,
                         'image_name': image.name,
-                        'location_name': location.name
+                        'location_name': location.name,
+                        'monitoring' : monitoring
                 }).success(function (machine) {
                     machine.backend = that.backend;
                     // Nephoscale returns machine id on request success,
