@@ -1461,7 +1461,14 @@ function program16(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.machineAddController.newMachineScript")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n\n        <div id=\"create-machine-cost\">\n        ");
+  data.buffer.push("\n\n        <!-- Enable monitoring -->\n        <div id=\"create-machine-monitoring\" class=\"ui-state-disabled\">\n            <label>\n            ");
+  hashContexts = {'data-theme': depth0,'checkedBinding': depth0};
+  hashTypes = {'data-theme': "STRING",'checkedBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
+    'data-theme': ("a"),
+    'checkedBinding': ("Mist.machineAddController.newMachineMonitoring")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n            Enable monitoring\n            </label>\n        </div>\n\n        <div id=\"create-machine-cost\">\n        ");
   hashTypes = {};
   hashContexts = {};
   stack1 = helpers['if'].call(depth0, "view.price", {hash:{},inverse:self.noop,fn:self.program(16, program16, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
