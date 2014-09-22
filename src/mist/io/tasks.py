@@ -15,6 +15,8 @@ from celery import Task
 from amqp import Message
 from amqp.connection import Connection
 
+from paramiko.ssh_exception import SSHException
+
 from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError
 from mist.io.shell import Shell
@@ -99,17 +101,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             ips = filter(lambda ip: ':' not in ip, node.public_ips)
             host = ips[0]
         else:
-            raise self.retry(exc=Exception(), countdown=60, max_retries=5)
-
-        if monitoring:
-            try:
-                monitoring_retval = enable_monitoring(user, backend_id, node.id,
-                      name=node.name, dns_name=node.extra.get('dns_name',''),
-                      public_ips=ips, no_ssh=True, dry=False)
-                command = monitoring_retval['command'] + ';' + command
-            except Exception as e:
-                print repr(e)
-                notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (user, node.name, e))
+            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
 
         try:
             from mist.io.shell import Shell
@@ -117,16 +109,29 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
                                                    key_id, username, password, 
                                                    port)
+            if monitoring:
+                try:
+                    monitoring_retval = enable_monitoring(user, backend_id, node.id,
+                          name=node.name, dns_name=node.extra.get('dns_name',''),
+                          public_ips=ips, no_ssh=True, dry=False)
+                    command = monitoring_retval['command'] + ';' + command
+                except Exception as e:
+                    print repr(e)
+                    notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
+                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
+
             start_time = time()
             retval, output = shell.command(command)
             execution_time = time() - start_time
             shell.disconnect()
+            output = output.decode('utf-8','ignore')
             msg = """
 Command: %s
 Return value: %s
 Duration: %s seconds
 Output:
 %s""" % (command, retval, execution_time, output)
+            msg = msg.encode('utf-8', 'ignore')
 
             if retval:
                 notify_user(user, "Deployment script failed for machine %s (%s)" % (node.name, node.id), msg)
@@ -135,11 +140,11 @@ Output:
                 notify_user(user, "Deployment script succeeded for machine %s (%s)" % (node.name, node.id), msg)
                 amqp_log("Deployment script succeeded for user %s machine %s (%s): %s" % (user, node.name, node.id, msg))
 
-        except ServiceUnavailableError as exc:
+        except (ServiceUnavailableError, SSHException) as exc:
             raise self.retry(exc=exc, countdown=60, max_retries=5)
     except Exception as exc:
         if str(exc).startswith('Retry'):
-            return
+            raise
         amqp_log("Deployment script failed for machine %s in backend %s by user %s after 5 retries: %s" % (node.id, backend_id, email, repr(exc)))
         notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
         notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))

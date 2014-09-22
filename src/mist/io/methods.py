@@ -155,9 +155,9 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if backend.provider == 'openstack':
             #Strip the v2.0 or v2.0/ at the end of the url if they are there
             if backend.apiurl.endswith('/v2.0/'):
-                backend.apiurl = backend.apiurl.rstrip('/v2.0/')
+                backend.apiurl = backend.apiurl.split('/v2.0/')[0]
             elif backend.apiurl.endswith('/v2.0'):
-                backend.apiurl = backend.apiurl.rstrip('/v2.0')
+                backend.apiurl = backend.apiurl.split('/v2.0')[0]
 
             backend.apiurl = backend.apiurl.rstrip('/')
 
