@@ -78,6 +78,10 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                       key_id=None, username=None, password=None, port=22):
     from mist.io.methods import ssh_command, connect_provider, enable_monitoring
     from mist.io.methods import notify_user, notify_admin
+    if multi_user:
+        from mist.core.methods import enable_monitoring
+    else:
+        from mist.io.methods import enable_monitoring
 
     user = user_from_email(email)
     try:
