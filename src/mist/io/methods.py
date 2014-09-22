@@ -63,6 +63,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
     log.info("Adding new backend in provider '%s'", provider)
 
     baremetal = provider == 'bare_metal'
+
     if provider == 'bare_metal':
         if not machine_hostname:
             raise RequiredParameterMissingError('machine_hostname')
@@ -153,10 +154,10 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         #so https://192.168.1.101:5000 will work but https://192.168.1.101:5000/ won't!
         if backend.provider == 'openstack':
             #Strip the v2.0 or v2.0/ at the end of the url if they are there
-            if backend.apiurl.endswith('v2.0/'):
-                backend.apiurl = backend.apiurl.strip('v2.0/')
-            elif backend.apiurl.endswith('v2.0'):
-                backend.apiurl = backend.apiurl.strip('v2.0')
+            if backend.apiurl.endswith('/v2.0/'):
+                backend.apiurl = backend.apiurl.rstrip('/v2.0/')
+            elif backend.apiurl.endswith('/v2.0'):
+                backend.apiurl = backend.apiurl.rstrip('/v2.0')
 
             backend.apiurl = backend.apiurl.rstrip('/')
 
