@@ -117,7 +117,8 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     command = monitoring_retval['command'] + ';' + command
                 except Exception as e:
                     print repr(e)
-                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (user, node.name, e))
+                    notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
+                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
 
             start_time = time()
             retval, output = shell.command(command)
