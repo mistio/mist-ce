@@ -1900,7 +1900,7 @@ def deploy_collectd_command(deploy_kwargs):
     url = "%s/deploy_script" % config.CORE_URI
     if query:
         url += "?" + query
-    command = "$(command -v sudo) bash -c \"$(wget -O - %s '%s')\"" % (
+    command = "wget -O - %s '%s' | `command -v sudo` bash" % (
         "--no-check-certificate" if not config.SSL_VERIFY else "",
         url,
     )
@@ -1911,11 +1911,10 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
     """Uninstall collectd from the machine and return command's output"""
     #FIXME: do not hard-code stuff!
     command = (
-        "sudo=$(command -v sudo); "
-        "[ -f /etc/cron.d/mistio-collectd ] && $sudo rm -f /etc/cron.d/mistio-collectd || "
-        "$sudo su -c 'cat /etc/rc.local | grep -v mistio-collectd > /etc/rc.local';"
-        "$sudo /opt/mistio-collectd/collectd.sh stop; "
-        "sleep 2; $sudo kill -9 `cat /opt/mistio-collectd/collectd.pid`"
+        "[ -f /etc/cron.d/mistio-collectd ] && `command -v sudo` rm -f /etc/cron.d/mistio-collectd || "
+        "echo `command -v sudo` /opt/mistio-collectd/collectd.sh stop | bash; "
+        "sleep 2; [ -f /opt/mistio-collectd/collectd.pid ] && "
+        "`command -v sudo` kill -9 `cat /opt/mistio-collectd/collectd.pid`"
     )
 
     tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
