@@ -191,6 +191,7 @@ def add_backend(request):
     machine_hostname = params.get('machine_ip', '')
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
+    remove_on_error = params.get('remove_on_error', True)
     try:
         docker_port = int(params.get('docker_port', 4243))
     except:
@@ -210,7 +211,8 @@ def add_backend(request):
         machine_hostname=machine_hostname, machine_key=machine_key,
         machine_user=machine_user, region=region,
         compute_endpoint=compute_endpoint, port=ssh_port,
-        docker_port=docker_port
+        docker_port=docker_port,
+        remove_on_error=remove_on_error,
     )
     backend = user.backends[backend_id]
     return {
