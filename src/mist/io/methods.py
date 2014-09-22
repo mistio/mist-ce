@@ -63,6 +63,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
     log.info("Adding new backend in provider '%s'", provider)
 
     baremetal = provider == 'bare_metal'
+
     if provider == 'bare_metal':
         if not machine_hostname:
             raise RequiredParameterMissingError('machine_hostname')
@@ -153,10 +154,10 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         #so https://192.168.1.101:5000 will work but https://192.168.1.101:5000/ won't!
         if backend.provider == 'openstack':
             #Strip the v2.0 or v2.0/ at the end of the url if they are there
-            if backend.apiurl.endswith('v2.0/'):
-                backend.apiurl = backend.apiurl.strip('v2.0/')
-            elif backend.apiurl.endswith('v2.0'):
-                backend.apiurl = backend.apiurl.strip('v2.0')
+            if backend.apiurl.endswith('/v2.0/'):
+                backend.apiurl = backend.apiurl.rstrip('/v2.0/')
+            elif backend.apiurl.endswith('/v2.0'):
+                backend.apiurl = backend.apiurl.rstrip('/v2.0')
 
             backend.apiurl = backend.apiurl.rstrip('/')
 
@@ -678,7 +679,7 @@ def list_machines(user, backend_id):
 @core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
-                   size_name, location_name, ips, ssh_port=22):
+                   size_name, location_name, ips, monitoring, ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -737,14 +738,14 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 pass
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
-        node = _create_machine_rackspace(conn, public_key, script, machine_name,
-                                        image, size, location)
+        node = _create_machine_rackspace(conn, public_key, machine_name, image, 
+                                         size, location)
     elif conn.type in [Provider.OPENSTACK]:
-        node = _create_machine_openstack(conn, private_key, public_key, script, machine_name,
-                                        image, size, location)
+        node = _create_machine_openstack(conn, private_key, public_key, 
+                                         machine_name, image, size, location)
     elif conn.type is Provider.HPCLOUD:
-        node = _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
-                                        image, size, location)
+        node = _create_machine_hpcloud(conn, private_key, public_key, 
+                                       machine_name, image, size, location)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
         for loc in locations:
@@ -752,11 +753,11 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 location = loc
                 break
         node = _create_machine_ec2(conn, key_id, private_key, public_key,
-                                  script, machine_name, image, size, location)
+                                   machine_name, image, size, location)
     elif conn.type is Provider.NEPHOSCALE:
         node = _create_machine_nephoscale(conn, key_id, private_key, public_key,
-                                         script, machine_name, image, size,
-                                         location, ips)
+                                          machine_name, image, size,
+                                          location, ips)
     elif conn.type is Provider.GCE:
         sizes = conn.list_sizes(location=location_name)
         for size in sizes:
@@ -764,28 +765,27 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 size = size
                 break
         node = _create_machine_gce(conn, key_id, private_key, public_key,
-                                         script, machine_name, image, size,
-                                         location)
+                                         machine_name, image, size, location)
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
-                                        script, machine_name, image, size,
-                                        location)
+                                         machine_name, image, size,
+                                         location)
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(conn, key_id, private_key,
-                                            public_key, script, machine_name,
-                                            image, size, location)
+                                             public_key, machine_name,
+                                             image, size, location)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
-                                     script, machine_name, image, size,
-                                     location)
+                                      machine_name, image, size,
+                                      location)
     else:
         raise BadRequestError("Provider unknown.")
 
     associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
-    if script:
-        tasks.run_deploy_script.delay(user.email, backend_id, node.id,
-                                      script, key_id)
+    if script or monitoring:
+        tasks.post_deploy_steps.delay(user.email, backend_id, node.id, 
+                                      monitoring, script, key_id)
 
     return {'id': node.id,
             'name': node.name,
@@ -795,7 +795,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             }
 
 
-def _create_machine_rackspace(conn, public_key, script, machine_name,
+def _create_machine_rackspace(conn, public_key, machine_name,
                              image, size, location):
     """Create a machine in Rackspace.
 
@@ -804,9 +804,6 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
 
     """
 
-    key = SSHKeyDeployment(str(public_key))
-    deploy_script = ScriptDeployment(script)
-    msd = MultiStepDeployment([key, deploy_script])
     key = str(public_key).replace('\n','')
 
     try:
@@ -832,7 +829,7 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
         raise MachineCreationError("Rackspace, got exception %r" % e)
 
 
-def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
+def _create_machine_openstack(conn, private_key, public_key, machine_name,
                              image, size, location):
     """Create a machine in Openstack.
 
@@ -840,9 +837,6 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
     sanitized by create_machine.
 
     """
-    key = SSHKeyDeployment(str(public_key))
-    deploy_script = ScriptDeployment(script)
-    msd = MultiStepDeployment([key, deploy_script])
     key = str(public_key).replace('\n','')
 
     try:
@@ -873,7 +867,7 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
 
-def _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
+def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
                              image, size, location):
     """Create a machine in HP Cloud.
 
@@ -881,9 +875,6 @@ def _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
     sanitized by create_machine.
 
     """
-    key = SSHKeyDeployment(str(public_key))
-    deploy_script = ScriptDeployment(script)
-    msd = MultiStepDeployment([key, deploy_script])
     key = str(public_key).replace('\n','')
 
     try:
@@ -918,7 +909,7 @@ def _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
     return node
 
 
-def _create_machine_ec2(conn, key_name, private_key, public_key, script,
+def _create_machine_ec2(conn, key_name, private_key, public_key,
                        machine_name, image, size, location):
     """Create a machine in Amazon EC2.
 
@@ -972,7 +963,7 @@ def _create_machine_ec2(conn, key_name, private_key, public_key, script,
     return node
 
 
-def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
+def _create_machine_nephoscale(conn, key_name, private_key, public_key,
                               machine_name, image, size, location, ips):
     """Create a machine in Nephoscale.
 
@@ -990,7 +981,6 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
     # characters and the hyphen ('-') character, cannot exceed 15 characters,
     # and can end with a letter or a number.
     key = public_key.replace('\n', '')
-    deploy_script = ScriptDeployment(script)
 
     # NephoScale has 2 keys that need be specified, console and ssh key
     # get the id of the ssh key if it exists, otherwise add the key
@@ -1044,7 +1034,7 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
         return node
 
 
-def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
+def _create_machine_softlayer(conn, key_name, private_key, public_key,
                              machine_name, image, size, location):
     """Create a machine in Softlayer.
 
@@ -1112,7 +1102,7 @@ def _create_machine_docker(conn, machine_name, image, script, public_key=None):
     return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
-                                 script, machine_name, image, size, location):
+                                  machine_name, image, size, location):
     """Create a machine in Digital Ocean.
 
     Here there is no checking done, all parameters are expected to be
@@ -1158,8 +1148,8 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         return node
 
 
-def _create_machine_gce(conn, key_name, private_key, public_key,
-                                 script, machine_name, image, size, location):
+def _create_machine_gce(conn, key_name, private_key, public_key, machine_name, 
+                        image, size, location):
     """Create a machine in GCE.
 
     Here there is no checking done, all parameters are expected to be
@@ -1168,7 +1158,7 @@ def _create_machine_gce(conn, key_name, private_key, public_key,
     """
     key = public_key.replace('\n', '')
 
-    metadata = {'startup-script': script,
+    metadata = {#'startup-script': script,
                 'sshKeys': 'user:%s' % key}
     #metadata for ssh user, ssh key and script to deploy
 
@@ -1186,7 +1176,7 @@ def _create_machine_gce(conn, key_name, private_key, public_key,
     return node
 
 
-def _create_machine_linode(conn, key_name, private_key, public_key, script,
+def _create_machine_linode(conn, key_name, private_key, public_key, 
                           machine_name, image, size, location):
     """Create a machine in Linode.
 
@@ -1196,7 +1186,6 @@ def _create_machine_linode(conn, key_name, private_key, public_key, script,
     """
 
     auth = NodeAuthSSHKey(public_key)
-    deploy_script = ScriptDeployment(script)
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1624,6 +1613,32 @@ def list_locations(user, backend_id):
                     'name': name,
                     'country': location.country})
 
+    return ret
+
+
+def list_networks(user, backend_id):
+    """List networks from each backend.
+
+    Currently NephoScale is supported. For other providers 
+    this returns an empty list
+
+    """
+
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    conn = connect_provider(backend)
+
+    try:
+        networks = conn.ex_list_networks()
+    except:
+        networks = []
+
+    ret = []
+    for network in networks:
+        ret.append({'id': network.id,
+                    'name': network.name,
+                    'extra': network.extra})
     return ret
 
 

@@ -69,17 +69,21 @@ def ssh_command(email, backend_id, machine_id, host, command,
     shell.disconnect()
     if retval:
         from mist.io.methods import notify_user
-        notify_user(user, "Async command failed for machine %s (%s)" % (machine_id, host), output)
+        notify_user(user, "Async command failed for machine %s (%s)" % 
+                    (machine_id, host), output)
 
 
 @app.task(bind=True, default_retry_delay=3*60)
-def run_deploy_script(self, email, backend_id, machine_id, command,
+def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                       key_id=None, username=None, password=None, port=22):
-    from mist.io.methods import ssh_command, connect_provider
+    from mist.io.methods import ssh_command, connect_provider, enable_monitoring
     from mist.io.methods import notify_user, notify_admin
+    if multi_user:
+        from mist.core.methods import enable_monitoring
+    else:
+        from mist.io.methods import enable_monitoring
 
     user = user_from_email(email)
-
     try:
         # find the node we're looking for and get its hostname
         conn = connect_provider(user.backends[backend_id])
@@ -97,11 +101,22 @@ def run_deploy_script(self, email, backend_id, machine_id, command,
         else:
             raise self.retry(exc=Exception(), countdown=60, max_retries=5)
 
+        if monitoring:
+            try:
+                monitoring_retval = enable_monitoring(user, backend_id, node.id,
+                      name=node.name, dns_name=node.extra.get('dns_name',''),
+                      public_ips=ips, no_ssh=True, dry=False)
+                command = monitoring_retval['command'] + ';' + command
+            except Exception as e:
+                print repr(e)
+                notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (user, node.name, e))
+
         try:
             from mist.io.shell import Shell
             shell = Shell(host)
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
-                                                   key_id, username, password, port)
+                                                   key_id, username, password, 
+                                                   port)
             start_time = time()
             retval, output = shell.command(command)
             execution_time = time() - start_time

@@ -191,6 +191,7 @@ def add_backend(request):
     machine_hostname = params.get('machine_ip', '')
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
+    remove_on_error = params.get('remove_on_error', True)
     try:
         docker_port = int(params.get('docker_port', 4243))
     except:
@@ -210,7 +211,8 @@ def add_backend(request):
         machine_hostname=machine_hostname, machine_key=machine_key,
         machine_user=machine_user, region=region,
         compute_endpoint=compute_endpoint, port=ssh_port,
-        docker_port=docker_port
+        docker_port=docker_port,
+        remove_on_error=remove_on_error,
     )
     backend = user.backends[backend_id]
     return {
@@ -453,6 +455,7 @@ def create_machine(request):
         size_name = request.json_body.get('size_name', None)
         location_name = request.json_body.get('location_name', None)
         ips = request.json_body.get('ips', None)
+        monitoring = request.json_body.get('monitoring', False)
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -460,7 +463,7 @@ def create_machine(request):
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                  location_id, image_id, size_id, script,
                                  image_extra, disk, image_name, size_name,
-                                 location_name, ips)
+                                 location_name, ips, monitoring)
     return ret
 
 
@@ -565,6 +568,14 @@ def list_locations(request):
     backend_id = request.matchdict['backend']
     user = user_from_request(request)
     return methods.list_locations(user, backend_id)
+
+
+@view_config(route_name='networks', request_method='GET', renderer='json')
+def list_networks(request):
+    """List networks from each backend."""
+    backend_id = request.matchdict['backend']
+    user = user_from_request(request)
+    return methods.list_networks(user, backend_id)
 
 
 @view_config(route_name='probe', request_method='POST', renderer='json')
