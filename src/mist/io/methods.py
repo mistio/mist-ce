@@ -1124,7 +1124,17 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         if not server_key:
             server_key = conn.ex_create_ssh_key(machine_name, key)
     except:
-        server_key = conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
+        try:
+            server_key = conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
+        except:
+            #on API v1 if we can't create that key, means that key is already
+            #on our account. Since we don't know the id, we pass all the ids
+            server_keys = [str(key.id) for key in keys]
+
+    if not server_key:
+        ex_ssh_key_ids = server_keys
+    else:
+        ex_ssh_key_ids = [str(server_key.id)]
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1132,7 +1142,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 name=machine_name,
                 image=image,
                 size=size,
-                ex_ssh_key_ids=[str(server_key.id)],
+                ex_ssh_key_ids=ex_ssh_key_ids,
                 location=location,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['root']*5,
