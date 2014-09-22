@@ -99,17 +99,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             ips = filter(lambda ip: ':' not in ip, node.public_ips)
             host = ips[0]
         else:
-            raise self.retry(exc=Exception(), countdown=60, max_retries=5)
-
-        if monitoring:
-            try:
-                monitoring_retval = enable_monitoring(user, backend_id, node.id,
-                      name=node.name, dns_name=node.extra.get('dns_name',''),
-                      public_ips=ips, no_ssh=True, dry=False)
-                command = monitoring_retval['command'] + ';' + command
-            except Exception as e:
-                print repr(e)
-                notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (user, node.name, e))
+            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
 
         try:
             from mist.io.shell import Shell
@@ -117,6 +107,16 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
                                                    key_id, username, password, 
                                                    port)
+            if monitoring:
+                try:
+                    monitoring_retval = enable_monitoring(user, backend_id, node.id,
+                          name=node.name, dns_name=node.extra.get('dns_name',''),
+                          public_ips=ips, no_ssh=True, dry=False)
+                    command = monitoring_retval['command'] + ';' + command
+                except Exception as e:
+                    print repr(e)
+                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (user, node.name, e))
+
             start_time = time()
             retval, output = shell.command(command)
             execution_time = time() - start_time
