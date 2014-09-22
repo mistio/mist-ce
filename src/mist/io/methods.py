@@ -1010,7 +1010,7 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key,
         console_keys = conn.ex_list_keypairs(key_group=4)
         if console_keys:
             console_key = console_keys[0].id
-    if size.name.startswith('D'):
+    if size.name and size.name.startswith('D'):
         baremetal=True
     else:
         baremetal=False
