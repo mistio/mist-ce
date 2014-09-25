@@ -1,77 +1,157 @@
 define('app/controllers/backend_edit', ['ember'],
-    /**
-     *  Backend Edit Controller
-     *
-     *  @returns Class
-     */
-    function() {
+    //
+    //  Backend Edit Controller
+    //
+    //  @returns Class
+    //
+    function () {
+
+        'use strict';
+
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             backend: null,
-            callback: null,
-            newBackendTitle: null,
+            newTitle: null,
+            newState: null,
+            renameLock: null,
 
 
-            /**
-             * 
-             *  Methods
-             * 
-             */
+            //
+            //
+            //  Methods
+            //
+            //
 
-            open: function(backend, callback) {
-                this.set('backend', backend);
-                this.set('callback', callback);
-                this.set('newBackendTitle', backend.title);
-                $('#monitoring-message').hide();
-                $('#backend-delete-confirm').hide();
-                $('#backend-toggle option[value=1]')[0].selected = backend.enabled;
-                $('#backend-toggle').slider('refresh');
-                $('#edit-backend-popup').popup('open', {transition: 'pop'});
+
+            open: function (backend) {
+                this._clear();
+                this.setProperties({
+                    backend: backend,
+                    newTitle: backend.title,
+                    newState: backend.enabled,
+                });
+                this.view.open();
             },
 
 
-            close: function() {
-                
+            close: function () {
+                this._clear();
+                this.view.close();
             },
 
 
-            _clear: function() {
-                this.set('backend', null);
-                this.set('callback', null);
-                this.set('newBackendTitle', null);
+            rename: function () {
+
+                if (this.newTitle == this.backend.title) return;
+                if (this.newTitle == '') return;
+
+                Mist.backendsController.renameBackend({
+                    backend: this.backend,
+                    newTitle: this.newTitle,
+                    callback: this._rename
+                });
             },
 
 
-            rename: function() {
-                if (! this.newBackendTitle) return;
-                Mist.backendsController.renameBackend(this.backend.id, this.newBackendTitle, this.callback);
+            toggle: function () {
+
+                if (this.newState == this.backend.enabled) return;
+
+                Mist.backendsController.toggleBackend({
+                    backend: this.backend,
+                    newState: this.newState,
+                    callback: this._toggle
+                });
             },
 
 
-            deleteBackend: function(callback) {
-                Mist.backendsController.deleteBackend(this.backend.id, callback);
+            delete: function () {
+
+                Mist.backendsController.deleteBackend({
+                    backend: this.backend,
+                    callback: this._delete
+                });
             },
 
 
-            toggleBackend: function(callback) {
-                var newState = $('#backend-toggle').val() == '1' ? true : false;
-                Mist.backendsController.toggleBackend(this.backend.id, newState, callback);
+            //
+            //
+            //  Pseudo-Private Methods
+            //
+            //
+
+
+            _clear: function () {
+                this.setProperties({
+                    backend: {},
+                    newTitle: null,
+                    newState: null,
+                })
             },
 
 
-            /**
-             *  
-             *  Observers
-             * 
-             */
+            _rename: function () {
+                var that = Mist.backendEditController;
+                if (!that.backend) return;
+                that.set('newTitle', that.backend.title);
+            },
 
-            backendTitleOBserver: function() {
-                Ember.run.once(this, 'rename');
-            }.observes('newBackendTitle'),
+
+            _toggle: function () {
+                var that = Mist.backendEditController;
+                if (!that.backend) return;
+                that.set('newState', that.backend.enabled);
+            },
+
+
+            _delete: function (success) {
+                var that = Mist.backendEditController;
+                if (success) that.close();
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            stateObserver: function () {
+                Ember.run.once(this, '_toggle');
+            }.observes('backend.enabled'),
+
+
+            newStateObserver: function () {
+                Ember.run.once(this, 'toggle');
+            }.observes('newState'),
+
+
+            titleObserver: function () {
+                Ember.run.once(this, '_rename');
+            }.observes('backend.title'),
+
+
+            newTitleObserver: function () {
+
+                // Send a rename request 1 second
+                // after the user stops typing
+                clearTimeout(this.renameLock);
+                this.renameLock = setTimeout(renameLater, 1000);
+
+                var that = this;
+                function renameLater () {
+                    that.rename();
+                }
+            }.observes('newTitle'),
         });
     }
 );

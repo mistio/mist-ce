@@ -21,6 +21,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
+            newMachineMonitoring: true,
 
 
             /**
@@ -73,12 +74,11 @@ define('app/controllers/machine_add', ['ember'],
                 // TODO: This thing is ugly. Move regex and strings into a dict
 
                 if (providerName == 'NephoScale') {
-                    var re = /^[0-9a-zA-Z-_]*$/;
+                    var re = /^[0-9a-z_-]*$/;
                     if ( machineName.length > 64 || !re.test(machineName)) {
 
                         Mist.notificationController.timeNotify(
-                            'Server name in NephoScale must start with a letter, can contain mixed alpha-numeric ' +
-                            'characters, hyphen (\'-\') and underscore (\'_\') characters, cannot exceed 64 ' +
+                            'Server name in NephoScale may have lower-case letters, numbers, hyphen (\'-\') and underscore (\'_\') characters, cannot exceed 64 ' +
                             'characters, and can end with a letter or a number.', 7000);
                         return;
                     }
@@ -134,6 +134,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineLocation,
                         this.newMachineKey,
                         this.newMachineScript,
+                        this.newMachineMonitoring,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }

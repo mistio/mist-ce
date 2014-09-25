@@ -21,16 +21,12 @@
 }
 
 #image-list-page .ui-checkbox-off:after {
-    background-image: url(../images/staroff.png);
     background-color: rgba(0,0,0,0) !important;
-    background-position: 0px -2px;
     background-repeat: no-repeat !important;
 }
 
 #image-list-page .ui-checkbox-on:after {
-    background-image: url(../images/staron.png);
     background-color: rgba(0,0,0,0) !important;
-    background-position: 0px -2px;
     background-repeat: no-repeat !important;
 }
 

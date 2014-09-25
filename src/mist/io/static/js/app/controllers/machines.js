@@ -21,7 +21,7 @@ define('app/controllers/machines', ['app/models/machine'],
             rebootingMachine: null,
             destroyingMachine: null,
             shutingdownMachine: null,
-            
+
             /* Let's disable sorting for now
             sortAscending: true,
             sortProperties: ['hasMonitoring', 'probed'],
@@ -33,36 +33,16 @@ define('app/controllers/machines', ['app/models/machine'],
              *
              */
 
-            load: function() {
+            init: function () {
+                this._super();
+                this.set('content', []);
+                this.set('loadint', true);
+            },
 
-                if (!this.backend.enabled) return;
 
-                var that = this;
-                this.set('loading', true);
-                Mist.ajax.GET('/backends/' + this.backend.id + '/machines', {
-                }).success(function(machines) {
-                    if (!that.backend.enabled) return;
-                    that.set('failCounter', 0);
-                    that._updateContent(machines);
-                    that._reload();
-                }).error(function() {
-                    if (!that.backend.enabled) return;
-                    Mist.notificationController.notify('Failed to load machines for ' + that.backend.title);
-
-                    // Increase machine load fail counter
-                    // If counter reaches 5, disable backend
-                    that.set('failCounter', that.failCounter + 1);
-                    if (that.failCounter == 5) {
-                        that.set('failCounter', 0);
-                        that.backend.set('enabled', false);
-                    } else {
-                        that._reload();
-                    }
-                }).complete(function(success) {
-                    if (!that.backend.enabled) return;
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
+            load: function (machines) {
+                this._updateContent(machines);
+                this.set('loading', false);
             },
 
 
@@ -72,7 +52,7 @@ define('app/controllers/machines', ['app/models/machine'],
              *
              */
 
-            newMachine: function(name, image, size, location, key, script) {
+            newMachine: function(name, image, size, location, key, script, monitoring) {
 
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -105,12 +85,19 @@ define('app/controllers/machines', ['app/models/machine'],
                         // Gce specific
                         'size_name': size.name,
                         'image_name': image.name,
-                        'location_name': location.name
+                        'location_name': location.name,
+                        'monitoring' : monitoring
                 }).success(function (machine) {
                     machine.backend = that.backend;
-                    that._createMachine(machine, key, dummyMachine);
+                    // Nephoscale returns machine id on request success,
+                    // but the machine is not listed on the next list_machines.
+                    // This makes the machine dissappear from the UI.
+                    if (that.backend.provider != 'nephoscale')
+                        that._createMachine(machine, key, dummyMachine);
+                    else
+                        dummyMachine.set('pendingCreation', false);
                 }).error(function (message) {
-                    that.removeObject(dummyMachine);
+                    that.content.removeObject(that.content.findBy('name', name));
                     Mist.notificationController.timeNotify('Failed to create machine: ' + message, 5000);
                 }).complete(function (success, machine) {
                     that.set('addingMachine', false);
@@ -146,7 +133,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('terminated');
                 machine.lockOn('pending');
                 this.set('destroyingMachine', true);
-                machine.set("beingDestroyed",true);
+                machine.set('beingDestroyed', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {
@@ -205,15 +192,6 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-            clear: function() {
-                Ember.run(this, function() {
-                    this.set('content', []);
-                    this.set('loading', false);
-                    this.trigger('onMachineListChange');
-                });
-            },
-
-
             getMachine: function(machineId) {
                 return this.content.findBy('id', machineId);
             },
@@ -224,18 +202,11 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-
             /**
              *
              *  Pseudo-Private Methods
              *
              */
-
-            _reload: function() {
-                Ember.run.later(this, function() {
-                    this.load();
-                }, this.backend.poll_interval);
-            },
 
 
             _updateContent: function(machines) {
@@ -280,11 +251,6 @@ define('app/controllers/machines', ['app/models/machine'],
                                 old_machine.set(attr, machine[attr]);
                             }
 
-                            // Set machine on probing loop
-                            if (prevState != 'running'
-                                && machine.state == 'running')
-                                    old_machine.probe();
-
                         } else {
 
                             // Add new machine
@@ -305,7 +271,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     machine = Machine.create(machine);
                     if (machine.state == 'stopped')
                         machine.set('state', 'pending');
-                    this.content.pushObject(machine);
+                    this.content.addObject(machine);
                     this.content.removeObject(dummyMachine);
                     Mist.keysController._associateKey(key.id, machine);
                     this.trigger('onMachineListChange');
@@ -336,18 +302,30 @@ define('app/controllers/machines', ['app/models/machine'],
                         Mist.monitored_machines.some(function(machine_tuple){
                             backend_id = machine_tuple[0];
                             machine_id = machine_tuple[1];
-                            if (machine.backend.id == backend_id && machine.id == machine_id && !machine.hasMonitoring) {
-                                that.getMachine(machine_id, backend_id).set('hasMonitoring', true);
-                                return true;
+                            if (!machine.hasMonitoring &&
+                                machine.id == machine_id &&
+                                machine.backend.id == backend_id) {
+                                    that.getMachine(machine_id, backend_id)
+                                        .set('hasMonitoring', true);
+                                    return true;
                             }
                         });
 
                         Mist.rulesController.content.forEach(function(rule) {
-                            if (!rule.machine.id) {
-                                if (rule.machine == machine.id && rule.backend == machine.backend.id) {
+                            if (rule.machine.id) return;
+                            if (rule.machine == machine.id &&
+                                rule.backend == machine.backend.id)
                                     rule.set('machine', machine);
-                                }
-                            }
+                        });
+
+                        Mist.metricsController.customMetrics.forEach(function(metric) {
+                            metric.machines.forEach(function(metricMachine, index) {
+                                if (metricMachine[1] == machine.id &&
+                                    metricMachine[0] == machine.backend.id) {
+                                        metric.machines[index] = machine;
+                                        Mist.metricsController.trigger('onMetricListChange');
+                                    }
+                            });
                         });
                     });
                 }

@@ -20,3 +20,10 @@
 
 ## SSH connection timeout
 #COMMAND_TIMEOUT = 20
+
+
+## Celery backend for task results
+#CELERY_BACKEND = 'amqp://guest:guest@127.0.0.1:5671//'
+
+## Celery message broker
+#CELERY_BROKER = 'amqp://guest:guest@127.0.0.1:5671//'

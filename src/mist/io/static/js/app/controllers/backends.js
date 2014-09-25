@@ -1,15 +1,22 @@
-define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'ember'],
-    /**
-     *  Backends Controller
-     *
-     *  @returns Class
-     */
-    function(Backend, Rule) {
+define('app/controllers/backends', ['app/models/backend', 'ember'],
+    //
+    //  Backends Controller
+    //
+    //  @returns Class
+    //
+    function (Backend) {
+
+        'use strict';
+
         return Ember.ArrayController.extend(Ember.Evented, {
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             content: [],
             imageCount: 0,
@@ -23,133 +30,115 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             checkedMonitoring: false,
             checkingMonitoring: false,
 
-            loading: false,
+            loading: true,
             loadingImages: false,
             loadingMachines: false,
 
-            /**
-             *
-             *  Initialization
-             *
-             */
 
-            load: function() {
-                var that = this;
-                this.set('loading', true);
-                Mist.ajax.GET('/backends', {
-                }).success(function(backends) {
-                    that._setContent(backends);
-                }).error(function() {
-                    that._reload();
-                }).complete(function() {
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
-            }.on('init'),
+            //
+            //
+            //  Initialization
+            //
+            //
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            load: function (backends) {
+                this._updateContent(backends);
+                this.set('loading', false);
+            },
 
-            addBackend: function(title, provider, apiKey, apiSecret, apiUrl,
-                                 region, tenant, computeEndpoint, dockerUrl,
-                                 port, key, callback) {
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            addBackend: function (args) {
+
+                var key = Mist.keysController.keyExists(args.key) ? args.key : null;
+
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
-                    'title'       : title,
-                    'provider'    : provider,
-                    'apikey'      : apiKey,
-                    'apisecret'   : apiSecret,
-                    'apiurl'      : apiUrl || dockerUrl,
-                    'tenant_name' : tenant,
-                    'region'      : region,
+                    'title'       : args.title,
+                    'provider'    : args.provider,
+                    'apikey'      : args.APIKey,
+                    'apisecret'   : args.APISecret,
+                    'apiurl'      : args.APIURL || args.dockerURL,
+                    'tenant_name' : args.tenant,
+                    'region'      : args.region,
                     'machine_key' : key,
-                    'compute_endpoint' : computeEndpoint,
-                    'docker_port' : port,
-                    'machine_port': port,      // For bare-metal
-                    'machine_ip'  : apiKey,    // For bare-metal
-                    'machine_user': apiSecret  // For bare-metal
-                }).success(function(backend) {
+                    'compute_endpoint' : args.computeEndpoint,
+                    'docker_port' : args.port,
+                    'machine_port': args.port,      // For bare-metal
+                    'machine_ip'  : args.APIKey,    // For bare-metal
+                    'machine_user': args.APISecret  // For bare-metal
+                }).success(function (backend) {
                     that._addBackend(backend, key);
-                }).error(function(message) {
-                    Mist.notificationController.notify('Failed to add backend: ' + message);
-                }).complete(function(success, backend) {
+                }).error(function (message) {
+                    Mist.notificationController.notify(
+                        'Failed to add backend: ' + message);
+                }).complete(function (success, backend) {
                     that.set('addingBackend', false);
-                    if (callback) callback(success, backend);
+                    if (args.callback) args.callback(success, backend);
                 });
             },
 
 
-            renameBackend: function(backendId, newTitle, callback) {
+            renameBackend: function (args) {
                 var that = this;
                 this.set('renamingBackend', true);
-                Mist.ajax.PUT('/backends/' + backendId, {
-                    'new_name': newTitle
-                }).success(function() {
-                    that._renameBackend(backendId, newTitle);
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to rename backend');
-                }).complete(function(success) {
+                Mist.ajax.PUT('/backends/' + args.backend.id, {
+                    'new_name': args.newTitle
+                }).success(function () {
+                    that._renameBackend(args.backend, args.newTitle);
+                }).error(function () {
+                    Mist.notificationController.notify(
+                        'Failed to rename backend');
+                }).complete(function (success) {
                     that.set('renamingBackend', false);
-                    if (callback) callback(success);
+                    if (args.callback) args.callback(success);
                 });
             },
 
 
-            deleteBackend: function(backendId, callback) {
+            deleteBackend: function(args) {
                 var that = this;
                 this.set('deletingBackend', true);
-                Mist.ajax.DELETE('/backends/' + backendId, {
+                Mist.ajax.DELETE('/backends/' + args.backend.id, {
                 }).success(function() {
-                    that._deleteBackend(backendId);
+                    that._deleteBackend(args.backend);
                 }).error(function() {
-                    Mist.notificationController.notify('Failed to delete backend');
+                    Mist.notificationController.notify(
+                        'Failed to delete backend');
                 }).complete(function(success) {
                     that.set('deletingBackend', false);
-                    if (callback) callback(success);
+                    if (args.callback) args.callback(success);
                 });
             },
 
 
-            toggleBackend: function(backendId, newState, callback) {
+            toggleBackend: function(args) {
                 var that = this;
                 this.set('togglingBackend', true);
-                Mist.ajax.POST('/backends/' + backendId, {
-                    'new_state': newState ? '1' : '0'
-                }).success(function() {
-                    that._toggleBackend(backendId, newState);
-                }).error(function() {
-                    Mist.notificationController.notify("Failed to change backend's state");
-                    that._toggleBackend(backendId, !newState);
-                }).complete(function(success) {
+                Mist.ajax.POST('/backends/' + args.backend.id, {
+                    'new_state': args.newState.toString()
+                }).success(function () {
+                    that._toggleBackend(args.backend, args.newState);
+                }).error(function () {
+                    Mist.notificationController.notify(
+                        "Failed to change backend's state");
+                }).complete(function (success) {
                     that.set('togglingBackend', false);
-                    if (callback) callback(success);
+                    if (args.callback) args.callback(success);
                 });
             },
 
 
             probeMachine: function(machine, keyId, callback) {
-
                 // TODO: This should be moved inside machines controller
-
-                function loadToColor(load, cores) {
-                    var weightedLoad = load / cores;
-                    if (weightedLoad > 1.2) {
-                        return 'hot';
-                    } else if (weightedLoad > 0.8) {
-                        return 'warm';
-                    } else if (weightedLoad > 0.4) {
-                        return 'eco';
-                    } else if (weightedLoad > 0.1) {
-                        return 'cool';
-                    } else {
-                        return 'cold';
-                    }
-                }
 
                 if (!machine.id || machine.id == -1) return;
                 if (!machine.state == 'running') return;
@@ -169,52 +158,18 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/probe', {
                     'host': host,
                     'key': keyId
-                }).success(function(data) {
-                    if (!machine.backend || !machine.backend.enabled) return;
-                    if (data.uptime) {
-                        uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
-                        machine.set('uptimeChecked', Date.now());
-                        machine.set('uptimeFromServer', uptime);
-                        machine.set('probed', true);
-                    } else {
-                        machine.set('uptimeChecked', -Date.now());
-                    }
-                    machine.set('cores', data.cores);
-                    machine.set('users', data.users);
-                    if (data.pub_ips) {
-                        data.pub_ips.forEach(function (ip) {
-                            if (machine.public_ips instanceof Array)
-                                machine.public_ips.addObject(ip);
-                        });
-                        machine.notifyPropertyChange('public_ips');
-                    }
-                    if (data.priv_ips) {
-                        data.priv_ips.forEach(function (ip) {
-                            if (machine.private_ips instanceof Array)
-                                machine.private_ips.addObject(ip);
-                        });
-                        machine.notifyPropertyChange('private_ips');
-                    }
-                    if (data.loadavg) {
-                        machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
-                        machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
-                        machine.set('loadavg15', loadToColor(data.loadavg[2], data.cores));
-                    }
-                    machine.set('loadavg', data.loadavg);
-                    machine.set('loss', data.packets_loss);
-                    machine.set('latency', Math.floor(data.rtt_avg));
-                    that.trigger('onMachineProbe', machine, keyId);
+                }).success(function (data) {
+                    machine.probeSuccess(data);
                 }).error(function(message) {
                     if (!machine.backend || !machine.backend.enabled) return;
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success, data) {
                     if (!machine.backend || !machine.backend.enabled) return;
-                    if (key) {
+                    if (key)
                         key.set('probing', false);
-                    }
                     machine.set('probing', false);
                     that.trigger('onMachineProbe');
-                    if (callback) callback(!!uptime, data);
+                    if (callback) callback(!!data.uptime, data);
                 });
             },
 
@@ -229,6 +184,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 this.set('machineCount', count);
                 this.trigger('updateMachines');
             }.observes('content.length'),
+
 
             updateImageCount: function() {
                 var count = 0;
@@ -283,69 +239,80 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
-            /**
-             *
-             *  Psudo-Private Methods
-             *
-             */
-
-            _reload: function() {
-                Ember.run.later(this, function() {
-                    this.load();
-                }, 2000);
-            },
+            //
+            //
+            //  Psudo-Private Methods
+            //
+            //
 
 
-            _setContent: function(backends) {
-                var that = this;
-                Ember.run(function() {
-                    that.set('content', []);
-                    backends.forEach(function(backend) {
-                        if (backend.provider == 'bare_metal')
-                            backend.isBareMetal = true;
-                        that.content.pushObject(Backend.create(backend));
-                    });
-                    that.trigger('onBackendListChange');
+            _updateContent: function (backends) {
+                Ember.run(this, function() {
+
+                    // Remove deleted backends
+                    this.content.forEach(function (backend) {
+                        if (!backends.findBy('id', backend.id))
+                            this.content.removeObject(backend);
+                    }, this);
+
+                    backends.forEach(function (backend) {
+
+                        var oldBackend = this.getBackend(backend.id);
+
+                        if (oldBackend)
+                            // Update existing backends
+                            forIn(backend, function (value, property) {
+                                oldBackend.set(property, value);
+                            });
+                        else
+                            // Add new backends
+                            this._addBackend(backend);
+                    }, this);
+
+                    this.trigger('onBackendListChange');
                 });
             },
 
 
             _addBackend: function(backend, keyId) {
                 Ember.run(this, function() {
+                    if (this.backendExists(backend.id)) return;
                     var backendModel = Backend.create(backend);
-                    this.content.pushObject(backendModel);
-                    backendModel.one('onMachineListChange', function() {
-                        if (backendModel.provider == 'bare_metal') {
-                            backendModel.set('isBareMetal', true);
-                            Mist.keysController._associateKey(keyId, backendModel.machines.content[0]);
-                        }
-                    });
-                    this.trigger('onBackendListChange');
+                    this.content.addObject(backendModel);
+                    // <TODO (gtsop): move this code into backend model
+                    if (keyId)
+                        backendModel.one('onMachineListChange', function() {
+                            if (backendModel.provider == 'bare_metal') {
+                                backendModel.set('isBareMetal', true);
+                                Mist.keysController._associateKey(keyId,
+                                    backendModel.machines.content[0]);
+                            }
+                        });
+                    // />
                     this.trigger('onBackendAdd');
                 });
             },
 
 
-            _deleteBackend: function(id) {
+            _deleteBackend: function(backend) {
                 Ember.run(this, function() {
-                    this.content.removeObject(this.getBackend(id));
-                    this.trigger('onBackendListChange');
+                    this.content.removeObject(backend);
                     this.trigger('onBackendDelete');
                 });
             },
 
 
-            _renameBackend: function(id, newTitle) {
+            _renameBackend: function(backend, newTitle) {
                 Ember.run(this, function() {
-                    this.getBackend(id).set('title', newTitle);
+                    backend.set('title', newTitle);
                     this.trigger('onBackendRename');
                 });
             },
 
 
-            _toggleBackend: function(id, newState) {
+            _toggleBackend: function(backend, newState) {
                 Ember.run(this, function() {
-                    this.getBackend(id).set('enabled', newState);
+                    backend.set('enabled', newState);
                     this.trigger('onBackendToggle');
                 });
             },
@@ -376,24 +343,14 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
 
             _updateLoadingImages: function() {
-                Ember.run(this, function() {
-                    var loadingImages = false;
-                    this.content.some(function(backend) {
-                        if (backend.loadingImages) return loadingImages = true;
-                    });
-                    this.set('loadingImages', loadingImages);
-                });
+                this.set('loadingImages',
+                    !!this.content.findBy('loadingImages', true));
             },
 
 
             _updateLoadingMachines: function() {
-                Ember.run(this, function() {
-                    var loadingMachines = false;
-                    this.content.some(function(backend) {
-                        if (backend.loadingMachines) return loadingMachines = true;
-                    });
-                    this.set('loadingMachines', loadingMachines);
-                });
+                this.set('loadingMachines',
+                    !!this.content.findBy('loadingMachines', true));
             },
 
 
@@ -409,11 +366,12 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //
+            //  Observers
+            //
+            //
+
 
             imageCountObserver: function() {
                 Ember.run.once(this, '_updateImageCount');

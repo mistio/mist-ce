@@ -58,27 +58,29 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
 
             add: function () {
+
                 var that = this;
                 var projectName = this.newBackendOpenStackTenant || this.newBackendProjectName;
-                Mist.backendsController.addBackend(
-                    this.newBackendProvider.title,
-                    this.newBackendProvider.provider,
-                    this.newBackendFirstField,
-                    this.newBackendSecondField,
-                    this.newBackendOpenStackURL,
-                    this.newBackendOpenStackRegion,
-                    projectName,
-                    this.newBackendOpenStackComputeEndpoint,
-                    this.newBackendDockerURL,
-                    this.newBackendPort,
-                    this.newBackendKey.id,
-                    function (success, backend) {
+
+                Mist.backendsController.addBackend({
+
+                    APIKey: this.newBackendFirstField,
+                    APISecret: this.newBackendSecondField,
+                    title: this.newBackendProvider.title,
+                    provider: this.newBackendProvider.provider,
+                    APIURL: this.newBackendOpenStackURL,
+                    region: this.newBackendOpenStackRegion,
+                    tenant: projectName,
+                    computeEndpont: this.newBackendOpenStackComputeEndpoint,
+                    dockerURL: this.newBackendDockerURL,
+                    port: this.newBackendPort,
+                    key: this.newBackendKey.id,
+
+                    callback: function (success, backend) {
                         that._giveCallback(success, backend);
-                        if (success) {
-                            that.close();
-                        }
+                        if (success) that.close();
                     }
-                );
+                });
             },
 
 
@@ -109,36 +111,46 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
 
             _updateFormReady: function () {
+
+                // Filter out the "Select provider" dummy provider
+                if (! ('provider' in this.newBackendProvider)) {
+                    this.set('formReady', false);
+                    return;
+                }
+
                 var ready = false;
-                info('hi', this.newBackendProvider.provider , this.newBackendDockerURL, this.newBackendPort)
-                if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
 
-                    if (this.newBackendProvider.provider == 'docker') {
-
-                        if (this.newBackendDockerURL && this.newBackendPort) {
-                            ready = true;
-                        }
-
-                    } else if (this.newBackendFirstField && this.newBackendSecondField) {
-
+                if (this.newBackendProvider.provider == 'docker') {
+                    if (this.newBackendDockerURL && this.newBackendPort) {
                         ready = true;
+                    }
+                } else if (this.newBackendProvider.provider == 'linode') {
+                    if (this.newBackendSecondField && this.newBackendSecondField) {
+                        ready = true;
+                    }                                    
+                } else if (this.newBackendProvider.provider == 'digitalocean') {
+                    if (this.newBackendSecondField) {
+                        ready = true;
+                    }                                    
+                } else if (this.newBackendFirstField && this.newBackendSecondField) {
 
-                        if (this.newBackendProvider.provider == 'openstack') { // Pure Openstack
-                            if (!this.newBackendOpenStackURL) {
-                                ready = false;
-                            }
-                        } else if (this.newBackendProvider.provider.indexOf('openstack') > -1) { // HpCloud
-                            if (!(this.newBackendOpenStackURL && this.newBackendOpenStackTenant)) {
-                                ready = false;
-                            }
-                        } else if (this.newBackendProvider.provider == 'bare_metal') { // Baremetal
-                            if (!Mist.keysController.keyExists(this.newBackendKey.id)) {
-                                ready = false;
-                            }
-                        } else if (this.newBackendProvider.provider == 'gce') { // Google Compute Engine
-                            if (!this.newBackendProjectName) {
-                                ready = false;
-                            }
+                    ready = true;
+
+                    if (this.newBackendProvider.provider == 'openstack') { // Openstack
+                        if (!this.newBackendOpenStackURL || !this.newBackendOpenStackTenant) {
+                            ready = false;
+                        }
+                    } else if (this.newBackendProvider.provider.indexOf('hpcloud') > -1) { // HpCloud
+                        if (!this.newBackendOpenStackTenant) {
+                            ready = false;
+                        }
+                    } else if (this.newBackendProvider.provider == 'bare_metal') { // Baremetal
+                        if (!Mist.keysController.keyExists(this.newBackendKey.id)) {
+                            ready = false;
+                        }
+                    } else if (this.newBackendProvider.provider == 'gce') { // Google Compute Engine
+                        if (!this.newBackendProjectName) {
+                            ready = false;
                         }
                     }
                 }

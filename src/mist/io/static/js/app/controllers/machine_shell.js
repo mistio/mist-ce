@@ -1,111 +1,123 @@
-define('app/controllers/machine_shell', ['app/models/command', 'ember'],
-    /**
-     * Machine Shell Controller
-     *
-     * @returns Class
-     */
+define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term'],
+    //
+    //  Machine Shell Controller
+    //
+    //  @returns Class
+    //
     function (Command) {
+
+        'use strict';
+
         return Ember.Object.extend(Ember.Evented, {
 
-            /**
-             *  Properties
-             */
 
-            command: null,
+            //
+            //
+            //  Properties
+            //
+            //
+
+
+            view: null,
             machine: null,
-            commandHistoryIndex: -1,
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //
+            //  Methods
+            //
+            //
+
 
             open: function (machine) {
+                //info(Terminal);
                 this._clear();
                 this.set('machine', machine);
-                $('#machine-shell-popup').on('popupafteropen',
-                    function(){
-                        var ua = navigator.userAgent.toLowerCase();
-                        var isAndroid = ua.indexOf("android") > -1;
-                        if (!isAndroid){ // Chrome for Android doesn't like input focus 
-                            $('#shell-input input').focus();
-                        }                        
-                    }
-                ).popup( "option", "dismissible", false ).popup('open');
-                
-                $(window).on('resize', function(){
-                        $('#shell-return').css({'height': ($(window).height() - 290) + 'px'});
-                        return true;
+
+                // Get the first ipv4 public ip to connect to
+                var host = '';
+                machine.public_ips.forEach(function (ip) {
+                    if (ip.search(':') == -1)
+                        host = ip;
                 });
-                $(window).trigger('resize');
-                Ember.run.next(function(){
-                    $('#shell-input input').focus();
-                });                
-            },
-
-
-            close: function () {
-                $('#machine-shell-popup').popup('close');
-                $(window).off('resize');
-                this._clear();
-            },
-
-
-            submit: function(timeout) {
-
-                var machine = this.machine;
-                if (!machine || !machine.probed || !this.command) {
+                if (!host) {
+                    this.close();
                     return;
                 }
 
-                var commandHistory = machine.commandHistory;
-                var command = Command.create({
-                    'id'             : machine.backend.id + machine.id + commandHistory.length,
-                    'command'        : this.command,
-                    'response'       : '',
-                    'pendingResponse': true,
-                    'data-collapsed' : false
+                // Open shell socket
+                Mist.set('shell', Socket({
+                    namespace: '/shell',
+                    keepAlive: false,
+                }));
+
+                var term = new Terminal({
+                  cols: 80,
+                  rows: 24,
+                  screenKeys: true
                 });
-                
-                // Modify machine's command history
-                commandHistory.unshiftObject(command);
-                
-                // Construct request
-                var url = '/backends/' + machine.backend.id + '/machines/' + machine.id + '/shell';
-                var host = machine.getHost();
-                var params = {
-                    'host'      : host,
-                    'command'   : command.command,
-                    'command_id': command.id
-                };
-                if (timeout)
-                    params.timeout = timeout;
 
-                function EncodeQueryData(data)
-                {
-                   var ret = [];
-                   for (var d in data)
-                      ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
-                   return ret.join('&');
+                term.on('data', function(data) {
+                    Mist.shell.emit('shell_data', data);
+                });
+
+                term.open(document.getElementById('shell-return'));
+
+                var payload = {'backend_id': machine.backend.id,
+                               'machine_id': machine.id,
+                               'host': host
+                               };
+                Mist.shell.emit('shell_open', payload);
+                Mist.shell.firstData = true;
+                Mist.shell.on('shell_data', function(data){
+                    term.write(data);
+                    if (Mist.shell.firstData){
+                        $('.terminal').focus();
+                        Mist.shell.firstData = false;
+                    }
+                });
+                term.write('Connecting to ' + host + '...\r\n');
+                Mist.set('term', term);
+
+                Ember.run.next(function(){
+                    $(window).trigger('resize');
+                });
+
+                if(Terminal._textarea) {
+                    // iOS virtual keyboard focus fix
+                    $(document).off('focusin');
+
+                    // Tap should trigger resize on Android for virtual keyboard to appear
+                    if (Mist.term && Mist.term.isAndroid){
+                        $('#shell-return').bind('tap',function(){
+                            $(window).trigger('resize');
+                        });
+                    }
+                    $(Terminal._textarea).show();
                 }
-                url = url + '?' + EncodeQueryData(params);
+                this.view.open();
+            },
 
-                $('#hidden-shell').append(
-                    '<iframe id="' + command.id +'" src="' + url + '"></iframe>'
-                );
-                
-                this.set('command', '');
-                this.set('commandHistoryIndex', -1);
+            close: function () {
+                warn('closing shell');
+                this.view.close();
+                Ember.run.later(this, function () {
+                    Mist.shell.emit('shell_close');
+                    Mist.term.destroy();
+                    Mist.shell.socket.disconnect();
+                    this._clear();
+                    if (Terminal._textarea)
+                        $(Terminal._textarea).hide();
+                }, 500);
             },
 
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
+            //
+            //
+            //  Pseudo-Private Methods
+            //
+            //
+
 
             _clear: function () {
                 Ember.run(this, function () {
@@ -116,18 +128,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
             _giveCallback: function (success, action) {
                 if (this.callback) this.callback(success, action);
-            },
-
-
-            /**
-             *
-             *  Observers
-             *
-             */
-
-            machinesObserver: function () {
-                Ember.run.once(this, '_updateActions');
-            }.observes('machines')
+            }
         });
     }
 );

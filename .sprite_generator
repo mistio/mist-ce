@@ -1,0 +1,3 @@
+[path]
+inputPath=src/mist/io/static/images/sprite-images
+outputPath=src/mist/io/static/images/sprite-build

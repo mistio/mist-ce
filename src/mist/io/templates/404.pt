@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+
+<head>
+    <meta charset="utf-8">
+    <meta content='True' name='HandheldFriendly' />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
+    <title>Mistio - cloud management in your pocket</title>
+    <link rel="icon" href="resources/favicon.ico" />
+    <link rel="stylesheet" media="all" href=""/>
+    <link rel="stylesheet" href="resources/css/missing.css"/>
+</head>
+
+<body>
+    <div id="splash">
+        <div id="container">
+            <a id="logo" href="/"></a>
+            <div id="message">
+                404. Got lost in the clouds
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

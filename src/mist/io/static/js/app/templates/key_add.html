@@ -1,44 +1,112 @@
-<div id="add-key-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+<!-- Popup Overlay -->
 
-    <div data-role="header" data-theme="b">
-        <h1>Add key</h1>
-    </div>
+<div id="key-add-screen"
+    class="ui-popup-screen ui-overlay-b ui-screen-hidden">
+</div>
 
-    <div data-role="content" data-theme="a">
+<!-- Popup Wrapper -->
 
-        <label for="add-key-id">Name:</label>
-        {{view Mist.TextField
-               id="add-key-id"
-               valueBinding="Mist.keyAddController.newKeyId"}}
+<div id="key-add-popup"
+    class="flip
+        ui-popup-container
+        ui-popup-hidden
+        ui-popup-truncate">
 
-        <label for="textarea-private-key">Private Key:
-            {{#if Mist.keysController.generatingKey}}
-                <div class="ajax-loader add-key-loader"></div>
-            {{/if}}
-            {{#if Mist.keyAddController.uploadingKey}}
-                <div class="ajax-loader add-key-loader"></div>
-            {{/if}}
-        </label>
-        {{view Ember.TextArea
-               id="add-key-private"
-               valueBinding="Mist.keyAddController.newKeyPrivate"}}
+    <!-- Popup -->
 
-        <div class="generate-upload" data-role="controlgroup" data-type="horizontal" data-theme="a">
-            <button data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
-            <button data-icon="arrow-u"
-                    data-iconpos="right"
-                    {{action "uploadClicked" target="view"}}>Upload</button>
+    <div id="key-add"
+        class="large-popup
+            ui-popup
+            ui-body-inherit
+            ui-overlay-shadow
+            ui-corner-all"
+        data-role="popup"
+        data-enhanced="true"
+        data-transition="flip">
+
+
+        <!-- Header -->
+
+        <div class="ui-header ui-bar-b" role="banner">
+
+            <h1 class="ui-title">Add key</h1>
+
         </div>
 
-        <input id="add-key-upload" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
+        <!-- Body -->
 
-        {{#if Mist.keysController.addingKey}}
-        <div class="ajax-loader"></div>
-        {{/if}}
+        <div class="ui-content ui-body-a" role="main">
 
-        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
-            <button id="add-key-ok" data-theme="d" {{action "addClicked" target="view"}}>Add</button>
+            <!-- Key Name Field -->
+
+            <label for="key-add-id">Name:</label>
+
+            {{view Mist.TextField id="key-add-id"
+                   valueBinding="Mist.keyAddController.keyId"}}
+
+            <!-- Key Private Field -->
+
+            <label for="key-add-private">Private Key:
+                {{#if Mist.keyAddController.generatingKey}}
+                    <div class="ajax-loader key-add-loader"></div>
+                {{else}} {{#if Mist.keyAddController.uploadingKey}}
+                    <div class="ajax-loader key-add-loader"></div>
+                {{/if}} {{/if}}
+            </label>
+
+            {{view Ember.TextArea id="key-add-private"
+                   valueBinding="Mist.keyAddController.keyPrivate"}}
+
+            <!-- Generate and Upload buttons -->
+
+            <div class="generate-upload
+                    ui-controlgroup
+                    ui-controlgroup-horizontal
+                    ui-group-theme-a
+                    ui-corner-all"
+                data-role="controlgroup"
+                data-type="horizontal">
+
+                <a class="ui-btn ui-btn-icon-left ui-icon-gear"
+                    {{action "generateClicked" target="view"}}>
+                        Generate
+                </a>
+
+                <a class="ui-btn ui-btn-icon-right ui-icon-arrow-u"
+                    {{action "uploadClicked" target="view"}}>
+                        Upload
+                </a>
+            </div>
+
+            <!-- Hidden Input field for uploading ssh keys -->
+
+            <input id="key-add-upload" type="file" name="file"
+                {{action "uploadInputChanged" on="change" target="view"}}/>
+
+            {{#if Mist.keyAddController.addingKey}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+
+            <!-- Back and Add buttons -->
+
+            <div class="ok-cancel
+                    ui-controlgroup
+                    ui-controlgroup-horizontal
+                    ui-group-theme-a
+                    ui-corner-all"
+                data-role="controlgroup"
+                data-type="horizontal">
+
+                <a class="ui-btn"
+                    {{action "backClicked" target="view"}}>
+                        Back
+                </a>
+                <a id="key-add-ok" class="ui-btn ui-btn-d ui-state-disabled"
+                    {{action "addClicked" target="view"}}>
+                        Add
+                </a>
+            </div>
+
         </div>
     </div>
 </div>

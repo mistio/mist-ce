@@ -46,7 +46,10 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
              */
 
             load: function () {
+
                 Ember.run(this, function () {
+
+                    this.set('isBareMetal', this.provider == 'bare_metal');
 
                     // Add controllers
                     this.sizes = SizesController.create({backend: this, content: []});
@@ -74,12 +77,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.locations.addObserver('loading', this, function () {
                         Ember.run.once(this, 'loadingLocationsObserver');
                     });
-
-                    // Load data
-                    this.sizes.load();
-                    this.images.load();
-                    this.machines.load();
-                    this.locations.load();
                 });
             }.on('init'),
 
@@ -145,6 +142,15 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
+            getSimpleProvider: function () {
+                if (this.provider.indexOf('ec2') == 0) return 'ec2';
+                if (this.provider.indexOf('hpcloud') == 0) return 'hpcloud';
+                if (this.provider.indexOf('openstack') == 0) return 'openstack';
+                if (this.provider.indexOf('rackspace') == 0) return 'rackspace';
+                if (this.provider.indexOf('bare_metal') == 0) return 'baremetal';
+                return this.provider;
+            },
+
             /**
              *
              *  Pseudo-Private Methods
@@ -153,16 +159,20 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             _toggle: function() {
                 if (this.enabled) {
+                    /*
                     this.sizes.load();
                     this.images.load();
                     this.machines.load();
                     this.locations.load();
+                    */
                 } else {
+                    /*
                     this.sizes.clear();
                     this.images.clear();
                     this.machines.clear();
                     this.locations.clear();
-                } 
+                    */
+                }
             },
 
             _updateSizeCount: function () {

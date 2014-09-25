@@ -9,8 +9,6 @@ be performed inside the corresponding method functions.
 
 """
 
-
-import logging
 from datetime import datetime
 
 import traceback
@@ -28,15 +26,24 @@ except ImportError:
     from mist.io.helpers import user_from_request
     from pyramid.view import view_config
 
+from socketio import socketio_manage
+
 from mist.io import methods
 from mist.io.model import Keypair
 from mist.io.shell import Shell
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
-from mist.io.helpers import get_auth_header
 
+from mist.io.helpers import get_auth_header, params_from_request
+from mist.io.helpers import trigger_session_update
+from mist.io.sockio import MistNamespace, ShellNamespace
 
+import logging
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
+
 OK = Response("OK", 200)
 
 
@@ -61,6 +68,13 @@ def exception_handler_mist(exc, request):
 
     # translate it to HTTP response based on http_code attribute
     return Response(str(exc), exc.http_code)
+
+
+@view_config(context='pyramid.httpexceptions.HTTPNotFound',
+             renderer='templates/404.pt')
+def not_found(self, request):
+    request.response.status = 404
+    return {}
 
 
 @view_config(route_name='home', request_method='GET',
@@ -159,21 +173,7 @@ def list_backends(request):
     """
 
     user = user_from_request(request)
-    ret = []
-    for backend_id in user.backends:
-        backend = user.backends[backend_id]
-        ret.append({'id': backend_id,
-                    'apikey': backend.apikey,
-                    'title': backend.title or backend.provider,
-                    'provider': backend.provider,
-                    'poll_interval': backend.poll_interval,
-                    'state': 'wait' if backend.enabled else 'offline',
-                    # for Provider.RACKSPACE_FIRST_GEN
-                    'region': backend.region,
-                    # for Provider.RACKSPACE (the new Nova provider)
-                    ## 'datacenter': backend.datacenter,
-                    'enabled': backend.enabled})
-    return ret
+    return methods.list_backends(user)
 
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
@@ -191,6 +191,7 @@ def add_backend(request):
     machine_hostname = params.get('machine_ip', '')
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
+    remove_on_error = params.get('remove_on_error', True)
     try:
         docker_port = int(params.get('docker_port', 4243))
     except:
@@ -210,7 +211,8 @@ def add_backend(request):
         machine_hostname=machine_hostname, machine_key=machine_key,
         machine_user=machine_user, region=region,
         compute_endpoint=compute_endpoint, port=ssh_port,
-        docker_port=docker_port
+        docker_port=docker_port,
+        remove_on_error=remove_on_error,
     )
     backend = user.backends[backend_id]
     return {
@@ -273,7 +275,7 @@ def toggle_backend(request):
     with user.lock_n_load():
         user.backends[backend_id].enabled = bool(int(new_state))
         user.save()
-
+    trigger_session_update(user.email, ['backends'])
     return OK
 
 
@@ -286,10 +288,7 @@ def list_keys(request):
 
     """
     user = user_from_request(request)
-    return [{'id': key,
-             'machines': user.keypairs[key].machines,
-             'isDefault': user.keypairs[key].default}
-            for key in user.keypairs]
+    return methods.list_keys(user)
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
@@ -455,6 +454,8 @@ def create_machine(request):
         image_name = request.json_body.get('image_name', None)
         size_name = request.json_body.get('size_name', None)
         location_name = request.json_body.get('location_name', None)
+        ips = request.json_body.get('ips', None)
+        monitoring = request.json_body.get('monitoring', False)
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -462,7 +463,7 @@ def create_machine(request):
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                  location_id, image_id, size_id, script,
                                  image_extra, disk, image_name, size_name,
-                                 location_name)
+                                 location_name, ips, monitoring)
     return ret
 
 
@@ -569,6 +570,14 @@ def list_locations(request):
     return methods.list_locations(user, backend_id)
 
 
+@view_config(route_name='networks', request_method='GET', renderer='json')
+def list_networks(request):
+    """List networks from each backend."""
+    backend_id = request.matchdict['backend']
+    user = user_from_request(request)
+    return methods.list_networks(user, backend_id)
+
+
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """Probes a machine using ping and ssh to collect metrics.
@@ -599,19 +608,8 @@ def check_monitoring(request):
 
     """
     user = user_from_request(request)
-
-    try:
-        ret = requests.get(config.CORE_URI + request.path,
-                           headers={'Authorization': get_auth_header(user)},
-                           verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        log.error("%r", exc)
-        raise SSLError()
-    if ret.status_code == 200:
-        return ret.json()
-    else:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
+    ret = methods.check_monitoring(user)
+    return ret
 
 
 @view_config(route_name='update_monitoring', request_method='POST',
@@ -681,33 +679,130 @@ def update_monitoring(request):
 
 @view_config(route_name='stats', request_method='GET', renderer='json')
 def get_stats(request):
-    core_uri = config.CORE_URI
-    user = user_from_request(request)
-    params = request.params
-    start = params.get('start')
-    stop = params.get('stop')
-    step = params.get('step')
-    expression = params.get('expression')
+    return methods.get_stats(
+        user_from_request(request),
+        request.matchdict['backend'],
+        request.matchdict['machine'],
+        request.params.get('start'),
+        request.params.get('stop'),
+        request.params.get('step')
+    )
 
-    params = {
-        'start': start,
-        'stop': stop,
-        'step': step,
-        'expression': expression,
-    }
-    try:
-        ret = requests.get(config.CORE_URI + request.path,
-                           params=params,
-                           headers={'Authorization': get_auth_header(user)},
-                           verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        log.error("%r", exc)
-        raise SSLError()
-    if ret.status_code == 200:
-        return ret.json()
+
+@view_config(route_name='metrics', request_method='GET',
+             renderer='json')
+def find_metrics(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    return methods.find_metrics(user, backend_id, machine_id)
+
+
+@view_config(route_name='metrics', request_method='PUT', renderer='json')
+def assoc_metric(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    params = params_from_request(request)
+    metric_id = params.get('metric_id')
+    if not metric_id:
+        raise RequiredParameterMissingError('metric_id')
+    methods.assoc_metric(user, backend_id, machine_id, metric_id)
+    return {}
+
+
+@view_config(route_name='metrics', request_method='DELETE', renderer='json')
+def disassoc_metric(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    params = params_from_request(request)
+    metric_id = params.get('metric_id')
+    if not metric_id:
+        raise RequiredParameterMissingError('metric_id')
+    methods.disassoc_metric(user, backend_id, machine_id, metric_id)
+    return {}
+
+
+@view_config(route_name='metric', request_method='PUT', renderer='json')
+def update_metric(request):
+    user = user_from_request(request)
+    metric_id = request.matchdict['metric']
+    params = params_from_request(request)
+    methods.update_metric(
+        user,
+        metric_id,
+        name=params.get('name'),
+        unit=params.get('unit'),
+        backend_id=params.get('backend_id'),
+        machine_id=params.get('machine_id'),
+    )
+    return {}
+
+
+@view_config(route_name='deploy_plugin', request_method='POST', renderer='json')
+def deploy_plugin(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    plugin_id = request.matchdict['plugin']
+    params = params_from_request(request)
+    plugin_type = params.get('plugin_type')
+    host = params.get('host')
+    if plugin_type == 'python':
+        ret = methods.deploy_python_plugin(
+            user, backend_id, machine_id, plugin_id,
+            value_type=params.get('value_type', 'gauge'),
+            read_function=params.get('read_function'),
+            host=host,
+        )
+        methods.update_metric(
+            user,
+            metric_id=ret['metric_id'],
+            name=params.get('name'),
+            unit=params.get('unit'),
+            backend_id=backend_id,
+            machine_id=machine_id,
+        )
+        return ret
     else:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
+        raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
+
+
+@view_config(route_name='deploy_plugin', request_method='DELETE', renderer='json')
+def undeploy_plugin(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    plugin_id = request.matchdict['plugin']
+    params = params_from_request(request)
+    plugin_type = params.get('plugin_type')
+    host = params.get('host')
+    if plugin_type == 'python':
+        ret = methods.undeploy_python_plugin(user, backend_id,
+                                             machine_id, plugin_id, host)
+        return ret
+    else:
+        raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
+
+
+## @view_config(route_name='metric', request_method='DELETE', renderer='json')
+## def remove_metric(request):
+    ## user = user_from_request(request)
+    ## metric_id = request.matchdict['metric']
+    ## url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
+    ## headers={'Authorization': get_auth_header(user)}
+    ## try:
+        ## resp = requests.delete(url, headers=headers, verify=config.SSL_VERIFY)
+    ## except requests.exceptions.SSLError as exc:
+        ## raise SSLError()
+    ## except Exception as exc:
+        ## log.error("Exception removing metric: %r", exc)
+        ## raise ServiceUnavailableError()
+    ## if not resp.ok:
+        ## log.error("Error removing metric %d:%s", resp.status_code, resp.text)
+        ## raise BadRequestError(resp.text)
+    ## return resp.json()
 
 
 @view_config(route_name='loadavg', request_method='GET')
@@ -758,6 +853,7 @@ def update_rule(request):
     if ret.status_code != 200:
         log.error("Error updating rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
+    trigger_session_update(user.email, ['monitoring'])
     return ret.json()
 
 
@@ -779,7 +875,7 @@ def delete_rule(request):
     if ret.status_code != 200:
         log.error("Error deleting rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
-
+    trigger_session_update(user.email, ['monitoring'])
     return OK
 
 
@@ -850,3 +946,12 @@ def list_supported_providers(request):
     @return: Return all of our SUPPORTED PROVIDERS
     """
     return {'supported_providers': config.SUPPORTED_PROVIDERS}
+
+
+@view_config(route_name='socketio', renderer='json')
+def socketio(request):
+    socketio_manage(request.environ,
+                    namespaces={'/mist': MistNamespace,
+                                '/shell': ShellNamespace},
+                    request=request)
+    return {}

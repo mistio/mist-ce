@@ -1,58 +1,86 @@
-<div id="home-page" data-role="page" class="ui-page-active" data-theme="c">
+<div id="home-page" data-role="page" class="ui-page-active ui-page ui-page-theme-a">
 
-    <div data-role="header" data-theme="b">
+    <!-- Page header -->
 
-        <h1>mist.io</h1>
+    <div class="ui-header ui-bar-b">
+
+        <h1 class="ui-title">mist.io</h1>
+
         {{view Mist.userMenuView}}
 
     </div>
 
-    <div data-role="content" data-theme="c">
+    <!-- Page Body -->
 
-        <a id="add-backend-btn"
-           data-role="button"
-           data-iconpos="right"
-           data-icon="plus"
-           data-theme="d"
-           {{action "addBackend" target="view"}}>Add backend</a>
+    <div role="main" class="ui-content" data-theme="a">
 
-        <div id="backend-buttons" data-role="controlgroup" data-type="horizontal">
+        <!-- Add backend button -->
+
+        <a id="add-backend-btn" class="ui-link ui-btn ui-btn-d ui-icon-plus
+            ui-btn-icon-right ui-shadow ui-corner-all"
+            {{action "addBackend" target="view"}}>
+                Add backend
+        </a>
+
+        <!-- Backends list -->
+
+        <div id="backend-buttons" data-role="controlgroup" data-type="horizontal"
+            class="ui-controlgroup ui-controlgroup-horizontal ui-corner-all">
+
             {{#each Mist.backendsController.content}}
-                {{view Mist.backendButtonView
-                       backendBinding="this"
-                       classBinding="state"
-                       data-icon="check"}}
+                {{view Mist.backendButtonView backendBinding="this"
+                       class="ui-btn ui-input-btn ui-corner-all ui-shadow"}}
             {{/each}}
+
         </div>
 
-        <ul data-role="listview" data-inset="true">
-            <li>
-                {{#link-to "machines"}}Machines
-                    {{#if Mist.backendsController.loadingMachines}}
-                    <div class="ajax-loader"></div>
-                    {{/if}}
-                    <span class="ui-li-count">{{Mist.backendsController.machineCount}}</span>
-                {{/link-to}}
-            </li>
-            
-            <li>
-                {{#link-to "images"}}Images
-                    {{#if Mist.backendsController.loadingImages}}
-                    <div class="ajax-loader"></div>
-                    {{/if}}
-                    <span class="ui-li-count">{{Mist.backendsController.imageCount}}</span>
-                {{/link-to}}
+        <!-- Navigation -->
+
+        <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+
+            <!-- Machines link -->
+
+            <li class="ui-li-has-count ui-first-child">
+
+                <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/machines">
+
+                    Machines
+
+                    <span class="ui-li-count ui-body-inherit">
+                        {{Mist.backendsController.machineCount}}
+                    </span>
+                </a>
             </li>
 
-            <li>
-                {{#link-to "keys"}}Keys
-                    {{#if Mist.keysController.loading}}
-                    <div class="ajax-loader"></div>
-                    {{/if}}
-                    <span class="ui-li-count">{{Mist.keysController.content.length}}</span>
-                {{/link-to}}
+            <!-- Images link -->
+
+            <li class="ui-li-has-count">
+
+                <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/images">
+
+                    Images
+
+                    <span class="ui-li-count ui-body-inherit">
+                        {{Mist.backendsController.imageCount}}
+                    </span>
+                </a>
+            </li>
+
+            <!-- Keys link -->
+
+            <li class="ui-li-has-count ui-last-child">
+
+                <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/keys">
+
+                    Keys
+
+                    <span class="ui-li-count ui-body-inherit">
+                        {{Mist.keysController.content.length}}
+                    </span>
+                </a>
             </li>
         </ul>
+
     </div>
 
     {{view Mist.backendAddView}}

@@ -5,15 +5,15 @@
 }
 
 #GraphsArea .valuePopUp{
-    position:fixed; 
+    position:fixed;
     z-index: 1;
     display: none;
-    left:0; 
-    top:0; 
-    width:90px; 
+    left:0;
+    top:0;
+    width:90px;
     height:30px;
     line-height:30px;
-    border:1px solid:#C2C4C2; 
+    border:1px solid:#C2C4C2;
     border-radius:10px;
     box-shadow: 2px 2px 4px 1px #888888;
     text-align: center;
@@ -31,17 +31,17 @@
 }
 
 .graph .grid-x path,.graph .grid-y path {
-    stroke-width: 1;    
+    stroke-width: 1;
 }
 
 .graphControls {
     width: 100%;
-    margin: 0 auto; 
+    margin: 0 auto;
     margin-top: 8px;
 }
 
 .graphControls .zoom{
-    display:block; 
+    display:block;
     text-align: center;
 }
 
@@ -62,12 +62,11 @@
     min-height: 50px;
     border:1px solid #ccc;
     background: #e0e0e1;
-    padding-right: 12px;
+    padding: 5px 10px 0px;
 }
 
 .graphBtn {
     display: inline-block;
-    margin: 0 5px;
     width: 150px;
 }
 
@@ -87,7 +86,6 @@
     }
     .graphBtn .ui-btn {
         font-size: 0.7em;
-        display: inline-block;
     }
 }
 
@@ -98,30 +96,29 @@
     box-shadow: 0px 2px 2px #888888;
 }
 
-.graph > .header > .title{
-    position: absolute;
+.graph > .header > .title {
+    position: relative;
     left: 10px;
-    bottom: 5px;
-    font-weight:bold;
+    bottom: -5px;
+    font-weight: bold;
     color: #404040;
+    display: inline-block;
+    float: left;
 }
 
-.graph > .header > .closeBtn{
-    position: absolute;
-    cursor: pointer;
+.graph .ajax-loader {
+    margin-top: 7px;
+    float: left;
+    display: inline-block;
+    margin-left: 20px;
+}
 
-    border-left: 1px solid #ccc;
-    
-    right: 0px;
-    bottom: 0px;
-    width: 60px;
-    height: 30px;
-
-    color: #404040;
-    font-size: 1.75em;
-    text-align: center;
-
-
+.graph > .header > .ui-btn {
+    float: right;
+    margin: 0;
+    margin-left: 5px;
+    padding: 0 10px;
+    width: 10px;
 }
 
 .graph > .header > .closeBtn:hover{
@@ -139,7 +136,7 @@
     border-radius: 0;
 
     border-left: 1px solid #ccc;
-    
+
     right: 60px;
     bottom: 0px;
     width: 110px;
@@ -160,7 +157,7 @@
 .graph > .header > select:hover{
     background: linear-gradient(to bottom,  rgba(224,224,224,1) 0%,rgba(206,206,206,1) 100%); /* W3C */
 }
-    
+
 .graph svg {
     background-color: white;
     font: 10px Arial;
@@ -205,3 +202,25 @@
     stroke: #333333;
     stroke-width: 1;
 }
+
+.area{
+    width: 500px;
+    height: 200px;
+    background-color: #eee;
+}
+
+/*
+path {
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: lightsteelblue;
+}
+
+line {
+    stroke: black;
+}
+circle.mark{
+    stroke: steelblue;
+    fill: #fff;
+}
+*/

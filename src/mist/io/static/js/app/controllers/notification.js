@@ -25,7 +25,7 @@ define('app/controllers/notification', ['ember'],
                 $('#notification-popup').show();
                 Ember.run.later(function () {
                     $('#notification-popup').hide();
-                }, this.timeout ? this.timeout : 2000);
+                }, this.timeout ? this.timeout : 5000);
             },
 
 

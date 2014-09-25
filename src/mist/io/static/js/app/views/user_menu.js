@@ -1,10 +1,13 @@
-define('app/views/user_menu', ['app/views/templated','ember'],
+define('app/views/user_menu', ['app/views/templated', 'md5'],
     /**
      *  User Menu View
      *
      *  @returns Class
      */
-    function(TemplatedView) {
+    function (TemplatedView) {
+
+        'user strict';
+
         return TemplatedView.extend({
 
             /**
@@ -19,9 +22,9 @@ define('app/views/user_menu', ['app/views/templated','ember'],
 
 
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
 
             actions: {

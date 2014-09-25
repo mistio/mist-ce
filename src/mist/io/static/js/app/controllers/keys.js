@@ -1,15 +1,22 @@
-define(['app/models/key'],
-    /**
-     *  Keys Controller
-     *
-     *  @returns Class
-     */
-    function(Key) {
+define('app/controllers/keys', ['app/models/key' , 'ember'],
+    //
+    //  Keys Controller
+    //
+    //  @returns Class
+    //
+    function (Key) {
+
+        'use strict';
+
         return Ember.ArrayController.extend(Ember.Evented, {
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             content: [],
             selectedKeys: [],
@@ -25,48 +32,48 @@ define(['app/models/key'],
             settingDefaultKey: false,
 
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            //
+            //
+            //  Initialization
+            //
+            //
 
-            load: function() {
-                var that = this;
+
+            init: function () {
+                this._super();
+                this.set('content', []);
                 this.set('loading', true);
-                Mist.ajax.GET('/keys', {
-                }).success(function(keys) {
-                    that._setContent(keys);
-                }).error(function() {
-                    that._reload();
-                }).complete(function(success) {
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
-            }.on('init'),
+            },
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //
+            //  Methods
+            //
+            //
 
-            addKey: function(keyId, keyPrivate, callback) {
+
+            load: function(keys) {
+                this._updateContent(keys);
+                this.set('loading', false);
+            },
+
+
+            addKey: function(args) {
                 var that = this;
                 this.set('addingKey', true);
                 Mist.ajax.PUT('/keys', {
-                    'id': keyId,
-                    'priv': keyPrivate
-                }).success(function(key) {
+                    'id': args.keyId,
+                    'priv': args.keyPrivate
+                }).success(function (key) {
                     that._addKey(key);
-                }).error(function(message) {
+                }).error(function (message) {
                     Mist.notificationController.notify(message);
-                }).complete(function(success, key) {
+                }).complete(function (success, key) {
                     that.set('addingKey', false);
-                    if (callback) callback(success, key);
+                    if (args.callback)
+                        args.callback(success, that.getKey(key.id));
                 });
-                keyPrivate = null;
             },
 
 
@@ -155,15 +162,16 @@ define(['app/models/key'],
             },
 
 
-            generateKey: function(callback) {
+            generateKey: function(args) {
                 var that = this;
                 this.set('generatingKey', true);
                 Mist.ajax.POST('/keys', {
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to generate key');
-                }).complete(function(success, key) {
+                }).error(function () {
+                    Mist.notificationController.notify(
+                        'Failed to generate key');
+                }).complete(function (success, key) {
                     that.set('generatingKey', false);
-                    if (callback) callback(success, key.priv);
+                    if (args.callback) args.callback(success, key.priv);
                 });
             },
 
@@ -230,29 +238,38 @@ define(['app/models/key'],
              *
              */
 
-            _reload: function() {
-                Ember.run.later(this, function() {
-                    this.load();
-                }, 2000);
-            },
+            _updateContent: function (keys) {
+                Ember.run(this, function() {
 
+                    // Remove deleted keys
+                    this.content.forEach(function (key) {
+                        if (!keys.findBy('id', key.id))
+                            this._deleteKey(key.id);
+                    }, this);
 
-            _setContent: function(keys) {
-                var that = this;
-                Ember.run(function() {
-                    that.set('content', []);
-                    keys.forEach(function(key) {
-                        that.content.pushObject(Key.create(key));
-                    });
-                    that.trigger('onKeyListChange');
+                    keys.forEach(function (key) {
+
+                        var oldKey = this.getKey(key.id);
+
+                        if (oldKey)
+                            // Update existing keys
+                            forIn(key, function (value, property) {
+                                oldKey.set(property, value);
+                            });
+                        else
+                            // Add new keys
+                            this._addKey(key);
+                    }, this);
+
+                    this.trigger('onKeyListChange');
                 });
             },
 
 
             _addKey: function(key) {
                 Ember.run(this, function() {
-                    this.content.pushObject(Key.create(key));
-                    this.trigger('onKeyListChange');
+                    if (this.keyExists(key.id)) return;
+                    this.content.addObject(Key.create(key));
                     this.trigger('onKeyAdd');
                 });
             },
@@ -261,7 +278,6 @@ define(['app/models/key'],
             _deleteKey: function(keyId) {
                 Ember.run(this, function() {
                     this.content.removeObject(this.getKey(keyId));
-                    this.trigger('onKeyListChange');
                     this.trigger('onKeyDelete');
                 });
             },
@@ -269,7 +285,8 @@ define(['app/models/key'],
 
             _renameKey: function(keyId, newKeyId) {
                 Ember.run(this, function() {
-                    this.getKey(keyId).set('id', newKeyId);
+                    if (this.keyExists(keyId))
+                        this.getKey(keyId).set('id', newKeyId);
                     this.trigger('onKeyRename');
                 });
             },
@@ -277,7 +294,7 @@ define(['app/models/key'],
 
             _setDefaultKey: function(keyId) {
                 Ember.run(this, function() {
-                    this.content.forEach(function(key) {
+                    this.content.forEach(function (key) {
                         key.set('isDefault', key.id == keyId);
                     });
                     this.trigger('onDefaultKeySet');
@@ -288,8 +305,10 @@ define(['app/models/key'],
             _associateKey: function(keyId, machine) {
                 Ember.run(this, function() {
                     this.getKey(keyId).machines.pushObject([machine.backend.id, machine.id]);
-                    machine.set('keysCount', this.getMachineKeysCount(machine));
-                    machine.probe(keyId);
+                    machine.setProperties({
+                        probed: true,
+                        keysCount: this.getMachineKeysCount(machine),
+                    });
                     this.trigger('onKeyAssociate');
                 });
             },
@@ -298,7 +317,7 @@ define(['app/models/key'],
             _disassociateKey: function(keyId, machine) {
                 Ember.run(this, function() {
                     var key = this.getKey(keyId);
-                    key.machines.some(function(key_machine) {
+                    key.machines.some(function (key_machine) {
                         if (key_machine[1] == machine.id && (key_machine[0] == machine.backend.id ||
                                                              key_machine[0] == machine.backend)) { // For ghost machines
                             key.machines.removeObject(key_machine);
