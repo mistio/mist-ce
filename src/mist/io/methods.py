@@ -582,7 +582,7 @@ def get_machine_actions(machine_from_api, conn):
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN, Provider.DOCKER):
+                     Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE):
         can_tag = False
 
     # for other states
@@ -1229,7 +1229,6 @@ def _machine_action(user, backend_id, machine_id, action):
     thing that changes is the action. This helper function saves us some code.
 
     """
-
     actions = ('start', 'stop', 'reboot', 'destroy')
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
