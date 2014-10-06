@@ -136,11 +136,11 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.region = region
         if provider == 'docker':
             backend.docker_port = docker_port
-        #For digital ocean v2 of the API, only apisecret is needed. 
+        #For digital ocean v2 of the API, only apisecret is needed.
         #However, in v1 both api_key and api_secret are needed. In order
-        #for both versions to be supported (existing v1, and new v2 which 
-        #is now the default) we set api_key same to api_secret to 
-        #distinguish digitalocean v2 logins, to avoid adding another 
+        #for both versions to be supported (existing v1, and new v2 which
+        #is now the default) we set api_key same to api_secret to
+        #distinguish digitalocean v2 logins, to avoid adding another
         #arguement on digital ocean libcloud driver
 
         if provider == 'digitalocean':
@@ -507,7 +507,7 @@ def connect_provider(backend):
     if backend.provider != 'bare_metal':
         driver = get_driver(backend.provider)
     elif backend.provider == Provider.AZURE:
-        conn = driver(backend.key, backend.secret)        
+        conn = driver(backend.key, backend.secret)
     if backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
         #as separate provider
@@ -750,13 +750,13 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 pass
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
-        node = _create_machine_rackspace(conn, public_key, machine_name, image, 
+        node = _create_machine_rackspace(conn, public_key, machine_name, image,
                                          size, location)
     elif conn.type in [Provider.OPENSTACK]:
-        node = _create_machine_openstack(conn, private_key, public_key, 
+        node = _create_machine_openstack(conn, private_key, public_key,
                                          machine_name, image, size, location)
     elif conn.type is Provider.HPCLOUD:
-        node = _create_machine_hpcloud(conn, private_key, public_key, 
+        node = _create_machine_hpcloud(conn, private_key, public_key,
                                        machine_name, image, size, location)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
@@ -796,7 +796,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
     if script or monitoring:
-        tasks.post_deploy_steps.delay(user.email, backend_id, node.id, 
+        tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
                                       monitoring, script, key_id)
 
     return {'id': node.id,
@@ -1170,7 +1170,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         return node
 
 
-def _create_machine_gce(conn, key_name, private_key, public_key, machine_name, 
+def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
                         image, size, location):
     """Create a machine in GCE.
 
@@ -1198,7 +1198,7 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
     return node
 
 
-def _create_machine_linode(conn, key_name, private_key, public_key, 
+def _create_machine_linode(conn, key_name, private_key, public_key,
                           machine_name, image, size, location):
     """Create a machine in Linode.
 
@@ -1229,6 +1229,7 @@ def _machine_action(user, backend_id, machine_id, action):
     thing that changes is the action. This helper function saves us some code.
 
     """
+    import pdb; pdb.set_trace()
     actions = ('start', 'stop', 'reboot', 'destroy')
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
@@ -1243,10 +1244,19 @@ def _machine_action(user, backend_id, machine_id, action):
     conn = connect_provider(user.backends[backend_id])
     #GCE needs machine.extra as well, so we need the real machine object
     try:
-        for node in conn.list_nodes():
-            if node.id == machine_id:
-                machine = node
-                break
+        if conn.type == 'azure':
+            #Azure needs the cloud service specified as well as the node
+            cloud_service = conn.get_cloud_service_from_node_id(machine_id)
+            nodes = conn.list_nodes(ex_cloud_service_name=cloud_service)
+            for node in nodes:
+                if node.id == machine_id:
+                    machine = node
+                    break
+        else:
+            for node in conn.list_nodes():
+                if node.id == machine_id:
+                    machine = node
+                    break
     except:
         machine = Node(machine_id,
                    name=machine_id,
@@ -1268,7 +1278,7 @@ def _machine_action(user, backend_id, machine_id, action):
 
                 with user.lock_n_load():
                     machine_uid = [backend_id, machine_id]
-    
+
                     for keypair in user.keypairs:
                         for machine in user.keypairs[keypair].machines:
                             if machine[:2] == machine_uid:
@@ -1289,7 +1299,10 @@ def _machine_action(user, backend_id, machine_id, action):
                 except:
                     return False
             else:
-                machine.reboot()
+                if conn.type == 'azure':
+                    conn.reboot_node(machine, ex_cloud_service_name=cloud_service)
+                else:
+                    machine.reboot()
                 if conn.type is Provider.DOCKER:
                     node_info = conn.inspect_node(node)
                     try:
@@ -1311,6 +1324,8 @@ def _machine_action(user, backend_id, machine_id, action):
             if conn.type is Provider.DOCKER and node.state == 0:
                 conn.ex_stop_node(node)
                 machine.destroy()
+            elif conn.type == 'azure':
+                conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
             else:
                 machine.destroy()
     except AttributeError:
@@ -1640,7 +1655,7 @@ def list_locations(user, backend_id):
 def list_networks(user, backend_id):
     """List networks from each backend.
 
-    Currently NephoScale is supported. For other providers 
+    Currently NephoScale is supported. For other providers
     this returns an empty list
 
     """
