@@ -1229,7 +1229,6 @@ def _machine_action(user, backend_id, machine_id, action):
     thing that changes is the action. This helper function saves us some code.
 
     """
-    import pdb; pdb.set_trace()
     actions = ('start', 'stop', 'reboot', 'destroy')
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
@@ -1267,7 +1266,10 @@ def _machine_action(user, backend_id, machine_id, action):
     try:
         if action is 'start':
             # In liblcoud it is not possible to call this with machine.start()
-            conn.ex_start_node(machine)
+            if conn.type == 'azure':
+                conn.ex_start_node(machine, ex_cloud_service_name=cloud_service)
+            else:
+                conn.ex_start_node(machine)
 
             if conn.type is Provider.DOCKER:
                 node_info = conn.inspect_node(node)
@@ -1288,7 +1290,10 @@ def _machine_action(user, backend_id, machine_id, action):
 
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
-            conn.ex_stop_node(machine)
+            if conn.type == 'azure':
+                conn.ex_stop_node(machine, ex_cloud_service_name=cloud_service)
+            else:
+                conn.ex_stop_node(machine)
         elif action is 'reboot':
             if bare_metal:
                 try:
