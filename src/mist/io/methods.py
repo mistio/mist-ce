@@ -628,17 +628,7 @@ def list_machines(user, backend_id):
     conn = connect_provider(user.backends[backend_id])
 
     try:
-        if conn.type == 'azure':
-            services = conn.ex_list_cloud_services()
-            machines = []
-            for service in services:
-                try:
-                    machines.extend(conn.list_nodes(ex_cloud_service_name=service))
-                except:
-                   pass
-            #FIXME: Azure does not return list of virtual machines directly
-        else:
-            machines = conn.list_nodes()
+        machines = conn.list_nodes()
     except InvalidCredsError:
         raise BackendUnauthorizedError()
     except Exception as exc:
@@ -739,7 +729,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
-
     if conn.type is Provider.DOCKER:
         node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
         if key_id and key_id in user.keypairs:
@@ -786,6 +775,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_digital_ocean(conn, key_id, private_key,
                                              public_key, machine_name,
                                              image, size, location)
+    elif conn.type == Provider.AZURE:
+        node = _create_machine_azure(conn, key_id, private_key,
+                                             public_key, machine_name,
+                                             image, size, location, cloud_service_name=None)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                       machine_name, image, size,
@@ -1170,6 +1163,31 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         return node
 
 
+def _create_machine_azure(conn, key_name, private_key, public_key,
+                                  machine_name, image, size, location, cloud_service_name):
+    """Create a machine Azure.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.create_node(
+                name=machine_name,
+                size=size.id,
+                image=image.id,
+                location=location.id,
+                ex_cloud_service_name=cloud_service_name
+            )
+        except Exception as e:
+            raise MachineCreationError("Azure, got exception %s" % e)
+
+        return node
+
+
 def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
                         image, size, location):
     """Create a machine in GCE.
@@ -1474,6 +1492,11 @@ def list_images(user, backend_id, term=None):
                     #eg ResourceNotFoundError
                     pass
             rest_images = [image for image in rest_images if not image.extra['deprecated']]
+        elif conn.type == Provider.AZURE:
+            # do not show Microsoft Windows images
+            rest_images = conn.list_images()
+            rest_images = [image for image in rest_images if 'Windows' not in image.name]
+
         elif conn.type == Provider.DOCKER:
             #get mist.io default docker images from config
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
