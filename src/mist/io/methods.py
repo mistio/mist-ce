@@ -1177,9 +1177,9 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
         try:
             node = conn.create_node(
                 name=machine_name,
-                size=size.id,
-                image=image.id,
-                location=location.id,
+                size=size,
+                image=image,
+                location=location,
                 ex_cloud_service_name=cloud_service_name
             )
         except Exception as e:
