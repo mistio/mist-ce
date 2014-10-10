@@ -21,6 +21,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
+            newMachineMonitoring: true,
 
 
             /**
@@ -133,6 +134,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineLocation,
                         this.newMachineKey,
                         this.newMachineScript,
+                        this.newMachineMonitoring,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }

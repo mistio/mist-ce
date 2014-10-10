@@ -455,7 +455,8 @@ var loadApp = function (
     App.MachineRoute = Ember.Route.extend({
         activate: function () {
             Ember.run.next(this, function () {
-                var id = this.modelFor('machine')._id;
+                var model = this.modelFor('machine');
+                var id = model._id || model.id;
                 var machine = Mist.backendsController.getMachine(id);
                 document.title = 'mist.io - ' + (machine ? machine.name : id);
             });
@@ -488,7 +489,10 @@ var loadApp = function (
     App.KeyRoute = Ember.Route.extend({
         activate: function () {
             Ember.run.next(this, function () {
-                document.title = 'mist.io - ' + this.modelFor('key')._id;
+                var model = this.modelFor('key');
+                var id = model._id || model.id;
+                var key = Mist.keysController.getKey(id);
+                document.title = 'mist.io - ' + (key ? key.id : id);
             });
         },
         redirect: function (key) {
@@ -603,7 +607,8 @@ var loadApp = function (
     });
     App.Checkbox = Ember.Checkbox.extend({
         attributeBindings: [
-            'data-mini'
+            'data-mini',
+            'data-theme'
         ]
     });
     App.TextField = Ember.TextField.extend({

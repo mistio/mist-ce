@@ -195,6 +195,8 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     this.fieldIsReady('key');
 
                     Mist.machineAddController.set('newMachineKey', key);
+                    $('#create-machine-monitoring').removeClass('ui-state-disabled');
+
                 },
 
 
@@ -205,7 +207,6 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                         Mist.machineAddController.set('newMachineKey', key);
                     });
                 },
-
 
                 backClicked: function () {
                     Mist.machineAddController.close();
