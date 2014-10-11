@@ -16,9 +16,8 @@ define('app/views/user_menu', ['app/views/templated', 'md5'],
 
             isNotCore: !IS_CORE,
             accountUrl: URL_PREFIX + '/account',
-            //TODO: change the logo_splash.png to user.png
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +
-                  encodeURIComponent('https://mist.io/resources/images/user.png') +'&s=36'),
+                  encodeURIComponent('https://mist.io/resources/images/sprite-images/user.png') +'&s=36'),
 
 
             /**
