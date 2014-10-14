@@ -7,6 +7,7 @@ from time import sleep, time
 from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
+from tempfile import NamedTemporaryFile
 
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -507,7 +508,12 @@ def connect_provider(backend):
     if backend.provider != 'bare_metal':
         driver = get_driver(backend.provider)
     elif backend.provider == Provider.AZURE:
-        conn = driver(backend.key, backend.secret)
+        #create a temp file and output the cert there, so that
+        #Azure driver is instantiated by providing a string with the key instead of
+        #a cert file
+        temp_key_file = NamedTemporaryFile(delete=False)
+        temp_key_file.write(backend.secret)
+        conn = driver(backend.key, temp_key_file.name)
     if backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
         #as separate provider
@@ -788,8 +794,15 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
 
     associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
-    if script or monitoring:
-        tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
+    if conn.type == Provider.AZURE:
+        #for Azure, connect with the generated password, deploy the ssh key
+        #when this is ok, it calss post_deploy for script/monitoring
+        tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
+                                      monitoring, script, key_id,
+                                      node.extra.get('user'), node.extra.get('password'), public_key)
+    else:
+        if script or monitoring:
+            tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
                                       monitoring, script, key_id)
 
     return {'id': node.id,
@@ -1172,7 +1185,6 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
 
     """
     key = public_key.replace('\n', '')
-
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -1182,6 +1194,7 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 location=location,
                 ex_cloud_service_name=cloud_service_name
             )
+            log.error(node.extra)
         except Exception as e:
             raise MachineCreationError("Azure, got exception %s" % e)
 
