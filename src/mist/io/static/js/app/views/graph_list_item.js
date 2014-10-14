@@ -230,8 +230,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             */
             setupMouseOver: function () {
 
-                return;
-
                 var that = this;
 
                 // Append the Selector Line
@@ -262,9 +260,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     if(mouseX > that.margin.left)
                     {
                         if(!isVisible){
-                            Mist.graph = $(graph);
                             $(graph).find('.selectorLine').show(0);
-                            $('#GraphsArea').find('.valuePopUp').show(0);
+                            $('.valuePopUp').show(0);
                             isVisible = true;
                         }
                         // Mouse X inside value line area
@@ -276,33 +273,39 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                             translate =  $('#' + that.graph.id).find('.valueLine > path').attr('transform');
                             translate = + translate.slice(10,translate.indexOf(','));
                         }
+
+                        // hack previous code
+                        var displayedData = that.graph.datasources[0].datapoints;
+                        var xCoordinates = that.xCoordinates[Object.keys(that.xCoordinates)[0]];
+
                         // Measurement That is less than curson x
                         var minValueIndex = 0;
                         var currentValue = 0;
 
-                        for (var i = 0; i < that.xCoordinates.length; i++) {
+                        for (var i = 0; i < xCoordinates.length; i++) {
 
-                            if (that.xCoordinates[i]+translate > virtualMouseX)
+                            if (xCoordinates[i]+translate > virtualMouseX)
                                 break;
                             else
                                 minValueIndex = i;
                         }
 
 
+
                         // Fix for the area that has not defined data
-                        if(that.displayedData.length == 0 || that.displayedData[minValueIndex].value == null || that.displayedData[minValueIndex+1].value == null ){
-                            $('#GraphsArea').children('.valuePopUp').text('No Data');
+                        if(displayedData.length == 0 || displayedData[minValueIndex].value == null || displayedData[minValueIndex+1].value == null ){
+                            $('.valuePopUp').text('No Data');
                             return;
                         }
 
 
                         // Distanse between value before curson and after curson
-                        var distance = that.displayedData[minValueIndex+1].value  - that.displayedData[minValueIndex].value;
+                        var distance = displayedData[minValueIndex+1].value  - displayedData[minValueIndex].value;
                         // Mouse offset between this two values
-                        var mouseOffset = (virtualMouseX -(that.xCoordinates[minValueIndex]+translate))/that.valuesDistance ;
+                        var mouseOffset = (virtualMouseX -(xCoordinates[minValueIndex]+translate))/that.valuesDistance ;
                         // Cursor's measurement value is the value before the curson +
                         // the mouse percentage after the first point * the distance between the values
-                        currentValue = that.displayedData[minValueIndex].value + distance * mouseOffset;
+                        currentValue = displayedData[minValueIndex].value + distance * mouseOffset;
 
                         // Value has a small loss of presition. We don't let it be less than 0
                         currentValue < 0 ? 0 : currentValue;
@@ -321,13 +324,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                             valueText = currentValue.toFixed(2);
 
                         // Update Value Text
-                        $('#GraphsArea').children('.valuePopUp').text(valueText);
+                        $('.valuePopUp').text(valueText);
                     } else {
 
                         if(isVisible){
 
                             $(graph).find('.selectorLine').hide(0);
-                            $('#GraphsArea').find('.valuePopUp').hide(0);
+                            $('.valuePopUp').hide(0);
                             isVisible = false;
                         }
                     }
@@ -344,14 +347,14 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                                  .attr('x2', mouseX);
 
                     // Make popup appear at left side when it is at the right edge
-                    var popupWidth = $('#GraphsArea').children('.valuePopUp').width();
+                    var popupWidth = $('.valuePopUp').width();
                     var xAlign = (event.pageX + popupWidth >= window.innerWidth-25) ? - (popupWidth + 15) : 15;
 
                     // Update popup cords
-                    $('#GraphsArea').children('.valuePopUp')
+                    $('.valuePopUp')
                         .css('left', (event.clientX + xAlign) + 'px');
 
-                    $('#GraphsArea').children('.valuePopUp')
+                    $('.valuePopUp')
                         .css('top', (event.clientY - 35) + 'px');
 
                     updatePopUpValue(this);
@@ -368,7 +371,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     if($(selectorLine).css('display') != 'none')
                         $(selectorLine).hide(0);
 
-                    $('#GraphsArea').find('.valuePopUp').hide(0);
+                    $('.valuePopUp').hide(0);
 
                     // Clear Interval
                     window.clearInterval(updateInterval);

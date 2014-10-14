@@ -61,3 +61,21 @@
         font-size: 0.7em;
     }
 }
+
+.valuePopUp{
+    position:fixed;
+    z-index: 1;
+    display: none;
+    left:0;
+    top:0;
+    width:90px;
+    height:30px;
+    line-height:30px;
+    border:1px solid:#C2C4C2;
+    border-radius:10px;
+    box-shadow: 2px 2px 4px 1px #888888;
+    text-align: center;
+    font-weight:bold;
+    color: #404040;
+    background: linear-gradient(to bottom,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
+}
