@@ -1,3 +1,4 @@
+import paramiko
 import json
 import functools
 
@@ -71,7 +72,7 @@ def ssh_command(email, backend_id, machine_id, host, command,
     shell.disconnect()
     if retval:
         from mist.io.methods import notify_user
-        notify_user(user, "Async command failed for machine %s (%s)" % 
+        notify_user(user, "Async command failed for machine %s (%s)" %
                     (machine_id, host), output)
 
 
@@ -87,6 +88,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
 
     user = user_from_email(email)
     try:
+
         # find the node we're looking for and get its hostname
         conn = connect_provider(user.backends[backend_id])
         nodes = conn.list_nodes()
@@ -107,7 +109,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             from mist.io.shell import Shell
             shell = Shell(host)
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
-                                                   key_id, username, password, 
+                                                   key_id, username, password,
                                                    port)
             if monitoring:
                 try:
@@ -148,6 +150,70 @@ Output:
         amqp_log("Deployment script failed for machine %s in backend %s by user %s after 5 retries: %s" % (node.id, backend_id, email, repr(exc)))
         notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
         notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
+
+
+@app.task(bind=True, default_retry_delay=3*60)
+def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, command,
+                      key_id, username, password, public_key):
+    from mist.io.methods import ssh_command, connect_provider, enable_monitoring
+    from mist.io.methods import notify_user, notify_admin
+    user = user_from_email(email)
+
+    try:
+        # find the node we're looking for and get its hostname
+        conn = connect_provider(user.backends[backend_id])
+        nodes = conn.list_nodes()
+        node = None
+        for n in nodes:
+            if n.id == machine_id:
+                node = n
+                break
+
+        if node and len(node.public_ips):
+            # filter out IPv6 addresses
+            ips = filter(lambda ip: ':' not in ip, node.public_ips)
+            host = ips[0]
+        else:
+            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
+
+        try:
+            #login with user, password. Deploy the public key, try to
+            #null the password, disable password authentication and reload ssh.
+            #After this is done, call post_deploy_steps if deploy script or monitoring
+            #is provided
+            ssh=paramiko.SSHClient()
+            ssh.load_system_host_keys()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(host, username=username, password=password)
+            ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys' % public_key)
+
+            chan = ssh.invoke_shell()
+            chan = ssh.get_transport().open_session()
+            chan.get_pty()
+            chan.exec_command('sudo /usr/sbin/usermod -p "!" %s' % username)
+            chan.send('%s\n' % password)
+            #for opensuse and other releases that usermod will fail (without the path)
+            #worst case this is run twice
+
+            chan = ssh.invoke_shell()
+            chan = ssh.get_transport().open_session()
+            chan.get_pty()
+            chan.exec_command('sudo usermod -p "!" %s' % username)
+            chan.send('%s\n' % password)
+
+            cmd = 'sudo su -c \'sed -i "s|[#]*PasswordAuthentication yes|PasswordAuthentication no|g" /etc/ssh/sshd_config &&  /etc/init.d/ssh reload; service ssh reload\' '
+            ssh.exec_command(cmd)
+            ssh.close()
+
+            if command or monitoring:
+                post_deploy_steps.delay(email, backend_id, machine_id,
+                                          monitoring, command, key_id)
+
+        except Exception as exc:
+            raise self.retry(exc=exc, countdown=60, max_retries=10)
+    except Exception as exc:
+        if str(exc).startswith('Retry'):
+            raise
 
 
 class UserTask(Task):
