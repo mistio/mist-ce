@@ -1518,8 +1518,7 @@ def list_images(user, backend_id, term=None):
             for image in rest_images:
                 temp_dict[image.name] = image
             #there are many builds for some images -eg Ubuntu). All have the same name!
-            rest_images = temp_dict.values()
-            sorted(rest_images, key=lambda k: k.name)
+            rest_images = sorted(temp_dict.values(), key=lambda k: k.name)
         elif conn.type == Provider.DOCKER:
             #get mist.io default docker images from config
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
