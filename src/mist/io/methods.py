@@ -1512,8 +1512,14 @@ def list_images(user, backend_id, term=None):
             # do not show Microsoft Windows images
             # from Azure's response we can't know which images are default
             rest_images = conn.list_images()
-            rest_images = [image for image in rest_images if 'ubuntu' in image.name.lower()
-                           or 'centos' in image.name.lower() or 'suse' in image.name.lower()]
+            rest_images = [image for image in rest_images if 'windows' not in image.name.lower()
+                           and 'RightImage' not in image.name]
+            temp_dict = {}
+            for image in rest_images:
+                temp_dict[image.name] = image
+            #there are many builds for some images -eg Ubuntu). All have the same name!
+            rest_images = temp_dict.values()
+            sorted(rest_images, key=lambda k: k.name)
         elif conn.type == Provider.DOCKER:
             #get mist.io default docker images from config
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
