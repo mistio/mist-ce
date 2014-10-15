@@ -58,7 +58,6 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
                 compute_endpoint="", port=22, docker_port=4243, remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
-
     if not provider:
         raise RequiredParameterMissingError("provider")
     log.info("Adding new backend in provider '%s'", provider)
@@ -507,14 +506,14 @@ def connect_provider(backend):
     """
     if backend.provider != 'bare_metal':
         driver = get_driver(backend.provider)
-    elif backend.provider == Provider.AZURE:
+    if backend.provider == Provider.AZURE:
         #create a temp file and output the cert there, so that
         #Azure driver is instantiated by providing a string with the key instead of
         #a cert file
         temp_key_file = NamedTemporaryFile(delete=False)
-        temp_key_file.write(backend.secret)
-        conn = driver(backend.key, temp_key_file.name)
-    if backend.provider == Provider.OPENSTACK:
+        temp_key_file.write(backend.apisecret)
+        conn = driver(backend.apikey, temp_key_file.name)
+    elif backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
         #as separate provider
         if 'hpcloudsvc' in backend.apiurl:
@@ -792,14 +791,19 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     else:
         raise BadRequestError("Provider unknown.")
 
-    associate_key(user, key_id, backend_id, node.id, port=ssh_port)
+    if conn.type == Provider.AZURE:
+        #we have the username
+        associate_key(user, key_id, backend_id, node.id,
+                      username=node.extra.get('username'), port=ssh_port)
+    else:
+        associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
     if conn.type == Provider.AZURE:
         #for Azure, connect with the generated password, deploy the ssh key
         #when this is ok, it calss post_deploy for script/monitoring
         tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
                                       monitoring, script, key_id,
-                                      node.extra.get('user'), node.extra.get('password'), public_key)
+                                      node.extra.get('username'), node.extra.get('password'), public_key)
     else:
         if script or monitoring:
             tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
@@ -1194,7 +1198,6 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 location=location,
                 ex_cloud_service_name=cloud_service_name
             )
-            log.error(node.extra)
         except Exception as e:
             raise MachineCreationError("Azure, got exception %s" % e)
 
@@ -1507,9 +1510,10 @@ def list_images(user, backend_id, term=None):
             rest_images = [image for image in rest_images if not image.extra['deprecated']]
         elif conn.type == Provider.AZURE:
             # do not show Microsoft Windows images
+            # from Azure's response we can't know which images are default
             rest_images = conn.list_images()
-            rest_images = [image for image in rest_images if 'Windows' not in image.name]
-
+            rest_images = [image for image in rest_images if 'ubuntu' in image.name.lower()
+                           or 'centos' in image.name.lower() or 'suse' in image.name.lower()]
         elif conn.type == Provider.DOCKER:
             #get mist.io default docker images from config
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
