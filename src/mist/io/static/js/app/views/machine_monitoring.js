@@ -219,6 +219,13 @@ define('app/views/machine_monitoring',
                     var entry = Mist.cookiesController.getSingleMachineGraphEntry(
                         this.machine, graph).hidden = false;
                     Mist.cookiesController.save();
+
+                    // Manipulate DOM
+
+                    moveGraphToEnd(graph.id);
+                    Ember.run.later(function () {
+                        moveGraphButtonToEnd(graph.id);
+                    }, 400);
                 },
 
 
@@ -231,20 +238,30 @@ define('app/views/machine_monitoring',
                     graph.view.set('isHidden', true);
 
                     // Update cookie
-                    // shift indexes and let this collapsed graph be
+                    // shift indexes and set this collapsed graph to be
                     // the last one
                     var graphs = Mist.cookiesController.getSingleMachineEntry(
                         this.machine).graphs;
                     var lastIndex = this.metrics.length - 1;
+                    var e;
                     forIn(graphs, function (entry) {
-                        if (entry.index > graph.index)
+                        if (entry.index == graph.index)
+                            e = entry;
+                        else if (entry.index > graph.index)
                             entry.index -= 1;
-                        else if (entry.index == graph.index)
-                            entry.index = lastIndex;
                     });
+                    e.index = lastIndex;
+                    e.hidden = true;
                     graph.set('index', lastIndex);
                     Mist.cookiesController.save();
+
+                    // Manipulate DOM
+                    moveGraphButtonToEnd(graph.id);
+                    Ember.run.later(function () {
+                        moveGraphToEnd(graph.id);
+                    }, 400);
                 },
+
 
                 removeClicked: function (graph) {
 
@@ -402,7 +419,7 @@ define('app/views/machine_monitoring',
 
                 this.set('pendingFirstStats', true);
                 Mist.graphsController.open({
-                    graphs: this.graphs,
+                    graphs: this.graphs.sortBy('index'),
                     config: {
                         canModify: true,
                         canControl: true,
@@ -483,8 +500,6 @@ define('app/views/machine_monitoring',
                 }, this);
                 if (ctlWasStreaming && graphWasAdded)
                     Mist.graphsController.stream.start();
-
-
                 function getGraphCookie (graph) {
                     return Mist.cookiesController
                         .getSingleMachineGraphEntry(that.machine, graph);
@@ -535,5 +550,29 @@ define('app/views/machine_monitoring',
                 Ember.run.once(this, '_updateGraphs');
             }.observes('metrics.@each'),
         });
+
+        function moveGraphToEnd(graphId) {
+
+            var parent = $("#" + graphId).parent();
+            var prev = parent.prev();
+            var next = parent.next();
+
+            // Move to end
+            parent.detach().appendTo('#graphs');
+            prev.detach().appendTo('#graphs');
+            next.detach().appendTo('#graphs');
+        };
+
+        function moveGraphButtonToEnd(graphId) {
+
+            var parent = $("#" + graphId + '-btn').parent();
+            var prev = parent.prev();
+            var next = parent.next();
+
+            // Move to end
+            parent.detach().insertBefore($('#add-metric-btn'));
+            prev.detach().insertBefore($('#add-metric-btn'));
+            next.detach().insertBefore($('#add-metric-btn'));
+        };
     }
 );

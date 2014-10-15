@@ -10,7 +10,7 @@ define('app/controllers/cookies', ['ember'],
 
 
         var COOKIE_NAME = 'mist';
-        var EXPIRATION_DAYS = 60; // in days
+        var EXPIRATION_DAYS = 60;
 
         //
         //  Cookie format
@@ -153,6 +153,7 @@ define('app/controllers/cookies', ['ember'],
 
 
             _createSingleMachineGraphEntry: function (machine, graph) {
+                info('creating new graph entry');
                 var machine_uuid = uuidFromMachine(machine);
                 this.cookie.smm[machine_uuid].graphs[graph.id] = {
                     index: graph.index || 0,

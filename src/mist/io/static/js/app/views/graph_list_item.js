@@ -418,14 +418,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 this.updateSVG();
                 this.set('isHidden', this.graph.isHidden);
-                return;
-
-                // Set graph visibility
-                var cookies = Mist.monitoringController.cookies;
-                if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].hashedId) > -1)
-                    $('#' + id).hide();
-                else
-                    $('#' + id).show();
             },
 
 

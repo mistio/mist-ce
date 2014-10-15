@@ -240,11 +240,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 },
 
 
-                get: function () {
-
-                },
-
-
                 disableOldCookie: function () {
                     if (document.cookie.indexOf('collapsedGraphs') > -1)
                         document.cookie = 'collapsedGraphs=;' +
