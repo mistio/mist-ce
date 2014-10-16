@@ -116,6 +116,11 @@ class Shell(object):
                 log.error("Got ssh error: %r", exc)
                 if not attempts:
                     raise ServiceUnavailableError("SSH timed-out repeatedly.")
+            except Exception as exc:
+                log.error("ssh exception %r", exc)
+                #don't fail if SSHException or other paramiko exception,
+                #eg related to network, but keep until all attempts are made
+
 
     def disconnect(self):
         """Close the SSH connection."""
