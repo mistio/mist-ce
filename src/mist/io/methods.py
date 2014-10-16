@@ -607,6 +607,11 @@ def get_machine_actions(machine_from_api, conn):
         can_reboot = True
         can_tag = False
 
+    if conn.type in [Provider.LINODE]:
+        if machine_from_api.state is NodeState.PENDING:
+        #after resize, node gets to pending mode, needs to be started
+            can_start = True
+        
     if conn.type is Provider.GCE:
         can_start = False
         can_stop = False
@@ -1212,13 +1217,13 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
     return node
 
 
-def _machine_action(user, backend_id, machine_id, action):
-    """Start, stop, reboot and destroy have the same logic underneath, the only
+def _machine_action(user, backend_id, machine_id, action, plan_id=None):
+    """Start, stop, reboot, resize and destroy have the same logic underneath, the only
     thing that changes is the action. This helper function saves us some code.
 
     """
 
-    actions = ('start', 'stop', 'reboot', 'destroy')
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize')
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
                                                                    actions))
@@ -1268,6 +1273,8 @@ def _machine_action(user, backend_id, machine_id, action):
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
             conn.ex_stop_node(machine)
+        elif action is 'resize':
+            conn.ex_resize_node(node, plan_id)
         elif action is 'reboot':
             if bare_metal:
                 try:
@@ -1339,6 +1346,11 @@ def stop_machine(user, backend_id, machine_id):
 def reboot_machine(user, backend_id, machine_id):
     """Reboots a machine on a certain backend."""
     _machine_action(user, backend_id, machine_id, 'reboot')
+
+
+def resize_machine(user, backend_id, machine_id, plan_id):
+    """Resize a machine on an other plan."""
+    _machine_action(user, backend_id, machine_id, 'resize', plan_id=plan_id)
 
 
 @core_wrapper
