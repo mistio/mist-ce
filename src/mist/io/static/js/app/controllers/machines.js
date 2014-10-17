@@ -140,7 +140,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     //that._destroyMachine(machineId);
                 }).error(function() {
                     machine.restoreState();
-                    Mist.notificationController.notify('Failed to destory machine');
+                    Mist.notificationController.notify('Failed to destroy machine');
                 }).complete(function(success) {
                     that.set('destroyingMachine', false);
                     machine.set("beingDestroyed",false);
