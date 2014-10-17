@@ -100,6 +100,13 @@ define('app/controllers/machine_add', ['ember'],
                         return;
                     }
                 }
+                if (providerName == 'Azure') {
+                    var re = /^[0-9a-zA-Z-]*$/;
+                    if (!re.test(machineName)) {
+                        Mist.notificationController.timeNotify('The name can contain only letters, numbers, and hyphens. The name must start with a letter and must end with a letter or a number.', 7000);
+                        return;
+                    }
+                }                
                 if (providerName == 'Google Compute Engine') {
                     var re = /^[0-9a-z-]*$/;
                     if (!re.test(machineName)) {
