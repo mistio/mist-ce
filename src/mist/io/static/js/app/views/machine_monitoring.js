@@ -508,20 +508,23 @@ define('app/views/machine_monitoring',
 
 
             _ruleAdded: function (event) {
-                if (this.machine.equals(event.rule.machine))
-                    this.rules.pushObject(event.rule);
+                if (this.machine.equals)
+                    if (this.machine.equals(event.rule.machine))
+                        this.rules.pushObject(event.rule);
             },
 
 
             _ruleDeleted: function (event) {
-                if (this.machine.equals(event.rule.machine))
-                    this.rules.removeObject(event.rule);
+                if (this.machine.equals)
+                    if (this.machine.equals(event.rule.machine))
+                        this.rules.removeObject(event.rule);
             },
 
 
             _metricAdded: function (event) {
-                if (this.machine.equals(event.machine))
-                    this.metrics.pushObject(event.metric);
+                if (this.machine.equals)
+                    if (this.machine.equals(event.machine))
+                        this.metrics.pushObject(event.metric);
             },
 
 

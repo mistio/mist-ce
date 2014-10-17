@@ -275,7 +275,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         }
 
                         // hack previous code
-                        var displayedData = that.graph.datasources[0].datapoints;
+                        var displayedData = that.displayedData[Object.keys(that.displayedData)[0]];
                         var xCoordinates = that.xCoordinates[Object.keys(that.xCoordinates)[0]];
 
                         // Measurement That is less than curson x
@@ -290,8 +290,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                                 minValueIndex = i;
                         }
 
-
-
                         // Fix for the area that has not defined data
                         if(displayedData.length == 0 || displayedData[minValueIndex].value == null || displayedData[minValueIndex+1].value == null ){
                             $('.valuePopUp').text('No Data');
@@ -299,11 +297,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         }
 
 
-                        // Distanse between value before curson and after curson
+                        // Distanse between value before cursor and after cursor
                         var distance = displayedData[minValueIndex+1].value  - displayedData[minValueIndex].value;
                         // Mouse offset between this two values
                         var mouseOffset = (virtualMouseX -(xCoordinates[minValueIndex]+translate))/that.valuesDistance ;
-                        // Cursor's measurement value is the value before the curson +
+                        // Cursor's measurement value is the value before the cursor +
                         // the mouse percentage after the first point * the distance between the values
                         currentValue = displayedData[minValueIndex].value + distance * mouseOffset;
 

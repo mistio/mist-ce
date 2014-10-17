@@ -86,14 +86,14 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 if (args.config.timeWindow)
                     this.resolution.change(args.config.timeWindow, true);
 
-                $(window).off('resize', this._handleWindowResize);
+                $(window).on('resize', this._handleWindowResize);
             },
 
 
             close: function () {
                 this.stream.stop();
                 this._clear();
-                $(window).on('resize', this._handleWindowResize);
+                $(window).off('resize', this._handleWindowResize);
             },
 
 
