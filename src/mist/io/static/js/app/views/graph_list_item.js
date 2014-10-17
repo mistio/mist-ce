@@ -248,29 +248,21 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 var updateInterval;
 
                 var updatePopUpValue = function(graph) {
-
-                    // Check if mouse left from element without clearing interval
-                    if($($('#' + that.graph.id).selector + ':hover').length <= 0)
-                    {
-                       clearUpdatePopUp();
-                       return;
-                    }
-
                     // Update popup when it is over value line
                     if(mouseX > that.margin.left)
                     {
                         if(!isVisible){
-                            $(graph).find('.selectorLine').show(0);
-                            $('.valuePopUp').show(0);
+                            $('.selectorLine').show(0);
                             isVisible = true;
                         }
                         // Mouse X inside value line area
                         var virtualMouseX = mouseX - that.margin.left;
+                        $('.selectorLine').attr('x1', virtualMouseX+50).attr('x2', virtualMouseX+50);
 
                         // Calculate Translate
                         var translate = 0;
                         if(that.animationEnabled){
-                            translate =  $('#' + that.graph.id).find('.valueLine > path').attr('transform');
+                            translate =  $('#' + graph.id).find('.valueLine > path').attr('transform');
                             translate = + translate.slice(10,translate.indexOf(','));
                         }
 
@@ -283,7 +275,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         var currentValue = 0;
 
                         for (var i = 0; i < xCoordinates.length; i++) {
-
                             if (xCoordinates[i]+translate > virtualMouseX)
                                 break;
                             else
@@ -292,7 +283,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                         // Fix for the area that has not defined data
                         if(displayedData.length == 0 || displayedData[minValueIndex].value == null || displayedData[minValueIndex+1].value == null ){
-                            $('.valuePopUp').text('No Data');
+                            $('#' + graph.id + ' .valuePopUp').text('No Data');
                             return;
                         }
 
@@ -322,23 +313,33 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                             valueText = currentValue.toFixed(2);
 
                         // Update Value Text
-                        $('.valuePopUp').text(valueText);
+                        warn('updating ' + graph.id + ' with ' + valueText);
+                        $('#' + graph.id + ' .valuePopUp').text(valueText);
                     } else {
 
                         if(isVisible){
-
-                            $(graph).find('.selectorLine').hide(0);
+                            $('.selectorLine').hide(0);
                             $('.valuePopUp').hide(0);
                             isVisible = false;
                         }
                     }
                 };
 
-
+                var updatePopUpValues = function() {
+                    // Check if mouse left from element without clearing interval
+                    if($('#graphs:hover').length <= 0)
+                    {
+                       clearUpdatePopUp();
+                       return;
+                    }
+                    $('#graphs .graph').each(function(i,g){
+                        updatePopUpValue(g);
+                    });
+                };
                 var updatePopUpOffset = function(event) {
-
-                    mouseX = event.pageX - $('#'+ that.graph.id).children('svg').offset().left;
-                    mouseY = event.pageY - $('#'+ that.graph.id).children('svg').offset().top;
+                    var svg = $('#'+ that.graph.id).children('svg');
+                    mouseX = event.pageX - svg.offset().left;
+                    mouseY = event.pageY - svg.offset().top;
 
                     // Set Mouse Line Cordinates
                     mouseOverLine.attr('x1', mouseX)
@@ -346,16 +347,16 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     // Make popup appear at left side when it is at the right edge
                     var popupWidth = $('.valuePopUp').width();
-                    var xAlign = (event.pageX + popupWidth >= window.innerWidth-25) ? - (popupWidth + 15) : 15;
+                    var xAlign = (event.pageX + popupWidth >= window.innerWidth-15) ? - (popupWidth + 5) : 5;
 
                     // Update popup cords
                     $('.valuePopUp')
                         .css('left', (event.clientX + xAlign) + 'px');
 
                     $('.valuePopUp')
-                        .css('top', (event.clientY - 35) + 'px');
-
-                    updatePopUpValue(this);
+                        .css('top', mouseY-svg.height() + 'px');
+                    $('.valuePopUp').show(0);
+                    updatePopUpValues();
 
                 };
 
@@ -365,9 +366,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     // We check for none display before we hide because jquery will 'show' the element instead
                     // (possible jquery bug ?)
-                    var selectorLine = $(this).find('.selectorLine');
-                    if($(selectorLine).css('display') != 'none')
-                        $(selectorLine).hide(0);
+                    $('.selectorLine').hide(0);
 
                     $('.valuePopUp').hide(0);
 
@@ -379,7 +378,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // Mouse Events
                 $('#' + this.graph.id).children('svg').mouseenter(function() {
                     // Setup Interval
-                    updateInterval = window.setInterval(updatePopUpValue,500);
+                    updateInterval = window.setInterval(updatePopUpValues,500);
                 });
 
                 $('#' + this.graph.id).children('svg').mouseleave(clearUpdatePopUp);

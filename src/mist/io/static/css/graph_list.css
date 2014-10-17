@@ -63,7 +63,7 @@
 }
 
 .valuePopUp{
-    position:fixed;
+    position:relative;
     z-index: 1;
     display: none;
     left:0;
@@ -71,6 +71,7 @@
     width:90px;
     height:30px;
     line-height:30px;
+    margin-top:-30px;
     border:1px solid:#C2C4C2;
     border-radius:10px;
     box-shadow: 2px 2px 4px 1px #888888;

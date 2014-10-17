@@ -5,7 +5,6 @@
 }
 
 #GraphsArea .valuePopUp{
-    position:fixed;
     z-index: 1;
     display: none;
     left:0;
