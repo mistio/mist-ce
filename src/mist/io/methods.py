@@ -1236,11 +1236,15 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
         bare_metal = True
     conn = connect_provider(user.backends[backend_id])
     #GCE needs machine.extra as well, so we need the real machine object
+    machine = None
     try:
         for node in conn.list_nodes():
             if node.id == machine_id:
                 machine = node
                 break
+        if machine is None:
+            #did not find the machine_id on the list of nodes, still do not fail
+            raise
     except:
         machine = Node(machine_id,
                    name=machine_id,
