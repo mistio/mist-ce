@@ -36,7 +36,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 requestMethod: 'XHR',
                 timeWindow: TIME_WINDOW_MAP.minutes,
                 measurementStep: 10 * TIME_MAP.SECOND,
-                measurementOffset: 40 * TIME_MAP.SECOND,
+                measurementOffset: 60 * TIME_MAP.SECOND,
 
                 canModify: true,
                 canControl: true,
