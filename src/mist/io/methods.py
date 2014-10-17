@@ -1244,7 +1244,8 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
                 break
         if machine is None:
             #did not find the machine_id on the list of nodes, still do not fail
-            raise
+            raise MachineUnavailableError("Error while attempting to %s machine"
+                                  % action)
     except:
         machine = Node(machine_id,
                    name=machine_id,
