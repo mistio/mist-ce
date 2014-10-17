@@ -43,7 +43,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             valuearea: null,
             valueline: null,
             xCoordinates: null,
-            displayedData: null,
             timeDisplayed: null,
             valuesDistance: null,
             animationEnabled: null,
@@ -249,6 +248,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 var updatePopUpValue = function(graph) {
                     // Update popup when it is over value line
+                    graph = Mist.graphsController.getGraphById(graph.id);
                     if(mouseX > that.margin.left)
                     {
                         if(!isVisible){
@@ -267,7 +267,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         }
 
                         // hack previous code
-                        var displayedData = that.displayedData[Object.keys(that.displayedData)[0]];
+                        var displayedData = graph.displayedData[Object.keys(graph.displayedData)[0]];
                         var xCoordinates = that.xCoordinates[Object.keys(that.xCoordinates)[0]];
 
                         // Measurement That is less than curson x
@@ -313,7 +313,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                             valueText = currentValue.toFixed(2);
 
                         // Update Value Text
-                        warn('updating ' + graph.id + ' with ' + valueText);
                         $('#' + graph.id + ' .valuePopUp').text(valueText);
                     } else {
 
@@ -428,9 +427,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // Then store the displayed datapoints into "displayedData"
                 // object using the id of each datasource as the property key
 
-                this.set('displayedData', {});
+                this.graph.set('displayedData', {});
                 this.graph.datasources.forEach(function (datasource) {
-                    this.displayedData[datasource.id] =
+                    this.graph.displayedData[datasource.id] =
                         datasource.datapoints.slice(
                             datasource.datapoints.length - DISPLAYED_DATAPOINTS);
                 }, this);
@@ -446,7 +445,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // values. max=1 fixes this.
                 var maxValue = 1;
                 var minValue = 0;
-                forIn(this.displayedData, function (datapoints) {
+                forIn(this.graph.displayedData, function (datapoints) {
                     var max = d3.max(datapoints, getDatapointValue);
                     var min = d3.min(datapoints, getDatapointValue);
                     if (max > maxValue) maxValue = max;
@@ -469,7 +468,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.scale.y.domain(
                     [this.minValue, this.maxValue]);
                 this.scale.x.domain(
-                    d3.extent(this.displayedData[firstDatasourceId], getDatapointTime));
+                    d3.extent(this.graph.displayedData[firstDatasourceId], getDatapointTime));
             },
 
 
@@ -482,7 +481,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // using the id of each datasource as the property key
 
                 this.set('xCoordinates', {});
-                forIn(this, this.displayedData, function (datapoints, datasourceId) {
+                forIn(this, this.graph.displayedData, function (datapoints, datasourceId) {
                     this.xCoordinates[datasourceId] = [];
                     datapoints.forEach(function (datapoint) {
                         this.xCoordinates[datasourceId].push(
@@ -546,7 +545,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // TODO (gtsop): Add description
 
                 this.set('valueLinePaths', {});
-                forIn(this, this.displayedData, function (datapoints, datasourceId) {
+                forIn(this, this.graph.displayedData, function (datapoints, datasourceId) {
                     this.valueLinePaths[datasourceId] =
                         this.valueline(datapoints) ||
                             'M 0 0' // Fix for 'Error: Problem parsing d='' ' in webkit

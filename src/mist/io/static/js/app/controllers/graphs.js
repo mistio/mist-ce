@@ -96,13 +96,18 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 $(window).off('resize', this._handleWindowResize);
             },
 
+            getGraphById: function(id) {
+                for (var i=0;i<this.content.length;i++)
+                    if (this.content[i].id == id)
+                        return this.content[i];
+            },
+
 
             //
             //
             //  Pseudo-Private Methods
             //
             //
-
 
             _clear: function () {
                 this.setProperties({
