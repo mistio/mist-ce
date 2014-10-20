@@ -395,7 +395,7 @@ var loadApp = function (
     });
 
     // Globals
-    App.set('debugSocket', false);
+    App.set('debugSocket', true);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);

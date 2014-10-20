@@ -80,3 +80,9 @@
     color: #404040;
     background: linear-gradient(to bottom,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
 }
+
+.graph .valueArea {
+    fill: #6CE0BA;
+    stroke-width: 0;
+    opacity: 0.25;
+}

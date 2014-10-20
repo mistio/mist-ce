@@ -411,6 +411,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 // valueline is function that creates the main line based on data
                 this.set('valueline', ValueLine(this));
+                this.set('valuearea', ValueArea(this));
+
 
                 this.updateSVG();
                 this.set('isHidden', this.graph.isHidden);
@@ -632,6 +634,21 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                             .push();
                     }, this);
 
+                    // If this is a single line graph, show area path
+                    if (this.graph.datasources.length == 1) {
+                        var firstKey = Object.keys(this.graph.displayedData)[0];
+                        var valueAreaPath = this.valuearea(this.graph.displayedData[firstKey]);
+                        this.svg.value.area.animation
+                            .select(this.svg.value.area)
+                            .fps(fps)
+                            .duration(duration)
+                            .points(this.valuesDistance,0, 0,0)
+                            .data(valueAreaPath)
+                            .before(function(data){
+                                this.d3Selector.attr('d', data);
+                            })
+                            .push();
+                    }
 
                     this.svg.axis.x.legend.animation
                                     .select(this.svg.axis.x.legend)
@@ -762,6 +779,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             });
             svg.value = new Object({
                 lines: [],
+                area: Area(args),
                 curtain: Curtain(args)
             });
 
@@ -774,6 +792,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             });
 
             svg.grid.x.animation = new Animation();
+            svg.value.area.animation = new Animation();
             svg.axis.x.legend.animation = new Animation();
 
             return svg;
@@ -806,10 +825,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
         function Area (args) {
-
-            return d3.select('#' + args.id + ' .valueArea')
+            return d3.select('#' + args.id + ' svg .valueArea')
                     .attr('transform', 'translate(' +
-                        args.margin.left + ',' + (args.margin.top + 2)+ ')')
+                        args.margin.left + ',' + (args.margin.top)+ ')')
                     .select('path');
         };
 

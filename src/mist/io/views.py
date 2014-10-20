@@ -683,15 +683,17 @@ def update_monitoring(request):
 
 @view_config(route_name='stats', request_method='GET', renderer='json')
 def get_stats(request):
-    return methods.get_stats(
+    data = methods.get_stats(
         user_from_request(request),
         request.matchdict['backend'],
         request.matchdict['machine'],
         request.params.get('start'),
         request.params.get('stop'),
         request.params.get('step'),
-        request.params.get('request_id')
+        request.params.get('metrics')
     )
+    data['request_id'] = request.params.get('request_id')
+    return data
 
 
 @view_config(route_name='metrics', request_method='GET',
