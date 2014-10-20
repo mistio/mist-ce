@@ -1646,7 +1646,7 @@ def list_locations(user, backend_id):
 def list_networks(user, backend_id):
     """List networks from each backend.
 
-    Currently NephoScale is supported. For other providers 
+    Currently NephoScale and Openstack networks are supported. For other providers
     this returns an empty list
 
     """
@@ -1656,16 +1656,18 @@ def list_networks(user, backend_id):
     backend = user.backends[backend_id]
     conn = connect_provider(backend)
 
-    try:
+    if conn.type in [Provider.NEPHOSCALE, Provider.OPENSTACK]:
         networks = conn.ex_list_networks()
-    except:
+    else:
         networks = []
 
     ret = []
+
     for network in networks:
         ret.append({'id': network.id,
                     'name': network.name,
-                    'extra': network.extra})
+                    'extra': network.extra,
+                    'cidr': None if conn.type is not Provider.OPENSTACK else network.cidr})
     return ret
 
 
