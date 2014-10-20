@@ -684,7 +684,7 @@ def list_machines(user, backend_id):
 @core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
-                   size_name, location_name, ips, monitoring, ssh_port=22):
+                   size_name, location_name, ips, monitoring, networks, ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -747,7 +747,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key, 
-                                         machine_name, image, size, location)
+                                         machine_name, image, size, location, networks)
     elif conn.type is Provider.HPCLOUD:
         node = _create_machine_hpcloud(conn, private_key, public_key, 
                                        machine_name, image, size, location)
@@ -835,7 +835,7 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
 
 def _create_machine_openstack(conn, private_key, public_key, machine_name,
-                             image, size, location):
+                             image, size, location, networks):
     """Create a machine in Openstack.
 
     Here there is no checking done, all parameters are expected to be
@@ -858,6 +858,15 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
         server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
         server_key = server_key.name
 
+    available_networks = conn.ex_list_networks()
+    try:
+        chosen_networks = []
+        for net in available_networks:
+            if net.id in networks:
+                chosen_networks.append(net)
+    except:
+        chosen_networks = []
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(name=machine_name,
@@ -867,7 +876,8 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
-                ex_keyname=server_key)
+                ex_keyname=server_key,
+                networks=chosen_networks if chosen_networks else available_networks)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node

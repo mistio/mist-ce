@@ -456,6 +456,7 @@ def create_machine(request):
         location_name = request.json_body.get('location_name', None)
         ips = request.json_body.get('ips', None)
         monitoring = request.json_body.get('monitoring', False)
+        networks = request.json_body.get('networks', [])
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -463,7 +464,7 @@ def create_machine(request):
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                  location_id, image_id, size_id, script,
                                  image_extra, disk, image_name, size_name,
-                                 location_name, ips, monitoring)
+                                 location_name, ips, monitoring, networks)
     return ret
 
 
