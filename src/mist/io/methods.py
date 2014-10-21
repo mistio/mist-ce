@@ -1680,25 +1680,32 @@ def list_networks(user, backend_id):
             'name': network.name,
             'extra': network.extra,
             'cidr': None if conn.type is not Provider.OPENSTACK else network.cidr,
-            'floating_ips': None if conn.type is not Provider.OPENSTACK else list_floating_ips(conn)
+            'floating_ips': None if conn.type is not Provider.OPENSTACK else list_floating_ips(conn, network)
         })
     return ret
 
 
-def list_floating_ips(conn):
+def list_floating_ips(conn, network):
     """
     Supports only OPENSTACK backend
     :param conn: libcloud conn/driver
+    :param network: libcloud network object
     :returns: List of floating ips
     """
     ret = []
-    ips = conn.ex_list_floating_ips()
+    pools = conn.ex_list_floating_ip_pools()
 
-    for ip in ips:
-        ret.append({
-            'id': ip.id,
-            'ip_address': ip.ip_address,
-        })
+    for pool in pools:
+        if pool.name == network.name:
+            ips = pool.list_floating_ips()
+            for ip in ips:
+                ret.append({
+                    'id': ip.id,
+                    'ip_address': ip.ip_address,
+                    'pool': pool.name
+                })
+
+    return ret
 
 
 def set_machine_metadata(user, backend_id, machine_id, tag):
