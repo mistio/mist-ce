@@ -35,7 +35,7 @@ from mist.io.exceptions import *
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish_user
 
-from mist.io import tasks
+import mist.io.tasks
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -136,11 +136,11 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.region = region
         if provider == 'docker':
             backend.docker_port = docker_port
-        #For digital ocean v2 of the API, only apisecret is needed. 
+        #For digital ocean v2 of the API, only apisecret is needed.
         #However, in v1 both api_key and api_secret are needed. In order
-        #for both versions to be supported (existing v1, and new v2 which 
-        #is now the default) we set api_key same to api_secret to 
-        #distinguish digitalocean v2 logins, to avoid adding another 
+        #for both versions to be supported (existing v1, and new v2 which
+        #is now the default) we set api_key same to api_secret to
+        #distinguish digitalocean v2 logins, to avoid adding another
         #arguement on digital ocean libcloud driver
 
         if provider == 'digitalocean':
@@ -611,7 +611,7 @@ def get_machine_actions(machine_from_api, conn):
         if machine_from_api.state is NodeState.PENDING:
         #after resize, node gets to pending mode, needs to be started
             can_start = True
-        
+
     if conn.type is Provider.GCE:
         can_start = False
         can_stop = False
@@ -743,13 +743,13 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 pass
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
-        node = _create_machine_rackspace(conn, public_key, machine_name, image, 
+        node = _create_machine_rackspace(conn, public_key, machine_name, image,
                                          size, location)
     elif conn.type in [Provider.OPENSTACK]:
-        node = _create_machine_openstack(conn, private_key, public_key, 
+        node = _create_machine_openstack(conn, private_key, public_key,
                                          machine_name, image, size, location)
     elif conn.type is Provider.HPCLOUD:
-        node = _create_machine_hpcloud(conn, private_key, public_key, 
+        node = _create_machine_hpcloud(conn, private_key, public_key,
                                        machine_name, image, size, location)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
@@ -789,8 +789,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
     if script or monitoring:
-        tasks.post_deploy_steps.delay(user.email, backend_id, node.id, 
-                                      monitoring, script, key_id)
+        mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
+                                              monitoring, script, key_id)
 
     return {'id': node.id,
             'name': node.name,
@@ -1163,7 +1163,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         return node
 
 
-def _create_machine_gce(conn, key_name, private_key, public_key, machine_name, 
+def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
                         image, size, location):
     """Create a machine in GCE.
 
@@ -1191,7 +1191,7 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
     return node
 
 
-def _create_machine_linode(conn, key_name, private_key, public_key, 
+def _create_machine_linode(conn, key_name, private_key, public_key,
                           machine_name, image, size, location):
     """Create a machine in Linode.
 
@@ -1267,7 +1267,7 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
 
                 with user.lock_n_load():
                     machine_uid = [backend_id, machine_id]
-    
+
                     for keypair in user.keypairs:
                         for machine in user.keypairs[keypair].machines:
                             if machine[:2] == machine_uid:
@@ -1535,7 +1535,7 @@ def star_image(user, backend_id, image_id):
             if image_id in backend.unstarred:
                 backend.unstarred.remove(image_id)
         user.save()
-    task = tasks.ListImages()
+    task = mist.io.tasks.ListImages()
     task.clear_cache(user.email, backend_id)
     task.delay(user.email, backend_id)
     return not star
@@ -1646,7 +1646,7 @@ def list_locations(user, backend_id):
 def list_networks(user, backend_id):
     """List networks from each backend.
 
-    Currently NephoScale is supported. For other providers 
+    Currently NephoScale is supported. For other providers
     this returns an empty list
 
     """
@@ -1857,20 +1857,12 @@ def enable_monitoring(user, backend_id, machine_id,
         else:
             raise ServiceUnavailableError()
 
-    resp_dict = resp.json()
-    host = resp_dict.get('host')
-    deploy_kwargs = resp_dict.get('deploy_kwargs')
-    command = deploy_collectd_command(deploy_kwargs)
-    ret_dict = {
-        'host': host,
-        'deploy_kwargs': deploy_kwargs,
-        'command': command,
-    }
+    ret_dict = resp.json()
     if dry:
         return ret_dict
-    stdout = ''
     if not no_ssh:
-        tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
+        mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
+                                            ret_dict['extra_vars'])
 
     trigger_session_update(user.email, ['monitoring'])
 
@@ -1910,20 +1902,6 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     return stdout
 
 
-def deploy_collectd_command(deploy_kwargs):
-    """Return command that must be run to deploy collectd on a machine."""
-    parts = ["%s=%s" % (key, value) for key, value in deploy_kwargs.items()]
-    query = "&".join(parts)
-    url = "%s/deploy_script" % config.CORE_URI
-    if query:
-        url += "?" + query
-    command = "wget -O - %s '%s' | `command -v sudo` bash" % (
-        "--no-check-certificate" if not config.SSL_VERIFY else "",
-        url,
-    )
-    return command
-
-
 def _undeploy_collectd(user, backend_id, machine_id, host):
     """Uninstall collectd from the machine and return command's output"""
     #FIXME: do not hard-code stuff!
@@ -1934,7 +1912,8 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
         "`command -v sudo` kill -9 `cat /opt/mistio-collectd/collectd.pid`"
     )
 
-    tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
+    mist.io.tasks.ssh_command.delay(user.email, backend_id, machine_id,
+                                    host, command)
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):

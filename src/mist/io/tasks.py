@@ -1,4 +1,6 @@
+import os
 import json
+import tempfile
 import functools
 
 import libcloud.security
@@ -17,10 +19,16 @@ from amqp.connection import Connection
 
 from paramiko.ssh_exception import SSHException
 
+import ansible.playbook
+import ansible.utils.template
+from ansible import callbacks
+from ansible import utils
+
 from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError
 from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
+from mist.io.inventory import MistInventory
 
 try:  # Multi-user environment
     from mist.core.helpers import user_from_email
@@ -71,7 +79,7 @@ def ssh_command(email, backend_id, machine_id, host, command,
     shell.disconnect()
     if retval:
         from mist.io.methods import notify_user
-        notify_user(user, "Async command failed for machine %s (%s)" % 
+        notify_user(user, "Async command failed for machine %s (%s)" %
                     (machine_id, host), output)
 
 
@@ -107,7 +115,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             from mist.io.shell import Shell
             shell = Shell(host)
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
-                                                   key_id, username, password, 
+                                                   key_id, username, password,
                                                    port)
             if monitoring:
                 try:
@@ -382,3 +390,58 @@ class Ping(UserTask):
     def error_rerun_handler(self, exc, errors, *args, **kwargs):
         return self.result_fresh
 
+
+@app.task
+def deploy_collectd(email, backend_id, machine_id, extra_vars):
+    user = user_from_email(email)
+    inventory = MistInventory(user, [(backend_id, machine_id)])
+    if len(inventory.hosts) != 1:
+        log.error("Expected 1 host, found: %s", inventory.hosts)
+        return
+    machine_name = inventory.hosts.keys()[0]
+    log.info("Will attempt to deploy collectd to machine '%s'.", machine_name)
+    files = inventory.export(include_localhost=False)
+    tmp_dir = tempfile.mkdtemp()
+    old_dir = os.getcwd()
+    os.chdir(tmp_dir)
+    os.mkdir('id_rsa')
+    for name, data in files.items():
+        with open(name, 'w') as f:
+            f.write(data)
+    for name in os.listdir('id_rsa'):
+        os.chmod('id_rsa/%s' % name, 0600)
+    log.info("Deploying collectd to '%s': files ready.", machine_name)
+
+    playbook_path = '%s/src/deploy_collectd/ansible/main.yml' % old_dir
+    ansible_hosts_path = 'inventory'
+    extra_vars['host_key_checking'] = False
+
+    log.error(tmp_dir)
+    log.error(old_dir)
+    log.error(playbook_path)
+    utils.VERBOSITY = 4
+    stats = callbacks.AggregateStats()
+    playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
+    runner_cb = callbacks.PlaybookRunnerCallbacks(stats,
+                                                  verbose=utils.VERBOSITY)
+    try:
+        playbook = ansible.playbook.PlayBook(
+            playbook=playbook_path,
+            host_list=ansible_hosts_path,
+            callbacks=playbook_cb,
+            runner_callbacks=runner_cb,
+            stats=stats,
+            extra_vars=extra_vars,
+            force_handlers=True,
+        )
+        result = playbook.run()
+    except Exception as exc:
+        log.error("Error deploying collectd to '%s': %r", machine_name, exc)
+        return
+    log.debug("Ansible result: %s", result)
+    if result[machine_name]['failures'] or result[machine_name]['unreachable']:
+        log.error("Deploying collectd to '%s' failed: %s",
+                  machine_name, result[machine_name])
+        return
+    log.info("Deploying collectd to '%s' succeeded: %s",
+             machine_name, result[machine_name])
