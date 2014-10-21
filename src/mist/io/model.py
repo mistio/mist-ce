@@ -85,27 +85,6 @@ class Machines(FieldsDict):
     _key_error = exceptions.MachineNotFoundError
 
 
-class Network(OODict):
-    """
-    A saved network in the networks list of some backend
-
-    For the time being supports only OPENSTACK and NEPHOSCALE backends
-    """
-
-    id = StrField()
-    name = StrField()
-    cidr = StrField()
-    extra = DictField()
-
-
-class Networks(FieldsDict):
-    """
-    Collection of networks for a certain backend
-    """
-    _itemtype = make_field(Network)
-    _key_error = exceptions.NetworkNotFoundError
-
-
 class Backend(OODict):
     """A cloud vm provider backend"""
 
@@ -124,7 +103,6 @@ class Backend(OODict):
     compute_endpoint = StrField()
     docker_port = IntField(4243)
     machines = make_field(Machines)()
-    networks = make_field(Networks)()
     starred = ListField()
     unstarred = ListField()
 
