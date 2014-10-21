@@ -98,6 +98,10 @@ class BackendNotFoundError(NotFoundError, KeyError):
     msg = "Backend not found"
 
 
+class NetworkNotFoundError(NotFoundError, KeyError):
+    msg = "Network not found"
+
+
 class KeypairNotFoundError(NotFoundError, KeyError):
     msg = "Keypair not found"
 

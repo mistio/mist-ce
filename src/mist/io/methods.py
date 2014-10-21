@@ -882,6 +882,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
 
+
 def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
                              image, size, location):
     """Create a machine in HP Cloud.
