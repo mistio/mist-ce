@@ -144,12 +144,22 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineProvider', backend);
 
+                    $('#create-machine-image').removeClass('ui-state-disabled');
+                    $('#create-machine-location').addClass('ui-state-disabled');
+                    $('#create-machine-size').addClass('ui-state-disabled');
+                    $('#create-machine-key').addClass('ui-state-disabled');
+                    $('#create-machine-network').addClass('ui-state-disabled');
 
-                   $('#create-machine-image').removeClass('ui-state-disabled');
-                   $('#create-machine-location').addClass('ui-state-disabled');
-                   $('#create-machine-size').addClass('ui-state-disabled');
-                   $('#create-machine-key').addClass('ui-state-disabled');
-                   $('#create-machine-network').addClass('ui-state-disabled');
+                    // Openstack networks
+                    if (backend.provider == 'openstack') {
+                        if (backend.networks.content.length > 0) {
+                            $('#create-machine-network').show();
+                            $('label[for=create-machine-script]').text('8. Script:');
+                        }
+                    } else {
+                        $('#create-machine-network').hide();
+                        $('label[for=create-machine-script]').text('7. Script:');
+                    }
                 },
 
 
@@ -215,6 +225,9 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                 toggleNetworkSelection: function (network) {
                     network.set('selected', !network.selected);
+                    $('#create-machine-machine')
+                        .collapsible('option', 'collapsedIcon', 'check')
+                        .collapsible('collapse');
                 },
 
 
