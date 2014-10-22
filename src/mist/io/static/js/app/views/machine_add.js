@@ -148,7 +148,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     $('#create-machine-location').addClass('ui-state-disabled');
                     $('#create-machine-size').addClass('ui-state-disabled');
                     $('#create-machine-key').addClass('ui-state-disabled');
-                    $('#create-machine-network').addClass('ui-state-disabled');
+                    $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
 
                     // Openstack networks
                     if (backend.provider == 'openstack') {
@@ -176,7 +176,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                    $('#create-machine-location').addClass('ui-state-disabled');
                    $('#create-machine-size').removeClass('ui-state-disabled');
                    $('#create-machine-key').addClass('ui-state-disabled');
-                   $('#create-machine-network').addClass('ui-state-disabled');
+                   $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
                 },
 
 
@@ -189,7 +189,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                     $('#create-machine-location').removeClass('ui-state-disabled');
                     $('#create-machine-key').addClass('ui-state-disabled');
-                    $('#create-machine-network').addClass('ui-state-disabled');
+                    $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
 
                     // Docker specific
                     if (Mist.machineAddController.newMachineProvider.provider == 'docker')
@@ -204,7 +204,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                     Mist.machineAddController.set('newMachineLocation', location);
                     $('#create-machine-key').removeClass('ui-state-disabled');
-                    $('#create-machine-network').addClass('ui-state-disabled');
+                    $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
                 },
 
 
@@ -214,7 +214,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                     Mist.machineAddController.set('newMachineKey', key);
                     $('#create-machine-monitoring').removeClass('ui-state-disabled');
-                    $('#create-machine-network')
+                    $('#create-machine-network .ui-collapsible')
                         .removeClass('ui-state-disabled')
                         .parent()
                         .trigger('create')
