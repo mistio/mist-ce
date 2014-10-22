@@ -41,6 +41,9 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             loadingLocations: null,
             loadingNetworks: null,
 
+            isOpenStack: function () {
+                return this.provider == 'openstack';
+            }.property('provider'),
 
             /**
              *

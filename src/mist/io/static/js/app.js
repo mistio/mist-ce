@@ -300,6 +300,7 @@ var loadFiles = function (callback) {
         'app/views/missing',
         'app/views/metric_node',
         'app/views/monitoring',
+        'app/views/network_list',
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/user_menu',
@@ -365,6 +366,7 @@ var loadApp = function (
     MissingView,
     MetricNodeView,
     MonitoringView,
+    NetworkListView,
     RuleView,
     RuleEditView,
     UserMenuView,
@@ -397,6 +399,7 @@ var loadApp = function (
     App.Router.map(function() {
         this.route('machines');
         this.route('images');
+        this.route('networks');
         this.route('machine', {
             path : '/machines/:machine_id',
         });
@@ -419,6 +422,14 @@ var loadApp = function (
         activate: function() {
             Ember.run.next(function() {
                 document.title = 'mist.io - images';
+            });
+        }
+    });
+
+    App.NetworksRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - networks';
             });
         }
     });
@@ -522,6 +533,7 @@ var loadApp = function (
     App.set('messageboxView', MessageBoxView);
     App.set('monitoringView', MonitoringView);
     App.set('machineView', SingleMachineView);
+    App.set('networkListView', NetworkListView);
     App.set('machineKeysView', MachineKeysView);
     App.set('machineTagsView', MachineTagsView);
     App.set('keyListItemView', KeyListItemView);

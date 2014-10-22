@@ -21,6 +21,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             content: [],
             imageCount: 0,
             machineCount: 0,
+            networkCount: 0,
             selectedMachines: [],
             machineRequest: false,
 
@@ -33,6 +34,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             loading: true,
             loadingImages: false,
             loadingMachines: false,
+
+
+            hasOpenStack: function () {
+                return !!this.content.findBy('isOpenStack', true);
+            }.property('content.@each.isOpenStack'),
 
 
             //
@@ -342,6 +348,19 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
+            _updateNetworkCount: function() {
+                Ember.run(this, function() {
+                    var counter = 0;
+                    this.content.forEach(function (backend) {
+                        if (backend.enabled && backend.provider == 'openstack')
+                            counter += backend.networkCount;
+                    });
+                    this.set('networkCount', counter);
+                    this.trigger('onNetworkListChange');
+                });
+            },
+
+
             _updateLoadingImages: function() {
                 this.set('loadingImages',
                     !!this.content.findBy('loadingImages', true));
@@ -351,6 +370,12 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             _updateLoadingMachines: function() {
                 this.set('loadingMachines',
                     !!this.content.findBy('loadingMachines', true));
+            },
+
+
+            _updateLoadingNetworks: function () {
+                this.set('loadingNetworks',
+                    !!this.content.findBy('loadingNetworks', true));
             },
 
 
@@ -383,6 +408,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             }.observes('content.@each.machineCount'),
 
 
+            networkCountObserver: function () {
+                Ember.run.once(this, '_updateNetworkCount');
+            }.observes('content.@each.networkCount'),
+
+
             loadingImagesObserver: function() {
                 Ember.run.once(this, '_updateLoadingImages');
             }.observes('content.@each.loadingImages'),
@@ -391,6 +421,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             loadingMachinesObserver: function() {
                 Ember.run.once(this, '_updateLoadingMachines');
             }.observes('content.@each.loadingMachines'),
+
+
+            loadingNetworksObserver: function () {
+                Ember.run.once(this, '_updateLoadingNetworks');
+            }.observes('content.@each.loadingNetworks'),
 
 
             selectedMachinesObserver: function() {
