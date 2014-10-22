@@ -877,7 +877,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
                 ex_keyname=server_key,
-                networks=chosen_networks if chosen_networks else available_networks)
+                networks=chosen_networks)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
