@@ -92,6 +92,7 @@ define('app/controllers/networks', ['app/models/network'],
 
             _addNetwork: function (network) {
                 Ember.run(this, function () {
+                    network.backend = this.backend;
                     this.content.addObject(Network.create(network));
                     this.trigger('onNetworkAdd');
                 });

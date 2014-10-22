@@ -20,8 +20,9 @@ define('app/models/network', ['ember'],
 
 			id: null,
 			name: null,
-			extra: null,
 			cidr: null,
+			extra: null,
+			backend: null,
 			selected: null,
 			floating_ips: null,
 

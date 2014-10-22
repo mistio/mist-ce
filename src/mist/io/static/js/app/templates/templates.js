@@ -37,6 +37,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/missing.html',
         'text!app/templates/monitoring.html',
         'text!app/templates/network_list.html',
+        'text!app/templates/network_list_item.html',
         'text!app/templates/rule.html',
         'text!app/templates/rule_edit.html',
         'text!app/templates/user_menu.html',
@@ -76,9 +77,10 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['missing/html'] = Ember.Handlebars.compile(arguments[32]);
         Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[33]);
         Ember.TEMPLATES['network_list/html'] = Ember.Handlebars.compile(arguments[34]);
-        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[35]);
-        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[36]);
-        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[37]);
+        Ember.TEMPLATES['network_list_item/html'] = Ember.Handlebars.compile(arguments[35]);
+        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[36]);
+        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[37]);
+        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[38]);
         callback();
       });
       return;

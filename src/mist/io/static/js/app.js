@@ -301,6 +301,7 @@ var loadFiles = function (callback) {
         'app/views/metric_node',
         'app/views/monitoring',
         'app/views/network_list',
+        'app/views/network_list_item',
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/user_menu',
@@ -367,6 +368,7 @@ var loadApp = function (
     MetricNodeView,
     MonitoringView,
     NetworkListView,
+    NetworkListItemView,
     RuleView,
     RuleEditView,
     UserMenuView,
@@ -542,6 +544,7 @@ var loadApp = function (
     App.set('machineAddView', MachineAddDialog);
     App.set('backendButtonView', BackendButton);
     App.set('graphButtonView', GraphButtonView);
+    App.set('networkListItemView', NetworkListItemView);
     App.set('machinePowerView', MachinePowerView);
     App.set('machineShellView', MachineShellView);
     App.set('machineListItemView', MachineListItem);

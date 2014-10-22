@@ -20,13 +20,26 @@
            data-theme="d"
            {{action "createClicked" target="view"}}>Create</a>
 
-        <ul data-role="listview"
-            data-filter="true"
+        <ul id="networks"
+            data-role="listview"
             data-inset="true"
-            data-filter-placeholder="Filter networks..."
+            data-filter="true"
+            data-filter-placeholder="Filter..."
+            data-theme="c"
             class="checkbox-list">
-
+            {{#each Mist.backendsController.content}}
+                {{#if this.enabled}}
+                    {{#if this.isOpenStack}}
+                      {{#each this.networks.content}}
+                          {{view Mist.networkListItemView
+                              networkBinding="this"
+                              class="checkbox-link"}}
+                      {{/each}}
+                    {{/if}}
+                {{/if}}
+            {{/each}}
         </ul>
+
 
         <div class="mid-padding"></div>
 
