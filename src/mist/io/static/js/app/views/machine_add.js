@@ -137,7 +137,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     }
 
                     backend.networks.content.forEach(function (network, index) {
-                        network.set('selected', index == 0);
+                        network.set('selected', false);
                     });
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineImage', {'name' : 'Select Image'})
