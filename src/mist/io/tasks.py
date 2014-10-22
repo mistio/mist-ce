@@ -193,6 +193,12 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
             chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\' ' % username)
             chan.send('%s\n' % password)
 
+            chan = ssh.invoke_shell()
+            chan = ssh.get_transport().open_session()
+            chan.get_pty()
+            chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/waagent\' ' % username)
+            chan.send('%s\n' % password)
+
             cmd = 'sudo su -c \'sed -i "s|[#]*PasswordAuthentication yes|PasswordAuthentication no|g" /etc/ssh/sshd_config &&  /etc/init.d/ssh reload; service ssh reload\' '
             ssh.exec_command(cmd)
             ssh.close()
