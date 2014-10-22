@@ -177,8 +177,8 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
             raise self.retry(exc=Exception(), countdown=120, max_retries=5)
 
         try:
-            #login with user, password. Deploy the public key, try to
-            #null the password, disable password authentication and reload ssh.
+            #login with user, password. Deploy the public key, enable sudo access for
+            #username, disable password authentication and reload ssh.
             #After this is done, call post_deploy_steps if deploy script or monitoring
             #is provided
             ssh=paramiko.SSHClient()
