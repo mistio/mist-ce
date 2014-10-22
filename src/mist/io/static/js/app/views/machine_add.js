@@ -136,15 +136,20 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                         this.fieldIsReady('provider');
                     }
 
+                    backend.networks.content.forEach(function (network, index) {
+                        network.set('selected', index == 0);
+                    });
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineImage', {'name' : 'Select Image'})
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineProvider', backend);
 
+
                    $('#create-machine-image').removeClass('ui-state-disabled');
                    $('#create-machine-location').addClass('ui-state-disabled');
                    $('#create-machine-size').addClass('ui-state-disabled');
                    $('#create-machine-key').addClass('ui-state-disabled');
+                   $('#create-machine-network').addClass('ui-state-disabled');
                 },
 
 
@@ -161,6 +166,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                    $('#create-machine-location').addClass('ui-state-disabled');
                    $('#create-machine-size').removeClass('ui-state-disabled');
                    $('#create-machine-key').addClass('ui-state-disabled');
+                   $('#create-machine-network').addClass('ui-state-disabled');
                 },
 
 
@@ -173,6 +179,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                     $('#create-machine-location').removeClass('ui-state-disabled');
                     $('#create-machine-key').addClass('ui-state-disabled');
+                    $('#create-machine-network').addClass('ui-state-disabled');
 
                     // Docker specific
                     if (Mist.machineAddController.newMachineProvider.provider == 'docker')
@@ -187,6 +194,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                     Mist.machineAddController.set('newMachineLocation', location);
                     $('#create-machine-key').removeClass('ui-state-disabled');
+                    $('#create-machine-network').addClass('ui-state-disabled');
                 },
 
 
@@ -196,7 +204,17 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                     Mist.machineAddController.set('newMachineKey', key);
                     $('#create-machine-monitoring').removeClass('ui-state-disabled');
+                    $('#create-machine-network')
+                        .removeClass('ui-state-disabled')
+                        .parent()
+                        .trigger('create')
+                        .find('label')
+                        .removeClass('ui-corner-all');
+                },
 
+
+                toggleNetworkSelection: function (network) {
+                    network.set('selected', !network.selected);
                 },
 
 
