@@ -1,11 +1,12 @@
 define('app/models/backend', ['app/controllers/machines', 'app/controllers/images', 'app/controllers/sizes',
-                              'app/controllers/locations', 'ember'],
+                              'app/controllers/locations','app/controllers/networks', 'ember'],
     /**
      *  Backend Model
      *
      *  @returns Class
      */
-    function (MachinesController, ImagesController, SizesController, LocationsController) {
+    function (MachinesController, ImagesController, SizesController,
+        LocationsController, NetworksController) {
         return Ember.Object.extend(Ember.Evented, {
 
             /**
@@ -27,6 +28,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             images: null,
             machines: null,
             locations: null,
+            networks: null,
 
             sizeCount: 0,
             imageCount: 0,
@@ -37,6 +39,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             loadingImages: null,
             loadingMachines: null,
             loadingLocations: null,
+            loadingNetworks: null,
 
 
             /**
@@ -56,12 +59,14 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.images = ImagesController.create({backend: this, content: []});
                     this.machines = MachinesController.create({backend: this, content: []});
                     this.locations = LocationsController.create({backend: this, content: []});
+                    this.networks = NetworksController.create({backend: this, content: []});
 
                     // Add events
                     this.sizes.on('onSizeListChange', this, '_updateSizeCount');
                     this.images.on('onImageListChange', this, '_updateImageCount');
                     this.machines.on('onMachineListChange', this, '_updateMachineCount');
                     this.locations.on('onLocationListChange', this, '_updateLocationCount');
+                    this.networks.on('onNetworkListChange', this, '_updateNetworkCount');
                     this.machines.on('onSelectedMachinesChange', this, '_updateSelectedMachines');
 
                     // Add observers
@@ -76,6 +81,9 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     });
                     this.locations.addObserver('loading', this, function () {
                         Ember.run.once(this, 'loadingLocationsObserver');
+                    });
+                    this.networks.addObserver('loading', this, function () {
+                        Ember.run.once(this, 'loadingNetowrksObserver');
                     });
                 });
             }.on('init'),
@@ -105,7 +113,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             getLocation: function (locationId) {
                 return this.locations.getLocation(locationId);
             },
-
 
             getMonitoredMachines: function () {
                 return this.machines.getMonitoredMachines();
@@ -207,6 +214,13 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
+            _updateNetworkCount: function () {
+                Ember.run(this, function () {
+                    this.set('networkCount', this.networks.content.length);
+                    this.trigger('onNetworkListChange');
+                });
+            },
+
             _updateSelectedMachines: function () {
                 Ember.run(this, function () {
                     this.set('selectedMachines', this.machines.selectedMachines);
@@ -261,6 +275,11 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             loadingLocationsObserver: function () {
                 this.set('loadingLocations', this.locations.loading);
+            },
+
+
+            loadingNetworksObserver: function () {
+                this.set('loadingNeworks', this.networks.loading);
             },
 
 
