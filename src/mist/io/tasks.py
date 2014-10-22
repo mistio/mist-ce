@@ -185,7 +185,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(host, username=username, password=password)
-            ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys' % public_key)
+            ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
 
             chan = ssh.invoke_shell()
             chan = ssh.get_transport().open_session()
