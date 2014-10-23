@@ -1667,45 +1667,47 @@ def list_networks(user, backend_id):
     backend = user.backends[backend_id]
     conn = connect_provider(backend)
 
-    if conn.type in [Provider.NEPHOSCALE, Provider.OPENSTACK]:
+    ret = []
+    if conn.type in [Provider.NEPHOSCALE]:
         networks = conn.ex_list_networks()
+
+        for network in networks:
+            ret.append({
+                'id': network.id,
+                'name': network.name,
+                'extra': network.extra,
+                'cidr': None,
+            })
+
+        return ret
+    elif conn.type in [Provider.OPENSTACK]:
+        networks = conn.ex_list_neutron_networks()
+        for network in networks:
+            ret.append(openstack_network_to_dict(network))
+        return ret
     else:
-        networks = []
+        return ret
 
-    ret = []
 
-    for network in networks:
-        ret.append({
-            'id': network.id,
-            'name': network.name,
-            'extra': network.extra,
-            'cidr': None if conn.type is not Provider.OPENSTACK else network.cidr,
-            'floating_ips': None if conn.type is not Provider.OPENSTACK else list_floating_ips(conn, network)
+def openstack_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['status'] = network.status
+
+    net['subnets'] = []
+    for sub in network.subnets:
+
+        net['subnets'].append({
+            'id': sub.id,
+            'name': sub.name,
+            'cidr': sub.cidr,
+            'enable_dhcp': sub.enable_dhcp,
+            'gateway_ip': sub.gateway_ip,
+            'dns_nameservers': sub.dns_nameservers,
+            'allocation_pools': sub.allocation_pools
         })
-    return ret
-
-
-def list_floating_ips(conn, network):
-    """
-    Supports only OPENSTACK backend
-    :param conn: libcloud conn/driver
-    :param network: libcloud network object
-    :returns: List of floating ips
-    """
-    ret = []
-    pools = conn.ex_list_floating_ip_pools()
-
-    for pool in pools:
-        if pool.name == network.name:
-            ips = pool.list_floating_ips()
-            for ip in ips:
-                ret.append({
-                    'id': ip.id,
-                    'ip_address': ip.ip_address,
-                    'pool': pool.name
-                })
-
-    return ret
+    return net
 
 
 def set_machine_metadata(user, backend_id, machine_id, tag):
