@@ -26,38 +26,59 @@
                     <td>{{id}}</td>
                 </tr>
                 <tr>
-                    <td>Cidr</td>
-                    <td>{{cidr}}</td>
+                    <td>Status</td>
+                    <td>{{status}}</td>
                 </tr>
-                {{#if floating_ips.length}}
-                    <td>Floating IPs</td>
-                    <td>
-                        {{#each floating_ips}}
-                            <div class="ip">{{this}}</div>
-                        {{/each}}
-                    </td>
-
-                {{/if}}
             </table>
 
         </div>
 
-        {{#if view.extra.length}}
-        <div id="single-network-extra" data-role="collapsible" data-collapsed="false">
+        <div id="single-network-subnets" data-role="collapsible" data-collapsed="false">
 
-            <h3>Extra</h3>
+            <h3>Subnets ({{subnets.length}})</h3>
 
-            <table class="info-table">
-                {{#each view.extra}}
-                <tr>
-                    <td>{{key}}</td>
-                    <td>{{value}}</td>
-                </tr>
-                {{/each}}
-            </table>
-
+            {{#each subnets}}
+                <table class="info-table">
+                    <tr>
+                        <td class="subnet-name">Name</td>
+                        <td class="subnet-name">{{this.name}}</td>
+                    </tr>
+                    <tr>
+                        <td>Id</td>
+                        <td>{{this.id}}</td>
+                    </tr>
+                    <tr>
+                        <td>Cidr</td>
+                        <td>{{this.cidr}}</td>
+                    </tr>
+                    <tr>
+                        <td>DHCP Enabled</td>
+                        <td>{{this.enable_dhcp}}</td>
+                    </tr>
+                    <tr>
+                        <td>Gateway IP</td>
+                        <td>{{this.gateway_ip}}
+                    </tr>
+                    {{#if this.dns_nameservers.length}}
+                        <td>DNS Nameservers</td>
+                        <td>
+                            {{#each this.dns_nameservers}}
+                                <div class="ip">{{this}}</div>
+                            {{/each}}
+                        </td>
+                    {{/if}}
+                    {{#if allocation_pools.length}}
+                        <td>Allocation pools</td>
+                        <td>
+                            {{#each this.allocation_pools}}
+                                <div class="ip">{{this.start}}</div> -
+                                <div class="ip">{{this.end}}</div>
+                            {{/each}}
+                        </td>
+                    {{/if}}
+                </table>
+            {{/each}}
         </div>
-        {{/if}}
 
         <div class="mid-padding"></div>
 

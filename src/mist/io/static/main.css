@@ -626,3 +626,7 @@ ul.checkbox-list li label {
 #network-create textarea {
     height: 75px !important;
 }
+
+.subnet-name {
+    background-color: #E8E8E8;
+}
