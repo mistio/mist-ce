@@ -393,55 +393,9 @@ class Ping(UserTask):
 
 @app.task
 def deploy_collectd(email, backend_id, machine_id, extra_vars):
+    if not multi_user:
+        from mist.io.methods import deploy_collectd as deploy_collectd_method
+    else:
+        from mist.core.methods import deploy_collectd as deploy_collectd_method
     user = user_from_email(email)
-    inventory = MistInventory(user, [(backend_id, machine_id)])
-    if len(inventory.hosts) != 1:
-        log.error("Expected 1 host, found: %s", inventory.hosts)
-        return
-    machine_name = inventory.hosts.keys()[0]
-    log.info("Will attempt to deploy collectd to machine '%s'.", machine_name)
-    files = inventory.export(include_localhost=False)
-    tmp_dir = tempfile.mkdtemp()
-    old_dir = os.getcwd()
-    os.chdir(tmp_dir)
-    os.mkdir('id_rsa')
-    for name, data in files.items():
-        with open(name, 'w') as f:
-            f.write(data)
-    for name in os.listdir('id_rsa'):
-        os.chmod('id_rsa/%s' % name, 0600)
-    log.info("Deploying collectd to '%s': files ready.", machine_name)
-
-    playbook_path = '%s/src/deploy_collectd/ansible/main.yml' % old_dir
-    ansible_hosts_path = 'inventory'
-    extra_vars['host_key_checking'] = False
-
-    log.error(tmp_dir)
-    log.error(old_dir)
-    log.error(playbook_path)
-    utils.VERBOSITY = 4
-    stats = callbacks.AggregateStats()
-    playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
-    runner_cb = callbacks.PlaybookRunnerCallbacks(stats,
-                                                  verbose=utils.VERBOSITY)
-    try:
-        playbook = ansible.playbook.PlayBook(
-            playbook=playbook_path,
-            host_list=ansible_hosts_path,
-            callbacks=playbook_cb,
-            runner_callbacks=runner_cb,
-            stats=stats,
-            extra_vars=extra_vars,
-            force_handlers=True,
-        )
-        result = playbook.run()
-    except Exception as exc:
-        log.error("Error deploying collectd to '%s': %r", machine_name, exc)
-        return
-    log.debug("Ansible result: %s", result)
-    if result[machine_name]['failures'] or result[machine_name]['unreachable']:
-        log.error("Deploying collectd to '%s' failed: %s",
-                  machine_name, result[machine_name])
-        return
-    log.info("Deploying collectd to '%s' succeeded: %s",
-             machine_name, result[machine_name])
+    deploy_collectd_method(user, backend_id, machine_id, extra_vars)
