@@ -36,6 +36,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/metric_node.html',
         'text!app/templates/missing.html',
         'text!app/templates/monitoring.html',
+        'text!app/templates/network.html',
         'text!app/templates/network_list.html',
         'text!app/templates/network_list_item.html',
         'text!app/templates/rule.html',
@@ -76,11 +77,12 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['metric_node/html'] = Ember.Handlebars.compile(arguments[31]);
         Ember.TEMPLATES['missing/html'] = Ember.Handlebars.compile(arguments[32]);
         Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[33]);
-        Ember.TEMPLATES['network_list/html'] = Ember.Handlebars.compile(arguments[34]);
-        Ember.TEMPLATES['network_list_item/html'] = Ember.Handlebars.compile(arguments[35]);
-        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[36]);
-        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[37]);
-        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[38]);
+        Ember.TEMPLATES['network/html'] = Ember.Handlebars.compile(arguments[34]);
+        Ember.TEMPLATES['network_list/html'] = Ember.Handlebars.compile(arguments[35]);
+        Ember.TEMPLATES['network_list_item/html'] = Ember.Handlebars.compile(arguments[36]);
+        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[37]);
+        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[38]);
+        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[39]);
         callback();
       });
       return;

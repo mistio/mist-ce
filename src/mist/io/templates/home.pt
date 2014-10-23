@@ -96,6 +96,9 @@
     <script type="text/x-handlebars" data-template-name="networks">
         {{view Mist.networkListView}}
     </script>
+    <script type="text/x-handlebars" data-template-name="network">
+        {{view Mist.networkView}}
+    </script>
     <script type="text/x-handlebars" data-template-name="machine">
         {{view Mist.machineView}}
     </script>

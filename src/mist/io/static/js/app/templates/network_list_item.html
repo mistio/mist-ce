@@ -1,4 +1,11 @@
-<a>
-	<h3>{{unbound view.network.name}}</h3>
-    <p class="tag">{{view.network.backend.title}}</p>
-</a>
+{{#link-to "network" view.network}}
+
+    <div class="ui-grid-b">
+        <div class="ui-block-a network-name">{{view.network.name}}</div>
+        <div class="ui-block-b"></div>
+        <div class="ui-block-c key-tags">
+            <span class="tag">{{view.network.backend.title}}</span>
+        </div>
+    </div>
+
+{{/link-to}}

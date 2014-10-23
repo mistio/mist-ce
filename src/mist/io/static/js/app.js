@@ -300,6 +300,7 @@ var loadFiles = function (callback) {
         'app/views/missing',
         'app/views/metric_node',
         'app/views/monitoring',
+        'app/views/network',
         'app/views/network_list',
         'app/views/network_list_item',
         'app/views/rule',
@@ -367,6 +368,7 @@ var loadApp = function (
     MissingView,
     MetricNodeView,
     MonitoringView,
+    NetworkView,
     NetworkListView,
     NetworkListItemView,
     RuleView,
@@ -402,6 +404,9 @@ var loadApp = function (
         this.route('machines');
         this.route('images');
         this.route('networks');
+        this.route('network', {
+            path: '/networks/:network_id',
+        });
         this.route('machine', {
             path : '/machines/:machine_id',
         });
@@ -435,6 +440,28 @@ var loadApp = function (
             });
         }
     });
+
+    App.NetworkRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(this, function () {
+                var model = this.modelFor('network');
+                var id = model._id || model.id;
+                var network = Mist.backendsController.getNetwork(id);
+                document.title = 'mist.io - ' + (network ? network.name : id);
+            });
+        },
+        redirect: function (network) {
+            Mist.backendsController.set('networkRequest', network._id);
+        },
+        model: function (args) {
+            var id = args.network_id;
+            if (Mist.backendsController.loading ||
+                Mist.backendsController.loadingNetworks)
+                    return {_id: id, backend: {}};
+            return Mist.backendsController.getNetwork(id);
+        }
+    });
+
 
     App.MachinesRoute = Ember.Route.extend({
         activate: function() {
@@ -524,6 +551,7 @@ var loadApp = function (
     App.set('missingView', MissingView);
     App.set('metricNodeView', MetricNodeView);
     App.set('keyListView', KeyListView);
+    App.set('networkView', NetworkView);
     App.set('userMenuView', UserMenuView);
     App.set('keyEditView', KeyEditDialog);
     App.set('backendAddView', BackendAdd);

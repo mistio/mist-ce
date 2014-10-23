@@ -24,6 +24,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             networkCount: 0,
             selectedMachines: [],
             machineRequest: false,
+            networkRequest: false,
 
             addingBackend: false,
             deletingBackend: false,
@@ -213,6 +214,13 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
+            getRequestedNetwork: function () {
+                if (this.networkRequest) {
+                    return this.getNetwork(this.networkRequest);
+                }
+            },
+
+
             getBackend: function(backendId) {
                 return this.content.findBy('id', backendId);
             },
@@ -235,6 +243,22 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
+            getNetwork: function (networkId, backendId) {
+                if (backendId) {
+                    var backend = this.getBackend(backendId);
+                    if (backend)
+                        return backend.getNetwork(networkId);
+                    return null;
+                }
+
+                var network = null;
+                this.content.some(function(backend) {
+                    return network = backend.getNetwork(networkId);
+                });
+                return network;
+            },
+
+
             machineExists: function(machineId, backendId) {
                 return !!this.getMachine(machineId, backendId);
             },
@@ -242,6 +266,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             backendExists: function(backendId) {
                 return !!this.getBackend(backendId);
+            },
+
+
+            networkExists: function (networkId, backendId) {
+                return !!this.getNetwork(networkId, backendId);
             },
 
 

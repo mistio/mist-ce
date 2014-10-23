@@ -117,6 +117,12 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 return this.locations.getLocation(locationId);
             },
 
+
+            getNetwork: function (networkId) {
+                return this.networks.getNetwork(networkId);
+            },
+
+
             getMonitoredMachines: function () {
                 return this.machines.getMonitoredMachines();
             },
