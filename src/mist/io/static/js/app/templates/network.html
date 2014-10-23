@@ -12,13 +12,43 @@
 
     <div data-role="content" data-theme="c">
 
-        {{#if view.extra}}
-        <div id="single-network-extra" data-role="collapsible">
+        <div id="single-network-info" data-role="collapsible" data-collapsed="false">
 
-            <h3>Full metadata list</h3>
+            <h3>Network Information</h3>
 
             <table class="info-table">
-                {{#each view.metadata}}
+                <tr>
+                    <td>Name</td>
+                    <td>{{name}}</td>
+                </tr>
+                <tr>
+                    <td>Id</td>
+                    <td>{{id}}</td>
+                </tr>
+                <tr>
+                    <td>Cidr</td>
+                    <td>{{cidr}}</td>
+                </tr>
+                {{#if floating_ips.length}}
+                    <td>Floating IPs</td>
+                    <td>
+                        {{#each floating_ips}}
+                            <div class="ip">{{this}}</div>
+                        {{/each}}
+                    </td>
+
+                {{/if}}
+            </table>
+
+        </div>
+
+        {{#if view.extra.length}}
+        <div id="single-network-extra" data-role="collapsible" data-collapsed="false">
+
+            <h3>Extra</h3>
+
+            <table class="info-table">
+                {{#each view.extra}}
                 <tr>
                     <td>{{key}}</td>
                     <td>{{value}}</td>

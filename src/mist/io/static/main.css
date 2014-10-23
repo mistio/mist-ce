@@ -580,3 +580,33 @@ ul.checkbox-list li label {
 .cold {
     background: #396b9e /*{b-bup-background-color}*/linear-gradient( #5f9cc5 /*{d-bup-background-start}*/, #396b9e /*{d-bup-background-end}*/) /*{d-bup-background-color}*/ !important;
 }
+/* Info table
+------------------------------------------------------------------------------*/
+.info-table {
+    width: 100%;
+}
+.info-table td {
+    margin: 0;
+    width: 50%;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #CFCFCF;
+}
+.info-table tr td:nth-child(2) {
+    font-weight: bold;
+}
+.info-table tr {
+    background-color: #F7F7F7;
+}
+.info-table .ip {
+    display: inline-block;
+}
+.info-table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+}
+
+.info-table tr {
+    border: 1px solid #ccc;
+}

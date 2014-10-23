@@ -13,6 +13,17 @@ define('app/views/network', ['app/views/mistscreen'],
 
             //
             //
+            //  Properties
+            //
+            //
+
+
+            network: null,
+            extra: null,
+
+
+            //
+            //
             //  Initialization
             //
             //
@@ -26,6 +37,7 @@ define('app/views/network', ['app/views/mistscreen'],
                 Ember.run(this, function() {
                     this.updateCurrentNetwork();
                     if (this.network.id) {
+                        this.updateExtra();
                     }
                 });
             }.on('didInsertElement'),
@@ -54,10 +66,26 @@ define('app/views/network', ['app/views/mistscreen'],
 
                     this.set('network', this.get('controller').get('model'));
                     if (this.network.id) {
+                        this.updateExtra();
                     }
                 });
             },
 
+
+            updateExtra: function () {
+                var newExtra = [];
+                if (this.network.extra instanceof Object)
+                    forIn(this.network.extra, function (value, key) {
+                        newExtra.push({
+                            key: key,
+                            value: value,
+                        });
+                    });
+                this.set('extra', newExtra);
+                Ember.run.next(function () {
+                    $('#single-network-extra').collapsible();
+                });
+            }.observes('network.extra.@each'),
         });
     }
 );
