@@ -24,6 +24,7 @@
 @import url("css/backend_edit.css");
 @import url("css/machine_tags.css");
 @import url("css/machine_list.css");
+@import url("css/network_list.css");
 @import url("css/machine_power.css");
 @import url("css/machine_shell.css");
 @import url("css/backend_button.css");
@@ -217,13 +218,16 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
-#machine-list-page .ui-filterable, #key-list-page .ui-filterable  {
+#machine-list-page .ui-filterable,
+#key-list-page .ui-filterable {
     margin: 10px 118px -44px 118px !important;
     position: relative;
     top: -49px;
 }
 
-#machine-list-page .ui-filterable input, #key-list-page .ui-filterable input {
+#machine-list-page .ui-filterable input,
+#key-list-page .ui-filterable input,
+#network-list-page .ui-filterable input {
     min-height:2.50em;
 }
 
@@ -609,4 +613,16 @@ ul.checkbox-list li label {
 
 .info-table tr {
     border: 1px solid #ccc;
+}
+
+#network-create-subnet-create-form {
+    display: none;
+    padding: 11px 9px 2px;
+    background-color: #E7E7E7;
+    margin: -11px 2px 2px;
+    border-radius: 5px;
+}
+
+#network-create textarea {
+    height: 75px !important;
 }

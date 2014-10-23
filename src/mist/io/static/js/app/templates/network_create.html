@@ -1,0 +1,112 @@
+<div id="network-create"
+    data-swipe-close="false"
+    class="side-panel"
+    data-role="panel"
+    data-position="right"
+    data-display="overlay"
+    data-theme="b">
+
+    <div data-role="header">
+        <h1>Create Network</h1>
+    </div>
+
+    <div data-role="content" data-theme="b">
+
+        <label for="create-network-name">Network Name:</label>
+        {{view Mist.TextField
+            id="create-network-name"
+            data-theme="a"
+            valueBinding="view.networkName"}}
+
+        <input id="network-create-subnet-create" data-theme="a"type="checkbox"
+            {{action "toggleCreateSubnet" on="change" target="view"}}>
+        <label for="network-create-subnet-create">
+            Create Subnet
+        </label>
+
+        <div id="network-create-subnet-create-form">
+
+            <label>Subnet Name:</label>
+            {{view Mist.TextField data-theme="a" valueBinding="view.subnetName"}}
+
+            <label>Network Address:</label>
+            {{view Mist.TextField data-theme="a" valueBinding="view.networkAddress"}}
+
+            <label>IP Version:</label>
+            <div id="network-create-subnet-ip-version"
+                 data-role="collapsible"
+                 data-iconpos="right"
+                 data-collapsed-icon="arrow-d"
+                 data-expanded-icon="arrow-u"
+                 data-theme="a"
+                 class="mist-select">
+
+                <h2>
+                    {{#if view.ipVersion}}
+                        {{view.ipVersion}}
+                    {{else}}
+                        Select IP Version
+                    {{/if}}
+                </h2>
+
+                <ul data-role="listview" data-theme="a">
+                    <li data-icon="false">
+                        <a {{action "selectIPVersion" "IPv4" target="view"}}>IPv4</a>
+                    </li>
+                    <li data-icon="false">
+                        <a {{action "selectIPVersion" "IPv6" target="view"}}>IPv6</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="network-create-subnet-gateway">
+                <label>Gateway IP:</label>
+                {{view Mist.TextField data-theme="a" valueBinding="view.gatewayIP"}}
+            </div>
+
+            <input id="network-create-disable-gateway" data-theme="a" type="checkbox"
+                {{action "toggleDisableGateway" on="change" target="view"}}>
+            <label for="network-create-disable-gateway">
+                Disable Gateway
+            </label>
+
+            <input id="network-create-enable-dhcp" data-theme="a" type="checkbox"
+                {{action "toggleEnableDHCP" on="change" target="view"}}>
+            <label for="network-create-enable-dhcp">
+                Enable DHCP
+            </label>
+
+            <label for="network-create-subnet-allocation-pools">
+                Allocation Pools:
+            </label>
+            {{view Mist.TextArea
+                id="network-create-subnet-allocation-pools"
+                data-theme="a"
+                valueBinding="view.allocationPools"}}
+
+            <label for="network-create-subnet-dns">
+                DNS Name Servers:
+            </label>
+            {{view Mist.TextArea
+                id="network-create-subnet-dns"
+                data-theme="a"
+                valueBinding="view.subnetDNS"}}
+
+            <label for="network-create-subnet-host-routes">
+                Host Routes:
+            </label>
+            {{view Mist.TextArea
+                id="network-create-subnet-host-routes"
+                data-theme="a"
+                valueBinding="view.hostRoutes"}}
+
+        </div>
+
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a class="ui-btn ui-btn-a"
+               {{action "backClicked" target="view"}}>Back</a>
+            <a class="ui-btn ui-btn-d" id="network-create-ok"
+                {{action "createClicked" target="view"}}>Create</a>
+        </div>
+    </div>
+</div>

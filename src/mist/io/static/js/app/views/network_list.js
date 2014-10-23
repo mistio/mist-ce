@@ -1,15 +1,31 @@
 define('app/views/network_list', ['app/views/mistscreen'],
-	//
-	//  Network List View
-	//
-	//  @returns class
-	//
-	function (Mistscreen) {
+    //
+    //  Network List View
+    //
+    //  @returns class
+    //
+    function (Mistscreen) {
 
-		'use strict';
+        'use strict';
 
-		return Mistscreen.extend({
+        return Mistscreen.extend({
 
-		});
-	}
+
+            createSubnet: false,
+
+            //
+            //
+            //  Actions
+            //
+            //
+
+
+            actions: {
+
+                createClicked: function () {
+                    Mist.networkCreateController.view.open();
+                },
+            }
+        });
+    }
 );

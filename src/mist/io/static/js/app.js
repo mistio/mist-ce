@@ -301,6 +301,7 @@ var loadFiles = function (callback) {
         'app/views/metric_node',
         'app/views/monitoring',
         'app/views/network',
+        'app/views/network_create',
         'app/views/network_list',
         'app/views/network_list_item',
         'app/views/rule',
@@ -369,6 +370,7 @@ var loadApp = function (
     MetricNodeView,
     MonitoringView,
     NetworkView,
+    NetworkCreateView,
     NetworkListView,
     NetworkListItemView,
     RuleView,
@@ -563,6 +565,7 @@ var loadApp = function (
     App.set('messageboxView', MessageBoxView);
     App.set('monitoringView', MonitoringView);
     App.set('machineView', SingleMachineView);
+    App.set('networkCreateView', NetworkCreateView);
     App.set('networkListView', NetworkListView);
     App.set('machineKeysView', MachineKeysView);
     App.set('machineTagsView', MachineTagsView);
@@ -608,6 +611,7 @@ var loadApp = function (
     App.set('machinePowerController', MachinePowerController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
     App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
+    App.set('networkCreateController', Ember.Object.extend({}).create());
 
     // Ember custom widgets
 
