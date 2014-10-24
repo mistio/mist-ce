@@ -1698,16 +1698,78 @@ def openstack_network_to_dict(network):
     net['subnets'] = []
     for sub in network.subnets:
 
-        net['subnets'].append({
-            'id': sub.id,
-            'name': sub.name,
-            'cidr': sub.cidr,
-            'enable_dhcp': sub.enable_dhcp,
-            'gateway_ip': sub.gateway_ip,
-            'dns_nameservers': sub.dns_nameservers,
-            'allocation_pools': sub.allocation_pools
-        })
+        net['subnets'].append(openstack_subnet_to_dict(sub))
     return net
+
+
+def openstack_subnet_to_dict(subnet):
+    net = {}
+
+    net['name'] = subnet.name
+    net['id'] = subnet.id
+    net['cidr'] = subnet.cidr
+    net['enable_dhcp'] = subnet.enable_dhcp
+    net['dns_nameservers'] = subnet.dns_nameservers
+    net['allocation_pools'] = subnet.allocation_pools
+    net['gateway_ip'] = subnet.gateway_ip
+
+    return net
+
+
+def create_network(user, backend_id, network, subnet):
+    """
+    Creates a new network. If subnet dict is specified, after creating the network
+    it will use the new network's id to create a subnet
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+
+    conn = connect_provider(backend)
+    if conn.type is not Provider.OPENSTACK:
+        raise NetworkActionNotSupported()
+
+    try:
+        network_name = network.get('name')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    admin_state_up = network.get('admin_state_up', True)
+    shared = network.get('shared', False)
+
+    # First we create the network
+    try:
+        new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+    except Exception as e:
+        raise NetworkCreationError("Got error r%" % e)
+
+    # If no subnet is specified we will just return the new network dict
+    if not subnet:
+        return openstack_network_to_dict(new_network)
+    else:
+        network_id = new_network.id
+
+        try:
+            subnet_name = subnet.get('name')
+            cidr = subnet.get('cidr')
+        except Exception as e:
+            raise RequiredParameterMissingError(e)
+
+        allocation_pools = subnet.get('allocation_pools', [])
+        gateway_ip = subnet.get('gateway_ip', None)
+        ip_version = subnet.get('ip_version', '4')
+        enable_dhcp = subnet.get('enable_dhcp', True)
+
+        subnet = conn.ex_create_neutron_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
+                                               allocation_pools=allocation_pools, gateway_ip=gateway_ip,
+                                               ip_version=ip_version, enable_dhcp=enable_dhcp)
+
+        ret = dict()
+        ret['network'] = openstack_network_to_dict(new_network)
+        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
+
+        return ret
 
 
 def set_machine_metadata(user, backend_id, machine_id, tag):

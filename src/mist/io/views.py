@@ -583,6 +583,23 @@ def list_networks(request):
     return methods.list_networks(user, backend_id)
 
 
+@view_config(route_name='networks', request_method='POST', renderer='json')
+def create_network(request):
+    """
+    Creates a new network. Currently workinh only with OPENSTACK backend
+    """
+    backend_id = request.matchdict['backend']
+
+    try:
+        network = request.json_body.get('network')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    subnet = request.json_body.get('subnet', None)
+    user = user_from_request(request)
+    return methods.create_network(user, backend_id, network, subnet)
+
+
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """Probes a machine using ping and ssh to collect metrics.
