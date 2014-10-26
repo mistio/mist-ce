@@ -1868,8 +1868,6 @@ def enable_monitoring(user, backend_id, machine_id,
             raise ServiceUnavailableError()
 
     ret_dict = resp.json()
-    if dry:
-        return ret_dict
     if not no_ssh:
         mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
                                             ret_dict['extra_vars'])
@@ -1902,28 +1900,10 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     ret_dict = json.loads(ret.content)
     host = ret_dict.get('host')
 
-    stdout = ""
-    try:
-        if not no_ssh:
-            stdout = _undeploy_collectd(user, backend_id, machine_id, host)
-    except:
-        pass
+    if not no_ssh:
+        mist.io.tasks.undeploy_collectd.delay(user.email,
+                                              backend_id, machine_id)
     trigger_session_update(user.email, ['monitoring'])
-    return stdout
-
-
-def _undeploy_collectd(user, backend_id, machine_id, host):
-    """Uninstall collectd from the machine and return command's output"""
-    #FIXME: do not hard-code stuff!
-    command = (
-        "[ -f /etc/cron.d/mistio-collectd ] && `command -v sudo` rm -f /etc/cron.d/mistio-collectd || "
-        "echo `command -v sudo` /opt/mistio-collectd/collectd.sh stop | bash; "
-        "sleep 2; [ -f /opt/mistio-collectd/collectd.pid ] && "
-        "`command -v sudo` kill -9 `cat /opt/mistio-collectd/collectd.pid`"
-    )
-
-    mist.io.tasks.ssh_command.delay(user.email, backend_id, machine_id,
-                                    host, command)
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
@@ -2380,6 +2360,7 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars,
 
         ansible.utils.VERBOSITY = 4 if debug else 0
         ansible.constants.HOST_KEY_CHECKING = False
+        ansible.constants.ANSIBLE_NOCOWS = True
         stats = ansible.callbacks.AggregateStats()
         playbook_cb = ansible.callbacks.PlaybookCallbacks(
             verbose=ansible.utils.VERBOSITY
@@ -2429,8 +2410,25 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars,
 def deploy_collectd(user, backend_id, machine_id, extra_vars):
     return run_playbook(
         user, backend_id, machine_id,
-        playbook_path='src/deploy_collectd/ansible/main.yml',
+        playbook_path='src/deploy_collectd/ansible/enable.yml',
         extra_vars=extra_vars,
         force_handlers=True,
         debug=True
     )
+
+
+def undeploy_collectd(user, backend_id, machine_id):
+    return run_playbook(
+        user, backend_id, machine_id,
+        playbook_path='src/deploy_collectd/ansible/disable.yml',
+        force_handlers=True,
+        debug=True
+    )
+
+
+def get_deploy_collectd_manual_command(uuid, password, monitor):
+    url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
+    cmd = "wget -O - %s | python - %s %s" % (url, uuid, password)
+    if monitor != 'monitor1.mist.io':
+        cmd += " -m %s" % monitor
+    return cmd

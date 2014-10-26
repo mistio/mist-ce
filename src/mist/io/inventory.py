@@ -47,6 +47,8 @@ class MistInventory(object):
         for name, host in self.hosts.items():
             vars_part = ' '.join(["%s=%s" % item for item in host.items()])
             ans_inv += '%s\t%s\n' % (name, vars_part)
+        ans_inv += ('\n[all:vars]\n'
+                    'ansible_python_interpreter="/usr/bin/env python2"\n')
         ans_cfg = '[defaults]\nhostfile=./inventory\nhost_key_checking=False\n'
         files = {'ansible.cfg': ans_cfg, 'inventory': ans_inv}
         files.update({'id_rsa/%s' % key_id: private_key

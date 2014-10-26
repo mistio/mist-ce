@@ -399,3 +399,10 @@ def deploy_collectd(email, backend_id, machine_id, extra_vars):
         from mist.core.methods import deploy_collectd as deploy_collectd_method
     user = user_from_email(email)
     deploy_collectd_method(user, backend_id, machine_id, extra_vars)
+
+
+@app.task
+def undeploy_collectd(email, backend_id, machine_id):
+    user = user_from_email
+    import mist.io.methods
+    mist.io.methods.undeploy_collectd(user, backend_id, machine_id)

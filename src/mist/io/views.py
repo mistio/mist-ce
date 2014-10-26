@@ -670,9 +670,8 @@ def update_monitoring(request):
             no_ssh=no_ssh
         )
     elif action == 'disable':
-        stdout = methods.disable_monitoring(user, backend_id, machine_id,
-                                            no_ssh=no_ssh)
-        ret_dict = {'cmd_output': stdout}
+        methods.disable_monitoring(user, backend_id, machine_id, no_ssh=no_ssh)
+        ret_dict = {}
     else:
         raise BadRequestError()
 
