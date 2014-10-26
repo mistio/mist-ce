@@ -2318,7 +2318,7 @@ def get_stats(user, backend_id, machine_id, start, stop, step):
         raise ServiceUnavailableError(resp.text)
 
 
-def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars,
+def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars={},
                  force_handlers=False, debug=False):
     ret_dict = {
         'success': False,
