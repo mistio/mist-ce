@@ -403,6 +403,6 @@ def deploy_collectd(email, backend_id, machine_id, extra_vars):
 
 @app.task
 def undeploy_collectd(email, backend_id, machine_id):
-    user = user_from_email
+    user = user_from_email(email)
     import mist.io.methods
     mist.io.methods.undeploy_collectd(user, backend_id, machine_id)
