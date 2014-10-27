@@ -221,6 +221,23 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 this.svg.axis.y.line.attr('y2', this.height - this.margin.bottom + 3);
 
+                // Update Grids
+                this.svg.grid.x.attr('transform', 'translate(' +
+                        this.margin.left + ',' + this.height + ')');
+
+                this.svg.grid.y.attr('transform', 'translate(' +
+                        this.margin.left + ',' + this.margin.top + ')');
+
+                // Update mouse over size
+                this.svg.canvas
+                    .select('.selectorLine').attr('y2', this.height - this.margin.bottom + 3);
+
+
+                // Update curtain
+                this.svg.value.curtain
+                    .attr('width', this.margin.left - 1)
+                    .attr('height', this.height + this.margin.top);
+
                 this.clearAnimation(true);
                 this.draw();
             },

@@ -138,6 +138,7 @@
     font: 10px Arial;
     font-weight: bold;
     color : #363636;
+    overflow: hidden;
 }
 
 .graph .hideAnimeLine{
