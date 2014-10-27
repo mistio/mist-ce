@@ -251,9 +251,6 @@ def amqp_log_listen():
     amqp_subscribe('mist_debug', None, echo)
 
 
-import sys
-
-
 class StdStreamCapture(object):
     def __init__(self, stdout=True, stderr=True, func=None, pass_through=True):
         """Starts to capture sys.stdout/sys.stderr"""
