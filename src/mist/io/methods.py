@@ -1,4 +1,7 @@
+import os
+import shutil
 import random
+import tempfile
 import json
 import requests
 import subprocess
@@ -17,6 +20,12 @@ from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
 
+import ansible.playbook
+import ansible.utils.template
+import ansible.callbacks
+import ansible.utils
+import ansible.constants
+
 try:
     from mist.core import config, model
     from mist.core.helpers import core_wrapper
@@ -34,8 +43,10 @@ from mist.io.exceptions import *
 
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish_user
+from mist.io.helpers import StdStreamCapture
 
-from mist.io import tasks
+import mist.io.tasks
+import mist.io.inventory
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -789,8 +800,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
     if script or monitoring:
-        tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id)
+        mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
+                                              monitoring, script, key_id)
 
     return {'id': node.id,
             'name': node.name,
@@ -1535,7 +1546,7 @@ def star_image(user, backend_id, image_id):
             if image_id in backend.unstarred:
                 backend.unstarred.remove(image_id)
         user.save()
-    task = tasks.ListImages()
+    task = mist.io.tasks.ListImages()
     task.clear_cache(user.email, backend_id)
     task.delay(user.email, backend_id)
     return not star
@@ -1822,13 +1833,12 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False, dry=False):
+                      no_ssh=False):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
         'action': 'enable',
         'no_ssh': True,
-        'dry': dry,
         'name': name,
         'public_ips': ",".join(public_ips),
         'dns_name': dns_name,
@@ -1857,20 +1867,10 @@ def enable_monitoring(user, backend_id, machine_id,
         else:
             raise ServiceUnavailableError()
 
-    resp_dict = resp.json()
-    host = resp_dict.get('host')
-    deploy_kwargs = resp_dict.get('deploy_kwargs')
-    command = deploy_collectd_command(deploy_kwargs)
-    ret_dict = {
-        'host': host,
-        'deploy_kwargs': deploy_kwargs,
-        'command': command,
-    }
-    if dry:
-        return ret_dict
-    stdout = ''
+    ret_dict = resp.json()
     if not no_ssh:
-        tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
+        mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
+                                            ret_dict['extra_vars'])
 
     trigger_session_update(user.email, ['monitoring'])
 
@@ -1900,41 +1900,10 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     ret_dict = json.loads(ret.content)
     host = ret_dict.get('host')
 
-    stdout = ""
-    try:
-        if not no_ssh:
-            stdout = _undeploy_collectd(user, backend_id, machine_id, host)
-    except:
-        pass
+    if not no_ssh:
+        mist.io.tasks.undeploy_collectd.delay(user.email,
+                                              backend_id, machine_id)
     trigger_session_update(user.email, ['monitoring'])
-    return stdout
-
-
-def deploy_collectd_command(deploy_kwargs):
-    """Return command that must be run to deploy collectd on a machine."""
-    parts = ["%s=%s" % (key, value) for key, value in deploy_kwargs.items()]
-    query = "&".join(parts)
-    url = "%s/deploy_script" % config.CORE_URI
-    if query:
-        url += "?" + query
-    command = "wget -O - %s '%s' | `command -v sudo` bash" % (
-        "--no-check-certificate" if not config.SSL_VERIFY else "",
-        url,
-    )
-    return command
-
-
-def _undeploy_collectd(user, backend_id, machine_id, host):
-    """Uninstall collectd from the machine and return command's output"""
-    #FIXME: do not hard-code stuff!
-    command = (
-        "[ -f /etc/cron.d/mistio-collectd ] && `command -v sudo` rm -f /etc/cron.d/mistio-collectd || "
-        "echo `command -v sudo` /opt/mistio-collectd/collectd.sh stop | bash; "
-        "sleep 2; [ -f /opt/mistio-collectd/collectd.pid ] && "
-        "`command -v sudo` kill -9 `cat /opt/mistio-collectd/collectd.pid`"
-    )
-
-    tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
@@ -2348,3 +2317,121 @@ def get_stats(user, backend_id, machine_id, start='', stop='', step='', metrics=
     else:
         log.error("Error getting stats %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
+
+
+def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
+                 force_handlers=False, debug=False):
+    if not extra_vars:
+        extra_vars = None
+    ret_dict = {
+        'success': False,
+        'started_at': time(),
+        'finished_at': 0,
+        'stdout': '',
+        'error_msg': '',
+        'inventory': '',
+        'stats': {},
+    }
+    inventory = mist.io.inventory.MistInventory(user,
+                                                [(backend_id, machine_id)])
+    if len(inventory.hosts) != 1:
+        log.error("Expected 1 host, found %s", inventory.hosts)
+        ret_dict['error_msg'] = "Expected 1 host, found %s" % inventory.hosts
+        ret_dict['finished_at'] = time()
+        return ret_dict
+    machine_name = inventory.hosts.keys()[0]
+    log_prefix = "Running playbook '%s' on machine '%s'" % (playbook_path,
+                                                            machine_name)
+    files = inventory.export(include_localhost=False)
+    ret_dict['inventory'] = files['inventory']
+    tmp_dir = tempfile.mkdtemp()
+    old_dir = os.getcwd()
+    os.chdir(tmp_dir)
+    try:
+        log.debug("%s: Saving inventory files", log_prefix)
+        os.mkdir('id_rsa')
+        for name, data in files.items():
+            with open(name, 'w') as f:
+                f.write(data)
+        for name in os.listdir('id_rsa'):
+            os.chmod('id_rsa/%s' % name, 0600)
+        log.debug("%s: Inventory files ready", log_prefix)
+
+        playbook_path = '%s/%s' % (old_dir, playbook_path)
+        ansible_hosts_path = 'inventory'
+        # extra_vars['host_key_checking'] = False
+
+        ansible.utils.VERBOSITY = 4 if debug else 0
+        ansible.constants.HOST_KEY_CHECKING = False
+        ansible.constants.ANSIBLE_NOCOWS = True
+        stats = ansible.callbacks.AggregateStats()
+        playbook_cb = ansible.callbacks.PlaybookCallbacks(
+            verbose=ansible.utils.VERBOSITY
+        )
+        runner_cb = ansible.callbacks.PlaybookRunnerCallbacks(
+            stats, verbose=ansible.utils.VERBOSITY
+        )
+        log.error(old_dir)
+        log.error(tmp_dir)
+        log.error(extra_vars)
+        log.error(playbook_path)
+        capture = StdStreamCapture(pass_through=debug)
+        try:
+            playbook = ansible.playbook.PlayBook(
+                playbook=playbook_path,
+                host_list=ansible_hosts_path,
+                callbacks=playbook_cb,
+                runner_callbacks=runner_cb,
+                stats=stats,
+                extra_vars=extra_vars,
+                force_handlers=force_handlers,
+            )
+            result = playbook.run()
+        except Exception as exc:
+            log.error("%s: Error %r", log_prefix, exc)
+            ret_dict['error_msg'] = repr(exc)
+        finally:
+            ret_dict['finished_at'] = time()
+            ret_dict['stdout'] = capture.close()
+        if ret_dict['error_msg']:
+            return ret_dict
+        log.debug("%s: Ansible result = %s", log_prefix, result)
+        mresult = result[machine_name]
+        ret_dict['stats'] = mresult
+        if mresult['failures'] or mresult['unreachable']:
+            log.error("%s: Ansible run failed: %s", log_prefix, mresult)
+            return ret_dict
+        log.info("%s: Ansible run succeeded: %s", log_prefix, mresult)
+        ret_dict['success'] = True
+        return ret_dict
+    finally:
+        os.chdir(old_dir)
+        if not debug:
+            shutil.rmtree(tmp_dir)
+
+
+def deploy_collectd(user, backend_id, machine_id, extra_vars):
+    return run_playbook(
+        user, backend_id, machine_id,
+        playbook_path='src/deploy_collectd/ansible/enable.yml',
+        extra_vars=extra_vars,
+        force_handlers=True,
+        debug=True
+    )
+
+
+def undeploy_collectd(user, backend_id, machine_id):
+    return run_playbook(
+        user, backend_id, machine_id,
+        playbook_path='src/deploy_collectd/ansible/disable.yml',
+        force_handlers=True,
+        debug=True
+    )
+
+
+def get_deploy_collectd_manual_command(uuid, password, monitor):
+    url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
+    cmd = "wget -O - %s | sudo python - %s %s" % (url, uuid, password)
+    if monitor != 'monitor1.mist.io':
+        cmd += " -m %s" % monitor
+    return cmd
