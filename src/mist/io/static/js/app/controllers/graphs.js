@@ -213,7 +213,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _generatePayload: function (request) {
                 return {
-                    v: 2,
                     request_id: request.id,
                     start: parseInt(request.from / 1000) - 50,
                     stop: parseInt(request.until / 1000) + 50,
