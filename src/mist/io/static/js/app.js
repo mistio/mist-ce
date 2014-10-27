@@ -942,6 +942,7 @@ function Ajax (csrfToken) {
                     type: type,
                     headers: {
                         'Csrf-Token': csrfToken,
+                        'Api-Version': 1,
                     },
                     complete: function(jqXHR) {
                         var success = (jqXHR.status == 200);
