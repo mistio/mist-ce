@@ -136,11 +136,11 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.region = region
         if provider == 'docker':
             backend.docker_port = docker_port
-        #For digital ocean v2 of the API, only apisecret is needed. 
+        #For digital ocean v2 of the API, only apisecret is needed.
         #However, in v1 both api_key and api_secret are needed. In order
-        #for both versions to be supported (existing v1, and new v2 which 
-        #is now the default) we set api_key same to api_secret to 
-        #distinguish digitalocean v2 logins, to avoid adding another 
+        #for both versions to be supported (existing v1, and new v2 which
+        #is now the default) we set api_key same to api_secret to
+        #distinguish digitalocean v2 logins, to avoid adding another
         #arguement on digital ocean libcloud driver
 
         if provider == 'digitalocean':
@@ -611,7 +611,7 @@ def get_machine_actions(machine_from_api, conn):
         if machine_from_api.state is NodeState.PENDING:
         #after resize, node gets to pending mode, needs to be started
             can_start = True
-        
+
     if conn.type is Provider.GCE:
         can_start = False
         can_stop = False
@@ -743,13 +743,13 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 pass
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
-        node = _create_machine_rackspace(conn, public_key, machine_name, image, 
+        node = _create_machine_rackspace(conn, public_key, machine_name, image,
                                          size, location)
     elif conn.type in [Provider.OPENSTACK]:
-        node = _create_machine_openstack(conn, private_key, public_key, 
+        node = _create_machine_openstack(conn, private_key, public_key,
                                          machine_name, image, size, location)
     elif conn.type is Provider.HPCLOUD:
-        node = _create_machine_hpcloud(conn, private_key, public_key, 
+        node = _create_machine_hpcloud(conn, private_key, public_key,
                                        machine_name, image, size, location)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
@@ -789,7 +789,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
     if script or monitoring:
-        tasks.post_deploy_steps.delay(user.email, backend_id, node.id, 
+        tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
                                       monitoring, script, key_id)
 
     return {'id': node.id,
@@ -1163,7 +1163,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         return node
 
 
-def _create_machine_gce(conn, key_name, private_key, public_key, machine_name, 
+def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
                         image, size, location):
     """Create a machine in GCE.
 
@@ -1191,7 +1191,7 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
     return node
 
 
-def _create_machine_linode(conn, key_name, private_key, public_key, 
+def _create_machine_linode(conn, key_name, private_key, public_key,
                           machine_name, image, size, location):
     """Create a machine in Linode.
 
@@ -1267,7 +1267,7 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
 
                 with user.lock_n_load():
                     machine_uid = [backend_id, machine_id]
-    
+
                     for keypair in user.keypairs:
                         for machine in user.keypairs[keypair].machines:
                             if machine[:2] == machine_uid:
@@ -1646,7 +1646,7 @@ def list_locations(user, backend_id):
 def list_networks(user, backend_id):
     """List networks from each backend.
 
-    Currently NephoScale is supported. For other providers 
+    Currently NephoScale is supported. For other providers
     this returns an empty list
 
     """
@@ -2335,7 +2335,7 @@ def get_stats(user, backend_id, machine_id, start, stop, step):
         resp = requests.get(
             "%s/backends/%s/machines/%s/stats" % (config.CORE_URI,
                                                   backend_id, machine_id),
-            params={'start': start, 'stop': stop, 'step': step, 'v': 2},
+            params={'start': start, 'stop': stop, 'step': step},
             headers={'Authorization': get_auth_header(user)},
             verify=config.SSL_VERIFY
         )
