@@ -36,7 +36,7 @@ from mist.io.exceptions import *
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish_user
 
-from mist.io import tasks
+import mist.io.tasks
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -806,12 +806,12 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if conn.type == Provider.AZURE:
         #for Azure, connect with the generated password, deploy the ssh key
         #when this is ok, it calss post_deploy for script/monitoring
-        tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
+        mist.io.tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
                                       monitoring, script, key_id,
                                       node.extra.get('username'), node.extra.get('password'), public_key)
     else:
         if script or monitoring:
-            tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
+            mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
                                       monitoring, script, key_id)
 
     return {'id': node.id,
@@ -1612,7 +1612,7 @@ def star_image(user, backend_id, image_id):
             if image_id in backend.unstarred:
                 backend.unstarred.remove(image_id)
         user.save()
-    task = tasks.ListImages()
+    task = mist.io.tasks.ListImages()
     task.clear_cache(user.email, backend_id)
     task.delay(user.email, backend_id)
     return not star
@@ -1947,7 +1947,7 @@ def enable_monitoring(user, backend_id, machine_id,
         return ret_dict
     stdout = ''
     if not no_ssh:
-        tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
+        mist.io.tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
 
     trigger_session_update(user.email, ['monitoring'])
 
@@ -2011,7 +2011,7 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
         "`command -v sudo` kill -9 `cat /opt/mistio-collectd/collectd.pid`"
     )
 
-    tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
+    mist.io.tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
