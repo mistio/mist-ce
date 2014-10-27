@@ -28,7 +28,6 @@ from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError
 from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
-from mist.io.inventory import MistInventory
 
 try:  # Multi-user environment
     from mist.core.helpers import user_from_email
