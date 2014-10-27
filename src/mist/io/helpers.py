@@ -2,6 +2,7 @@
 
 import os
 import re
+import sys
 import time
 import json
 import random
@@ -21,7 +22,7 @@ try:
     from mist.core import config
 except ImportError:
     from mist.io import config
-    
+
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
@@ -248,3 +249,54 @@ def amqp_log_listen():
         print msg.body
 
     amqp_subscribe('mist_debug', None, echo)
+
+
+class StdStreamCapture(object):
+    def __init__(self, stdout=True, stderr=True, func=None, pass_through=True):
+        """Starts to capture sys.stdout/sys.stderr"""
+        self.func = func
+        self.pass_through = pass_through
+        self.buff = []
+        self.streams = {}
+        if stdout:
+            self.streams['stdout'] = sys.stdout
+        if stderr:
+            self.streams['stderr'] = sys.stderr
+
+        class Stream(object):
+            def __init__(self, name):
+                self.name = name
+
+            def write(_self, text):
+                self._write(_self.name, text)
+
+        for name in self.streams:
+            setattr(sys, name, Stream(name))
+
+    def _write(self, name, text):
+        self.buff.append((name, text))
+        if self.pass_through:
+            self.streams[name].write(text)
+        if self.func is not None:
+            self.func(name, text)
+
+    def _get_capture(self, names=('stdout', 'stderr')):
+        buff = ""
+        for name, text in self.buff:
+            if name in names:
+                buff += text
+        return buff
+
+    def get_stdout(self):
+        return self._get_capture(['stdout'])
+
+    def get_stderr(self):
+        return self._get_capture(['stderr'])
+
+    def get_mux(self):
+        return self._get_capture()
+
+    def close(self):
+        for name in self.streams:
+            setattr(sys, name, self.streams[name])
+        return self.get_mux()
