@@ -205,6 +205,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     .attr('width', this.width)
                     .attr('height', this.height);
 
+                // Change valuearea height
+                this.valuearea.y0(this.height - this.margin.top - this.margin.bottom);
+
                 // Update scale to new values
                 this.updateScale();
 
