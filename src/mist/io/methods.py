@@ -2304,7 +2304,7 @@ def get_stats(user, backend_id, machine_id, start='', stop='', step='', metrics=
         resp = requests.get(
             "%s/backends/%s/machines/%s/stats" % (config.CORE_URI,
                                                   backend_id, machine_id),
-            params={'start': start, 'stop': stop, 'step': step, 'v': 2},
+            params={'start': start, 'stop': stop, 'step': step},
             headers={'Authorization': get_auth_header(user)},
             verify=config.SSL_VERIFY
         )
