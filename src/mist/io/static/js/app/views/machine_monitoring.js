@@ -380,9 +380,9 @@ define('app/views/machine_monitoring',
                             },
                         ],
                         callback: function (didConfirm) {
-                            if (!didConfirm)
-                                Mist.monitoringController.disableMonitoring(
-                                    that.machine
+                            if (didConfirm)
+                                Mist.monitoringController.enableMonitoring(
+                                    that.machine, null, true
                                 );
                         },
                     });
