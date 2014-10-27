@@ -142,7 +142,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 try:
                     enable_monitoring(user, backend_id, node.id,
                         name=node.name, dns_name=node.extra.get('dns_name',''),
-                        public_ips=ips, no_ssh=False
+                        public_ips=ips, no_ssh=False, dry=False,
                     )
                 except Exception as e:
                     print repr(e)

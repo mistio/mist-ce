@@ -1833,12 +1833,13 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False):
+                      no_ssh=False, dry=False):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
         'action': 'enable',
         'no_ssh': True,
+        'dry': dry,
         'name': name,
         'public_ips': ",".join(public_ips),
         'dns_name': dns_name,
@@ -1866,8 +1867,11 @@ def enable_monitoring(user, backend_id, machine_id,
             raise PaymentRequiredError(resp.text.replace('Payment required: ', ''))
         else:
             raise ServiceUnavailableError()
-
     ret_dict = resp.json()
+
+    if dry:
+        return ret_dict
+
     if not no_ssh:
         mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
                                             ret_dict['extra_vars'])

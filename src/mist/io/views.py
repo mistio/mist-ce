@@ -654,20 +654,12 @@ def update_monitoring(request):
     public_ips = request.json_body.get('public_ips', [])
     dns_name = request.json_body.get('dns_name', '')
     no_ssh = bool(request.json_body.get('no_ssh', False))
-
-    payload = {
-        'action': action,
-        'name': name,
-        'public_ips': ",".join(public_ips),
-        'dns_name': dns_name,
-        # tells core not to try to run ssh command to (un)deploy collectd
-        'no_ssh': True,
-    }
+    dry = bool(request.json_body.get('dry', False))
 
     if action == 'enable':
         ret_dict = methods.enable_monitoring(
             user, backend_id, machine_id, name, dns_name, public_ips,
-            no_ssh=no_ssh
+            no_ssh=no_ssh, dry=dry
         )
     elif action == 'disable':
         methods.disable_monitoring(user, backend_id, machine_id, no_ssh=no_ssh)
