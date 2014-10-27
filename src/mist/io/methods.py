@@ -2318,8 +2318,10 @@ def get_stats(user, backend_id, machine_id, start, stop, step):
         raise ServiceUnavailableError(resp.text)
 
 
-def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars={},
+def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
                  force_handlers=False, debug=False):
+    if not extra_vars:
+        extra_vars = None
     ret_dict = {
         'success': False,
         'started_at': time(),
@@ -2356,7 +2358,7 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars={},
 
         playbook_path = '%s/%s' % (old_dir, playbook_path)
         ansible_hosts_path = 'inventory'
-        extra_vars['host_key_checking'] = False
+        # extra_vars['host_key_checking'] = False
 
         ansible.utils.VERBOSITY = 4 if debug else 0
         ansible.constants.HOST_KEY_CHECKING = False
