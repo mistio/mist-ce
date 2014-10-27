@@ -165,6 +165,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.svg.value.lines.forEach(function (line) {
                     line.animation.clearBuffer(stopCurrent);
                 });
+                this.svg.value.area.animation.clearBuffer(stopCurrent);
                 this.svg.axis.x.legend.animation.clearBuffer(stopCurrent);
                 this.svg.grid.x.animation.clearBuffer(stopCurrent);
 
@@ -222,6 +223,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             },
 
 
+
             /*
             *
             * Setups event listeners for mouse,
@@ -248,7 +250,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 var updatePopUpValue = function(graph) {
                     // Update popup when it is over value line
-                    graph = Mist.graphsController.getGraphById(graph.id);
+                    graph = Mist.graphsController.getGraph(graph.id);
+
+                    if (graph.view.isHidden)
+                        return;
+
                     if(mouseX > that.margin.left)
                     {
                         if(!isVisible){
@@ -398,7 +404,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.margin = {top: 10, right: 0, bottom: 24, left: 52};;
                 this.timeDisplayed    = Mist.graphsController.config.timeWindow;
                 this.yAxisValueFormat = '';
-                this.displayedData    = [];
                 this.xCoordinates      = [];
                 this.clearAnimPending = false;
                 this.animationEnabled = true;
@@ -614,6 +619,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 this._setValueLinePaths();
 
+                var firstKey = Object.keys(this.graph.displayedData)[0];
+                var valueAreaPath = this.valuearea(this.graph.displayedData[firstKey]);
+
                 // Animate line, axis and grid
                 if (this.animationEnabled && !this.clearAnimPending) {
 
@@ -636,8 +644,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     // If this is a single line graph, show area path
                     if (this.graph.datasources.length == 1) {
-                        var firstKey = Object.keys(this.graph.displayedData)[0];
-                        var valueAreaPath = this.valuearea(this.graph.displayedData[firstKey]);
                         this.svg.value.area.animation
                             .select(this.svg.value.area)
                             .fps(fps)
@@ -684,6 +690,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     this.svg.value.lines.forEach(function (line) {
                         line.attr('d', this.valueLinePaths[line.id]);
                     }, this);
+                    if (this.graph.datasources.length == 1) {
+                        this.svg.value.area.attr('d', valueAreaPath);
+                    }
                     this.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,this.abelFormat, this.timeDisplayed));
                     this.svg.axis.x.legend.selectAll('text')
                            .style('text-anchor', 'end')
@@ -697,7 +706,10 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         window.setTimeout(function(){
                             that.svg.value.lines.forEach(function (line) {
                                 line.attr('transform', 'translate(' + 0 + ')');
-                            })
+                            });
+                            if (that.graph.datasources.length == 1) {
+                                that.svg.value.area.attr('transform', 'translate(' + 0 + ')');
+                            }
                             that.svg.axis.x.legend.attr('transform', 'translate(' + that.margin.left + ',' + (that.height - that.margin.bottom + 2) + ')');
                             that.svg.grid.x.attr('transform', 'translate(' + that.margin.left + ',' + that.height + ')');
                             that.clearAnimPending = false;

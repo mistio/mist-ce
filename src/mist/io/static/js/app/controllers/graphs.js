@@ -96,10 +96,14 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 $(window).off('resize', this._handleWindowResize);
             },
 
-            getGraphById: function(id) {
-                for (var i=0;i<this.content.length;i++)
-                    if (this.content[i].id == id)
-                        return this.content[i];
+
+            getGraph: function(id) {
+                return this.content.findBy('id', id);
+            },
+
+
+            graphExists: function (id) {
+                return !!this.getGraph(id);
             },
 
 
@@ -108,6 +112,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             //  Pseudo-Private Methods
             //
             //
+
 
             _clear: function () {
                 this.setProperties({
@@ -122,12 +127,13 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 if (this.isClosed) return;
 
-                // Log requests
-                info('Requesting stats from: ' +
-                    Mist.prettyTime(new Date(args.from)) +
-                    ' until: ' +
-                    Mist.prettyTime(new Date(args.until)));
-                ////////////////////////////////////////////
+                // Log requests ///////////////////////////////
+                if (Mist.debugStats)
+                    info('Requesting stats from: ' +
+                        Mist.prettyTime(new Date(args.from)) +
+                        ' until: ' +
+                        Mist.prettyTime(new Date(args.until)));
+                ////////////////////////////////////////////////
 
                 this._clearPendingRequests();
                 this.setProperties({
