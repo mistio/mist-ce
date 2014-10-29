@@ -1761,9 +1761,12 @@ def create_network(user, backend_id, network, subnet):
         ip_version = subnet.get('ip_version', '4')
         enable_dhcp = subnet.get('enable_dhcp', True)
 
-        subnet = conn.ex_create_neutron_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
-                                               allocation_pools=allocation_pools, gateway_ip=gateway_ip,
-                                               ip_version=ip_version, enable_dhcp=enable_dhcp)
+        try:
+            subnet = conn.ex_create_neutron_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
+                                                   allocation_pools=allocation_pools, gateway_ip=gateway_ip,
+                                                   ip_version=ip_version, enable_dhcp=enable_dhcp)
+        except Exception as e:
+            raise NetworkError(e)
 
         ret = dict()
         ret['network'] = openstack_network_to_dict(new_network)
