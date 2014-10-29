@@ -72,6 +72,43 @@ define('app/views/network', ['app/views/mistscreen'],
             },
 
 
+            //
+            //
+            //  Actions
+            //
+            //
+
+
+            actions: {
+
+                deleteClicked: function () {
+
+                    var that = this;
+                    var networkId = this.network.id;
+
+                    Mist.confirmationController.set('title', 'Delete network');
+                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + networkId + '" ?');
+                    Mist.confirmationController.set('callback', function () {
+                        that.network.backend.networks.deleteNetwork(networkId,
+                            function (success) {
+                                Ember.run.later(function () {
+                                    if (success)
+                                        Mist.Router.router.transitionTo('networks');
+                                }, 300);
+                        });
+                    });
+                    Mist.confirmationController.show();
+                }
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
             updateExtra: function () {
                 var newExtra = [];
                 if (this.network.extra instanceof Object)

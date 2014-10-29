@@ -55,6 +55,24 @@ define('app/controllers/networks', ['app/models/network'],
             },
 
 
+            deleteNetwork: function (networkId, callback) {
+
+                var that = this;
+                that.set('deletingNetwork', true);
+                var url = '/backends/' + this.backend.id +
+                    '/networks/' + networkId;
+                Mist.ajax.DELETE(url)
+                .success(function () {
+                    that._deleteNetwork(networkId);
+                }).error(function (message) {
+                    Mist.notificationController.notify(message);
+                }).complete(function (success, message) {
+                    that.set('deletingNetwork', false);
+                    if (callback) callback(success, message);
+                });
+            },
+
+
             //
             //
             //  Pseudo-Private Methods
