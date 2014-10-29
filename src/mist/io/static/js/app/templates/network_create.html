@@ -73,6 +73,39 @@
                 data-theme="a"
                 id="network-create-name"
                 valueBinding="Mist.networkCreateController.network.name"}}
+
+
+            <!--
+                Select Admin State Up
+            -->
+
+
+            <label>Admin State:</label>
+            <div id="network-create-admin-state"
+                data-role="collapsible"
+                data-iconpos="right"
+                data-collapsed-icon="arrow-d"
+                data-expanded-icon="arrow-u"
+                data-theme="a"
+                class="mist-select">
+
+                <h2>
+                    {{Mist.networkCreateController.adminStateUpToText}}
+                </h2>
+
+                <ul data-role="listview" data-theme="a">
+                    <li data-icon="false">
+                        <a {{action "adminStateSelected" true target="view"}}>
+                            UP
+                        </a>
+                    </li>
+                    <li data-icon="false">
+                        <a {{action "adminStateSelected" false target="view"}}>
+                            DOWN
+                        </a>
+                    </li>
+                </ul> <!-- list -->
+            </div><!-- collapsible -->
         </div>
 
 
@@ -195,9 +228,11 @@
                     -->
 
 
-                    <input id="network-create-enable-dhcp" data-theme="a" type="checkbox"
-                        {{action "toggleEnableDHCP" on="change" target="view"}}>
-                    <label for="network-create-enable-dhcp">
+                    {{view Mist.Checkbox
+                        data-theme="a"
+                        id="network-create-subnet-dhcp"
+                        checkedBinding="Mist.networkCreateController.network.subnet.enableDHCP"}}
+                    <label for="network-create-subnet-dhcp">
                         Enable DHCP
                     </label>
 
@@ -212,34 +247,35 @@
                     {{view Mist.TextArea
                         id="network-create-subnet-allocation-pools"
                         data-theme="a"
-                        valueBinding="view.allocationPools"}}
+                        valueBinding="Mist.networkCreateController.network.subnet.allocationPools"}}
 
 
                     <!--
                         DNS Servers
-                    -->
+                    --
 
 
                     <label for="network-create-subnet-dns">
                         DNS Name Servers:
                     </label>
-                    {{view Mist.TextArea
+                    {{!view Mist.TextArea
                         id="network-create-subnet-dns"
                         data-theme="a"
-                        valueBinding="view.subnetDNS"}}
+                        valueBinding="Mist.networkCreateController.network.subnet.DNS"}}
 
                     <!--
                         Host Routes
-                    -->
+                    --
 
 
                     <label for="network-create-subnet-host-routes">
                         Host Routes:
                     </label>
-                    {{view Mist.TextArea
+                    {{!view Mist.TextArea
                         id="network-create-subnet-host-routes"
                         data-theme="a"
-                        valueBinding="view.hostRoutes"}}
+                        valueBinding="Mist.networkCreateController.network.subnet.hostRoutes"}}
+                    -->
 
                 </div>
             </div>

@@ -26,6 +26,7 @@ define('app/views/network_create', ['app/views/panel'],
 
             clear: function () {
                 $('#network-create-name-wrapper').hide();
+                $('#network-create-admin-state-wrapper').hide();
                 $('#network-create-subnet-wrapper').hide();
                 $('#network-create-subnet-form').hide();
                 $('#network-create-subnet-name-wrapper').hide();
@@ -85,6 +86,12 @@ define('app/views/network_create', ['app/views/panel'],
                 },
 
 
+                adminStateSelected: function (isUp) {
+                    Mist.networkCreateController.selectAdminState(isUp);
+                    this._fieldIsReady('admin-state')
+                },
+
+
                 ipvSelected: function (ipv) {
                     Ember.run.later(function () {
                         $('#network-create-gateway-wrapper').slideDown();
@@ -95,12 +102,12 @@ define('app/views/network_create', ['app/views/panel'],
 
 
                 backClicked: function () {
-                    Mist.networkCreateController.view.close();
+                    Mist.networkCreateController.close();
                 },
 
 
                 createClicked: function () {
-                    // TODO(gtsop)
+                    Mist.networkCreateController.create();
                 },
             },
 
