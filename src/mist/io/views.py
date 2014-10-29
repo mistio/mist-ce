@@ -609,7 +609,9 @@ def delete_network(request):
     network_id = request.matchdict['network']
 
     user = user_from_request(request)
-    return methods.delete_network(user, backend_id, network_id)
+    methods.delete_network(user, backend_id, network_id)
+
+    return OK
 
 
 @view_config(route_name='probe', request_method='POST', renderer='json')
