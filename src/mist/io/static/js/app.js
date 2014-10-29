@@ -263,6 +263,7 @@ var loadFiles = function (callback) {
         'app/controllers/metric_add_custom',
         'app/controllers/metrics',
         'app/controllers/monitoring',
+        'app/controllers/network_create',
         'app/controllers/notification',
         'app/controllers/rule_edit',
         'app/controllers/rules',
@@ -332,6 +333,7 @@ var loadApp = function (
     MetricAddCustomController,
     MetricsController,
     MonitoringController,
+    NetworkCreateController,
     NotificationController,
     RuleEditController,
     RulesController,
@@ -609,9 +611,10 @@ var loadApp = function (
     App.set('confirmationController', ConfirmationController.create());
     App.set('notificationController', NotificationController.create());
     App.set('machinePowerController', MachinePowerController.create());
+    App.set('networkCreateController', NetworkCreateController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
     App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
-    App.set('networkCreateController', Ember.Object.extend({}).create());
+
 
     // Ember custom widgets
 

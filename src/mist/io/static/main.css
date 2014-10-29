@@ -25,6 +25,7 @@
 @import url("css/machine_tags.css");
 @import url("css/machine_list.css");
 @import url("css/network_list.css");
+@import url("css/network_create.css");
 @import url("css/machine_power.css");
 @import url("css/machine_shell.css");
 @import url("css/backend_button.css");
@@ -135,12 +136,6 @@ textarea#private-key, #manual-monitoring-popup textarea {
 .ui-btn-icon-right {
     padding: .6em 2.5em .6em 1.1em !important;
 }
-.ok-cancel {
-    width: 100%;
-}
-.ok-cancel > .ui-controlgroup-controls {
-    width: 100%;
-}
 
 
 /* Popup
@@ -192,7 +187,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
      *  so this change can easily be undone or modified
      */
     width: 325px; /* Useless, but leave it there for reference reasons */
-    min-height: 300px;
+    min-height: 0;
 }
 .side-panel .ui-panel-inner {
     padding: 7px;
@@ -369,7 +364,6 @@ ul.checkbox-list li label {
  */
 
 .mist-select .ui-collapsible-content {
-    padding-right: 30px;
     background: transparent !important;
 }
 .mist-select h2 {
@@ -378,6 +372,11 @@ ul.checkbox-list li label {
 }
 .mist-select ul {
     margin-top: 0px;
+}
+
+.mist-select .ui-collapsible-content {
+    margin: 0 3px !important;
+    padding-top: 0;
 }
 
 #message-box-popup {
@@ -584,6 +583,18 @@ ul.checkbox-list li label {
 .cold {
     background: #396b9e /*{b-bup-background-color}*/linear-gradient( #5f9cc5 /*{d-bup-background-start}*/, #396b9e /*{d-bup-background-end}*/) /*{d-bup-background-color}*/ !important;
 }
+
+/* OK - Cancel
+------------------------------------------------------------------------------*/
+.ok-cancel {
+    width: 100%;
+    margin: 0;
+    padding-bottom: 0 !important;
+}
+.ok-cancel > .ui-controlgroup-controls {
+    width: 100%;
+}
+
 /* Info table
 ------------------------------------------------------------------------------*/
 .info-table {
@@ -613,20 +624,4 @@ ul.checkbox-list li label {
 
 .info-table tr {
     border: 1px solid #ccc;
-}
-
-#network-create-subnet-create-form {
-    display: none;
-    padding: 11px 9px 2px;
-    background-color: #E7E7E7;
-    margin: -11px 2px 2px;
-    border-radius: 5px;
-}
-
-#network-create textarea {
-    height: 75px !important;
-}
-
-.subnet-name {
-    background-color: #E8E8E8;
 }

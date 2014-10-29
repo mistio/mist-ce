@@ -23,7 +23,7 @@ define('app/views/network_list', ['app/views/mistscreen'],
             actions: {
 
                 createClicked: function () {
-                    Mist.networkCreateController.view.open();
+                    Mist.networkCreateController.open();
                 },
             }
         });
