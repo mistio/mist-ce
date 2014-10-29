@@ -442,6 +442,13 @@ var loadApp = function (
             Ember.run.next(function () {
                 document.title = 'mist.io - networks';
             });
+        },
+        exit: function() {
+            Mist.backendsController.forEach(function (backend) {
+                backend.networks.forEach(function (network) {
+                    network.set('selected', false);
+                });
+            });
         }
     });
 

@@ -82,22 +82,17 @@ define('app/views/network', ['app/views/mistscreen'],
             actions: {
 
                 deleteClicked: function () {
-
                     var that = this;
                     var networkId = this.network.id;
-
-                    Mist.confirmationController.set('title', 'Delete network');
-                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + networkId + '" ?');
-                    Mist.confirmationController.set('callback', function () {
-                        that.network.backend.networks.deleteNetwork(networkId,
-                            function (success) {
-                                Ember.run.later(function () {
+                    Mist.confirmationController.setUp('Delete network',
+                        'Are you sure you want to delete "' + this.network.name + '" ?', function () {
+                            that.network.backend.networks.deleteNetwork(networkId,
+                                function (success) {
                                     if (success)
                                         Mist.Router.router.transitionTo('networks');
-                                }, 300);
-                        });
-                    });
-                    Mist.confirmationController.show();
+                            });
+                        }
+                    );
                 }
             },
 

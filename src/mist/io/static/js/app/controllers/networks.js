@@ -122,7 +122,30 @@ define('app/controllers/networks', ['app/models/network'],
                     this.content.removeObject(this.getNetwork(networkId));
                     this.trigger('onNetworkDelete');
                 });
-            }
+            },
+
+
+            _updateSelectedNetworks: function() {
+                Ember.run(this, function() {
+                    var newSelectedNetworks = this.content.filter(function (network) {
+                        return network.selected;
+                    });
+                    this.set('selectedNetworks', newSelectedNetworks);
+                    this.trigger('onSelectedNetworksChange');
+                });
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            selectedNetworksObserver: function() {
+                Ember.run.once(this, '_updateSelectedNetworks');
+            }.observes('content.@each.selected')
 		});
 	}
 );

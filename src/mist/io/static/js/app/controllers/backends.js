@@ -23,6 +23,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             machineCount: 0,
             networkCount: 0,
             selectedMachines: [],
+            selectedNetworks: [],
             machineRequest: false,
             networkRequest: false,
 
@@ -420,6 +421,18 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
+            _updateSelectedNetworks: function () {
+                Ember.run(this, function () {
+                    var newSelectedNetworks = [];
+                    this.content.forEach(function (backend) {
+                        newSelectedNetworks = newSelectedNetworks.concat(backend.selectedNetworks);
+                    });
+                    this.set('selectedNetworks', newSelectedNetworks);
+                    this.trigger('onSelectedNetworksChange');
+                });
+            },
+
+
             //
             //
             //  Observers
@@ -457,9 +470,14 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             }.observes('content.@each.loadingNetworks'),
 
 
-            selectedMachinesObserver: function() {
+            selectedMachinesObserver: function () {
                 Ember.run.once(this, '_updateSelectedMachines');
-            }.observes('content.@each.selectedMachines')
+            }.observes('content.@each.selectedMachines'),
+
+
+            selectedNetworksObserver: function () {
+                Ember.run.once(this, '_updateSelectedNetworks');
+            }.observes('content.@each.selectedNetworks')
         });
     }
 );

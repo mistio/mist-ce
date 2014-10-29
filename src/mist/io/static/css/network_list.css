@@ -8,10 +8,6 @@
     margin: 10px 118px -44px 0px !important;
 }
 
-#network-list-page ul.checkbox-list li a {
-    padding-left: 1em !important;
-}
-
 #network-list-page .checkbox-link .tag {
     position: relative;
     bottom: -6px;
