@@ -1772,6 +1772,25 @@ def create_network(user, backend_id, network, subnet):
         return ret
 
 
+def delete_network(user, backend_id, network_id):
+    """
+    Delete a neutron network
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+
+    conn = connect_provider(backend)
+    if conn.type is not Provider.OPENSTACK:
+        raise NetworkActionNotSupported()
+
+    try:
+        conn.ex_delete_neutron_network(network_id)
+    except Exception as e:
+        raise NetworkError(e)
+
+
 def set_machine_metadata(user, backend_id, machine_id, tag):
     """Sets metadata for a machine, given the backend and machine id.
 
