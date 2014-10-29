@@ -148,13 +148,13 @@ define('app/controllers/network_create', ['ember'],
                 var url = '/backends/' + this.network.backend.id +
                     '/networks';
                 var that = this;
+                that.set('creatingNetwork', true);
                 Mist.ajax.POST(url, payload).success(function (network) {
-                    info(network);
                     that.close();
                 }).error(function (message) {
-                    info(message);
+                    Mist.notificationController.notify(message);
                 }).complete(function (success, network) {
-                    info(success, network);
+                    that.set('creatingNetwork', false);
                 });
             },
 

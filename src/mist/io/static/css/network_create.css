@@ -27,3 +27,8 @@
 #network-create-subnet-other-wrapper > div {
     padding-bottom: 15px;
 }
+
+#network-create .ajax-loader {
+	margin-top: -15px;
+	margin-bottom: 5px;
+}
