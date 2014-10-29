@@ -97,30 +97,52 @@ define('app/controllers/network_create', ['ember'],
 
             create: function () {
 
-                var payload = {
-                    network: {
-                        name: this.network.name,
-                        admin_state_up: this.network.adminStateUp,
-                    }
-                };
+                var payload = {};
+                var network = this.network;
+                var subnet = network.subnet;
 
-                if (this.network.createSubnet) {
-                    var subnet = this.network.subnet;
-                    payload.subnet = {
-                        name: subnet.name,
-                        ip_version: subnet.ipv.charAt(3),
-                        cidr: subnet.address,
-                        gateway_ip: subnet.disableGateway ? null : subnet.gatewayIP,
-                        allocation_pools: subnet.allocationPools
+                // Construct network params
+                payload.network = {};
+
+                if (network.name !== null && network.name.length)
+                    payload.network.name = network.name;
+
+                if (network.adminStateUp !== null)
+                    payload.network.admin_state_up = network.adminStateUp;
+
+
+                // Construct subnet params
+                if (network.createSubnet) {
+
+                    payload.subnet = {};
+
+                    if (subnet.name !== null && subnet.name.length)
+                        payload.subnet.name = subnet.name;
+
+                    if (subnet.ipv !== null)
+                        payload.subnet.ip_version = subnet.ipv.charAt(3);
+
+                    if (subnet.address !== null && subnet.address.length)
+                        payload.subnet.cidr = subnet.address;
+
+                    if (subnet.disableGateway !== null && !subnet.disableGateway)
+                        payload.subnet.gateway_ip = subnet.gatewayIP;
+
+                    if (subnet.enableDHCP !== null)
+                        payload.subnet.enable_dhcp = subnet.enableDHCP;
+
+                    if (subnet.allocationPools !== null && subnet.allocationPools.length)
+                        payload.subnet.allocation_pools = subnet.allocationPools
                             .split('\n')
                             .map(function (pool) {
-                                return {
-                                    start: pool.split(',')[0].trim(),
-                                    stop: pool.split(',')[1].trim()
-                                }
-                            }),
-                        enable_dhcp: subnet.enableDHCP
-                    }
+                                var tuple = pool.split(',');
+                                if (tuple.length == 2)
+                                    return {
+                                        start: tuple[0].trim(),
+                                        stop: tuple[1].trim()
+                                    };
+                                return {start: '', stop: ''};
+                            });
                 }
 
                 var url = '/backends/' + this.network.backend.id +
