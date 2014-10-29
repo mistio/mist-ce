@@ -416,10 +416,10 @@ define('app/views/machine_monitoring',
 
                 if (Mist.graphsController.isOpen)
                     return;
-
+                this.set('graphs', this.graphs.sortBy('index'));
                 this.set('pendingFirstStats', true);
                 Mist.graphsController.open({
-                    graphs: this.graphs.sortBy('index'),
+                    graphs: this.graphs,
                     config: {
                         canModify: true,
                         canControl: true,
