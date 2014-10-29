@@ -97,13 +97,16 @@ define('app/controllers/network_create', ['ember'],
 
             create: function () {
 
-                var subnet = this.network.subnet;
                 var payload = {
                     network: {
                         name: this.network.name,
                         admin_state_up: this.network.adminStateUp,
-                    },
-                    subnet: {
+                    }
+                };
+
+                if (this.network.createSubnet) {
+                    var subnet = this.network.subnet;
+                    payload.subnet = {
                         name: subnet.name,
                         ip_version: subnet.ipv.charAt(3),
                         cidr: subnet.address,
@@ -118,7 +121,8 @@ define('app/controllers/network_create', ['ember'],
                             }),
                         enable_dhcp: subnet.enableDHCP
                     }
-                };
+                }
+
                 var url = '/backends/' + this.network.backend.id +
                     '/networks';
                 var that = this;
