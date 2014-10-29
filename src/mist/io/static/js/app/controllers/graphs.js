@@ -33,7 +33,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             fetchingStats: null,
             fetchingStatsArgs: null,
             config: Ember.Object.create({
-                requestMethod: 'XHR',
+                requestMethod: 'Socket',
                 timeWindow: TIME_WINDOW_MAP.minutes,
                 measurementStep: 10 * TIME_MAP.SECOND,
                 measurementOffset: 60 * TIME_MAP.SECOND,
