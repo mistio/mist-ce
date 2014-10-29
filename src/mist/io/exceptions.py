@@ -107,6 +107,10 @@ class NetworkNotFoundError(NotFoundError, KeyError):
     msg = "Network not found"
 
 
+class NetworkError(NotFoundError, KeyError):
+    msg = "Error on network action"
+
+
 class KeypairNotFoundError(NotFoundError, KeyError):
     msg = "Keypair not found"
 
