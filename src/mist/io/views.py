@@ -600,17 +600,13 @@ def create_network(request):
     return methods.create_network(user, backend_id, network, subnet)
 
 
-@view_config(route_name='networks', request_method='DELETE', renderer='json')
+@view_config(route_name='network', request_method='DELETE')
 def delete_network(request):
     """
     Deletes a network. Currently working only with OPENSTACK backend
     """
     backend_id = request.matchdict['backend']
-
-    try:
-        network_id = request.json_body.get('network')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
+    network_id = request.matchdict['network']
 
     user = user_from_request(request)
     return methods.delete_network(user, backend_id, network_id)
