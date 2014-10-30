@@ -127,7 +127,7 @@ define('app/views/machine_monitoring',
                         head: 'Disable monitoring',
                         body: [
                             {
-                                paragraph: 'Are you sure you want to disable' +
+                                paragraph: 'Are you sure you want to disable ' +
                                     'monitoring for this machine?'
                             }
                         ],
