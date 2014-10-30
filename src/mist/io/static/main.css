@@ -117,6 +117,14 @@ body {
     width: 16px;
 }
 
+.ajax-loader.l {
+    background-image: url('images/ajax-loader.gif');
+    width: 135px;
+    height: 75px;
+    background-color: #9A9A9A;
+    border-radius: 5px;
+}
+
 
 /* Text fields
 -----------------------------------------------------------------------------------------------------------*/
