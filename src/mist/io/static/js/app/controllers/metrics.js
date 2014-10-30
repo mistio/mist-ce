@@ -185,14 +185,6 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             },
 
 
-            getMetricByAlias: function (alias) {
-                var result = this.builtInMetrics.findBy('alias', alias);
-                if (!result)
-                    result = this.customMetrics.findBy('alias', alias);
-                return result;
-            },
-
-
             _addMetric: function (metric, machine) {
                 Ember.run(this, function () {
                     metric = Metric.create(metric);

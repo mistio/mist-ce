@@ -2,14 +2,15 @@ define('app/views/machine_monitoring',
     [
         'app/views/templated',
         'app/models/graph',
-        'app/models/datasource'
+        'app/models/datasource',
+        'app/models/stats_request'
     ],
     //
     //  Machine Monitoring View
     //
     //  @returns Class
     //
-    function (TemplatedView, Graph, Datasource) {
+    function (TemplatedView, Graph, Datasource, StatsRequest) {
 
         'use strict';
 
@@ -38,7 +39,7 @@ define('app/views/machine_monitoring',
 
 
             load: function () {
-
+                Mist.set('m', this);
                 // Add event handlers
                 Mist.rulesController.on('onRuleAdd', this, '_ruleAdded');
                 Mist.rulesController.on('onRuleDelete', this, '_ruleDeleted');
@@ -67,9 +68,11 @@ define('app/views/machine_monitoring',
             showMonitoring: function () {
                 this._clear();
                 this._updateRules();
-                this._updateMetrics();
-                this._updateGraphs();
-                this._showGraphs();
+                var that = this;
+                this._updateMetrics(function () {
+                    that._updateGraphs();
+                    that._showGraphs();
+                });
             },
 
 
@@ -417,7 +420,6 @@ define('app/views/machine_monitoring',
                 if (Mist.graphsController.isOpen)
                     return;
                 this.set('graphs', this.graphs.sortBy('index'));
-                this.set('pendingFirstStats', true);
                 Mist.graphsController.open({
                     graphs: this.graphs,
                     config: {
@@ -457,17 +459,40 @@ define('app/views/machine_monitoring',
             },
 
 
-            _updateMetrics: function () {
-                Mist.metricsController.builtInMetrics.forEach(function (metric) {
-                    if (!this.metrics.findBy('id', metric.id))
-                        this.metrics.pushObject(metric);
-                }, this);
-                Mist.metricsController.customMetrics.forEach(function (metric) {
-                    if (metric.hasMachine(this.machine) &&
-                        !this.metrics.findBy('id', metric.id)) {
-                            this.metrics.pushObject(metric);
-                    }
-                }, this);
+            _updateMetrics: function (callback) {
+                this.set('pendingFirstStats', true);
+                var that = this;
+                var request = StatsRequest.create({
+                    from: Date.now(),
+                    until: Date.now(),
+                    datasources: [{machine: this.machine}]
+                });
+                (function getStats () {
+                    $.ajax({
+                        type: 'GET',
+                        url: request.url,
+                        data: Mist.graphsController._generatePayload(request),
+                        complete: function (jqXHR) {
+                            if (!that.$()) return;
+                            var success = jqXHR.status == 200;
+                            var metrics = jqXHR.responseJSON;
+
+                            if (success && Object.keys(metrics).length > 1) {
+                                forIn(that, metrics, function (metric, target) {
+                                    var metric = Mist.metricsController.getMetric(target);
+                                    if (metric && !that.metrics.findBy('id', metric.id))
+                                        that.metrics.pushObject(metric);
+                                });
+                                callback();
+                            }
+                            else
+                                Ember.run.later(function () {
+                                    if (!!that.$())
+                                        getStats();
+                                }, TIME_MAP.MINUTE / 2);
+                        }
+                    });
+                })()
             },
 
 
