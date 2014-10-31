@@ -1890,7 +1890,7 @@ def delete_network(user, backend_id, network_id):
         task = mist.io.tasks.ListNetworks()
         task.clear_cache(user.email, backend_id)
         trigger_session_update(user.email, ['backends'])
-    except Excetion as e:
+    except Exception as e:
         pass
 
 
