@@ -10,6 +10,7 @@ from time import sleep, time
 from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
+from tempfile import NamedTemporaryFile
 
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -48,6 +49,7 @@ from mist.io.helpers import StdStreamCapture
 import mist.io.tasks
 import mist.io.inventory
 
+
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
 libcloud.security.CA_CERTS_PATH.append('cacert.pem')
@@ -68,7 +70,6 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
                 compute_endpoint="", port=22, docker_port=4243, remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
-
     if not provider:
         raise RequiredParameterMissingError("provider")
     log.info("Adding new backend in provider '%s'", provider)
@@ -517,7 +518,14 @@ def connect_provider(backend):
     """
     if backend.provider != 'bare_metal':
         driver = get_driver(backend.provider)
-    if backend.provider == Provider.OPENSTACK:
+    if backend.provider == Provider.AZURE:
+        #create a temp file and output the cert there, so that
+        #Azure driver is instantiated by providing a string with the key instead of
+        #a cert file
+        temp_key_file = NamedTemporaryFile(delete=False)
+        temp_key_file.write(backend.apisecret)
+        conn = driver(backend.apikey, temp_key_file.name)
+    elif backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
         #as separate provider
         if 'hpcloudsvc' in backend.apiurl:
@@ -591,7 +599,7 @@ def get_machine_actions(machine_from_api, conn):
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN, Provider.DOCKER):
+                     Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE):
         can_tag = False
 
     # for other states
@@ -743,7 +751,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
-
     if conn.type is Provider.DOCKER:
         node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
         if key_id and key_id in user.keypairs:
@@ -790,6 +797,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_digital_ocean(conn, key_id, private_key,
                                              public_key, machine_name,
                                              image, size, location)
+    elif conn.type == Provider.AZURE:
+        node = _create_machine_azure(conn, key_id, private_key,
+                                             public_key, machine_name,
+                                             image, size, location, cloud_service_name=None)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                       machine_name, image, size,
@@ -797,11 +808,23 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     else:
         raise BadRequestError("Provider unknown.")
 
-    associate_key(user, key_id, backend_id, node.id, port=ssh_port)
+    if conn.type == Provider.AZURE:
+        #we have the username
+        associate_key(user, key_id, backend_id, node.id,
+                      username=node.extra.get('username'), port=ssh_port)
+    else:
+        associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
-    if script or monitoring:
-        mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
-                                              monitoring, script, key_id)
+    if conn.type == Provider.AZURE:
+        #for Azure, connect with the generated password, deploy the ssh key
+        #when this is ok, it calss post_deploy for script/monitoring
+        mist.io.tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
+                                      monitoring, script, key_id,
+                                      node.extra.get('username'), node.extra.get('password'), public_key)
+    else:
+        if script or monitoring:
+            mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
+                                      monitoring, script, key_id)
 
     return {'id': node.id,
             'name': node.name,
@@ -1177,6 +1200,30 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         return node
 
 
+def _create_machine_azure(conn, key_name, private_key, public_key,
+                                  machine_name, image, size, location, cloud_service_name):
+    """Create a machine Azure.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.create_node(
+                name=machine_name,
+                size=size,
+                image=image,
+                location=location,
+                ex_cloud_service_name=cloud_service_name
+            )
+        except Exception as e:
+            raise MachineCreationError("Azure, got exception %s" % e)
+
+        return node
+
+
 def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
                         image, size, location):
     """Create a machine in GCE.
@@ -1236,8 +1283,8 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
     thing that changes is the action. This helper function saves us some code.
 
     """
-
     actions = ('start', 'stop', 'reboot', 'destroy', 'resize')
+
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
                                                                    actions))
@@ -1252,10 +1299,19 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
     #GCE needs machine.extra as well, so we need the real machine object
     machine = None
     try:
-        for node in conn.list_nodes():
-            if node.id == machine_id:
-                machine = node
-                break
+        if conn.type == 'azure':
+            #Azure needs the cloud service specified as well as the node
+            cloud_service = conn.get_cloud_service_from_node_id(machine_id)
+            nodes = conn.list_nodes(ex_cloud_service_name=cloud_service)
+            for node in nodes:
+                if node.id == machine_id:
+                    machine = node
+                    break
+        else:
+            for node in conn.list_nodes():
+                if node.id == machine_id:
+                    machine = node
+                    break
         if machine is None:
             #did not find the machine_id on the list of nodes, still do not fail
             raise MachineUnavailableError("Error while attempting to %s machine"
@@ -1270,7 +1326,10 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
     try:
         if action is 'start':
             # In liblcoud it is not possible to call this with machine.start()
-            conn.ex_start_node(machine)
+            if conn.type == 'azure':
+                conn.ex_start_node(machine, ex_cloud_service_name=cloud_service)
+            else:
+                conn.ex_start_node(machine)
 
             if conn.type is Provider.DOCKER:
                 node_info = conn.inspect_node(node)
@@ -1291,7 +1350,10 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
 
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
-            conn.ex_stop_node(machine)
+            if conn.type == 'azure':
+                conn.ex_stop_node(machine, ex_cloud_service_name=cloud_service)
+            else:
+                conn.ex_stop_node(machine)
         elif action is 'resize':
             conn.ex_resize_node(node, plan_id)
         elif action is 'reboot':
@@ -1304,7 +1366,10 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
                 except:
                     return False
             else:
-                machine.reboot()
+                if conn.type == 'azure':
+                    conn.reboot_node(machine, ex_cloud_service_name=cloud_service)
+                else:
+                    machine.reboot()
                 if conn.type is Provider.DOCKER:
                     node_info = conn.inspect_node(node)
                     try:
@@ -1326,6 +1391,8 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
             if conn.type is Provider.DOCKER and node.state == 0:
                 conn.ex_stop_node(node)
                 machine.destroy()
+            elif conn.type == 'azure':
+                conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
             else:
                 machine.destroy()
     except AttributeError:
@@ -1474,6 +1541,17 @@ def list_images(user, backend_id, term=None):
                     #eg ResourceNotFoundError
                     pass
             rest_images = [image for image in rest_images if not image.extra['deprecated']]
+        elif conn.type == Provider.AZURE:
+            # do not show Microsoft Windows images
+            # from Azure's response we can't know which images are default
+            rest_images = conn.list_images()
+            rest_images = [image for image in rest_images if 'windows' not in image.name.lower()
+                           and 'RightImage' not in image.name]
+            temp_dict = {}
+            for image in rest_images:
+                temp_dict[image.name] = image
+            #there are many builds for some images -eg Ubuntu). All have the same name!
+            rest_images = sorted(temp_dict.values(), key=lambda k: k.name)
         elif conn.type == Provider.DOCKER:
             #get mist.io default docker images from config
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})

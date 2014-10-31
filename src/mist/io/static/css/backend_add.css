@@ -7,6 +7,9 @@
 #add-backend-panel #baremetal-bundle {
     display: none;
 }
+#add-backend-panel #azure-bundle {
+    display: none;
+}
 #add-backend-panel label {
     margin-top: 10px;
 }
