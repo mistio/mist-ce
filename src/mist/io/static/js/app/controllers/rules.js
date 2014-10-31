@@ -78,7 +78,9 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     'operator': 'gt',
                     'value': 5,
                     'action': 'alert'
-                }).error(function(message) {
+                }).success(function (rule) {
+                    that._addRule(rule);
+                }).error(function (message) {
                     Mist.notificationController.notify(
                         'Error while creating rule: ' + message);
                 }).complete(function (success, data) {
@@ -183,7 +185,8 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             _addRule: function (rule) {
                 Ember.run(this, function () {
                     var newRule = Rule.create(rule);
-                    this.content.pushObject(newRule);
+                    if (this.ruleExists(rule.id)) return;
+                    this.content.addObject(newRule);
                     this.trigger('onRuleAdd', {
                         rule: newRule
                     });
