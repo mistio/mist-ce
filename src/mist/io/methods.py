@@ -892,6 +892,16 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
         server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
         server_key = server_key.name
 
+    # select the right OpenStack network object
+    available_networks = conn.ex_list_networks()
+    try:
+        chosen_networks = []
+        for net in available_networks:
+            if net.id in networks:
+                chosen_networks.append(net)
+    except:
+        chosen_networks = []
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -903,7 +913,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
                 ex_keyname=server_key,
-                networks=networks)
+                networks=chosen_networks)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
@@ -1852,7 +1862,7 @@ def create_network(user, backend_id, network, subnet):
     else:
         ret = openstack_network_to_dict(new_network)
 
-    task = tasks.ListNetworks()
+    task = mist.io.tasks.ListNetworks()
     task.clear_cache(user.email, backend_id)
     trigger_session_update(user.email, ['backends'])
     return ret
@@ -1873,11 +1883,15 @@ def delete_network(user, backend_id, network_id):
 
     try:
         conn.ex_delete_neutron_network(network_id)
-        task = tasks.ListNetworks()
-        task.clear_cache(user.email, backend_id)
-        trigger_session_update(user.email, ['backends'])
     except Exception as e:
         raise NetworkError(e)
+
+    try:
+        task = mist.io.tasks.ListNetworks()
+        task.clear_cache(user.email, backend_id)
+        trigger_session_update(user.email, ['backends'])
+    except Excetion as e:
+        pass
 
 
 def set_machine_metadata(user, backend_id, machine_id, tag):
