@@ -307,8 +307,8 @@ class ListLocations(UserTask):
 class ListNetworks(UserTask):
     abstract = False
     task_key = 'list_networks'
-    result_expires = 60 * 60 * 24 * 7
-    result_fresh = 60 * 60
+    result_expires = 60 * 60 * 24
+    result_fresh = 10
     polling = False
 
     def execute(self, email, backend_id):
