@@ -1746,6 +1746,7 @@ def create_network(user, backend_id, network, subnet):
 
     # If no subnet is specified we will just return the new network dict
     if not subnet:
+        trigger_session_update(user.email, ['backends'])
         return openstack_network_to_dict(new_network)
     else:
         network_id = new_network.id
@@ -1772,6 +1773,7 @@ def create_network(user, backend_id, network, subnet):
         ret['network'] = openstack_network_to_dict(new_network)
         ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
 
+        trigger_session_update(user.email, ['backends'])
         return ret
 
 
