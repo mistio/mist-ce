@@ -21,8 +21,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             content: [],
             imageCount: 0,
             machineCount: 0,
+            networkCount: 0,
             selectedMachines: [],
+            selectedNetworks: [],
             machineRequest: false,
+            networkRequest: false,
 
             addingBackend: false,
             deletingBackend: false,
@@ -33,6 +36,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             loading: true,
             loadingImages: false,
             loadingMachines: false,
+
+
+            hasOpenStack: function () {
+                return !!this.content.findBy('isOpenStack', true);
+            }.property('content.@each.isOpenStack'),
 
 
             //
@@ -207,6 +215,13 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
+            getRequestedNetwork: function () {
+                if (this.networkRequest) {
+                    return this.getNetwork(this.networkRequest);
+                }
+            },
+
+
             getBackend: function(backendId) {
                 return this.content.findBy('id', backendId);
             },
@@ -229,6 +244,22 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
+            getNetwork: function (networkId, backendId) {
+                if (backendId) {
+                    var backend = this.getBackend(backendId);
+                    if (backend)
+                        return backend.getNetwork(networkId);
+                    return null;
+                }
+
+                var network = null;
+                this.content.some(function(backend) {
+                    return network = backend.getNetwork(networkId);
+                });
+                return network;
+            },
+
+
             machineExists: function(machineId, backendId) {
                 return !!this.getMachine(machineId, backendId);
             },
@@ -236,6 +267,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             backendExists: function(backendId) {
                 return !!this.getBackend(backendId);
+            },
+
+
+            networkExists: function (networkId, backendId) {
+                return !!this.getNetwork(networkId, backendId);
             },
 
 
@@ -342,6 +378,19 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
+            _updateNetworkCount: function() {
+                Ember.run(this, function() {
+                    var counter = 0;
+                    this.content.forEach(function (backend) {
+                        if (backend.enabled && backend.provider == 'openstack')
+                            counter += backend.networkCount;
+                    });
+                    this.set('networkCount', counter);
+                    this.trigger('onNetworkListChange');
+                });
+            },
+
+
             _updateLoadingImages: function() {
                 this.set('loadingImages',
                     !!this.content.findBy('loadingImages', true));
@@ -354,6 +403,12 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
+            _updateLoadingNetworks: function () {
+                this.set('loadingNetworks',
+                    !!this.content.findBy('loadingNetworks', true));
+            },
+
+
             _updateSelectedMachines: function() {
                 Ember.run(this, function() {
                     var newSelectedMachines = [];
@@ -362,6 +417,18 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                     });
                     this.set('selectedMachines', newSelectedMachines);
                     this.trigger('onSelectedMachinesChange');
+                });
+            },
+
+
+            _updateSelectedNetworks: function () {
+                Ember.run(this, function () {
+                    var newSelectedNetworks = [];
+                    this.content.forEach(function (backend) {
+                        newSelectedNetworks = newSelectedNetworks.concat(backend.selectedNetworks);
+                    });
+                    this.set('selectedNetworks', newSelectedNetworks);
+                    this.trigger('onSelectedNetworksChange');
                 });
             },
 
@@ -383,6 +450,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             }.observes('content.@each.machineCount'),
 
 
+            networkCountObserver: function () {
+                Ember.run.once(this, '_updateNetworkCount');
+            }.observes('content.@each.networkCount'),
+
+
             loadingImagesObserver: function() {
                 Ember.run.once(this, '_updateLoadingImages');
             }.observes('content.@each.loadingImages'),
@@ -393,9 +465,19 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             }.observes('content.@each.loadingMachines'),
 
 
-            selectedMachinesObserver: function() {
+            loadingNetworksObserver: function () {
+                Ember.run.once(this, '_updateLoadingNetworks');
+            }.observes('content.@each.loadingNetworks'),
+
+
+            selectedMachinesObserver: function () {
                 Ember.run.once(this, '_updateSelectedMachines');
-            }.observes('content.@each.selectedMachines')
+            }.observes('content.@each.selectedMachines'),
+
+
+            selectedNetworksObserver: function () {
+                Ember.run.once(this, '_updateSelectedNetworks');
+            }.observes('content.@each.selectedNetworks')
         });
     }
 );

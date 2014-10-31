@@ -38,4 +38,15 @@
 #create-machine-script {
     height: auto !important;
 }
+#create-machine-network {
+	display: none;
+}
+#create-machine-network label {
+	margin-top: 0;
+}
+#create-machine-network fieldset {
+	margin-top: 0;
+}
+#create-machine-network .ui-collapsible-content {
+	padding: 0;
 }

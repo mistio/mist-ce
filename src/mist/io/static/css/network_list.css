@@ -1,0 +1,18 @@
+/* Network List CSS
+------------------------------------------------------------------------------*/
+
+#network-list-page .ui-filterable {
+    clear: both;
+    position: relative;
+    top: -49px;
+    margin: 10px 118px -44px 0px !important;
+}
+
+#network-list-page .checkbox-link .tag {
+    position: relative;
+    bottom: -6px;
+}
+
+#network-list-page #network-create-btn {
+    float: right;
+}

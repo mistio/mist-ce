@@ -266,6 +266,7 @@ var loadFiles = function (callback) {
         'app/controllers/metric_add_custom',
         'app/controllers/metrics',
         'app/controllers/monitoring',
+        'app/controllers/network_create',
         'app/controllers/notification',
         'app/controllers/rule_edit',
         'app/controllers/rules',
@@ -306,6 +307,10 @@ var loadFiles = function (callback) {
         'app/views/metric_add_custom',
         'app/views/missing',
         'app/views/metric_node',
+        'app/views/network',
+        'app/views/network_create',
+        'app/views/network_list',
+        'app/views/network_list_item',
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/rule_list',
@@ -338,6 +343,7 @@ var loadApp = function (
     MetricAddCustomController,
     MetricsController,
     MonitoringController,
+    NetworkCreateController,
     NotificationController,
     RuleEditController,
     RulesController,
@@ -378,6 +384,10 @@ var loadApp = function (
     MetricAddCustomView,
     MissingView,
     MetricNodeView,
+    NetworkView,
+    NetworkCreateView,
+    NetworkListView,
+    NetworkListItemView,
     RuleView,
     RuleEditView,
     RuleListView,
@@ -412,6 +422,10 @@ var loadApp = function (
     App.Router.map(function() {
         this.route('machines');
         this.route('images');
+        this.route('networks');
+        this.route('network', {
+            path: '/networks/:network_id',
+        });
         this.route('machine', {
             path : '/machines/:machine_id',
         });
@@ -437,6 +451,43 @@ var loadApp = function (
             });
         }
     });
+
+    App.NetworksRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - networks';
+            });
+        },
+        exit: function() {
+            Mist.backendsController.forEach(function (backend) {
+                backend.networks.forEach(function (network) {
+                    network.set('selected', false);
+                });
+            });
+        }
+    });
+
+    App.NetworkRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(this, function () {
+                var model = this.modelFor('network');
+                var id = model._id || model.id;
+                var network = Mist.backendsController.getNetwork(id);
+                document.title = 'mist.io - ' + (network ? network.name : id);
+            });
+        },
+        redirect: function (network) {
+            Mist.backendsController.set('networkRequest', network._id);
+        },
+        model: function (args) {
+            var id = args.network_id;
+            if (Mist.backendsController.loading ||
+                Mist.backendsController.loadingNetworks)
+                    return {_id: id, backend: {}};
+            return Mist.backendsController.getNetwork(id);
+        }
+    });
+
 
     App.MachinesRoute = Ember.Route.extend({
         activate: function() {
@@ -525,6 +576,7 @@ var loadApp = function (
     App.set('missingView', MissingView);
     App.set('metricNodeView', MetricNodeView);
     App.set('keyListView', KeyListView);
+    App.set('networkView', NetworkView);
     App.set('userMenuView', UserMenuView);
     App.set('keyEditView', KeyEditDialog);
     App.set('backendAddView', BackendAdd);
@@ -540,6 +592,8 @@ var loadApp = function (
     App.set('graphListBarView', GraphListBarView);
     App.set('graphListControlView', GraphListControlView);
     App.set('graphListItemView', GraphListItemView);
+    App.set('networkCreateView', NetworkCreateView);
+    App.set('networkListView', NetworkListView);
     App.set('machineKeysView', MachineKeysView);
     App.set('machineTagsView', MachineTagsView);
     App.set('keyListItemView', KeyListItemView);
@@ -550,6 +604,7 @@ var loadApp = function (
     App.set('machineAddView', MachineAddDialog);
     App.set('backendButtonView', BackendButton);
     App.set('graphButtonView', GraphButtonView);
+    App.set('networkListItemView', NetworkListItemView);
     App.set('machinePowerView', MachinePowerView);
     App.set('machineShellView', MachineShellView);
     App.set('machineListItemView', MachineListItem);
@@ -586,7 +641,9 @@ var loadApp = function (
     App.set('notificationController', NotificationController.create());
     App.set('dialogController', DialogController.create());
     App.set('machinePowerController', MachinePowerController.create());
+    App.set('networkCreateController', NetworkCreateController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
+
 
     // Ember custom widgets
 
@@ -846,6 +903,11 @@ var setupSocketEvents = function (socket, callback) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
             backend.locations.load(data.locations);
+    })
+    .on('list_networks', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.networks.load(data.networks);
     })
     .on('monitoring',function (data){
         Mist.monitoringController._updateMonitoringData(data);

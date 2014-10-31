@@ -143,7 +143,7 @@ class MistNamespace(BaseNamespace):
         routing_key = msg.delivery_info.get('routing_key')
         log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
-                               'list_machines', 'list_locations', 'ping']):
+                               'list_networks', 'list_machines', 'list_locations', 'ping']):
             self.emit(routing_key, msg.body)
             if routing_key == 'probe':
                 log.warn('send probe')
@@ -241,7 +241,8 @@ def list_backends_from_socket(namespace):
     for key, task in (('list_machines', tasks.ListMachines()),
                       ('list_images', tasks.ListImages()),
                       ('list_sizes', tasks.ListSizes()),
-                      ('list_locations', tasks.ListLocations())):
+                      ('list_networks', tasks.ListNetworks()),
+                      ('list_locations', tasks.ListLocations()),):
         for backend_id in user.backends:
             if user.backends[backend_id].enabled:
                 cached = task.smart_delay(user.email, backend_id)

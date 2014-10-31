@@ -98,6 +98,19 @@ class BackendNotFoundError(NotFoundError, KeyError):
     msg = "Backend not found"
 
 
+class NetworkActionNotSupported(MistError):
+    msg = "Action is not supported for this backend"
+    http_code = 404
+
+
+class NetworkNotFoundError(NotFoundError, KeyError):
+    msg = "Network not found"
+
+
+class NetworkError(NotFoundError, KeyError):
+    msg = "Error on network action"
+
+
 class KeypairNotFoundError(NotFoundError, KeyError):
     msg = "Keypair not found"
 
@@ -138,6 +151,10 @@ class InternalServerError(MistError):
 
 class MachineCreationError(InternalServerError):
     msg = "Machine creation failed"
+
+
+class NetworkCreationError(InternalServerError):
+    msg = "Network creation failed"
 
 
 class SSLError(MistError):

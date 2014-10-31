@@ -695,7 +695,7 @@ def list_machines(user, backend_id):
 @core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
-                   size_name, location_name, ips, monitoring, ssh_port=22):
+                   size_name, location_name, ips, monitoring, networks=[], ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -758,7 +758,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key,
-                                         machine_name, image, size, location)
+                                         machine_name, image, size, location, networks)
     elif conn.type is Provider.HPCLOUD:
         node = _create_machine_hpcloud(conn, private_key, public_key,
                                        machine_name, image, size, location)
@@ -846,7 +846,7 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
 
 def _create_machine_openstack(conn, private_key, public_key, machine_name,
-                             image, size, location):
+                             image, size, location, networks):
     """Create a machine in Openstack.
 
     Here there is no checking done, all parameters are expected to be
@@ -871,17 +871,20 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
-            node = conn.create_node(name=machine_name,
+            node = conn.create_node(
+                name=machine_name,
                 image=image,
                 size=size,
                 location=location,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
-                ex_keyname=server_key)
+                ex_keyname=server_key,
+                networks=networks)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
+
 
 def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
                              image, size, location):
@@ -1656,8 +1659,7 @@ def list_locations(user, backend_id):
 
 def list_networks(user, backend_id):
     """List networks from each backend.
-
-    Currently NephoScale is supported. For other providers
+    Currently NephoScale and Openstack networks are supported. For other providers
     this returns an empty list
 
     """
@@ -1667,17 +1669,137 @@ def list_networks(user, backend_id):
     backend = user.backends[backend_id]
     conn = connect_provider(backend)
 
-    try:
-        networks = conn.ex_list_networks()
-    except:
-        networks = []
-
     ret = []
-    for network in networks:
-        ret.append({'id': network.id,
-                    'name': network.name,
-                    'extra': network.extra})
+    if conn.type in [Provider.NEPHOSCALE]:
+        networks = conn.ex_list_networks()
+
+        for network in networks:
+            ret.append({
+                'id': network.id,
+                'name': network.name,
+                'extra': network.extra,
+            })
+
+        return ret
+    elif conn.type in [Provider.OPENSTACK]:
+        networks = conn.ex_list_neutron_networks()
+        for network in networks:
+            ret.append(openstack_network_to_dict(network))
+        return ret
+    else:
+        return ret
+
+
+def openstack_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['status'] = network.status
+
+    net['subnets'] = []
+    for sub in network.subnets:
+
+        net['subnets'].append(openstack_subnet_to_dict(sub))
+    return net
+
+
+def openstack_subnet_to_dict(subnet):
+    net = {}
+
+    net['name'] = subnet.name
+    net['id'] = subnet.id
+    net['cidr'] = subnet.cidr
+    net['enable_dhcp'] = subnet.enable_dhcp
+    net['dns_nameservers'] = subnet.dns_nameservers
+    net['allocation_pools'] = subnet.allocation_pools
+    net['gateway_ip'] = subnet.gateway_ip
+
+    return net
+
+
+def create_network(user, backend_id, network, subnet):
+    """
+    Creates a new network. If subnet dict is specified, after creating the network
+    it will use the new network's id to create a subnet
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+
+    conn = connect_provider(backend)
+    if conn.type is not Provider.OPENSTACK:
+        raise NetworkActionNotSupported()
+
+    try:
+        network_name = network.get('name')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    admin_state_up = network.get('admin_state_up', True)
+    shared = network.get('shared', False)
+
+    # First we create the network
+    try:
+        new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+    except Exception as e:
+        raise NetworkCreationError("Got error r%" % e)
+
+    ret = dict()
+    if subnet:
+        network_id = new_network.id
+
+        try:
+            subnet_name = subnet.get('name')
+            cidr = subnet.get('cidr')
+        except Exception as e:
+            raise RequiredParameterMissingError(e)
+
+        allocation_pools = subnet.get('allocation_pools', [])
+        gateway_ip = subnet.get('gateway_ip', None)
+        ip_version = subnet.get('ip_version', '4')
+        enable_dhcp = subnet.get('enable_dhcp', True)
+
+        try:
+            subnet = conn.ex_create_neutron_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
+                                                   allocation_pools=allocation_pools, gateway_ip=gateway_ip,
+                                                   ip_version=ip_version, enable_dhcp=enable_dhcp)
+        except Exception as e:
+            conn.ex_delete_neutron_network(network_id)
+            raise NetworkError(e)
+
+        ret['network'] = openstack_network_to_dict(new_network)
+        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
+
+    else:
+        ret = openstack_network_to_dict(new_network)
+
+    task = tasks.ListNetworks()
+    task.clear_cache(user.email, backend_id)
+    trigger_session_update(user.email, ['backends'])
     return ret
+
+
+def delete_network(user, backend_id, network_id):
+    """
+    Delete a neutron network
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+
+    conn = connect_provider(backend)
+    if conn.type is not Provider.OPENSTACK:
+        raise NetworkActionNotSupported()
+
+    try:
+        conn.ex_delete_neutron_network(network_id)
+        task = tasks.ListNetworks()
+        task.clear_cache(user.email, backend_id)
+        trigger_session_update(user.email, ['backends'])
+    except Exception as e:
+        raise NetworkError(e)
 
 
 def set_machine_metadata(user, backend_id, machine_id, tag):

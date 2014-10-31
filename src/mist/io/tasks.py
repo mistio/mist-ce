@@ -313,6 +313,20 @@ class ListLocations(UserTask):
         return {'backend_id': backend_id, 'locations': locations}
 
 
+class ListNetworks(UserTask):
+    abstract = False
+    task_key = 'list_networks'
+    result_expires = 60 * 60 * 24
+    result_fresh = 10
+    polling = False
+
+    def execute(self, email, backend_id):
+        from mist.io import methods
+        user = user_from_email(email)
+        networks = methods.list_networks(user, backend_id)
+        return {'backend_id': backend_id, 'networks': networks}
+
+
 class ListImages(UserTask):
     abstract = False
     task_key = 'list_images'
