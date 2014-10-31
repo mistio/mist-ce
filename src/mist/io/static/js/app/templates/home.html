@@ -66,6 +66,22 @@
                 </a>
             </li>
 
+            <!-- Networks link -->
+
+            {{#if Mist.backendsController.hasOpenStack}}
+            <li class="ui-li-has-count">
+
+                <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/networks">
+
+                    Networks
+
+                    <span class="ui-li-count ui-body-inherit">
+                        {{Mist.backendsController.networkCount}}
+                    </span>
+                </a>
+            </li>
+            {{/if}}
+
             <!-- Keys link -->
 
             <li class="ui-li-has-count ui-last-child">

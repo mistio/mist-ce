@@ -456,6 +456,7 @@ def create_machine(request):
         location_name = request.json_body.get('location_name', None)
         ips = request.json_body.get('ips', None)
         monitoring = request.json_body.get('monitoring', False)
+        networks = request.json_body.get('networks', [])
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -463,7 +464,7 @@ def create_machine(request):
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                  location_id, image_id, size_id, script,
                                  image_extra, disk, image_name, size_name,
-                                 location_name, ips, monitoring)
+                                 location_name, ips, monitoring, networks)
     return ret
 
 
@@ -580,6 +581,37 @@ def list_networks(request):
     backend_id = request.matchdict['backend']
     user = user_from_request(request)
     return methods.list_networks(user, backend_id)
+
+
+@view_config(route_name='networks', request_method='POST', renderer='json')
+def create_network(request):
+    """
+    Creates a new network. Currently working only with OPENSTACK backend
+    """
+    backend_id = request.matchdict['backend']
+
+    try:
+        network = request.json_body.get('network')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    subnet = request.json_body.get('subnet', None)
+    user = user_from_request(request)
+    return methods.create_network(user, backend_id, network, subnet)
+
+
+@view_config(route_name='network', request_method='DELETE')
+def delete_network(request):
+    """
+    Deletes a network. Currently working only with OPENSTACK backend
+    """
+    backend_id = request.matchdict['backend']
+    network_id = request.matchdict['network']
+
+    user = user_from_request(request)
+    methods.delete_network(user, backend_id, network_id)
+
+    return OK
 
 
 @view_config(route_name='probe', request_method='POST', renderer='json')
