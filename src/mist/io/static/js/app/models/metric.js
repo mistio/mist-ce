@@ -65,7 +65,7 @@ define('app/models/metric', ['ember'],
             hasMachine: function (machine) {
                 var hasMachine = false;
                 this.machines.some(function (metricMachine) {
-                    if (metricMachine.equals(machine))
+                    if (machine.equals(metricMachine))
                         return hasMachine = true;
                 });
                 return hasMachine;

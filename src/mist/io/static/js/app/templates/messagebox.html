@@ -1,31 +1,82 @@
-<div id="message-box-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-a"></div>
-<div id="message-box-popup-popup"
-     class="ui-popup-container ui-popup-hidden large-popup ui-body-a ui-corner-all">
+<!-- Popup Overlay -->
 
-    <div id="message-box-popup"
-         class="ui-popup ui-corner-all ui-overlay-shadow large-popup"
-         data-role="popup"
-         data-enhanced="true"
-         data-transition="flip"
-         data-dismissible="false">
+<div id="message-box-screen"
+    class="ui-popup-screen ui-overlay-b ui-screen-hidden">
+</div>
 
-        <div class="ui-header ui-bar-b">
-            <h1 class="ui-title">{{Mist.notificationController.msgHeader}}</h1>
+<!-- Popup Wrapper -->
+
+<div id="message-box-popup"
+    class="flip
+        ui-popup-container
+        ui-popup-hidden
+        ui-popup-truncate">
+
+    <!-- Popup -->
+
+    <div id="message-box"
+        class="large-popup
+            ui-popup
+            ui-body-inherit
+            ui-overlay-shadow
+            ui-corner-all"
+        data-role="popup"
+        data-transition="flip"
+        data-dismissible="false">
+
+
+        <!-- Header -->
+
+        <div class="ui-header ui-bar-b" role="banner">
+            <h1 class="ui-title">
+                {{Mist.notificationController.messageBox.options.title}}
+            </h1>
         </div>
-        <div class="ui-content">
 
-            <p>{{Mist.notificationController.msgPart1}}</p>
-            <p>{{Mist.notificationController.msgPart2}}</p>
-            <p>{{Mist.notificationController.msgPart3}}</p>
-            {{#if Mist.notificationController.msgCmd}}
-            <p id="message-cmd">{{Mist.notificationController.msgCmd}}</p>
+        <!-- Body -->
+
+        <div class="ui-content ui-body-a" role="main">
+
+
+            <!--
+                Paragraphs
+            -->
+
+
+            {{#each Mist.notificationController.messageBox.options.paragraphs}}
+                <p>{{this}}</p>
+            {{/each}}
+
+
+            <!--
+                Command
+            -->
+
+            {{#if Mist.notificationController.messageBox.options.command}}
+                <p id="message-cmd">
+                    {{Mist.notificationController.messageBox.options.command}}
+                </p>
             {{/if}}
-            <p id="message-ps">{{Mist.notificationController.msgPart4}}</p>
-            <a id="message-link" target="_blank">
-                {{Mist.notificationController.msgLink}}
-            </a>
+
+
+            <!--
+                Postscript
+            -->
+
+            {{#if Mist.notificationController.messageBox.options.ps}}
+                <p id="message-ps">
+                    {{Mist.notificationController.messageBox.options.ps}}
+                </p>
+            {{/if}}
+
+
+            <!--
+                OK Button
+            -->
+
+
             <a class="ui-btn ui-btn-a ui-corner-all"
-                {{action "closeMessage" target="view"}}>OK</a>
+                {{action "okClicked" target="view"}}>OK</a>
         </div>
     </div>
 </div>

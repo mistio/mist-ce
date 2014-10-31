@@ -55,16 +55,19 @@ define('app/views/metric_add', ['app/views/popup'],
             showSSHError: function () {
                 this.close();
                 var that = this;
-                Mist.notificationController.set('msgHeader', 'SSH key missing');
-                Mist.notificationController.set('msgPart1', 'Please add a key to ' +
-                    ' your server to deploy custom metrics.');
-                Mist.notificationController.set('msgCallback', function () {
-                    Ember.run.later(function () {
-                        that.open();
-                    }, 400);
-                })
                 Ember.run.later(function () {
-                    Mist.notificationController.showMessagebox();
+                    Mist.notificationController.messagebox.open({
+                        title: 'SSH key missing',
+                        paragraphs: [
+                            'Please add a key to your server ' +
+                            'to deploy custom metrics.'
+                        ],
+                        callback: function () {
+                            Ember.run.later(function () {
+                                that.open();
+                            }, 400);
+                        }
+                    });
                 }, 400);
             },
 

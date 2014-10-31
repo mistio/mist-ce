@@ -4,6 +4,25 @@
 #single-machine-page .ui-footer {
     display: block;
 }
+#single-machine-page .info-table {
+    width: 100%;
+}
+#single-machine-page .info-table td {
+    margin: 0;
+    width: 50%;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #CFCFCF;
+}
+#single-machine-page .info-table tr td:nth-child(2) {
+    font-weight: bold;
+}
+#single-machine-page .info-table tr {
+    background-color: #F7F7F7;
+}
+#single-machine-page .info-table .ip {
+    display: inline-block;
+}
 #single-machine-page #monitoring-disabled p {
     text-align: center;
 }
@@ -54,20 +73,6 @@
     position: relative;
     top: 3px;
     left: 6px;
-}
-
-#manual-monitoring-popup #manual-monitoring-command {
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    overflow-x: auto;
-    border: 1px solid #AAA;
-    font-family: monospace;
-    border-radius: 4px;
-    text-shadow: none;
-    background: #444;
-    font-size: 11px;
-    color: #efeff1;
-    padding: 6px;
 }
 
 #enable-monitoring-bundle .ajax-loader {

@@ -2033,12 +2033,13 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False):
+                      no_ssh=False, dry=False):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
         'action': 'enable',
         'no_ssh': True,
+        'dry': dry,
         'name': name,
         'public_ips': ",".join(public_ips),
         'dns_name': dns_name,
@@ -2066,8 +2067,11 @@ def enable_monitoring(user, backend_id, machine_id,
             raise PaymentRequiredError(resp.text.replace('Payment required: ', ''))
         else:
             raise ServiceUnavailableError()
-
     ret_dict = resp.json()
+
+    if dry:
+        return ret_dict
+
     if not no_ssh:
         mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
                                             ret_dict['extra_vars'])
@@ -2499,12 +2503,12 @@ $sudo /opt/mistio-collectd/collectd.sh restart
     return {'metric_id': None, 'stdout': stdout}
 
 
-def get_stats(user, backend_id, machine_id, start, stop, step):
+def get_stats(user, backend_id, machine_id, start='', stop='', step='', metrics=''):
     try:
         resp = requests.get(
             "%s/backends/%s/machines/%s/stats" % (config.CORE_URI,
                                                   backend_id, machine_id),
-            params={'start': start, 'stop': stop, 'step': step, 'v': 2},
+            params={'start': start, 'stop': stop, 'step': step},
             headers={'Authorization': get_auth_header(user)},
             verify=config.SSL_VERIFY
         )
@@ -2512,7 +2516,8 @@ def get_stats(user, backend_id, machine_id, start, stop, step):
         log.error("%r", exc)
         raise SSLError()
     if resp.status_code == 200:
-        return resp.json()
+        ret = resp.json()
+        return ret
     else:
         log.error("Error getting stats %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
