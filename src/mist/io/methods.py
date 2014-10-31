@@ -1,4 +1,7 @@
+import os
+import shutil
 import random
+import tempfile
 import json
 import requests
 import subprocess
@@ -18,6 +21,12 @@ from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
 
+import ansible.playbook
+import ansible.utils.template
+import ansible.callbacks
+import ansible.utils
+import ansible.constants
+
 try:
     from mist.core import config, model
     from mist.core.helpers import core_wrapper
@@ -35,8 +44,11 @@ from mist.io.exceptions import *
 
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish_user
+from mist.io.helpers import StdStreamCapture
 
 import mist.io.tasks
+import mist.io.inventory
+
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -691,7 +703,7 @@ def list_machines(user, backend_id):
 @core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
-                   size_name, location_name, ips, monitoring, ssh_port=22):
+                   size_name, location_name, ips, monitoring, networks=[], ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -753,7 +765,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key,
-                                         machine_name, image, size, location)
+                                         machine_name, image, size, location, networks)
     elif conn.type is Provider.HPCLOUD:
         node = _create_machine_hpcloud(conn, private_key, public_key,
                                        machine_name, image, size, location)
@@ -857,7 +869,7 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
 
 def _create_machine_openstack(conn, private_key, public_key, machine_name,
-                             image, size, location):
+                             image, size, location, networks):
     """Create a machine in Openstack.
 
     Here there is no checking done, all parameters are expected to be
@@ -882,17 +894,20 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
-            node = conn.create_node(name=machine_name,
+            node = conn.create_node(
+                name=machine_name,
                 image=image,
                 size=size,
                 location=location,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
-                ex_keyname=server_key)
+                ex_keyname=server_key,
+                networks=networks)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
+
 
 def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
                              image, size, location):
@@ -1722,8 +1737,7 @@ def list_locations(user, backend_id):
 
 def list_networks(user, backend_id):
     """List networks from each backend.
-
-    Currently NephoScale is supported. For other providers
+    Currently NephoScale and Openstack networks are supported. For other providers
     this returns an empty list
 
     """
@@ -1733,17 +1747,137 @@ def list_networks(user, backend_id):
     backend = user.backends[backend_id]
     conn = connect_provider(backend)
 
-    try:
-        networks = conn.ex_list_networks()
-    except:
-        networks = []
-
     ret = []
-    for network in networks:
-        ret.append({'id': network.id,
-                    'name': network.name,
-                    'extra': network.extra})
+    if conn.type in [Provider.NEPHOSCALE]:
+        networks = conn.ex_list_networks()
+
+        for network in networks:
+            ret.append({
+                'id': network.id,
+                'name': network.name,
+                'extra': network.extra,
+            })
+
+        return ret
+    elif conn.type in [Provider.OPENSTACK]:
+        networks = conn.ex_list_neutron_networks()
+        for network in networks:
+            ret.append(openstack_network_to_dict(network))
+        return ret
+    else:
+        return ret
+
+
+def openstack_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['status'] = network.status
+
+    net['subnets'] = []
+    for sub in network.subnets:
+
+        net['subnets'].append(openstack_subnet_to_dict(sub))
+    return net
+
+
+def openstack_subnet_to_dict(subnet):
+    net = {}
+
+    net['name'] = subnet.name
+    net['id'] = subnet.id
+    net['cidr'] = subnet.cidr
+    net['enable_dhcp'] = subnet.enable_dhcp
+    net['dns_nameservers'] = subnet.dns_nameservers
+    net['allocation_pools'] = subnet.allocation_pools
+    net['gateway_ip'] = subnet.gateway_ip
+
+    return net
+
+
+def create_network(user, backend_id, network, subnet):
+    """
+    Creates a new network. If subnet dict is specified, after creating the network
+    it will use the new network's id to create a subnet
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+
+    conn = connect_provider(backend)
+    if conn.type is not Provider.OPENSTACK:
+        raise NetworkActionNotSupported()
+
+    try:
+        network_name = network.get('name')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    admin_state_up = network.get('admin_state_up', True)
+    shared = network.get('shared', False)
+
+    # First we create the network
+    try:
+        new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+    except Exception as e:
+        raise NetworkCreationError("Got error r%" % e)
+
+    ret = dict()
+    if subnet:
+        network_id = new_network.id
+
+        try:
+            subnet_name = subnet.get('name')
+            cidr = subnet.get('cidr')
+        except Exception as e:
+            raise RequiredParameterMissingError(e)
+
+        allocation_pools = subnet.get('allocation_pools', [])
+        gateway_ip = subnet.get('gateway_ip', None)
+        ip_version = subnet.get('ip_version', '4')
+        enable_dhcp = subnet.get('enable_dhcp', True)
+
+        try:
+            subnet = conn.ex_create_neutron_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
+                                                   allocation_pools=allocation_pools, gateway_ip=gateway_ip,
+                                                   ip_version=ip_version, enable_dhcp=enable_dhcp)
+        except Exception as e:
+            conn.ex_delete_neutron_network(network_id)
+            raise NetworkError(e)
+
+        ret['network'] = openstack_network_to_dict(new_network)
+        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
+
+    else:
+        ret = openstack_network_to_dict(new_network)
+
+    task = tasks.ListNetworks()
+    task.clear_cache(user.email, backend_id)
+    trigger_session_update(user.email, ['backends'])
     return ret
+
+
+def delete_network(user, backend_id, network_id):
+    """
+    Delete a neutron network
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+
+    conn = connect_provider(backend)
+    if conn.type is not Provider.OPENSTACK:
+        raise NetworkActionNotSupported()
+
+    try:
+        conn.ex_delete_neutron_network(network_id)
+        task = tasks.ListNetworks()
+        task.clear_cache(user.email, backend_id)
+        trigger_session_update(user.email, ['backends'])
+    except Exception as e:
+        raise NetworkError(e)
 
 
 def set_machine_metadata(user, backend_id, machine_id, tag):
@@ -1899,13 +2033,12 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False, dry=False):
+                      no_ssh=False):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
         'action': 'enable',
         'no_ssh': True,
-        'dry': dry,
         'name': name,
         'public_ips': ",".join(public_ips),
         'dns_name': dns_name,
@@ -1934,20 +2067,10 @@ def enable_monitoring(user, backend_id, machine_id,
         else:
             raise ServiceUnavailableError()
 
-    resp_dict = resp.json()
-    host = resp_dict.get('host')
-    deploy_kwargs = resp_dict.get('deploy_kwargs')
-    command = deploy_collectd_command(deploy_kwargs)
-    ret_dict = {
-        'host': host,
-        'deploy_kwargs': deploy_kwargs,
-        'command': command,
-    }
-    if dry:
-        return ret_dict
-    stdout = ''
+    ret_dict = resp.json()
     if not no_ssh:
-        mist.io.tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
+        mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
+                                            ret_dict['extra_vars'])
 
     trigger_session_update(user.email, ['monitoring'])
 
@@ -1977,41 +2100,10 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     ret_dict = json.loads(ret.content)
     host = ret_dict.get('host')
 
-    stdout = ""
-    try:
-        if not no_ssh:
-            stdout = _undeploy_collectd(user, backend_id, machine_id, host)
-    except:
-        pass
+    if not no_ssh:
+        mist.io.tasks.undeploy_collectd.delay(user.email,
+                                              backend_id, machine_id)
     trigger_session_update(user.email, ['monitoring'])
-    return stdout
-
-
-def deploy_collectd_command(deploy_kwargs):
-    """Return command that must be run to deploy collectd on a machine."""
-    parts = ["%s=%s" % (key, value) for key, value in deploy_kwargs.items()]
-    query = "&".join(parts)
-    url = "%s/deploy_script" % config.CORE_URI
-    if query:
-        url += "?" + query
-    command = "wget -O - %s '%s' | `command -v sudo` bash" % (
-        "--no-check-certificate" if not config.SSL_VERIFY else "",
-        url,
-    )
-    return command
-
-
-def _undeploy_collectd(user, backend_id, machine_id, host):
-    """Uninstall collectd from the machine and return command's output"""
-    #FIXME: do not hard-code stuff!
-    command = (
-        "[ -f /etc/cron.d/mistio-collectd ] && `command -v sudo` rm -f /etc/cron.d/mistio-collectd || "
-        "echo `command -v sudo` /opt/mistio-collectd/collectd.sh stop | bash; "
-        "sleep 2; [ -f /opt/mistio-collectd/collectd.pid ] && "
-        "`command -v sudo` kill -9 `cat /opt/mistio-collectd/collectd.pid`"
-    )
-
-    mist.io.tasks.ssh_command.delay(user.email, backend_id, machine_id, host, command)
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
@@ -2424,3 +2516,121 @@ def get_stats(user, backend_id, machine_id, start, stop, step):
     else:
         log.error("Error getting stats %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
+
+
+def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
+                 force_handlers=False, debug=False):
+    if not extra_vars:
+        extra_vars = None
+    ret_dict = {
+        'success': False,
+        'started_at': time(),
+        'finished_at': 0,
+        'stdout': '',
+        'error_msg': '',
+        'inventory': '',
+        'stats': {},
+    }
+    inventory = mist.io.inventory.MistInventory(user,
+                                                [(backend_id, machine_id)])
+    if len(inventory.hosts) != 1:
+        log.error("Expected 1 host, found %s", inventory.hosts)
+        ret_dict['error_msg'] = "Expected 1 host, found %s" % inventory.hosts
+        ret_dict['finished_at'] = time()
+        return ret_dict
+    machine_name = inventory.hosts.keys()[0]
+    log_prefix = "Running playbook '%s' on machine '%s'" % (playbook_path,
+                                                            machine_name)
+    files = inventory.export(include_localhost=False)
+    ret_dict['inventory'] = files['inventory']
+    tmp_dir = tempfile.mkdtemp()
+    old_dir = os.getcwd()
+    os.chdir(tmp_dir)
+    try:
+        log.debug("%s: Saving inventory files", log_prefix)
+        os.mkdir('id_rsa')
+        for name, data in files.items():
+            with open(name, 'w') as f:
+                f.write(data)
+        for name in os.listdir('id_rsa'):
+            os.chmod('id_rsa/%s' % name, 0600)
+        log.debug("%s: Inventory files ready", log_prefix)
+
+        playbook_path = '%s/%s' % (old_dir, playbook_path)
+        ansible_hosts_path = 'inventory'
+        # extra_vars['host_key_checking'] = False
+
+        ansible.utils.VERBOSITY = 4 if debug else 0
+        ansible.constants.HOST_KEY_CHECKING = False
+        ansible.constants.ANSIBLE_NOCOWS = True
+        stats = ansible.callbacks.AggregateStats()
+        playbook_cb = ansible.callbacks.PlaybookCallbacks(
+            verbose=ansible.utils.VERBOSITY
+        )
+        runner_cb = ansible.callbacks.PlaybookRunnerCallbacks(
+            stats, verbose=ansible.utils.VERBOSITY
+        )
+        log.error(old_dir)
+        log.error(tmp_dir)
+        log.error(extra_vars)
+        log.error(playbook_path)
+        capture = StdStreamCapture(pass_through=debug)
+        try:
+            playbook = ansible.playbook.PlayBook(
+                playbook=playbook_path,
+                host_list=ansible_hosts_path,
+                callbacks=playbook_cb,
+                runner_callbacks=runner_cb,
+                stats=stats,
+                extra_vars=extra_vars,
+                force_handlers=force_handlers,
+            )
+            result = playbook.run()
+        except Exception as exc:
+            log.error("%s: Error %r", log_prefix, exc)
+            ret_dict['error_msg'] = repr(exc)
+        finally:
+            ret_dict['finished_at'] = time()
+            ret_dict['stdout'] = capture.close()
+        if ret_dict['error_msg']:
+            return ret_dict
+        log.debug("%s: Ansible result = %s", log_prefix, result)
+        mresult = result[machine_name]
+        ret_dict['stats'] = mresult
+        if mresult['failures'] or mresult['unreachable']:
+            log.error("%s: Ansible run failed: %s", log_prefix, mresult)
+            return ret_dict
+        log.info("%s: Ansible run succeeded: %s", log_prefix, mresult)
+        ret_dict['success'] = True
+        return ret_dict
+    finally:
+        os.chdir(old_dir)
+        if not debug:
+            shutil.rmtree(tmp_dir)
+
+
+def deploy_collectd(user, backend_id, machine_id, extra_vars):
+    return run_playbook(
+        user, backend_id, machine_id,
+        playbook_path='src/deploy_collectd/ansible/enable.yml',
+        extra_vars=extra_vars,
+        force_handlers=True,
+        debug=True
+    )
+
+
+def undeploy_collectd(user, backend_id, machine_id):
+    return run_playbook(
+        user, backend_id, machine_id,
+        playbook_path='src/deploy_collectd/ansible/disable.yml',
+        force_handlers=True,
+        debug=True
+    )
+
+
+def get_deploy_collectd_manual_command(uuid, password, monitor):
+    url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
+    cmd = "wget -O - %s | sudo python - %s %s" % (url, uuid, password)
+    if monitor != 'monitor1.mist.io':
+        cmd += " -m %s" % monitor
+    return cmd

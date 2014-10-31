@@ -36,6 +36,10 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/metric_node.html',
         'text!app/templates/missing.html',
         'text!app/templates/monitoring.html',
+        'text!app/templates/network_create.html',
+        'text!app/templates/network.html',
+        'text!app/templates/network_list.html',
+        'text!app/templates/network_list_item.html',
         'text!app/templates/rule_edit.html',
         'text!app/templates/rule.html',
         'text!app/templates/user_menu.html',
@@ -74,9 +78,13 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['metric_node/html'] = Ember.Handlebars.compile(arguments[31]);
         Ember.TEMPLATES['missing/html'] = Ember.Handlebars.compile(arguments[32]);
         Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[33]);
-        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[34]);
-        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[35]);
-        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[36]);
+        Ember.TEMPLATES['network_create/html'] = Ember.Handlebars.compile(arguments[34]);
+        Ember.TEMPLATES['network/html'] = Ember.Handlebars.compile(arguments[35]);
+        Ember.TEMPLATES['network_list/html'] = Ember.Handlebars.compile(arguments[36]);
+        Ember.TEMPLATES['network_list_item/html'] = Ember.Handlebars.compile(arguments[37]);
+        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[38]);
+        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[39]);
+        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[40]);
         callback();
       });
       return;
@@ -647,6 +655,17 @@ function program1(depth0,data) {
   return buffer;
   }
 
+function program3(depth0,data) {
+  
+  var buffer = '', hashTypes, hashContexts;
+  data.buffer.push("\n            <li class=\"ui-li-has-count\">\n\n                <a class=\"ui-btn ui-btn-icon-right ui-icon-carat-r\" href=\"#/networks\">\n\n                    Networks\n\n                    <span class=\"ui-li-count ui-body-inherit\">\n                        ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.backendsController.networkCount", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                    </span>\n                </a>\n            </li>\n            ");
+  return buffer;
+  }
+
   data.buffer.push("<div id=\"home-page\" data-role=\"page\" class=\"ui-page-active ui-page ui-page-theme-a\">\n\n    <!-- Page header -->\n\n    <div class=\"ui-header ui-bar-b\">\n\n        <h1 class=\"ui-title\">mist.io</h1>\n\n        ");
   hashTypes = {};
   hashContexts = {};
@@ -670,7 +689,12 @@ function program1(depth0,data) {
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.backendsController.imageCount", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n                    </span>\n                </a>\n            </li>\n\n            <!-- Keys link -->\n\n            <li class=\"ui-li-has-count ui-last-child\">\n\n                <a class=\"ui-btn ui-btn-icon-right ui-icon-carat-r\" href=\"#/keys\">\n\n                    Keys\n\n                    <span class=\"ui-li-count ui-body-inherit\">\n                        ");
+  data.buffer.push("\n                    </span>\n                </a>\n            </li>\n\n            <!-- Networks link -->\n\n            ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "Mist.backendsController.hasOpenStack", {hash:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n\n            <!-- Keys link -->\n\n            <li class=\"ui-li-has-count ui-last-child\">\n\n                <a class=\"ui-btn ui-btn-icon-right ui-icon-carat-r\" href=\"#/keys\">\n\n                    Keys\n\n                    <span class=\"ui-li-count ui-body-inherit\">\n                        ");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.keysController.content.length", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
@@ -787,13 +811,13 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
     'class': ("view.starClass")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push("\n	");
+  data.buffer.push("\n    ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "toggleImageStar", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n	");
+  data.buffer.push(">\n    ");
   hashContexts = {'checkedBinding': depth0};
   hashTypes = {'checkedBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
@@ -1243,7 +1267,7 @@ function program1(depth0,data) {
 Ember.TEMPLATES["machine_add/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, hashContexts, hashTypes, escapeExpression=this.escapeExpression, self=this;
+  var buffer = '', stack1, hashContexts, hashTypes, escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
 
 function program1(depth0,data) {
   
@@ -1385,6 +1409,40 @@ function program14(depth0,data) {
 
 function program16(depth0,data) {
   
+  var buffer = '', stack1, hashContexts, hashTypes, options;
+  data.buffer.push("\n                        <input ");
+  hashContexts = {'id': depth0,'name': depth0,'checked': depth0};
+  hashTypes = {'id': "STRING",'name': "STRING",'checked': "STRING"};
+  options = {hash:{
+    'id': ("this.id"),
+    'name': ("this.id"),
+    'checked': ("this.selected")
+  },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
+  data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
+  data.buffer.push("\n                            type=\"checkbox\" ");
+  hashContexts = {'on': depth0,'target': depth0};
+  hashTypes = {'on': "STRING",'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "toggleNetworkSelection", "", {hash:{
+    'on': ("change"),
+    'target': ("view")
+  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                        <label ");
+  hashContexts = {'for': depth0};
+  hashTypes = {'for': "STRING"};
+  options = {hash:{
+    'for': ("this.id")
+  },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
+  data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
+  data.buffer.push(" data-corners=\"false\">\n                            ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                        </label>\n                    ");
+  return buffer;
+  }
+
+function program18(depth0,data) {
+  
   var buffer = '', hashTypes, hashContexts;
   data.buffer.push("\n            Estimated price:\n            <span>");
   hashTypes = {};
@@ -1394,7 +1452,7 @@ function program16(depth0,data) {
   return buffer;
   }
 
-  data.buffer.push("<div id=\"create-machine-panel\"\n     data-swipe-close=\"false\"\n     class=\"side-panel\"\n     data-role=\"panel\"\n     data-position=\"right\"\n     data-display=\"overlay\"\n     data-theme=\"b\">\n\n    <div data-role=\"header\">\n        <h1>Create Machine</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"b\">\n\n        <!-- Select Name -->\n\n        <label for=\"create-machine-name\">1. Name:</label>\n        ");
+  data.buffer.push("<div id=\"create-machine-panel\"\n     data-swipe-close=\"false\"\n     class=\"side-panel\"\n     data-role=\"panel\"\n     data-position=\"right\"\n     data-display=\"overlay\"\n     data-theme=\"b\">\n\n    <div data-role=\"header\">\n        <h1 class=\"ui-title\">Create Machine</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"b\">\n\n        <!-- Select Name -->\n\n        <label for=\"create-machine-name\">1. Name:</label>\n        ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -1438,7 +1496,7 @@ function program16(depth0,data) {
   hashContexts = {};
   stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.locations.content", {hash:{},inverse:self.noop,fn:self.program(12, program12, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            </ul>\n        </div>\n\n        <!-- Select Key -->\n\n        <label>6. Key:</label>\n        <div id=\"create-machine-key\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h2>");
+  data.buffer.push("\n            </ul>\n        </div>\n\n\n        <!-- Select Key -->\n\n        <label>6. Key:</label>\n        <div id=\"create-machine-key\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h2>");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.machineAddController.newMachineKey.id", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
@@ -1453,7 +1511,12 @@ function program16(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "createKeyClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Add Key</a>\n                </li>\n            </ul>\n        </div>\n\n        <!-- Select Script -->\n\n        <label for=\"create-machine-script\">7.Script:</label>\n        ");
+  data.buffer.push(">Add Key</a>\n                </li>\n            </ul>\n        </div>\n\n        <!-- Select Networks -->\n\n        <div id=\"create-machine-network\">\n            <label>7. Networks:</label>\n            <div data-role=\"collapsible\"\n                    data-iconpos=\"right\"\n                    data-collapsed-icon=\"arrow-d\"\n                    data-expanded-icon=\"arrow-u\"\n                    data-theme=\"a\"\n                    class=\"mist-select\">\n                <h2>Networks</h2>\n                <fieldset data-role=\"controlgroup\" data-theme=\"a\">\n                    ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.networks.content", {hash:{},inverse:self.noop,fn:self.program(16, program16, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                </fieldset>\n            </div>\n        </div>\n\n        <!-- Select Script -->\n\n        <label for=\"create-machine-script\">7. Script:</label>\n        ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextArea", {hash:{
@@ -1471,7 +1534,7 @@ function program16(depth0,data) {
   data.buffer.push("\n            Enable monitoring\n            </label>\n        </div>\n\n        <div id=\"create-machine-cost\">\n        ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers['if'].call(depth0, "view.price", {hash:{},inverse:self.noop,fn:self.program(16, program16, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers['if'].call(depth0, "view.price", {hash:{},inverse:self.noop,fn:self.program(18, program18, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </div>\n\n        <div class=\"ok-cancel\" data-role=\"ui-grid-a\" >\n            <div class=\"ui-block-a\">\n                <a data-role=\"button\"\n                   data-theme=\"a\"\n                   ");
   hashContexts = {'target': depth0};
@@ -2432,17 +2495,17 @@ function program1(depth0,data) {
   },inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   stack2 = ((stack1 = helpers['link-to'] || (depth0 && depth0['link-to'])),stack1 ? stack1.call(depth0, "machine", "view.machine", options) : helperMissing.call(depth0, "link-to", "machine", "view.machine", options));
   if(stack2 || stack2 === 0) { data.buffer.push(stack2); }
-  data.buffer.push("\n    \n");
+  data.buffer.push("\n\n");
   return buffer;
   }
 function program2(depth0,data) {
   
   var buffer = '', stack1, stack2, hashTypes, hashContexts, options;
-  data.buffer.push("\n    \n        <div class=\"ui-grid-b\">\n            <div class=\"ui-block-a machine-name\">");
+  data.buffer.push("\n\n        <div class=\"ui-grid-b\">\n            <div class=\"ui-block-a machine-name\">");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.machine.name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</div>\n    \n            <span class=\"ui-block-b machine-state\">\n                <span ");
+  data.buffer.push("</div>\n\n            <span class=\"ui-block-b machine-state\">\n                <span ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
@@ -2468,7 +2531,7 @@ function program2(depth0,data) {
   hashContexts = {};
   stack2 = helpers.unless.call(depth0, "pendingCreation", {hash:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack2 || stack2 === 0) { data.buffer.push(stack2); }
-  data.buffer.push("\n                \n            </div>\n            \n            <div class=\"ui-block-c machine-tags\">              \n                <span class=\"tag\">");
+  data.buffer.push("\n\n            </div>\n\n            <div class=\"ui-block-c machine-tags\">\n                <span class=\"tag\">");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.machine.backend.title", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
@@ -2477,7 +2540,7 @@ function program2(depth0,data) {
   hashContexts = {};
   stack2 = helpers.each.call(depth0, "view.machine.tags", {hash:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack2 || stack2 === 0) { data.buffer.push(stack2); }
-  data.buffer.push("             \n            </div>    \n                                \n        </div>\n    ");
+  data.buffer.push("\n            </div>\n\n        </div>\n    ");
   return buffer;
   }
 function program3(depth0,data) {
@@ -2514,21 +2577,21 @@ function program9(depth0,data) {
     'class': ("probing probed")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push(">\n                        <div class=\"loadleds\">                                                                      \n                            <div ");
+  data.buffer.push(">\n                        <div class=\"loadleds\">\n                            <div ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
     'class': ("loadavg15 :led")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push(">\n                            </div>                \n                            <div ");
+  data.buffer.push(">\n                            </div>\n                            <div ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
     'class': ("loadavg5 :led")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push(">\n                            </div> \n                            <div ");
+  data.buffer.push(">\n                            </div>\n                            <div ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
@@ -2549,28 +2612,28 @@ function program9(depth0,data) {
     'class': ("netled4 :netled1")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push(">\n                            </div> \n                            <div ");
+  data.buffer.push(">\n                            </div>\n                            <div ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
     'class': ("netled3 :netled2")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push(">\n                            </div> \n                            <div ");
+  data.buffer.push(">\n                            </div>\n                            <div ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
     'class': ("netled2 :netled3")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push(">\n                            </div> \n                            <div ");
+  data.buffer.push(">\n                            </div>\n                            <div ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
     'class': ("netled1 :netled4")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push(">\n                            </div>\n                        </div>\n                                                 \n                    </div>\n                ");
+  data.buffer.push(">\n                            </div>\n                        </div>\n\n                    </div>\n                ");
   return buffer;
   }
 
@@ -2594,11 +2657,11 @@ function program13(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "disassociateGhostMachine", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n        \n        <div class=\"ui-grid-b\">\n            <div class=\"ui-block-a machine-name\">");
+  data.buffer.push(">\n\n        <div class=\"ui-grid-b\">\n            <div class=\"ui-block-a machine-name\">");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.machine.name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</div>\n    \n            <span class=\"ui-block-b machine-state\">\n                <span ");
+  data.buffer.push("</div>\n\n            <span class=\"ui-block-b machine-state\">\n                <span ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
   options = {hash:{
@@ -2609,7 +2672,7 @@ function program13(depth0,data) {
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.machine.state", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n                </span>\n            </span> \n                                \n        </div>\n\n    </a>\n    \n");
+  data.buffer.push("\n                </span>\n            </span>\n\n        </div>\n\n    </a>\n\n");
   return buffer;
   }
 
@@ -3216,6 +3279,497 @@ function program4(depth0,data) {
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push(">\n                    Add Graph\n            </a>\n        </div>\n    </div>\n</div>");
+  return buffer;
+  
+});
+Ember.TEMPLATES["network_create/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', stack1, hashTypes, hashContexts, escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                        ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "backend", {hash:{},inverse:self.program(4, program4, data),fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                    ");
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = '', hashTypes, hashContexts;
+  data.buffer.push("\n                            ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "backend.title", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                        ");
+  return buffer;
+  }
+
+function program4(depth0,data) {
+  
+  
+  data.buffer.push("\n                            Select backend\n                        ");
+  }
+
+function program6(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                        ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "enabled", {hash:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                    ");
+  return buffer;
+  }
+function program7(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                            ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "isOpenStack", {hash:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                        ");
+  return buffer;
+  }
+function program8(depth0,data) {
+  
+  var buffer = '', hashContexts, hashTypes;
+  data.buffer.push("\n                                <li data-icon=\"false\">\n                                    <a ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "backendSelected", "", {hash:{
+    'target': ("view")
+  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                                        ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "title", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                                    </a>\n                                </li>\n                            ");
+  return buffer;
+  }
+
+function program10(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                                ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "ipv", {hash:{},inverse:self.program(13, program13, data),fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                            ");
+  return buffer;
+  }
+function program11(depth0,data) {
+  
+  var buffer = '', hashTypes, hashContexts;
+  data.buffer.push("\n                                    ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "ipv", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                                ");
+  return buffer;
+  }
+
+function program13(depth0,data) {
+  
+  
+  data.buffer.push("\n                                    Select IP Version\n                                ");
+  }
+
+function program15(depth0,data) {
+  
+  
+  data.buffer.push("\n            <div class=\"ajax-loader\"></div>\n        ");
+  }
+
+  data.buffer.push("<div id=\"network-create\"\n    data-swipe-close=\"false\"\n    class=\"side-panel\"\n    data-role=\"panel\"\n    data-position=\"right\"\n    data-display=\"overlay\"\n    data-theme=\"b\">\n\n    <div data-role=\"header\">\n        <h1>Create Network</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"b\">\n\n        <!--\n            Select Backend\n\n            Allow only openstack backends for now\n        -->\n\n\n        <div id=\"network-create-backend-wrapper\">\n\n            <label for=\"network-create-backend\">Backend:</label>\n\n            <div id=\"network-create-backend\"\n                data-role=\"collapsible\"\n                data-iconpos=\"right\"\n                data-collapsed-icon=\"arrow-d\"\n                data-expanded-icon=\"arrow-u\"\n                data-theme=\"a\"\n                class=\"mist-select\">\n\n                <h2>\n                    ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['with'].call(depth0, "Mist.networkCreateController.network", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                </h2>\n\n                <ul data-role=\"listview\" data-theme=\"a\">\n\n                    ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n\n                </ul> <!-- list -->\n            </div> <!-- collapsible -->\n        </div><!-- wrapper -->\n\n\n        <!--\n            Select Network Name\n        -->\n\n\n        <div id=\"network-create-name-wrapper\">\n\n            <label for=\"network-create-name\">Network Name:</label>\n\n            ");
+  hashContexts = {'data-theme': depth0,'id': depth0,'valueBinding': depth0};
+  hashTypes = {'data-theme': "STRING",'id': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'data-theme': ("a"),
+    'id': ("network-create-name"),
+    'valueBinding': ("Mist.networkCreateController.network.name")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n\n            <!--\n                Select Admin State Up\n            -->\n\n\n            <label>Admin State:</label>\n            <div id=\"network-create-admin-state\"\n                data-role=\"collapsible\"\n                data-iconpos=\"right\"\n                data-collapsed-icon=\"arrow-d\"\n                data-expanded-icon=\"arrow-u\"\n                data-theme=\"a\"\n                class=\"mist-select\">\n\n                <h2>\n                    ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.networkCreateController.adminStateUpToText", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                </h2>\n\n                <ul data-role=\"listview\" data-theme=\"a\">\n                    <li data-icon=\"false\">\n                        <a ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "adminStateSelected", true, {hash:{
+    'target': ("view")
+  },contexts:[depth0,depth0],types:["STRING","BOOLEAN"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                            UP\n                        </a>\n                    </li>\n                    <li data-icon=\"false\">\n                        <a ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "adminStateSelected", false, {hash:{
+    'target': ("view")
+  },contexts:[depth0,depth0],types:["STRING","BOOLEAN"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                            DOWN\n                        </a>\n                    </li>\n                </ul> <!-- list -->\n            </div><!-- collapsible -->\n        </div>\n\n\n        <!--\n            Create Subnet\n        -->\n\n\n        <div id=\"network-create-subnet-wrapper\">\n\n            ");
+  hashContexts = {'data-theme': depth0,'id': depth0,'checkedBinding': depth0};
+  hashTypes = {'data-theme': "STRING",'id': "STRING",'checkedBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
+    'data-theme': ("a"),
+    'id': ("network-create-subnet-create"),
+    'checkedBinding': ("Mist.networkCreateController.network.createSubnet")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n            <label for=\"network-create-subnet-create\">\n                Create Subnet\n            </label>\n\n\n            <div id=\"network-create-subnet-form\">\n\n\n                <!--\n                    Select Subnet Name\n                -->\n\n\n                <div id=\"network-create-subnet-name-wrapper\">\n                    <label for=\"network-create-subnet-name\">Subnet Name:</label>\n                    ");
+  hashContexts = {'data-theme': depth0,'id': depth0,'valueBinding': depth0};
+  hashTypes = {'data-theme': "STRING",'id': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'data-theme': ("a"),
+    'id': ("network-create-subnet-name"),
+    'valueBinding': ("Mist.networkCreateController.network.subnet.name")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                </div>\n\n\n                <!--\n                    Select Network Address\n                -->\n\n\n                <div id=\"network-create-subnet-address-wrapper\">\n                    <label for=\"network-create-subnet-address\">Network Address:</label>\n                    ");
+  hashContexts = {'data-theme': depth0,'id': depth0,'valueBinding': depth0};
+  hashTypes = {'data-theme': "STRING",'id': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'data-theme': ("a"),
+    'id': ("network-create-subnet-address"),
+    'valueBinding': ("Mist.networkCreateController.network.subnet.address")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                </div>\n\n\n                <!--\n                    Select IP Version\n                -->\n\n\n                <div id=\"network-create-subnet-ipv-wrapper\">\n                    <label>IP Version:</label>\n                    <div id=\"network-create-subnet-ipv\"\n                        data-role=\"collapsible\"\n                        data-iconpos=\"right\"\n                        data-collapsed-icon=\"arrow-d\"\n                        data-expanded-icon=\"arrow-u\"\n                        data-theme=\"a\"\n                        class=\"mist-select\">\n\n                        <h2>\n                            ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['with'].call(depth0, "Mist.networkCreateController.network.subnet", {hash:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                        </h2>\n\n                        <ul data-role=\"listview\" data-theme=\"a\">\n                            <li data-icon=\"false\">\n                                <a ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "ipvSelected", "IPv4", {hash:{
+    'target': ("view")
+  },contexts:[depth0,depth0],types:["STRING","STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                                    IPv4\n                                </a>\n                            </li>\n                            <li data-icon=\"false\">\n                                <a ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "ipvSelected", "IPv6", {hash:{
+    'target': ("view")
+  },contexts:[depth0,depth0],types:["STRING","STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                                    IPv6\n                                </a>\n                            </li>\n                        </ul> <!-- list -->\n                    </div><!-- collapsible -->\n                </div><!-- wrapper -->\n\n\n\n                <div id=\"network-create-subnet-other-wrapper\">\n\n\n                    <!--\n                        Enable Gateway\n                    -->\n\n                    <div>\n                        <div id=\"network-create-subnet-gateway-ip-wrapper\">\n                            <label for=\"network-create-subnet-gateway-ip\">Gateway IP:</label>\n                            ");
+  hashContexts = {'data-theme': depth0,'id': depth0,'valueBinding': depth0};
+  hashTypes = {'data-theme': "STRING",'id': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'data-theme': ("a"),
+    'id': ("network-create-subnet-gateway-ip"),
+    'valueBinding': ("Mist.networkCreateController.network.subnet.gatewayIP")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                        </div>\n                        ");
+  hashContexts = {'data-theme': depth0,'id': depth0,'checkedBinding': depth0};
+  hashTypes = {'data-theme': "STRING",'id': "STRING",'checkedBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
+    'data-theme': ("a"),
+    'id': ("network-create-subnet-gateway"),
+    'checkedBinding': ("Mist.networkCreateController.network.subnet.disableGateway")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                        <label for=\"network-create-subnet-gateway\">\n                            Disable Gateway\n                        </label>\n                    </div>\n\n\n                    <!--\n                        Enable DHCP\n                    -->\n\n\n                    ");
+  hashContexts = {'data-theme': depth0,'id': depth0,'checkedBinding': depth0};
+  hashTypes = {'data-theme': "STRING",'id': "STRING",'checkedBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
+    'data-theme': ("a"),
+    'id': ("network-create-subnet-dhcp"),
+    'checkedBinding': ("Mist.networkCreateController.network.subnet.enableDHCP")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                    <label for=\"network-create-subnet-dhcp\">\n                        Enable DHCP\n                    </label>\n\n\n                    <!--\n                        Allocation Pools\n                    -->\n\n                    <label for=\"network-create-subnet-allocation-pools\">\n                        Allocation Pools:\n                    </label>\n                    ");
+  hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
+  hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextArea", {hash:{
+    'id': ("network-create-subnet-allocation-pools"),
+    'data-theme': ("a"),
+    'valueBinding': ("Mist.networkCreateController.network.subnet.allocationPools")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n\n                    <!--\n                        DNS Servers\n                    --\n\n\n                    <label for=\"network-create-subnet-dns\">\n                        DNS Name Servers:\n                    </label>\n                    \n\n                    <!--\n                        Host Routes\n                    --\n\n\n                    <label for=\"network-create-subnet-host-routes\">\n                        Host Routes:\n                    </label>\n                    \n                    -->\n\n                </div>\n            </div>\n        </div>\n\n        ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "Mist.networkCreateController.creatingNetwork", {hash:{},inverse:self.noop,fn:self.program(15, program15, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n\n        <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n            <a class=\"ui-btn ui-btn-a\"\n               ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Back</a>\n            <a class=\"ui-btn ui-btn-d\" id=\"network-create-ok\"\n                ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "createClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Create</a>\n        </div>\n    </div>\n</div>\n");
+  return buffer;
+  
+});
+Ember.TEMPLATES["network/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', stack1, hashTypes, hashContexts, escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                <table class=\"info-table\">\n                    <tr>\n                        <td class=\"subnet-name\">Name</td>\n                        <td class=\"subnet-name\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</td>\n                    </tr>\n                    <tr>\n                        <td>Id</td>\n                        <td>");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "id", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</td>\n                    </tr>\n                    <tr>\n                        <td>Cidr</td>\n                        <td>");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "cidr", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</td>\n                    </tr>\n                    <tr>\n                        <td>DHCP Enabled</td>\n                        <td>");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "enable_dhcp", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</td>\n                    </tr>\n                    <tr>\n                        <td>Gateway IP</td>\n                        <td>");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "gateway_ip", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                    </tr>\n                    ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "dns_nameservers.length", {hash:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                    ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "allocation_pools.length", {hash:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                </table>\n            ");
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                        <td>DNS Nameservers</td>\n                        <td>\n                            ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers.each.call(depth0, "dns_nameservers", {hash:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                        </td>\n                    ");
+  return buffer;
+  }
+function program3(depth0,data) {
+  
+  var buffer = '', hashTypes, hashContexts;
+  data.buffer.push("\n                                <div class=\"ip\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</div>\n                            ");
+  return buffer;
+  }
+
+function program5(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                        <td>Allocation pools</td>\n                        <td>\n                            ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers.each.call(depth0, "allocation_pools", {hash:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                        </td>\n                    ");
+  return buffer;
+  }
+function program6(depth0,data) {
+  
+  var buffer = '', hashTypes, hashContexts;
+  data.buffer.push("\n                                <div class=\"ip\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "start", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</div> -\n                                <div class=\"ip\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "end", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</div>\n                            ");
+  return buffer;
+  }
+
+  data.buffer.push("<div id=\"single-network-page\" data-role=\"page\" class=\"ui-page-active\" data-theme=\"c\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#/networks\" class=\"responsive-button\" data-icon=\"arrow-l\">Networks</a>\n\n        <h1>");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</h1>\n\n        ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"c\">\n\n        <div id=\"single-network-info\" data-role=\"collapsible\" data-collapsed=\"false\">\n\n            <h3>Network Information</h3>\n\n            <table class=\"info-table\">\n                <tr>\n                    <td>Name</td>\n                    <td>");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</td>\n                </tr>\n                <tr>\n                    <td>Id</td>\n                    <td>");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "id", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</td>\n                </tr>\n                <tr>\n                    <td>Status</td>\n                    <td>");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "status", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</td>\n                </tr>\n            </table>\n\n        </div>\n\n        <div id=\"single-network-subnets\" data-role=\"collapsible\" data-collapsed=\"false\">\n\n            <h3>Subnets (");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "subnets.length", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(")</h3>\n\n            ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers.each.call(depth0, "subnets", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n        </div>\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.confirmationDialog", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n    <div class=\"single-action-footer\" data-role=\"footer\" data-theme=\"b\">\n        <a class=\"ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete\"\n            ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "deleteClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                Delete\n        </a>\n    </div>\n\n</div>\n");
+  return buffer;
+  
+});
+Ember.TEMPLATES["network_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', stack1, hashTypes, hashContexts, escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "enabled", {hash:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            ");
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                    ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "isOpenStack", {hash:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                ");
+  return buffer;
+  }
+function program3(depth0,data) {
+  
+  var buffer = '', stack1, hashTypes, hashContexts;
+  data.buffer.push("\n                      ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers.each.call(depth0, "networks.content", {hash:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                    ");
+  return buffer;
+  }
+function program4(depth0,data) {
+  
+  var buffer = '', hashContexts, hashTypes;
+  data.buffer.push("\n                          ");
+  hashContexts = {'networkBinding': depth0,'class': depth0};
+  hashTypes = {'networkBinding': "STRING",'class': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.networkListItemView", {hash:{
+    'networkBinding': ("this"),
+    'class': ("checkbox-link")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                      ");
+  return buffer;
+  }
+
+  data.buffer.push("<div id=\"network-list-page\" data-role=\"page\" class=\"ui-page-active\" data-theme=\"c\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#\" class=\"responsive-button\" data-icon=\"home\">Home</a>\n\n        <h1>Networks</h1>\n\n        ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"c\">\n\n        <a id=\"network-create-btn\"\n            class=\"responsive-button\"\n            data-role=\"button\"\n            data-icon=\"plus\"\n            data-iconpos=\"right\"\n            data-theme=\"d\"\n            ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "createClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Create</a>\n\n        <ul id=\"networks\"\n            data-role=\"listview\"\n            data-inset=\"true\"\n            data-filter=\"true\"\n            data-filter-placeholder=\"Filter...\"\n            data-theme=\"c\"\n            class=\"checkbox-list\">\n            ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n        </ul>\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.networkCreateView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n    ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.confirmationDialog", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n    <div class=\"single-action-footer\" data-role=\"footer\" data-theme=\"b\">\n        <a class=\"ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete\"\n            ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "deleteClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                Delete\n        </a>\n    </div>\n</div>\n");
+  return buffer;
+  
+});
+Ember.TEMPLATES["network_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', stack1, stack2, hashContexts, hashTypes, options, escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = '', hashTypes, hashContexts;
+  data.buffer.push("\n\n    <div class=\"ui-grid-b\">\n        <div class=\"ui-block-a network-name\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.network.name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</div>\n        <div class=\"ui-block-b\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.network.status", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</div>\n        <div class=\"ui-block-c key-tags\">\n            <span class=\"tag\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.network.backend.title", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</span>\n        </div>\n    </div>\n\n");
+  return buffer;
+  }
+
+  data.buffer.push("<label>");
+  hashContexts = {'checkedBinding': depth0};
+  hashTypes = {'checkedBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
+    'checkedBinding': ("view.network.selected")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</label>\n\n");
+  hashTypes = {};
+  hashContexts = {};
+  options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
+  stack2 = ((stack1 = helpers['link-to'] || (depth0 && depth0['link-to'])),stack1 ? stack1.call(depth0, "network", "view.network", options) : helperMissing.call(depth0, "link-to", "network", "view.network", options));
+  if(stack2 || stack2 === 0) { data.buffer.push(stack2); }
+  data.buffer.push("\n");
   return buffer;
   
 });

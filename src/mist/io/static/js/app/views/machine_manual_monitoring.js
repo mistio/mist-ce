@@ -26,9 +26,6 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
                 },
 
                 doneClicked: function () {
-                    Mist.monitoringController.enableMonitoring(
-                        Mist.machineManualMonitoringController.machine, null, true
-                    );
                     Mist.machineManualMonitoringController.close();
                 }
             }

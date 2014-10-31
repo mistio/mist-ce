@@ -14,6 +14,7 @@ var
 src/libcloud
 src/fabric
 src/paramiko
+src/deploy_collectd
 .DS_Store
 .Python
 /.project

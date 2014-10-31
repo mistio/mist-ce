@@ -59,7 +59,6 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
                     'public_ips': machine.public_ips ? machine.public_ips : [],
                     'name': machine.name ? machine.name : machine.id,
                     'no_ssh': true,
-                    'dry': true,
                 }).success(function(data) {
                     that.set('command', data.command);
                 }).error(function(message) {

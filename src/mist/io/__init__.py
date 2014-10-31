@@ -123,6 +123,7 @@ def add_routes(configurator):
     configurator.add_route('sizes', '/backends/{backend}/sizes')
     configurator.add_route('locations', '/backends/{backend}/locations')
     configurator.add_route('networks', '/backends/{backend}/networks')
+    configurator.add_route('network', '/backends/{backend}/networks/{network}')
 
     configurator.add_route('keys', '/keys')
     configurator.add_route('key_action', '/keys/{key}')

@@ -456,6 +456,7 @@ def create_machine(request):
         location_name = request.json_body.get('location_name', None)
         ips = request.json_body.get('ips', None)
         monitoring = request.json_body.get('monitoring', False)
+        networks = request.json_body.get('networks', [])
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -463,7 +464,7 @@ def create_machine(request):
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                  location_id, image_id, size_id, script,
                                  image_extra, disk, image_name, size_name,
-                                 location_name, ips, monitoring)
+                                 location_name, ips, monitoring, networks)
     return ret
 
 
@@ -582,6 +583,37 @@ def list_networks(request):
     return methods.list_networks(user, backend_id)
 
 
+@view_config(route_name='networks', request_method='POST', renderer='json')
+def create_network(request):
+    """
+    Creates a new network. Currently working only with OPENSTACK backend
+    """
+    backend_id = request.matchdict['backend']
+
+    try:
+        network = request.json_body.get('network')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    subnet = request.json_body.get('subnet', None)
+    user = user_from_request(request)
+    return methods.create_network(user, backend_id, network, subnet)
+
+
+@view_config(route_name='network', request_method='DELETE')
+def delete_network(request):
+    """
+    Deletes a network. Currently working only with OPENSTACK backend
+    """
+    backend_id = request.matchdict['backend']
+    network_id = request.matchdict['network']
+
+    user = user_from_request(request)
+    methods.delete_network(user, backend_id, network_id)
+
+    return OK
+
+
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """Probes a machine using ping and ssh to collect metrics.
@@ -654,7 +686,6 @@ def update_monitoring(request):
     public_ips = request.json_body.get('public_ips', [])
     dns_name = request.json_body.get('dns_name', '')
     no_ssh = bool(request.json_body.get('no_ssh', False))
-    dry = bool(request.json_body.get('dry', False))
 
     payload = {
         'action': action,
@@ -663,18 +694,16 @@ def update_monitoring(request):
         'dns_name': dns_name,
         # tells core not to try to run ssh command to (un)deploy collectd
         'no_ssh': True,
-        'dry': dry,
     }
 
     if action == 'enable':
         ret_dict = methods.enable_monitoring(
             user, backend_id, machine_id, name, dns_name, public_ips,
-            no_ssh=no_ssh, dry=dry
+            no_ssh=no_ssh
         )
     elif action == 'disable':
-        stdout = methods.disable_monitoring(user, backend_id, machine_id,
-                                            no_ssh=no_ssh)
-        ret_dict = {'cmd_output': stdout}
+        methods.disable_monitoring(user, backend_id, machine_id, no_ssh=no_ssh)
+        ret_dict = {}
     else:
         raise BadRequestError()
 
