@@ -83,7 +83,6 @@
     <!-- Ember Views -->
     <script type="text/x-handlebars" data-template-name="application">
         {{outlet}}
-        {{view Mist.dialogView}}
     </script>
     <script type="text/x-handlebars" data-template-name="index">
         {{view Mist.homeView}}
