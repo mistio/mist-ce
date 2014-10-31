@@ -34,6 +34,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             sizeCount: 0,
             imageCount: 0,
             machineCount: 0,
+            networkCount: 0,
             locationCoount: 0,
 
             loadingSizes: null,
