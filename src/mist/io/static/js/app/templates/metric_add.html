@@ -13,21 +13,30 @@
             <h1 class="ui-title">Select Metric</h1>
         </div>
 
-        {{#if Mist.metricAddController.metrics.length}}
+        <div {{bind-attr class="
+                Mist.metricAddController.metrics.length::no-metrics
+                :ui-content
+                :ui-body-a"}}
+            role="main">
 
             <a class="ui-btn ui-btn-d ui-corner-all ui-btn-icon-left ui-icon-plus"
                 {{action "customClicked" target="view"}}>custom</a>
 
-            {{view Mist.metricNodeView
-                nodeBinding="Mist.metricAddController.metricsTree"}}
+            {{#if Mist.metricAddController.metrics.length}}
+                {{view Mist.metricNodeView
+                    nodeBinding="Mist.metricAddController.metricsTree"}}
+            {{else}}
+                <div class="ui-body-a">
+                    <p>Checking available metrics on your server</p>
+                    <div class="ajax-loader"></div>
+                </div>
+            {{/if}}
 
-        {{else}}
-            <div class="ajax-loader"></div>
-        {{/if}}
+            {{#if Mist.metricsController.addingMetric}}
+                <div id="overlay"></div>
+            {{/if}}
 
-        {{#if Mist.metricsController.addingMetric}}
-            <div id="overlay"></div>
-        {{/if}}
+        </div>
     </div>
 </div>
 

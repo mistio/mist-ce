@@ -5,7 +5,6 @@
 }
 
 #GraphsArea .valuePopUp{
-    position:fixed;
     z-index: 1;
     display: none;
     left:0;
@@ -63,30 +62,6 @@
     border:1px solid #ccc;
     background: #e0e0e1;
     padding: 5px 10px 0px;
-}
-
-.graphBtn {
-    display: inline-block;
-    width: 150px;
-}
-
-.graphZoomer {
-    float: right;
-}
-
-.graphMover {
-    display: inline-block;
-}
-
-/* Conditional for < 600px */
-@media only screen and  (max-width: 400px) {
-    .graphBtn {
-        width: 45%;
-        display: inline-block;
-    }
-    .graphBtn .ui-btn {
-        font-size: 0.7em;
-    }
 }
 
 .graph > .header{
@@ -163,6 +138,7 @@
     font: 10px Arial;
     font-weight: bold;
     color : #363636;
+    overflow: hidden;
 }
 
 .graph .hideAnimeLine{
@@ -209,6 +185,68 @@
     background-color: #eee;
 }
 
+.graph .valueLine {
+    transition: 2s;
+    stroke-width: 2;
+    fill: none;
+}
+
+.graph .valueLine.green {
+    stroke: #6CE0BA;
+}
+
+.graph .valueLine.orange {
+    stroke: #FF9933;
+}
+
+.graph .valueLine.blue {
+    stroke: #0066FF;
+}
+
+.graph .valueLine.pink {
+    stroke: #FF99FF;
+}
+
+.graph .valueLine.brick {
+    stroke: #990033;
+}
+
+.graph .valueLine.gray {
+    stroke: gray !important;
+}
+
+
+
+.graph .lineLegend .green {
+    background-color: #6CE0BA;
+}
+
+.graph .lineLegend .orange {
+    background-color: #FF9933;
+}
+
+.graph .lineLegend .blue {
+    background-color: #0066FF;
+}
+
+.graph .lineLegend .pink {
+    background-color: #FF99FF;
+}
+
+.graph .lineLegend .brick {
+    background-color: #990033;
+}
+
+.graph .lineLegend div {
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+}
+
+.graph .title * {
+    display: inline-block;
+}
+
 /*
 path {
     stroke: steelblue;
@@ -224,3 +262,41 @@ circle.mark{
     fill: #fff;
 }
 */
+
+#machine-monitoring #machine-monitoring-disabled {
+    background: #e0e0e1;
+    border-radius: 0 0 5px 5px;
+    padding: 30px 10px 30px 10px;
+}
+
+#machine-monitoring #machine-monitoring-disabled .ajax-loader {
+    margin-top: 15px;
+    margin-bottom: -10px;
+}
+
+#machine-monitoring #enable-monitoring-label{
+    text-align: center;
+}
+
+#machine-monitoring #enable-monitoring-btn {
+    width: 165px;
+    margin: 20px auto auto auto;
+}
+
+#graphs-wrapper.hidden {
+    display: none;
+}
+
+.command-container {
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    overflow-x: auto;
+    border: 1px solid #AAA;
+    font-family: monospace;
+    border-radius: 4px;
+    text-shadow: none;
+    background: #444;
+    font-size: 11px;
+    color: #efeff1;
+    padding: 6px;
+}

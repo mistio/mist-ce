@@ -1,15 +1,9 @@
 /* Metric Add view CSS
 -----------------------------------------------------------------------------------------------------------*/
 
-#metric-add  .ajax-loader {
-    display: inline;
-    float: right;
-    margin-top: 1px;
-}
-
 @-moz-document url-prefix() {
     #metric-add  .ui-collapsible .ajax-loader {
-        margin-top: -19px;
+        /*margin-top: -19px;*/
     }
 }
 
@@ -31,14 +25,23 @@
     display: none;
 }
 
-#metric-add-popup {
-    padding-bottom: 40px !important;
+#metric-add .ui-content {
+    padding: 0;
+}
+
+#metric-add p {
+    padding: 5px;
+    text-align: center;
 }
 
 #metric-add .ajax-loader {
     width: 100%;
-    margin-top: 1em;
-    margin-bottom: -1.5em;
+    margin-top: -14px;
+    margin-bottom: 14px;
+}
+
+#metric-add .ui-content .ui-body-a {
+    margin-top: -8px;
 }
 
 #metric-add #overlay {

@@ -1,6 +1,6 @@
 define('app/controllers/metrics', ['app/models/metric', 'ember'],
     //
-    //  Metric Controller
+    //  Metrics Controller
     //
     //  @returns Class
     //
@@ -43,12 +43,8 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                     'machine_id': machine_id,
                     'backend_id': backend_id,
                 }).success(function(data) {
-                    //info(data);
-                    //metric.id = data.metric_id;
-                    //metric.name = metric.newName;
                     metric.machines = machine ? [machine] : [];
                     that._addMetric(metric, machine);
-                    Mist.monitoringController.graphs.addDummyGraph(metric.name);
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Failed to add metric: ' + message);
@@ -189,18 +185,14 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             },
 
 
-            getMetricByAlias: function (alias) {
-                var result = this.builtInMetrics.findBy('alias', alias);
-                if (!result)
-                    result = this.customMetrics.findBy('alias', alias);
-                return result;
-            },
-
-
             _addMetric: function (metric, machine) {
                 Ember.run(this, function () {
-                    this.customMetrics.addObject(Metric.create(metric));
-                    this.trigger('onMetricAdd');
+                    metric = Metric.create(metric);
+                    this.customMetrics.addObject(metric);
+                    this.trigger('onMetricAdd', {
+                        metric: metric,
+                        machine: machine,
+                    });
                 });
             },
 
@@ -209,29 +201,24 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                 Ember.run(this, function () {
                     metric = this.getMetric(metric.id);
                     metric.machines.removeObject(machine);
-                    this.trigger('onMetricDisassociate');
+                    this.trigger('onMetricDisassociate', {
+                        metric: metric,
+                        machine: machine,
+                    });
                 });
             },
 
 
             _deleteMetric: function (metric) {
                 Ember.run(this, function () {
-                    this.customMetrics.removeObject(
-                        this.customMetrics.findBy('id', metric.id)
-                    );
-                    this.trigger('onMetricDelete');
+                    metric = this.customMetrics.findBy('id', metric.id);
+                    this.customMetrics.removeObject(metric);
+                    this.trigger('onMetricDelete', {
+                        metric: metric
+                    });
                     this.trigger('onMetricListChange');
                 });
             }
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
-
         });
     }
 );

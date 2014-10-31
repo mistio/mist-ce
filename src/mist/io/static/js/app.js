@@ -247,7 +247,11 @@ var loadFiles = function (callback) {
         'app/controllers/backend_edit',
         'app/controllers/backends',
         'app/controllers/confirmation',
+        'app/controllers/cookies',
+        'app/controllers/datasources',
+        'app/controllers/dialog',
         'app/controllers/file_upload',
+        'app/controllers/graphs',
         'app/controllers/image_search',
         'app/controllers/key_add',
         'app/controllers/key_edit',
@@ -255,7 +259,6 @@ var loadFiles = function (callback) {
         'app/controllers/login',
         'app/controllers/machine_add',
         'app/controllers/machine_keys',
-        'app/controllers/machine_manual_monitoring',
         'app/controllers/machine_power',
         'app/controllers/machine_shell',
         'app/controllers/machine_tags',
@@ -263,6 +266,7 @@ var loadFiles = function (callback) {
         'app/controllers/metric_add_custom',
         'app/controllers/metrics',
         'app/controllers/monitoring',
+        'app/controllers/network_create',
         'app/controllers/notification',
         'app/controllers/rule_edit',
         'app/controllers/rules',
@@ -270,9 +274,13 @@ var loadFiles = function (callback) {
         'app/views/backend_button',
         'app/views/backend_edit',
         'app/views/confirmation_dialog',
+        'app/views/dialog',
         'app/views/file_upload',
-        'app/views/graph',
         'app/views/graph_button',
+        'app/views/graph_list',
+        'app/views/graph_list_bar',
+        'app/views/graph_list_control',
+        'app/views/graph_list_item',
         'app/views/home',
         'app/views/image_list',
         'app/views/image_list_item',
@@ -288,7 +296,7 @@ var loadFiles = function (callback) {
         'app/views/machine_keys_list_item',
         'app/views/machine_list',
         'app/views/machine_list_item',
-        'app/views/machine_manual_monitoring',
+        'app/views/machine_monitoring',
         'app/views/machine_power',
         'app/views/machine_shell',
         'app/views/machine_shell_list_item',
@@ -299,9 +307,13 @@ var loadFiles = function (callback) {
         'app/views/metric_add_custom',
         'app/views/missing',
         'app/views/metric_node',
-        'app/views/monitoring',
+        'app/views/network',
+        'app/views/network_create',
+        'app/views/network_list',
+        'app/views/network_list_item',
         'app/views/rule',
         'app/views/rule_edit',
+        'app/views/rule_list',
         'app/views/user_menu',
     ], callback);
 };
@@ -312,7 +324,11 @@ var loadApp = function (
     BackendEditController,
     BackendsController,
     ConfirmationController,
+    CookiesController,
+    DatasourcesController,
+    DialogController,
     FileUploadController,
+    GraphsController,
     ImageSearchController,
     KeyAddController,
     KeyEditController,
@@ -320,7 +336,6 @@ var loadApp = function (
     LoginController,
     MachineAddController,
     MachineKeysController,
-    MachineManualMonitoringController,
     MachinePowerController,
     MachineShellController,
     MachineTagsController,
@@ -328,6 +343,7 @@ var loadApp = function (
     MetricAddCustomController,
     MetricsController,
     MonitoringController,
+    NetworkCreateController,
     NotificationController,
     RuleEditController,
     RulesController,
@@ -335,9 +351,13 @@ var loadApp = function (
     BackendButton,
     BackendEdit,
     ConfirmationDialog,
+    DialogView,
     FileUploadView,
-    GraphView,
     GraphButtonView,
+    GraphListView,
+    GraphListBarView,
+    GraphListControlView,
+    GraphListItemView,
     Home,
     ImageListView,
     ImageListItem,
@@ -353,7 +373,7 @@ var loadApp = function (
     MachineKeysListItemView,
     MachineListView,
     MachineListItem,
-    MachineManualMonitoringView,
+    MachineMonitoringView,
     MachinePowerView,
     MachineShellView,
     MachineShellListItemView,
@@ -364,9 +384,13 @@ var loadApp = function (
     MetricAddCustomView,
     MissingView,
     MetricNodeView,
-    MonitoringView,
+    NetworkView,
+    NetworkCreateView,
+    NetworkListView,
+    NetworkListItemView,
     RuleView,
     RuleEditView,
+    RuleListView,
     UserMenuView,
     callback) {
 
@@ -382,6 +406,7 @@ var loadApp = function (
 
     // Globals
     App.set('debugSocket', false);
+    App.set('debugStats', false);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
@@ -397,6 +422,10 @@ var loadApp = function (
     App.Router.map(function() {
         this.route('machines');
         this.route('images');
+        this.route('networks');
+        this.route('network', {
+            path: '/networks/:network_id',
+        });
         this.route('machine', {
             path : '/machines/:machine_id',
         });
@@ -422,6 +451,43 @@ var loadApp = function (
             });
         }
     });
+
+    App.NetworksRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - networks';
+            });
+        },
+        exit: function() {
+            Mist.backendsController.forEach(function (backend) {
+                backend.networks.forEach(function (network) {
+                    network.set('selected', false);
+                });
+            });
+        }
+    });
+
+    App.NetworkRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(this, function () {
+                var model = this.modelFor('network');
+                var id = model._id || model.id;
+                var network = Mist.backendsController.getNetwork(id);
+                document.title = 'mist.io - ' + (network ? network.name : id);
+            });
+        },
+        redirect: function (network) {
+            Mist.backendsController.set('networkRequest', network._id);
+        },
+        model: function (args) {
+            var id = args.network_id;
+            if (Mist.backendsController.loading ||
+                Mist.backendsController.loadingNetworks)
+                    return {_id: id, backend: {}};
+            return Mist.backendsController.getNetwork(id);
+        }
+    });
+
 
     App.MachinesRoute = Ember.Route.extend({
         activate: function() {
@@ -504,13 +570,13 @@ var loadApp = function (
 
     App.set('homeView', Home);
     App.set('ruleView', RuleView);
-    App.set('graphView', GraphView);
     App.set('loginView', LoginView);
     App.set('keyAddView', KeyAddView);
     App.set('keyView', SingleKeyView);
     App.set('missingView', MissingView);
     App.set('metricNodeView', MetricNodeView);
     App.set('keyListView', KeyListView);
+    App.set('networkView', NetworkView);
     App.set('userMenuView', UserMenuView);
     App.set('keyEditView', KeyEditDialog);
     App.set('backendAddView', BackendAdd);
@@ -520,16 +586,25 @@ var loadApp = function (
     App.set('imageListView', ImageListView);
     App.set('fileUploadView', FileUploadView);
     App.set('messageboxView', MessageBoxView);
-    App.set('monitoringView', MonitoringView);
+    App.set('machineMonitoringView', MachineMonitoringView);
     App.set('machineView', SingleMachineView);
+    App.set('graphListView', GraphListView);
+    App.set('graphListBarView', GraphListBarView);
+    App.set('graphListControlView', GraphListControlView);
+    App.set('graphListItemView', GraphListItemView);
+    App.set('networkCreateView', NetworkCreateView);
+    App.set('networkListView', NetworkListView);
     App.set('machineKeysView', MachineKeysView);
     App.set('machineTagsView', MachineTagsView);
     App.set('keyListItemView', KeyListItemView);
+    App.set('dialogView', DialogView);
+    App.set('ruleListView', RuleListView);
     App.set('machineListView', MachineListView);
     App.set('imageListItemView', ImageListItem);
     App.set('machineAddView', MachineAddDialog);
     App.set('backendButtonView', BackendButton);
     App.set('graphButtonView', GraphButtonView);
+    App.set('networkListItemView', NetworkListItemView);
     App.set('machinePowerView', MachinePowerView);
     App.set('machineShellView', MachineShellView);
     App.set('machineListItemView', MachineListItem);
@@ -538,7 +613,6 @@ var loadApp = function (
     App.set('machineKeysListItemView', MachineKeysListItemView);
     App.set('machineTagsListItemView', MachineTagsListItemView);
     App.set('machineShellListItemView', MachineShellListItemView);
-    App.set('machineManualMonitoringView', MachineManualMonitoringView);
 
     // Ember controllers
 
@@ -547,7 +621,9 @@ var loadApp = function (
     App.set('rulesController', RulesController.create());
     App.set('keyAddController', KeyAddController.create());
     App.set('metricsController', MetricsController.create());
+    App.set('graphsController', GraphsController.create());
     App.set('keyEditController', KeyEditController.create());
+    App.set('cookiesController', CookiesController.create());
     App.set('ruleEditController', RuleEditController.create());
     App.set('backendsController', BackendsController.create());
     App.set('metricAddController', MetricAddController.create());
@@ -559,12 +635,15 @@ var loadApp = function (
     App.set('machineTagsController', MachineTagsController.create());
     App.set('machineKeysController', MachineKeysController.create());
     App.set('imageSearchController', ImageSearchController.create());
+    App.set('datasourcesController', DatasourcesController.create());
     App.set('machineShellController', MachineShellController.create());
     App.set('confirmationController', ConfirmationController.create());
     App.set('notificationController', NotificationController.create());
+    App.set('dialogController', DialogController.create());
     App.set('machinePowerController', MachinePowerController.create());
+    App.set('networkCreateController', NetworkCreateController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
-    App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
+
 
     // Ember custom widgets
 
@@ -617,10 +696,19 @@ var loadApp = function (
     // Mist functions
 
     App.prettyTime = function(date) {
+
+        var showDate = false;
+        if (date.getMonth() != new Date().getMonth()) {
+            showDate = true;
+            var day = date.getUTCDate();
+            var month = date.getMonth();
+        }
+
         var hour = date.getHours();
         var min = date.getMinutes();
         var sec = date.getSeconds();
-        return (hour < 10 ? '0' : '') + hour + ':' +
+        return (showDate ? day + '/' + month + ' ': '') +
+            (hour < 10 ? '0' : '') + hour + ':' +
             (min < 10 ? '0' : '') + min + ':' +
             (sec < 10 ? '0' : '') + sec;
     };
@@ -660,7 +748,11 @@ var loadApp = function (
     };
 
     App.selectElementContents = function(elementId) {
-        var el = document.getElementById(elementId);
+        var el;
+        if (elementId instanceof HTMLElement)
+            el = elementId;
+        else
+            el = document.getElementById(elementId);
         var range = document.createRange();
         range.selectNodeContents(el);
         var sel = window.getSelection();
@@ -812,20 +904,30 @@ var setupSocketEvents = function (socket, callback) {
         if (backend)
             backend.locations.load(data.locations);
     })
-    .on('monitoring',function(data){
+    .on('list_networks', function (data) {
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend)
+            backend.networks.load(data.networks);
+    })
+    .on('monitoring',function (data){
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
         Mist.backendsController.set('checkedMonitoring', true);
     })
-    .on('stats', function(data){
-        Mist.monitoringController.request.updateMetrics(
-            data.metrics, data.start, data.stop, data.requestID);
+    .on('stats', function (data) {
+        Mist.graphsController._handleSocketResponse(data);
     })
     .on('notify',function(data){
         if (data.message) {
-            Mist.notificationController.set('msgHeader', data.title);
-            Mist.notificationController.set('msgCmd', data.message.substr(1));
-            Mist.notificationController.showMessagebox();
+            Mist.dialogController.open({
+                type: DIALOG_TYPES.OK,
+                head: data.title,
+                body: [
+                    {
+                        command: data.message.substr(1)
+                    }
+                ]
+            });
         } else {
             Mist.notificationController.notify(data.title);
         }
@@ -902,6 +1004,7 @@ function Ajax (csrfToken) {
                     type: type,
                     headers: {
                         'Csrf-Token': csrfToken,
+                        'Api-Version': 1,
                     },
                     complete: function(jqXHR) {
                         var success = (jqXHR.status == 200);
@@ -1088,3 +1191,64 @@ function error() {
     if (LOGLEVEL > 0)
         console.error.apply(console, arguments);
 }
+
+
+function showGraphs() {
+
+    Mist.set('didShowGraphs', true);
+    require(['app/models/graph', 'app/models/datapoint'], function (Graph, Datapoint) {
+
+        var graph = Graph.create({
+            id: 'graph-' + parseInt(Math.random() * 10000),
+            title: 'Load for all servers',
+            datasources: [],
+        });
+
+        var metric = Mist.metricsController.getMetric('load.shortterm');
+
+        Mist.monitored_machines.forEach(function (machineTuple) {
+            var backend = Mist.backendsController.getBackend(machineTuple[0]);
+            if (!backend) return;
+            var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
+            if (!machine) return;
+            Mist.datasourcesController.addDatasource({
+                machine: machine,
+                metric: metric,
+                callback: function (success, datasource) {
+                    graph.addDatasource(datasource);
+                }
+            });
+        });
+
+        Mist.graphsController.open({
+            graphs: [graph],
+            config: {
+                canModify: true,
+                canControl: true,
+                canMinimize: true,
+            }
+        });
+    });
+}
+
+
+//  GLOBAL DEFINITIONS
+
+var DISPLAYED_DATAPOINTS = 60;
+
+var TIME_MAP = {
+    SECOND: 1000,
+    MINUTE: 60 * 1000,
+    HOUR: 60 * 60 * 1000,
+    DAY: 24 * 60 * 60 * 1000,
+    WEEK: 7 * 24 * 60 * 60 * 1000,
+    MONTH: 30 * 24 * 60 * 60 * 1000,
+};
+
+var DIALOG_TYPES = {
+    OK: 0,
+    OK_CANCEL: 1,
+    YES_NO: 2,
+    DONE_BACK: 3,
+};
+

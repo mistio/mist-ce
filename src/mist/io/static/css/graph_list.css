@@ -1,0 +1,88 @@
+
+/* Graph List View
+-----------------------------------------------------------------------------------------------------------*/
+
+#graph-list-control .align {
+    width: 49%;
+    display: inline-block;
+}
+
+#graph-list-control {
+    display: block;
+    width: 100%;
+}
+
+#history-control {
+    width: 280px;
+    height: 55px;
+    margin-left: -5px;
+    display: inline-block;
+}
+
+#history-control-stream {
+    width: 50px;
+}
+
+#history-control div {
+    text-align: center;
+}
+
+#history-control a.time {
+    width: 75px;
+    height: 43px;
+    border-radius: 0.3em;
+}
+
+#time-window-control {
+    float: right;
+    margin-right: -10px;
+}
+
+#time-window-control .ui-btn {
+    height: 23px;
+}
+
+
+.graph-button {
+    display: inline-block;
+    width: 150px;
+}
+
+#add-metric-btn {
+    display: inline-block;
+}
+
+/* Conditional for < 400px */
+@media only screen and  (max-width: 400px) {
+    .graph-button {
+        width: 45%;
+    }
+    .graph-button .ui-btn {
+        font-size: 0.7em;
+    }
+}
+
+.valuePopUp{
+    position:relative;
+    z-index: 1;
+    display: none;
+    left:0;
+    top:0;
+    width:90px;
+    height:30px;
+    line-height:30px;
+    margin-top:-30px;
+    border:1px solid:#C2C4C2;
+    border-radius:10px;
+    box-shadow: 2px 2px 4px 1px #888888;
+    text-align: center;
+    font-weight:bold;
+    color: #404040;
+    background: linear-gradient(to bottom,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
+}
+
+.graph .valueArea {
+    fill: #6CE0BA;
+    stroke-width: 0;
+    opacity: 0.25;
+}

@@ -71,6 +71,14 @@ define('app/controllers/machines', ['app/models/machine'],
                 // Don't send dummy key text
                 key = Mist.keysController.keyExists(key.id) ? key : null;
                 var that = this;
+
+                // Construct array of network ids for openstack
+                var networks = [];
+                this.backend.networks.content.forEach(function (network) {
+                    if (network.selected)
+                        networks.push(network.id);
+                });
+
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
                         'name': name,
@@ -86,7 +94,9 @@ define('app/controllers/machines', ['app/models/machine'],
                         'size_name': size.name,
                         'image_name': image.name,
                         'location_name': location.name,
-                        'monitoring' : monitoring
+                        'monitoring' : monitoring,
+                        // Openstack
+                        'networks': networks
                 }).success(function (machine) {
                     machine.backend = that.backend;
                     // Nephoscale returns machine id on request success,

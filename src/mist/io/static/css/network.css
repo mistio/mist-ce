@@ -1,0 +1,10 @@
+/* Network View CSS
+------------------------------------------------------------------------------*/
+
+#single-network-page .subnet-name {
+    background-color: #E8E8E8;
+}
+
+#single-network-page .single-action-footer {
+	display: block;
+}

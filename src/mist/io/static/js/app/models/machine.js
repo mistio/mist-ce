@@ -136,6 +136,8 @@ define('app/models/machine', ['ember'],
 
 
             equals: function (machine) {
+                if (typeof machine == 'string')
+                    return machine == this.id;
                 if (machine instanceof Array)
                     if (machine[1] == this.id &&
                         machine[0] == this.backend.id)

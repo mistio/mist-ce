@@ -139,7 +139,7 @@
 
         <div id="gce-bundle">
 
-            <label for ="new-backend-key">3. Private key:</label>
+            <label for="new-backend-key">3. Private key:</label>
 
             <!-- Value is sent to newBackendSecondField -->
             <a class="ui-btn ui-btn-a ui-corner-all"
@@ -154,6 +154,17 @@
                    valueBinding="Mist.backendAddController.newBackendProjectName"}}
         </div>
 
+
+        <div id="azure-bundle">
+
+            <label for="new-backend-azure-cert">3. Certificate file:</label>
+
+            <!-- Value is sent to newBackendSecondField -->
+            <a class="ui-btn ui-btn-a ui-corner-all"
+              {{action "addCertificateClicked" target="view"}}>
+                Add Certificate
+            </a>
+        </div>
         <!--
 
             BAREMETAL
