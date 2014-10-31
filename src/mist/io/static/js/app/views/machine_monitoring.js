@@ -470,34 +470,36 @@ define('app/views/machine_monitoring',
                     until: Date.now(),
                     datasources: [{machine: this.machine}]
                 });
-                (function getStats () {
-                    $.ajax({
-                        type: 'GET',
-                        url: request.url,
-                        data: Mist.graphsController._generatePayload(request),
-                        complete: function (jqXHR) {
-                            if (!that.$()) return;
-                            var success = jqXHR.status == 200;
-                            var metrics = jqXHR.responseJSON;
-
-                            if (success && Object.keys(metrics).length > 1) {
-                                forIn(that, metrics, function (metric, target) {
-                                    var metric = Mist.metricsController.getMetric(target);
-                                    if (metric && !that.metrics.findBy('id', metric.id))
-                                        that.metrics.pushObject(metric);
-                                });
-                                if (that.metrics.length)
-                                    that.set('pendingFirstStats', false);
-                                callback();
-                            }
-                            else
-                                Ember.run.later(function () {
-                                    if (!!that.$())
-                                        getStats();
-                                }, TIME_MAP.MINUTE / 2);
+                function unsubscribeSocket () {
+                    Mist.socket.$events.stats.pop();
+                }
+                function handleSocket (data) {
+                    info('handling socket request');
+                    if (data.request_id == request.id) {
+                        if (Object.keys(data.metrics).length > 1) {
+                            forIn(that, data.metrics, function (metric, target) {
+                                var metric = Mist.metricsController.getMetric(target);
+                                if (metric && !that.metrics.findBy('id', metric.id))
+                                    that.metrics.pushObject(metric);
+                            });
+                            if (that.metrics.length)
+                                that.set('pendingFirstStats', false);
+                            unsubscribeSocket();
+                            callback();
+                        } else {
+                            Ember.run.later(getStats, TIME_MAP.SECOND * 10);
                         }
-                    });
-                })()
+                    }
+                }
+                function getStats () {
+                    if (!that.$()) {
+                        unsubscribeSocket();
+                        return;
+                    }
+                    Mist.socket.on('stats', handleSocket);
+                    Mist.graphsController._fetchStatsFromSocket(request);
+                }
+                getStats();
             },
 
 
