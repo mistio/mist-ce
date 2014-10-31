@@ -240,7 +240,7 @@ function program7(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendOpenStackComputeEndpoint")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n            </div>\n        </div>\n\n        <!--\n\n            GCE\n\n        -->\n\n        <div id=\"gce-bundle\">\n\n            <label for =\"new-backend-key\">3. Private key:</label>\n\n            <!-- Value is sent to newBackendSecondField -->\n            <a class=\"ui-btn ui-btn-a ui-corner-all\"\n              ");
+  data.buffer.push("\n            </div>\n        </div>\n\n        <!--\n\n            GCE\n\n        -->\n\n        <div id=\"gce-bundle\">\n\n            <label for=\"new-backend-key\">3. Private key:</label>\n\n            <!-- Value is sent to newBackendSecondField -->\n            <a class=\"ui-btn ui-btn-a ui-corner-all\"\n              ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "privateKeyClicked", {hash:{
@@ -254,7 +254,13 @@ function program7(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendProjectName")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n        </div>\n\n        <!--\n\n            BAREMETAL\n\n        -->\n\n        <div id=\"baremetal-bundle\">\n            <label for=\"new-backend-port\">4. Port:</label>\n            ");
+  data.buffer.push("\n        </div>\n\n\n        <div id=\"azure-bundle\">\n\n            <label for=\"new-backend-azure-cert\">3. Certificate file:</label>\n\n            <!-- Value is sent to newBackendSecondField -->\n            <a class=\"ui-btn ui-btn-a ui-corner-all\"\n              ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "addCertificateClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                Add Certificate\n            </a>\n        </div>\n        <!--\n\n            BAREMETAL\n\n        -->\n\n        <div id=\"baremetal-bundle\">\n            <label for=\"new-backend-port\">4. Port:</label>\n            ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
