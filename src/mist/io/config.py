@@ -82,6 +82,11 @@ SUPPORTED_PROVIDERS = [
         'title': 'Bare Metal Server',
         'provider': 'bare_metal'
     },
+    # Azure
+    {
+        'title': 'Azure',
+        'provider': Provider.AZURE
+    },    
     # EC2
     {
         'title': 'EC2 AP NORTHEAST',

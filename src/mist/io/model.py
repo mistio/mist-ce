@@ -117,6 +117,8 @@ class Backend(OODict):
         elif self.provider == 'bare_metal':
             name = self.machines.values()[0].name
             concat = '%s%s%s' % (self.provider, '', name)
+        elif self.provider == 'openstack':
+            concat = "%s%s%s%s%s" % (self.provider, self.region, self.apikey, self.apiurl, self.tenant_name)
         else:
             concat = '%s%s%s' % (self.provider, self.region, self.apikey)
         return b58_encode(int(sha1(concat).hexdigest(), 16))
