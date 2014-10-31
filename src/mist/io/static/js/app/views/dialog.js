@@ -41,9 +41,9 @@ define('app/views/dialog', ['app/views/popup'],
 
 
             open: function () {
-                console.log('yo');
                 Ember.run.later(this, function () {
                     $(this.popupId)
+                        .trigger('create')
                         .popup('reposition', {positionTo: 'window'})
                         .popup('open');
                 }, 300);
