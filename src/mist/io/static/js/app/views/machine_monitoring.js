@@ -471,10 +471,13 @@ define('app/views/machine_monitoring',
                     datasources: [{machine: this.machine}]
                 });
                 function unsubscribeSocket () {
-                    Mist.socket.$events.stats.pop();
+                    // First event handler is the one defined in app.js
+                    if (Mist.socket.$events.stats.length > 1)
+                        Mist.socket.$events.stats.pop();
                 }
                 function handleSocket (data) {
                     info('handling socket request');
+                    unsubscribeSocket();
                     if (data.request_id == request.id) {
                         if (Object.keys(data.metrics).length > 1) {
                             forIn(that, data.metrics, function (metric, target) {
@@ -484,7 +487,6 @@ define('app/views/machine_monitoring',
                             });
                             if (that.metrics.length)
                                 that.set('pendingFirstStats', false);
-                            unsubscribeSocket();
                             callback();
                         } else {
                             Ember.run.later(getStats, TIME_MAP.SECOND * 10);
