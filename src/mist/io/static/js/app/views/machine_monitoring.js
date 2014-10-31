@@ -39,13 +39,15 @@ define('app/views/machine_monitoring',
 
 
             load: function () {
-                Mist.set('m', this);
+
+                Mist.set('ma', this);
                 // Add event handlers
                 Mist.rulesController.on('onRuleAdd', this, '_ruleAdded');
                 Mist.rulesController.on('onRuleDelete', this, '_ruleDeleted');
                 Mist.metricsController.on('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.on('onMetricDelte', this, '_metricDeleted');
                 Mist.metricsController.on('onMetricDisassociate', this, '_metricDeleted');
+                Mist.graphsController.on('onFetchStats', this, '_analyzeStatsResponse');
 
             }.on('didInsertElement'),
 
@@ -58,6 +60,7 @@ define('app/views/machine_monitoring',
                 Mist.metricsController.off('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.off('onMetricDelte', this, '_metricDeleted');
                 Mist.metricsController.off('onMetricDisassociate', this, '_metricDeleted');
+                Mist.graphsController.off('onFetchStats', this, '_analyzeStatsResponse');
 
                 this._clear();
                 this._hideGraphs();
@@ -529,6 +532,17 @@ define('app/views/machine_monitoring',
                     return Mist.cookiesController
                         .getSingleMachineGraphEntry(that.machine, graph);
                 }
+            },
+
+
+            _analyzeStatsResponse: function (response) {
+                Ember.run.later(this, function () {
+                    forIn(this, response, function (metric, metricId) {
+                        var metric = Mist.metricsController.getMetric(metricId);
+                        if (metric && !this.metrics.findBy('id', metric.id))
+                            this.metrics.pushObject(metric);
+                    });
+                }, TIME_MAP.SECOND);
             },
 
 

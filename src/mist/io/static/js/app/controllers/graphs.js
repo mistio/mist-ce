@@ -267,7 +267,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 this.pendingRequests.removeObject(request);
 
                 if (!this.pendingRequests.length && hadRequests)
-                    this._fetchStatsEnded();
+                    this._fetchStatsEnded(response);
             },
 
 
@@ -282,7 +282,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             },
 
 
-            _fetchStatsEnded: function () {
+            _fetchStatsEnded: function (response) {
                 Ember.run.next(this, function () {
                     this.get('content').forEach(function (graph) {
                         graph.view.draw();
@@ -290,7 +290,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     this.set('fetchingStats', false);
                     if (this.fetchStatsArgs.callback instanceof Function)
                         this.fetchStatsArgs.callback();
-                    this.trigger('onFetchStats');
+                    this.trigger('onFetchStats', response);
                 });
             },
 
