@@ -486,6 +486,8 @@ define('app/views/machine_monitoring',
                                     if (metric && !that.metrics.findBy('id', metric.id))
                                         that.metrics.pushObject(metric);
                                 });
+                                if (that.metrics.length)
+                                    that.set('pendingFirstStats', false);
                                 callback();
                             }
                             else
