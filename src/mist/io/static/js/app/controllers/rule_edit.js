@@ -19,6 +19,7 @@ define('app/controllers/rule_edit', ['ember'],
 
 
             rule: null,
+            metrics: null,
             property: null,
             callback: null,
 
