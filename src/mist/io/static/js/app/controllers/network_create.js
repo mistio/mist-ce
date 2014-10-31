@@ -139,9 +139,9 @@ define('app/controllers/network_create', ['ember'],
                                 if (tuple.length == 2)
                                     return {
                                         start: tuple[0].trim(),
-                                        stop: tuple[1].trim()
+                                        end: tuple[1].trim()
                                     };
-                                return {start: '', stop: ''};
+                                return {start: '', end: ''};
                             });
                 }
 

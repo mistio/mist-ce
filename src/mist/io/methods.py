@@ -1769,6 +1769,9 @@ def create_network(user, backend_id, network, subnet):
                                                    allocation_pools=allocation_pools, gateway_ip=gateway_ip,
                                                    ip_version=ip_version, enable_dhcp=enable_dhcp)
         except Exception as e:
+            task = tasks.ListNetworks()
+            task.clear_cache(user.email, backend_id)
+            trigger_session_update(user.email, ['backends'])
             raise NetworkError(e)
 
         ret = dict()
@@ -1796,6 +1799,9 @@ def delete_network(user, backend_id, network_id):
 
     try:
         conn.ex_delete_neutron_network(network_id)
+        task = tasks.ListNetworks()
+        task.clear_cache(user.email, backend_id)
+        trigger_session_update(user.email, ['backends'])
     except Exception as e:
         raise NetworkError(e)
 
