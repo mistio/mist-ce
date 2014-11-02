@@ -71,8 +71,6 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
 
 
             datasourceExists: function (datasourceId) {
-                info('search for:', datasourceId);
-                info(this.getDatasource(datasourceId));
                 return !!this.getDatasource(datasourceId);
             },
 

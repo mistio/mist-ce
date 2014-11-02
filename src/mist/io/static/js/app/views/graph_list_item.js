@@ -9,11 +9,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         'use strict';
 
         var LINE_COLOR_MAP = {
-            0: 'green',
-            1: 'orange',
-            2: 'blue',
-            3: 'pink',
-            4: 'brick',
+            1: 'green',
+            2: 'orange',
+            3: 'blue',
+            4: 'pink',
+            5: 'brick',
         };
 
         return TemplatedView.extend({
@@ -115,13 +115,15 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 var datasources = this.graph.datasources;
                 datasources.forEach(function (datasource) {
                     $('#' + this.graph.id + ' .title .' + datasource.id)
-                        .addClass(LINE_COLOR_MAP[datasources.indexOf(datasource)]);
+                        .addClass(getColor(datasources.indexOf(datasource)));
                 }, this);
             },
 
 
             draw: function () {
-                this.updateView();
+                try {
+                    this.updateView();
+                } catch (e) {}
             },
 
 
@@ -288,7 +290,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                         // Calculate Translate
                         var translate = 0;
-                        if(that.animationEnabled){
+                        if (that.animationEnabled) {
                             translate =  $('#' + graph.id).find('.valueLine > path').attr('transform');
                             translate = + translate.slice(10,translate.indexOf(','));
                         }
@@ -852,7 +854,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             return d3.select('#' + args.id + ' svg .' + datasource.id)
                     .attr('transform', 'translate(' +
                         args.margin.left + ',' + args.margin.top + ')')
-                    .attr('class', 'valueLine ' + LINE_COLOR_MAP[index] + ' ' + datasource.id)
+                    .attr('class', 'valueLine ' + getColor(index) + ' ' + datasource.id)
                     .select('path');
         };
 
@@ -1154,6 +1156,18 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         }
         function getDatapointTime (d) {
             return d.time;
+        }
+
+        function getColor (num) {
+
+            // get rid of zero
+            num++;
+
+            var map = LINE_COLOR_MAP;
+            var length = Object.keys(map).length;
+            while (num > length)
+                num -= length;
+            return map[num];
         }
     }
 );

@@ -19,7 +19,9 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
 
             load: function () {
-                this.checkedMonitoringObserver();
+                Ember.run.next(this, function () {
+                    this.checkedMonitoringObserver();
+                });
             }.on('didInsertElement'),
 
 
@@ -78,7 +80,8 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
                     });
                 });
 
-                if (!datasources.length) return;
+                if (!datasources.length)
+                    return;
 
                 Mist.graphsController.open({
                     graphs: [Graph.create({
@@ -132,8 +135,10 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
 
             checkedMonitoringObserver: function () {
-                if (Mist.backendsController.checkedMonitoring)
-                    this.showGraphs();
+                Ember.run.later(this, function () {
+                    if (Mist.backendsController.checkedMonitoring)
+                        this.showGraphs();
+                }, 500); // to make sure datasources exist
             }.observes('Mist.backendsController.checkedMonitoring')
         });
     }
