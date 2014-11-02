@@ -176,7 +176,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             autoResize: function () {
-                this.changeWidth($('#monitoring-bottom-btns').width() - 2);
+                info('auto resizing', this.$().width())
+                this.changeWidth(this.$().width() - 2);
             },
 
 
@@ -415,7 +416,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 var id = this.graph.id;
                 this.id = id;
-                this.width = $('#monitoring-bottom-btns').width() - 2;
+                this.width = this.$().width() - 2;
 
                  // Calculate Aspect Ratio Of Height
                 var fixedHeight = this.width * 0.125; // (160 / 1280)

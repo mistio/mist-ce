@@ -37,7 +37,9 @@ define('app/views/graph_list_bar', ['app/views/templated'],
                 // a single machine, or even be ONLY in single
                 // machine view.
 
+                try {
                 this.set('machine', this.actionProxy.get('machine'));
+                } catch (e) {}
 
             }.on('didInsertElement')
         });
