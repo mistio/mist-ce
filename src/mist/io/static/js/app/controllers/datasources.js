@@ -51,9 +51,8 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
                 //info(datasource);
 
                 if (this.datasourceExists(datasource.id)) {
-                    info('exists')
                     if (args.callback)
-                        args.callback(false);
+                        args.callback(false, this.getDatasource(datasource.id));
                     return;
                 }
 

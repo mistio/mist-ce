@@ -76,4 +76,17 @@
     </svg>
 
     <div class="valuePopUp"></div>
+
+    <!--
+        Graph Secondary Legend Header
+    -->
+
+    {{#if view.graph.isMultiline}}
+        <div class="legend">
+            {{#each view.graph.datasources}}
+                {{this.machine.name}}
+                <div {{bind-attr class="this.id :lineLegend"}}></div>
+            {{/each}}
+        </div>
+    {{/if}}
 </div>

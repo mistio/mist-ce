@@ -114,7 +114,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.set('svg', SvgSet(this));
                 var datasources = this.graph.datasources;
                 datasources.forEach(function (datasource) {
-                    $('#' + this.graph.id + ' .title .' + datasource.id)
+                    $('#' + this.graph.id + ' .' + datasource.id)
                         .addClass(getColor(datasources.indexOf(datasource)));
                 }, this);
             },

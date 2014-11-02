@@ -86,3 +86,38 @@
     stroke-width: 0;
     opacity: 0.25;
 }
+
+
+.graph .lineLegend.green {
+    background-color: #6CE0BA;
+}
+.graph .lineLegend.orange {
+    background-color: #FF9933;
+}
+.graph .lineLegend.blue {
+    background-color: #0066FF;
+}
+.graph .lineLegend.pink {
+    background-color: #FF99FF;
+}
+.graph .lineLegend.brick {
+    background-color: #990033;
+}
+.graph .lineLegend {
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    position: relative;
+    top: 1px;
+}
+
+.graph .legend {
+    box-shadow: none;
+    text-align: center;
+    padding: 5px;
+    box-sizing: border-box;
+    background: none repeat scroll 0% 0% #FBFBFB;
+    font-size: 0.82em;
+    border-top: 1px solid #F1F1F1;
+    margin-top: -6px;
+}

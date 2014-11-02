@@ -45,6 +45,11 @@ define('app/models/graph', ['ember'],
             }.property('datasources'),
 
 
+            isMultiline: function () {
+                return !!(this.datasources.length > 1);
+            }.property('datasources.@each'),
+
+
             //
             //
             // Initialization
