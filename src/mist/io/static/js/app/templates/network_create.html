@@ -73,13 +73,15 @@
                 data-theme="a"
                 id="network-create-name"
                 valueBinding="Mist.networkCreateController.network.name"}}
+        </div>
 
 
-            <!--
-                Select Admin State Up
-            -->
+        <!--
+            Select Admin State
+        -->
 
 
+        <div id="network-create-admin-state-wrapper">
             <label>Admin State:</label>
             <div id="network-create-admin-state"
                 data-role="collapsible"
@@ -106,7 +108,7 @@
                     </li>
                 </ul> <!-- list -->
             </div><!-- collapsible -->
-        </div>
+        </div><!-- wrapper -->
 
 
         <!--
@@ -156,49 +158,42 @@
                 </div>
 
 
-                <!--
-                    Select IP Version
-                -->
-
-
-                <div id="network-create-subnet-ipv-wrapper">
-                    <label>IP Version:</label>
-                    <div id="network-create-subnet-ipv"
-                        data-role="collapsible"
-                        data-iconpos="right"
-                        data-collapsed-icon="arrow-d"
-                        data-expanded-icon="arrow-u"
-                        data-theme="a"
-                        class="mist-select">
-
-                        <h2>
-                            {{#with Mist.networkCreateController.network.subnet}}
-                                {{#if ipv}}
-                                    {{ipv}}
-                                {{else}}
-                                    Select IP Version
-                                {{/if}}
-                            {{/with}}
-                        </h2>
-
-                        <ul data-role="listview" data-theme="a">
-                            <li data-icon="false">
-                                <a {{action "ipvSelected" "IPv4" target="view"}}>
-                                    IPv4
-                                </a>
-                            </li>
-                            <li data-icon="false">
-                                <a {{action "ipvSelected" "IPv6" target="view"}}>
-                                    IPv6
-                                </a>
-                            </li>
-                        </ul> <!-- list -->
-                    </div><!-- collapsible -->
-                </div><!-- wrapper -->
-
-
-
                 <div id="network-create-subnet-other-wrapper">
+
+
+                    <!--
+                        Select IP Version
+                    -->
+
+
+                    <div id="network-create-subnet-ipv-wrapper">
+                        <label>IP Version:</label>
+                        <div id="network-create-subnet-ipv"
+                            data-role="collapsible"
+                            data-iconpos="right"
+                            data-collapsed-icon="arrow-d"
+                            data-expanded-icon="arrow-u"
+                            data-theme="a"
+                            class="mist-select">
+
+                            <h2>
+                                {{Mist.networkCreateController.network.subnet.ipv}}
+                            </h2>
+
+                            <ul data-role="listview" data-theme="a">
+                                <li data-icon="false">
+                                    <a {{action "ipvSelected" "IPv4" target="view"}}>
+                                        IPv4
+                                    </a>
+                                </li>
+                                <li data-icon="false">
+                                    <a {{action "ipvSelected" "IPv6" target="view"}}>
+                                        IPv6
+                                    </a>
+                                </li>
+                            </ul> <!-- list -->
+                        </div><!-- collapsible -->
+                    </div><!-- wrapper -->
 
 
                     <!--

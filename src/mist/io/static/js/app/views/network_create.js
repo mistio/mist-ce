@@ -27,17 +27,21 @@ define('app/views/network_create', ['app/views/panel'],
             clear: function () {
                 $('#network-create-name-wrapper').hide();
                 $('#network-create-admin-state-wrapper').hide();
+                $('#network-create-admin-state-wrapper').hide();
                 $('#network-create-subnet-wrapper').hide();
                 $('#network-create-subnet-form').hide();
-                $('#network-create-subnet-name-wrapper').hide();
                 $('#network-create-subnet-address-wrapper').hide();
-                $('#network-create-subnet-ipv-wrapper').hide();
                 $('#network-create-subnet-other-wrapper').hide();
                 $('#network-create-subnet-gateway-ip-wrapper').show();
                 $('#network-create .ui-collapsible')
                     .collapsible('option', 'collapsedIcon', 'arrow-d')
                     .collapsible('collapse');
+                $('#network-create .ui-checkbox > .ui-btn')
+                    .removeClass('ui-checkbox-on')
+                    .addClass('ui-checkbox-off');
                 this.renderFields();
+                this._fieldIsReady('admin-state');
+                this._fieldIsReady('subnet-ipv');
             },
 
 
@@ -93,9 +97,6 @@ define('app/views/network_create', ['app/views/panel'],
 
 
                 ipvSelected: function (ipv) {
-                    Ember.run.later(function () {
-                        $('#network-create-gateway-wrapper').slideDown();
-                    }, SLIDE_DOWN_DELAY);
                     Mist.networkCreateController.selectIpv(ipv);
                     this._fieldIsReady('subnet-ipv');
                 },
@@ -123,6 +124,7 @@ define('app/views/network_create', ['app/views/panel'],
                 Ember.run.later(function () {
                     if (Mist.networkCreateController.network.name)
                         $('#network-create-subnet-wrapper').slideDown();
+                        $('#network-create-admin-state-wrapper').slideDown();
                 }, SLIDE_DOWN_DELAY);
             }.observes('Mist.networkCreateController.network.name'),
 
@@ -150,17 +152,9 @@ define('app/views/network_create', ['app/views/panel'],
             subnetAddressObserver: function () {
                 Ember.run.later(function () {
                     if (Mist.networkCreateController.network.subnet.address)
-                        $('#network-create-subnet-ipv-wrapper').slideDown();
-                }, SLIDE_DOWN_DELAY);
-            }.observes('Mist.networkCreateController.network.subnet.address'),
-
-
-            subnetIpvObserver: function () {
-                Ember.run.later(function () {
-                    if (Mist.networkCreateController.network.subnet.ipv)
                         $('#network-create-subnet-other-wrapper').slideDown();
                 }, SLIDE_DOWN_DELAY);
-            }.observes('Mist.networkCreateController.network.subnet.ipv'),
+            }.observes('Mist.networkCreateController.network.subnet.address'),
 
 
             subnetEnableGatewayObserver: function () {
