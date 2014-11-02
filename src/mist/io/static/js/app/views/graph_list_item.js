@@ -254,6 +254,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             */
             setupMouseOver: function () {
 
+                if (this.graph.get('isMultiline'))
+                    return;
+
                 var that = this;
 
                 // Append the Selector Line
