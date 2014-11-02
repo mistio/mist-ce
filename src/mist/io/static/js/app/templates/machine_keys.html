@@ -80,12 +80,13 @@
 <div id="machine-userPort-popup"
     class="large-popup"
     data-role="popup"
+    data-theme="b"
     data-overlay-theme="b"
     data-position-to="#machine-keys-panel"
-    data-transition="pop">
+    data-transition="flip">
 
-    <div data-role="header" data-theme="b">
-        <h2 class='title'>SSH user & port</h2>
+    <div data-role="header">
+        <h2>SSH user & port</h2>
     </div>
 
     <div data-role="content">
@@ -95,18 +96,24 @@
         <label for="user">User:</label>
         {{view Mist.TextField
                id="user"
+               data-theme="a"
                placeholder="root"
                valueBinding="Mist.machineKeysController.user"}}
 
         <label for="port">Port:</label>
         {{view Mist.TextField
                id="port"
+               data-theme="a"
                placeholder="22"
                valueBinding="Mist.machineKeysController.port"}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" {{action "closeSSH_Details" target="Mist.machineKeysController"}}>Cancel</a>
-            <a id="tryAssociate" data-role="button" data-theme="d" {{action "customAssociateClicked" target="view"}}>Retry</a>
+            <a class="ui-btn ui-btn-a"
+                {{action "closeSSH_Details" target="Mist.machineKeysController"}}>
+                Cancel
+            </a>
+            <a id="tryAssociate" class="ui-btn ui-btn-d"
+                {{action "customAssociateClicked" target="view"}}>Retry</a>
         </div>
 
     </div>
