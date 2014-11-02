@@ -18,20 +18,19 @@ define('app/controllers/network_create', ['ember'],
             //
 
             adminStateUpToText: function () {
-                return this.network.adminStateUp === null ? 'Select Admin State' :
-                    this.network.adminStateUp ? 'UP' : 'DOWN';
+                return this.network.adminStateUp ? 'UP' : 'DOWN';
             }.property('network.adminStateUp'),
 
             network: Ember.Object.create({
                 name: null,
                 backend: null,
-                adminStateUp: null,
+                adminStateUp: true,
                 createSubnet: null,
                 clear: function () {
                     this.setProperties({
                         name: null,
                         backend: null,
-                        adminStateUp: null,
+                        adminStateUp: true,
                         createSubnet: null,
                     });
                     this.subnet.clear();
@@ -48,7 +47,7 @@ define('app/controllers/network_create', ['ember'],
                     DNS: null,
                     clear: function () {
                         this.setProperties({
-                            ipv: null,
+                            ipv: 'IPv4',
                             name: null,
                             address: null,
                             gatewayIP: null,
