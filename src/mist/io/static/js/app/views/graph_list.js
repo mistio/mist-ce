@@ -20,6 +20,7 @@ define('app/views/graph_list', ['app/views/templated'],
 
             actionProxy: null,
 
+
         });
     }
 );

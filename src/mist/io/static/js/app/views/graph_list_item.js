@@ -828,7 +828,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 line.id = datasource.id;
                 svg.value.lines.push(line);
             });
-
             svg.grid.x.animation = new Animation();
             svg.value.area.animation = new Animation();
             svg.axis.x.legend.animation = new Animation();

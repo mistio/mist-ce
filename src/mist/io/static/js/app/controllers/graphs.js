@@ -41,6 +41,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 canModify: true,
                 canControl: true,
                 canMinimize: true,
+                historyWidgetPosition: 'top',
             }),
 
 

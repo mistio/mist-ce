@@ -91,6 +91,7 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
                     config: {
                         canModify: false,
                         canMinimize: false,
+                        historyWidgetPosition: 'bottom',
                     }
                 });
             },
