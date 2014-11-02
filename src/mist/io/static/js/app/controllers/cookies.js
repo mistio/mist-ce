@@ -77,6 +77,7 @@ define('app/controllers/cookies', ['ember'],
                     this._createFreshCookie();
                 }
 
+                deleteOldCookies();
             }.on('init'),
 
 
@@ -178,6 +179,14 @@ define('app/controllers/cookies', ['ember'],
 
         function uuidFromMachine(machine) {
             return machine.id + '_' + machine.backend.id;
+        }
+
+        function deleteOldCookies () {
+            _deleteCookie('mist');
+            _deleteCookie('mist-monitoring');
+            function _deleteCookie (name) {
+                document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            }
         }
     }
 );
