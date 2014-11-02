@@ -117,7 +117,7 @@ class Backend(OODict):
         elif self.provider == 'bare_metal':
             name = self.machines.values()[0].name
             concat = '%s%s%s' % (self.provider, '', name)
-        elif self.provider == 'openstack':
+        elif self.provider == 'openstack' or 'hpcloud' in self.provider:
             concat = "%s%s%s%s%s" % (self.provider, self.region, self.apikey, self.apiurl, self.tenant_name)
         else:
             concat = '%s%s%s' % (self.provider, self.region, self.apikey)

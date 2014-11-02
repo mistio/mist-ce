@@ -62,9 +62,10 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                 var that = this;
                 var projectName = this.newBackendOpenStackTenant || this.newBackendProjectName;
 
-                // Add tenant name to backend title for openstack
+                // Add tenant name to backend title for openstack and hpcloud
+                var provider = this.newBackendProvider.provider;
                 var title = this.newBackendProvider.title +
-                    (this.newBackendProvider.provider == 'openstack' ?
+                    (provider == 'openstack' || provider.indexOf('hpcloud') > -1 ?
                         ' ' + this.newBackendOpenStackTenant : '');
 
                 Mist.backendsController.addBackend({
