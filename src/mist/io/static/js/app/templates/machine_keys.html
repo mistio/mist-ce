@@ -12,13 +12,12 @@
 
     <div data-role="content" data-theme="b">
 
-        <a id="associate-btn"
-           data-role="button"
-           data-theme="d"
-           {{action "associateClicked" target="view"}}>Associate</a>
+        <a id="associate-btn" data-role="button"
+            class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
+           {{action "associateClicked" target="view"}}>Add Key</a>
 
         {{#if Mist.machineKeysController.associatedKeys}}
-        <ul id="machine-keys" data-role="listview">
+        <ul id="machine-keys">
             {{#each Mist.machineKeysController.associatedKeys}}
                 {{view Mist.machineKeysListItemView keyBinding="this"}}
             {{/each}}
@@ -31,7 +30,7 @@
             <div class="ajax-loader"></div>
         {{/if}} {{/if}}
 
-        <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
+        <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
 
     </div>
 
@@ -39,22 +38,33 @@
 
 {{view Mist.keyAddView}}
 
-<div id="key-actions-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="flip"
-                                                                                        data-position-to="#machine-keys"
-                                                                                        data-theme="b">
+<div id="key-actions-popup"
+    class="tiny-popup"
+    data-role="popup"
+    data-overlay-theme="b"
+    data-transition="flip"
+    data-position-to="#machine-keys"
+    data-theme="b">
+
     <div data-role="header">
         <h1>Actions</h1>
     </div>
 
     <div data-role="content">
-        <button data-theme="a" {{action "removeClicked" target="view"}}>Remove</button>
-        <button data-theme="a" {{action "probeClicked" target="view"}}>Probe</button>
-        <button data-theme="a" {{action "cancelClicked" target="view"}}>Cancel</button>
+        <a class="ui-btn ui-btn-a ui-corner-all" {{action "removeClicked" target="view"}}>Remove</a>
+        <a class="ui-btn ui-btn-a ui-corner-all" {{action "probeClicked" target="view"}}>Probe</a>
+        <a class="ui-btn ui-btn-a ui-corner-all" {{action "viewClicked" target="view"}}>View</a>
+        <a class="ui-btn ui-btn-a ui-corner-all" {{action "cancelClicked" target="view"}}>Cancel</a>
     </div>
 </div>
 
-<div id="non-associated-keys-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="flip"
-                                                                                        data-position-to="#associate-btn">
+<div id="non-associated-keys-popup"
+    class="tiny-popup"
+    data-role="popup"
+    data-overlay-theme="b"
+    data-transition="flip"
+    data-position-to="#associate-btn">
+
     <ul data-role="listview">
         {{#each Mist.machineKeysController.nonAssociatedKeys}}
         <li data-icon="false">
@@ -66,11 +76,17 @@
         </li>
     </ul>
 </div>
-<!-- data-position-to="#machine-keys-panel" -->
-<div id="machine-userPort-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-position-to="#machine-keys-panel"  data-transition="pop">
 
-    <div data-role="header" data-theme="b">
-        <h2 class='title'>SSH user & port</h2>
+<div id="machine-userPort-popup"
+    class="large-popup"
+    data-role="popup"
+    data-theme="b"
+    data-overlay-theme="b"
+    data-position-to="#machine-keys-panel"
+    data-transition="flip">
+
+    <div data-role="header">
+        <h2>SSH user & port</h2>
     </div>
 
     <div data-role="content">
@@ -80,20 +96,25 @@
         <label for="user">User:</label>
         {{view Mist.TextField
                id="user"
+               data-theme="a"
                placeholder="root"
                valueBinding="Mist.machineKeysController.user"}}
 
         <label for="port">Port:</label>
         {{view Mist.TextField
                id="port"
+               data-theme="a"
                placeholder="22"
                valueBinding="Mist.machineKeysController.port"}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" {{action "closeSSH_Details" target="Mist.machineKeysController"}}>Cancel</a>
-            <a id="tryAssociate" data-role="button" data-theme="d" {{action "customAssociateClicked" target="view"}}>Retry</a>
+            <a class="ui-btn ui-btn-a"
+                {{action "closeSSH_Details" target="Mist.machineKeysController"}}>
+                Cancel
+            </a>
+            <a id="tryAssociate" class="ui-btn ui-btn-d"
+                {{action "customAssociateClicked" target="view"}}>Retry</a>
         </div>
 
     </div>
-
 </div>
