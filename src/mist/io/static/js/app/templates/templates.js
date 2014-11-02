@@ -3664,34 +3664,6 @@ function program8(depth0,data) {
 
 function program10(depth0,data) {
   
-  var buffer = '', stack1, hashTypes, hashContexts;
-  data.buffer.push("\n                                ");
-  hashTypes = {};
-  hashContexts = {};
-  stack1 = helpers['if'].call(depth0, "ipv", {hash:{},inverse:self.program(13, program13, data),fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n                            ");
-  return buffer;
-  }
-function program11(depth0,data) {
-  
-  var buffer = '', hashTypes, hashContexts;
-  data.buffer.push("\n                                    ");
-  hashTypes = {};
-  hashContexts = {};
-  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "ipv", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n                                ");
-  return buffer;
-  }
-
-function program13(depth0,data) {
-  
-  
-  data.buffer.push("\n                                    Select IP Version\n                                ");
-  }
-
-function program15(depth0,data) {
-  
   
   data.buffer.push("\n            <div class=\"ajax-loader\"></div>\n        ");
   }
@@ -3714,7 +3686,7 @@ function program15(depth0,data) {
     'id': ("network-create-name"),
     'valueBinding': ("Mist.networkCreateController.network.name")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n\n\n            <!--\n                Select Admin State Up\n            -->\n\n\n            <label>Admin State:</label>\n            <div id=\"network-create-admin-state\"\n                data-role=\"collapsible\"\n                data-iconpos=\"right\"\n                data-collapsed-icon=\"arrow-d\"\n                data-expanded-icon=\"arrow-u\"\n                data-theme=\"a\"\n                class=\"mist-select\">\n\n                <h2>\n                    ");
+  data.buffer.push("\n        </div>\n\n\n        <!--\n            Select Admin State\n        -->\n\n\n        <div id=\"network-create-admin-state-wrapper\">\n            <label>Admin State:</label>\n            <div id=\"network-create-admin-state\"\n                data-role=\"collapsible\"\n                data-iconpos=\"right\"\n                data-collapsed-icon=\"arrow-d\"\n                data-expanded-icon=\"arrow-u\"\n                data-theme=\"a\"\n                class=\"mist-select\">\n\n                <h2>\n                    ");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.networkCreateController.adminStateUpToText", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
@@ -3730,7 +3702,7 @@ function program15(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "adminStateSelected", false, {hash:{
     'target': ("view")
   },contexts:[depth0,depth0],types:["STRING","BOOLEAN"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n                            DOWN\n                        </a>\n                    </li>\n                </ul> <!-- list -->\n            </div><!-- collapsible -->\n        </div>\n\n\n        <!--\n            Create Subnet\n        -->\n\n\n        <div id=\"network-create-subnet-wrapper\">\n\n            ");
+  data.buffer.push(">\n                            DOWN\n                        </a>\n                    </li>\n                </ul> <!-- list -->\n            </div><!-- collapsible -->\n        </div><!-- wrapper -->\n\n\n        <!--\n            Create Subnet\n        -->\n\n\n        <div id=\"network-create-subnet-wrapper\">\n\n            ");
   hashContexts = {'data-theme': depth0,'id': depth0,'checkedBinding': depth0};
   hashTypes = {'data-theme': "STRING",'id': "STRING",'checkedBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
@@ -3746,7 +3718,7 @@ function program15(depth0,data) {
     'id': ("network-create-subnet-name"),
     'valueBinding': ("Mist.networkCreateController.network.subnet.name")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n                </div>\n\n\n                <!--\n                    Select Network Address\n                -->\n\n\n                <div id=\"network-create-subnet-address-wrapper\">\n                    <label for=\"network-create-subnet-address\">Network Address:</label>\n                    ");
+  data.buffer.push("\n                </div>\n\n\n                <!--\n                    Select Network Address\n                -->\n\n\n                <div id=\"network-create-subnet-address-wrapper\">\n                    <label for=\"network-create-subnet-address\">Network Address (CIDR):</label>\n                    ");
   hashContexts = {'data-theme': depth0,'id': depth0,'valueBinding': depth0};
   hashTypes = {'data-theme': "STRING",'id': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -3754,24 +3726,23 @@ function program15(depth0,data) {
     'id': ("network-create-subnet-address"),
     'valueBinding': ("Mist.networkCreateController.network.subnet.address")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n                </div>\n\n\n                <!--\n                    Select IP Version\n                -->\n\n\n                <div id=\"network-create-subnet-ipv-wrapper\">\n                    <label>IP Version:</label>\n                    <div id=\"network-create-subnet-ipv\"\n                        data-role=\"collapsible\"\n                        data-iconpos=\"right\"\n                        data-collapsed-icon=\"arrow-d\"\n                        data-expanded-icon=\"arrow-u\"\n                        data-theme=\"a\"\n                        class=\"mist-select\">\n\n                        <h2>\n                            ");
+  data.buffer.push("\n                </div>\n\n\n                <div id=\"network-create-subnet-other-wrapper\">\n\n\n                    <!--\n                        Select IP Version\n                    -->\n\n\n                    <div id=\"network-create-subnet-ipv-wrapper\">\n                        <label>IP Version:</label>\n                        <div id=\"network-create-subnet-ipv\"\n                            data-role=\"collapsible\"\n                            data-iconpos=\"right\"\n                            data-collapsed-icon=\"arrow-d\"\n                            data-expanded-icon=\"arrow-u\"\n                            data-theme=\"a\"\n                            class=\"mist-select\">\n\n                            <h2>\n                                ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers['with'].call(depth0, "Mist.networkCreateController.network.subnet", {hash:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n                        </h2>\n\n                        <ul data-role=\"listview\" data-theme=\"a\">\n                            <li data-icon=\"false\">\n                                <a ");
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.networkCreateController.network.subnet.ipv", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n                            </h2>\n\n                            <ul data-role=\"listview\" data-theme=\"a\">\n                                <li data-icon=\"false\">\n                                    <a ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "ipvSelected", "IPv4", {hash:{
     'target': ("view")
   },contexts:[depth0,depth0],types:["STRING","STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n                                    IPv4\n                                </a>\n                            </li>\n                            <li data-icon=\"false\">\n                                <a ");
+  data.buffer.push(">\n                                        IPv4\n                                    </a>\n                                </li>\n                                <li data-icon=\"false\">\n                                    <a ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "ipvSelected", "IPv6", {hash:{
     'target': ("view")
   },contexts:[depth0,depth0],types:["STRING","STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n                                    IPv6\n                                </a>\n                            </li>\n                        </ul> <!-- list -->\n                    </div><!-- collapsible -->\n                </div><!-- wrapper -->\n\n\n\n                <div id=\"network-create-subnet-other-wrapper\">\n\n\n                    <!--\n                        Enable Gateway\n                    -->\n\n                    <div>\n                        <div id=\"network-create-subnet-gateway-ip-wrapper\">\n                            <label for=\"network-create-subnet-gateway-ip\">Gateway IP:</label>\n                            ");
+  data.buffer.push(">\n                                        IPv6\n                                    </a>\n                                </li>\n                            </ul> <!-- list -->\n                        </div><!-- collapsible -->\n                    </div><!-- wrapper -->\n\n\n                    <!--\n                        Enable Gateway\n                    -->\n\n                    <div>\n                        <div id=\"network-create-subnet-gateway-ip-wrapper\">\n                            <label for=\"network-create-subnet-gateway-ip\">Gateway IP:</label>\n                            ");
   hashContexts = {'data-theme': depth0,'id': depth0,'valueBinding': depth0};
   hashTypes = {'data-theme': "STRING",'id': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -3806,7 +3777,7 @@ function program15(depth0,data) {
   data.buffer.push("\n\n\n                    <!--\n                        DNS Servers\n                    --\n\n\n                    <label for=\"network-create-subnet-dns\">\n                        DNS Name Servers:\n                    </label>\n                    \n\n                    <!--\n                        Host Routes\n                    --\n\n\n                    <label for=\"network-create-subnet-host-routes\">\n                        Host Routes:\n                    </label>\n                    \n                    -->\n\n                </div>\n            </div>\n        </div>\n\n        ");
   hashTypes = {};
   hashContexts = {};
-  stack1 = helpers['if'].call(depth0, "Mist.networkCreateController.creatingNetwork", {hash:{},inverse:self.noop,fn:self.program(15, program15, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.networkCreateController.creatingNetwork", {hash:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n        <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n            <a class=\"ui-btn ui-btn-a\"\n               ");
   hashContexts = {'target': depth0};
