@@ -122,9 +122,10 @@ define('app/views/network_create', ['app/views/panel'],
 
             networkNameObserver: function () {
                 Ember.run.later(function () {
-                    if (Mist.networkCreateController.network.name)
+                    if (Mist.networkCreateController.network.name) {
                         $('#network-create-subnet-wrapper').slideDown();
                         $('#network-create-admin-state-wrapper').slideDown();
+                    }
                 }, SLIDE_DOWN_DELAY);
             }.observes('Mist.networkCreateController.network.name'),
 
