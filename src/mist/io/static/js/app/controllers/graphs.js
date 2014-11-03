@@ -41,6 +41,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 canModify: true,
                 canControl: true,
                 canMinimize: true,
+                showGraphLegend: false,
                 historyWidgetPosition: 'top',
             }),
 
@@ -124,6 +125,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     canModify: true,
                     canControl: true,
                     canMinimize: true,
+                    showGraphLegend: false,
                     historyWidgetPosition: 'top',
                 });
                 this._clearPendingRequests();

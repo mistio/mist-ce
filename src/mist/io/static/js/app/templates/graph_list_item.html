@@ -81,7 +81,7 @@
         Graph Secondary Legend Header
     -->
 
-    {{#if view.graph.isMultiline}}
+    {{#if Mist.graphsController.config.showGraphLegend}}
         <div class="legend">
             {{#each view.graph.datasources}}
                 {{this.machine.name}}
