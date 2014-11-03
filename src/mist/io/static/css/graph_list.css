@@ -19,6 +19,10 @@
     display: inline-block;
 }
 
+#history-control a, #graph-list-control .ui-select {
+    margin: .5%;
+}
+
 #history-control-stream {
     width: 50px;
 }
@@ -35,7 +39,6 @@
 
 #time-window-control {
     float: right;
-    margin-right: -10px;
 }
 
 #time-window-control .ui-btn {

@@ -155,6 +155,10 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 /* Popup
 -----------------------------------------------------------------------------------------------------------*/
+.ui-popup .ui-content {
+    padding: 8px 16px;
+    text-align: center;
+}
 .tiny-popup {
     width: 150px !important;
 }
