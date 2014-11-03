@@ -51,18 +51,10 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
             //
             //
 
-
             showGraphs: function () {
 
                 if (Mist.graphsController.isOpen)
                     return;
-
-                var machines = []
-                Mist.backendsController.content.forEach(function (backend) {
-                    backend.machines.content.forEach(function (machine) {
-                        machines.push(machine);
-                    });
-                });
 
                 var datasources = [];
                 var loadMetric = Mist.metricsController.getMetric('load.shortterm');

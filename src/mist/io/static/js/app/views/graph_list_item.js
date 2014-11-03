@@ -178,7 +178,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             autoResize: function () {
-                info('auto resizing', this.$().width())
                 this.changeWidth(this.$().width());
             },
 
@@ -234,7 +233,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // Update mouse over size
                 this.svg.canvas
                     .select('.selectorLine').attr('y2', this.height - this.margin.bottom + 3);
-
 
                 // Update curtain
                 this.svg.value.curtain
@@ -768,9 +766,10 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             isVisibleObserver: function () {
                 if (this.isHidden)
                     $('#' + this.id).parent().hide(400);
-                else
+                else if (this.isHidden !== undefined) {
                     $('#' + this.id).parent().show(400);
-                this.draw();
+                    this.draw();
+                }
             }.observes('isHidden'),
 
 
@@ -852,6 +851,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
         function Line (args, datasource) {
+
             var index = args.graph.datasources.indexOf(datasource);
             return d3.select('#' + args.id + ' svg .' + datasource.id)
                     .attr('transform', 'translate(' +
@@ -862,6 +862,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
         function Area (args) {
+
             return d3.select('#' + args.id + ' svg .valueArea')
                     .attr('transform', 'translate(' +
                         args.margin.left + ',' + (args.margin.top)+ ')')
@@ -870,6 +871,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
         function ScaleX (args) {
+
             return d3.time.scale().range([
                     0, args.width - args.margin.left - args.margin.right]);
         };
