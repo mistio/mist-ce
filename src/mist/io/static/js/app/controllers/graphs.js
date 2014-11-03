@@ -120,6 +120,12 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     'isOpen': null,
                     'content': [],
                 });
+                this.config.setProperties({
+                    canModify: true,
+                    canControl: true,
+                    canMinimize: true,
+                    historyWidgetPosition: 'top',
+                });
                 this._clearPendingRequests();
             },
 
