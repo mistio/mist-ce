@@ -156,7 +156,9 @@ textarea#private-key, #manual-monitoring-popup textarea {
 /* Popup
 -----------------------------------------------------------------------------------------------------------*/
 .ui-popup .ui-content {
-    padding: 8px 16px;
+    padding: 12px 16px;
+}
+#dialog .ui-content{
     text-align: center;
 }
 .tiny-popup {
@@ -434,7 +436,7 @@ ul.checkbox-list li label {
 }
 #confirmation-popup  .ok-cancel a,
 #confirmation-popup  .ok-cancel button {
-    width: 127px !important;
+    width: 126px !important;
 }
 
 .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
