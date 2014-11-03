@@ -88,6 +88,12 @@
 body {
     background-color: #F9F9F9 !important;
 }
+.ui-content {
+    padding: .5% 1%;
+}
+.ui-collapsible-content {
+    padding: .5%
+}
 .ui-mobile, .ui-mobile body {
     height: 0 !important;
 }
@@ -429,7 +435,6 @@ ul.checkbox-list li label {
 
 .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
     border-right-width: 2px;
-    margin-left: -1px;
 }
 
 #confirmation-popup p {

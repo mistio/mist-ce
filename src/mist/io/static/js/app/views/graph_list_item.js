@@ -179,7 +179,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             autoResize: function () {
                 info('auto resizing', this.$().width())
-                this.changeWidth(this.$().width() - 2);
+                this.changeWidth(this.$().width());
             },
 
 
@@ -198,9 +198,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     return;
 
                 // Create an aspect ratio
-                var newHeight = width * 0.125; // (160 / 1280)
+                var newHeight = width * 0.15;
 
-                this.height = (newHeight < 85 ? 85 : newHeight);
+                this.height = (newHeight < 100 ? 100 : newHeight);
                 this.width = width;
 
                 // Set new values to SVG element
