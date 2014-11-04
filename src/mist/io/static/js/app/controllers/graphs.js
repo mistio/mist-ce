@@ -254,6 +254,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     'id', parseInt(data.request_id));
                 if (request)
                     that._handleResponse(request, data.metrics);
+                that.trigger('onFetchStatsFromSocket', data);
             },
 
 

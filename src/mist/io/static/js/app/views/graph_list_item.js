@@ -420,8 +420,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             setupGraph: function () {
 
-                var id = this.graph.id;
-                this.id = id;
+                this.id = this.graph.id;
                 this.width = this.$().width();
 
                  // Calculate Aspect Ratio Of Height
