@@ -169,7 +169,7 @@ define('app/controllers/cookies', ['ember'],
         function getCookie (cname) {
             try {
                 return localStorage.getItem(cname);
-            catch (e) {
+            } catch (e) {
                 return {ssm: {}};
             }
         }
