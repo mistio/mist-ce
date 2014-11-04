@@ -139,8 +139,8 @@
 
 .graph .hideAnimeLine,
 .graph svg {
-    background-color: transparent;
-    fill: transparent;
+    background-color: #F9F9F9;
+    fill: #F9F9F9;
 }
 
 .graph .valueArea {
