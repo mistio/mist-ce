@@ -91,7 +91,7 @@ body {
 .ui-content {
     padding: .5% 1%;
 }
-.ui-collapsible-content {
+#monitoring-collapsible .ui-collapsible-content {
     padding: .5%
 }
 .ui-mobile, .ui-mobile body {
