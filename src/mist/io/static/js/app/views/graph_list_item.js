@@ -16,6 +16,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             5: 'brick',
         };
 
+        var MIN_GRAPH_HEIGHT = 100;
+        var SIZE_RATIO = 0.15;
+
         return TemplatedView.extend({
 
 
@@ -197,9 +200,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     return;
 
                 // Create an aspect ratio
-                var newHeight = width * 0.15;
+                var newHeight = width * SIZE_RATIO;
 
-                this.height = (newHeight < 100 ? 100 : newHeight);
+                this.height = (newHeight < MIN_GRAPH_HEIGHT ? MIN_GRAPH_HEIGHT : newHeight);
                 this.width = width;
 
                 // Set new values to SVG element
@@ -419,12 +422,12 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 var id = this.graph.id;
                 this.id = id;
-                this.width = this.$().width() - 2;
+                this.width = this.$().width();
 
                  // Calculate Aspect Ratio Of Height
-                var fixedHeight = this.width * 0.125; // (160 / 1280)
+                var fixedHeight = this.width * SIZE_RATIO; // (160 / 1280)
 
-                this.height = fixedHeight < 85 ? 85 : fixedHeight;
+                this.height = fixedHeight < MIN_GRAPH_HEIGHT ? MIN_GRAPH_HEIGHT : fixedHeight;
                 this.margin = {top: 10, right: 0, bottom: 24, left: 52};;
                 this.timeDisplayed    = Mist.graphsController.config.timeWindow;
                 this.yAxisValueFormat = '';
