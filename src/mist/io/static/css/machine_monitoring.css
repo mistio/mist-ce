@@ -188,27 +188,39 @@
     fill: none;
 }
 
-.graph .valueLine.green {
+.graph .green {
+    transition: 2s;
+    fill: none;
     stroke: #6CE0BA;
 }
 
-.graph .valueLine.orange {
+.graph .orange {
+    transition: 2s;
+    fill: none;
     stroke: #FF9933;
 }
 
-.graph .valueLine.blue {
+.graph .blue {
+    transition: 2s;
+    fill: none;
     stroke: #0066FF;
 }
 
-.graph .valueLine.pink {
+.graph .pink {
+    transition: 2s;
+    fill: none;
     stroke: #FF99FF;
 }
 
-.graph .valueLine.brick {
+.graph .brick {
+    transition: 2s;
+    fill: none;
     stroke: #990033;
 }
 
-.graph .valueLine.gray {
+.graph .gray {
+    transition: 2s;
+    fill: none;
     stroke: gray !important;
 }
 
