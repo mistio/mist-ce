@@ -88,7 +88,7 @@
 body {
     background-color: #F9F9F9 !important;
 }
-.ui-content {
+.ui-page > .ui-content {
     padding: .5% 1%;
 }
 #monitoring-collapsible .ui-collapsible-content {
