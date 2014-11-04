@@ -45,6 +45,11 @@ define('app/models/graph', ['ember'],
             }.property('datasources'),
 
 
+            isMultiline: function () {
+                return !!(this.datasources.length > 1);
+            }.property('datasources.@each'),
+
+
             //
             //
             // Initialization
@@ -57,7 +62,7 @@ define('app/models/graph', ['ember'],
                 if (this.datasources.length);
                     dts=this.datasources;
 
-                this.set('id', 'graph-' + (dts ? dts[0].id : ''));
+                this.set('id', 'graph-' + (dts.length ? dts[0].id : ''));
                 this.set('datasources',
                     dts ? dts : []);
                 this.set('isEmpty', true);

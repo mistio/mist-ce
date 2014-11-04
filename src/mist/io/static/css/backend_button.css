@@ -3,6 +3,8 @@
 -----------------------------------------------------------------------------------------------------------*/
 #backend-buttons {
     display: block;
+    margin-top: -51px;
+    margin-right: 165px;
 }
 #backend-buttons .ui-controlgroup-controls a {
     padding: 13px 10px 10px 40px !important;
@@ -23,6 +25,7 @@
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn {
     border: 1px solid #C0C0C0;
+    margin-top: 10px;
 }
 @media only screen and  (max-width: 460px) {
     #backend-buttons .ui-controlgroup-controls .ui-btn {
