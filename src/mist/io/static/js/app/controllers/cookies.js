@@ -167,12 +167,18 @@ define('app/controllers/cookies', ['ember'],
 
 
         function getCookie (cname) {
-            return localStorage.getItem(cname);
+            try {
+                return localStorage.getItem(cname);
+            catch (e) {
+                return {ssm: {}};
+            }
         }
 
 
         function setCookie (cname, cvalue, exdays) {
-            localStorage.setItem(cname, cvalue);
+            try {
+                localStorage.setItem(cname, cvalue);
+            } catch (e) {}
             return getCookie(cname);
         }
 
