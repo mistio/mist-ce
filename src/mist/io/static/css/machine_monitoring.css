@@ -130,7 +130,6 @@
 }
 
 .graph svg {
-    background-color: white;
     font: 10px Arial;
     font-weight: bold;
     color : #363636;
@@ -138,9 +137,10 @@
     margin-left: -15px;
 }
 
-.graph .hideAnimeLine{
-    /* Must be same color as svg bg */
-    fill: white;
+.graph .hideAnimeLine,
+.graph svg {
+    background-color: transparent;
+    fill: transparent;
 }
 
 .graph .valueArea {
