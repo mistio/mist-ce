@@ -9,9 +9,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         'use strict';
 
         var LINE_COLOR_MAP = {
-            1: 'blue',
+            1: 'green',
             2: 'orange',
-            3: 'green',
+            3: 'blue',
             4: 'pink',
             5: 'brown',
             6: 'red',
