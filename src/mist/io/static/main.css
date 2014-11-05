@@ -375,9 +375,14 @@ ul.checkbox-list li label {
     display: inline;
 }
 .small-list-item p {
-    top: 5px;
+    top: -8px;
     position: relative;
     display: inline;
+}
+@-moz-document url-prefix() {
+    .small-list-item p {
+        top: 5px;
+    }
 }
 
 /*
