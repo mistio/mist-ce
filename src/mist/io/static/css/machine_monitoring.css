@@ -143,17 +143,6 @@
     fill: #F9F9F9;
 }
 
-.graph .valueArea {
-    fill: #6CE0BA;
-    stroke-width: 0;
-    opacity: 0.25;
-}
-
-.graph .valueLine {
-    stroke: #6CE0BA;
-    stroke-width: 3;
-    fill: none;
-}
     /*, .x-axis line*/
 .graph .x-axis path, .graph .y-axis path {
     fill: none;
@@ -176,86 +165,12 @@
     stroke-width: 1;
 }
 
-.area{
+.area {
     width: 500px;
     height: 200px;
     background-color: #eee;
 }
 
-.graph .valueLine {
-    transition: 2s;
-    stroke-width: 2;
-    fill: none;
-}
-
-.graph .green {
-    transition: 2s;
-    fill: none;
-    stroke: #6CE0BA;
-}
-
-.graph .orange {
-    transition: 2s;
-    fill: none;
-    stroke: #FF9933;
-}
-
-.graph .blue {
-    transition: 2s;
-    fill: none;
-    stroke: #0066FF;
-}
-
-.graph .pink {
-    transition: 2s;
-    fill: none;
-    stroke: #FF99FF;
-}
-
-.graph .brick {
-    transition: 2s;
-    fill: none;
-    stroke: #990033;
-}
-
-.graph .gray {
-    transition: 2s;
-    fill: none;
-    stroke: gray !important;
-}
-
-
-
-.graph .lineLegend .green {
-    background-color: #6CE0BA;
-}
-
-.graph .lineLegend .orange {
-    background-color: #FF9933;
-}
-
-.graph .lineLegend .blue {
-    background-color: #0066FF;
-}
-
-.graph .lineLegend .pink {
-    background-color: #FF99FF;
-}
-
-.graph .lineLegend .brick {
-    background-color: #990033;
-}
-
-.graph .lineLegend div {
-    width: 8px;
-    height: 8px;
-    border-radius: 100%;
-}
-
-.graph .header *,
-.graph .legend * {
-    display: inline-block;
-}
 
 /*
 path {
