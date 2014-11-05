@@ -164,3 +164,7 @@
 .rules-container input::-webkit-inner-spin-button {
     -webkit-appearance: none !important;
 }
+
+#rule-action .ui-listview {
+    margin: 0;
+}
