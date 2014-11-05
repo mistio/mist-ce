@@ -9,11 +9,14 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         'use strict';
 
         var LINE_COLOR_MAP = {
-            1: 'green',
+            1: 'blue',
             2: 'orange',
-            3: 'blue',
+            3: 'green',
             4: 'pink',
-            5: 'brick',
+            5: 'brown',
+            6: 'red',
+            7: 'purple',
+            8: 'black'
         };
 
         var MIN_GRAPH_HEIGHT = 100;
