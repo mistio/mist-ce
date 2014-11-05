@@ -120,7 +120,7 @@
 }
 
 .graph .green {
-    stroke: #6DD16D;
+    stroke: #6CE0BA;
     transition: 2s;
     fill: none;
 }
@@ -174,7 +174,7 @@
 }
 
 .graph .lineLegend.green {
-    background-color: #6DD16D;
+    background-color: #6CE0BA;
 }
 
 .graph .lineLegend.orange {
@@ -212,7 +212,7 @@
 }
 
 .graph .valueArea {
-    fill: #66A5D9;
+    fill: #6CE0BA;
     stroke-width: 0;
     opacity: 0.25;
 }
