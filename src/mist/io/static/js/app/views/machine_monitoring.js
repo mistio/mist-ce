@@ -52,11 +52,11 @@ define('app/views/machine_monitoring',
                 // In case of manual installation or
                 // when collectd has been installed but data
                 // haven't arrived yet
-                if (manual || (finished_at && !activated_at))
+                if (manual || finished_at)
                     return "Waiting for monitoring data";
 
                 // Collectd has not been installed yet, probably..
-                if (!finished_at || !activated_at)
+                if (!finished_at)
                     return "Installing collectd monitoring agent";
 
             }.property('machine.finished_at', 'machine.activated_at'),
