@@ -467,11 +467,6 @@ define('app/views/machine_monitoring',
                         .val(cookie.timeWindow)
                         .trigger('change');
                 });
-
-                var that = this;
-                Mist.graphsController.one('onFetchStats', function () {
-                    that.set('pendingFirstStats', false);
-                });
             },
 
 
@@ -499,23 +494,20 @@ define('app/views/machine_monitoring',
                     until: Date.now(),
                     datasources: [{machine: this.machine}]
                 });
-                function unsubscribeSocket () {
-                    // First event handler is the one defined in app.js
-                    if (Mist.socket.$events.stats.length > 1)
-                        Mist.socket.$events.stats.pop();
+                function unhandleResponse () {
+                    Mist.graphsController.off(
+                        'onFetchStatsFromSocket',handleResponse);
                 }
-                function handleSocket (data) {
-                    info('handling socket request');
-                    unsubscribeSocket();
+                function handleResponse (data) {
                     if (data.request_id == request.id) {
+                        unhandleResponse();
                         if (Object.keys(data.metrics).length > 1) {
                             forIn(that, data.metrics, function (metric, target) {
                                 var metric = Mist.metricsController.getMetric(target);
                                 if (metric && !that.metrics.findBy('id', metric.id))
                                     that.metrics.pushObject(metric);
                             });
-                            if (that.metrics.length)
-                                that.set('pendingFirstStats', false);
+                            that.set('pendingFirstStats', false);
                             callback();
                         } else {
                             Ember.run.later(getStats, TIME_MAP.SECOND * 10);
@@ -523,12 +515,14 @@ define('app/views/machine_monitoring',
                     }
                 }
                 function getStats () {
-                    if (!that.$()) {
-                        unsubscribeSocket();
-                        return;
+                    if (that.$()) {
+                        Mist.graphsController.on(
+                            'onFetchStatsFromSocket',handleResponse);
+                        Mist.graphsController._fetchStatsFromSocket(request);
+                    } else {
+                        unhandleResponse();
                     }
-                    Mist.socket.on('stats', handleSocket);
-                    Mist.graphsController._fetchStatsFromSocket(request);
+
                 }
                 getStats();
             },

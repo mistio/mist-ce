@@ -41,6 +41,8 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 canModify: true,
                 canControl: true,
                 canMinimize: true,
+                showGraphLegend: false,
+                historyWidgetPosition: 'top',
             }),
 
 
@@ -119,6 +121,13 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     'isOpen': null,
                     'content': [],
                 });
+                this.config.setProperties({
+                    canModify: true,
+                    canControl: true,
+                    canMinimize: true,
+                    showGraphLegend: false,
+                    historyWidgetPosition: 'top',
+                });
                 this._clearPendingRequests();
             },
 
@@ -128,11 +137,12 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 if (this.isClosed) return;
 
                 // Log requests ///////////////////////////////
-                if (Mist.debugStats)
+                if (Mist.debugStats) {
                     info('Requesting stats from: ' +
                         Mist.prettyTime(new Date(args.from)) +
                         ' until: ' +
                         Mist.prettyTime(new Date(args.until)));
+                }
                 ////////////////////////////////////////////////
 
                 this._clearPendingRequests();
@@ -244,6 +254,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     'id', parseInt(data.request_id));
                 if (request)
                     that._handleResponse(request, data.metrics);
+                that.trigger('onFetchStatsFromSocket', data);
             },
 
 

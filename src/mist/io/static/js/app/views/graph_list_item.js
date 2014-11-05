@@ -9,12 +9,15 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         'use strict';
 
         var LINE_COLOR_MAP = {
-            0: 'green',
-            1: 'orange',
-            2: 'blue',
-            3: 'pink',
-            4: 'brick',
+            1: 'green',
+            2: 'orange',
+            3: 'blue',
+            4: 'pink',
+            5: 'brick',
         };
+
+        var MIN_GRAPH_HEIGHT = 100;
+        var SIZE_RATIO = 0.15;
 
         return TemplatedView.extend({
 
@@ -114,14 +117,16 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.set('svg', SvgSet(this));
                 var datasources = this.graph.datasources;
                 datasources.forEach(function (datasource) {
-                    $('#' + this.graph.id + ' .title .' + datasource.id)
-                        .addClass(LINE_COLOR_MAP[datasources.indexOf(datasource)]);
+                    $('#' + this.graph.id + ' .' + datasource.id)
+                        .addClass(getColor(datasources.indexOf(datasource)));
                 }, this);
             },
 
 
             draw: function () {
-                this.updateView();
+                try {
+                    this.updateView();
+                } catch (e) {}
             },
 
 
@@ -176,7 +181,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             autoResize: function () {
-                this.changeWidth($('#monitoring-bottom-btns').width() - 2);
+                this.changeWidth(this.$().width());
             },
 
 
@@ -195,9 +200,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     return;
 
                 // Create an aspect ratio
-                var newHeight = width * 0.125; // (160 / 1280)
+                var newHeight = width * SIZE_RATIO;
 
-                this.height = (newHeight < 85 ? 85 : newHeight);
+                this.height = (newHeight < MIN_GRAPH_HEIGHT ? MIN_GRAPH_HEIGHT : newHeight);
                 this.width = width;
 
                 // Set new values to SVG element
@@ -232,7 +237,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.svg.canvas
                     .select('.selectorLine').attr('y2', this.height - this.margin.bottom + 3);
 
-
                 // Update curtain
                 this.svg.value.curtain
                     .attr('width', this.margin.left - 1)
@@ -250,6 +254,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             * also creates interval for popup value update
             */
             setupMouseOver: function () {
+
+                if (this.graph.get('isMultiline'))
+                    return;
 
                 var that = this;
 
@@ -287,7 +294,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                         // Calculate Translate
                         var translate = 0;
-                        if(that.animationEnabled){
+                        if (that.animationEnabled) {
                             translate =  $('#' + graph.id).find('.valueLine > path').attr('transform');
                             translate = + translate.slice(10,translate.indexOf(','));
                         }
@@ -413,14 +420,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             setupGraph: function () {
 
-                var id = this.graph.id;
-                this.id = id;
-                this.width = $('#monitoring-bottom-btns').width() - 2;
+                this.id = this.graph.id;
+                this.width = this.$().width();
 
                  // Calculate Aspect Ratio Of Height
-                var fixedHeight = this.width * 0.125; // (160 / 1280)
+                var fixedHeight = this.width * SIZE_RATIO; // (160 / 1280)
 
-                this.height = fixedHeight < 85 ? 85 : fixedHeight;
+                this.height = fixedHeight < MIN_GRAPH_HEIGHT ? MIN_GRAPH_HEIGHT : fixedHeight;
                 this.margin = {top: 10, right: 0, bottom: 24, left: 52};;
                 this.timeDisplayed    = Mist.graphsController.config.timeWindow;
                 this.yAxisValueFormat = '';
@@ -762,9 +768,10 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             isVisibleObserver: function () {
                 if (this.isHidden)
                     $('#' + this.id).parent().hide(400);
-                else
+                else if (this.isHidden !== undefined) {
                     $('#' + this.id).parent().show(400);
-                this.draw();
+                    this.draw();
+                }
             }.observes('isHidden'),
 
 
@@ -822,7 +829,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 line.id = datasource.id;
                 svg.value.lines.push(line);
             });
-
             svg.grid.x.animation = new Animation();
             svg.value.area.animation = new Animation();
             svg.axis.x.legend.animation = new Animation();
@@ -847,16 +853,18 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
         function Line (args, datasource) {
+
             var index = args.graph.datasources.indexOf(datasource);
             return d3.select('#' + args.id + ' svg .' + datasource.id)
                     .attr('transform', 'translate(' +
                         args.margin.left + ',' + args.margin.top + ')')
-                    .attr('class', 'valueLine ' + LINE_COLOR_MAP[index] + ' ' + datasource.id)
+                    .attr('class', 'valueLine ' + getColor(index) + ' ' + datasource.id)
                     .select('path');
         };
 
 
         function Area (args) {
+
             return d3.select('#' + args.id + ' svg .valueArea')
                     .attr('transform', 'translate(' +
                         args.margin.left + ',' + (args.margin.top)+ ')')
@@ -865,6 +873,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
         function ScaleX (args) {
+
             return d3.time.scale().range([
                     0, args.width - args.margin.left - args.margin.right]);
         };
@@ -1153,6 +1162,18 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         }
         function getDatapointTime (d) {
             return d.time;
+        }
+
+        function getColor (num) {
+
+            // get rid of zero
+            num++;
+
+            var map = LINE_COLOR_MAP;
+            var length = Object.keys(map).length;
+            while (num > length)
+                num -= length;
+            return map[num];
         }
     }
 );

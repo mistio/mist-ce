@@ -42,7 +42,7 @@
             -->
 
             {{#if Mist.graphsController.config.canMinimize}}
-                <a class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-d"
+                <a class="ui-btn ui-btn-c ui-btn-icon-notext ui-corner-all ui-icon-arrow-d"
                     {{action "collapseClicked" view.graph target="view.actionProxy"}}>-
                 </a>
             {{/if}}
@@ -76,4 +76,17 @@
     </svg>
 
     <div class="valuePopUp"></div>
+
+    <!--
+        Graph Secondary Legend Header
+    -->
+
+    {{#if Mist.graphsController.config.showGraphLegend}}
+        <div class="legend">
+            {{#each view.graph.datasources}}
+                {{this.machine.name}}
+                <div {{bind-attr class="this.id :lineLegend"}}></div>
+            {{/each}}
+        </div>
+    {{/if}}
 </div>
