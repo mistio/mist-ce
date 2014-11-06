@@ -222,7 +222,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.updateScale();
 
                 // Update x-axis based on new height
-                this.svg.axis.x.legend.attr('transform', 'translate(0,' + (this.height - this.margin.bottom) + ')');
+                setTranslate(this.svg.axis.x.legend, 0, this.height - this.margin.bottom);
 
                 // Update y-axis line
                 this.svg.axis.x.line.attr('y1', this.height - this.margin.bottom + 2)
@@ -232,11 +232,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.svg.axis.y.line.attr('y2', this.height - this.margin.bottom + 3);
 
                 // Update Grids
-                this.svg.grid.x.attr('transform', 'translate(' +
-                        this.margin.left + ',' + this.height + ')');
-
-                this.svg.grid.y.attr('transform', 'translate(' +
-                        this.margin.left + ',' + this.margin.top + ')');
+                setTranslate(this.svg.grid.x, this.margin.left, this.height);
+                setTranslate(this.svg.grid.y, this.margin.left, this.margin.top);
 
                 // Update mouse over size
                 this.svg.canvas
@@ -719,13 +716,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         // Wait for 50ms for animation to finishes its changes
                         window.setTimeout(function(){
                             that.svg.value.lines.forEach(function (line) {
-                                line.attr('transform', 'translate(' + 0 + ')');
+                                setTranslate(line, 0);
                             });
                             if (that.graph.datasources.length == 1) {
-                                that.svg.value.area.attr('transform', 'translate(' + 0 + ')');
+                                setTranslate(that.svg.value.area, 0);
                             }
-                            that.svg.axis.x.legend.attr('transform', 'translate(' + that.margin.left + ',' + (that.height - that.margin.bottom + 2) + ')');
-                            that.svg.grid.x.attr('transform', 'translate(' + that.margin.left + ',' + that.height + ')');
+                            setTranslate(that.svg.axis.x.legend, that.margin.left, that.height - that.margin.bottom + 2);
+                            setTranslate(that.svg.grid.x, that.margin.left, that.height);
                             that.clearAnimPending = false;
                         }, 50);
                     }
@@ -994,7 +991,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     var interpolate = d3.interpolateTransform(start,stop);
 
                     // Initial Start
-                    this.d3Selector.attr('transform', interpolate(0));
+                    setTranslate(this.d3Selector interpolate(0));
 
                     // TODO: This interval should not be that
                     // deep into the code.
@@ -1008,7 +1005,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         var transformValue = interpolate(
                             frame / (that.fps * that.duration));
 
-                        that.d3Selector.attr('transform', transformValue);
+                        setTranslate(that.d3Selector, transformValue);
 
                         // Check if animation should stop
                         if(frame >= that.fps * that.duration || that.stopFlag){
@@ -1085,7 +1082,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 return this;
             }
 
-            this.after = function (callback){
+            this.after = function (callback) {
                 current_animation.after = callback;
                 return this;
             }
@@ -1095,7 +1092,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 current_animation = new _Animation();
             }
 
-            this.clearBuffer = function(stopCurrent) {
+            this.clearBuffer = function (stopCurrent) {
                 if ((typeof stopCurrent == 'undefined' || stopCurrent) && buffer.length > 0 ) {
                     buffer[0].stop();
                 }
@@ -1147,6 +1144,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             while (num > length)
                 num -= length;
             return map[num];
+        }
+
+        function setTranslate(element, x, y) {
+            element.attr('transform', 'translate(' + x +
+                (y !== undefined ? ',' + y : '' ) +')');
         }
     }
 );
