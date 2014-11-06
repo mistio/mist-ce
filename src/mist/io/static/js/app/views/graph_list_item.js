@@ -68,6 +68,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             load: function () {
 
                 Ember.run.next(this, function () {
+
                     // Add event handlers
                     this.graph.on('onDatasourceAdd', this, 'updateSVG');
                     this.graph.on('onDatasourceRemove', this, 'updateSVG');
@@ -99,7 +100,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             showFetchingStats: function () {
                 if (!this.svg) return;
-                $('#' + this.id + ' .fetching-stats-loader').fadeIn(400);
+                this.$().find('.fetching-stats-loader').show(400);
                 this.graph.datasources.forEach(function (datasource) {
                     var line = d3.select('#' + this.id + ' .' + datasource.id);
                     if (line.attr('class').indexOf('gray') == -1)
@@ -110,7 +111,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             hideFetchingStats: function () {
                 if (!this.svg) return;
-                $('#' + this.id + ' .fetching-stats-loader').fadeOut(400);
+                this.$().find('.fetching-stats-loader').hide(400);
                 this.graph.datasources.forEach(function (datasource) {
                     var line = d3.select('#' + this.id + ' .' + datasource.id);
                     line.attr('class', line.attr('class').replace('gray', ''));
@@ -121,9 +122,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             updateSVG: function () {
                 this.set('svg', SvgSet(this));
                 var datasources = this.graph.datasources;
-                datasources.forEach(function (datasource) {
-                    $('#' + this.graph.id + ' .' + datasource.id)
-                        .addClass(getColor(datasources.indexOf(datasource)));
+                datasources.forEach(function (datasource, index) {
+                    this.$().find('.' + datasource.id).addClass(getColor(index));
                 }, this);
             },
 
