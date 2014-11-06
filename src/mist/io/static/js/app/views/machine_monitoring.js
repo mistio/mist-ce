@@ -31,6 +31,36 @@ define('app/views/machine_monitoring',
             gettingCommand: null,
 
 
+
+            //
+            //
+            //  Computed Properties
+            //
+            //
+
+
+            monitoringMessage: function () {
+
+                var finishedAt = this.machine.installationStatus.finished_at;
+                var activatedAt = this.machine.installationStatus.activated_at;
+                var manual = this.machine.installationStatus.manual;
+
+                // Machine has sent data to the monitoring server
+                if (activatedAt)
+                    return "Fetching monitoring data";
+
+                // In case of manual installation or
+                // when collectd has been installed but data1
+                // haven't arrived yet
+                if (manual || finishedAt)
+                    return "Waiting for monitoring data";
+
+                return "Installing collectd monitoring agent";
+
+            }.property('machine.installationStatus.finished_at',
+                'machine.installationStatus.activated_at'),
+
+
             //
             //
             //  Initialization
@@ -593,6 +623,7 @@ define('app/views/machine_monitoring',
             }.observes('metrics.@each'),
         });
 
+
         function moveGraphToEnd(graphId) {
 
             var parent = $("#" + graphId).parent();
@@ -604,6 +635,7 @@ define('app/views/machine_monitoring',
             prev.detach().appendTo('#graphs');
             next.detach().appendTo('#graphs');
         };
+
 
         function moveGraphButtonToEnd(graphId) {
 

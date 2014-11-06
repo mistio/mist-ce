@@ -41,6 +41,16 @@ define('app/models/machine', ['ember'],
             loadavg5: null,
             loadavg15: null,
 
+            installationStatus: Ember.Object.create({
+                activated_at: null,
+                error_msg: null,
+                finished_at: null,
+                manual: null,
+                started_at: null,
+                state: null,
+                stdout: null,
+            }),
+
 
             /**
              *  Computed Properties

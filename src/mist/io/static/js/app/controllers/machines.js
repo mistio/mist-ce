@@ -303,42 +303,35 @@ define('app/controllers/machines', ['app/models/machine'],
 
             _updateMonitoredMachines: function() {
 
-                var that = this;
+                forIn(this, Mist.monitored_machines_, function (machineDict, uuid) {
 
-                if (Mist.monitored_machines) {
+                    var machine = this.getMachine(machineDict.machine_id);
+                    if (!machine) return;
 
-                    that.content.forEach(function(machine) {
+                    machine.set('hasMonitoring', true);
 
-                        Mist.monitored_machines.some(function(machine_tuple){
-                            backend_id = machine_tuple[0];
-                            machine_id = machine_tuple[1];
-                            if (!machine.hasMonitoring &&
-                                machine.id == machine_id &&
-                                machine.backend.id == backend_id) {
-                                    that.getMachine(machine_id, backend_id)
-                                        .set('hasMonitoring', true);
-                                    return true;
+                    // Inject installation status on machine
+                    forIn(machineDict.installation_status, function (value, property) {
+                        machine.installationStatus.set(property, value);
+                    });
+
+                    // Pass machine reference to rules
+                    Mist.rulesController.content.forEach(function (rule) {
+                        if (rule.machine.id) return;
+                        if (machine.equals([rule.backend, rule.machine]))
+                            rule.set('machine', machine);
+                    });
+
+                    // Pass machine reference to metrics
+                    Mist.metricsController.customMetrics.forEach(function (metric) {
+                        metric.machines.forEach(function (metricMachine, index) {
+                            if (machine.equals(metricMachine)) {
+                                metric.machines[index] = machine;
+                                Mist.metricsController.trigger('onMetricListChange');
                             }
                         });
-
-                        Mist.rulesController.content.forEach(function(rule) {
-                            if (rule.machine.id) return;
-                            if (rule.machine == machine.id &&
-                                rule.backend == machine.backend.id)
-                                    rule.set('machine', machine);
-                        });
-
-                        Mist.metricsController.customMetrics.forEach(function(metric) {
-                            metric.machines.forEach(function(metricMachine, index) {
-                                if (metricMachine[1] == machine.id &&
-                                    metricMachine[0] == machine.backend.id) {
-                                        metric.machines[index] = machine;
-                                        Mist.metricsController.trigger('onMetricListChange');
-                                    }
-                            });
-                        });
                     });
-                }
+                });
             },
 
 
