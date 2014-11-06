@@ -276,6 +276,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 var mouseY = 0;
                 var isVisible = false;
                 var updateInterval;
+                var valuePopUp = $('.valuePopUp');
 
                 var updatePopUpValue = function(graph) {
                     // Update popup when it is over value line
@@ -352,7 +353,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                         if(isVisible){
                             $('.selectorLine').hide(0);
-                            $('.valuePopUp').hide(0);
+                            valuePopUp.hide(0);
                             isVisible = false;
                         }
                     }
@@ -379,16 +380,14 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                                  .attr('x2', mouseX);
 
                     // Make popup appear at left side when it is at the right edge
-                    var popupWidth = $('.valuePopUp').width();
+                    var popupWidth = valuePopUp.width();
                     var xAlign = (event.pageX + popupWidth >= window.innerWidth-15) ? - (popupWidth + 5) : 5;
 
                     // Update popup cords
-                    $('.valuePopUp')
-                        .css('left', (event.clientX + xAlign) + 'px');
-
-                    $('.valuePopUp')
-                        .css('top', mouseY-svg.height() + 'px');
-                    $('.valuePopUp').show(0);
+                    valuePopUp
+                        .css('left', (event.clientX + xAlign) + 'px')
+                        .css('top', mouseY-svg.height() + 'px')
+                        .show(0);
                     updatePopUpValues();
 
                 };
@@ -401,7 +400,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     // (possible jquery bug ?)
                     $('.selectorLine').hide(0);
 
-                    $('.valuePopUp').hide(0);
+                    valuePopUp.hide(0);
 
                     // Clear Interval
                     window.clearInterval(updateInterval);
@@ -991,7 +990,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     var interpolate = d3.interpolateTransform(start,stop);
 
                     // Initial Start
-                    setTranslate(this.d3Selector interpolate(0));
+                    this.d3Selector.attr('transform', interpolate(0));
 
                     // TODO: This interval should not be that
                     // deep into the code.
@@ -1005,7 +1004,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         var transformValue = interpolate(
                             frame / (that.fps * that.duration));
 
-                        setTranslate(that.d3Selector, transformValue);
+                        that.d3Selector.attr('transform', transformValue);
 
                         // Check if animation should stop
                         if(frame >= that.fps * that.duration || that.stopFlag){
