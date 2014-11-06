@@ -21,6 +21,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
         var MIN_GRAPH_HEIGHT = 100;
         var SIZE_RATIO = 0.15;
+        var ANIMATION_FPS = 12;
 
         return TemplatedView.extend({
 
@@ -655,13 +656,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 if (this.animationEnabled && !this.clearAnimPending) {
 
                     // Animation values
-                    var fps  = 12;
                     var duration = 9;
 
                     this.svg.value.lines.forEach(function (line) {
                         line.animation
                             .select(line)
-                            .fps(fps)
                             .duration(duration)
                             .points(this.valuesDistance, 0, 0, 0)
                             .data(this.valueLinePaths[line.id])
@@ -675,7 +674,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     if (this.graph.datasources.length == 1) {
                         this.svg.value.area.animation
                             .select(this.svg.value.area)
-                            .fps(fps)
                             .duration(duration)
                             .points(this.valuesDistance,0, 0,0)
                             .data(valueAreaPath)
@@ -687,7 +685,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     this.svg.axis.x.legend.animation
                                     .select(this.svg.axis.x.legend)
-                                    .fps(fps)
                                     .duration(duration)
                                     .points(( this.margin.left + this.valuesDistance),(this.height - this.margin.bottom +2), this.margin.left,(this.height - this.margin.bottom +2))
                                     .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: this.labelFormat})
@@ -702,7 +699,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     this.svg.grid.x.animation
                                     .select(this.svg.grid.x)
-                                    .fps(fps)
                                     .duration(duration)
                                     .points((this.margin.left + this.valuesDistance),this.height, this.margin.left,this.height)
                                     .data({modelX: modelGridX,modelY: modelGridY})
@@ -983,7 +979,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             function _Animation() {
 
                 this.d3Selector = null;
-                this.fps        = null;
+                this.fps        = ANIMATION_FPS;
                 this.duration   = null;
                 this.data       = null;
                 this.before     = null;
@@ -1086,11 +1082,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             this.select = function (d3Selector) {
                 current_animation.d3Selector = d3Selector;
-                return this;
-            }
-
-            this.fps = function (fps) {
-                current_animation.fps = fps;
                 return this;
             }
 
