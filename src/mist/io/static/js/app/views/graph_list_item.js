@@ -278,9 +278,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 var updateInterval;
                 var valuePopUp = $('.valuePopUp');
 
-                var updatePopUpValue = function(graph) {
-                    // Update popup when it is over value line
-                    graph = Mist.graphsController.getGraph(graph.id);
+                var updatePopUpValue = function (graph) {
 
                     if (graph.view.isHidden)
                         return;
@@ -366,8 +364,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                        clearUpdatePopUp();
                        return;
                     }
-                    $('#graphs .graph').each(function(i,g){
-                        updatePopUpValue(g);
+
+                    Mist.graphsController.content.forEach(function (graph) {
+                        updatePopUpValue(graph);
                     });
                 };
                 var updatePopUpOffset = function(event) {
