@@ -325,7 +325,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                             return;
                         }
 
-
                         // Distanse between value before cursor and after cursor
                         var distance = displayedData[minValueIndex+1].value  - displayedData[minValueIndex].value;
                         // Mouse offset between this two values
@@ -658,7 +657,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     this.svg.value.lines.forEach(function (line) {
                         line.animation
-                            .select(line)
                             .points(this.valuesDistance, 0, 0, 0)
                             .data(this.valueLinePaths[line.id])
                             .before(function (data) {
@@ -670,7 +668,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     // If this is a single line graph, show area path
                     if (this.graph.datasources.length == 1) {
                         this.svg.value.area.animation
-                            .select(this.svg.value.area)
                             .points(this.valuesDistance,0, 0,0)
                             .data(valueAreaPath)
                             .before(function(data){
@@ -680,7 +677,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     }
 
                     this.svg.axis.x.legend.animation
-                                    .select(this.svg.axis.x.legend)
                                     .points(( this.margin.left + this.valuesDistance),(this.height - this.margin.bottom +2), this.margin.left,(this.height - this.margin.bottom +2))
                                     .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: this.labelFormat})
                                     .before(function(data){
@@ -693,7 +689,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                                     .push();
 
                     this.svg.grid.x.animation
-                                    .select(this.svg.grid.x)
                                     .points((this.margin.left + this.valuesDistance),this.height, this.margin.left,this.height)
                                     .data({modelX: modelGridX,modelY: modelGridY})
                                     .before(function(data){
@@ -818,13 +813,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             // Popuplate value lines
             args.graph.datasources.forEach(function (datasource) {
                 var line = Line(args, datasource);
-                line.animation = new Animation();
+                line.animation = new Animation(line);
                 line.id = datasource.id;
                 svg.value.lines.push(line);
             });
-            svg.grid.x.animation = new Animation();
-            svg.value.area.animation = new Animation();
-            svg.axis.x.legend.animation = new Animation();
+            svg.grid.x.animation = new Animation(svg.grid.x);
+            svg.value.area.animation = new Animation(svg.value.area);
+            svg.axis.x.legend.animation = new Animation(svg.axis.x.legend);
 
             return svg;
         };
@@ -968,11 +963,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
          * @constructor
          * @param {number} bufferSize - The max length of the buffer (default : 3 animations)
          */
-        function Animation(bufferSize){
+        function Animation(d3Selector, bufferSize){
 
             function _Animation() {
 
-                this.d3Selector = null;
+                this.d3Selector = d3Selector;
                 this.fps        = ANIMATION_FPS;
                 this.duration   = ANIMATION_DURATION;
                 this.data       = null;
@@ -1072,11 +1067,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 };
 
                 return buffer;
-            }
-
-            this.select = function (d3Selector) {
-                current_animation.d3Selector = d3Selector;
-                return this;
             }
 
             this.points = function (startPointX, startPointY, stopPointX, stopPointY) {
