@@ -22,6 +22,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         var MIN_GRAPH_HEIGHT = 100;
         var SIZE_RATIO = 0.15;
         var ANIMATION_FPS = 12;
+        var ANIMATION_DURATION = 9;
 
         return TemplatedView.extend({
 
@@ -655,13 +656,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // Animate line, axis and grid
                 if (this.animationEnabled && !this.clearAnimPending) {
 
-                    // Animation values
-                    var duration = 9;
-
                     this.svg.value.lines.forEach(function (line) {
                         line.animation
                             .select(line)
-                            .duration(duration)
                             .points(this.valuesDistance, 0, 0, 0)
                             .data(this.valueLinePaths[line.id])
                             .before(function (data) {
@@ -674,7 +671,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     if (this.graph.datasources.length == 1) {
                         this.svg.value.area.animation
                             .select(this.svg.value.area)
-                            .duration(duration)
                             .points(this.valuesDistance,0, 0,0)
                             .data(valueAreaPath)
                             .before(function(data){
@@ -685,7 +681,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     this.svg.axis.x.legend.animation
                                     .select(this.svg.axis.x.legend)
-                                    .duration(duration)
                                     .points(( this.margin.left + this.valuesDistance),(this.height - this.margin.bottom +2), this.margin.left,(this.height - this.margin.bottom +2))
                                     .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: this.labelFormat})
                                     .before(function(data){
@@ -699,7 +694,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                     this.svg.grid.x.animation
                                     .select(this.svg.grid.x)
-                                    .duration(duration)
                                     .points((this.margin.left + this.valuesDistance),this.height, this.margin.left,this.height)
                                     .data({modelX: modelGridX,modelY: modelGridY})
                                     .before(function(data){
@@ -980,7 +974,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                 this.d3Selector = null;
                 this.fps        = ANIMATION_FPS;
-                this.duration   = null;
+                this.duration   = ANIMATION_DURATION;
                 this.data       = null;
                 this.before     = null;
                 this.after      = null;
@@ -1082,11 +1076,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             this.select = function (d3Selector) {
                 current_animation.d3Selector = d3Selector;
-                return this;
-            }
-
-            this.duration = function (duration) {
-                current_animation.duration = duration;
                 return this;
             }
 
