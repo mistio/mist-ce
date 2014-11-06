@@ -41,23 +41,24 @@ define('app/views/machine_monitoring',
 
             monitoringMessage: function () {
 
-                var finished_at = this.machine.finished_at;
-                var activated_at = this.machine.activated_at;
-                var manual = this.machine.manual;
+                var finishedAt = this.machine.installationStatus.finished_at;
+                var activatedAt = this.machine.installationStatus.activated_at;
+                var manual = this.machine.installationStatus.manual;
 
                 // Machine has sent data to the monitoring server
-                if (activated_at)
+                if (activatedAt)
                     return "Fetching monitoring data";
 
                 // In case of manual installation or
-                // when collectd has been installed but data
+                // when collectd has been installed but data1
                 // haven't arrived yet
-                if (manual || finished_at)
+                if (manual || finishedAt)
                     return "Waiting for monitoring data";
 
                 return "Installing collectd monitoring agent";
 
-            }.property('machine.finished_at', 'machine.activated_at'),
+            }.property('machine.installationStatus.finished_at',
+                'machine.installationStatus.activated_at'),
 
 
             //
