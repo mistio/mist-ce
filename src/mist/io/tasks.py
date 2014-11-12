@@ -5,7 +5,7 @@ import functools
 
 import libcloud.security
 
-from time import time
+from time import time, sleep
 from uuid import uuid4
 
 from base64 import b64encode
@@ -192,19 +192,22 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
             ssh=paramiko.SSHClient()
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(host, username=username, password=password)
-            ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
+            ssh.connect(host, username=username, password=password, timeout=None, banner_timeout=None, allow_agent=False, look_for_keys=False)
             chan = ssh.invoke_shell()
             chan = ssh.get_transport().open_session()
             chan.get_pty()
             chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\' ' % username)
+            sleep(0.5)
             chan.send('%s\n' % password)
 
             chan = ssh.invoke_shell()
             chan = ssh.get_transport().open_session()
             chan.get_pty()
             chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/waagent\' ' % username)
+            sleep(0.5)
             chan.send('%s\n' % password)
+
+            ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
 
             cmd = 'sudo su -c \'sed -i "s|[#]*PasswordAuthentication yes|PasswordAuthentication no|g" /etc/ssh/sshd_config &&  /etc/init.d/ssh reload; service ssh reload\' '
             ssh.exec_command(cmd)
