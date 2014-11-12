@@ -40,11 +40,12 @@ define('app/views/machine_list', ['app/views/mistscreen'],
             updateFooter: function () {
                 switch (Mist.backendsController.selectedMachines.length) {
                 case 0:
-                    $('#machine-list-page .ui-footer').slideUp();
+                    if (!Mist.machineShellController.isOpen)
+                        $('#machine-list-page .ui-footer').slideUp();
                     break;
                 case 1:
                     var machine = Mist.backendsController.selectedMachines[0];
-                    
+
                     $('#machine-list-page .ui-footer').slideDown();
 
                     if (machine.can_tag) {

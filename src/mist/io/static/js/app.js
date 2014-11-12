@@ -18,6 +18,7 @@ require.config({
     },
     deps: ['jquery'],
     callback: function () {
+        fontTest = $('#font-test')
         handleMobileInit();
         appLoader.init();
     },
@@ -1161,26 +1162,29 @@ function forIn () {
 
 
 // Calculates maximum chars that can be displayed into a fixed width
+var fontTest;
 function maxCharsInWidth (fontSize, width) {
 
-    var fontTest = $('#font-test')
-        .css('font-size', fontSize);
+    fontTest.css('font-size', fontSize);
 
-    var testString = '';
-    var textWidth = 0;
-    for (var charCount = 0; textWidth < width; charCount++) {
-        testString += 't';
+    // Initialize testString to a number of chars that will "probably"
+    // fit in width
+    var textWidth = fontTest.text('t').width();
+    info(width, '/', textWidth, '=', width / textWidth);
+    var testString = Array(parseInt(width / textWidth) + 5).join('t');
+    textWidth = fontTest.text(testString).width();
+
+    for (var charCount = testString.length; textWidth > width; charCount--) {
+        testString = testString.slice(1);
         textWidth = fontTest.text(testString).width();
     };
     return charCount;
 }
 
-
 // Calculates maximum lines that can be displayed into a fixed height
 function maxLinesInHeight (fontSize, height) {
 
-    var fontTest = $('#font-test')
-        .css('font-size', fontSize);
+    fontTest.css('font-size', fontSize);
 
     var testString = '';
     var textHeight = 0

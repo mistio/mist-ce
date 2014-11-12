@@ -167,18 +167,27 @@ define('app/views/machine_shell', ['app/views/popup'],
                 .css('font-size', '1em')
                 .css('font-size');
 
-            // Calculate how many columns fit in the shell
-            var numOfColumns = maxCharsInWidth(fontSize, size.width);
-
-            // Calculate how many rows fit in the shell
-            var numOfRows = maxLinesInHeight(fontSize, size.height);
+            var numOfColumns;
+            var numOfRows;
 
             // Make sure the shell is at least wide/tall enough for
             // the terminal standards
-            while (numOfColumns < MIN_TERM_COLUMNS || numOfRows < MIN_TERM_ROWS) {
-                fontSize = (fontSize.replace('px', '') - 0.5) + 'px';
+            while (true) {
+
+                fontSize = (fontSize.replace('px', '') - 0.5);
+                if (fontSize < 10)
+                    break;
+                fontSize +='px';
+
                 numOfColumns = maxCharsInWidth(fontSize, size.width);
+                if (numOfColumns < MIN_TERM_COLUMNS)
+                    continue;
+
                 numOfRows = maxLinesInHeight(fontSize, size.height);
+                if (numOfRows < MIN_TERM_ROWS)
+                    continue;
+
+                break;
             }
 
             $('#shell-return')
