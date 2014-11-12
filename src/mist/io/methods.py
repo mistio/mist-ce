@@ -524,6 +524,7 @@ def connect_provider(backend):
         #a cert file
         temp_key_file = NamedTemporaryFile(delete=False)
         temp_key_file.write(backend.apisecret)
+        temp_key_file.close()
         conn = driver(backend.apikey, temp_key_file.name)
     elif backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
