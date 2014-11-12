@@ -101,30 +101,26 @@ def backend_creds(context, backend):
         api_key_input = context.browser.find_element_by_id("new-backend-second-field")
         api_key_input.send_keys(context.credentials['NEPHOSCALE']['password'])
     elif "LINODE" in backend:
-        username_input = context.browser.find_element_by_id("new-backend-first-field")
-        username_input.send_keys(context.credentials['LINODE']['username'])
-        api_key_input = context.browser.find_element_by_id("new-backend-second-field")
-        api_key_input.send_keys(context.credentials['LINODE']['api_key'])
+        token_input = context.browser.find_element_by_id("new-backend-token")
+        token_input.send_keys(context.credentials['LINODE']['api_key'])
     elif "DOCKER" in backend:
         username_input = context.browser.find_element_by_id("new-backend-docker-url")
         username_input.send_keys(context.credentials['DOCKER']['host'])
     elif "DIGITALOCEAN" in backend:
-        username_input = context.browser.find_element_by_id("new-backend-first-field")
-        username_input.send_keys(context.credentials['DIGITALOCEAN']['client_id'])
-        api_key_input = context.browser.find_element_by_id("new-backend-second-field")
-        api_key_input.send_keys(context.credentials['DIGITALOCEAN']['api_key'])
+        token_input = context.browser.find_element_by_id("new-backend-token")
+        token_input.send_keys(context.credentials['DIGITALOCEAN']['token'])
 
 
 @when(u'I rename the backend to "{new_name}"')
 def rename_backend(context, new_name):
-    popup = context.browser.find_element_by_id("edit-backend-popup")
+    popup = context.browser.find_element_by_id("backend-edit")
     textfield = popup.find_element_by_class_name("ui-input-text").find_element_by_tag_name("input")
     for i in range(20):
         textfield.send_keys(u'\ue003')
 
     for letter in new_name:
         textfield.send_keys(letter)
-        sleep(1)
+        sleep(0.7)
 
 
 @then(u'the "{backend}" backend should be added within {seconds} seconds')

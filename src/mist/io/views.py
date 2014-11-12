@@ -70,6 +70,13 @@ def exception_handler_mist(exc, request):
     return Response(str(exc), exc.http_code)
 
 
+@view_config(context='pyramid.httpexceptions.HTTPNotFound',
+             renderer='templates/404.pt')
+def not_found(self, request):
+    request.response.status = 404
+    return {}
+
+
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
 def home(request):
@@ -184,6 +191,7 @@ def add_backend(request):
     machine_hostname = params.get('machine_ip', '')
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
+    remove_on_error = params.get('remove_on_error', True)
     try:
         docker_port = int(params.get('docker_port', 4243))
     except:
@@ -203,7 +211,8 @@ def add_backend(request):
         machine_hostname=machine_hostname, machine_key=machine_key,
         machine_user=machine_user, region=region,
         compute_endpoint=compute_endpoint, port=ssh_port,
-        docker_port=docker_port
+        docker_port=docker_port,
+        remove_on_error=remove_on_error,
     )
     backend = user.backends[backend_id]
     return {
@@ -445,6 +454,9 @@ def create_machine(request):
         image_name = request.json_body.get('image_name', None)
         size_name = request.json_body.get('size_name', None)
         location_name = request.json_body.get('location_name', None)
+        ips = request.json_body.get('ips', None)
+        monitoring = request.json_body.get('monitoring', False)
+        networks = request.json_body.get('networks', [])
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -452,7 +464,7 @@ def create_machine(request):
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                  location_id, image_id, size_id, script,
                                  image_extra, disk, image_name, size_name,
-                                 location_name)
+                                 location_name, ips, monitoring, networks)
     return ret
 
 
@@ -464,7 +476,9 @@ def machine_actions(request):
     user = user_from_request(request)
     params = request.json_body
     action = params.get('action', '')
-    if action in ('start', 'stop', 'reboot', 'destroy'):
+    plan_id = params.get('plan_id', '')
+    #plan_id is the id of the plan to resize
+    if action in ('start', 'stop', 'reboot', 'destroy', 'resize'):
         if action == 'start':
             methods.start_machine(user, backend_id, machine_id)
         elif action == 'stop':
@@ -473,6 +487,8 @@ def machine_actions(request):
             methods.reboot_machine(user, backend_id, machine_id)
         elif action == 'destroy':
             methods.destroy_machine(user, backend_id, machine_id)
+        elif action == 'resize':
+            methods.resize_machine(user, backend_id, machine_id, plan_id)
         ## return OK
         return methods.list_machines(user, backend_id)
     raise BadRequestError()
@@ -559,6 +575,45 @@ def list_locations(request):
     return methods.list_locations(user, backend_id)
 
 
+@view_config(route_name='networks', request_method='GET', renderer='json')
+def list_networks(request):
+    """List networks from each backend."""
+    backend_id = request.matchdict['backend']
+    user = user_from_request(request)
+    return methods.list_networks(user, backend_id)
+
+
+@view_config(route_name='networks', request_method='POST', renderer='json')
+def create_network(request):
+    """
+    Creates a new network. Currently working only with OPENSTACK backend
+    """
+    backend_id = request.matchdict['backend']
+
+    try:
+        network = request.json_body.get('network')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    subnet = request.json_body.get('subnet', None)
+    user = user_from_request(request)
+    return methods.create_network(user, backend_id, network, subnet)
+
+
+@view_config(route_name='network', request_method='DELETE')
+def delete_network(request):
+    """
+    Deletes a network. Currently working only with OPENSTACK backend
+    """
+    backend_id = request.matchdict['backend']
+    network_id = request.matchdict['network']
+
+    user = user_from_request(request)
+    methods.delete_network(user, backend_id, network_id)
+
+    return OK
+
+
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """Probes a machine using ping and ssh to collect metrics.
@@ -633,25 +688,14 @@ def update_monitoring(request):
     no_ssh = bool(request.json_body.get('no_ssh', False))
     dry = bool(request.json_body.get('dry', False))
 
-    payload = {
-        'action': action,
-        'name': name,
-        'public_ips': ",".join(public_ips),
-        'dns_name': dns_name,
-        # tells core not to try to run ssh command to (un)deploy collectd
-        'no_ssh': True,
-        'dry': dry,
-    }
-
     if action == 'enable':
         ret_dict = methods.enable_monitoring(
             user, backend_id, machine_id, name, dns_name, public_ips,
             no_ssh=no_ssh, dry=dry
         )
     elif action == 'disable':
-        stdout = methods.disable_monitoring(user, backend_id, machine_id,
-                                            no_ssh=no_ssh)
-        ret_dict = {'cmd_output': stdout}
+        methods.disable_monitoring(user, backend_id, machine_id, no_ssh=no_ssh)
+        ret_dict = {}
     else:
         raise BadRequestError()
 
@@ -660,14 +704,17 @@ def update_monitoring(request):
 
 @view_config(route_name='stats', request_method='GET', renderer='json')
 def get_stats(request):
-    return methods.get_stats(
+    data = methods.get_stats(
         user_from_request(request),
         request.matchdict['backend'],
         request.matchdict['machine'],
         request.params.get('start'),
         request.params.get('stop'),
-        request.params.get('step')
+        request.params.get('step'),
+        request.params.get('metrics')
     )
+    data['request_id'] = request.params.get('request_id')
+    return data
 
 
 @view_config(route_name='metrics', request_method='GET',

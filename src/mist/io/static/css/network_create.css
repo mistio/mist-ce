@@ -1,0 +1,37 @@
+/* Network Create View CSS
+------------------------------------------------------------------------------*/
+
+#network-create-subnet-form {
+    padding: 11px 9px 2px;
+    background-color: #E7E7E7;
+    margin: 0px 2px 2px;
+    border-radius: 5px;
+}
+
+#network-create textarea {
+    height: 75px !important;
+}
+
+#network-create-name-wrapper,
+#network-create-admin-state-wrapper,
+#network-create-subnet-wrapper,
+#network-create-subnet-form,
+#network-create-subnet-address-wrapper,
+#network-create-subnet-other-wrapper {
+    display: none;
+}
+
+#network-create .ui-content > div,
+#network-create-subnet-form > div,
+#network-create-subnet-other-wrapper > div {
+    padding-bottom: 15px;
+}
+
+#network-create .ajax-loader {
+	margin-top: -15px;
+	margin-bottom: 5px;
+}
+
+#network-create-subnet-wrapper > .ui-checkbox > label {
+	margin-bottom: -10px;
+}

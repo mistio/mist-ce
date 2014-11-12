@@ -12,7 +12,7 @@
     <link rel="stylesheet" type='text/css' href="resources/main.css"
           tal:condition="not:css_build"/>
 
-    <link rel="stylesheet" href="resources/mist-1407168873.css"
+    <link rel="stylesheet" href="resources/mist-1415282901.css"
           tal:condition="css_build" />
 
     <script tal:content="string: var IS_CORE=${is_core}" />
@@ -32,7 +32,7 @@
                 baseUrl: 'resources/js/',
                 paths: {
                     //the optimized mist.js source file.
-                    "app": "../build/mist-1407168873"
+                    "app": "../build/mist-1415282901"
                 }
             });
             require(["app"]);
@@ -93,6 +93,12 @@
     <script type="text/x-handlebars" data-template-name="images">
         {{view Mist.imageListView}}
     </script>
+    <script type="text/x-handlebars" data-template-name="networks">
+        {{view Mist.networkListView}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="network">
+        {{view Mist.networkView}}
+    </script>
     <script type="text/x-handlebars" data-template-name="machine">
         {{view Mist.machineView}}
     </script>
@@ -101,6 +107,9 @@
     </script>
     <script type="text/x-handlebars" data-template-name="key">
         {{view Mist.keyView}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="missing">
+        {{view Mist.missingView}}
     </script>
 
 </body>

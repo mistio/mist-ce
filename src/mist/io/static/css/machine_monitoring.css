@@ -1,11 +1,9 @@
 .graph {
     margin-top: 6px;
     margin-bottom: 20px;
-    border: 1px solid #ccc;
 }
 
 #GraphsArea .valuePopUp{
-    position:fixed;
     z-index: 1;
     display: none;
     left:0;
@@ -65,35 +63,9 @@
     padding: 5px 10px 0px;
 }
 
-.graphBtn {
-    display: inline-block;
-    width: 150px;
-}
-
-.graphZoomer {
-    float: right;
-}
-
-.graphMover {
-    display: inline-block;
-}
-
-/* Conditional for < 600px */
-@media only screen and  (max-width: 400px) {
-    .graphBtn {
-        width: 45%;
-        display: inline-block;
-    }
-    .graphBtn .ui-btn {
-        font-size: 0.7em;
-    }
-}
-
 .graph > .header{
     position: relative;
-    background: linear-gradient(to bottom,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
     height: 30px;
-    box-shadow: 0px 2px 2px #888888;
 }
 
 .graph > .header > .title {
@@ -122,7 +94,7 @@
 }
 
 .graph > .header > .closeBtn:hover{
-    background: linear-gradient(to bottom,  rgba(224,224,224,1) 0%,rgba(206,206,206,1) 100%); /* W3C */
+    background: transparent;
 }
 
 
@@ -135,7 +107,6 @@
     border: 0;
     border-radius: 0;
 
-    border-left: 1px solid #ccc;
 
     right: 60px;
     bottom: 0px;
@@ -159,28 +130,19 @@
 }
 
 .graph svg {
-    background-color: white;
     font: 10px Arial;
     font-weight: bold;
     color : #363636;
+    overflow: hidden;
+    margin-left: -15px;
 }
 
-.graph .hideAnimeLine{
-    /* Must be same color as svg bg */
-    fill: white;
+.graph .hideAnimeLine,
+.graph svg {
+    background-color: #F9F9F9;
+    fill: #F9F9F9;
 }
 
-.graph .valueArea {
-    fill: #6CE0BA;
-    stroke-width: 0;
-    opacity: 0.25;
-}
-
-.graph .valueLine {
-    stroke: #6CE0BA;
-    stroke-width: 3;
-    fill: none;
-}
     /*, .x-axis line*/
 .graph .x-axis path, .graph .y-axis path {
     fill: none;
@@ -203,11 +165,12 @@
     stroke-width: 1;
 }
 
-.area{
+.area {
     width: 500px;
     height: 200px;
     background-color: #eee;
 }
+
 
 /*
 path {
@@ -224,3 +187,41 @@ circle.mark{
     fill: #fff;
 }
 */
+
+#machine-monitoring #machine-monitoring-disabled {
+    background: #e0e0e1;
+    border-radius: 0 0 5px 5px;
+    padding: 30px 10px 30px 10px;
+}
+
+#machine-monitoring #machine-monitoring-disabled .ajax-loader {
+    margin-top: 15px;
+    margin-bottom: -10px;
+}
+
+#machine-monitoring #enable-monitoring-label{
+    text-align: center;
+}
+
+#machine-monitoring #enable-monitoring-btn {
+    width: 165px;
+    margin: 20px auto auto auto;
+}
+
+#graphs-wrapper.hidden {
+    display: none;
+}
+
+.command-container {
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    overflow-x: auto;
+    border: 1px solid #AAA;
+    font-family: monospace;
+    border-radius: 4px;
+    text-shadow: none;
+    background: #444;
+    font-size: 11px;
+    color: #efeff1;
+    padding: 6px;
+}

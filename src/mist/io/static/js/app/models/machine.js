@@ -41,6 +41,16 @@ define('app/models/machine', ['ember'],
             loadavg5: null,
             loadavg15: null,
 
+            installationStatus: Ember.Object.create({
+                activated_at: null,
+                error_msg: null,
+                finished_at: null,
+                manual: null,
+                started_at: null,
+                state: null,
+                stdout: null,
+            }),
+
 
             /**
              *  Computed Properties
@@ -136,6 +146,8 @@ define('app/models/machine', ['ember'],
 
 
             equals: function (machine) {
+                if (typeof machine == 'string')
+                    return machine == this.id;
                 if (machine instanceof Array)
                     if (machine[1] == this.id &&
                         machine[0] == this.backend.id)

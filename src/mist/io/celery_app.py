@@ -3,8 +3,10 @@ from __future__ import absolute_import
 
 from celery import Celery
 
+TASKS = ['mist.io.tasks']
 try:
     from mist.core import config
+    TASKS.append('mist.core.tasks')
 except ImportError:
     from mist.io import config
 
@@ -28,7 +30,7 @@ app = Celery(
     'tasks',
     # backend=settings.get('CELERY_BACKEND', 'amqp://guest:guest@127.0.0.1//'),
     broker=settings.get('CELERY_BROKER', 'amqp://guest:guest@127.0.0.1//'),
-    include=['mist.io.tasks'],
+    include=TASKS,
 )
 
 app.conf.update(

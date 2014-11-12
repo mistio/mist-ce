@@ -7,6 +7,9 @@
 #add-backend-panel #baremetal-bundle {
     display: none;
 }
+#add-backend-panel #azure-bundle {
+    display: none;
+}
 #add-backend-panel label {
     margin-top: 10px;
 }
@@ -42,3 +45,8 @@
 #add-backend-panel #hpcloud-bundle {
     display: none;
 }
+
+#add-backend-panel #tokenonly-bundle {
+    display: none;
+}
+

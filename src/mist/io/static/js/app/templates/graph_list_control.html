@@ -1,0 +1,74 @@
+<div id="graph-list-control">
+
+    <div id="time-window-control">
+        <select data-inline="true" data-shadow="false"
+            {{action "timeWindowChanged" on="change" target="view.actionProxy"}}>
+                <option value="minutes" selected='true'>10min</option>
+                <option value="hour">1h</option>
+                <option value="day">1d</option>
+                <option value="week">1w</option>
+                <option value="month">1mo</option>
+        </select>
+    </div>
+
+    <div id="history-control" class="ui-grid-b">
+
+        <!--
+            Back Button
+        -->
+
+        <div class="ui-block-a">
+            <a id="history-control-back"
+                class="time
+                    ui-btn
+                    ui-corner-all
+                    ui-btn-inline
+                    ui-btn-icon-notext
+                    ui-icon-arrow-l"
+                {{action "backClicked" target="view.actionProxy"}}>
+            </a>
+        </div>
+
+        <!--
+            Stream Toggle
+        -->
+
+        <div class="ui-block-b">
+            {{#if Mist.graphsController.stream.isStreaming}}
+                <a id="history-control-stream"
+                    class="ui-btn
+                        ui-btn-b
+                        ui-corner-all
+                        ui-btn-inline"
+                    {{action "pauseClicked" target="view.actionProxy"}}>
+                        Pause
+                </a>
+            {{else}}
+                <a id="history-control-stream"
+                    class="ui-btn
+                        ui-btn-b
+                        ui-corner-all
+                        ui-btn-inline"
+                    {{action "resetClicked" target="view.actionProxy"}}>
+                        Reset
+                </a>
+            {{/if}}
+        </div>
+
+        <!--
+            Forward Button
+        -->
+
+        <div class="ui-block-c">
+            <a id="history-control-forward"
+                class="time
+                    ui-btn
+                    ui-corner-all
+                    ui-btn-inline
+                    ui-btn-icon-notext
+                    ui-icon-arrow-r"
+                {{action "forwardClicked" target="view.actionProxy"}}>
+            </a>
+        </div>
+    </div>
+</div>

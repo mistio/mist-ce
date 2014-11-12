@@ -76,7 +76,7 @@ class ShellNamespace(BaseNamespace):
         finally:
             self.channel.close()
 
-    def disconnect(silent=False):
+    def disconnect(self, silent=False):
         if multi_user:
             # reload the session, to avoid saving a stale or deleted session
             self.request.environ['beaker.session'].load()
@@ -121,19 +121,20 @@ class MistNamespace(BaseNamespace):
         self.keys_greenlet = self.spawn_later(2, list_keys_from_socket, self)
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
 
-    def on_stats(self, backend_id, machine_id, start, stop, step, requestID):
+    def on_stats(self, backend_id, machine_id, start, stop, step, request_id, metrics):
         try:
             data = get_stats(self.user, backend_id, machine_id,
-                             start - 50, stop + 50, step / 1000)
+                             start, stop, step)
         except Exception as exc:
             amqp_log("Error getting stats: %r" % exc)
             return
+
         ret = {
             'backend_id': backend_id,
             'machine_id': machine_id,
             'start': start,
             'stop': stop,
-            'requestID': requestID,
+            'request_id': request_id,
             'metrics': data,
         }
         self.emit('stats', ret)
@@ -142,7 +143,7 @@ class MistNamespace(BaseNamespace):
         routing_key = msg.delivery_info.get('routing_key')
         log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
-                               'list_machines', 'list_locations', 'ping']):
+                               'list_networks', 'list_machines', 'list_locations', 'ping']):
             self.emit(routing_key, msg.body)
             if routing_key == 'probe':
                 log.warn('send probe')
@@ -200,7 +201,7 @@ class MistNamespace(BaseNamespace):
                 self.monitoring_greenlet = self.spawn(check_monitoring_from_socket,
                                                       self)
 
-    def disconnect(silent=False):
+    def disconnect(self, silent=False):
         if multi_user:
             # reload the session, to avoid saving a stale or deleted session
             self.request.environ['beaker.session'].load()
@@ -240,7 +241,8 @@ def list_backends_from_socket(namespace):
     for key, task in (('list_machines', tasks.ListMachines()),
                       ('list_images', tasks.ListImages()),
                       ('list_sizes', tasks.ListSizes()),
-                      ('list_locations', tasks.ListLocations())):
+                      ('list_networks', tasks.ListNetworks()),
+                      ('list_locations', tasks.ListLocations()),):
         for backend_id in user.backends:
             if user.backends[backend_id].enabled:
                 cached = task.smart_delay(user.email, backend_id)

@@ -41,6 +41,8 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
             clear: function () {
 
                 $('#gce-bundle').hide();
+                $('#azure-bundle').hide();
+                $('#tokenonly-bundle').hide();
                 $('#non-hp-cloud').hide();
                 $('#docker-bundle').hide();
                 $('#baremetal-bundle').hide();
@@ -74,24 +76,34 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     $('#new-backend-provider').collapsible('collapse');
                     $('#opentack-advanced-wrapper').hide();
                     $('#openstack-bundle').hide();
+                    $('#tokenonly-bundle').hide();
                     $('#baremetal-bundle').hide();
                     $('#docker-bundle').hide();
                     $('#hpcloud-bundle').hide();
                     $('#non-hp-cloud').hide();
 
-                    if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('softlayer') > -1 || provider.provider.indexOf('linode') > -1) {
+                    if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('softlayer') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'API Key');
                     } else if (provider.provider.indexOf('nephoscale') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');
                     } else if (provider.provider.indexOf('digitalocean') > -1) {
-                        this.set('firstFieldLabel', 'Client ID');
+                        this.set('secondFieldLabel', 'Token');
+                        $('#common-bundle').hide();
+                        $('#tokenonly-bundle').show();
+                    } else if (provider.provider.indexOf('linode') > -1) {
                         this.set('secondFieldLabel', 'API Key');
+                        $('#common-bundle').hide();
+                        $('#tokenonly-bundle').show();
                     } else if (provider.provider.indexOf('gce') > -1) {
                         this.set('firstFieldLabel', 'Email address');
                         this.set('secondFieldLabel', '');
                         $('#gce-bundle').show();
+                    } else if (provider.provider.indexOf('azure') > -1) {
+                        this.set('firstFieldLabel', 'Subscription ID');
+                        this.set('secondFieldLabel', '');
+                        $('#azure-bundle').show();
                     } else if (provider.provider.indexOf('docker') > -1) {
                         this.set('firstFieldLabel', 'BasicAuth User (optional)');
                         this.set('secondFieldLabel', 'BasicAuth Password (optional)');
@@ -162,6 +174,15 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                 },
 
 
+                addCertificateClicked: function () {
+                    Mist.fileUploadController.open('Upload certificate', 'Certificate',
+                        function (uploadedFile) {
+                            Mist.backendAddController.set('newBackendSecondField',
+                                uploadedFile);
+                        }
+                    );
+                },
+
                 createKeyClicked: function() {
                     Mist.keyAddController.open( function (success, key) {
                         if (success) {
@@ -207,3 +228,4 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
         });
     }
 );
+

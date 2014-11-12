@@ -19,6 +19,8 @@ define('app/controllers/rule_edit', ['ember'],
 
 
             rule: null,
+            metrics: null,
+            property: null,
             callback: null,
 
 
@@ -29,33 +31,36 @@ define('app/controllers/rule_edit', ['ember'],
             //
 
 
-            open: function (rule, option, callback) {
+            open: function (rule, property, callback) {
                 this.clear();
                 this.set('rule', rule)
+                    .set('property', property)
                     .set('callback', callback);
-                this.view.open(option);
+                this.view.open(property);
+            },
+
+
+            close: function () {
+                this.view.close(this.property);
+                this.clear();
             },
 
 
             clear: function () {
                 this.set('rule', null)
+                    .set('property', null)
                     .set('callback', null);
             },
 
 
-            //
-            //
-            //  Pseudo-Private Methods
-            //
-            //
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
+            edit: function (keyValuePairs) {
+                Mist.rulesController.editRule({
+                    rule      : this.rule,
+                    callback  : this.callback,
+                    properties: keyValuePairs,
+                });
+                this.close();
+            }
         });
     }
 );

@@ -12,10 +12,12 @@
 @import url("css/images.css");
 @import url("css/machine.css");
 @import url("css/key_add.css");
+@import url("css/missing.css");
+@import url("css/network.css");
 @import url("css/key_list.css");
 @import url("css/providers.css");
 @import url("css/metric_add.css");
-@import url("css/monitoring.css");
+@import url("css/machine_monitoring.css");
 @import url("css/file_upload.css");
 @import url("css/backend_add.css");
 @import url("css/machine_add.css");
@@ -23,9 +25,12 @@
 @import url("css/backend_edit.css");
 @import url("css/machine_tags.css");
 @import url("css/machine_list.css");
+@import url("css/network_list.css");
+@import url("css/network_create.css");
 @import url("css/machine_power.css");
 @import url("css/machine_shell.css");
 @import url("css/backend_button.css");
+@import url("css/graph_list.css");
 @import url("css/metric_add_custom.css");
 
 
@@ -83,6 +88,12 @@
 body {
     background-color: #F9F9F9 !important;
 }
+.ui-page > .ui-content {
+    padding: .5% 1%;
+}
+#monitoring-collapsible .ui-collapsible-content {
+    padding: .5%
+}
 .ui-mobile, .ui-mobile body {
     height: 0 !important;
 }
@@ -115,6 +126,14 @@ body {
     width: 16px;
 }
 
+.ajax-loader.l {
+    background-image: url('images/ajax-loader.gif');
+    width: 135px;
+    height: 75px;
+    background-color: #9A9A9A;
+    border-radius: 5px;
+}
+
 
 /* Text fields
 -----------------------------------------------------------------------------------------------------------*/
@@ -132,16 +151,16 @@ textarea#private-key, #manual-monitoring-popup textarea {
 .ui-btn-icon-right {
     padding: .6em 2.5em .6em 1.1em !important;
 }
-.ok-cancel {
-    width: 100%;
-}
-.ok-cancel > .ui-controlgroup-controls {
-    width: 100%;
-}
 
 
 /* Popup
 -----------------------------------------------------------------------------------------------------------*/
+.ui-popup .ui-content {
+    padding: 12px 16px;
+}
+#dialog .ui-content{
+    text-align: center;
+}
 .tiny-popup {
     width: 150px !important;
 }
@@ -189,7 +208,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
      *  so this change can easily be undone or modified
      */
     width: 325px; /* Useless, but leave it there for reference reasons */
-    min-height: 300px;
+    min-height: 0;
 }
 .side-panel .ui-panel-inner {
     padding: 7px;
@@ -215,13 +234,16 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
-#machine-list-page .ui-filterable, #key-list-page .ui-filterable  {
+#machine-list-page .ui-filterable,
+#key-list-page .ui-filterable {
     margin: 10px 118px -44px 118px !important;
     position: relative;
     top: -49px;
 }
 
-#machine-list-page .ui-filterable input, #key-list-page .ui-filterable input {
+#machine-list-page .ui-filterable input,
+#key-list-page .ui-filterable input,
+#network-list-page .ui-filterable input {
     min-height:2.50em;
 }
 
@@ -353,9 +375,14 @@ ul.checkbox-list li label {
     display: inline;
 }
 .small-list-item p {
-    top: 5px;
+    top: -8px;
     position: relative;
     display: inline;
+}
+@-moz-document url-prefix() {
+    .small-list-item p {
+        top: 5px;
+    }
 }
 
 /*
@@ -363,7 +390,6 @@ ul.checkbox-list li label {
  */
 
 .mist-select .ui-collapsible-content {
-    padding-right: 30px;
     background: transparent !important;
 }
 .mist-select h2 {
@@ -372,6 +398,11 @@ ul.checkbox-list li label {
 }
 .mist-select ul {
     margin-top: 0px;
+}
+
+.mist-select .ui-collapsible-content {
+    margin: 0 3px !important;
+    padding-top: 0;
 }
 
 #message-box-popup {
@@ -410,12 +441,11 @@ ul.checkbox-list li label {
 }
 #confirmation-popup  .ok-cancel a,
 #confirmation-popup  .ok-cancel button {
-    width: 127px !important;
+    width: 126px !important;
 }
 
 .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
     border-right-width: 2px;
-    margin-left: -1px;
 }
 
 #confirmation-popup p {
@@ -479,13 +509,8 @@ ul.checkbox-list li label {
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
     padding: 15px;
-    background: #e0e0e1;
-    border-radius: inherit;
-    text-align: center;
 }
-.monitoring-dialog-container div {
-    margin-bottom: 5px;
-}
+
 .ui-collapsible-inset .ui-collapsible-content {
     padding-top: 0px;
     margin-top: -1px;
@@ -579,4 +604,44 @@ ul.checkbox-list li label {
     background: #396b9e /*{b-bup-background-color}*/linear-gradient( #5f9cc5 /*{d-bup-background-start}*/, #396b9e /*{d-bup-background-end}*/) /*{d-bup-background-color}*/ !important;
 }
 
+/* OK - Cancel
+------------------------------------------------------------------------------*/
+.ok-cancel {
+    width: 100%;
+    margin: 0;
+    padding-bottom: 0 !important;
+}
+.ok-cancel > .ui-controlgroup-controls {
+    width: 100%;
+}
 
+/* Info table
+------------------------------------------------------------------------------*/
+.info-table {
+    width: 100%;
+}
+.info-table td {
+    margin: 0;
+    width: 50%;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #CFCFCF;
+}
+.info-table tr td:nth-child(2) {
+    font-weight: bold;
+}
+.info-table tr {
+    background-color: #F7F7F7;
+}
+.info-table .ip {
+    display: inline-block;
+}
+.info-table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+}
+
+.info-table tr {
+    border: 1px solid #ccc;
+}

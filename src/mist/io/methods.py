@@ -1,4 +1,7 @@
+import os
+import shutil
 import random
+import tempfile
 import json
 import requests
 import subprocess
@@ -7,6 +10,7 @@ from time import sleep, time
 from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
+from tempfile import NamedTemporaryFile
 
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -16,6 +20,12 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
+
+import ansible.playbook
+import ansible.utils.template
+import ansible.callbacks
+import ansible.utils
+import ansible.constants
 
 try:
     from mist.core import config, model
@@ -34,8 +44,11 @@ from mist.io.exceptions import *
 
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish_user
-from mist.io.tasks import run_deploy_script
-from mist.io.tasks import ssh_command as async_ssh_command
+from mist.io.helpers import StdStreamCapture
+
+import mist.io.tasks
+import mist.io.inventory
+
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -57,12 +70,12 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
                 compute_endpoint="", port=22, docker_port=4243, remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
-
     if not provider:
         raise RequiredParameterMissingError("provider")
     log.info("Adding new backend in provider '%s'", provider)
 
     baremetal = provider == 'bare_metal'
+
     if provider == 'bare_metal':
         if not machine_hostname:
             raise RequiredParameterMissingError('machine_hostname')
@@ -117,9 +130,10 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if not provider.__class__ is int and ':' in provider:
             provider, region = provider.split(':')[0], provider.split(':')[1]
 
+        #docker url is the only piece needed in docker
         if remove_on_error and provider != 'docker':
-            #docker url is the only piece needed in docker
-            if not apikey:
+            #a few providers need only the apisecret
+            if not apikey and provider not in ['digitalocean', 'linode']:
                 raise RequiredParameterMissingError("apikey")
             if not apisecret:
                 raise RequiredParameterMissingError("apisecret")
@@ -134,7 +148,15 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.region = region
         if provider == 'docker':
             backend.docker_port = docker_port
+        #For digital ocean v2 of the API, only apisecret is needed.
+        #However, in v1 both api_key and api_secret are needed. In order
+        #for both versions to be supported (existing v1, and new v2 which
+        #is now the default) we set api_key same to api_secret to
+        #distinguish digitalocean v2 logins, to avoid adding another
+        #arguement on digital ocean libcloud driver
 
+        if provider == 'digitalocean':
+            backend.apikey = backend.apisecret
         #OpenStack specific: compute_endpoint is passed only when there is a
         # custom endpoint for the compute/nova-compute service
         backend.compute_endpoint = compute_endpoint
@@ -144,10 +166,10 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         #so https://192.168.1.101:5000 will work but https://192.168.1.101:5000/ won't!
         if backend.provider == 'openstack':
             #Strip the v2.0 or v2.0/ at the end of the url if they are there
-            if backend.apiurl.endswith('v2.0/'):
-                backend.apiurl = backend.apiurl.strip('v2.0/')
-            elif backend.apiurl.endswith('v2.0'):
-                backend.apiurl = backend.apiurl.strip('v2.0')
+            if backend.apiurl.endswith('/v2.0/'):
+                backend.apiurl = backend.apiurl.split('/v2.0/')[0]
+            elif backend.apiurl.endswith('/v2.0'):
+                backend.apiurl = backend.apiurl.split('/v2.0')[0]
 
             backend.apiurl = backend.apiurl.rstrip('/')
 
@@ -496,7 +518,14 @@ def connect_provider(backend):
     """
     if backend.provider != 'bare_metal':
         driver = get_driver(backend.provider)
-    if backend.provider == Provider.OPENSTACK:
+    if backend.provider == Provider.AZURE:
+        #create a temp file and output the cert there, so that
+        #Azure driver is instantiated by providing a string with the key instead of
+        #a cert file
+        temp_key_file = NamedTemporaryFile(delete=False)
+        temp_key_file.write(backend.apisecret)
+        conn = driver(backend.apikey, temp_key_file.name)
+    elif backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
         #as separate provider
         if 'hpcloudsvc' in backend.apiurl:
@@ -532,10 +561,14 @@ def connect_provider(backend):
                               Provider.RACKSPACE]:
         conn = driver(backend.apikey, backend.apisecret,
                       region=backend.region)
-    elif backend.provider in [Provider.NEPHOSCALE,
-                              Provider.DIGITAL_OCEAN,
-                              Provider.SOFTLAYER]:
+    elif backend.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(backend.apikey, backend.apisecret)
+    elif backend.provider == Provider.DIGITAL_OCEAN:
+        if backend.apikey == backend.apisecret:  # API v2
+            conn = driver(backend.apisecret)
+        else:   # API v1
+            driver = get_driver('digitalocean_first_gen')
+            conn = driver(backend.apikey, backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
     else:
@@ -566,7 +599,7 @@ def get_machine_actions(machine_from_api, conn):
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN, Provider.DOCKER):
+                     Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE):
         can_tag = False
 
     # for other states
@@ -592,6 +625,11 @@ def get_machine_actions(machine_from_api, conn):
         can_stop = False
         can_reboot = True
         can_tag = False
+
+    if conn.type in [Provider.LINODE]:
+        if machine_from_api.state is NodeState.PENDING:
+        #after resize, node gets to pending mode, needs to be started
+            can_start = True
 
     if conn.type is Provider.GCE:
         can_start = False
@@ -665,7 +703,7 @@ def list_machines(user, backend_id):
 @core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
-                   size_name, location_name, ssh_port=22):
+                   size_name, location_name, ips, monitoring, networks=[], ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -687,7 +725,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     through mist.io and those from the Linode interface.
 
     """
-
     log.info('Creating machine %s on backend %s' % (machine_name, backend_id))
 
     if backend_id not in user.backends:
@@ -714,7 +751,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
-
     if conn.type is Provider.DOCKER:
         node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
         if key_id and key_id in user.keypairs:
@@ -725,14 +761,14 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 pass
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
-        node = _create_machine_rackspace(conn, public_key, script, machine_name,
-                                        image, size, location)
+        node = _create_machine_rackspace(conn, public_key, machine_name, image,
+                                         size, location)
     elif conn.type in [Provider.OPENSTACK]:
-        node = _create_machine_openstack(conn, private_key, public_key, script, machine_name,
-                                        image, size, location)
+        node = _create_machine_openstack(conn, private_key, public_key,
+                                         machine_name, image, size, location, networks)
     elif conn.type is Provider.HPCLOUD:
-        node = _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
-                                        image, size, location)
+        node = _create_machine_hpcloud(conn, private_key, public_key,
+                                       machine_name, image, size, location)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
         for loc in locations:
@@ -740,11 +776,11 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 location = loc
                 break
         node = _create_machine_ec2(conn, key_id, private_key, public_key,
-                                  script, machine_name, image, size, location)
+                                   machine_name, image, size, location)
     elif conn.type is Provider.NEPHOSCALE:
         node = _create_machine_nephoscale(conn, key_id, private_key, public_key,
-                                         script, machine_name, image, size,
-                                         location)
+                                          machine_name, image, size,
+                                          location, ips)
     elif conn.type is Provider.GCE:
         sizes = conn.list_sizes(location=location_name)
         for size in sizes:
@@ -752,28 +788,43 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 size = size
                 break
         node = _create_machine_gce(conn, key_id, private_key, public_key,
-                                         script, machine_name, image, size,
-                                         location)
+                                         machine_name, image, size, location)
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
-                                        script, machine_name, image, size,
-                                        location)
+                                         machine_name, image, size,
+                                         location)
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(conn, key_id, private_key,
-                                            public_key, script, machine_name,
-                                            image, size, location)
+                                             public_key, machine_name,
+                                             image, size, location)
+    elif conn.type == Provider.AZURE:
+        node = _create_machine_azure(conn, key_id, private_key,
+                                             public_key, machine_name,
+                                             image, size, location, cloud_service_name=None)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
-                                     script, machine_name, image, size,
-                                     location)
+                                      machine_name, image, size,
+                                      location)
     else:
         raise BadRequestError("Provider unknown.")
 
-    associate_key(user, key_id, backend_id, node.id, port=ssh_port)
+    if conn.type == Provider.AZURE:
+        #we have the username
+        associate_key(user, key_id, backend_id, node.id,
+                      username=node.extra.get('username'), port=ssh_port)
+    else:
+        associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
-    if script:
-        from mist.io.tasks import run_deploy_script
-        run_deploy_script.delay(user.email, backend_id, node.id, script, key_id)
+    if conn.type == Provider.AZURE:
+        #for Azure, connect with the generated password, deploy the ssh key
+        #when this is ok, it calss post_deploy for script/monitoring
+        mist.io.tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
+                                      monitoring, script, key_id,
+                                      node.extra.get('username'), node.extra.get('password'), public_key)
+    else:
+        if script or monitoring:
+            mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
+                                      monitoring, script, key_id)
 
     return {'id': node.id,
             'name': node.name,
@@ -783,7 +834,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             }
 
 
-def _create_machine_rackspace(conn, public_key, script, machine_name,
+def _create_machine_rackspace(conn, public_key, machine_name,
                              image, size, location):
     """Create a machine in Rackspace.
 
@@ -792,9 +843,6 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
 
     """
 
-    key = SSHKeyDeployment(str(public_key))
-    deploy_script = ScriptDeployment(script)
-    msd = MultiStepDeployment([key, deploy_script])
     key = str(public_key).replace('\n','')
 
     try:
@@ -820,17 +868,14 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
         raise MachineCreationError("Rackspace, got exception %r" % e)
 
 
-def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
-                             image, size, location):
+def _create_machine_openstack(conn, private_key, public_key, machine_name,
+                             image, size, location, networks):
     """Create a machine in Openstack.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
 
     """
-    key = SSHKeyDeployment(str(public_key))
-    deploy_script = ScriptDeployment(script)
-    msd = MultiStepDeployment([key, deploy_script])
     key = str(public_key).replace('\n','')
 
     try:
@@ -847,21 +892,34 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
         server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
         server_key = server_key.name
 
+    # select the right OpenStack network object
+    available_networks = conn.ex_list_networks()
+    try:
+        chosen_networks = []
+        for net in available_networks:
+            if net.id in networks:
+                chosen_networks.append(net)
+    except:
+        chosen_networks = []
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
-            node = conn.create_node(name=machine_name,
+            node = conn.create_node(
+                name=machine_name,
                 image=image,
                 size=size,
                 location=location,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
-                ex_keyname=server_key)
+                ex_keyname=server_key,
+                networks=chosen_networks)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
 
-def _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
+
+def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
                              image, size, location):
     """Create a machine in HP Cloud.
 
@@ -869,9 +927,6 @@ def _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
     sanitized by create_machine.
 
     """
-    key = SSHKeyDeployment(str(public_key))
-    deploy_script = ScriptDeployment(script)
-    msd = MultiStepDeployment([key, deploy_script])
     key = str(public_key).replace('\n','')
 
     try:
@@ -906,7 +961,7 @@ def _create_machine_hpcloud(conn, private_key, public_key, script, machine_name,
     return node
 
 
-def _create_machine_ec2(conn, key_name, private_key, public_key, script,
+def _create_machine_ec2(conn, key_name, private_key, public_key,
                        machine_name, image, size, location):
     """Create a machine in Amazon EC2.
 
@@ -960,15 +1015,14 @@ def _create_machine_ec2(conn, key_name, private_key, public_key, script,
     return node
 
 
-def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
-                              machine_name, image, size, location):
+def _create_machine_nephoscale(conn, key_name, private_key, public_key,
+                              machine_name, image, size, location, ips):
     """Create a machine in Nephoscale.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
 
     """
-
     machine_name = machine_name[:64].replace(' ', '-')
     # name in NephoScale must start with a letter, can contain mixed
     # alpha-numeric characters, hyphen ('-') and underscore ('_')
@@ -979,7 +1033,6 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
     # characters and the hyphen ('-') character, cannot exceed 15 characters,
     # and can end with a letter or a number.
     key = public_key.replace('\n', '')
-    deploy_script = ScriptDeployment(script)
 
     # NephoScale has 2 keys that need be specified, console and ssh key
     # get the id of the ssh key if it exists, otherwise add the key
@@ -1009,6 +1062,10 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
         console_keys = conn.ex_list_keypairs(key_group=4)
         if console_keys:
             console_key = console_keys[0].id
+    if size.name and size.name.startswith('D'):
+        baremetal=True
+    else:
+        baremetal=False
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1021,16 +1078,15 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                 server_key=server_key,
                 console_key=console_key,
                 ssh_key=tmp_key_path,
-                connect_attempts=20,
-                ex_wait=True,
-                deploy=deploy_script
+                baremetal=baremetal,
+                ips=ips
             )
         except Exception as e:
             raise MachineCreationError("Nephoscale, got exception %s" % e)
         return node
 
 
-def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
+def _create_machine_softlayer(conn, key_name, private_key, public_key,
                              machine_name, image, size, location):
     """Create a machine in Softlayer.
 
@@ -1098,21 +1154,39 @@ def _create_machine_docker(conn, machine_name, image, script, public_key=None):
     return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
-                                 script, machine_name, image, size, location):
+                                  machine_name, image, size, location):
     """Create a machine in Digital Ocean.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
 
     """
-
     key = public_key.replace('\n', '')
-    deploy_script = ScriptDeployment(script)
 
+    #on API v1 list keys returns only ids, without actual public keys
+    #So the check fails. If there's already a key with the same pub key,
+    #create key call will fail!
     try:
-        key = conn.ex_create_ssh_key(machine_name, key)
+        server_key = ''
+        keys = conn.ex_list_ssh_keys()
+        for k in keys:
+            if key == k.pub_key:
+                server_key = k
+                break
+        if not server_key:
+            server_key = conn.ex_create_ssh_key(machine_name, key)
     except:
-        key = conn.ex_create_ssh_key('mist.io', key)
+        try:
+            server_key = conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
+        except:
+            #on API v1 if we can't create that key, means that key is already
+            #on our account. Since we don't know the id, we pass all the ids
+            server_keys = [str(key.id) for key in keys]
+
+    if not server_key:
+        ex_ssh_key_ids = server_keys
+    else:
+        ex_ssh_key_ids = [str(server_key.id)]
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1120,7 +1194,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 name=machine_name,
                 image=image,
                 size=size,
-                ex_ssh_key_ids=[str(key.id)],
+                ex_ssh_key_ids=ex_ssh_key_ids,
                 location=location,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['root']*5,
@@ -1136,8 +1210,32 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         return node
 
 
-def _create_machine_gce(conn, key_name, private_key, public_key,
-                                 script, machine_name, image, size, location):
+def _create_machine_azure(conn, key_name, private_key, public_key,
+                                  machine_name, image, size, location, cloud_service_name):
+    """Create a machine Azure.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.create_node(
+                name=machine_name,
+                size=size,
+                image=image,
+                location=location,
+                ex_cloud_service_name=cloud_service_name
+            )
+        except Exception as e:
+            raise MachineCreationError("Azure, got exception %s" % e)
+
+        return node
+
+
+def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
+                        image, size, location):
     """Create a machine in GCE.
 
     Here there is no checking done, all parameters are expected to be
@@ -1146,9 +1244,9 @@ def _create_machine_gce(conn, key_name, private_key, public_key,
     """
     key = public_key.replace('\n', '')
 
-    metadata = {'startup-script': script,
+    metadata = {#'startup-script': script,
                 'sshKeys': 'user:%s' % key}
-    #metadata for ssh user, ssh key and script to deploy 
+    #metadata for ssh user, ssh key and script to deploy
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1164,7 +1262,7 @@ def _create_machine_gce(conn, key_name, private_key, public_key,
     return node
 
 
-def _create_machine_linode(conn, key_name, private_key, public_key, script,
+def _create_machine_linode(conn, key_name, private_key, public_key,
                           machine_name, image, size, location):
     """Create a machine in Linode.
 
@@ -1174,7 +1272,6 @@ def _create_machine_linode(conn, key_name, private_key, public_key, script,
     """
 
     auth = NodeAuthSSHKey(public_key)
-    deploy_script = ScriptDeployment(script)
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1191,13 +1288,13 @@ def _create_machine_linode(conn, key_name, private_key, public_key, script,
     return node
 
 
-def _machine_action(user, backend_id, machine_id, action):
-    """Start, stop, reboot and destroy have the same logic underneath, the only
+def _machine_action(user, backend_id, machine_id, action, plan_id=None):
+    """Start, stop, reboot, resize and destroy have the same logic underneath, the only
     thing that changes is the action. This helper function saves us some code.
 
     """
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize')
 
-    actions = ('start', 'stop', 'reboot', 'destroy')
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
                                                                    actions))
@@ -1210,11 +1307,25 @@ def _machine_action(user, backend_id, machine_id, action):
         bare_metal = True
     conn = connect_provider(user.backends[backend_id])
     #GCE needs machine.extra as well, so we need the real machine object
+    machine = None
     try:
-        for node in conn.list_nodes():
-            if node.id == machine_id:
-                machine = node
-                break
+        if conn.type == 'azure':
+            #Azure needs the cloud service specified as well as the node
+            cloud_service = conn.get_cloud_service_from_node_id(machine_id)
+            nodes = conn.list_nodes(ex_cloud_service_name=cloud_service)
+            for node in nodes:
+                if node.id == machine_id:
+                    machine = node
+                    break
+        else:
+            for node in conn.list_nodes():
+                if node.id == machine_id:
+                    machine = node
+                    break
+        if machine is None:
+            #did not find the machine_id on the list of nodes, still do not fail
+            raise MachineUnavailableError("Error while attempting to %s machine"
+                                  % action)
     except:
         machine = Node(machine_id,
                    name=machine_id,
@@ -1225,7 +1336,10 @@ def _machine_action(user, backend_id, machine_id, action):
     try:
         if action is 'start':
             # In liblcoud it is not possible to call this with machine.start()
-            conn.ex_start_node(machine)
+            if conn.type == 'azure':
+                conn.ex_start_node(machine, ex_cloud_service_name=cloud_service)
+            else:
+                conn.ex_start_node(machine)
 
             if conn.type is Provider.DOCKER:
                 node_info = conn.inspect_node(node)
@@ -1234,19 +1348,24 @@ def _machine_action(user, backend_id, machine_id, action):
                 except KeyError:
                     port = 22
 
-            with user.lock_n_load():
-                machine_uid = [backend_id, machine_id]
+                with user.lock_n_load():
+                    machine_uid = [backend_id, machine_id]
 
-                for keypair in user.keypairs:
-                    for machine in user.keypairs[keypair].machines:
-                        if machine[:2] == machine_uid:
-                            key_id = keypair
-                            machine[-1] = int(port)
-                user.save()
+                    for keypair in user.keypairs:
+                        for machine in user.keypairs[keypair].machines:
+                            if machine[:2] == machine_uid:
+                                key_id = keypair
+                                machine[-1] = int(port)
+                    user.save()
 
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
-            conn.ex_stop_node(machine)
+            if conn.type == 'azure':
+                conn.ex_stop_node(machine, ex_cloud_service_name=cloud_service)
+            else:
+                conn.ex_stop_node(machine)
+        elif action is 'resize':
+            conn.ex_resize_node(node, plan_id)
         elif action is 'reboot':
             if bare_metal:
                 try:
@@ -1257,7 +1376,10 @@ def _machine_action(user, backend_id, machine_id, action):
                 except:
                     return False
             else:
-                machine.reboot()
+                if conn.type == 'azure':
+                    conn.reboot_node(machine, ex_cloud_service_name=cloud_service)
+                else:
+                    machine.reboot()
                 if conn.type is Provider.DOCKER:
                     node_info = conn.inspect_node(node)
                     try:
@@ -1279,6 +1401,8 @@ def _machine_action(user, backend_id, machine_id, action):
             if conn.type is Provider.DOCKER and node.state == 0:
                 conn.ex_stop_node(node)
                 machine.destroy()
+            elif conn.type == 'azure':
+                conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
             else:
                 machine.destroy()
     except AttributeError:
@@ -1318,6 +1442,11 @@ def stop_machine(user, backend_id, machine_id):
 def reboot_machine(user, backend_id, machine_id):
     """Reboots a machine on a certain backend."""
     _machine_action(user, backend_id, machine_id, 'reboot')
+
+
+def resize_machine(user, backend_id, machine_id, plan_id):
+    """Resize a machine on an other plan."""
+    _machine_action(user, backend_id, machine_id, 'resize', plan_id=plan_id)
 
 
 @core_wrapper
@@ -1422,6 +1551,17 @@ def list_images(user, backend_id, term=None):
                     #eg ResourceNotFoundError
                     pass
             rest_images = [image for image in rest_images if not image.extra['deprecated']]
+        elif conn.type == Provider.AZURE:
+            # do not show Microsoft Windows images
+            # from Azure's response we can't know which images are default
+            rest_images = conn.list_images()
+            rest_images = [image for image in rest_images if 'windows' not in image.name.lower()
+                           and 'RightImage' not in image.name]
+            temp_dict = {}
+            for image in rest_images:
+                temp_dict[image.name] = image
+            #there are many builds for some images -eg Ubuntu). All have the same name!
+            rest_images = sorted(temp_dict.values(), key=lambda k: k.name)
         elif conn.type == Provider.DOCKER:
             #get mist.io default docker images from config
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
@@ -1497,6 +1637,9 @@ def star_image(user, backend_id, image_id):
             if image_id in backend.unstarred:
                 backend.unstarred.remove(image_id)
         user.save()
+    task = mist.io.tasks.ListImages()
+    task.clear_cache(user.email, backend_id)
+    task.delay(user.email, backend_id)
     return not star
 
 
@@ -1540,7 +1683,10 @@ def list_sizes(user, backend_id):
             sizes = conn.list_sizes(location='us-central1-a')
             sizes = [s for s in sizes if s.name and not s.name.endswith('-d')]
             #deprecated sizes for GCE
-
+        elif conn.type == Provider.NEPHOSCALE:
+            sizes = conn.list_sizes(baremetal=False)
+            dedicated = conn.list_sizes(baremetal=True)
+            sizes.extend(dedicated)
         else:
             sizes = conn.list_sizes()
     except:
@@ -1597,6 +1743,155 @@ def list_locations(user, backend_id):
                     'country': location.country})
 
     return ret
+
+
+def list_networks(user, backend_id):
+    """List networks from each backend.
+    Currently NephoScale and Openstack networks are supported. For other providers
+    this returns an empty list
+
+    """
+
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    conn = connect_provider(backend)
+
+    ret = []
+    if conn.type in [Provider.NEPHOSCALE]:
+        networks = conn.ex_list_networks()
+
+        for network in networks:
+            ret.append({
+                'id': network.id,
+                'name': network.name,
+                'extra': network.extra,
+            })
+
+        return ret
+    elif conn.type in [Provider.OPENSTACK]:
+        networks = conn.ex_list_neutron_networks()
+        for network in networks:
+            ret.append(openstack_network_to_dict(network))
+        return ret
+    else:
+        return ret
+
+
+def openstack_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['status'] = network.status
+
+    net['subnets'] = []
+    for sub in network.subnets:
+
+        net['subnets'].append(openstack_subnet_to_dict(sub))
+    return net
+
+
+def openstack_subnet_to_dict(subnet):
+    net = {}
+
+    net['name'] = subnet.name
+    net['id'] = subnet.id
+    net['cidr'] = subnet.cidr
+    net['enable_dhcp'] = subnet.enable_dhcp
+    net['dns_nameservers'] = subnet.dns_nameservers
+    net['allocation_pools'] = subnet.allocation_pools
+    net['gateway_ip'] = subnet.gateway_ip
+
+    return net
+
+
+def create_network(user, backend_id, network, subnet):
+    """
+    Creates a new network. If subnet dict is specified, after creating the network
+    it will use the new network's id to create a subnet
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+
+    conn = connect_provider(backend)
+    if conn.type is not Provider.OPENSTACK:
+        raise NetworkActionNotSupported()
+
+    try:
+        network_name = network.get('name')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    admin_state_up = network.get('admin_state_up', True)
+    shared = network.get('shared', False)
+
+    # First we create the network
+    try:
+        new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+    except Exception as e:
+        raise NetworkCreationError("Got error r%" % e)
+
+    ret = dict()
+    if subnet:
+        network_id = new_network.id
+
+        try:
+            subnet_name = subnet.get('name')
+            cidr = subnet.get('cidr')
+        except Exception as e:
+            raise RequiredParameterMissingError(e)
+
+        allocation_pools = subnet.get('allocation_pools', [])
+        gateway_ip = subnet.get('gateway_ip', None)
+        ip_version = subnet.get('ip_version', '4')
+        enable_dhcp = subnet.get('enable_dhcp', True)
+
+        try:
+            subnet = conn.ex_create_neutron_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
+                                                   allocation_pools=allocation_pools, gateway_ip=gateway_ip,
+                                                   ip_version=ip_version, enable_dhcp=enable_dhcp)
+        except Exception as e:
+            conn.ex_delete_neutron_network(network_id)
+            raise NetworkError(e)
+
+        ret['network'] = openstack_network_to_dict(new_network)
+        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
+
+    else:
+        ret = openstack_network_to_dict(new_network)
+
+    task = mist.io.tasks.ListNetworks()
+    task.clear_cache(user.email, backend_id)
+    trigger_session_update(user.email, ['backends'])
+    return ret
+
+
+def delete_network(user, backend_id, network_id):
+    """
+    Delete a neutron network
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+
+    conn = connect_provider(backend)
+    if conn.type is not Provider.OPENSTACK:
+        raise NetworkActionNotSupported()
+
+    try:
+        conn.ex_delete_neutron_network(network_id)
+    except Exception as e:
+        raise NetworkError(e)
+
+    try:
+        task = mist.io.tasks.ListNetworks()
+        task.clear_cache(user.email, backend_id)
+        trigger_session_update(user.email, ['backends'])
+    except Exception as e:
+        pass
 
 
 def set_machine_metadata(user, backend_id, machine_id, tag):
@@ -1786,21 +2081,14 @@ def enable_monitoring(user, backend_id, machine_id,
             raise PaymentRequiredError(resp.text.replace('Payment required: ', ''))
         else:
             raise ServiceUnavailableError()
+    ret_dict = resp.json()
 
-    resp_dict = resp.json()
-    host = resp_dict.get('host')
-    deploy_kwargs = resp_dict.get('deploy_kwargs')
-    command = deploy_collectd_command(deploy_kwargs)
-    ret_dict = {
-        'host': host,
-        'deploy_kwargs': deploy_kwargs,
-        'command': command,
-    }
     if dry:
         return ret_dict
-    stdout = ''
+
     if not no_ssh:
-        async_ssh_command.delay(user.email, backend_id, machine_id, host, command)
+        mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
+                                            ret_dict['extra_vars'])
 
     trigger_session_update(user.email, ['monitoring'])
 
@@ -1830,42 +2118,10 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     ret_dict = json.loads(ret.content)
     host = ret_dict.get('host')
 
-    stdout = ""
-    try:
-        if not no_ssh:
-            stdout = _undeploy_collectd(user, backend_id, machine_id, host)
-    except:
-        pass
+    if not no_ssh:
+        mist.io.tasks.undeploy_collectd.delay(user.email,
+                                              backend_id, machine_id)
     trigger_session_update(user.email, ['monitoring'])
-    return stdout
-
-
-def deploy_collectd_command(deploy_kwargs):
-    """Return command that must be run to deploy collectd on a machine."""
-    parts = ["%s=%s" % (key, value) for key, value in deploy_kwargs.items()]
-    query = "&".join(parts)
-    url = "%s/deploy_script" % config.CORE_URI
-    if query:
-        url += "?" + query
-    command = "$(command -v sudo) bash -c \"$(wget -O - %s '%s')\"" % (
-        "--no-check-certificate" if not config.SSL_VERIFY else "",
-        url,
-    )
-    return command
-
-
-def _undeploy_collectd(user, backend_id, machine_id, host):
-    """Uninstall collectd from the machine and return command's output"""
-    #FIXME: do not hard-code stuff!
-    command = (
-        "sudo=$(command -v sudo); "
-        "[ -f /etc/cron.d/mistio-collectd ] && $sudo rm -f /etc/cron.d/mistio-collectd || "
-        "$sudo su -c 'cat /etc/rc.local | grep -v mistio-collectd > /etc/rc.local';"
-        "$sudo /opt/mistio-collectd/collectd.sh stop; "
-        "sleep 2; $sudo kill -9 `cat /opt/mistio-collectd/collectd.pid`"
-    )
-
-    async_ssh_command.delay(user.email, backend_id, machine_id, host, command)
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
@@ -2261,12 +2517,12 @@ $sudo /opt/mistio-collectd/collectd.sh restart
     return {'metric_id': None, 'stdout': stdout}
 
 
-def get_stats(user, backend_id, machine_id, start, stop, step):
+def get_stats(user, backend_id, machine_id, start='', stop='', step='', metrics=''):
     try:
         resp = requests.get(
             "%s/backends/%s/machines/%s/stats" % (config.CORE_URI,
                                                   backend_id, machine_id),
-            params={'start': start, 'stop': stop, 'step': step, 'v': 2},
+            params={'start': start, 'stop': stop, 'step': step},
             headers={'Authorization': get_auth_header(user)},
             verify=config.SSL_VERIFY
         )
@@ -2274,7 +2530,126 @@ def get_stats(user, backend_id, machine_id, start, stop, step):
         log.error("%r", exc)
         raise SSLError()
     if resp.status_code == 200:
-        return resp.json()
+        ret = resp.json()
+        return ret
     else:
         log.error("Error getting stats %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
+
+
+def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
+                 force_handlers=False, debug=False):
+    if not extra_vars:
+        extra_vars = None
+    ret_dict = {
+        'success': False,
+        'started_at': time(),
+        'finished_at': 0,
+        'stdout': '',
+        'error_msg': '',
+        'inventory': '',
+        'stats': {},
+    }
+    inventory = mist.io.inventory.MistInventory(user,
+                                                [(backend_id, machine_id)])
+    if len(inventory.hosts) != 1:
+        log.error("Expected 1 host, found %s", inventory.hosts)
+        ret_dict['error_msg'] = "Expected 1 host, found %s" % inventory.hosts
+        ret_dict['finished_at'] = time()
+        return ret_dict
+    machine_name = inventory.hosts.keys()[0]
+    log_prefix = "Running playbook '%s' on machine '%s'" % (playbook_path,
+                                                            machine_name)
+    files = inventory.export(include_localhost=False)
+    ret_dict['inventory'] = files['inventory']
+    tmp_dir = tempfile.mkdtemp()
+    old_dir = os.getcwd()
+    os.chdir(tmp_dir)
+    try:
+        log.debug("%s: Saving inventory files", log_prefix)
+        os.mkdir('id_rsa')
+        for name, data in files.items():
+            with open(name, 'w') as f:
+                f.write(data)
+        for name in os.listdir('id_rsa'):
+            os.chmod('id_rsa/%s' % name, 0600)
+        log.debug("%s: Inventory files ready", log_prefix)
+
+        playbook_path = '%s/%s' % (old_dir, playbook_path)
+        ansible_hosts_path = 'inventory'
+        # extra_vars['host_key_checking'] = False
+
+        ansible.utils.VERBOSITY = 4 if debug else 0
+        ansible.constants.HOST_KEY_CHECKING = False
+        ansible.constants.ANSIBLE_NOCOWS = True
+        stats = ansible.callbacks.AggregateStats()
+        playbook_cb = ansible.callbacks.PlaybookCallbacks(
+            verbose=ansible.utils.VERBOSITY
+        )
+        runner_cb = ansible.callbacks.PlaybookRunnerCallbacks(
+            stats, verbose=ansible.utils.VERBOSITY
+        )
+        log.error(old_dir)
+        log.error(tmp_dir)
+        log.error(extra_vars)
+        log.error(playbook_path)
+        capture = StdStreamCapture(pass_through=debug)
+        try:
+            playbook = ansible.playbook.PlayBook(
+                playbook=playbook_path,
+                host_list=ansible_hosts_path,
+                callbacks=playbook_cb,
+                runner_callbacks=runner_cb,
+                stats=stats,
+                extra_vars=extra_vars,
+                force_handlers=force_handlers,
+            )
+            result = playbook.run()
+        except Exception as exc:
+            log.error("%s: Error %r", log_prefix, exc)
+            ret_dict['error_msg'] = repr(exc)
+        finally:
+            ret_dict['finished_at'] = time()
+            ret_dict['stdout'] = capture.close()
+        if ret_dict['error_msg']:
+            return ret_dict
+        log.debug("%s: Ansible result = %s", log_prefix, result)
+        mresult = result[machine_name]
+        ret_dict['stats'] = mresult
+        if mresult['failures'] or mresult['unreachable']:
+            log.error("%s: Ansible run failed: %s", log_prefix, mresult)
+            return ret_dict
+        log.info("%s: Ansible run succeeded: %s", log_prefix, mresult)
+        ret_dict['success'] = True
+        return ret_dict
+    finally:
+        os.chdir(old_dir)
+        if not debug:
+            shutil.rmtree(tmp_dir)
+
+
+def deploy_collectd(user, backend_id, machine_id, extra_vars):
+    return run_playbook(
+        user, backend_id, machine_id,
+        playbook_path='src/deploy_collectd/ansible/enable.yml',
+        extra_vars=extra_vars,
+        force_handlers=True,
+        debug=True
+    )
+
+
+def undeploy_collectd(user, backend_id, machine_id):
+    return run_playbook(
+        user, backend_id, machine_id,
+        playbook_path='src/deploy_collectd/ansible/disable.yml',
+        force_handlers=True,
+        debug=True
+    )
+
+
+def get_deploy_collectd_manual_command(uuid, password, monitor):
+    url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
+    cmd = "wget -O - %s | sudo python - %s %s" % (url, uuid, password)
+    if monitor != 'monitor1.mist.io':
+        cmd += " -m %s" % monitor
+    return cmd

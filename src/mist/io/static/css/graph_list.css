@@ -1,0 +1,223 @@
+
+/* Graph List View
+-----------------------------------------------------------------------------------------------------------*/
+
+#graph-list-control .align {
+    width: 49%;
+    display: inline-block;
+}
+
+#graph-list-control {
+    display: block;
+    width: 100%;
+}
+
+#history-control {
+    width: 280px;
+    height: 55px;
+    margin-left: -5px;
+    display: inline-block;
+}
+
+#history-control a, #graph-list-control .ui-select {
+    margin: .5%;
+}
+
+#history-control-stream {
+    width: 50px;
+}
+
+#history-control div {
+    text-align: center;
+}
+
+#history-control a.time {
+    width: 75px;
+    height: 43px;
+    border-radius: 0.3em;
+}
+
+#time-window-control {
+    float: right;
+}
+
+#time-window-control .ui-btn {
+    height: 23px;
+}
+
+
+.graph-button {
+    display: inline-block;
+    width: 150px;
+}
+
+#add-metric-btn {
+    display: inline-block;
+}
+
+/* Conditional for < 400px */
+@media only screen and  (max-width: 400px) {
+    .graph-button {
+        width: 45%;
+    }
+    .graph-button .ui-btn {
+        font-size: 0.7em;
+    }
+}
+
+.valuePopUp{
+    position:relative;
+    z-index: 1;
+    display: none;
+    left:0;
+    top:0;
+    width:90px;
+    height:30px;
+    line-height:30px;
+    margin-top:-30px;
+    border:1px solid:#C2C4C2;
+    border-radius:10px;
+    box-shadow: 2px 2px 4px 1px #888888;
+    text-align: center;
+    font-weight:bold;
+    color: #404040;
+    background: linear-gradient(to bottom,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
+}
+
+
+
+.graph .lineLegend {
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    position: relative;
+    top: 1px;
+}
+
+.graph .legend {
+    box-shadow: none;
+    text-align: center;
+    padding: 5px;
+    box-sizing: border-box;
+    font-size: 0.82em;
+    margin-top: -6px;
+}
+
+#bottom-history {
+    position: relative;
+    bottom: 20px;
+}
+
+#top-history {
+    margin-top: 20px;
+}
+
+/* Color palete */
+.graph .valueLine {
+    transition: 2s;
+    stroke-width: 2;
+    fill: none;
+}
+
+.graph .green {
+    stroke: #6CE0BA;
+    transition: 2s;
+    fill: none;
+}
+
+.graph .orange {
+    stroke: #F2B752;
+    transition: 2s;
+    fill: none;
+}
+
+.graph .blue {
+    stroke: #66A5D9;
+    transition: 2s;
+    fill: none;
+}
+
+.graph .pink {
+    stroke: #D68BCD;
+    transition: 2s;
+    fill: none;
+}
+
+.graph .brown {
+    stroke: #C47E52;
+    transition: 2s;
+    fill: none;
+}
+
+.graph .red {
+    stroke: #F25757;
+    transition: 2s;
+    fill: none;
+}
+
+.graph .purple {
+    stroke: #8F66C4;
+    transition: 2s;
+    fill: none;
+}
+
+.graph .black {
+    stroke: #5C5C5C;
+    transition: 2s;
+    fill: none;
+}
+
+.graph .gray {
+    stroke: gray !important;
+    transition: 2s;
+    fill: none;
+}
+
+.graph .lineLegend.green {
+    background-color: #6CE0BA;
+}
+
+.graph .lineLegend.orange {
+    background-color: #F2B752;
+}
+
+.graph .lineLegend.blue {
+    background-color: #66A5D9;
+}
+
+.graph .lineLegend.pink {
+    background-color: #D68BCD;
+}
+
+.graph .lineLegend.brown {
+    background-color: #C47E52;
+}
+
+.graph .lineLegend.red {
+    background-color: #F25757;
+}
+
+.graph .lineLegend.purple {
+    background-color: #8F66C4;
+}
+
+.graph .lineLegend.black {
+    background-color: #5C5C5C;
+}
+
+.graph .lineLegend div {
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+}
+
+.graph .valueArea {
+    fill: #6CE0BA;
+    stroke-width: 0;
+    opacity: 0.25;
+}
+
+.graph .header *,
+.graph .legend * {
+    display: inline-block;
+}

@@ -211,7 +211,7 @@ define('app/controllers/images', ['app/models/image'],
             _addImage: function (image) {
                 Ember.run(this, function () {
                     image.backend = this.backend;
-                    this.content.pushObject(Image.create(image));
+                    this.content.addObject(Image.create(image));
                     this.trigger('onImageAdd');
                 });
             },

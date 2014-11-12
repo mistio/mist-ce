@@ -7,7 +7,7 @@
      data-theme="b">
 
     <div data-role="header">
-        <h1>Create Machine</h1>
+        <h1 class="ui-title">Create Machine</h1>
     </div>
 
     <div data-role="content" data-theme="b">
@@ -114,6 +114,7 @@
             </ul>
         </div>
 
+
         <!-- Select Key -->
 
         <label>6. Key:</label>
@@ -137,13 +138,46 @@
             </ul>
         </div>
 
+        <!-- Select Networks -->
+
+        <div id="create-machine-network">
+            <label>7. Networks:</label>
+            <div data-role="collapsible"
+                    data-iconpos="right"
+                    data-collapsed-icon="arrow-d"
+                    data-expanded-icon="arrow-u"
+                    data-theme="a"
+                    class="mist-select">
+                <h2>Networks</h2>
+                <fieldset data-role="controlgroup" data-theme="a">
+                    {{#each Mist.machineAddController.newMachineProvider.networks.content}}
+                        <input {{bind-attr id="this.id" name="this.id" checked="this.selected"}}
+                            type="checkbox" {{action "toggleNetworkSelection" this on="change" target="view"}}>
+                        <label {{bind-attr for="this.id"}} data-corners="false">
+                            {{this.name}}
+                        </label>
+                    {{/each}}
+                </fieldset>
+            </div>
+        </div>
+
         <!-- Select Script -->
 
-        <label for="create-machine-script">7.Script:</label>
+        <label for="create-machine-script">7. Script:</label>
         {{view Mist.TextArea
                id="create-machine-script"
                data-theme="a"
                valueBinding="Mist.machineAddController.newMachineScript"}}
+
+        <!-- Enable monitoring -->
+        <div id="create-machine-monitoring" class="ui-state-disabled">
+            <label>
+            {{view Mist.Checkbox
+               data-theme="a"
+               checkedBinding="Mist.machineAddController.newMachineMonitoring"}}
+            Enable monitoring
+            </label>
+        </div>
 
         <div id="create-machine-cost">
         {{#if view.price}}

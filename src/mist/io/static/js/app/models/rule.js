@@ -22,21 +22,36 @@ define('app/models/rule', ['ember'],
             unit: null,
             value: null,
             metric: null,
-            cycles: null,
             command: null,
             machine: null,
             operator: null,
             maxValue: null,
-            machineKey: null,
-            machineName: null,
-            machineSize: null,
+            aggregate: null,
+            timeWindow: null,
             actionToTake: null,
-            machineImage: null,
-            machineScript: null,
             pendingAction: false,
-            machineBackend: null,
-            machineLocation: null
 
+
+            init: function () {
+                this._super();
+                this.updateFromRawData(this);
+            },
+
+            updateFromRawData: function (data) {
+
+                this.setProperties({
+                    // Rename action attribute because it conflicts with
+                    // handlebar's templating "action" keyword
+                    value: data.value,
+                    actionToTake: data.action,
+                    timeWindow: data.reminder_offset,
+                    operator: Mist.rulesController.getOperatorByTitle(data.operator),
+                    metric: Mist.metricsController.getMetric(data.metric),
+                    aggregate: Mist.rulesController.getAggregateByValue(data.aggregate),
+                    machine: Mist.backendsController.getMachine(
+                        data.machine, data.backend) || data.machine
+                });
+            }
         });
     }
 );

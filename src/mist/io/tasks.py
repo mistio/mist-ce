@@ -1,4 +1,6 @@
+import paramiko
 import json
+import tempfile
 import functools
 
 import libcloud.security
@@ -14,6 +16,13 @@ from celery import Task
 
 from amqp import Message
 from amqp.connection import Connection
+
+from paramiko.ssh_exception import SSHException
+
+import ansible.playbook
+import ansible.utils.template
+from ansible import callbacks
+from ansible import utils
 
 from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError
@@ -49,7 +58,7 @@ log = logging.getLogger(__name__)
 def update_machine_count(email, backend_id, machine_count):
     if not multi_user:
         return
-    
+
     user = user_from_email(email)
     with user.lock_n_load():
         user.backends[backend_id].machine_count = machine_count
@@ -69,15 +78,93 @@ def ssh_command(email, backend_id, machine_id, host, command,
     shell.disconnect()
     if retval:
         from mist.io.methods import notify_user
-        notify_user(user, "Async command failed for machine %s (%s)" % (machine_id, host), output)
+        notify_user(user, "Async command failed for machine %s (%s)" %
+                    (machine_id, host), output)
 
 
 @app.task(bind=True, default_retry_delay=3*60)
-def run_deploy_script(self, email, backend_id, machine_id, command,
+def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                       key_id=None, username=None, password=None, port=22):
-    from mist.io.methods import ssh_command, connect_provider
+    from mist.io.methods import ssh_command, connect_provider, enable_monitoring
     from mist.io.methods import notify_user, notify_admin
+    if multi_user:
+        from mist.core.methods import enable_monitoring
+    else:
+        from mist.io.methods import enable_monitoring
 
+    user = user_from_email(email)
+    try:
+
+        # find the node we're looking for and get its hostname
+        conn = connect_provider(user.backends[backend_id])
+        nodes = conn.list_nodes()
+        node = None
+        for n in nodes:
+            if n.id == machine_id:
+                node = n
+                break
+
+        if node and len(node.public_ips):
+            # filter out IPv6 addresses
+            ips = filter(lambda ip: ':' not in ip, node.public_ips)
+            host = ips[0]
+        else:
+            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
+
+        try:
+            from mist.io.shell import Shell
+            shell = Shell(host)
+            # connect with ssh even if no command, to create association
+            # to be able to enable monitoring
+            key_id, ssh_user = shell.autoconfigure(
+                user, backend_id, node.id, key_id, username, password, port
+            )
+
+            if command:
+                start_time = time()
+                retval, output = shell.command(command)
+                execution_time = time() - start_time
+                output = output.decode('utf-8','ignore')
+                msg = ("Command: %s\n"
+                       "Return value: %s\n"
+                       "Duration: %d seconds\n"
+                       "Output:%s\n") % (command, retval,
+                                         execution_time, output)
+                msg = msg.encode('utf-8', 'ignore')
+                msg_title = "Deployment script %s for machine %s (%s)" % (
+                    'failed' if retval else 'succeeded',
+                    node.name, node.id
+                )
+                notify_user(user, msg_title, msg)
+
+            shell.disconnect()
+
+            if monitoring:
+                try:
+                    enable_monitoring(user, backend_id, node.id,
+                        name=node.name, dns_name=node.extra.get('dns_name',''),
+                        public_ips=ips, no_ssh=False, dry=False,
+                    )
+                except Exception as e:
+                    print repr(e)
+                    notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
+                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
+
+        except (ServiceUnavailableError, SSHException) as exc:
+            raise self.retry(exc=exc, countdown=60, max_retries=5)
+    except Exception as exc:
+        if str(exc).startswith('Retry'):
+            raise
+        amqp_log("Deployment script failed for machine %s in backend %s by user %s after 5 retries: %s" % (node.id, backend_id, email, repr(exc)))
+        notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
+        notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
+
+
+@app.task(bind=True, default_retry_delay=3*60)
+def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, command,
+                      key_id, username, password, public_key):
+    from mist.io.methods import ssh_command, connect_provider, enable_monitoring
+    from mist.io.methods import notify_user, notify_admin
     user = user_from_email(email)
 
     try:
@@ -95,39 +182,44 @@ def run_deploy_script(self, email, backend_id, machine_id, command,
             ips = filter(lambda ip: ':' not in ip, node.public_ips)
             host = ips[0]
         else:
-            raise self.retry(exc=Exception(), countdown=60, max_retries=5)
+            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
 
         try:
-            from mist.io.shell import Shell
-            shell = Shell(host)
-            key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
-                                                   key_id, username, password, port)
-            start_time = time()
-            retval, output = shell.command(command)
-            execution_time = time() - start_time
-            shell.disconnect()
-            msg = """
-Command: %s
-Return value: %s
-Duration: %s seconds
-Output:
-%s""" % (command, retval, execution_time, output)
+            #login with user, password. Deploy the public key, enable sudo access for
+            #username, disable password authentication and reload ssh.
+            #After this is done, call post_deploy_steps if deploy script or monitoring
+            #is provided
+            ssh=paramiko.SSHClient()
+            ssh.load_system_host_keys()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(host, username=username, password=password)
+            ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
 
-            if retval:
-                notify_user(user, "Deployment script failed for machine %s (%s)" % (node.name, node.id), msg)
-                amqp_log("Deployment script failed for user %s machine %s (%s): %s" % (user, node.name, node.id, msg))
-            else:
-                notify_user(user, "Deployment script succeeded for machine %s (%s)" % (node.name, node.id), msg)
-                amqp_log("Deployment script succeeded for user %s machine %s (%s): %s" % (user, node.name, node.id, msg))
+            chan = ssh.invoke_shell()
+            chan = ssh.get_transport().open_session()
+            chan.get_pty()
+            chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\' ' % username)
+            chan.send('%s\n' % password)
 
-        except ServiceUnavailableError as exc:
-            raise self.retry(exc=exc, countdown=60, max_retries=5)
+            chan = ssh.invoke_shell()
+            chan = ssh.get_transport().open_session()
+            chan.get_pty()
+            chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/waagent\' ' % username)
+            chan.send('%s\n' % password)
+
+            cmd = 'sudo su -c \'sed -i "s|[#]*PasswordAuthentication yes|PasswordAuthentication no|g" /etc/ssh/sshd_config &&  /etc/init.d/ssh reload; service ssh reload\' '
+            ssh.exec_command(cmd)
+            ssh.close()
+
+            if command or monitoring:
+                post_deploy_steps.delay(email, backend_id, machine_id,
+                                          monitoring, command, key_id)
+
+        except Exception as exc:
+            raise self.retry(exc=exc, countdown=60, max_retries=10)
     except Exception as exc:
         if str(exc).startswith('Retry'):
-            return
-        amqp_log("Deployment script failed for machine %s in backend %s by user %s after 5 retries: %s" % (node.id, backend_id, email, repr(exc)))
-        notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
-        notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
+            raise
 
 
 class UserTask(Task):
@@ -161,6 +253,12 @@ class UserTask(Task):
         else:
             self.delay(*args, **kwargs)
 
+    def clear_cache(self, *args, **kwargs):
+        id_str = json.dumps([self.task_key, args, kwargs])
+        cache_key = b64encode(id_str)
+        log.info("Clearing cache for '%s'", id_str)
+        return self.memcache.delete(cache_key)
+
     def run(self, *args, **kwargs):
         email = args[0]
         # seq_id is an id for the sequence of periodic tasks, to avoid
@@ -172,7 +270,7 @@ class UserTask(Task):
         cached_err = self.memcache.get(cache_key + 'error')
         if cached_err:
             # task has been failing recently
-            if seq_id != cached_err['seq_id']: 
+            if seq_id != cached_err['seq_id']:
                 # other sequence of task already handling this error flow
                 # This is not working! Passing instead
                 #return
@@ -278,6 +376,20 @@ class ListLocations(UserTask):
         return {'backend_id': backend_id, 'locations': locations}
 
 
+class ListNetworks(UserTask):
+    abstract = False
+    task_key = 'list_networks'
+    result_expires = 60 * 60 * 24
+    result_fresh = 10
+    polling = False
+
+    def execute(self, email, backend_id):
+        from mist.io import methods
+        user = user_from_email(email)
+        networks = methods.list_networks(user, backend_id)
+        return {'backend_id': backend_id, 'networks': networks}
+
+
 class ListImages(UserTask):
     abstract = False
     task_key = 'list_images'
@@ -356,3 +468,19 @@ class Ping(UserTask):
     def error_rerun_handler(self, exc, errors, *args, **kwargs):
         return self.result_fresh
 
+
+@app.task
+def deploy_collectd(email, backend_id, machine_id, extra_vars):
+    if not multi_user:
+        from mist.io.methods import deploy_collectd as deploy_collectd_method
+    else:
+        from mist.core.methods import deploy_collectd as deploy_collectd_method
+    user = user_from_email(email)
+    deploy_collectd_method(user, backend_id, machine_id, extra_vars)
+
+
+@app.task
+def undeploy_collectd(email, backend_id, machine_id):
+    user = user_from_email(email)
+    import mist.io.methods
+    mist.io.methods.undeploy_collectd(user, backend_id, machine_id)

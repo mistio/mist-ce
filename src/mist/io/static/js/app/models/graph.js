@@ -8,8 +8,6 @@ define('app/models/graph', ['ember'],
 
         'use strict';
 
-        var MAX_BUFFER_DATA = 60;
-
         return Ember.Object.extend(Ember.Evented, {
 
 
@@ -20,24 +18,54 @@ define('app/models/graph', ['ember'],
             //
 
 
-            view: null,
-
             id: null,
-            unit: null,
+            view: null,
             title: null,
-            metrics: null,
-            isBuiltIn: null,
+            isEmpty: null,
+            datasources: null,
 
 
             //
             //
-            //  Initialization
+            //  Computed Properties
+            //
+            //
+
+
+            unit: function () {
+                return this.datasources && this.datasources.length ?
+                    this.datasources[0].metric.unit : '';
+            }.property('datasources'),
+
+
+            isBuiltIn: function () {
+                return this.datasources && this.datasources.length ?
+                    !!Mist.metricsController.builtInMetrics.findBy('id', this.datasources[0].metric.id)
+                    : false;
+            }.property('datasources'),
+
+
+            isMultiline: function () {
+                return !!(this.datasources.length > 1);
+            }.property('datasources.@each'),
+
+
+            //
+            //
+            // Initialization
             //
             //
 
 
             load: function () {
-                this.set('metrics', []);
+                var dts;
+                if (this.datasources.length);
+                    dts=this.datasources;
+
+                this.set('id', 'graph-' + (dts.length ? dts[0].id : ''));
+                this.set('datasources',
+                    dts ? dts : []);
+                this.set('isEmpty', true);
             }.on('init'),
 
 
@@ -48,80 +76,20 @@ define('app/models/graph', ['ember'],
             //
 
 
-            getMetric: function(metricId) {
-                return this.metrics.findBy('id', metricId);
-            },
-
-
-            hasMetric: function (metricId) {
-                return !!this.getMetric(metricId);
-            },
-
-
-            addMetric: function (metric) {
+            addDatasource: function (datasource) {
                 Ember.run(this, function () {
-                    this.metrics.pushObject(metric);
-                    this.insertDummyData(metric);
-                    this.trigger('onMetricAdd');
-                    this.trigger('onDataUpdate', metric.datapoints);
+                    this.datasources.addObject(datasource);
+                    this.trigger('onDatasourceAdd');
                 });
             },
 
 
-            removeMetric: function (metricId) {
+            removeDatasource: function (datasource) {
                 Ember.run(this, function () {
-                    this.metrics.removeObject(
-                        this.getMetric(metricId)
-                    );
-                    this.trigger('onMetricRemove');
+                    this.datasources.removeObject(datasource);
+                    this.trigger('onDatasourceRemove');
                 });
-            },
-
-
-            updateData: function (data) {
-
-                if (this.pendingCreation) return;
-
-                Ember.run(this, function () {
-                    for (var metricId in data) {
-                        var metric = this.getMetric(metricId);
-                        if (metric) {
-                            metric.datapoints.addObjects(data[metricId]);
-                            var datapoints = metric.datapoints;
-                            if (datapoints.length > MAX_BUFFER_DATA * 2) {
-                                // If we don't multiply by two, the code will
-                                // end up trimming a single datapoint on each
-                                // update, which consumes resources for nothing
-                                var spare = datapoints.length - MAX_BUFFER_DATA;
-                                metric.datapoints = datapoints.slice(spare);
-                            }
-                        }
-                    }
-                    this.trigger('onDataUpdate', this.metrics[0].datapoints);
-                });
-            },
-
-
-            insertDummyData: function (metric) {
-
-                // If metric doesn't have any datapoints, add one
-                if (!metric.datapoints.length)
-                    metric.datapoints =
-                        [new Datapoint(prevTimestamp - step)]; // BUG!!!
-
-                var datapoints = metric.datapoints;
-                var step = Mist.monitoringController.request.step;
-
-                while (datapoints.length < MAX_BUFFER_DATA)
-                    datapoints.unshift(
-                        new Datapoint(datapoints[0].time - step));
-            },
+            }
         });
-
-
-        function Datapoint(timestamp, value) {
-           this.time = new Date(timestamp || null);
-           this.value = value || null;
-        };
     }
 );

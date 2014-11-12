@@ -2,7 +2,11 @@
 
     <div data-role="header" data-theme="b">
 
-        <a href="#/machines" class="responsive-button" data-icon="arrow-l">Machines</a>
+        <a class="ui-btn
+                ui-btn-icon-left
+                ui-icon-arrow-l
+                responsive-button"
+            href="#/machines">Machines</a>
 
         <h1>{{name}}</h1>
 
@@ -12,74 +16,62 @@
 
     <div data-role="header" data-theme="a" class="single-machine-header">
 
+        <!-- Provider Icon -->
         <span class="single-view-icon-wrapper">
-            <span id="single-view-provider-icon" {{bind-attr class="view.providerIconClass"}}></span>
+            <span id="single-view-provider-icon"
+                {{bind-attr class="view.providerIconClass"}}>
+            </span>
         </span>
-        <span {{bind-attr class=":single-view-icon-wrapper"}}>
+
+        <!-- OS Icon -->
+        <span class="single-view-icon-wrapper">
             <span id="single-view-image-icon"
                 {{bind-attr class="view.imageIconClass"}}>
             </span>
         </span>
 
-        <h1 {{bind-attr class="view.machine.state"}}>{{state}}</h1>
+        <!-- State label -->
+        <h1 {{bind-attr class="state"}}>{{state}}</h1>
 
-        {{#unless view.machine.id}}
+        <!-- Show spinner if machines are being loaded -->
+        {{#unless id}}
             {{#if Mist.backendsController.loadingMachines}}
                 <div class="ajax-loader"></div>
             {{/if}}
         {{/unless}}
 
-        <span class="ui-btn-right" id="mist-manage-keys">
-            {{#if pendingCreation}}
-                <a class="ui-btn ui-btn-icon-right ui-icon-plus
-                    ui-corner-all ui-state-disabled">
-                        Add key
-                </a>
-            {{else}} {{#if keysCount}}
-                <a class="ui-btn ui-shadow ui-corner-all"
-                    {{action "manageKeysClicked" target="view"}}>
+
+        <!-- If machine is not running created, disable keys UI -->
+        <span id="mist-manage-keys"
+            {{bind-attr
+                class="view.isRunning::ui-state-disabled
+                :ui-btn-right"}}>
+
+            <!-- If machine is beging created, hide keys UI -->
+            {{#unless pendingCreation}}
+                {{#if keysCount}}
+                    <a class="ui-btn
+                            ui-shadow
+                            ui-corner-all"
+                        {{action "manageKeysClicked" target="view"}}>
                         {{keysCount}} keys
-                </a>
-            {{else}}
-                <a class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
-                    {{action "addKeyClicked" target="view"}}>
+                    </a>
+                {{else}}
+                    <a class="ui-btn
+                            ui-btn-d
+                            ui-btn-icon-right
+                            ui-icon-plus
+                            ui-corner-all"
+                        {{action "addKeyClicked" target="view"}}>
                         Add key
-                </a>
-            {{/if}}{{/if}}
+                    </a>
+                {{/if}}
+            {{/unless}}
         </span>
     </div>
 
     <div data-role="content" data-theme="c">
 
-        <!--
-
-             Info popups
-
-        -->
-
-
-        {{#if enablingMonitoring}}
-        {{#unless pendingMonitoring}}
-        <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
-            <span class="ui-icon ui-icon-loading"></span>
-            <h1>Enabling monitoring. Please wait</h1>
-        </div>
-        {{/unless}}
-        {{/if}}
-
-        {{#if disablingMonitoring}}
-        <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
-            <span class="ui-icon ui-icon-loading"></span>
-            <h1>Disabling monitoring. Please wait</h1>
-        </div>
-        {{/if}}
-
-        {{#if pendingStats}}
-        <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
-            <span class="ui-icon ui-icon-loading"></span>
-            <h1>Fetching stats...</h1>
-        </div>
-        {{/if}}
 
         <!--
 
@@ -87,84 +79,23 @@
 
         -->
 
-        <div data-role="collapsible" id="monitoring-collapsible" data-collapsed="false">
+
+        <div id="monitoring-collapsible" data-role="collapsible" data-collapsed="false">
 
             <h3>Monitoring</h3>
 
-            {{#if hasMonitoring}}
-
-            {{#unless pendingMonitoring}}
-
-                {{#if pendingFirstData}}
-                <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
-                    <span class="ui-icon ui-icon-loading"></span>
-                    <h1>Waiting for data</h1>
-                </div>
-                {{/if}}
-
-                {{view Mist.monitoringView}}
-
-                <div class="rules-container" data-role="listview">
-                    {{#each view.rules}}
-                        {{view Mist.ruleView ruleBinding="this"}}
-                    {{/each}}
-
-                    {{#if Mist.rulesController.creationPending}}
-                    <div class="rule-box" id="creation-rule">
-                        <div class="ajax-loader"></div>
-                    </div>
-                    {{/if}}
-                </div>
-
-                <div id="monitoring-bottom-btns">
-                    <div data-rule="ui-grid-a">
-                        <div class="ui-block-a">
-                            <a id="add-rule-button"
-                                class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
-                                {{action "addRuleClicked" target="view"}}>Add Rule</a>
-                        </div>
-                        <!--div class="ui-block-b">
-                            <a id="add-metric-btn"
-                                class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
-                                {{action "addMetricClicked" target="view"}}>Add Metric</a>
-                        </div-->
-                        <div class="ui-block-b">
-                            <a id="disable-monitor-btn"
-                            class="ui-btn ui-corner-all ui-btn-b ui-btn-icon-left ui-icon-delete"
-                                {{action "disableMonitoringClicked" target="view"}}>Disable</a>
-                        </div>
-                    </div>
-                </div>
-
-            {{/unless}}
-
-            {{else}}
-
-                <div class="monitoring-dialog-container" id="monitoring-disabled">
-
-                    <div id="enable-monitoring-bundle">
-                        <div>Monitoring is currently disabled</div>
-
-                        <a id="enable-monitor-btn"
-                           class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-star"
-                           {{action "enableMonitoringClicked" target="view"}}>Enable</a>
-
-                       {{#if Mist.machineManualMonitoringController.gettingCommand}}
-                            <div class="ajax-loader"></div>
-                       {{/if}}
-                    </div>
-
-                </div>
-
-            {{/if}}
+            {{view Mist.machineMonitoringView
+                machineBinding="view.machine"}}
 
         </div>
+
 
         <!--
 
              Information collapsibles
 
         -->
+
 
         <div data-role="collapsible" data-collapsed="false">
 
@@ -179,69 +110,66 @@
                              {{view.lastProbe}}
                              <a id="machine-probe-btn"
                                 class="ui-btn ui-shadow ui-corner-all"
-                                data-mini="true"
                                 {{action "probeClicked" target="view"}}>
                                     Probe
                             </a>
                          {{/if}}
                     </td>
                 </tr>
-                </tr>
                 {{#if probed}}
-                <tr>
-                    <td>Up and running for</td>
-                    <td>{{view.upFor}}</td>
-                </tr>
+                    <tr>
+                        <td>Up and running for</td>
+                        <td>{{view.upFor}}</td>
+                    </tr>
                 {{/if}}
                 {{#if loadavg}}
-                <tr>
-                    <td>Load</td>
-                    <td>
-                        <div class="loadleds">
-
-                            <div {{bind-attr class="loadavg15 :led"}}>
+                    <tr>
+                        <td>Load</td>
+                        <td>
+                            <div class="loadleds">
+                                <div {{bind-attr class="loadavg15 :led"}}>
+                                </div>
+                                <div {{bind-attr class="loadavg5 :led"}}>
+                                </div>
+                                <div {{bind-attr class="loadavg1 :led"}}>
+                                </div>
                             </div>
-                            <div {{bind-attr class="loadavg5 :led"}}>
-                            </div>
-                            <div {{bind-attr class="loadavg1 :led"}}>
-                            </div>
-                        </div>
-                        {{loadavg}} - {{loadavg5}}
-                    </td>
-                </tr>
+                            {{loadavg}} - {{loadavg5}}
+                        </td>
+                    </tr>
                 {{/if}}
                 {{#if latency}}
-                <tr>
-                    <td>Latency</td>
-                    <td>
-                        <div {{bind-attr class=":netleds"}}>
-                            <div {{bind-attr class="netled4 :netled1"}}>
+                    <tr>
+                        <td>Latency</td>
+                        <td>
+                            <div {{bind-attr class=":netleds"}}>
+                                <div {{bind-attr class="netled4 :netled1"}}>
+                                </div>
+                                <div {{bind-attr class="netled3 :netled2"}}>
+                                </div>
+                                <div {{bind-attr class="netled2 :netled3"}}>
+                                </div>
+                                <div {{bind-attr class="netled1 :netled4"}}>
+                                </div>
                             </div>
-                            <div {{bind-attr class="netled3 :netled2"}}>
-                            </div>
-                            <div {{bind-attr class="netled2 :netled3"}}>
-                            </div>
-                            <div {{bind-attr class="netled1 :netled4"}}>
-                            </div>
-                        </div>
-                        {{latency}}ms</td>
-                </tr>
+                            {{latency}}ms</td>
+                    </tr>
                 {{/if}}
                 {{#if loss}}
-                <tr>
-                    <td>Packet loss</td>
-                    <td>{{loss}}</td>
-                </tr>
+                    <tr>
+                        <td>Packet loss</td>
+                        <td>{{loss}}</td>
+                    </tr>
                 {{/if}}
                 {{#if tags}}
-                <tr>
-                    <td>Tags</td>
-                    <td>
-                        {{#each tags}}
-                        <span class="tag">{{this}}</span>
-                        {{/each}}
-                    </td>
-                </tr>
+                    <tr>
+                        <td>Tags</td>
+                        <td>
+                            {{#each tags}}
+                            <span class="tag">{{this}}</span>
+                            {{/each}}
+                        </td>
+                    </tr>
                 {{/if}}
                 {{#if view.public_ips}}
                     <tr>
@@ -264,36 +192,36 @@
                     </tr>
                 {{/if}}
                 {{#each view.basicInfo}}
-                <tr>
-                    <td>{{key}}</td>
-                    <td>{{value}}</td>
-                </tr>
+                    <tr>
+                        <td>{{key}}</td>
+                        <td>{{value}}</td>
+                    </tr>
                 {{/each}}
             </table>
         </div>
 
         {{#if view.metadata}}
-        <div id="single-machine-metadata" data-role="collapsible">
+            <div id="single-machine-metadata" data-role="collapsible">
 
-            <h3>Full metadata list</h3>
+                <h3>Full metadata list</h3>
 
-            <table class="info-table">
-                {{#each view.metadata}}
-                <tr>
-                    <td>{{key}}</td>
-                    <td>{{value}}</td>
-                </tr>
-                {{/each}}
-            </table>
+                <table class="info-table">
+                    {{#each view.metadata}}
+                        <tr>
+                            <td>{{key}}</td>
+                            <td>{{value}}</td>
+                        </tr>
+                    {{/each}}
+                </table>
 
-        </div>
+            </div>
         {{/if}}
 
         <div class="mid-padding"></div>
 
     </div>
 
-    {{view Mist.ruleEditView}}
+    {{view Mist.dialogView}}
 
     {{view Mist.metricAddView}}
 
@@ -307,30 +235,29 @@
 
     {{view Mist.confirmationDialog}}
 
-    {{view Mist.machineManualMonitoringView}}
-
-    <div id="manual-monitoring-popup" class="mid-popup" data-role="popup" data-transition="popp"
-         data-overlay-theme="b" data-disimissible="false">
-
-        <div data-role="header" data-theme="b">
-            <h1>Manual collectd installation</h1>
-        </div>
-
-        <div data-role="content" data-theme="c">
-
-            <p>Run these commands on your server:</p>
-            <textarea>Command here...</textarea>
-            <a data-role="button" {{action "closeManualMonitoringPopup" target="view"}}>Back</a>
-        </div>
-    </div>
-
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
-            <a id="single-machine-tags-btn" data-role="button" data-icon="grid"{{action "tagsClicked" target="view"}}>Tags</a>
+            <a id="single-machine-tags-btn"
+                {{bind-attr class="id::ui-state-disabled
+                    can_tag::ui-state-disabled
+                    :ui-btn
+                    :ui-btn-icon-left
+                    :ui-icon-grid"}}
+                {{action "tagsClicked" target="view"}}>Tags</a>
         </td><td>
-            <a id="single-machine-shell-btn" data-role="button" data-icon="gear" {{action "shellClicked" target="view"}}>Shell</a>
+            <a id="single-machine-shell-btn"
+                {{bind-attr class="id::ui-state-disabled
+                    :ui-btn
+                    :ui-btn-icon-left
+                    :ui-icon-gear"}}
+                {{action "shellClicked" target="view"}}>Shell</a>
         </td><td>
-            <a id="single-machine-power-btn" data-role="button" data-icon="power" {{action "powerClicked" target="view"}}>Power</a>
+            <a id="single-machine-power-btn"
+                {{bind-attr class="id::ui-state-disabled
+                    :ui-btn
+                    :ui-btn-icon-left
+                    :ui-icon-power"}}
+                {{action "powerClicked" target="view"}}>Power</a>
         </td></tr></tbody></table>
     </div>
 

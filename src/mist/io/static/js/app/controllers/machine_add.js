@@ -21,6 +21,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
+            newMachineMonitoring: true,
 
 
             /**
@@ -48,7 +49,8 @@ define('app/controllers/machine_add', ['ember'],
                $('#create-machine-image').addClass('ui-state-disabled');
                $('#create-machine-size').addClass('ui-state-disabled');
                $('#create-machine-key').addClass('ui-state-disabled');
-
+                $('#create-machine-panel .ui-collapsible').collapsible('option', 'collapsedIcon', 'arrow-d')
+                    .collapsible('collapse');
 
                 this._clear();
                 this._updateFormReady();
@@ -73,12 +75,11 @@ define('app/controllers/machine_add', ['ember'],
                 // TODO: This thing is ugly. Move regex and strings into a dict
 
                 if (providerName == 'NephoScale') {
-                    var re = /^[0-9a-zA-Z-_]*$/;
+                    var re = /^[0-9a-z_-]*$/;
                     if ( machineName.length > 64 || !re.test(machineName)) {
 
                         Mist.notificationController.timeNotify(
-                            'Server name in NephoScale must start with a letter, can contain mixed alpha-numeric ' +
-                            'characters, hyphen (\'-\') and underscore (\'_\') characters, cannot exceed 64 ' +
+                            'Server name in NephoScale may have lower-case letters, numbers, hyphen (\'-\') and underscore (\'_\') characters, cannot exceed 64 ' +
                             'characters, and can end with a letter or a number.', 7000);
                         return;
                     }
@@ -100,6 +101,13 @@ define('app/controllers/machine_add', ['ember'],
                         return;
                     }
                 }
+                if (providerName == 'Azure') {
+                    var re = /^[0-9a-zA-Z-]*$/;
+                    if (!re.test(machineName)) {
+                        Mist.notificationController.timeNotify('The name can contain only letters, numbers, and hyphens. The name must start with a letter and must end with a letter or a number.', 7000);
+                        return;
+                    }
+                }                
                 if (providerName == 'Google Compute Engine') {
                     var re = /^[0-9a-z-]*$/;
                     if (!re.test(machineName)) {
@@ -134,6 +142,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineLocation,
                         this.newMachineKey,
                         this.newMachineScript,
+                        this.newMachineMonitoring,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }
