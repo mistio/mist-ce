@@ -3,10 +3,9 @@
 {{#link-to "log" view.log}}
 
     <div class="ui-grid-b">
-        <div class="ui-block-a log-name">{{view.log.id}}</div>
-        <div class="ui-block-b"></div>
-        <div class="ui-block-c">
-        </div>
+        <div class="ui-block-a log-event">{{view.log.event}}</div>
+        <div class="ui-block-b">{{view.log.formatedDate}}</div>
+        <div class="ui-block-c">{{view.log.user}}</div>
     </div>
 
 {{/link-to}}

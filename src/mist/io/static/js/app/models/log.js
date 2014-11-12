@@ -14,10 +14,26 @@ define('app/models/log', ['ember'],
             //
             //
             //  Properties
-            ///
+            //
+            //
+
 
             id: null,
+            user: null,
+            event: null,
+            timestamp: null,
 
+
+            //
+            //
+            //  Computed Properties
+            //
+            //
+
+
+            formatedDate: function () {
+                return Mist.prettyDate(this.get('timestamp'));
+            }.property('timestamp')
         });
     }
 );
