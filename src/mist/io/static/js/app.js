@@ -437,6 +437,7 @@ var loadApp = function (
         this.route('key', {
             path : '/keys/:key_id'
         });
+        this.route('logs');
         this.route('missing', { path: "/*path" });
     });
 
@@ -559,6 +560,19 @@ var loadApp = function (
             if (Mist.keysController.loading)
                 return {_id: id, machines: []};
             return Mist.keysController.getKey(id);
+        }
+    });
+
+    App.LogsRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - logs';
+            });
+        },
+        exit: function () {
+            Mist.logsController.content.forEach(function (log) {
+                 log.set('selected', false);
+            });
         }
     });
 
