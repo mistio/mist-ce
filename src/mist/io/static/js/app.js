@@ -290,6 +290,7 @@ var loadFiles = function (callback) {
         'app/views/key_edit',
         'app/views/key_list',
         'app/views/key_list_item',
+        'app/views/log_list',
         'app/views/login',
         'app/views/machine',
         'app/views/machine_add',
@@ -368,6 +369,7 @@ var loadApp = function (
     KeyEditDialog,
     KeyListView,
     KeyListItemView,
+    LogListView,
     LoginView,
     SingleMachineView,
     MachineAddDialog,
@@ -573,6 +575,7 @@ var loadApp = function (
     App.set('homeView', Home);
     App.set('ruleView', RuleView);
     App.set('loginView', LoginView);
+    App.set('logListView', LogListView);
     App.set('keyAddView', KeyAddView);
     App.set('keyView', SingleKeyView);
     App.set('missingView', MissingView);
