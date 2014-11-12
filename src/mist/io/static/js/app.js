@@ -900,7 +900,8 @@ var setupSocketEvents = function (socket, callback) {
     })
     .on('list_logs', function (logs) {
         Mist.logsController.load(logs);
-    }).on('list_backends', function (backends) {
+    })
+    .on('list_backends', function (backends) {
         Mist.backendsController.load(backends);
         if (callback)
             callback();
