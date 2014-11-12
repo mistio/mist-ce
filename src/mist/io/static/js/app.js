@@ -257,6 +257,7 @@ var loadFiles = function (callback) {
         'app/controllers/key_edit',
         'app/controllers/keys',
         'app/controllers/login',
+        'app/controllers/logs',
         'app/controllers/machine_add',
         'app/controllers/machine_keys',
         'app/controllers/machine_power',
@@ -334,6 +335,7 @@ var loadApp = function (
     KeyEditController,
     KeysController,
     LoginController,
+    LogsController,
     MachineAddController,
     MachineKeysController,
     MachinePowerController,
@@ -617,6 +619,7 @@ var loadApp = function (
     // Ember controllers
 
     App.set('keysController', KeysController.create());
+    App.set('logsController', LogsController.create());
     App.set('loginController', LoginController.create());
     App.set('rulesController', RulesController.create());
     App.set('keyAddController', KeyAddController.create());
