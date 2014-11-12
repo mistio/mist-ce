@@ -177,12 +177,12 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
                 node = n
                 break
 
-        if node and len(node.public_ips):
+        if node and node.state == 0 and len(node.public_ips):
             # filter out IPv6 addresses
             ips = filter(lambda ip: ':' not in ip, node.public_ips)
             host = ips[0]
         else:
-            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
+            raise self.retry(exc=Exception(), max_retries=20)
 
         try:
             #login with user, password. Deploy the public key, enable sudo access for
@@ -194,7 +194,6 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(host, username=username, password=password)
             ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
-
             chan = ssh.invoke_shell()
             chan = ssh.get_transport().open_session()
             chan.get_pty()
@@ -216,7 +215,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
                                           monitoring, command, key_id)
 
         except Exception as exc:
-            raise self.retry(exc=exc, countdown=60, max_retries=10)
+            raise self.retry(exc=exc, max_retries=10)
     except Exception as exc:
         if str(exc).startswith('Retry'):
             raise
