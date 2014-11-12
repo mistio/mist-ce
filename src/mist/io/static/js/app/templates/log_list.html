@@ -4,7 +4,7 @@
 
         <a href="#" class="responsive-button" data-icon="home">Home</a>
 
-        <h1>Keys</h1>
+        <h1>Logs</h1>
 
         {{view Mist.userMenuView}}
 
@@ -24,7 +24,7 @@
             data-filter-placeholder="Filter..."
             class="checkbox-list">
             {{#each Mist.logsController.content}}
-                {{!view Mist.logListItemView logBinding="this" class="checkbox-link"}}
+                {{view Mist.logListItemView logBinding="this" class="checkbox-link"}}
             {{/each}}
         </ul>
 
