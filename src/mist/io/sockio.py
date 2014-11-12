@@ -65,6 +65,13 @@ class ShellNamespace(BaseNamespace):
     def on_shell_data(self, data):
         self.channel.send(data)
 
+    def on_shell_resize(self, columns, rows):
+        log.warning("Resizing shell to %d * %d", columns, rows)
+        try:
+            self.channel.resize_pty(columns, rows)
+        except:
+            pass
+
     def get_ssh_data(self):
         try:
             while True:

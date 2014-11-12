@@ -5,6 +5,7 @@
 #machine-shell-popup #shell-return {
 
     color: #efeff1;
+    line-height: 20px;
     background-color: #000;
 
     border: 1px solid #AAA;

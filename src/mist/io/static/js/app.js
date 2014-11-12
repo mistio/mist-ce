@@ -610,7 +610,6 @@ var loadApp = function (
     App.set('metricAddCustomView', MetricAddCustomView);
     App.set('machineKeysListItemView', MachineKeysListItemView);
     App.set('machineTagsListItemView', MachineTagsListItemView);
-    App.set('machineShellListItemView', MachineShellListItemView);
 
     // Ember controllers
 
@@ -1181,8 +1180,7 @@ function maxCharsInWidth (fontSize, width) {
 function maxLinesInHeight (fontSize, height) {
 
     var fontTest = $('#font-test')
-        .css('font-size', fontSize)
-        .css('line-height', fontSize);
+        .css('font-size', fontSize);
 
     var testString = '';
     var textHeight = 0

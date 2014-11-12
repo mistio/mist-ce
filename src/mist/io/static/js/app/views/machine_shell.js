@@ -89,17 +89,11 @@ define('app/views/machine_shell', ['app/views/popup'],
         var resizeLock;
         function windowResizeHandler () {
 
-            // Resize popup only when client is on mobile, which means
-            // terminal resolution is fixed to the minimum standards.
-            // If we resized the popup on desktop clients, we would need to
-            // open a new shell session using the new resolution
-            if (!Mist.isClientMobile) return;
-
             // Prevent shell recalibration if user hasn't stopped resizing the
             // window, which is most probably device rotation or the appearance
             // of the on screen keyboard
             clearTimeout(resizeLock);
-            resizeLock = setTimeout(mobileCalibration, 500);
+            resizeLock = setTimeout(initShell, 1000);
         }
 
 
@@ -169,6 +163,7 @@ define('app/views/machine_shell', ['app/views/popup'],
             // Set font size to the default of 1em and then get it's
             // value in pixels because it may vary across platforms/browsers
             var fontSize = $('#font-test')
+                .css('line-height', $('#shell-return').css('line-height'))
                 .css('font-size', '1em')
                 .css('font-size');
 
@@ -187,8 +182,7 @@ define('app/views/machine_shell', ['app/views/popup'],
             }
 
             $('#shell-return')
-                .css('font-size', fontSize)
-                .css('line-height', fontSize);
+                .css('font-size', fontSize);
 
             Mist.machineShellController.set('cols', numOfColumns);
             Mist.machineShellController.set('rows', numOfRows);

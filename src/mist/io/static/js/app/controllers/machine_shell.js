@@ -52,7 +52,11 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
             connect: function () {
 
-                if (this.connected) return;
+                if (this.connected) {
+                    this.resize();
+                    return;
+                }
+
                 this.set('connected', true);
 
                 // Open shell socket
@@ -112,6 +116,13 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
                     $(Terminal._textarea).show();
                 }
+            },
+
+
+            resize: function () {
+                info('resizing', this.cols, this.rows);
+                Mist.term.resize(this.cols, this.rows);
+                Mist.shell.emit('shell_resize',this.cols, this.rows);
             },
 
 
