@@ -898,7 +898,9 @@ var setupSocketEvents = function (socket, callback) {
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);
     })
-    .on('list_backends', function (backends) {
+    .on('list_logs', function (logs) {
+        Mist.logsController.load(logs);
+    }).on('list_backends', function (backends) {
         Mist.backendsController.load(backends);
         if (callback)
             callback();
