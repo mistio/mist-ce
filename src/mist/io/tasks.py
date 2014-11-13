@@ -193,24 +193,46 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(host, username=username, password=password, timeout=None, banner_timeout=None, allow_agent=False, look_for_keys=False)
+
+            ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
+            #Makes no sense but sometimes the sudo command is not run on some VMs, eg Centos.
+            #Thus the VM is unuseable, since the ssh key is deployed but we have no root access.
+            #By re-sending the command we increase the possibilities of things going correctly
+            try:
+                chan = ssh.invoke_shell()
+                chan = ssh.get_transport().open_session()
+                chan.get_pty()
+                chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\' ' % username)
+                sleep(0.5)
+                chan.send('%s\n' % password)
+            except:
+                pass
+
             chan = ssh.invoke_shell()
             chan = ssh.get_transport().open_session()
             chan.get_pty()
             chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\' ' % username)
-            sleep(0.5)
             chan.send('%s\n' % password)
+
+            try:
+                chan = ssh.invoke_shell()
+                chan = ssh.get_transport().open_session()
+                chan.get_pty()
+                chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/waagent\' ' % username)
+                sleep(0.5)
+                chan.send('%s\n' % password)
+            except:
+                pass
 
             chan = ssh.invoke_shell()
             chan = ssh.get_transport().open_session()
             chan.get_pty()
             chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/waagent\' ' % username)
-            sleep(0.5)
             chan.send('%s\n' % password)
-
-            ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
 
             cmd = 'sudo su -c \'sed -i "s|[#]*PasswordAuthentication yes|PasswordAuthentication no|g" /etc/ssh/sshd_config &&  /etc/init.d/ssh reload; service ssh reload\' '
             ssh.exec_command(cmd)
+
             ssh.close()
 
             if command or monitoring:
@@ -218,7 +240,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
                                           monitoring, command, key_id)
 
         except Exception as exc:
-            raise self.retry(exc=exc, max_retries=10)
+            raise self.retry(exc=exc, countdown=30, max_retries=10)
     except Exception as exc:
         if str(exc).startswith('Retry'):
             raise
