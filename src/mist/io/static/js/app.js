@@ -924,7 +924,7 @@ var setupSocketEvents = function (socket, callback) {
                 head: data.title,
                 body: [
                     {
-                        command: data.message.substr(1)
+                        command: data.message
                     }
                 ]
             });
