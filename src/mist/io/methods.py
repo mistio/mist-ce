@@ -1562,7 +1562,7 @@ def list_images(user, backend_id, term=None):
             # from Azure's response we can't know which images are default
             rest_images = conn.list_images()
             rest_images = [image for image in rest_images if 'windows' not in image.name.lower()
-                           and 'RightImage' not in image.name]
+                           and 'RightImage' not in image.name and 'Barracuda' not in image.name and 'BizTalk' not in image.name]
             temp_dict = {}
             for image in rest_images:
                 temp_dict[image.name] = image
