@@ -524,6 +524,7 @@ def connect_provider(backend):
         #a cert file
         temp_key_file = NamedTemporaryFile(delete=False)
         temp_key_file.write(backend.apisecret)
+        temp_key_file.close()
         conn = driver(backend.apikey, temp_key_file.name)
     elif backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
@@ -1229,7 +1230,12 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 ex_cloud_service_name=cloud_service_name
             )
         except Exception as e:
-            raise MachineCreationError("Azure, got exception %s" % e)
+            try:
+                #get to get the message only out of the XML response
+                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value).group(2)
+            except:
+                msg = e
+            raise MachineCreationError('Azure, got exception %s' % msg)
 
         return node
 
@@ -1556,7 +1562,7 @@ def list_images(user, backend_id, term=None):
             # from Azure's response we can't know which images are default
             rest_images = conn.list_images()
             rest_images = [image for image in rest_images if 'windows' not in image.name.lower()
-                           and 'RightImage' not in image.name]
+                           and 'RightImage' not in image.name and 'Barracuda' not in image.name and 'BizTalk' not in image.name]
             temp_dict = {}
             for image in rest_images:
                 temp_dict[image.name] = image

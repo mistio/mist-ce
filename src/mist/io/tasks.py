@@ -5,7 +5,7 @@ import functools
 
 import libcloud.security
 
-from time import time
+from time import time, sleep
 from uuid import uuid4
 
 from base64 import b64encode
@@ -177,12 +177,12 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
                 node = n
                 break
 
-        if node and len(node.public_ips):
+        if node and node.state == 0 and len(node.public_ips):
             # filter out IPv6 addresses
             ips = filter(lambda ip: ':' not in ip, node.public_ips)
             host = ips[0]
         else:
-            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
+            raise self.retry(exc=Exception(), max_retries=20)
 
         try:
             #login with user, password. Deploy the public key, enable sudo access for
@@ -192,14 +192,37 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
             ssh=paramiko.SSHClient()
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(host, username=username, password=password)
+            ssh.connect(host, username=username, password=password, timeout=None, banner_timeout=None, allow_agent=False, look_for_keys=False)
+
             ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
+            #Makes no sense but sometimes the sudo command is not run on some VMs, eg Centos.
+            #Thus the VM is unuseable, since the ssh key is deployed but we have no root access.
+            #By re-sending the command we increase the possibilities of things going correctly
+            try:
+                chan = ssh.invoke_shell()
+                chan = ssh.get_transport().open_session()
+                chan.get_pty()
+                chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\' ' % username)
+                sleep(0.5)
+                chan.send('%s\n' % password)
+            except:
+                pass
 
             chan = ssh.invoke_shell()
             chan = ssh.get_transport().open_session()
             chan.get_pty()
             chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\' ' % username)
             chan.send('%s\n' % password)
+
+            try:
+                chan = ssh.invoke_shell()
+                chan = ssh.get_transport().open_session()
+                chan.get_pty()
+                chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/waagent\' ' % username)
+                sleep(0.5)
+                chan.send('%s\n' % password)
+            except:
+                pass
 
             chan = ssh.invoke_shell()
             chan = ssh.get_transport().open_session()
@@ -209,6 +232,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
 
             cmd = 'sudo su -c \'sed -i "s|[#]*PasswordAuthentication yes|PasswordAuthentication no|g" /etc/ssh/sshd_config &&  /etc/init.d/ssh reload; service ssh reload\' '
             ssh.exec_command(cmd)
+
             ssh.close()
 
             if command or monitoring:
@@ -216,7 +240,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
                                           monitoring, command, key_id)
 
         except Exception as exc:
-            raise self.retry(exc=exc, countdown=60, max_retries=10)
+            raise self.retry(exc=exc, countdown=30, max_retries=10)
     except Exception as exc:
         if str(exc).startswith('Retry'):
             raise
