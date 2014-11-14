@@ -20,8 +20,9 @@ define('app/models/log', ['ember'],
 
             id: null,
             user: null,
-            event: null,
-            timestamp: null,
+            type: null,
+            action: null,
+            time: null,
 
 
             //
@@ -32,8 +33,8 @@ define('app/models/log', ['ember'],
 
 
             formatedDate: function () {
-                return Mist.prettyDate(this.get('timestamp'));
-            }.property('timestamp')
+                return Mist.prettyDate(this.get('time'));
+            }.property('time')
         });
     }
 );
