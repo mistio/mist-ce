@@ -89,6 +89,11 @@ define('app/models/machine', ['ember'],
             }.property('imageId'),
 
 
+            hasKeys: function () {
+                return !!Mist.keysController.getMachineKeysCount(this)
+            }.property('Mist.keysController.content.@each.machines'),
+
+
             /**
              *
              *  Initialization

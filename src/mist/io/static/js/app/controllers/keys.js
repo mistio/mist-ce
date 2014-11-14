@@ -223,7 +223,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                 var count = 0;
                 this.content.forEach(function(key) {
                     key.machines.some(function(key_machine) {
-                        if (key_machine[1] == machine.id && key_machine[0] == machine.backend.id) {
+                        if (machine.equals(key_machine)) {
                             return ++count;
                         }
                     });
