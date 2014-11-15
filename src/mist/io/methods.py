@@ -48,7 +48,7 @@ from mist.io.helpers import StdStreamCapture
 
 import mist.io.tasks
 import mist.io.inventory
-
+from paramiko.ssh_exception import SSHException
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -441,6 +441,9 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
             raise MachineUnauthorizedError(
                 "Couldn't connect to deploy new SSH keypair."
             )
+    except SSHException:
+        # give it another try, in case it has failed with 'SSH session not active' or 'Error reading SSH protocol banner' errors
+        ssh_command(user, backend_id, machine_id, host, command, username=username, port=port)
     else:
         # deployment probably succeeded
         # attemp to connect with new key
