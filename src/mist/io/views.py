@@ -181,6 +181,12 @@ def add_backend(request):
     """Adds a new backend."""
 
     params = request.json_body
+    #remove spaces from start/end of string fields that are often included
+    #when pasting keys, preventing thus succesfull connection with the 
+    #backend
+    for key in params.keys():
+        if type(params[key]) in [unicode, str]:
+            params[key] = params[key].rstrip().lstrip()
     title = params.get('title', '')
     provider = params.get('provider', '')
     apikey = params.get('apikey', '')
