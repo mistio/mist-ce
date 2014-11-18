@@ -115,10 +115,13 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     payload[property] = value;
                 });
 
+                var that = this;
                 args.rule.set('pendingAction', true);
                 Mist.ajax.POST('/rules',
                     payload
-                ).error(function(message) {
+                ).success(function (data) {
+                    that._updateRule(args.rule, data);
+                }).error(function(message) {
                     Mist.notificationController.notify(
                         'Error while updating rule: ' + message);
                 }).complete(function (success, data) {
