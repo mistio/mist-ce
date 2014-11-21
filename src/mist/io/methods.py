@@ -178,7 +178,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             backend.apiurl = HPCLOUD_AUTH_URL
 
         if provider == 'vcloud':
-            for prefix in ['https://', 'http://']
+            for prefix in ['https://', 'http://']:
                 backend.apiurl = backend.apiurl.strip(prefix)
             backend.apiurl = backend.apiurl.split('/')[0] #need host, not url
 
