@@ -55,13 +55,6 @@ def get_temp_file(content):
             pass
 
 
-def core_wrapper(func):
-    """Dummy decorator for compatibility with core."""
-    def wrapped_func(*args, **kwargs):
-        return func(*args, **kwargs)
-    return wrapped_func
-
-
 def params_from_request(request):
     """Get the parameters dict from request.
 
