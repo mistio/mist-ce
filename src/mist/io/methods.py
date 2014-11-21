@@ -177,6 +177,11 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if 'hpcloudsvc' in apiurl:
             backend.apiurl = HPCLOUD_AUTH_URL
 
+        if provider == 'vcloud':
+            for prefix in ['https://', 'http://']
+                backend.apiurl = backend.apiurl.strip(prefix)
+            backend.apiurl = backend.apiurl.split('/')[0] #need host, not url
+
         backend_id = backend.get_id()
         if backend_id in user.backends:
             raise BackendExistsError(backend_id)
@@ -564,6 +569,9 @@ def connect_provider(backend):
                       region=backend.region)
     elif backend.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(backend.apikey, backend.apisecret)
+    elif backend.provider == Provider.VCLOUD:
+        libcloud.security.VERIFY_SSL_CERT = False;
+        conn = driver(backend.apikey, backend.apisecret, host=backend.apiurl)
     elif backend.provider == Provider.DIGITAL_OCEAN:
         if backend.apikey == backend.apisecret:  # API v2
             conn = driver(backend.apisecret)
