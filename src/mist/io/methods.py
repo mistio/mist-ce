@@ -608,7 +608,8 @@ def get_machine_actions(machine_from_api, conn):
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE):
+                     Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
+                     Provider.VCLOUD):
         can_tag = False
 
     # for other states
