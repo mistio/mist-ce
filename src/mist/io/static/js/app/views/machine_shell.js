@@ -26,7 +26,8 @@ define('app/views/machine_shell', ['app/views/popup'],
                     .on('popupafteropen', afterOpenHandler)
                     .on('popupbeforeposition', beforeOpenHandler)
                     .parent()
-                    .addClass(Mist.isClientMobile ? 'mobile' : 'desktop');
+                    .addClass(Mist.isClientMobile ? 'mobile' : 'desktop')
+                    .addClass(Mist.isClientMoblie ? 'huge-popup' : '');
             }.on('didInsertElement'),
 
 
@@ -228,8 +229,7 @@ define('app/views/machine_shell', ['app/views/popup'],
             } while (eWidth > maxWidth || eHeight > maxHeight);
 
             $('#shell-return')
-                .css('font-size', fontSize + 'px')
-                .css('line-height', fontSize + 'px');
+                .css('font-size', fontSize + 'px');
 
             // Place popup in the center
             var popup = $('#machine-shell-popup');

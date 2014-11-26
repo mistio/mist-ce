@@ -5,8 +5,7 @@
 #machine-shell-popup #shell-return {
 
     color: #efeff1;
-    line-height: 20px;
-    background-color: #000;
+    background-color: #0A0A0A;
 
     border: 1px solid #AAA;
     border-radius: 4px;
@@ -46,11 +45,12 @@ span.terminal-cursor {
 ---------------------------*/
 
 #machine-shell-popup.desktop {
-    opacity: 0.8;
+    opacity: 0.85;
 }
 
 #machine-shell-popup.desktop #shell-return {
     font-size: 1em;
+    line-height: 20px;
 }
 
 #machine-shell-popup.desktop .ui-btn {
@@ -77,21 +77,36 @@ span.terminal-cursor {
 /* Mobile specific css
 ---------------------------*/
 
+#machine-shell-popup.mobile #shell-back {
+    margin-bottom: 0;
+}
+
 #machine-shell-popup.mobile {
     top: 1% !important;
     max-height: 98% !important;
-}
-
-#machine-shell-popup.mobile .ui-btn {
-    margin: 0;
-}
-
-#machine-shell-popup.mobile .ui-content {
-    padding: 0;
+    position: fixed;
 }
 
 #machine-shell-popup.mobile #shell-return {
+    background: #444 !important;
+    border: 1px solid #AAA;
+    font-family: monospace;
+    font-size: 150%;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    margin-bottom: 0px;
+    background: #dfe1e2;
+    overflow-y: auto;
+    color: #efeff1;
+    padding: 6px;
+    text-shadow: none;
+    overflow: hidden !important;
     max-width: 98%;
+}
+
+
+#machine-shell-popup.mobile #shell-return {
     font-size: 150%;
     margin-bottom: 0px;
 }
