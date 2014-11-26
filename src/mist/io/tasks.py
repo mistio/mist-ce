@@ -5,7 +5,7 @@ import functools
 
 import libcloud.security
 
-from time import time
+from time import time, sleep
 from uuid import uuid4
 
 from base64 import b64encode
@@ -160,7 +160,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
         notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
 
 
-@app.task(bind=True, default_retry_delay=3*60)
+@app.task(bind=True, default_retry_delay=2*60)
 def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, command,
                       key_id, username, password, public_key):
     from mist.io.methods import ssh_command, connect_provider, enable_monitoring
@@ -177,12 +177,12 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
                 node = n
                 break
 
-        if node and len(node.public_ips):
+        if node and node.state == 0 and len(node.public_ips):
             # filter out IPv6 addresses
             ips = filter(lambda ip: ':' not in ip, node.public_ips)
             host = ips[0]
         else:
-            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
+            raise self.retry(exc=Exception(), max_retries=20)
 
         try:
             #login with user, password. Deploy the public key, enable sudo access for
@@ -192,23 +192,27 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
             ssh=paramiko.SSHClient()
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(host, username=username, password=password)
+            ssh.connect(host, username=username, password=password, timeout=None, allow_agent=False, look_for_keys=False)
+
             ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
 
-            chan = ssh.invoke_shell()
             chan = ssh.get_transport().open_session()
             chan.get_pty()
             chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers\' ' % username)
             chan.send('%s\n' % password)
 
-            chan = ssh.invoke_shell()
+            check_sudo_command = 'sudo su -c \'whoami\''
+
             chan = ssh.get_transport().open_session()
             chan.get_pty()
-            chan.exec_command('sudo su -c \'echo "%s ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/waagent\' ' % username)
-            chan.send('%s\n' % password)
+            chan.exec_command(check_sudo_command)
+            output = chan.recv(1024)
 
+            if not output.startswith('root'):
+                raise
             cmd = 'sudo su -c \'sed -i "s|[#]*PasswordAuthentication yes|PasswordAuthentication no|g" /etc/ssh/sshd_config &&  /etc/init.d/ssh reload; service ssh reload\' '
             ssh.exec_command(cmd)
+
             ssh.close()
 
             if command or monitoring:
@@ -216,7 +220,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
                                           monitoring, command, key_id)
 
         except Exception as exc:
-            raise self.retry(exc=exc, countdown=60, max_retries=10)
+            raise self.retry(exc=exc, countdown=10, max_retries=15)
     except Exception as exc:
         if str(exc).startswith('Retry'):
             raise
