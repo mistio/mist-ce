@@ -13,9 +13,8 @@
 }
 
 #history-control {
-    width: 280px;
+    width: 230px;
     height: 55px;
-    margin-left: -5px;
     display: inline-block;
 }
 
@@ -32,8 +31,8 @@
 }
 
 #history-control a.time {
-    width: 75px;
-    height: 43px;
+    width: 65px;
+    height: 35px;
     border-radius: 0.3em;
 }
 
@@ -42,9 +41,12 @@
 }
 
 #time-window-control .ui-btn {
-    height: 23px;
+    height: 20px;
 }
 
+#time-window-control span {
+    padding: 3px;
+}
 
 .graph-button {
     display: inline-block;
