@@ -35,7 +35,7 @@ app = Celery(
 
 app.conf.update(
     CELERY_TASK_SERIALIZER = "json",
-    CELERYD_MAX_TASKS_PER_CHILD = 128,
+    CELERYD_MAX_TASKS_PER_CHILD = 32,
     CELERYD_LOG_FORMAT = "%(asctime)s %(levelname)s %(threadName)s %(module)s - %(funcName)s: %(message)s",
     CELERYD_TASK_LOG_FORMAT = "%(asctime)s %(levelname)s %(threadName)s %(module)s - %(funcName)s: %(message)s",
     ## CELERY_TASK_RESULT_EXPIRES=3600,
