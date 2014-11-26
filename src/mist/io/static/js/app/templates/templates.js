@@ -763,54 +763,54 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = '', hashContexts, hashTypes;
-  data.buffer.push("\n                <a id=\"history-control-stream\"\n                    class=\"ui-btn\n                        ui-btn-b\n                        ui-corner-all\n                        ui-btn-inline\"\n                    ");
+  data.buffer.push("\n            <a id=\"history-control-stream\"\n                class=\"ui-btn\n                    ui-mini\n                    ui-btn-b\n                    ui-corner-all\n                    ui-btn-inline\"\n                ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "pauseClicked", {hash:{
     'target': ("view.actionProxy")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n                        Pause\n                </a>\n            ");
+  data.buffer.push(">\n                    Pause\n            </a>\n        ");
   return buffer;
   }
 
 function program3(depth0,data) {
   
   var buffer = '', hashContexts, hashTypes;
-  data.buffer.push("\n                <a id=\"history-control-stream\"\n                    class=\"ui-btn\n                        ui-btn-b\n                        ui-corner-all\n                        ui-btn-inline\"\n                    ");
+  data.buffer.push("\n            <a id=\"history-control-stream\"\n                class=\"ui-btn\n                    ui-mini\n                    ui-btn-b\n                    ui-corner-all\n                    ui-btn-inline\"\n                ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "resetClicked", {hash:{
     'target': ("view.actionProxy")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n                        Reset\n                </a>\n            ");
+  data.buffer.push(">\n                    Reset\n            </a>\n        ");
   return buffer;
   }
 
-  data.buffer.push("<div id=\"graph-list-control\">\n\n    <div id=\"time-window-control\">\n        <select data-inline=\"true\" data-shadow=\"false\"\n            ");
+  data.buffer.push("<div id=\"graph-list-control\">\n\n    <div id=\"time-window-control\" class=\"ui-mini\">\n        <select data-inline=\"true\" data-shadow=\"false\" data-mini=\"true\"\n            ");
   hashContexts = {'on': depth0,'target': depth0};
   hashTypes = {'on': "STRING",'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "timeWindowChanged", {hash:{
     'on': ("change"),
     'target': ("view.actionProxy")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n                <option value=\"minutes\" selected='true'>10min</option>\n                <option value=\"hour\">1h</option>\n                <option value=\"day\">1d</option>\n                <option value=\"week\">1w</option>\n                <option value=\"month\">1mo</option>\n        </select>\n    </div>\n\n    <div id=\"history-control\" class=\"ui-grid-b\">\n\n        <!--\n            Back Button\n        -->\n\n        <div class=\"ui-block-a\">\n            <a id=\"history-control-back\"\n                class=\"time\n                    ui-btn\n                    ui-corner-all\n                    ui-btn-inline\n                    ui-btn-icon-notext\n                    ui-icon-arrow-l\"\n                ");
+  data.buffer.push(">\n                <option value=\"minutes\" selected='true'>10 minutes</option>\n                <option value=\"hour\">1 hour</option>\n                <option value=\"day\">1 day</option>\n                <option value=\"week\">1 week</option>\n                <option value=\"month\">1 month</option>\n        </select>\n    </div>\n\n    <div id=\"history-control\">\n\n        <!--\n            Back Button\n        -->\n        <a id=\"history-control-back\"\n            class=\"time\n                ui-btn\n                ui-mini\n                ui-corner-all\n                ui-btn-inline\n                ui-btn-icon-notext\n                ui-icon-arrow-l\"\n            ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
     'target': ("view.actionProxy")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n            </a>\n        </div>\n\n        <!--\n            Stream Toggle\n        -->\n\n        <div class=\"ui-block-b\">\n            ");
+  data.buffer.push(">\n        </a>\n\n        <!--\n            Stream Toggle\n        -->\n        ");
   hashTypes = {};
   hashContexts = {};
   stack1 = helpers['if'].call(depth0, "Mist.graphsController.stream.isStreaming", {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n        </div>\n\n        <!--\n            Forward Button\n        -->\n\n        <div class=\"ui-block-c\">\n            <a id=\"history-control-forward\"\n                class=\"time\n                    ui-btn\n                    ui-corner-all\n                    ui-btn-inline\n                    ui-btn-icon-notext\n                    ui-icon-arrow-r\"\n                ");
+  data.buffer.push("\n\n        <!--\n            Forward Button\n        -->\n        <a id=\"history-control-forward\"\n            class=\"time\n                ui-btn\n                ui-mini\n                ui-corner-all\n                ui-btn-inline\n                ui-btn-icon-notext\n                ui-icon-arrow-r\"\n            ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "forwardClicked", {hash:{
     'target': ("view.actionProxy")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n            </a>\n        </div>\n    </div>\n</div>\n");
+  data.buffer.push(">\n        </a>\n    </div>\n</div>\n");
   return buffer;
   
 });
@@ -1012,11 +1012,7 @@ function program15(depth0,data) {
   }
 function program16(depth0,data) {
   
-  var buffer = '', stack1, hashTypes, hashContexts, options;
-  data.buffer.push("\n                ");
-  hashTypes = {};
-  hashContexts = {};
-  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "machine.name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  var buffer = '', stack1, hashContexts, hashTypes, options;
   data.buffer.push("\n                <div ");
   hashContexts = {'class': depth0};
   hashTypes = {'class': "STRING"};
@@ -1024,7 +1020,11 @@ function program16(depth0,data) {
     'class': ("this.id :lineLegend")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data};
   data.buffer.push(escapeExpression(((stack1 = helpers['bind-attr'] || (depth0 && depth0['bind-attr'])),stack1 ? stack1.call(depth0, options) : helperMissing.call(depth0, "bind-attr", options))));
-  data.buffer.push("></div>\n            ");
+  data.buffer.push("></div>\n                ");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "machine.name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n            ");
   return buffer;
   }
 
