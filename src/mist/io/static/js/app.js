@@ -18,6 +18,7 @@ require.config({
     },
     deps: ['jquery'],
     callback: function () {
+        fontTest = $('#font-test')
         handleMobileInit();
         appLoader.init();
     },
@@ -299,7 +300,6 @@ var loadFiles = function (callback) {
         'app/views/machine_monitoring',
         'app/views/machine_power',
         'app/views/machine_shell',
-        'app/views/machine_shell_list_item',
         'app/views/machine_tags',
         'app/views/machine_tags_list_item',
         'app/views/messagebox',
@@ -376,7 +376,6 @@ var loadApp = function (
     MachineMonitoringView,
     MachinePowerView,
     MachineShellView,
-    MachineShellListItemView,
     MachineTagsView,
     MachineTagsListItemView,
     MessageBoxView,
@@ -612,7 +611,6 @@ var loadApp = function (
     App.set('metricAddCustomView', MetricAddCustomView);
     App.set('machineKeysListItemView', MachineKeysListItemView);
     App.set('machineTagsListItemView', MachineTagsListItemView);
-    App.set('machineShellListItemView', MachineShellListItemView);
 
     // Ember controllers
 
@@ -1143,7 +1141,7 @@ function virtualKeyboardHeight () {
         keyboardHeight = 0;
     }
     return keyboardHeight;
-};
+}
 
 
 // forEach like function on objects
@@ -1160,7 +1158,55 @@ function forIn () {
     var keysLength = keys.length;
     for (var i = 0; i < keysLength; i++)
         callback.call(thisArg, object[keys[i]], keys[i]);
-};
+}
+
+
+// Calculates maximum chars that can be displayed into a fixed width
+var fontTest;
+function maxCharsInWidth (fontSize, width) {
+
+    fontTest.css('font-size', fontSize);
+
+    // Initialize testString to a number of chars that will "probably"
+    // fit in width
+    var textWidth = fontTest.text('t').width();
+    info(width, '/', textWidth, '=', width / textWidth);
+    var testString = Array(parseInt(width / textWidth) + 5).join('t');
+    textWidth = fontTest.text(testString).width();
+
+    for (var charCount = testString.length; textWidth > width; charCount--) {
+        testString = testString.slice(1);
+        textWidth = fontTest.text(testString).width();
+    };
+    return charCount;
+}
+
+// Calculates maximum lines that can be displayed into a fixed height
+function maxLinesInHeight (fontSize, height) {
+
+    fontTest.css('font-size', fontSize);
+
+    var testString = '';
+    var textHeight = 0
+    for (var lineCount = 0; textHeight < height; lineCount++) {
+        testString += '<div>t</div>';
+        textHeight = fontTest.html(testString).height();
+    };
+    return lineCount;
+}
+
+
+function lockScroll(){
+    $('body').data('y-scroll', self.pageYOffset)
+             .css('overflow', 'hidden');
+    window.scrollTo(null, self.pageYOffset);
+}
+
+
+function unlockScroll(){
+      $('body').css('overflow', 'auto');
+      window.scrollTo(null, $('body').data('y-scroll'))
+}
 
 
 // Simple timer tool for performance measurements

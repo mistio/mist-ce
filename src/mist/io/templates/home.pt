@@ -71,8 +71,8 @@
         </div>
     </div>
 
-    <!-- Dumping area for shell streaming -->
-    <div id="hidden-shell"></div>
+    <!-- Shell calibration element -->
+    <div id="font-test"></div>
 
     <!-- Notification widget -->
     <div id="notification-popup" class="ui-loader ui-corner-all ui-body-b ui-loader-verbose ui-loader-textonly">
