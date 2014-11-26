@@ -164,7 +164,6 @@ define('app/views/machine_shell', ['app/views/popup'],
             // Set font size to the default of 1em and then get it's
             // value in pixels because it may vary across platforms/browsers
             var fontSize = $('#font-test')
-                .css('line-height', $('#shell-return').css('line-height'))
                 .css('font-size', '1em')
                 .css('font-size');
 
