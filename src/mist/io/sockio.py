@@ -8,6 +8,7 @@ greenlet.
 
 """
 
+import uuid
 import random
 from time import time
 
@@ -48,8 +49,10 @@ class CustomNamespace(BaseNamespace):
     def __init__(self, *args, **kwargs):
         super(CustomNamespace, self).__init__(*args, **kwargs)
         self.user = user_from_request(self.request)
-        log.info("Initialized %s for user %s. Socket session id %s",
-                 self.__class__.__name__, self.user.email, self.socket.sessid)
+        self.session_id = uuid.uuid4().hex
+        log.info("Initialized %s for user %s. Socket %s. Session %s",
+                 self.__class__.__name__, self.user.email,
+                 self.socket.sessid, self.session_id)
         self.init()
 
     def init(self):
@@ -67,8 +70,9 @@ class CustomNamespace(BaseNamespace):
             except Exception as exc:
                 log.error("%s: Error reloading request session: %r",
                           self.__class__.__name__, exc)
-        log.info("Disconnecting %s for user %s. Socket session id %s",
-                 self.__class__.__name__, self.user.email, self.socket.sessid)
+        log.info("Disconnecting %s for user %s. Socket %s. Session %s",
+                 self.__class__.__name__, self.user.email,
+                 self.socket.sessid, self.session_id)
         return super(CustomNamespace, self).disconnect(silent=silent)
 
 
