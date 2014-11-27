@@ -84,8 +84,8 @@
     {{#if Mist.graphsController.config.showGraphLegend}}
         <div class="legend">
             {{#each view.graph.datasources}}
-                {{this.machine.name}}
                 <div {{bind-attr class="this.id :lineLegend"}}></div>
+                {{this.machine.name}}
             {{/each}}
         </div>
     {{/if}}

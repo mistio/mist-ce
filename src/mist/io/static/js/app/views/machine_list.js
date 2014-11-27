@@ -38,6 +38,10 @@ define('app/views/machine_list', ['app/views/mistscreen'],
              */
 
             updateFooter: function () {
+
+                if (Mist.machineShellController.isOpen)
+                    return;
+
                 switch (Mist.backendsController.selectedMachines.length) {
                 case 0:
                     $('#machine-list-page .ui-footer').slideUp();
