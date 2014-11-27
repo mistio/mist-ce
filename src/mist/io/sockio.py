@@ -79,11 +79,27 @@ class CustomNamespace(BaseNamespace):
 class ShellNamespace(CustomNamespace):
     def init(self):
         self.channel = None
+        self.ssh_info = {}
 
     def on_shell_open(self, data):
+        if self.ssh_info:
+            self.disconnect()
+        self.ssh_info = {
+            'backend_id': data['backend_id'],
+            'machine_id': data['machine_id'],
+            'host': data['host'],
+        }
         log.info("opened shell")
         self.shell = Shell(data['host'])
-        key_id, ssh_user = self.shell.autoconfigure(self.user, data['backend_id'], data['machine_id'])
+        try:
+            key_id, ssh_user = self.shell.autoconfigure(
+                self.user, data['backend_id'], data['machine_id']
+            )
+        except Exception as exc:
+            self.ssh_info['error'] = str(exc)
+            self.emit_shell_data(self, str(exc))
+            self.disconnect()
+        self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
         self.channel = self.shell.ssh.invoke_shell('xterm')
         self.spawn(self.get_ssh_data)
 
@@ -91,6 +107,7 @@ class ShellNamespace(CustomNamespace):
         log.info("closing shell")
         if self.channel:
             self.channel.close()
+        self.disconnect()
 
     def on_shell_data(self, data):
         self.channel.send(data)
@@ -102,9 +119,12 @@ class ShellNamespace(CustomNamespace):
                 data = self.channel.recv(1024).decode('utf-8','ignore')
                 if not len(data):
                     return
-                self.emit('shell_data', data)
+                self.emit_shell_data(data)
         finally:
             self.channel.close()
+
+    def emit_shell_data(self, data):
+        self.emit('shell_data', data)
 
 
 class MistNamespace(CustomNamespace):
