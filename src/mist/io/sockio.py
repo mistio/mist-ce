@@ -44,11 +44,37 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 
-class ShellNamespace(BaseNamespace):
-    def initialize(self):
+class CustomNamespace(BaseNamespace):
+    def __init__(self, *args, **kwargs):
+        super(CustomNamespace, self).__init__(*args, **kwargs)
         self.user = user_from_request(self.request)
+        log.info("Initialized %s for user %s. Socket session id %s",
+                 self.__class__.__name__, self.user.email, self.socket.sessid)
+        self.init()
+
+    def init(self):
+        # IMPORTANT: initialize() is called automatically by BaseNamespace on
+        # all the classes and mixins in the order of the MRO which creates
+        # weird issues when trying to subclass. Use init instead because it
+        # is called only once and can use super.
+        pass
+
+    def disconnect(self, silent=False):
+        if multi_user:
+            try:
+                # reload the session to avoid saving a stale or deleted session
+                self.request.environ['beaker.session'].load()
+            except Exception as exc:
+                log.error("%s: Error reloading request session: %r",
+                          self.__class__.__name__, exc)
+        log.info("Disconnecting %s for user %s. Socket session id %s",
+                 self.__class__.__name__, self.user.email, self.socket.sessid)
+        return super(CustomNamespace, self).disconnect(silent=silent)
+
+
+class ShellNamespace(CustomNamespace):
+    def init(self):
         self.channel = None
-        log.info("opening shell socket")
 
     def on_shell_open(self, data):
         log.info("opened shell")
@@ -76,17 +102,9 @@ class ShellNamespace(BaseNamespace):
         finally:
             self.channel.close()
 
-    def disconnect(self, silent=False):
-        if multi_user:
-            # reload the session, to avoid saving a stale or deleted session
-            self.request.environ['beaker.session'].load()
-        return super(ShellNamespace, self).disconnect(silent=silent)
 
-
-class MistNamespace(BaseNamespace):
-    def initialize(self):
-        log.info("init")
-        self.user = user_from_request(self.request)
+class MistNamespace(CustomNamespace):
+    def init(self):
         self.update_greenlet = None
         self.running_machines = set()
 
@@ -200,12 +218,6 @@ class MistNamespace(BaseNamespace):
                 self.monitoring_greenlet.kill()
                 self.monitoring_greenlet = self.spawn(check_monitoring_from_socket,
                                                       self)
-
-    def disconnect(self, silent=False):
-        if multi_user:
-            # reload the session, to avoid saving a stale or deleted session
-            self.request.environ['beaker.session'].load()
-        return super(MistNamespace, self).disconnect(silent=silent)
 
 
 def update_subscriber(namespace):
