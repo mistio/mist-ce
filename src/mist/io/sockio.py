@@ -33,6 +33,7 @@ except ImportError:
 from mist.io.helpers import amqp_subscribe_user
 from mist.io.helpers import amqp_log
 from mist.io.methods import notify_user
+from mist.io.exceptions import MachineUnauthorizedError
 
 from mist.io import methods
 from mist.io import tasks
@@ -96,8 +97,12 @@ class ShellNamespace(CustomNamespace):
                 self.user, data['backend_id'], data['machine_id']
             )
         except Exception as exc:
-            self.ssh_info['error'] = str(exc)
-            self.emit_shell_data(str(exc))
+            if isinstance(exc, MachineUnauthorizedError):
+                err = 'Permission denied (publickey).'
+            else:
+                err = str(exc)
+            self.ssh_info['error'] = err
+            self.emit_shell_data(err)
             self.disconnect()
             return
         self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
