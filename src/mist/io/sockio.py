@@ -99,6 +99,7 @@ class ShellNamespace(CustomNamespace):
             self.ssh_info['error'] = str(exc)
             self.emit_shell_data(str(exc))
             self.disconnect()
+            return
         self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
         self.channel = self.shell.ssh.invoke_shell('xterm', data['cols'], data['rows'])
         self.spawn(self.get_ssh_data)
