@@ -89,6 +89,8 @@ class ShellNamespace(CustomNamespace):
             'backend_id': data['backend_id'],
             'machine_id': data['machine_id'],
             'host': data['host'],
+            'columns': data['cols'],
+            'rows': data['rows'],
         }
         log.info("opened shell")
         self.shell = Shell(data['host'])
