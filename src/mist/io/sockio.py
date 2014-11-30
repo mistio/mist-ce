@@ -111,12 +111,6 @@ class ShellNamespace(CustomNamespace):
         self.channel = self.shell.ssh.invoke_shell('xterm', data['cols'], data['rows'])
         self.spawn(self.get_ssh_data)
 
-    def on_shell_close(self):
-        log.info("closing shell")
-        if self.channel:
-            self.channel.close()
-        self.disconnect()
-
     def on_shell_data(self, data):
         self.channel.send(data)
 
@@ -140,6 +134,11 @@ class ShellNamespace(CustomNamespace):
 
     def emit_shell_data(self, data):
         self.emit('shell_data', data)
+
+    def disconnect(self, silent=False):
+        if self.channel:
+            self.channel.close()
+        super(ShellNamespace, self).disconnect(silent=silent)
 
 
 class MistNamespace(CustomNamespace):
