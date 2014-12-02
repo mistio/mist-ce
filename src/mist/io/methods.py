@@ -815,7 +815,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                              public_key, machine_name,
                                              image, size, location, cloud_service_name=None)
     elif conn.type == Provider.VCLOUD:
-        node = _create_machine_vcloud(conn, machine_name, image, size, public_key, location)
+        node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                       machine_name, image, size,
@@ -1254,7 +1254,7 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
         return node
 
 
-def _create_machine_vcloud(conn, machine_name, image, size, public_key, location):
+def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks):
     """Create a machine vCloud.
 
     Here there is no checking done, all parameters are expected to be
@@ -1269,12 +1269,25 @@ def _create_machine_vcloud(conn, machine_name, image, size, public_key, location
     deploy_script.write('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % key)
     deploy_script.close()
 
+    # select the right network object
+    ex_network = None
+    try:
+        if networks:
+            network = networks[0]
+            available_networks = conn.ex_list_networks()
+            available_networks_ids = [net.id for net in available_networks]
+            if network in available_networks_ids:
+                ex_network = network
+    except:
+        pass
+
     try:
         node = conn.create_node(
             name=machine_name,
             image=image,
             size=size,
-            ex_vm_script=deploy_script.name
+            ex_vm_script=deploy_script.name,
+            ex_network=ex_network
         )
     except Exception as e:
             raise MachineCreationError("vCloud, got exception %s" % e)
@@ -1806,7 +1819,7 @@ def list_networks(user, backend_id):
     conn = connect_provider(backend)
 
     ret = []
-    if conn.type in [Provider.NEPHOSCALE]:
+    if conn.type in [Provider.NEPHOSCALE, Provider.VCLOUD]:
         networks = conn.ex_list_networks()
 
         for network in networks:
