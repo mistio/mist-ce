@@ -814,6 +814,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_azure(conn, key_id, private_key,
                                              public_key, machine_name,
                                              image, size, location, cloud_service_name=None)
+    elif conn.type == Provider.VCLOUD:
+        node = _create_machine_vcloud(conn, machine_name, image, size, public_key, location)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                       machine_name, image, size,
@@ -1250,6 +1252,34 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
             raise MachineCreationError('Azure, got exception %s' % msg)
 
         return node
+
+
+def _create_machine_vcloud(conn, machine_name, image, size, public_key, location):
+    """Create a machine vCloud.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+    #we have the option to pass a guest customisation script as ex_vm_script. We'll pass
+    #the ssh key there
+
+    deploy_script = NamedTemporaryFile(delete=False)
+    deploy_script.write('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % key)
+    deploy_script.close()
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            ex_vm_script=deploy_script.name
+        )
+    except Exception as e:
+            raise MachineCreationError("vCloud, got exception %s" % e)
+
+    return node
 
 
 def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
