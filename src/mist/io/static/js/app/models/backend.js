@@ -47,6 +47,13 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 return this.provider == 'openstack';
             }.property('provider'),
 
+
+            hasNetworks: function () {
+                return this.provider == 'openstack' ||
+                    this.provider == 'vcloud';
+            }.property(''),
+
+
             /**
              *
              *  Initialization
