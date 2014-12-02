@@ -1,13 +1,21 @@
 
 /* Backend Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
-#add-backend-panel #openstack-bundle {
+#add-backend-panel #openstack-bundle,
+#add-backend-panel #baremetal-bundle,
+#add-backend-panel #vcloud-bundle,
+#add-backend-panel #azure-bundle,
+#add-backend-panel #gce-bundle,
+#add-backend-panel #docker-bundle,
+#add-backend-panel #vcloud-bundle,
+#add-backend-panel #hpcloud-bundle {
     display: none;
 }
-#add-backend-panel #baremetal-bundle {
+
+#add-backend-panel #tokenonly-bundle {
     display: none;
 }
-#add-backend-panel #azure-bundle {
+
     display: none;
 }
 #add-backend-panel label {
@@ -34,19 +42,4 @@
     margin-bottom: -20px;
 }
 
-#add-backend-panel #gce-bundle {
-    display: none;
-}
-
-#add-backend-panel #docker-bundle {
-    display: none;
-}
-
-#add-backend-panel #hpcloud-bundle {
-    display: none;
-}
-
-#add-backend-panel #tokenonly-bundle {
-    display: none;
-}
 
