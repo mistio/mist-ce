@@ -44,6 +44,7 @@
                 {{view Mist.TextField
                        id="new-backend-first-field"
                        data-theme="a"
+                       placeholderBinding="view.firstFieldPlaceholder"
                        valueBinding="Mist.backendAddController.newBackendFirstField"}}
 
                 {{#if view.secondFieldLabel}}
@@ -245,6 +246,7 @@
             {{view Mist.TextField
                    id="new-backend-host"
                    data-theme="a"
+                   placeholder="api.vcd.example.com"
                    valueBinding="Mist.backendAddController.newBackendHost"}}
         </div>
 

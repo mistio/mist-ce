@@ -24,6 +24,22 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
             //
             //
+            //  Computer Properties
+            //
+            //
+
+
+            firstFieldPlaceholder: function () {
+                var provider = Mist.backendAddController.newBackendProvider;
+                if (provider) {
+                    if (provider.provider == 'vcloud')
+                        return 'user@org';
+                }
+            }.property('Mist.backendAddController.newBackendProvider'),
+
+
+            //
+            //
             //  Methods
             //
             //
