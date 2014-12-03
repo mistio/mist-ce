@@ -2589,7 +2589,7 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
         log.error(tmp_dir)
         log.error(extra_vars)
         log.error(playbook_path)
-        capture = StdStreamCapture(pass_through=debug)
+        capture = StdStreamCapture()
         try:
             playbook = ansible.playbook.PlayBook(
                 playbook=playbook_path,
@@ -2652,7 +2652,7 @@ def deploy_collectd(user, backend_id, machine_id, extra_vars):
         playbook_path='src/deploy_collectd/ansible/enable.yml',
         extra_vars=extra_vars,
         force_handlers=True,
-        debug=True
+        # debug=True,
     )
     _notify_playbook_result(user, ret_dict, backend_id, machine_id,
                             label='Collectd deployment')
@@ -2664,7 +2664,7 @@ def undeploy_collectd(user, backend_id, machine_id):
         user, backend_id, machine_id,
         playbook_path='src/deploy_collectd/ansible/disable.yml',
         force_handlers=True,
-        debug=True
+        # debug=True,
     )
     _notify_playbook_result(user, ret_dict, backend_id, machine_id,
                             label='Collectd undeployment')
