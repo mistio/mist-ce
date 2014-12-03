@@ -475,12 +475,9 @@ class Ping(UserTask):
 
 @app.task
 def deploy_collectd(email, backend_id, machine_id, extra_vars):
-    if not multi_user:
-        from mist.io.methods import deploy_collectd as deploy_collectd_method
-    else:
-        from mist.core.methods import deploy_collectd as deploy_collectd_method
+    import mist.io.methods
     user = user_from_email(email)
-    deploy_collectd_method(user, backend_id, machine_id, extra_vars)
+    mist.io.methods.deploy_collectd(user, backend_id, machine_id, extra_vars)
 
 
 @app.task
