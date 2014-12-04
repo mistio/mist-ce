@@ -1278,7 +1278,7 @@ def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks
             image=image,
             size=size,
             ex_vm_script=deploy_script.name,
-            ex_network=ex_network
+            ex_vm_network=ex_network
         )
     except Exception as e:
             raise MachineCreationError("vCloud, got exception %s" % e)
