@@ -2600,7 +2600,7 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
         log.error(tmp_dir)
         log.error(extra_vars)
         log.error(playbook_path)
-        capture = StdStreamCapture(pass_through=debug)
+        capture = StdStreamCapture()
         try:
             playbook = ansible.playbook.PlayBook(
                 playbook=playbook_path,
@@ -2635,23 +2635,52 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
             shutil.rmtree(tmp_dir)
 
 
+def _notify_playbook_result(user, res, backend_id=None, machine_id=None,
+                            extra_vars=None, label='Ansible playbook'):
+    data = {}
+    title = label + (' succeeded' if res['success'] else ' failed')
+    msg = ''
+    if backend_id and machine_id:
+        try:
+            name = user.backends[backend_id].machines[machine_id].name
+            msg += 'Machine: %s\n' % name
+        except MachineNotFoundError:
+            pass
+        msg += 'Backend/Machine ids: (%s / %s)\n' % (backend_id, machine_id)
+    msg += 'Result: %s\n'  % ('Success' if res['success'] else 'Error')
+    if res['error_msg']:
+        msg += 'Error: %s\n' % res['error_msg']
+    msg += 'Duration: %.2f secs\n' % (res['finished_at'] - res['started_at'])
+    if extra_vars:
+        msg += 'Vars: %s\n' % extra_vars
+    if not res['success']:
+        msg += 'Stdout/Stderr:\n%s' % res['stdout']
+    notify_user(user, title, msg)
+
+
 def deploy_collectd(user, backend_id, machine_id, extra_vars):
-    return run_playbook(
+    ret_dict = run_playbook(
         user, backend_id, machine_id,
         playbook_path='src/deploy_collectd/ansible/enable.yml',
         extra_vars=extra_vars,
         force_handlers=True,
-        debug=True
+        # debug=True,
     )
+    _notify_playbook_result(user, ret_dict, backend_id, machine_id,
+                            label='Collectd deployment')
+    return ret_dict
 
 
 def undeploy_collectd(user, backend_id, machine_id):
-    return run_playbook(
+    ret_dict = run_playbook(
         user, backend_id, machine_id,
         playbook_path='src/deploy_collectd/ansible/disable.yml',
         force_handlers=True,
-        debug=True
+        # debug=True,
     )
+    _notify_playbook_result(user, ret_dict, backend_id, machine_id,
+                            label='Collectd undeployment')
+    return ret_dict
 
 
 def get_deploy_collectd_manual_command(uuid, password, monitor):
