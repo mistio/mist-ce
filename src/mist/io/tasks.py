@@ -185,10 +185,10 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
             raise self.retry(exc=Exception(), max_retries=20)
 
         try:
-            #login with user, password. Deploy the public key, enable sudo access for
-            #username, disable password authentication and reload ssh.
-            #After this is done, call post_deploy_steps if deploy script or monitoring
-            #is provided
+            # login with user, password. Deploy the public key, enable sudo access for
+            # username, disable password authentication and reload ssh.
+            # After this is done, call post_deploy_steps if deploy script or monitoring
+            # is provided
             ssh=paramiko.SSHClient()
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -210,6 +210,57 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
 
             if not output.startswith('root'):
                 raise
+            cmd = 'sudo su -c \'sed -i "s|[#]*PasswordAuthentication yes|PasswordAuthentication no|g" /etc/ssh/sshd_config &&  /etc/init.d/ssh reload; service ssh reload\' '
+            ssh.exec_command(cmd)
+
+            ssh.close()
+
+            if command or monitoring:
+                post_deploy_steps.delay(email, backend_id, machine_id,
+                                          monitoring, command, key_id)
+
+        except Exception as exc:
+            raise self.retry(exc=exc, countdown=10, max_retries=15)
+    except Exception as exc:
+        if str(exc).startswith('Retry'):
+            raise
+
+
+@app.task(bind=True, default_retry_delay=2*60)
+def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id, monitoring, command,
+                      key_id, password, public_key, username='root'):
+    from mist.io.methods import ssh_command, connect_provider, enable_monitoring
+    from mist.io.methods import notify_user, notify_admin
+    user = user_from_email(email)
+
+    try:
+        # find the node we're looking for and get its hostname
+        conn = connect_provider(user.backends[backend_id])
+        nodes = conn.list_nodes()
+        node = None
+        for n in nodes:
+            if n.id == machine_id:
+                node = n
+                break
+
+        if node and node.state == 0 and len(node.public_ips):
+            # filter out IPv6 addresses
+            ips = filter(lambda ip: ':' not in ip, node.public_ips)
+            host = ips[0]
+        else:
+            raise self.retry(exc=Exception(), max_retries=20)
+
+        try:
+            # login with user, password and deploy the ssh public key. Disable password authentication and reload ssh.
+            # After this is done, call post_deploy_steps if deploy script or monitoring
+            # is provided
+            ssh=paramiko.SSHClient()
+            ssh.load_system_host_keys()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(host, username=username, password=password, timeout=None, allow_agent=False, look_for_keys=False)
+
+            ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
+
             cmd = 'sudo su -c \'sed -i "s|[#]*PasswordAuthentication yes|PasswordAuthentication no|g" /etc/ssh/sshd_config &&  /etc/init.d/ssh reload; service ssh reload\' '
             ssh.exec_command(cmd)
 
