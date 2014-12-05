@@ -927,7 +927,7 @@ var setupSocketEvents = function (socket, callback) {
         if (machine.id) {
             dialogBody.push({
                 link: machine.name,
-                class: 'ui-btn ui-btn-icon-right ui-icon-carat-r ui-corner-all',
+                class: 'ui-btn ui-btn-icon-right ui-icon-carat-r ui-mini ui-corner-all',
                 href: '#/machines/' + machineId,
                 closeDialog: true,
             });
