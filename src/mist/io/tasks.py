@@ -1,5 +1,6 @@
 import paramiko
 import json
+import uuid
 import tempfile
 import functools
 
@@ -89,8 +90,10 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
     from mist.io.methods import notify_user, notify_admin
     if multi_user:
         from mist.core.methods import enable_monitoring
+        from mist.core.helpers import log_event
     else:
         from mist.io.methods import enable_monitoring
+        log_event = lambda *args, **kwargs: None
 
     user = user_from_email(email)
     try:
@@ -121,6 +124,18 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             )
 
             if command:
+                log_dict = {
+                    'email': email,
+                    'event_type': 'job',
+                    'backend_id': backend_id,
+                    'machine_id': machine_id,
+                    'job_id': uuid.uuid4().hex,
+                    'command': command,
+                    'host': host,
+                    'key_id': key_id,
+                    'ssh_user': ssh_user,
+                }
+                log_event(action='deployment_script_started', **log_dict)
                 start_time = time()
                 retval, output = shell.command(command)
                 execution_time = time() - start_time
@@ -136,6 +151,11 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     node.name, node.id
                 )
                 notify_user(user, msg_title, msg)
+                log_event(action='deployment_script_finished',
+                          error=retval > 0,
+                          return_value=retval,
+                          stdout=output,
+                          **log_dict)
 
             shell.disconnect()
 
@@ -158,6 +178,16 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
         amqp_log("Deployment script failed for machine %s in backend %s by user %s after 5 retries: %s" % (node.id, backend_id, email, repr(exc)))
         notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
         notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
+        log_event(
+            email=email,
+            event_type='job',
+            action='deployment_script_failed',
+            backend_id=backend_id,
+            machine_id=machine_id,
+            enable_monitoring=bool(monitoring),
+            command=command,
+            error="Couldn't connect to run post deploy steps (5 attempts).",
+        )
 
 
 @app.task(bind=True, default_retry_delay=2*60)
