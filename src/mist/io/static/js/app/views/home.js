@@ -29,6 +29,8 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
             unload: function () {
                 Mist.graphsController.close();
+                Mist.backendsController.off('onMachineListChange', this,
+                    'checkedMonitoringObserver');
             }.on('willDestroyElement'),
 
 
