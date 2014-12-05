@@ -118,8 +118,10 @@ class Shell(object):
                     raise ServiceUnavailableError("SSH timed-out repeatedly.")
             except Exception as exc:
                 log.error("ssh exception %r", exc)
-                #don't fail if SSHException or other paramiko exception,
-                #eg related to network, but keep until all attempts are made
+                # don't fail if SSHException or other paramiko exception,
+                # eg related to network, but keep until all attempts are made
+                if not attempts:
+                    raise ServiceUnavailableError(repr(exc))
 
 
     def disconnect(self):

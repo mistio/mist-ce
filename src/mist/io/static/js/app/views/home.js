@@ -22,11 +22,15 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
                 Ember.run.next(this, function () {
                     this.checkedMonitoringObserver();
                 });
+                Mist.backendsController.on('onMachineListChange', this,
+                    'checkedMonitoringObserver');
             }.on('didInsertElement'),
 
 
             unload: function () {
                 Mist.graphsController.close();
+                Mist.backendsController.off('onMachineListChange', this,
+                    'checkedMonitoringObserver');
             }.on('willDestroyElement'),
 
 
