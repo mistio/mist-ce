@@ -822,11 +822,17 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
     if conn.type == Provider.AZURE:
-        #for Azure, connect with the generated password, deploy the ssh key
-        #when this is ok, it calss post_deploy for script/monitoring
+        # for Azure, connect with the generated password, deploy the ssh key
+        # when this is ok, it calss post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
                                       monitoring, script, key_id,
                                       node.extra.get('username'), node.extra.get('password'), public_key)
+    elif conn.type == Provider.RACKSPACE_FIRST_GEN:
+        # for Rackspace First Gen, cannot specify ssh keys. When node is
+        # created we have the generated password, so deploy the ssh key
+        # when this is ok and call post_deploy for script/monitoring
+        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(user.email, backend_id, node.id,
+                                      monitoring, script, key_id, node.extra.get('password'), public_key)
     else:
         if script or monitoring:
             mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
@@ -862,13 +868,18 @@ def _create_machine_rackspace(conn, public_key, machine_name,
             server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
             server_key = server_key.name
     except:
-        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
-        server_key = server_key.name
+        try:
+            server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
+            server_key = server_key.name
+        except AttributeError:
+            # RackspaceFirstGenNodeDriver based on OpenStack_1_0_NodeDriver
+            # has no support for keys. So don't break here, since create_node won't
+            # include it anyway
+            server_key = None
 
     try:
         node = conn.create_node(name=machine_name, image=image, size=size,
                                 location=location, ex_keyname=server_key)
-
         return node
     except Exception as e:
         raise MachineCreationError("Rackspace, got exception %r" % e)
@@ -2646,7 +2657,7 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
         log.error(tmp_dir)
         log.error(extra_vars)
         log.error(playbook_path)
-        capture = StdStreamCapture(pass_through=debug)
+        capture = StdStreamCapture()
         try:
             playbook = ansible.playbook.PlayBook(
                 playbook=playbook_path,
@@ -2681,23 +2692,52 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
             shutil.rmtree(tmp_dir)
 
 
+def _notify_playbook_result(user, res, backend_id=None, machine_id=None,
+                            extra_vars=None, label='Ansible playbook'):
+    data = {}
+    title = label + (' succeeded' if res['success'] else ' failed')
+    msg = ''
+    if backend_id and machine_id:
+        try:
+            name = user.backends[backend_id].machines[machine_id].name
+            msg += 'Machine: %s\n' % name
+        except MachineNotFoundError:
+            pass
+        msg += 'Backend/Machine ids: (%s / %s)\n' % (backend_id, machine_id)
+    msg += 'Result: %s\n'  % ('Success' if res['success'] else 'Error')
+    if res['error_msg']:
+        msg += 'Error: %s\n' % res['error_msg']
+    msg += 'Duration: %.2f secs\n' % (res['finished_at'] - res['started_at'])
+    if extra_vars:
+        msg += 'Vars: %s\n' % extra_vars
+    if not res['success']:
+        msg += 'Stdout/Stderr:\n%s' % res['stdout']
+    notify_user(user, title, msg)
+
+
 def deploy_collectd(user, backend_id, machine_id, extra_vars):
-    return run_playbook(
+    ret_dict = run_playbook(
         user, backend_id, machine_id,
         playbook_path='src/deploy_collectd/ansible/enable.yml',
         extra_vars=extra_vars,
         force_handlers=True,
-        debug=True
+        # debug=True,
     )
+    _notify_playbook_result(user, ret_dict, backend_id, machine_id,
+                            label='Collectd deployment')
+    return ret_dict
 
 
 def undeploy_collectd(user, backend_id, machine_id):
-    return run_playbook(
+    ret_dict = run_playbook(
         user, backend_id, machine_id,
         playbook_path='src/deploy_collectd/ansible/disable.yml',
         force_handlers=True,
-        debug=True
+        # debug=True,
     )
+    _notify_playbook_result(user, ret_dict, backend_id, machine_id,
+                            label='Collectd undeployment')
+    return ret_dict
 
 
 def get_deploy_collectd_manual_command(uuid, password, monitor):

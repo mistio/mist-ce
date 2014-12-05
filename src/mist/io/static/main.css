@@ -645,3 +645,15 @@ ul.checkbox-list li label {
 .info-table tr {
     border: 1px solid #ccc;
 }
+
+
+/* Dialog
+------------------------------------------------------------------------------*/
+#dialog-popup .command-container {
+    white-space: pre;
+    text-align: left;
+    height: 250px;
+    overflow: scroll;
+}
+
+
