@@ -656,4 +656,11 @@ ul.checkbox-list li label {
     overflow: scroll;
 }
 
+#dialog-popup .duration {
+    font-family: monospace;
+    font-size: 11px;
+}
+
+
+
 
