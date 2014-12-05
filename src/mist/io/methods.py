@@ -2642,7 +2642,8 @@ def _notify_playbook_result(user, res, backend_id=None, machine_id=None,
     msg += 'Duration: %.2f secs\n' % (res['finished_at'] - res['started_at'])
     if extra_vars:
         msg += 'Vars: %s\n' % extra_vars
-    msg += 'Stdout/Stderr:\n%s' % res['stdout']
+    if not res['success']:
+        msg += 'Stdout/Stderr:\n%s' % res['stdout']
     notify_user(user, title, msg)
 
 
