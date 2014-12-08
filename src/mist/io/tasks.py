@@ -156,7 +156,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                             output=output,
                             duration=execution_time,
                             retval=retval,
-                            error=not retval)
+                            error=retval > 0)
                 log_event(action='deployment_script_finished',
                           error=retval > 0,
                           return_value=retval,
