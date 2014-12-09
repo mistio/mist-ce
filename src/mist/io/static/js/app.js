@@ -758,6 +758,11 @@ var loadApp = function (
         return newArray;
     };
 
+    App.getSortMonthName = function (date) {
+        return ['Jan','Feb','Mar','Apr','May','Jun','Jul',
+        'Aug','Sep','Oct','Nov','Dec'][date.getMonth()];
+    };
+
     App.decapitalizeArray = function (array) {
         var newArray = [];
         array.forEach(function(string) {
@@ -885,7 +890,6 @@ var loadApp = function (
 
         else if (diff < TIME_MAP.YEAR)
             ret = Mist.getSortMonthName(date) + ' ' + date.getUTCDate();
-
 
         if (ret.indexOf('sec') > -1 ||
             ret.indexOf('min') > -1 ||
@@ -1520,6 +1524,7 @@ var TIME_MAP = {
     DAY: 24 * 60 * 60 * 1000,
     WEEK: 7 * 24 * 60 * 60 * 1000,
     MONTH: 30 * 24 * 60 * 60 * 1000,
+    YEAR: 12 * 30 * 24 * 60 * 60 * 1000,
 };
 
 var DIALOG_TYPES = {
