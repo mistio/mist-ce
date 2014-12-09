@@ -4,7 +4,7 @@ define('app/models/log', ['ember'],
     //
     //  @returns Class
     //
-    function() {
+    function () {
 
         'use strict';
 
@@ -18,23 +18,14 @@ define('app/models/log', ['ember'],
             //
 
 
-            id: null,
-            user: null,
-            type: null,
-            action: null,
+            _id: null,
+            email: null,
             time: null,
+            action: null,
+            backendId: null,
+            machineId: null,
+            mode: null,
 
-
-            //
-            //
-            //  Computed Properties
-            //
-            //
-
-
-            formatedDate: function () {
-                return Mist.prettyDate(this.get('time'));
-            }.property('time')
         });
     }
 );

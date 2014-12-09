@@ -22,6 +22,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/key_list.html',
         'text!app/templates/key_list_item.html',
         'text!app/templates/log_list.html',
+        'text!app/templates/log_list_item.html',
         'text!app/templates/login.html',
         'text!app/templates/machine.html',
         'text!app/templates/machine_add.html',
@@ -32,7 +33,6 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/machine_monitoring.html',
         'text!app/templates/machine_power.html',
         'text!app/templates/machine_shell.html',
-        'text!app/templates/machine_shell_list_item.html',
         'text!app/templates/machine_tags.html',
         'text!app/templates/machine_tags_list_item.html',
         'text!app/templates/messagebox.html',
@@ -69,17 +69,17 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['key_list/html'] = Ember.Handlebars.compile(arguments[17]);
         Ember.TEMPLATES['key_list_item/html'] = Ember.Handlebars.compile(arguments[18]);
         Ember.TEMPLATES['log_list/html'] = Ember.Handlebars.compile(arguments[19]);
-        Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[20]);
-        Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[21]);
-        Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[22]);
-        Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[23]);
-        Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[24]);
-        Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[25]);
-        Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[26]);
-        Ember.TEMPLATES['machine_monitoring/html'] = Ember.Handlebars.compile(arguments[27]);
-        Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[28]);
-        Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[29]);
-        Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[30]);
+        Ember.TEMPLATES['log_list_item/html'] = Ember.Handlebars.compile(arguments[20]);
+        Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[21]);
+        Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[22]);
+        Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[23]);
+        Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[24]);
+        Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[25]);
+        Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[26]);
+        Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[27]);
+        Ember.TEMPLATES['machine_monitoring/html'] = Ember.Handlebars.compile(arguments[28]);
+        Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[29]);
+        Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[30]);
         Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[31]);
         Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[32]);
         Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[33]);

@@ -1,6 +1,6 @@
-define('app/controllers/logs', ['app/models/log' , 'ember'],
+define('app/controllers/logs', ['app/models/log', 'ember'],
     //
-    //  Logs Controller
+    //  Users Controller
     //
     //  @returns Class
     //
@@ -19,54 +19,8 @@ define('app/controllers/logs', ['app/models/log' , 'ember'],
 
 
             content: [],
-            selectedLogs: [],
-
-            loading: false,
-            logRequest: false,
-
-
-            //
-            //
-            //  Initialization
-            //
-            //
-
-
-            init: function () {
-                this._super();
-                this.set('content', []);
-                this.set('loading', true);
-            },
-
-
-            //
-            //
-            //  Methods
-            //
-            //
-
-
-            load: function(logs) {
-                this._updateContent(logs);
-                this.set('loading', false);
-            },
-
-
-            getLog: function(logId) {
-                return this.content.findBy('id', logId);
-            },
-
-
-            getRequestedLog: function() {
-                if (this.logRequest) {
-                    return this.getLog(this.logRequest);
-                }
-            },
-
-
-            logExists: function(logId) {
-                return !!this.getLog(logId);
-            },
+            loading: null,
+            userRequest: null,
 
 
             //
@@ -75,82 +29,50 @@ define('app/controllers/logs', ['app/models/log' , 'ember'],
             //
             //
 
-            _updateContent: function (logs) {
-                Ember.run(this, function() {
 
-                    // Remove deleted logs
-                    this.content.forEach(function (log) {
-                        if (!logs.findBy('id', log.id))
-                            this._deleteLog(log.id);
-                    }, this);
+            _reload: function () {
+                Ember.run.later(this, function () {
+                    this.load();
+                }, 2000);
+            },
 
+
+            _setContent: function (logs) {
+                Ember.run(this, function () {
+                    var newContent = [];
                     logs.forEach(function (log) {
-
-                        var oldLog = this.getLog(log.id);
-
-                        if (oldLog)
-                            // Update existing logs
-                            forIn(log, function (value, property) {
-                                oldLog.set(property, value);
-                            });
-                        else
-                            // Add new logs
-                            this._addLog(log);
-                    }, this);
-
+                        newContent.push(Log.create(log));
+                    });
+                    this.set('content', newContent);
                     this.trigger('onLogListChange');
                 });
             },
 
 
-            _addLog: function(log) {
-                Ember.run(this, function() {
-                    if (this.logExists(log.id)) return;
-                    this.content.addObject(Log.create(log));
-                    this.trigger('onLogAdd');
-                });
-            },
-
-
-            _deleteLog: function(logId) {
-                Ember.run(this, function() {
-                    this.content.removeObject(this.getLog(logId));
-                    this.trigger('onLogDelete');
-                });
-            },
-
-
-            _renameLog: function(logId, newLogId) {
-                Ember.run(this, function() {
-                    if (this.logExists(logId))
-                        this.getLog(logId).set('id', newLogId);
-                    this.trigger('onLogRename');
-                });
-            },
-
-
-            _updateSelectedLogs: function() {
-                Ember.run(this, function() {
-                    var newSelectedLogs = [];
-                    this.content.forEach(function(log) {
-                        if (log.selected) newSelectedLogs.push(log);
+            _prependContent: function (logs) {
+                Ember.run(this, function () {
+                    var additionalContent = [];
+                    logs.forEach(function (log) {
+                        info('before')
+                        additionalContent.push(Log.create(log));
                     });
-                    this.set('selectedLogs', newSelectedLogs);
-                    this.trigger('onSelectedLogsChange');
+                    info('additionalContent', additionalContent);
+                    this.get('content').unshiftObjects(additionalContent);
+                    this.trigger('onLogListChange');
                 });
             },
 
 
-
-            /**
-             *
-             *  Observers
-             *
-             */
-
-            selectedLogsObserver: function() {
-                Ember.run.once(this, '_updateSelectedLogs');
-            }.observes('content.@each.selected')
+            _appendContent: function (logs) {
+                Ember.run(this, function () {
+                    var additionalContent = [];
+                    logs.forEach(function (log) {
+                        additionalContent.push(Log.create(log));
+                    });
+                    this.get('content').pushObjects(additionalContent);
+                    this.trigger('onLogListChange');
+                });
+            }
         });
     }
 );

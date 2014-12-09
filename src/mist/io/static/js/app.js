@@ -18,6 +18,7 @@ require.config({
     },
     deps: ['jquery'],
     callback: function () {
+        fontTest = $('#font-test')
         handleMobileInit();
         appLoader.init();
     },
@@ -291,6 +292,7 @@ var loadFiles = function (callback) {
         'app/views/key_list',
         'app/views/key_list_item',
         'app/views/log_list',
+        'app/views/log_list_item',
         'app/views/login',
         'app/views/machine',
         'app/views/machine_add',
@@ -301,7 +303,6 @@ var loadFiles = function (callback) {
         'app/views/machine_monitoring',
         'app/views/machine_power',
         'app/views/machine_shell',
-        'app/views/machine_shell_list_item',
         'app/views/machine_tags',
         'app/views/machine_tags_list_item',
         'app/views/messagebox',
@@ -370,6 +371,7 @@ var loadApp = function (
     KeyListView,
     KeyListItemView,
     LogListView,
+    LogListItemView,
     LoginView,
     SingleMachineView,
     MachineAddDialog,
@@ -380,7 +382,6 @@ var loadApp = function (
     MachineMonitoringView,
     MachinePowerView,
     MachineShellView,
-    MachineShellListItemView,
     MachineTagsView,
     MachineTagsListItemView,
     MessageBoxView,
@@ -618,6 +619,7 @@ var loadApp = function (
     App.set('keyListItemView', KeyListItemView);
     App.set('dialogView', DialogView);
     App.set('ruleListView', RuleListView);
+    App.set('logListItemView', LogListItemView);
     App.set('machineListView', MachineListView);
     App.set('imageListItemView', ImageListItem);
     App.set('machineAddView', MachineAddDialog);
@@ -631,7 +633,6 @@ var loadApp = function (
     App.set('metricAddCustomView', MetricAddCustomView);
     App.set('machineKeysListItemView', MachineKeysListItemView);
     App.set('machineTagsListItemView', MachineTagsListItemView);
-    App.set('machineShellListItemView', MachineShellListItemView);
 
     // Ember controllers
 
@@ -735,6 +736,10 @@ var loadApp = function (
 
     App.getViewName = function (view) {
         return view.constructor.toString().split('.')[1].split('View')[0];
+    };
+
+    App.isScrolledToTop = function () {
+        return window.pageYOffset <= 20;
     };
 
     App.capitalize = function (string) {
@@ -852,6 +857,65 @@ var loadApp = function (
         }
         return [string];
     };
+
+    App.dateFromNow = function (date) {
+
+        // Convert timestamps to date
+        if (!(date instanceof Date))
+            date = new Date(parseInt(date) * 1000);
+
+        var now = new Date();
+        var diff = now - date;
+        var ret = '';
+
+        if (diff < 10 * TIME_MAP.SECOND)
+            ret = 'Now';
+
+        else if (diff < TIME_MAP.MINUTE)
+            ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
+
+        else if (diff < TIME_MAP.HOUR)
+            ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
+
+        else if (diff < TIME_MAP.DAY)
+            ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
+
+        else if (diff < 2 * TIME_MAP.DAY)
+            ret = 'Yesterday';
+
+        else if (diff < TIME_MAP.YEAR)
+            ret = Mist.getSortMonthName(date) + ' ' + date.getUTCDate();
+
+
+        if (ret.indexOf('sec') > -1 ||
+            ret.indexOf('min') > -1 ||
+            ret.indexOf('hour') > -1) {
+
+            // Add 's' for plural
+            if (ret.split(' ')[0] != '1')
+                ret = ret + 's';
+
+            ret = ret + ' ago';
+        }
+
+        return ret;
+    };
+
+    App.getMonthName = function (date) {
+        return ['January','February','March','April','May','June','July',
+        'August','September','October','November','December'][date.getMonth()];
+    };
+
+    App.prettyDateTime = function(date) {
+        date = parseInt(date);
+        var prt_date = new Date(date*1000);
+        var hour = prt_date.getHours();
+        var min = prt_date.getMinutes();
+        var sec = prt_date.getSeconds();
+        return App.getMonthName(prt_date) + ' ' + prt_date.getDate() + ', ' + prt_date.getFullYear() + ", " + (hour < 10 ? '0' : '') + hour + ':' + (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
+    };
+
+    window.EventHandler = Ember.Object.extend(Ember.Evented, {});
 };
 
 
@@ -940,20 +1004,45 @@ var setupSocketEvents = function (socket, callback) {
     .on('stats', function (data) {
         Mist.graphsController._handleSocketResponse(data);
     })
-    .on('notify',function(data){
-        if (data.message) {
-            Mist.dialogController.open({
-                type: DIALOG_TYPES.OK,
-                head: data.title,
-                body: [
-                    {
-                        command: data.message.substr(1)
-                    }
-                ]
+    .on('notify', function (data){
+
+        var dialogBody = [];
+
+        // Extract machine information
+        var machineId = data.machine_id;
+        var backendId = data.backend_id;
+        var machine = Mist.backendsController.getMachine(machineId, backendId);
+        if (machine.id) {
+            dialogBody.push({
+                link: machine.name,
+                class: 'ui-btn ui-btn-icon-right ui-icon-carat-r ui-mini ui-corner-all',
+                href: '#/machines/' + machineId,
+                closeDialog: true,
             });
-        } else {
-            Mist.notificationController.notify(data.title);
         }
+
+        // Get output
+        if (data.output)
+            dialogBody.push({
+                command: data.output
+            });
+
+        // Get duration
+        var duration = parseInt(data.duration);
+        if (duration) {
+            var durationMins = parseInt(duration / 60);
+            var durationSecs = duration - (durationMins * 60);
+            dialogBody.push({
+                paragraph: 'Completed in ' + durationMins + 'min ' + durationSecs + ' sec',
+                class: 'duration'
+            });
+        }
+
+        Mist.dialogController.open({
+            type: DIALOG_TYPES.OK,
+            head: data.title,
+            body: dialogBody
+        });
     })
     .on('probe', onProbe)
     .on('ping', onProbe)
@@ -1151,6 +1240,156 @@ function Socket (args) {
 }
 
 
+//
+//  TODO (gtsop): Get rid of the previous wrapper
+//  Socket Wrapper v2
+//
+//
+
+
+
+function Socket_ (args) {
+
+
+    return Ember.Object.extend({
+
+
+        //
+        //
+        //  Properties
+        //
+        //
+
+
+        events: null,
+        socket: null,
+        namespace: null,
+
+
+        //
+        //
+        //  Public Methods
+        //
+        //
+
+
+        load: function (args) {
+
+            this._log('initializing');
+            this._parseArguments(args);
+            this.set('socket', io.connect(this.get('namespace')));
+            this.set('events', EventHandler.create());
+
+            var that = this;
+            this._connect(function () {
+                that._handleDisconnection();
+                if (that.onInit instanceof Function)
+                    that.onInit(that);
+            });
+        }.on('init'),
+
+
+        on: function (event) {
+            var that = this;
+            var events = this.get('events');
+            var socket = this.get('socket');
+
+            events.on.apply(events, arguments);
+            if (!socket.$events || !socket.$events[event])
+                socket.on(event, function (response) {
+                    that._log('RECEIVE', response);
+                    events.trigger.call(events, event, response);
+                });
+        },
+
+
+        off: function () {
+            var events = this.get('events');
+            events.off.apply(events, arguments);
+        },
+
+
+        emit: function () {
+            this._log('EMIT', slice(arguments));
+            var socket = this.get('socket');
+            socket.emit.apply(socket, arguments);
+        },
+
+
+        kill: function () {
+            this.set('keepAlive', false);
+            var socket = this.get('socket');
+            socket.disconnect();
+            if (socket.$events)
+                for (event in socket.$events)
+                    delete socket.$events[event];
+        },
+
+
+        //
+        //
+        //  Private Methods
+        //
+        //
+
+
+        _connect: function (callback) {
+
+            var socket = this.get('socket');
+
+            if (socket.socket.connected) {
+                this._log('connected');
+                callback();
+                if (this.onConnect instanceof Function)
+                    this.onConnect(this);
+            } else if (socket.socket.connecting) {
+                this._log('connecting');
+                this._reconnect(callback);
+            } else {
+                socket.socket.connect();
+                this._reconnect(callback);
+            }
+        },
+
+
+        _reconnect: function (callback) {
+            Ember.run.later(this, function () {
+                this._connect(callback);
+            }, 500);
+        },
+
+
+        _parseArguments: function (args) {
+            forIn(this, args, function (value, property) {
+                this.set(property, value);
+            });
+        },
+
+
+        _handleDisconnection: function () {
+            var that = this;
+            this.get('socket').on('disconnect', function () {
+                that._log('disconnected');
+                // keep socket connections alive by default
+                if (that.get('keepAlive') !== undefined ? that.get('keepAlive') : true)
+                    that._reconnect();
+            });
+        },
+
+
+        _log: function () {
+            if (!Mist.get('debugSocket'))
+                return;
+            var args = slice(arguments);
+            var preText = Mist.prettyTime(new Date()) +
+                ' | ' + this.get('namespace');
+            args.unshift(preText);
+            console.log.apply(console, args);
+        },
+
+    }).create(args);
+}
+
 function virtualKeyboardHeight () {
     var keyboardHeight = 0;
 
@@ -1166,7 +1405,7 @@ function virtualKeyboardHeight () {
         keyboardHeight = 0;
     }
     return keyboardHeight;
-};
+}
 
 
 // forEach like function on objects
@@ -1183,7 +1422,55 @@ function forIn () {
     var keysLength = keys.length;
     for (var i = 0; i < keysLength; i++)
         callback.call(thisArg, object[keys[i]], keys[i]);
-};
+}
+
+
+// Calculates maximum chars that can be displayed into a fixed width
+var fontTest;
+function maxCharsInWidth (fontSize, width) {
+
+    fontTest.css('font-size', fontSize);
+
+    // Initialize testString to a number of chars that will "probably"
+    // fit in width
+    var textWidth = fontTest.text('t').width();
+    info(width, '/', textWidth, '=', width / textWidth);
+    var testString = Array(parseInt(width / textWidth) + 5).join('t');
+    textWidth = fontTest.text(testString).width();
+
+    for (var charCount = testString.length; textWidth > width; charCount--) {
+        testString = testString.slice(1);
+        textWidth = fontTest.text(testString).width();
+    };
+    return charCount;
+}
+
+// Calculates maximum lines that can be displayed into a fixed height
+function maxLinesInHeight (fontSize, height) {
+
+    fontTest.css('font-size', fontSize);
+
+    var testString = '';
+    var textHeight = 0
+    for (var lineCount = 0; textHeight < height; lineCount++) {
+        testString += '<div>t</div>';
+        textHeight = fontTest.html(testString).height();
+    };
+    return lineCount;
+}
+
+
+function lockScroll(){
+    $('body').data('y-scroll', self.pageYOffset)
+             .css('overflow', 'hidden');
+    window.scrollTo(null, self.pageYOffset);
+}
+
+
+function unlockScroll(){
+      $('body').css('overflow', 'auto');
+      window.scrollTo(null, $('body').data('y-scroll'))
+}
 
 
 // Simple timer tool for performance measurements
@@ -1218,45 +1505,9 @@ function error() {
         console.error.apply(console, arguments);
 }
 
-
-function showGraphs() {
-
-    Mist.set('didShowGraphs', true);
-    require(['app/models/graph', 'app/models/datapoint'], function (Graph, Datapoint) {
-
-        var graph = Graph.create({
-            id: 'graph-' + parseInt(Math.random() * 10000),
-            title: 'Load for all servers',
-            datasources: [],
-        });
-
-        var metric = Mist.metricsController.getMetric('load.shortterm');
-
-        Mist.monitored_machines.forEach(function (machineTuple) {
-            var backend = Mist.backendsController.getBackend(machineTuple[0]);
-            if (!backend) return;
-            var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
-            if (!machine) return;
-            Mist.datasourcesController.addDatasource({
-                machine: machine,
-                metric: metric,
-                callback: function (success, datasource) {
-                    graph.addDatasource(datasource);
-                }
-            });
-        });
-
-        Mist.graphsController.open({
-            graphs: [graph],
-            config: {
-                canModify: true,
-                canControl: true,
-                canMinimize: true,
-            }
-        });
-    });
-}
-
+function slice (args) {
+    return Array.prototype.slice.call(args);
+};
 
 //  GLOBAL DEFINITIONS
 

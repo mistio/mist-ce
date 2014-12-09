@@ -12,6 +12,7 @@
 @import url("css/rules.css");
 @import url("css/images.css");
 @import url("css/machine.css");
+@import url("css/log_list.css");
 @import url("css/key_add.css");
 @import url("css/missing.css");
 @import url("css/network.css");
@@ -648,3 +649,22 @@ ul.checkbox-list li label {
 .info-table tr {
     border: 1px solid #ccc;
 }
+
+
+/* Dialog
+------------------------------------------------------------------------------*/
+#dialog-popup .command-container {
+    white-space: pre;
+    text-align: left;
+    max-height: 250px;
+    overflow: scroll;
+}
+
+#dialog-popup .duration {
+    font-family: monospace;
+    font-size: 11px;
+}
+
+
+
+

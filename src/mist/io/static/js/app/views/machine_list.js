@@ -38,13 +38,17 @@ define('app/views/machine_list', ['app/views/mistscreen'],
              */
 
             updateFooter: function () {
+
+                if (Mist.machineShellController.isOpen)
+                    return;
+
                 switch (Mist.backendsController.selectedMachines.length) {
                 case 0:
                     $('#machine-list-page .ui-footer').slideUp();
                     break;
                 case 1:
                     var machine = Mist.backendsController.selectedMachines[0];
-                    
+
                     $('#machine-list-page .ui-footer').slideDown();
 
                     if (machine.can_tag) {
@@ -53,7 +57,7 @@ define('app/views/machine_list', ['app/views/mistscreen'],
                         $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
                     }
 
-                    if (machine.probed && machine.state == 'running') {
+                    if (machine.get('hasKeys') && machine.state == 'running') {
                         $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');
