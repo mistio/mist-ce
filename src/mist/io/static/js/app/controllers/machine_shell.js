@@ -129,7 +129,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             close: function () {
                 this.view.close();
                 Ember.run.later(this, function () {
-                    Mist.shell.emit('shell_close');
                     Mist.term.destroy();
                     Mist.shell.disconnect();
                     this._clear();

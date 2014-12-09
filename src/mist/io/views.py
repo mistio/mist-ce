@@ -182,7 +182,7 @@ def add_backend(request):
 
     params = request.json_body
     #remove spaces from start/end of string fields that are often included
-    #when pasting keys, preventing thus succesfull connection with the 
+    #when pasting keys, preventing thus succesfull connection with the
     #backend
     for key in params.keys():
         if type(params[key]) in [unicode, str]:
@@ -839,35 +839,6 @@ def undeploy_plugin(request):
     ## return resp.json()
 
 
-@view_config(route_name='loadavg', request_method='GET')
-def get_loadavg(request, action=None):
-    """Get the loadavg png displayed in the machines list view."""
-    params = request.params
-    start = params.get('start', '')
-    stop = params.get('stop', '')
-    user = user_from_request(request)
-    core_uri = config.CORE_URI
-    payload = {
-        'start': start,
-        'stop': stop,
-    }
-    headers = {
-        'Authorization': get_auth_header(user),
-        'Content-type': 'image/png',
-        'Accept': '*/*'
-    }
-    try:
-        ret = requests.get(config.CORE_URI + request.path, params=payload,
-                           headers=headers, verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        log.error("%r", exc)
-        raise SSLError()
-    if ret.status_code != 200:
-        log.error("Error getting loadavg %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
-    return Response(ret.content, content_type='image/png', request=request)
-
-
 @view_config(route_name='rules', request_method='POST', renderer='json')
 def update_rule(request):
     """Creates or updates a rule.
@@ -911,66 +882,6 @@ def delete_rule(request):
         raise ServiceUnavailableError()
     trigger_session_update(user.email, ['monitoring'])
     return OK
-
-
-@view_config(route_name='shell', request_method='GET')
-def shell_stream(request):
-    """Execute command via SSH and stream output
-
-    Streams output using the hidden iframe technique.
-
-    """
-
-    def parse(lines):
-        """Generator function that converts stdout_lines to html with
-        js which it streams in a hidden iframe.
-
-        """
-        # send some blank data to fill the initial buffer and get (webkit)
-        # browsers to display right away what's sent
-        #yield 1024*'\0'
-        # start the html response
-        yield "<html><body>\n"
-        js = "<script type='text/javascript'>parent.appendShell('%s', '%s');</script>\n"
-        for line in lines:
-            # get commands output, line by line
-            clear_line = line.replace('\'', '\\\'')
-            clear_line = clear_line.replace('\n', '<br/>')
-            clear_line = clear_line.replace('\r', '')
-            #.replace('<','&lt;').replace('>', '&gt;')
-            ret = js % (clear_line, cmd_id)
-            yield ret
-        js = "<script type='text/javascript'>"
-        js += "parent.completeShell(%s, '%s');</script>\n"
-        yield js % (1, cmd_id)  # FIXME
-        yield "</body></html>\n"
-
-    log.info("got shell_stream request")
-    backend_id = request.matchdict['backend']
-    machine_id = request.matchdict['machine']
-    cmd = request.params.get('command')
-    cmd_id = request.params.get('command_id').encode('utf-8', 'ignore')
-    host = request.params.get('host')
-    try:
-        if not cmd:
-            raise RequiredParameterMissingError("command")
-        if not host:
-            raise RequiredParameterMissingError("host")
-
-        user = user_from_request(request)
-        shell = Shell(host)
-        shell.autoconfigure(user, backend_id, machine_id)
-        # stdout_lines is a generator that spits out lines of combined
-        # stdout and stderr output. cmd is executed via the shell on the
-        # background and the stdout_lines generator is immediately available.
-        # stdout_lines will block if no line is in the buffer and will stop
-        # iterating once the command is completed and the pipe is closed.
-        stdout_lines = shell.command_stream(cmd)
-    except Exception as e:
-        message = ["Failed to execute command\n", "Error: %s \n" % e]
-        return Response(status=500, app_iter=parse(message))
-
-    return Response(status=200, app_iter=parse(stdout_lines))
 
 
 @view_config(route_name='providers', request_method='GET', renderer='json')
