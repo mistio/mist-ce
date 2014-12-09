@@ -744,7 +744,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
     if conn.type is Provider.DOCKER:
-        node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
+        node = _create_machine_docker(conn, machine_name, image_id, script, public_key=public_key)
         if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
