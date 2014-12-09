@@ -29,7 +29,6 @@ from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError
 from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
-from libcloud.compute.types import Provider
 
 
 try:  # Multi-user environment
@@ -175,11 +174,6 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
         except (ServiceUnavailableError, SSHException) as exc:
             raise self.retry(exc=exc, countdown=60, max_retries=5)
     except Exception as exc:
-
-        # This is temporal for Docker script/command
-        conn = connect_provider(user.backends[backend_id])
-        if conn.type is Provider.DOCKER:
-            return
         if str(exc).startswith('Retry'):
             raise
         amqp_log("Deployment script failed for machine %s in backend %s by user %s after 5 retries: %s" % (node.id, backend_id, email, repr(exc)))
