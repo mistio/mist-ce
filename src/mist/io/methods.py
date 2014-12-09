@@ -1140,7 +1140,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
             raise MachineCreationError("Softlayer, got exception %s" % e)
     return node
 
-def _create_machine_docker(conn, machine_name, image, script, public_key=None):
+def _create_machine_docker(conn, machine_name, image, script, public_key=None, tty_attach=True):
     """Create a machine in docker.
 
     """
@@ -1155,6 +1155,7 @@ def _create_machine_docker(conn, machine_name, image, script, public_key=None):
             image=image,
             command=script,
             environment=environment,
+            tty=tty_attach
         )
     except Exception as e:
         raise MachineCreationError("Docker, got exception %s" % e)
