@@ -21,6 +21,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             view: null,
             cols: null,
             rows: null,
+            isOpen: null,
             machine: null,
 
 
@@ -34,7 +35,10 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             open: function (machine) {
 
                 this._clear();
-                this.set('machine', machine);
+                this.setProperties({
+                    machine: machine,
+                    isOpen: true,
+                });
 
                 // Get the first ipv4 public ip to connect to
                 machine.public_ips.forEach(function (ip) {
@@ -120,7 +124,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
 
             resize: function () {
-                info('resizing', this.cols, this.rows);
                 Mist.term.resize(this.cols, this.rows);
                 Mist.shell.emit('shell_resize',this.cols, this.rows);
             },
@@ -147,10 +150,13 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
             _clear: function () {
                 Ember.run(this, function () {
-                    this.set('cols', null);
-                    this.set('rows', null);
-                    this.set('machine', null);
-                    this.set('connected', null);
+                    this.setProperties({
+                        cols: null,
+                        rows: null,
+                        machine: null,
+                        connected: null,
+                        isOpen: false,
+                    });
                 });
             },
 

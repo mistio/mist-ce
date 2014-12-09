@@ -1195,7 +1195,6 @@ function maxCharsInWidth (fontSize, width) {
     // Initialize testString to a number of chars that will "probably"
     // fit in width
     var textWidth = fontTest.text('t').width();
-    info(width, '/', textWidth, '=', width / textWidth);
     var testString = Array(parseInt(width / textWidth) + 5).join('t');
     textWidth = fontTest.text(testString).width();
 
