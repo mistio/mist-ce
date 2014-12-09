@@ -915,20 +915,45 @@ var setupSocketEvents = function (socket, callback) {
     .on('stats', function (data) {
         Mist.graphsController._handleSocketResponse(data);
     })
-    .on('notify',function(data){
-        if (data.message) {
-            Mist.dialogController.open({
-                type: DIALOG_TYPES.OK,
-                head: data.title,
-                body: [
-                    {
-                        command: data.message
-                    }
-                ]
+    .on('notify', function (data){
+
+        var dialogBody = [];
+
+        // Extract machine information
+        var machineId = data.machine_id;
+        var backendId = data.backend_id;
+        var machine = Mist.backendsController.getMachine(machineId, backendId);
+        if (machine.id) {
+            dialogBody.push({
+                link: machine.name,
+                class: 'ui-btn ui-btn-icon-right ui-icon-carat-r ui-mini ui-corner-all',
+                href: '#/machines/' + machineId,
+                closeDialog: true,
             });
-        } else {
-            Mist.notificationController.notify(data.title);
         }
+
+        // Get output
+        if (data.output)
+            dialogBody.push({
+                command: data.output
+            });
+
+        // Get duration
+        var duration = parseInt(data.duration);
+        if (duration) {
+            var durationMins = parseInt(duration / 60);
+            var durationSecs = duration - (durationMins * 60);
+            dialogBody.push({
+                paragraph: 'Completed in ' + durationMins + 'min ' + durationSecs + ' sec',
+                class: 'duration'
+            });
+        }
+
+        Mist.dialogController.open({
+            type: DIALOG_TYPES.OK,
+            head: data.title,
+            body: dialogBody
+        });
     })
     .on('probe', onProbe)
     .on('ping', onProbe)

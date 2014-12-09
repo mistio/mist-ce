@@ -2244,11 +2244,52 @@ def notify_user(user, title, message="", **kwargs):
     # Notify connected user via amqp
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
+    if 'command' in kwargs:
+        output = '%s\n' % kwargs['command']
+        if 'output' in kwargs:
+            output += '%s\n' % kwargs['output']
+        if 'retval' in kwargs:
+            output += 'returned with exit code %d.\n' % kwargs['retval']
+        payload['output'] = output
     amqp_publish_user(user, routing_key='notify', data=payload)
+
+    body = message + '\n' if message else ''
+    if 'backend_id' in kwargs:
+        backend_id = kwargs['backend_id']
+        backend = user.backends[backend_id]
+        body += "Backend:\n  Name: %s\n  Id: %s\n" % (backend.title,
+                                                      backend_id)
+        if 'machine_id' in kwargs:
+            machine_id = kwargs['machine_id']
+            body += "Machine:\n"
+            if kwargs.get('machine_name'):
+                name = kwargs['machine_name']
+            else:
+                try:
+                    name = backend.machines[machine_id].name
+                except MachineNotFoundError:
+                    name = ''
+            if name:
+                body += "  Name: %s\n" % name
+            title += " for machine %s" % (name or machine_id)
+            body += "  Id: %s\n" % machine_id
+    if 'error' in kwargs:
+        error = kwargs['error']
+        body += "Result: %s\n" % ('Success' if not error else 'Error')
+        if error and error is not True:
+            body += "Error: %s" % error
+    if 'command' in kwargs:
+        body += "Command: %s\n" % kwargs['command']
+    if 'retval' in kwargs:
+        body += "Return value: %s\n" % kwargs['retval']
+    if 'duration' in kwargs:
+        body += "Duration: %.2f secs\n" % kwargs['duration']
+    if 'output' in kwargs:
+        body += "Output: %s\n" % kwargs['output']
 
     try: # Send email in multi-user env
         from mist.core.helpers import send_email
-        send_email("[mist.io] %s" % title, message, user.email)
+        send_email("[mist.io] %s" % title, body, user.email)
     except ImportError:
         pass
 
@@ -2637,25 +2678,16 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
 
 def _notify_playbook_result(user, res, backend_id=None, machine_id=None,
                             extra_vars=None, label='Ansible playbook'):
-    data = {}
     title = label + (' succeeded' if res['success'] else ' failed')
-    msg = ''
-    if backend_id and machine_id:
-        try:
-            name = user.backends[backend_id].machines[machine_id].name
-            msg += 'Machine: %s\n' % name
-        except MachineNotFoundError:
-            pass
-        msg += 'Backend/Machine ids: (%s / %s)\n' % (backend_id, machine_id)
-    msg += 'Result: %s\n'  % ('Success' if res['success'] else 'Error')
-    if res['error_msg']:
-        msg += 'Error: %s\n' % res['error_msg']
-    msg += 'Duration: %.2f secs\n' % (res['finished_at'] - res['started_at'])
-    if extra_vars:
-        msg += 'Vars: %s\n' % extra_vars
+    kwargs = {
+        'backend_id': backend_id,
+        'machine_id': machine_id,
+        'duration': res['finished_at'] - res['started_at'],
+        'error': False if res['success'] else res['error_msg'] or True,
+    }
     if not res['success']:
-        msg += 'Stdout/Stderr:\n%s' % res['stdout']
-    notify_user(user, title, msg)
+        kwargs['output'] = res['stdout']
+    notify_user(user, title, **kwargs)
 
 
 def deploy_collectd(user, backend_id, machine_id, extra_vars):

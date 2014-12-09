@@ -652,8 +652,15 @@ ul.checkbox-list li label {
 #dialog-popup .command-container {
     white-space: pre;
     text-align: left;
-    height: 250px;
+    max-height: 250px;
     overflow: scroll;
 }
+
+#dialog-popup .duration {
+    font-family: monospace;
+    font-size: 11px;
+}
+
+
 
 
