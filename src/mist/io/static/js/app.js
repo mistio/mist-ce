@@ -664,7 +664,8 @@ var loadApp = function (
     App.Checkbox = Ember.Checkbox.extend({
         attributeBindings: [
             'data-mini',
-            'data-theme'
+            'data-theme',
+            'data-disabled'
         ]
     });
     App.TextField = Ember.TextField.extend({
