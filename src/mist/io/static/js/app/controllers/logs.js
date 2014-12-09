@@ -53,10 +53,8 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
                 Ember.run(this, function () {
                     var additionalContent = [];
                     logs.forEach(function (log) {
-                        info('before')
                         additionalContent.push(Log.create(log));
                     });
-                    info('additionalContent', additionalContent);
                     this.get('content').unshiftObjects(additionalContent);
                     this.trigger('onLogListChange');
                 });

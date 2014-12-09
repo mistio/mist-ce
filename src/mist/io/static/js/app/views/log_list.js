@@ -159,13 +159,11 @@ define('app/views/log_list', ['app/views/mistscreen'],
                         Mist.logsController._appendContent(logs);
                         this.set('fetchingHistory', false);
                     } else {
-                        info('calling prepend')
                         Mist.logsController._prependContent(logs);
                     }
                     return;
                     if (Mist.logsController.content.length < 30)
                         Ember.run.later(this, function () {
-                            info('fetching more logs due to few results')
                             this.fetchHistory(200);
                         }, 500);
                 });
