@@ -64,6 +64,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
                 }, 1000);
 
                 this.updateLogTime();
+                this.updateCheckboxClasses();
                 Mist.logsController._setContent([]);
             }.on('didInsertElement'),
 
@@ -255,6 +256,14 @@ define('app/views/log_list', ['app/views/mistscreen'],
             },
 
 
+            updateCheckboxClasses: function () {
+                Ember.run.next(function () {
+                    $('.ui-radio label').removeClass('ui-btn-d');
+                    $('.ui-radio :checked').parent().find('label').addClass('ui-btn-d');
+                });
+            },
+
+
             //
             //
             //  Actions
@@ -275,6 +284,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
                         searchIncidents: all || error ? false : $('#event-incidents').is(":checked"),
                         searchErrors: error,
                     });
+                    this.updateCheckboxClasses();
                 },
             },
 
