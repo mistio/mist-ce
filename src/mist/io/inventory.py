@@ -51,8 +51,8 @@ class MistInventory(object):
                     'ansible_python_interpreter="/usr/bin/env python2"\n')
         ans_cfg = '[defaults]\nhostfile=./inventory\nhost_key_checking=False\n'
         files = {'ansible.cfg': ans_cfg, 'inventory': ans_inv}
-        files.update({'id_rsa/%s' % key_id: private_key
-                      for key_id, private_key in self.keys.items()})
+        for key_id, private_key in self.keys.items():
+             files.update({'id_rsa/%s' % key_id: private_key})
         return files
 
     def _list_machines(self, backend_id):
