@@ -189,12 +189,14 @@ def add_backend(request):
             params[key] = params[key].rstrip().lstrip()
 
     api_version = request.headers.get('Api-Version', 1)
+    title = params.get('title', '')
+    provider = params.get('provider', '')
+
+    user = user_from_request(request)
 
     if api_version == 2:
-        pass
+        backend_id = methods.add_backend_v_2(user, title, provider, params)
     else:
-        title = params.get('title', '')
-        provider = params.get('provider', '')
         apikey = params.get('apikey', '')
         apisecret = params.get('apisecret', '')
         apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
@@ -216,7 +218,6 @@ def add_backend(request):
         compute_endpoint = params.get('compute_endpoint', '')
         # TODO: check if all necessary information was provided in the request
 
-        user = user_from_request(request)
         backend_id = methods.add_backend(
             user, title, provider, apikey, apisecret, apiurl,
             tenant_name=tenant_name,
@@ -226,20 +227,21 @@ def add_backend(request):
             docker_port=docker_port,
             remove_on_error=remove_on_error,
         )
-        backend = user.backends[backend_id]
-        return {
-            'index': len(user.backends) - 1,
-            'id': backend_id,
-            'apikey': backend.apikey,
-            'apiurl': backend.apiurl,
-            'tenant_name': backend.tenant_name,
-            'title': backend.title,
-            'provider': backend.provider,
-            'poll_interval': backend.poll_interval,
-            'region': backend.region,
-            'status': 'off',
-            'enabled': backend.enabled,
-        }
+
+    backend = user.backends[backend_id]
+    return {
+        'index': len(user.backends) - 1,
+        'id': backend_id,
+        'apikey': backend.apikey,
+        'apiurl': backend.apiurl,
+        'tenant_name': backend.tenant_name,
+        'title': backend.title,
+        'provider': backend.provider,
+        'poll_interval': backend.poll_interval,
+        'region': backend.region,
+        'status': 'off',
+        'enabled': backend.enabled,
+    }
 
 
 @view_config(route_name='backend_action', request_method='DELETE')

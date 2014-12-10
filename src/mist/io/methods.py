@@ -200,6 +200,80 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
     return backend_id
 
 
+def add_backend_v_2(user, title, provider, params):
+    """
+    Version 2 of add_backend
+    Adds a new backend to the user and returns the backend_id
+    """
+    if not provider:
+        raise RequiredParameterMissingError("provider")
+    log.info("Adding new backend in provider '%s'", provider)
+
+    baremetal = provider == 'bare_metal'
+
+    if provider == 'bare_metal':
+        backend_id = _add_backend_bare_metal(user, title, provider, params)
+
+
+def _add_backend_bare_metal(user, title, provider, params):
+    """
+    Add a bare metal backend
+    """
+    machine_hostname = params.get('machine_ip', '')
+    if not machine_hostname:
+        raise RequiredParameterMissingError('machine_hostname')
+
+    remove_on_error = params.get('remove_on_error', True)
+    machine_key = params.get('machine_key', '')
+    machine_user = params.get('machine_user', '')
+
+    if remove_on_error:
+        if not machine_key:
+            raise RequiredParameterMissingError('machine_key')
+        if machine_key not in user.keypairs:
+            raise KeypairNotFoundError(machine_key)
+        if not machine_user:
+            machine_user = 'root'
+
+    try:
+        port = int(params.get('machine_port', 22))
+    except:
+        port = 22
+    machine = model.Machine()
+    machine.dns_name = machine_hostname
+    machine.ssh_port = port
+
+    machine.public_ips = [machine_hostname]
+    machine_id = machine_hostname.replace('.', '').replace(' ', '')
+    machine.name = machine_hostname
+    backend = model.Backend()
+    backend.title = machine_hostname
+    backend.provider = provider
+    backend.enabled = True
+    backend.machines[machine_id] = machine
+    backend_id = backend.get_id()
+
+    with user.lock_n_load():
+        if backend_id in user.backends:
+            raise BackendExistsError(backend_id)
+        user.backends[backend_id] = backend
+        # try to connect. this will either fail and we'll delete the
+        # backend, or it will work and it will create the association
+        if remove_on_error:
+            try:
+                ssh_command(
+                    user, backend_id, machine_id, machine_hostname, 'uptime',
+                    key_id=machine_key, username=machine_user, password=None,
+                    port=port
+                )
+            except MachineUnauthorizedError as exc:
+                # remove backend
+                del user.backends[backend_id]
+                user.save()
+                raise BackendUnauthorizedError(exc)
+        user.save()
+
+
 def rename_backend(user, backend_id, new_name):
     """Renames backend with given backend_id."""
 
