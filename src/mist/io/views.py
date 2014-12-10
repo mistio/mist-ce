@@ -187,53 +187,59 @@ def add_backend(request):
     for key in params.keys():
         if type(params[key]) in [unicode, str]:
             params[key] = params[key].rstrip().lstrip()
-    title = params.get('title', '')
-    provider = params.get('provider', '')
-    apikey = params.get('apikey', '')
-    apisecret = params.get('apisecret', '')
-    apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
-    tenant_name = params.get('tenant_name', '')
-    # following params are for baremetal
-    machine_hostname = params.get('machine_ip', '')
-    machine_key = params.get('machine_key', '')
-    machine_user = params.get('machine_user', '')
-    remove_on_error = params.get('remove_on_error', True)
-    try:
-        docker_port = int(params.get('docker_port', 4243))
-    except:
-        docker_port = 4243
-    try:
-        ssh_port = int(params.get('machine_port', 22))
-    except:
-        ssh_port = 22
-    region = params.get('region', '')
-    compute_endpoint = params.get('compute_endpoint', '')
-    # TODO: check if all necessary information was provided in the request
 
-    user = user_from_request(request)
-    backend_id = methods.add_backend(
-        user, title, provider, apikey, apisecret, apiurl,
-        tenant_name=tenant_name,
-        machine_hostname=machine_hostname, machine_key=machine_key,
-        machine_user=machine_user, region=region,
-        compute_endpoint=compute_endpoint, port=ssh_port,
-        docker_port=docker_port,
-        remove_on_error=remove_on_error,
-    )
-    backend = user.backends[backend_id]
-    return {
-        'index': len(user.backends) - 1,
-        'id': backend_id,
-        'apikey': backend.apikey,
-        'apiurl': backend.apiurl,
-        'tenant_name': backend.tenant_name,
-        'title': backend.title,
-        'provider': backend.provider,
-        'poll_interval': backend.poll_interval,
-        'region': backend.region,
-        'status': 'off',
-        'enabled': backend.enabled,
-    }
+    api_version = request.headers.get('Api-Version', 1)
+
+    if api_version == 2:
+        pass
+    else:
+        title = params.get('title', '')
+        provider = params.get('provider', '')
+        apikey = params.get('apikey', '')
+        apisecret = params.get('apisecret', '')
+        apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
+        tenant_name = params.get('tenant_name', '')
+        # following params are for baremetal
+        machine_hostname = params.get('machine_ip', '')
+        machine_key = params.get('machine_key', '')
+        machine_user = params.get('machine_user', '')
+        remove_on_error = params.get('remove_on_error', True)
+        try:
+            docker_port = int(params.get('docker_port', 4243))
+        except:
+            docker_port = 4243
+        try:
+            ssh_port = int(params.get('machine_port', 22))
+        except:
+            ssh_port = 22
+        region = params.get('region', '')
+        compute_endpoint = params.get('compute_endpoint', '')
+        # TODO: check if all necessary information was provided in the request
+
+        user = user_from_request(request)
+        backend_id = methods.add_backend(
+            user, title, provider, apikey, apisecret, apiurl,
+            tenant_name=tenant_name,
+            machine_hostname=machine_hostname, machine_key=machine_key,
+            machine_user=machine_user, region=region,
+            compute_endpoint=compute_endpoint, port=ssh_port,
+            docker_port=docker_port,
+            remove_on_error=remove_on_error,
+        )
+        backend = user.backends[backend_id]
+        return {
+            'index': len(user.backends) - 1,
+            'id': backend_id,
+            'apikey': backend.apikey,
+            'apiurl': backend.apiurl,
+            'tenant_name': backend.tenant_name,
+            'title': backend.title,
+            'provider': backend.provider,
+            'poll_interval': backend.poll_interval,
+            'region': backend.region,
+            'status': 'off',
+            'enabled': backend.enabled,
+        }
 
 
 @view_config(route_name='backend_action', request_method='DELETE')
