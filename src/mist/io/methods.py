@@ -222,6 +222,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_rackspace(title, provider, params)
     elif provider == 'nephoscale':
         backend_id, backend = _add_backend_nephoscale(title, provider, params)
+    elif provider == 'digitalocean':
+        backend_id, backend = _add_backend_digitalocean(title, provider, params)
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
@@ -364,6 +366,22 @@ def _add_backend_nephoscale(title, provider, params):
     backend.provider = provider
     backend.apikey = username
     backend.apisecret = password
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_digitalocean(title, provider, params):
+    token = params.get('token', '')
+    if not token:
+        raise RequiredParameterMissingError('token')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = token
+    backend.apisecret = token
     backend.enabled = True
     backend_id = backend.get_id()
 
