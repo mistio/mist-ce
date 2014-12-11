@@ -68,7 +68,6 @@ define('app/controllers/file_upload', ['ember'],
                 var reader = new FileReader();
 
                 reader.onloadend = function (e) {
-
                     var success;
                     if (e.target.readyState == FileReader.DONE) {
                         that.set('file', e.target.result);
@@ -78,13 +77,17 @@ define('app/controllers/file_upload', ['ember'],
                         success = false
                     }
                     that.set('uploadingFile', false);
-
+                    if (args.fileInput)
+                        resetFileInputField($(args.fileInput));
                     if (args.callback)
                         args.callback(success, that.file);
                 };
 
                 this.set('uploadingFile', true);
-                reader.readAsText(args.file, 'UTF-8');
+                if (args.file)
+                    reader.readAsText(args.file, 'UTF-8');
+                if (args.fileInput)
+                    reader.readAsText(args.fileInput.files[0], 'UTF-8');
             }
         });
     }
