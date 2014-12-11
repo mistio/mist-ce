@@ -26,9 +26,10 @@ from ansible import callbacks
 from ansible import utils
 
 from mist.io.celery_app import app
-from mist.io.exceptions import ServiceUnavailableError
+from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
 from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
+
 
 try:  # Multi-user environment
     from mist.core.helpers import user_from_email
@@ -67,6 +68,7 @@ def update_machine_count(email, backend_id, machine_count):
             [backend.machine_count for backend in user.backends.values()]
         )
         user.save()
+
 
 @app.task
 def ssh_command(email, backend_id, machine_id, host, command,
@@ -123,6 +125,11 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 user, backend_id, node.id, key_id, username, password, port
             )
 
+            backend = user.backends[backend_id]
+            msg = "Backend:\n  Name: %s\n  Id: %s\n" % (backend.title,
+                                                        backend_id)
+            msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name,
+                                                             node.id)
             if command:
                 log_dict = {
                     'email': email,
@@ -140,17 +147,17 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 retval, output = shell.command(command)
                 execution_time = time() - start_time
                 output = output.decode('utf-8','ignore')
-                msg = ("Command: %s\n"
-                       "Return value: %s\n"
-                       "Duration: %d seconds\n"
-                       "Output:%s\n") % (command, retval,
-                                         execution_time, output)
-                msg = msg.encode('utf-8', 'ignore')
-                msg_title = "Deployment script %s for machine %s (%s)" % (
-                    'failed' if retval else 'succeeded',
-                    node.name, node.id
-                )
-                notify_user(user, msg_title, msg)
+                title = "Deployment script %s" % ('failed' if retval
+                                                  else 'succeeded')
+                notify_user(user, title,
+                            backend_id=backend_id,
+                            machine_id=machine_id,
+                            machine_name=node.name,
+                            command=command,
+                            output=output,
+                            duration=execution_time,
+                            retval=retval,
+                            error=retval > 0)
                 log_event(action='deployment_script_finished',
                           error=retval > 0,
                           return_value=retval,
@@ -175,7 +182,6 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
     except Exception as exc:
         if str(exc).startswith('Retry'):
             raise
-        amqp_log("Deployment script failed for machine %s in backend %s by user %s after 5 retries: %s" % (node.id, backend_id, email, repr(exc)))
         notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
         notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
         log_event(

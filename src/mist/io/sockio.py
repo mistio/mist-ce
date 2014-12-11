@@ -112,7 +112,7 @@ class ShellNamespace(CustomNamespace):
         self.spawn(self.get_ssh_data)
 
     def on_shell_data(self, data):
-        self.channel.send(data)
+        self.channel.send(data.encode('utf-8', 'ignore'))
 
     def on_shell_resize(self, columns, rows):
         log.info("Resizing shell to %d * %d", columns, rows)
