@@ -230,6 +230,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_azure(title, provider, params)
     elif provider == 'linode':
         backend_id, backend = _add_backend_linode(title, provider, params)
+    elif provider == 'docker':
+        backend_id, backend = _add_backend_docker(title, provider, params)
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
@@ -449,6 +451,32 @@ def _add_backend_linode(title, provider, params):
     backend.provider = provider
     backend.apikey = api_key
     backend.apisecret = api_key
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_docker(title, provider, params):
+    try:
+        docker_port = int(params.get('docker_port', 4243))
+    except:
+        docker_port = 4243
+
+    docker_host = params.get('docker_host', '')
+    if not docker_host:
+        raise RequiredParameterMissingError('docker_host')
+
+    auth_user = params.get('auth_user', '')
+    auth_password = params.get('auth_password', '')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.docker_port = docker_port
+    backend.apikey = auth_user
+    backend.apisecret = auth_password
+    backend.apiurl = docker_host
     backend.enabled = True
     backend_id = backend.get_id()
 
