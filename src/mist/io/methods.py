@@ -226,6 +226,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_digitalocean(title, provider, params)
     elif provider == 'gce':
         backend_id, backend = _add_backend_gce(title, provider, params)
+    elif provider == 'azure':
+        backend_id, backend = _add_backend_azure(title, provider, params)
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
@@ -409,6 +411,26 @@ def _add_backend_gce(title, provider, params):
     backend.apikey = email
     backend.apisecret = private_key
     backend.tenant_name = project_id
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_azure(title, provider, params):
+    subscription_id = params.get('subscription_id', '')
+    if not subscription_id:
+        raise RequiredParameterMissingError('subscription_id')
+
+    certificate = params.get('certificate', '')
+    if not certificate:
+        raise RequiredParameterMissingError('certificate')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = subscription_id
+    backend.apisecret = certificate
     backend.enabled = True
     backend_id = backend.get_id()
 
