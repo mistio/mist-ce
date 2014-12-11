@@ -169,7 +169,8 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                                 $('#gce-bundle a').removeClass('ui-icon-check')
                                     .addClass('ui-icon-carat-u');
                             }
-                        }
+                        },
+                        Mist.backendAddController.get('newBackendSecondField')
                     );
                 },
 
@@ -179,9 +180,11 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         function (uploadedFile) {
                             Mist.backendAddController.set('newBackendSecondField',
                                 uploadedFile);
-                        }
+                        },
+                        Mist.backendAddController.get('newBackendSecondField')
                     );
                 },
+
 
                 createKeyClicked: function() {
                     Mist.keyAddController.open( function (success, key) {
