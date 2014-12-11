@@ -672,26 +672,26 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     }
 
                     this.svg.axis.x.legend.animation
-                                    .points(( this.margin.left + this.valuesDistance),(this.height - this.margin.bottom +2), this.margin.left,(this.height - this.margin.bottom +2))
-                                    .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: this.labelFormat})
-                                    .before(function(data){
-                                        this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat, that.timeDisplayed));
-                                        this.d3Selector.selectAll('text')
-                                                       .style('text-anchor', 'end')
-                                                       .attr('x','-10');
-                                        that.svg.axis.y.legend.call(data.modelY);
-                                    })
-                                    .push();
+                        .points(( this.margin.left + this.valuesDistance),(this.height - this.margin.bottom +2), this.margin.left,(this.height - this.margin.bottom +2))
+                        .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: this.labelFormat})
+                        .before(function(data){
+                            this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat, that.timeDisplayed));
+                            this.d3Selector.selectAll('text')
+                                           .style('text-anchor', 'end')
+                                           .attr('x','-10');
+                            that.svg.axis.y.legend.call(data.modelY);
+                        })
+                        .push();
 
                     this.svg.grid.x.animation
-                                    .points((this.margin.left + this.valuesDistance),this.height, this.margin.left,this.height)
-                                    .data({modelX: modelGridX,modelY: modelGridY})
-                                    .before(function(data){
-                                        this.d3Selector.call(labelTicksFixed(data.modelX, null, that.timeDisplayed));
-                                        // Y grid should change when x changes
-                                        that.svg.grid.y.call(data.modelY);
-                                    })
-                                    .push();
+                        .points((this.margin.left + this.valuesDistance),this.height, this.margin.left,this.height)
+                        .data({modelX: modelGridX,modelY: modelGridY})
+                        .before(function(data){
+                            this.d3Selector.call(labelTicksFixed(data.modelX, null, that.timeDisplayed));
+                            // Y grid should change when x changes
+                            that.svg.grid.y.call(data.modelY);
+                        })
+                        .push();
 
                 } else {
 
@@ -702,7 +702,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     if (this.graph.datasources.length == 1) {
                         this.svg.value.area.attr('d', valueAreaPath);
                     }
-                    this.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,this.abelFormat, this.timeDisplayed));
+                    this.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,this.labelFormat, this.timeDisplayed));
                     this.svg.axis.x.legend.selectAll('text')
                            .style('text-anchor', 'end')
                            .attr('x','-10');
