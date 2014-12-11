@@ -224,6 +224,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_nephoscale(title, provider, params)
     elif provider == 'digitalocean':
         backend_id, backend = _add_backend_digitalocean(title, provider, params)
+    elif provider == 'softlayer':
+        backend_id, backend = _add_backend_softlayer(title, provider, params)
     elif provider == 'gce':
         backend_id, backend = _add_backend_gce(title, provider, params)
     elif provider == 'azure':
@@ -380,6 +382,26 @@ def _add_backend_nephoscale(title, provider, params):
     backend.provider = provider
     backend.apikey = username
     backend.apisecret = password
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_softlayer(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = api_key
     backend.enabled = True
     backend_id = backend.get_id()
 
