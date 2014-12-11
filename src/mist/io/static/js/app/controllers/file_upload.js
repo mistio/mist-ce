@@ -32,10 +32,11 @@ define('app/controllers/file_upload', ['ember'],
             //
 
 
-            open: function (title, label, callback) {
+            open: function (title, label, callback, defaultText) {
                 this.clear();
                 this.set('title', title)
                     .set('label', label)
+                    .set('file', defaultText)
                     .set('callback', callback);
 
                 $('#file-upload').popup('open');
