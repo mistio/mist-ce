@@ -42,7 +42,10 @@ STATES = {
     NodeState.PENDING: 'pending',
     # we assume unknown means stopped, especially for the EC2 case
     NodeState.UNKNOWN: 'stopped',
-    NodeState.STOPPED: 'stopped'
+    NodeState.STOPPED: 'stopped',
+    NodeState.ERROR: 'error',
+    NodeState.PAUSED: 'paused',
+    NodeState.SUSPENDED: 'suspended',
 }
 
 
