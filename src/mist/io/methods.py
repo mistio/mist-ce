@@ -232,6 +232,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_linode(title, provider, params)
     elif provider == 'docker':
         backend_id, backend = _add_backend_docker(title, provider, params)
+    elif 'hpcloud' in provider:
+        backend_id, backend = _add_backend_hp(title, provider, params)
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
@@ -477,6 +479,38 @@ def _add_backend_docker(title, provider, params):
     backend.apikey = auth_user
     backend.apisecret = auth_password
     backend.apiurl = docker_host
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_hp(title, provider, params):
+    provider, region = provider.split(':')[0], provider.split(':')[1]
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    tenant_name = params.get('tenant_name', '')
+    if not tenant_name:
+        raise RequiredParameterMissingError('tenant_name')
+
+    apiurl = params.get('apiurl') or ''
+    if 'hpcloudsvc' in apiurl:
+            apiurl = HPCLOUD_AUTH_URL
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.apiurl = apiurl
+    backend.region = region
+    backend.tenant_name = tenant_name
     backend.enabled = True
     backend_id = backend.get_id()
 

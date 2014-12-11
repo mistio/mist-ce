@@ -192,6 +192,9 @@ def add_backend(request):
     title = params.get('title', '')
     provider = params.get('provider', '')
 
+    if not provider:
+        raise RequiredParameterMissingError('provider')
+
     user = user_from_request(request)
 
     if int(api_version) == 2:
