@@ -213,6 +213,36 @@ def add_backend_v_2(user, title, provider, params):
 
     if provider == 'bare_metal':
         backend_id = _add_backend_bare_metal(user, title, provider, params)
+        log.info("Backend with id '%s' added succesfully.", backend_id)
+        trigger_session_update(user.email, ['backends'])
+        return backend_id
+    elif 'ec2' in provider:
+        backend_id, backend = _add_backend_ec2(user, title, provider, params)
+
+    if backend_id in user.backends:
+        raise BackendExistsError(backend_id)
+
+    remove_on_error = params.get('remove_on_error', True)
+    # validate backend before adding
+    if remove_on_error:
+        try:
+            conn = connect_provider(backend)
+        except:
+            raise BackendUnauthorizedError()
+        try:
+            machines = conn.list_nodes()
+        except InvalidCredsError:
+            raise BackendUnauthorizedError()
+        except Exception as exc:
+            log.error("Error while trying list_nodes: %r", exc)
+            raise BackendUnavailableError()
+
+    with user.lock_n_load():
+        user.backends[backend_id] = backend
+        user.save()
+    log.info("Backend with id '%s' added succesfully.", backend_id)
+    trigger_session_update(user.email, ['backends'])
+    return backend_id
 
 
 def _add_backend_bare_metal(user, title, provider, params):
@@ -272,6 +302,26 @@ def _add_backend_bare_metal(user, title, provider, params):
                 user.save()
                 raise BackendUnauthorizedError(exc)
         user.save()
+
+
+def _add_backend_ec2(user, title, provider, params):
+        api_key = params.get('api_key', '')
+        if not api_key:
+            raise RequiredParameterMissingError('api_key')
+
+        api_secret = params.get('api_secret', '')
+        if not api_secret:
+            raise RequiredParameterMissingError('api_secret')
+
+        backend = model.Backend()
+        backend.title = title
+        backend.provider = provider
+        backend.apikey = api_key
+        backend.apisecret = api_secret
+        backend.enabled = True
+        backend_id = backend.get_id()
+
+        return backend_id, backend
 
 
 def rename_backend(user, backend_id, new_name):

@@ -194,7 +194,7 @@ def add_backend(request):
 
     user = user_from_request(request)
 
-    if api_version == 2:
+    if int(api_version) == 2:
         backend_id = methods.add_backend_v_2(user, title, provider, params)
     else:
         apikey = params.get('apikey', '')
