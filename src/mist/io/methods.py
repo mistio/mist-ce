@@ -234,6 +234,10 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_docker(title, provider, params)
     elif 'hpcloud' in provider:
         backend_id, backend = _add_backend_hp(title, provider, params)
+    elif provider == 'openstack':
+        backend_id, backend = _add_backend_openstack(title, provider, params)
+    else:
+        raise BadRequestError("Provider unknown.")
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
@@ -511,6 +515,49 @@ def _add_backend_hp(title, provider, params):
     backend.apiurl = apiurl
     backend.region = region
     backend.tenant_name = tenant_name
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_openstack(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    auth_url = params.get('auth_url')
+    if not auth_url:
+        raise RequiredParameterMissingError('auth_url')
+
+    if auth_url.endswith('/v2.0/'):
+        auth_url = auth_url.split('/v2.0/')[0]
+    elif auth_url.endswith('/v2.0'):
+        auth_url = auth_url.split('/v2.0')[0]
+
+    auth_url = auth_url.rstrip('/')
+
+    tenant_name = params.get('tenant_name', '')
+    if not tenant_name:
+        raise RequiredParameterMissingError('tenant_name')
+
+    region = params.get('region', '')
+    compute_endpoint = params.get('compute_endpoint', '')
+
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.apiurl = auth_url
+    backend.tenant_name = tenant_name
+    backend.region = region
+    backend.compute_endpoint = compute_endpoint
     backend.enabled = True
     backend_id = backend.get_id()
 
