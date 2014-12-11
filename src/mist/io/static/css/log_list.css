@@ -1,0 +1,87 @@
+.details {
+    display: none;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.details.info-table {
+    background-color: rgb(214, 214, 214);
+}
+
+.details table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.details table td {
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+#log-list-page .ui-block-c div {
+    float: right;
+    margin-left: 10px;
+}
+
+#log-list-page .ui-block-a div {
+    float: left;
+    top: 3px;
+    position: relative;
+    overflow: hidden;
+    max-width: 100%;
+    text-overflow: ellipsis;
+}
+
+#log-list-page .filter-wrapper {
+    margin-bottom: 20px;
+}
+
+#log-list-page .filter-wrapper fieldset {
+    float: left;
+}
+
+#log-list-page .filter-wrapper .ui-input-text {
+    margin-left: 29.5em;
+    margin-top: 2px;
+    position: relative;
+    top: 7px;
+}
+
+#log-list-page li {
+    padding: 0;
+    border:none;
+}
+
+#log-list-page a .ui-block-a {
+    text-align: left;
+}
+
+#log-list-page .ui-block-a div.error {
+    top: 0;
+    left: 5px;
+}
+
+#log-list-page a .ui-block-c {
+    text-align: right;
+}
+
+#log-list-page li a {
+    margin: 0;
+}
+
+#log-list-page span.open {
+
+}
+
+#log-list-page span.open a {
+    background-color: rgb(214, 214, 214);
+}
+
+
+#log-list-page .details table td:first-child {
+    width: 33%;
+}
+
+#log-list-page .details table td:last-child {
+    width: 66%;
+}
