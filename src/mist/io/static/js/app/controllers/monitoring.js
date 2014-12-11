@@ -141,19 +141,13 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
                 Mist.set('current_plan', data.current_plan);
                 Mist.set('monitored_machines', data.machines);
+                Mist.set('monitored_machines_', data.monitored_machines);
 
                 Mist.metricsController.setCustomMetrics(data.custom_metrics);
                 Mist.metricsController.setBuiltInMetrics(data.builtin_metrics);
                 Mist.rulesController.load(data.rules);
 
-                data.machines.forEach(function(machineTuple) {
-                    var machine = Mist.backendsController.getMachine(
-                                    machineTuple[1], machineTuple[0]);
-                    if (machine)
-                        machine.set('hasMonitoring', true);
-                });
-
-                Mist.backendsController.content.forEach(function(backend) {
+                Mist.backendsController.content.forEach(function (backend) {
                    backend.machines._updateMonitoredMachines();
                 });
             },

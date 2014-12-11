@@ -69,6 +69,13 @@ define('app/views/dialog', ['app/views/popup'],
                 },
 
 
+                linkClicked: function (link) {
+                    if (link.closeDialog)
+                        Mist.dialogController.close();
+                    window.location = link.href;
+                },
+
+
                 commandClicked: function (e) {
                     $(this.popupId + ' .command-container')
                         .toArray()

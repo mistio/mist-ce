@@ -44,20 +44,19 @@
             {{#each Mist.dialogController.options.body}}
 
                 {{#if this.paragraph}}
-                    <p>{{this.paragraph}}</p>
+                    <p {{bind-attr class="this.class"}}>{{this.paragraph}}</p>
                 {{/if}}
 
                 {{#if this.link}}
-                    <a {{bind-attr href="this.href"}} target="_blank">
-                        {{this.link}}
+                    <a {{bind-attr href="this.href" class="this.class" target="this.target"}}
+                        {{action "linkClicked" this target="view"}}>
+                            {{this.link}}
                     </a>
                 {{/if}}
 
                 {{#if this.command}}
                     <div class="command-container"
-                        {{action "commandClicked" this on="click" target="view"}}>
-                            {{this.command}}
-                    </div>
+                        {{action "commandClicked" this on="click" target="view"}}>{{this.command}}</div>
                 {{/if}}
 
             {{/each}}

@@ -41,6 +41,16 @@ define('app/models/machine', ['ember'],
             loadavg5: null,
             loadavg15: null,
 
+            installationStatus: Ember.Object.create({
+                activated_at: null,
+                error_msg: null,
+                finished_at: null,
+                manual: null,
+                started_at: null,
+                state: null,
+                stdout: null,
+            }),
+
 
             /**
              *  Computed Properties
@@ -77,6 +87,11 @@ define('app/models/machine', ['ember'],
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('imageId'),
+
+
+            hasKeys: function () {
+                return !!Mist.keysController.getMachineKeysCount(this)
+            }.property('Mist.keysController.content.@each.machines'),
 
 
             /**

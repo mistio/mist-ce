@@ -23,6 +23,10 @@ If you wish to install it in a virtual environment you'll also need::
 
     sudo aptitude install python-virtualenv
 
+In Red Hat based systems the following packages need to be installed:
+   
+    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml  gcc libxml2 libxml2-python libxml2-devel
+
 In MacOSX you have to install Xcode and its command line tools. For virtualenv
 you simply run::
 
@@ -34,6 +38,7 @@ create a virtualenv and run buildout::
     git clone https://github.com/mistio/mist.io.git
     cd mist.io
     virtualenv --no-site-packages .
+    ./bin/pip install ansible
     ./bin/python bootstrap.py
     ./bin/buildout -v
 

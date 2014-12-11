@@ -6,9 +6,9 @@
     <meta content='True' name='HandheldFriendly' />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
     <title>Mistio - cloud management in your pocket</title>
-    <link rel="icon" href="resources/favicon.ico" />
+    <link rel="icon" href="/resources/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
-    <link rel="stylesheet" href="resources/css/missing.css"/>
+    <link rel="stylesheet" href="/resources/css/missing.css"/>
 </head>
 
 <body>

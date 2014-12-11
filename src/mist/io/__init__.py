@@ -104,7 +104,6 @@ def add_routes(configurator):
     configurator.add_route('machine_metadata',
                      '/backends/{backend}/machines/{machine}/metadata')
     configurator.add_route('probe', '/backends/{backend}/machines/{machine}/probe')
-    configurator.add_route('shell', '/backends/{backend}/machines/{machine}/shell')
 
     configurator.add_route('monitoring', '/monitoring')
     configurator.add_route('update_monitoring',
@@ -115,8 +114,6 @@ def add_routes(configurator):
     configurator.add_route('metric', '/metrics/{metric}')
     configurator.add_route('deploy_plugin',
                      '/backends/{backend}/machines/{machine}/plugins/{plugin}')
-    configurator.add_route('loadavg',
-                     '/backends/{backend}/machines/{machine}/loadavg.png')
 
     configurator.add_route('images', '/backends/{backend}/images')
     configurator.add_route('image', '/backends/{backend}/images/{image:.*}')
@@ -136,5 +133,5 @@ def add_routes(configurator):
     configurator.add_route('rule', '/rules/{rule}')
     configurator.add_route('check_auth', '/auth')
     configurator.add_route('account', '/account')
-    
+
     configurator.add_route('socketio', '/socket.io/*remaining')

@@ -560,14 +560,14 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // TODO (gtsop): Add description
 
                 // Timestamp fix for small screens
-                var tLabelFormat = '%I:%M%p';
+                var tLabelFormat = '%H:%M';
                 if ((this.width <= 700 && this.timeDisplayed == TIME_MAP.WEEK) ||
                     (this.width <= 521 && this.timeDisplayed == TIME_MAP.MONTH)) // 1 Week || 1 Month
                         tLabelFormat = '%d-%b';
                 else if (this.width <= 560 && this.timeDisplayed == TIME_MAP.DAY) // 1 Day
-                    tLabelFormat = '%I:%M%p';
+                    tLabelFormat = '%H:%M';
                 else if (this.timeDisplayed >= TIME_MAP.DAY) // 1 Day (24*60*60) >=, should display date as well
-                    tLabelFormat = '%d-%m | %I:%M%p';
+                    tLabelFormat = '%d-%m | %H:%M';
                 this.set('labelFormat', tLabelFormat);
             },
 

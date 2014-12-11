@@ -26,9 +26,9 @@
            data-theme="d"
            {{action "addClicked" target="view"}}>Add</a>
 
-        <ul data-role="listview" 
-            data-filter="true" 
-            data-inset="true" 
+        <ul data-role="listview"
+            data-filter="true"
+            data-inset="true"
             data-filter-placeholder="Filter..."
             class="checkbox-list">
             {{#each Mist.keysController.content}}
@@ -39,6 +39,8 @@
         <div class="mid-padding"></div>
 
     </div>
+
+    {{view Mist.dialogView}}
 
     {{view Mist.keyAddView}}
 

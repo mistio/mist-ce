@@ -29,10 +29,8 @@ import ansible.constants
 
 try:
     from mist.core import config, model
-    from mist.core.helpers import core_wrapper
 except ImportError:
     from mist.io import config, model
-    from mist.io.helpers import core_wrapper
 
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
@@ -65,7 +63,6 @@ HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/to
 GCE_IMAGES = ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']
 
 
-@core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
                 compute_endpoint="", port=22, docker_port=4243, remove_on_error=True):
@@ -219,7 +216,6 @@ def rename_backend(user, backend_id, new_name):
     trigger_session_update(user.email, ['backends'])
 
 
-@core_wrapper
 def delete_backend(user, backend_id):
     """Deletes backend with given backend_id."""
 
@@ -249,7 +245,6 @@ def delete_backend(user, backend_id):
     trigger_session_update(user.email, ['backends'])
 
 
-@core_wrapper
 def add_key(user, key_id, private_key):
     """Adds a new keypair and returns the new key_id."""
 
@@ -280,7 +275,6 @@ def add_key(user, key_id, private_key):
     return key_id
 
 
-@core_wrapper
 def delete_key(user, key_id):
     """Deletes given keypair.
 
@@ -367,7 +361,6 @@ def edit_key(user, new_key, old_key):
     trigger_session_update(user.email, ['keys'])
 
 
-@core_wrapper
 def associate_key(user, key_id, backend_id, machine_id, host='', username=None, port=22):
     """Associates a key with a machine.
 
@@ -452,7 +445,6 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
         log.info("Key associated and deployed succesfully.")
 
 
-@core_wrapper
 def disassociate_key(user, key_id, backend_id, machine_id, host=None):
     """Disassociates a key from a machine.
 
@@ -524,6 +516,7 @@ def connect_provider(backend):
         #a cert file
         temp_key_file = NamedTemporaryFile(delete=False)
         temp_key_file.write(backend.apisecret)
+        temp_key_file.close()
         conn = driver(backend.apikey, temp_key_file.name)
     elif backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
@@ -700,7 +693,6 @@ def list_machines(user, backend_id):
     return ret
 
 
-@core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[], ssh_port=22):
@@ -735,24 +727,29 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         raise KeypairNotFoundError(key_id)
 
     # if key_id not provided, search for default key
-    if not key_id:
-        for kid in user.keypairs:
-            if user.keypairs[kid].default:
-                key_id = kid
-                break
-    if key_id is None:
-        raise KeypairNotFoundError("Couldn't find default keypair")
+    if conn.type != Provider.DOCKER:
+        if not key_id:
+            for kid in user.keypairs:
+                if user.keypairs[kid].default:
+                    key_id = kid
+                    break
+        if key_id is None:
+            raise KeypairNotFoundError("Couldn't find default keypair")
 
-    keypair = user.keypairs[key_id]
-    private_key = keypair.private
-    public_key = keypair.public
+    if key_id:
+        keypair = user.keypairs[key_id]
+        private_key = keypair.private
+        public_key = keypair.public
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
     if conn.type is Provider.DOCKER:
-        node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
+        if key_id:
+            node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
+        else:
+            node = _create_machine_docker(conn, machine_name, image_id, script)
         if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
@@ -812,16 +809,22 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         #we have the username
         associate_key(user, key_id, backend_id, node.id,
                       username=node.extra.get('username'), port=ssh_port)
-    else:
+    elif key_id:
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
     if conn.type == Provider.AZURE:
-        #for Azure, connect with the generated password, deploy the ssh key
-        #when this is ok, it calss post_deploy for script/monitoring
+        # for Azure, connect with the generated password, deploy the ssh key
+        # when this is ok, it calss post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
                                       monitoring, script, key_id,
                                       node.extra.get('username'), node.extra.get('password'), public_key)
-    else:
+    elif conn.type == Provider.RACKSPACE_FIRST_GEN:
+        # for Rackspace First Gen, cannot specify ssh keys. When node is
+        # created we have the generated password, so deploy the ssh key
+        # when this is ok and call post_deploy for script/monitoring
+        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(user.email, backend_id, node.id,
+                                      monitoring, script, key_id, node.extra.get('password'), public_key)
+    elif key_id:
         if script or monitoring:
             mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
                                       monitoring, script, key_id)
@@ -856,13 +859,18 @@ def _create_machine_rackspace(conn, public_key, machine_name,
             server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
             server_key = server_key.name
     except:
-        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
-        server_key = server_key.name
+        try:
+            server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
+            server_key = server_key.name
+        except AttributeError:
+            # RackspaceFirstGenNodeDriver based on OpenStack_1_0_NodeDriver
+            # has no support for keys. So don't break here, since create_node won't
+            # include it anyway
+            server_key = None
 
     try:
         node = conn.create_node(name=machine_name, image=image, size=size,
                                 location=location, ex_keyname=server_key)
-
         return node
     except Exception as e:
         raise MachineCreationError("Rackspace, got exception %r" % e)
@@ -1132,7 +1140,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
             raise MachineCreationError("Softlayer, got exception %s" % e)
     return node
 
-def _create_machine_docker(conn, machine_name, image, script, public_key=None):
+def _create_machine_docker(conn, machine_name, image, script, public_key=None, tty_attach=True):
     """Create a machine in docker.
 
     """
@@ -1147,6 +1155,7 @@ def _create_machine_docker(conn, machine_name, image, script, public_key=None):
             image=image,
             command=script,
             environment=environment,
+            tty=tty_attach
         )
     except Exception as e:
         raise MachineCreationError("Docker, got exception %s" % e)
@@ -1229,7 +1238,12 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 ex_cloud_service_name=cloud_service_name
             )
         except Exception as e:
-            raise MachineCreationError("Azure, got exception %s" % e)
+            try:
+                #get to get the message only out of the XML response
+                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value).group(2)
+            except:
+                msg = e
+            raise MachineCreationError('Azure, got exception %s' % msg)
 
         return node
 
@@ -1449,7 +1463,6 @@ def resize_machine(user, backend_id, machine_id, plan_id):
     _machine_action(user, backend_id, machine_id, 'resize', plan_id=plan_id)
 
 
-@core_wrapper
 def destroy_machine(user, backend_id, machine_id):
     """Destroys a machine on a certain backend.
 
@@ -1556,7 +1569,7 @@ def list_images(user, backend_id, term=None):
             # from Azure's response we can't know which images are default
             rest_images = conn.list_images()
             rest_images = [image for image in rest_images if 'windows' not in image.name.lower()
-                           and 'RightImage' not in image.name]
+                           and 'RightImage' not in image.name and 'Barracuda' not in image.name and 'BizTalk' not in image.name]
             temp_dict = {}
             for image in rest_images:
                 temp_dict[image.name] = image
@@ -2237,11 +2250,52 @@ def notify_user(user, title, message="", **kwargs):
     # Notify connected user via amqp
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
+    if 'command' in kwargs:
+        output = '%s\n' % kwargs['command']
+        if 'output' in kwargs:
+            output += '%s\n' % kwargs['output']
+        if 'retval' in kwargs:
+            output += 'returned with exit code %d.\n' % kwargs['retval']
+        payload['output'] = output
     amqp_publish_user(user, routing_key='notify', data=payload)
+
+    body = message + '\n' if message else ''
+    if 'backend_id' in kwargs:
+        backend_id = kwargs['backend_id']
+        backend = user.backends[backend_id]
+        body += "Backend:\n  Name: %s\n  Id: %s\n" % (backend.title,
+                                                      backend_id)
+        if 'machine_id' in kwargs:
+            machine_id = kwargs['machine_id']
+            body += "Machine:\n"
+            if kwargs.get('machine_name'):
+                name = kwargs['machine_name']
+            else:
+                try:
+                    name = backend.machines[machine_id].name
+                except MachineNotFoundError:
+                    name = ''
+            if name:
+                body += "  Name: %s\n" % name
+            title += " for machine %s" % (name or machine_id)
+            body += "  Id: %s\n" % machine_id
+    if 'error' in kwargs:
+        error = kwargs['error']
+        body += "Result: %s\n" % ('Success' if not error else 'Error')
+        if error and error is not True:
+            body += "Error: %s" % error
+    if 'command' in kwargs:
+        body += "Command: %s\n" % kwargs['command']
+    if 'retval' in kwargs:
+        body += "Return value: %s\n" % kwargs['retval']
+    if 'duration' in kwargs:
+        body += "Duration: %.2f secs\n" % kwargs['duration']
+    if 'output' in kwargs:
+        body += "Output: %s\n" % kwargs['output']
 
     try: # Send email in multi-user env
         from mist.core.helpers import send_email
-        send_email("[mist.io] %s" % title, message, user.email)
+        send_email("[mist.io] %s" % title, body, user.email)
     except ImportError:
         pass
 
@@ -2593,7 +2647,7 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
         log.error(tmp_dir)
         log.error(extra_vars)
         log.error(playbook_path)
-        capture = StdStreamCapture(pass_through=debug)
+        capture = StdStreamCapture()
         try:
             playbook = ansible.playbook.PlayBook(
                 playbook=playbook_path,
@@ -2628,23 +2682,43 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
             shutil.rmtree(tmp_dir)
 
 
+def _notify_playbook_result(user, res, backend_id=None, machine_id=None,
+                            extra_vars=None, label='Ansible playbook'):
+    title = label + (' succeeded' if res['success'] else ' failed')
+    kwargs = {
+        'backend_id': backend_id,
+        'machine_id': machine_id,
+        'duration': res['finished_at'] - res['started_at'],
+        'error': False if res['success'] else res['error_msg'] or True,
+    }
+    if not res['success']:
+        kwargs['output'] = res['stdout']
+    notify_user(user, title, **kwargs)
+
+
 def deploy_collectd(user, backend_id, machine_id, extra_vars):
-    return run_playbook(
+    ret_dict = run_playbook(
         user, backend_id, machine_id,
         playbook_path='src/deploy_collectd/ansible/enable.yml',
         extra_vars=extra_vars,
         force_handlers=True,
-        debug=True
+        # debug=True,
     )
+    _notify_playbook_result(user, ret_dict, backend_id, machine_id,
+                            label='Collectd deployment')
+    return ret_dict
 
 
 def undeploy_collectd(user, backend_id, machine_id):
-    return run_playbook(
+    ret_dict = run_playbook(
         user, backend_id, machine_id,
         playbook_path='src/deploy_collectd/ansible/disable.yml',
         force_handlers=True,
-        debug=True
+        # debug=True,
     )
+    _notify_playbook_result(user, ret_dict, backend_id, machine_id,
+                            label='Collectd undeployment')
+    return ret_dict
 
 
 def get_deploy_collectd_manual_command(uuid, password, monitor):

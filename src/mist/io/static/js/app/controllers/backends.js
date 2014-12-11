@@ -204,7 +204,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
 
             providerList: function() {
-                return SUPPORTED_PROVIDERS;
+                return SUPPORTED_PROVIDERS.sortBy('title');
             }.property('providerList'),
 
 
