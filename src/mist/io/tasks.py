@@ -30,6 +30,7 @@ from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
 from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
 
+
 try:  # Multi-user environment
     from mist.core.helpers import user_from_email
     from mist.core import config
