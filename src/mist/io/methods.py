@@ -217,7 +217,9 @@ def add_backend_v_2(user, title, provider, params):
         trigger_session_update(user.email, ['backends'])
         return backend_id
     elif 'ec2' in provider:
-        backend_id, backend = _add_backend_ec2(user, title, provider, params)
+        backend_id, backend = _add_backend_ec2(title, provider, params)
+    elif 'rackspace' in provider:
+        backend_id, backend = _add_backend_rackspace(title, provider, params)
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
@@ -304,7 +306,7 @@ def _add_backend_bare_metal(user, title, provider, params):
         user.save()
 
 
-def _add_backend_ec2(user, title, provider, params):
+def _add_backend_ec2(title, provider, params):
         api_key = params.get('api_key', '')
         if not api_key:
             raise RequiredParameterMissingError('api_key')
@@ -322,6 +324,28 @@ def _add_backend_ec2(user, title, provider, params):
         backend_id = backend.get_id()
 
         return backend_id, backend
+
+
+def _add_backend_rackspace(title, provider, params):
+    provider, region = provider.split(':')[0], provider.split(':')[1]
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = api_key
+    backend.enabled = True
+    backend.region = region
+    backend_id = backend.get_id()
+
+    return backend_id, backend
 
 
 def rename_backend(user, backend_id, new_name):
