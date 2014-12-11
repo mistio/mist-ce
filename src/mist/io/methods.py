@@ -228,6 +228,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_gce(title, provider, params)
     elif provider == 'azure':
         backend_id, backend = _add_backend_azure(title, provider, params)
+    elif provider == 'linode':
+        backend_id, backend = _add_backend_linode(title, provider, params)
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
@@ -431,6 +433,22 @@ def _add_backend_azure(title, provider, params):
     backend.provider = provider
     backend.apikey = subscription_id
     backend.apisecret = certificate
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_linode(title, provider, params):
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = api_key
+    backend.apisecret = api_key
     backend.enabled = True
     backend_id = backend.get_id()
 
