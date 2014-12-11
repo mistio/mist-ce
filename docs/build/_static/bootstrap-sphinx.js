@@ -54,7 +54,7 @@
   $(window).load(function () {
     /*
      * Scroll the window to avoid the topnav bar
-     * https://github.com/twitter/bootstrap/issues/1768
+     * https://github.com/twbs/bootstrap/issues/1768
      */
     if ($("#navbar.navbar-fixed-top").length > 0) {
       var navHeight = $("#navbar").height(),
@@ -89,27 +89,6 @@
     $(".bs-sidenav ul").addClass("nav nav-list");
     $(".bs-sidenav > ul > li > a").addClass("nav-header");
 
-    
-    // back to top
-    setTimeout(function () {
-      var $sideBar = $('.bs-sidenav');
-
-      $sideBar.affix({
-        offset: {
-          top: function () {
-            var offsetTop      = $sideBar.offset().top;
-            var sideBarMargin  = parseInt($sideBar.children(0).css('margin-top'), 10);
-            var navOuterHeight = $('#navbar').height();
-
-            return (this.top = offsetTop - navOuterHeight - sideBarMargin);
-          }
-        , bottom: function () {
-            // add 25 because the footer height doesn't seem to be enough
-            return (this.bottom = $('.footer').outerHeight(true) + 25);
-          }
-        }
-      });
-    }, 100);
     
 
     // Local TOC.
