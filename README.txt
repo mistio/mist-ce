@@ -47,6 +47,9 @@ solve this you need to::
 
    ./bin/pip install setuptools --upgrade
 
+If you are using Python 2.6 you'll have to install ipython version 1, otherwise buildout will fail
+   ./bin/pip install ipython==1
+
 Deployment
 ----------
 
