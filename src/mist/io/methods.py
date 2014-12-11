@@ -207,7 +207,7 @@ def add_backend_v_2(user, title, provider, params):
     """
     if not provider:
         raise RequiredParameterMissingError("provider")
-    log.info("Adding new backend in provider '%s'", provider)
+    log.info("Adding new backend in provider '%s' with Api-Version: 2", provider)
 
     baremetal = provider == 'bare_metal'
 
@@ -220,6 +220,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_ec2(title, provider, params)
     elif 'rackspace' in provider:
         backend_id, backend = _add_backend_rackspace(title, provider, params)
+    elif provider == 'nephoscale':
+        backend_id, backend = _add_backend_nephoscale(title, provider, params)
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
@@ -343,6 +345,26 @@ def _add_backend_rackspace(title, provider, params):
     backend.apisecret = api_key
     backend.enabled = True
     backend.region = region
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_nephoscale(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.enabled = True
     backend_id = backend.get_id()
 
     return backend_id, backend
