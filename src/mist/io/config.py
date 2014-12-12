@@ -75,6 +75,121 @@ LINODE_DATACENTERS = {
     8: 'Tokyo, JP'
 }
 
+SUPPORTED_PROVIDERS_V_2 = [
+    # BareMetal
+    {
+        'title': 'Bare Metal Server',
+        'provider': 'bare_metal',
+        'regions': []
+    },
+    # Azure
+    {
+        'title': 'Azure',
+        'provider': Provider.AZURE,
+        'regions': []
+    },
+    # EC2
+    {
+        'title': 'EC2',
+        'provider': 'ec2',
+        'regions': [
+            Provider.EC2_AP_NORTHEAST,
+            Provider.EC2_AP_SOUTHEAST,
+            Provider.EC2_AP_SOUTHEAST2,
+            Provider.EC2_EU_WEST,
+            Provider.EC2_SA_EAST,
+            Provider.EC2_US_EAST,
+            Provider.EC2_US_WEST,
+            Provider.EC2_US_WEST_OREGON
+        ]
+    },
+    # GCE
+    {
+        'title': 'Google Compute Engine',
+        'provider': Provider.GCE,
+        'regions': []
+    },
+
+    # NephoScale
+    {
+        'title': 'NephoScale',
+        'provider': Provider.NEPHOSCALE,
+        'regions': []
+    },
+    # DigitalOcean
+    {
+        'title': 'DigitalOcean',
+        'provider': Provider.DIGITAL_OCEAN,
+        'regions': []
+    },
+    # Linode
+    {
+        'title': 'Linode',
+        'provider': Provider.LINODE,
+        'regions': []
+    },
+    # OpenStack TODO: re-enable & test
+    {
+        'title': 'OpenStack',
+        'provider': Provider.OPENSTACK,
+        'regions': []
+    },
+    # Rackspace
+
+    {
+        'title': 'Rackspace DFW',
+        'provider': "%s:dfw" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace ORD',
+        'provider' : "%s:ord" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace IAD',
+        'provider' : "%s:iad" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace LON',
+        'provider' : "%s:lon" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace AU',
+        'provider' : "%s:syd" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace HKG',
+        'provider' : "%s:hkg" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace US (OLD)',
+        'provider' : "%s:us" % Provider.RACKSPACE_FIRST_GEN
+    },
+    {
+        'title': 'Rackspace UK (OLD)',
+        'provider' : "%s:uk" % Provider.RACKSPACE_FIRST_GEN
+    },
+    # Softlayer
+    {
+        'title': 'SoftLayer',
+        'provider': Provider.SOFTLAYER,
+        'regions': []
+    },
+    #HP Cloud
+    {
+        'title': 'HP Helion Cloud',
+        'provider': Provider.HPCLOUD,
+        'regions': [
+            'region-a.geo-1',
+            'region-b.geo-1'
+        ]
+    },
+    # Docker
+    {
+        'title': 'Docker',
+        'provider': Provider.DOCKER,
+        'regions': []
+    }
+]
 
 SUPPORTED_PROVIDERS = [
     # BareMetal
