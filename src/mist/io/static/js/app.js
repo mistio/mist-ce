@@ -1377,7 +1377,6 @@ var PROVIDER_MAP = {
         {
             name: 'token',
             type: 'password',
-            label: 'token',
         }
     ],
 
@@ -1411,12 +1410,10 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'text',
-            label: 'API Key',
         },
         {
             name: 'api_secret',
             type: 'password',
-            label: 'API Secret',
         }
     ],
 
@@ -1429,13 +1426,11 @@ var PROVIDER_MAP = {
         {
             name: 'private_key',
             type: 'file',
-            label: 'Private key',
             buttonText: 'Add key',
         },
         {
             name: 'project_id',
             type: 'text',
-            label: 'Project ID',
         }
     ],
 
@@ -1443,17 +1438,14 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
-            label: 'Username'
         },
         {
             name: 'password',
             type: 'password',
-            label: 'Password',
         },
         {
             name: 'tenant_name',
             type: 'text',
-            label: 'Tenant Name',
         }
     ],
 
@@ -1461,7 +1453,6 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'text',
-            label: 'API Key',
         }
     ],
 
@@ -1469,12 +1460,10 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
-            label: 'Username',
         },
         {
             name: 'password',
             type: 'password',
-            label: 'Password',
         }
     ],
 
@@ -1482,34 +1471,28 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
-            label: 'Username',
         },
         {
             name: 'password',
             type: 'password',
-            label: 'Password',
         },
         {
             name: 'auth_url',
             type: 'text',
-            label: 'Auth URL',
         },
         {
             name: 'tenant_name',
             type: 'text',
-            label: 'Tenant Name',
         },
         {
             advanced: [
                 {
                     name: 'region',
                     type: 'text',
-                    label: 'Region',
                 },
                 {
                     name: 'compute_endpoint',
                     type: 'text',
-                    label: 'Compute Endpoint',
                 }
             ]
         }
@@ -1519,12 +1502,10 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
-            label: 'Username',
         },
         {
             name: 'api_key',
             type: 'password',
-            label: 'API Key',
         }
     ],
 
@@ -1532,12 +1513,10 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
-            label: 'Username',
         },
         {
             name: 'api_key',
             type: 'password',
-            label: 'API Key',
         }
     ]
 };
