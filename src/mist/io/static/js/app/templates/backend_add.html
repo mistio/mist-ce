@@ -1,4 +1,4 @@
-<div id="add-backend-panel"
+<div id="backend-add"
     data-swipe-close="false"
     class="side-panel"
     data-role="panel"
@@ -34,9 +34,6 @@
             </ul>
         </div>
 
-
-        <!-- Dynamically generate form from BACKEND_MAP -->
-
         {{#each field in view.providerFields}}
             <label {{bind-attr for="field.name"}}>
                 {{field.label}}:
@@ -58,12 +55,14 @@
         {{/each}}
 
         {{#if Mist.backendsController.addingBackend}}
-        <div class="ajax-loader"></div>
+            <div class="ajax-loader"></div>
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" {{action "backClicked" target="view"}} data-theme="a">Back</a>
-            <button id="new-backend-ok" data-theme="d" {{action "addClicked" target="view"}}>Add</a>
+            <a id="new-backend-ok" data-theme="d"
+                {{bind-attr class="view.isReady::ui-state-disabled :ui-btn :ui-btn-d"}}
+                {{action "addClicked" target="view"}}>Add</a>
         </div>
     </div>
 </div>
@@ -76,87 +75,6 @@
      data-display="overlay"
      data-theme="b">
 
-    <div data-role="header">
-        <h1>Add backend</h1>
-        <a class="ui-btn-right" data-icon="info" data-iconpos="notext" data-theme="b"
-            target="_blank" href="https://mistio.zendesk.com/hc/en-us"></a>
-    </div>
-
-    <div data-role="content" data-theme="b">
-
-        <label>1. Provider:</label>
-        <div id="new-backend-provider"
-             class="mist-select"
-             data-role="collapsible"
-             data-collapsed-icon="carat-d"
-             data-expanded-icon="carat-u"
-             data-iconpos="right"
-             data-theme="a">
-            <h2>{{Mist.backendAddController.newBackendProvider.title}}</h2>
-            <ul class="select-listmenu" data-role="listview" data-theme="a">
-                {{#each Mist.backendsController.providerList}}
-                <li data-icon="false">
-                    <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
-                </li>
-                {{/each}}
-            </ul>
-        </div>
-
-        <!--
-
-            COMMON
-
-        -->
-
-        <div id="common-bundle">
-            <div data-theme="a">
-                <label for="new-backend-first-field">2. {{view.firstFieldLabel}}:</label>
-                {{view Mist.TextField
-                       id="new-backend-first-field"
-                       data-theme="a"
-                       valueBinding="Mist.backendAddController.newBackendFirstField"}}
-
-                {{#if view.secondFieldLabel}}
-                    <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
-                    {{view Mist.TextField
-                           type="password"
-                           id="new-backend-second-field"
-                           data-theme="a"
-                           valueBinding="Mist.backendAddController.newBackendSecondField"}}
-                {{/if}}
-            </div>
-        </div>
-
-        <!--
-
-            Token only
-
-        -->
-
-        <div id="tokenonly-bundle">
-            <div data-theme="a">
-                <label for="new-backend-token">2. {{view.secondFieldLabel}}:</label>
-                {{view Mist.TextField
-                       type="password"
-                       id="new-backend-token"
-                       data-theme="a"
-                       valueBinding="Mist.backendAddController.newBackendSecondField"}}
-            </div>
-        </div>
-
-        <!--
-
-           HP Cloud
-
-        -->
-
-        <div id="hpcloud-bundle" data-theme="a">
-            <label for="new-backend-hpcloud-tenant">4. Tenant Name:</label>
-            {{view Mist.TextField
-                   id="new-backend-hpcloud-tenant"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
-        </div>
 
         <!--
 
@@ -165,18 +83,6 @@
         -->
 
         <div id="openstack-bundle" data-theme="a">
-            <label for="new-backend-openstack-url">4. Auth URL:</label>
-            {{view Mist.TextField
-                   id="new-backend-openstack-url"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendOpenStackURL"}}
-
-            <label for="new-backend-openstack-tenant">5. Tenant Name:</label>
-            {{view Mist.TextField
-                   id="new-backend-openstack-tenant"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
-
             <div id="opentack-advanced-wrapper">
                 <select id="openstack-advanced" data-role="slider" data-theme="a"
                 {{action "advancedToggled" target="view" on="change"}}>
@@ -185,69 +91,10 @@
                 </select>
             </div>
 
-            <div id="non-hp-cloud">
-
-                <label for="new-backend-openstack-region">6. Region:</label>
-                {{view Mist.TextField
-                       id="new-backend-openstack-region"
-                       data-theme="a"
-                       valueBinding="Mist.backendAddController.newBackendOpenStackRegion"}}
-
-                <label for="new-backend-openstack-endpoint">7. Compute Endpoint:</label>
-                {{view Mist.TextField
-                       id="new-backend-openstack-endpoint"
-                       data-theme="a"
-                       valueBinding="Mist.backendAddController.newBackendOpenStackComputeEndpoint"}}
-            </div>
         </div>
 
-        <!--
-
-            GCE
-
-        -->
-
-        <div id="gce-bundle">
-
-            <label for="new-backend-key">3. Private key:</label>
-
-            <!-- Value is sent to newBackendSecondField -->
-            <a class="ui-btn ui-btn-a ui-corner-all"
-              {{action "privateKeyClicked" target="view"}}>
-                Add key
-            </a>
-
-            <label for="new-backend-port">4. Project ID:</label>
-            {{view Mist.TextField
-                   id="new-backend-project-name"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendProjectName"}}
-        </div>
-
-
-        <div id="azure-bundle">
-
-            <label for="new-backend-azure-cert">3. Certificate file:</label>
-
-            <!-- Value is sent to newBackendSecondField -->
-            <a class="ui-btn ui-btn-a ui-corner-all"
-              {{action "addCertificateClicked" target="view"}}>
-                Add Certificate
-            </a>
-        </div>
-        <!--
-
-            BAREMETAL
-
-        -->
 
         <div id="baremetal-bundle">
-            <label for="new-backend-port">4. Port:</label>
-            {{view Mist.TextField
-                   id="new-backend-port"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendPort"}}
-
             <label>5. SSH Key:</label>
             <div id="new-backend-key"
                  class="mist-select"
@@ -270,47 +117,10 @@
             </div>
         </div>
 
-        <!--
-
-            DOCKER
-
-        -->
-
-        <div id="docker-bundle">
-
-            <label for="new-backend-docker-url">2. Host:</label>
-            {{view Mist.TextField
-                   id="new-backend-docker-url"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendDockerURL"}}
-
-            <label for="new-backend-docker-port">3. Port:</label>
-            {{view Mist.TextField
-                   id="new-backend-docker-port"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendPort"}}
-
-            <label for="new-backend-docker-user">4. BasicAuth User:</label>
-            {{view Mist.TextField
-                   id="new-backend-docker-user"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendFirstField"}}
-
-            <label for="new-backend-docker-pass">5. BasicAuth Password:</label>
-            {{view Mist.TextField
-                   id="new-backend-docker-pass"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendSecondField"}}
-        </div>
-
         {{#if Mist.backendsController.addingBackend}}
         <div class="ajax-loader"></div>
         {{/if}}
 
-        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" {{action "backClicked" target="view"}} data-theme="a">Back</a>
-            <button id="new-backend-ok" data-theme="d" {{action "addClicked" target="view"}}>Add</a>
-        </div>
     </div>
 </div>
 

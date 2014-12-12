@@ -1,14 +1,14 @@
-define('app/views/backend_add', ['app/views/templated'],
+define('app/views/backend_add', ['app/views/panel'],
     //
-    //  Add Backend View
+    //  Backend Add View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function (PanelView) {
 
         'use strict';
 
-        return TemplatedView.extend({
+        return PanelView.extend({
 
 
             //
@@ -23,14 +23,7 @@ define('app/views/backend_add', ['app/views/templated'],
             }.property('Mist.backendAddController.provider'),
 
 
-            //
-            //
-            //  Methods
-            //
-            //
-
-
-            updateAddButton: function() {
+            isReady: function () {
                 var isReady = true
                 this.get('providerFields').some(function (field) {
                     if (field.optional) return;
@@ -39,16 +32,20 @@ define('app/views/backend_add', ['app/views/templated'],
                         field.value === '')
                             return isReady = false;
                 });
-                if (isReady)
-                    $('#new-backend-ok').removeClass('ui-state-disabled');
-                else
-                    $('#new-backend-ok').addClass('ui-state-disabled');
-            },
+                return isReady;
+            }.property('providerFields.@each.value'),
+
+
+            //
+            //
+            //  Methods
+            //
+            //
 
 
             clear: function () {
-                Ember.run.next(function () {
-                    $('#add-backend-panel').trigger('create');
+                Ember.run.next(this, function () {
+                    $(this.panelId).trigger('create');
                 });
             },
 
@@ -121,18 +118,6 @@ define('app/views/backend_add', ['app/views/templated'],
                     }
                 }
             },
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
-
-            updateDoneButtonObserver: function() {
-                Ember.run.once(this, 'updateAddButton');
-            }.observes('providerFields.@each.value')
         });
     }
 );

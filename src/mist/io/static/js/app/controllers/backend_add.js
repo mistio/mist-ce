@@ -19,7 +19,6 @@ define('app/controllers/backend_add', ['app/models/backend'],
 
 
             callback: null,
-            formReady: null,
 
 
             //
@@ -28,25 +27,17 @@ define('app/controllers/backend_add', ['app/models/backend'],
             //
             //
 
+
             open: function (callback) {
+                this._clear();
+                this.view.open();
                 this.set('callback', callback);
-
-                $('#add-backend-panel').panel('open');
-                Ember.run.next(function () {
-                    $('.ui-page-active').height($('.ui-panel-open').height());
-                    $('body').css('overflow', 'auto');
-
-                    //This is the advanced section of OpenStack, by default
-                    //hidden
-                    $('#openstack-advanced').val('0').slider('refresh');
-                    $('#non-hp-cloud').hide();
-                });
             },
 
 
             close: function () {
-                $('#add-backend-panel').panel('close');
                 this._clear();
+                this.view.close();
             },
 
 
@@ -76,18 +67,6 @@ define('app/controllers/backend_add', ['app/models/backend'],
                         if (success) that.close();
                     }
                 });
-                return;
-
-
-                var that = this;
-                var projectName = this.newBackendOpenStackTenant || this.newBackendProjectName;
-
-                // Add tenant name to backend title for openstack and hpcloud
-                var provider = this.newBackendProvider.provider;
-                var title = this.newBackendProvider.title +
-                    (provider == 'openstack' || provider.indexOf('hpcloud') > -1 ?
-                        ' ' + this.newBackendOpenStackTenant : '');
-
             },
 
 
@@ -96,6 +75,11 @@ define('app/controllers/backend_add', ['app/models/backend'],
             //  Pseudo-Private Methods
             //
             //
+
+
+            _clear: function () {
+                this.set('callback', null);
+            },
 
 
             _giveCallback: function (success, backend) {
