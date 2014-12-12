@@ -1,37 +1,32 @@
-define('app/controllers/backend_add', ['app/models/backend', 'ember'],
-    /**
-     *  Backend Add Controller
-     *
-     *  @returns Class
-     */
+define('app/controllers/backend_add', ['app/models/backend'],
+    //
+    //  Backend Add Controller
+    //
+    //  @returns Class
+    //
     function (Backend) {
+
+        'use strict';
+
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             callback: null,
             formReady: null,
 
-            newBackendKey: null,
-            newBackendPort: null,
-            newBackendProvider: null,
-            newBackendFirstField: null,
-            newBackendSecondField: null,
-            newBackendProjectName: null,
-            newBackendDockerURL: null,
-            newBackendOpenStackURL: null,
-            newBackendOpenStackRegion: null,
-            newBackendOpenStackTenant: null,
-            newBackendOpenStackComputeEndpoint: null,
 
-
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //
+            //  Methods
+            //
+            //
 
             open: function (callback) {
                 this._clear();
@@ -58,6 +53,26 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
 
             add: function () {
+
+                var fields = getProviderFields(this.get('provider'));
+                var payload = {
+                    title: this.get('provider').title,
+                    provider: this.get('provider').provider,
+                };
+                fields.forEach(function (field) {
+                    payload[field.name] = field.value;
+                });
+                info(payload);
+                var that = this;
+                Mist.backendsController.addBackend({
+                    payload: payload,
+                    callback: function (success, backend) {
+                        that._giveCallback(success, backend);
+                        if (success) that.close();
+                    }
+                });
+                return;
+
 
                 var that = this;
                 var projectName = this.newBackendOpenStackTenant || this.newBackendProjectName;

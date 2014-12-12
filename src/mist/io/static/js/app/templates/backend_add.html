@@ -1,4 +1,74 @@
 <div id="add-backend-panel"
+    data-swipe-close="false"
+    class="side-panel"
+    data-role="panel"
+    data-position="right"
+    data-display="overlay"
+    data-theme="b">
+
+    <div data-role="header">
+        <h1>Add backend</h1>
+        <a class="ui-btn-right" data-icon="info" data-iconpos="notext" data-theme="b"
+            target="_blank" href="https://mistio.zendesk.com/hc/en-us"></a>
+    </div>
+
+    <div data-role="content" data-theme="b">
+
+        <label>Provider:</label>
+        <div id="new-backend-provider"
+            class="mist-select"
+            data-role="collapsible"
+            data-collapsed-icon="carat-d"
+            data-expanded-icon="carat-u"
+            data-iconpos="right"
+            data-theme="a">
+            <h2>{{Mist.backendAddController.provider.title}}</h2>
+            <ul class="select-listmenu" data-role="listview" data-theme="a">
+                {{#each Mist.backendsController.providerList}}
+                    <li data-icon="false">
+                        <a {{action "selectProvider" this target="view"}}>
+                            {{this.title}}
+                        </a>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+
+
+        <!-- Dynamically generate form from BACKEND_MAP -->
+
+        {{#each field in view.providerFields}}
+            <label {{bind-attr for="field.name"}}>
+                {{field.label}}:
+            </label>
+            {{#if field.isText}}
+                {{view Mist.TextField
+                    data-theme="a"
+                    type=field.type
+                    id=field.name
+                    valueBinding=field.value}}
+            {{/if}}
+            {{#if field.isFile}}
+                <a class="ui-btn ui-btn-icon-right ui-icon-plus ui-btn-a ui-corner-all"
+                    {{bind-attr id="field.name"}}
+                    {{action "uploadFile" field target="view"}}>
+                        {{field.buttonText}}
+                </a>
+            {{/if}}
+        {{/each}}
+
+        {{#if Mist.backendsController.addingBackend}}
+        <div class="ajax-loader"></div>
+        {{/if}}
+
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" {{action "backClicked" target="view"}} data-theme="a">Back</a>
+            <button id="new-backend-ok" data-theme="d" {{action "addClicked" target="view"}}>Add</a>
+        </div>
+    </div>
+</div>
+
+<div id="aadd-backend-panel"
      data-swipe-close="false"
      class="side-panel"
      data-role="panel"
