@@ -19,6 +19,7 @@ define('app/controllers/backend_add', ['app/models/backend'],
 
 
             callback: null,
+            provider: null,
 
 
             //
@@ -78,7 +79,10 @@ define('app/controllers/backend_add', ['app/models/backend'],
 
 
             _clear: function () {
-                this.set('callback', null);
+                this.setProperties({
+                    callback: null,
+                    provider: null,
+                });
             },
 
 

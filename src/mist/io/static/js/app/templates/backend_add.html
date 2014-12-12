@@ -22,7 +22,12 @@
             data-expanded-icon="carat-u"
             data-iconpos="right"
             data-theme="a">
-            <h2>{{Mist.backendAddController.provider.title}}</h2>
+            <h2>{{#if Mist.backendAddController.provider.title}}
+                    {{Mist.backendAddController.provider.title}}
+                {{else}}
+                    Select provider
+                {{/if}}
+            </h2>
             <ul class="select-listmenu" data-role="listview" data-theme="a">
                 {{#each Mist.backendsController.providerList}}
                     <li data-icon="false">
@@ -33,6 +38,9 @@
                 {{/each}}
             </ul>
         </div>
+
+
+
 
         {{#each field in view.providerFields}}
             <label {{bind-attr for="field.name"}}>
