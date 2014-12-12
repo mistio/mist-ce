@@ -21,6 +21,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             newBackendSecondField: null,
             newBackendProjectName: null,
             newBackendDockerURL: null,
+            newBackendHost: null,
             newBackendOpenStackURL: null,
             newBackendOpenStackRegion: null,
             newBackendOpenStackTenant: null,
@@ -74,7 +75,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     APISecret: this.newBackendSecondField,
                     title: title,
                     provider: this.newBackendProvider.provider,
-                    APIURL: this.newBackendOpenStackURL,
+                    APIURL: this.newBackendOpenStackURL || this.newBackendHost,
                     region: this.newBackendOpenStackRegion,
                     tenant: projectName,
                     computeEndpont: this.newBackendOpenStackComputeEndpoint,
@@ -107,6 +108,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     .set('newBackendOpenStackTenant', null)
                     .set('newBackendOpenStackComputeEndpoint', null)
                     .set('newBackendDockerURL', null)
+                    .set('newBackendHost', null)
                     .set('newBackendKey', {id: 'Select SSH Key'})
                     .set('newBackendProvider', {title: 'Select provider'});
 
@@ -158,6 +160,10 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                         if (!this.newBackendProjectName) {
                             ready = false;
                         }
+                    } else if (this.newBackendProvider.provider == 'vcloud') { // Vcloud
+                        if (!this.newBackendHost) {
+                            ready = false;
+                        }
                     }
                 }
                 this.set('formReady', ready);
@@ -185,7 +191,8 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                        'newBackendDockerURL',
                        'newBackendPort',
                        'newBackendOpenStackURL',
-                       'newBackendOpenStackTenant')
+                       'newBackendOpenStackTenant',
+                       'newBackendHost')
         });
     }
 );
