@@ -426,6 +426,10 @@ var loadApp = function (
                 field.isText = true;
             if (field.type == 'file')
                 field.isFile = true;
+            if (field.type == 'ssh_key')
+                field.isKey = true;
+            if (field.advanced == true)
+                field.optional = true;
             if (!field.label)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||

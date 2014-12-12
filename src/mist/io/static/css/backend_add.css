@@ -4,7 +4,7 @@
 #backend-add label {
     margin-top: 10px;
 }
-#backend-add .select-listmenu {
+#backend-add .mist-select ul {
     height: 120px;
     overflow-y: scroll;
 }
