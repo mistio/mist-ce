@@ -63,8 +63,9 @@ define('app/views/backend_add', ['app/views/templated'],
             actions: {
 
                 selectProvider: function(provider) {
-                    Mist.backendAddController._clear();
                     this.clear();
+                    $('#new-backend-key').collapsible('collapse').collapsible('option', 'collapsedIcon', 'carat-d');
+                    $('#new-backend-provider').collapsible('collapse').collapsible('option', 'collapsedIcon', 'carat-d');
                     Mist.backendAddController.set('provider', provider);
                     clearProviderFields(provider);
                 },
