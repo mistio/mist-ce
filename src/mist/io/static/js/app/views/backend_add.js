@@ -83,17 +83,18 @@ define('app/views/backend_add', ['app/views/panel'],
                 },
 
 
-                selectKey: function(key) {
-                    $('#new-backend-key').collapsible('collapse');
-                    Mist.backendAddController.set('newBackendKey', key);
+                selectKey: function (key, field) {
+                    $('#' + field.name).collapsible('collapse');
+                    field.set('value', key.id);
                 },
 
-                createKeyClicked: function() {
+
+                createKeyClicked: function (field) {
                     Mist.keyAddController.open( function (success, key) {
                         if (success) {
-                            Mist.backendAddController.set('newBackendKey', key);
-                            $('#new-backend-key').collapsible('collapse');
-                            $('#new-backend-key .ui-listview').listview('refresh');
+                            $('#' + field.name).collapsible('collapse');
+                            $('#' + field.name + ' .ui-listview').listview('refresh');
+                            field.set('value', key.id);
                         }
                     });
                 },

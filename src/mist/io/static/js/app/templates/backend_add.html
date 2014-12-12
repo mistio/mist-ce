@@ -28,7 +28,7 @@
                     Select provider
                 {{/if}}
             </h2>
-            <ul class="select-listmenu" data-role="listview" data-theme="a">
+            <ul class="mist-select" data-role="listview" data-theme="a">
                 {{#each Mist.backendsController.providerList}}
                     <li data-icon="false">
                         <a {{action "selectProvider" this target="view"}}>
@@ -38,9 +38,6 @@
                 {{/each}}
             </ul>
         </div>
-
-
-
 
         {{#each field in view.providerFields}}
             <label {{bind-attr for="field.name"}}>
@@ -59,6 +56,27 @@
                     {{action "uploadFile" field target="view"}}>
                         {{field.buttonText}}
                 </a>
+            {{/if}}
+            {{#if field.isKey}}
+                <div {{bind-attr id="field.name"}}
+                    class="mist-select"
+                    data-role="collapsible"
+                    data-iconpos="right"
+                    data-collapsed-icon="carat-d"
+                    data-expanded-icon="carat-u"
+                    data-theme="a">
+                    <h2>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h2>
+                    <ul data-role="listview">
+                        {{#each Mist.keysController.content}}
+                            <li data-icon="false" data-theme="a">
+                                <a {{action "selectKey" this field target="view"}}>{{this.id}}</a>
+                            </li>
+                        {{/each}}
+                        <li data-icon="false" data-theme="d">
+                            <a {{action "createKeyClicked" field target="view"}}>Add Key</a>
+                        </li>
+                    </ul>
+                </div>
             {{/if}}
         {{/each}}
 
@@ -104,25 +122,6 @@
 
         <div id="baremetal-bundle">
             <label>5. SSH Key:</label>
-            <div id="new-backend-key"
-                 class="mist-select"
-                 data-role="collapsible"
-                 data-iconpos="right"
-                 data-collapsed-icon="carat-d"
-                 data-expanded-icon="carat-u"
-                 data-theme="a">
-                <h2>{{Mist.backendAddController.newBackendKey.id}}</h2>
-                <ul data-role="listview">
-                    {{#each Mist.keysController.content}}
-                        <li data-icon="false" data-theme="a">
-                            <a {{action "selectKey" this target="view"}}>{{this.id}}</a>
-                        </li>
-                    {{/each}}
-                    <li data-icon="false" data-theme="d">
-                        <a {{action "createKeyClicked" target="view"}}>Add Key</a>
-                    </li>
-                </ul>
-            </div>
         </div>
 
         {{#if Mist.backendsController.addingBackend}}
