@@ -419,8 +419,6 @@ var loadApp = function (
     // Parse PROVIDER_MAP to generate template friendly fields
     forIn(PROVIDER_MAP, function (fields, title) {
         fields.forEach(function (field, index) {
-            if (field.advanced)
-                return;
             field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
             field.value = field.defaultValue || '';
             if (field.type == 'text' ||
@@ -1485,16 +1483,14 @@ var PROVIDER_MAP = {
             type: 'text',
         },
         {
-            advanced: [
-                {
-                    name: 'region',
-                    type: 'text',
-                },
-                {
-                    name: 'compute_endpoint',
-                    type: 'text',
-                }
-            ]
+            name: 'region',
+            type: 'text',
+            advanced: true,
+        },
+        {
+            name: 'compute_endpoint',
+            type: 'text',
+            advanced: true,
         }
     ],
 
