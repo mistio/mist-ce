@@ -216,9 +216,9 @@ def add_backend_v_2(user, title, provider, params):
         log.info("Backend with id '%s' added succesfully.", backend_id)
         trigger_session_update(user.email, ['backends'])
         return backend_id
-    elif 'ec2' in provider:
+    elif provider == 'ec2':
         backend_id, backend = _add_backend_ec2(title, provider, params)
-    elif 'rackspace' in provider:
+    elif provider == 'rackspace':
         backend_id, backend = _add_backend_rackspace(title, provider, params)
     elif provider == 'nephoscale':
         backend_id, backend = _add_backend_nephoscale(title, provider, params)
@@ -234,7 +234,7 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_linode(title, provider, params)
     elif provider == 'docker':
         backend_id, backend = _add_backend_docker(title, provider, params)
-    elif 'hpcloud' in provider:
+    elif provider == 'hpcloud':
         backend_id, backend = _add_backend_hp(title, provider, params)
     elif provider == 'openstack':
         backend_id, backend = _add_backend_openstack(title, provider, params)
@@ -335,9 +335,13 @@ def _add_backend_ec2(title, provider, params):
         if not api_secret:
             raise RequiredParameterMissingError('api_secret')
 
+        region = params.get('region', '')
+        if not region:
+            raise RequiredParameterMissingError('region')
+
         backend = model.Backend()
         backend.title = title
-        backend.provider = provider
+        backend.provider = region
         backend.apikey = api_key
         backend.apisecret = api_secret
         backend.enabled = True
@@ -347,7 +351,6 @@ def _add_backend_ec2(title, provider, params):
 
 
 def _add_backend_rackspace(title, provider, params):
-    provider, region = provider.split(':')[0], provider.split(':')[1]
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -355,6 +358,13 @@ def _add_backend_rackspace(title, provider, params):
     api_key = params.get('api_key', '')
     if not api_key:
         raise RequiredParameterMissingError('api_key')
+
+    region = params.get('region', '')
+    if not region:
+        raise RequiredParameterMissingError('region')
+
+    if 'rackspace_first_gen' in region:
+        provider, region = region.split(':')[0], region.split(':')[1]
 
     backend = model.Backend()
     backend.title = title
@@ -512,7 +522,6 @@ def _add_backend_docker(title, provider, params):
 
 
 def _add_backend_hp(title, provider, params):
-    provider, region = provider.split(':')[0], provider.split(':')[1]
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -528,6 +537,10 @@ def _add_backend_hp(title, provider, params):
     apiurl = params.get('apiurl') or ''
     if 'hpcloudsvc' in apiurl:
             apiurl = HPCLOUD_AUTH_URL
+
+    region = params.get('region', '')
+    if not region:
+        raise RequiredParameterMissingError('region')
 
     backend = model.Backend()
     backend.title = title
