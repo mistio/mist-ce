@@ -31,8 +31,7 @@ define('app/views/backend_add', ['app/views/panel'],
                     return Mist.backendAddController.provider.regions.map(function (region) {
                         return {
                             title: region.split('_').map(function (word) {
-                                    if (word == 'ec2' ||
-                                        word == 'ap')
+                                    if (word == 'ec2')
                                             return word.toUpperCase();
                                     return word.capitalize()
                                 }).join(' '),
