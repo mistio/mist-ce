@@ -428,6 +428,8 @@ var loadApp = function (
                 field.isFile = true;
             if (field.type == 'ssh_key')
                 field.isKey = true;
+            if (field.type == 'region')
+                field.isRegion = true;
             if (field.advanced == true)
                 field.optional = true;
             if (!field.label)
@@ -1410,6 +1412,10 @@ var PROVIDER_MAP = {
 
     ec2: [
         {
+            name: 'region',
+            type: 'region',
+        },
+        {
             name: 'api_key',
             type: 'text',
         },
@@ -1437,6 +1443,10 @@ var PROVIDER_MAP = {
     ],
 
     hpcloud: [
+        {
+            name: 'region',
+            type: 'region',
+        },
         {
             name: 'username',
             type: 'text',
@@ -1499,6 +1509,10 @@ var PROVIDER_MAP = {
     ],
 
     rackspace: [
+        {
+            name: 'region',
+            type: 'region',
+        },
         {
             name: 'username',
             type: 'text',

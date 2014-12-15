@@ -11,6 +11,9 @@ define('app/views/backend_add', ['app/views/panel'],
         return PanelView.extend({
 
 
+            selectedRegion: null,
+
+
             //
             //
             //  Computed Properties
@@ -20,6 +23,22 @@ define('app/views/backend_add', ['app/views/panel'],
 
             providerFields: function () {
                 return getProviderFields(Mist.backendAddController.provider);
+            }.property('Mist.backendAddController.provider'),
+
+
+            providerRegions: function () {
+                if (Mist.backendAddController.provider)
+                    return Mist.backendAddController.provider.regions.map(function (region) {
+                        return {
+                            title: region.split('_').map(function (word) {
+                                    if (word == 'ec2' ||
+                                        word == 'ap')
+                                            return word.toUpperCase();
+                                    return word.capitalize()
+                                }).join(' '),
+                            id: region,
+                        };
+                    });
             }.property('Mist.backendAddController.provider'),
 
 
@@ -61,10 +80,16 @@ define('app/views/backend_add', ['app/views/panel'],
 
                 selectProvider: function(provider) {
                     this.clear();
-                    $('#new-backend-key').collapsible('collapse').collapsible('option', 'collapsedIcon', 'carat-d');
-                    $('#new-backend-provider').collapsible('collapse').collapsible('option', 'collapsedIcon', 'carat-d');
-                    Mist.backendAddController.set('provider', provider);
                     clearProviderFields(provider);
+                    Mist.backendAddController.set('provider', provider);
+                    $('#new-backend-provider').collapsible('collapse');
+                },
+
+
+                selectRegion: function (region, field) {
+                    field.set('value', region.id);
+                    this.set('selectedRegion', region.title);
+                    $('#region').collapsible('collapse');
                 },
 
 

@@ -40,45 +40,77 @@
         </div>
 
         {{#each field in view.providerFields}}
-            <label {{bind-attr for="field.name"}}>
-                {{field.label}}:
-            </label>
-            {{#if field.isText}}
-                {{view Mist.TextField
-                    data-theme="a"
-                    type=field.type
-                    id=field.name
-                    valueBinding=field.value}}
-            {{/if}}
-            {{#if field.isFile}}
-                <a class="ui-btn ui-btn-icon-right ui-icon-plus ui-btn-a ui-corner-all"
-                    {{bind-attr id="field.name"}}
-                    {{action "uploadFile" field target="view"}}>
-                        {{field.buttonText}}
-                </a>
-            {{/if}}
-            {{#if field.isKey}}
-                <div {{bind-attr id="field.name"}}
-                    class="mist-select"
-                    data-role="collapsible"
-                    data-iconpos="right"
-                    data-collapsed-icon="carat-d"
-                    data-expanded-icon="carat-u"
-                    data-theme="a">
-                    <h2>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h2>
-                    <ul data-role="listview">
-                        {{#each Mist.keysController.content}}
-                            <li data-icon="false" data-theme="a">
-                                <a {{action "selectKey" this field target="view"}}>{{this.id}}</a>
+            {{#unless field.advanced}}
+                <label {{bind-attr for="field.name"}}>
+                    {{field.label}}:
+                </label>
+                {{#if field.isText}}
+                    {{view Mist.TextField
+                        data-theme="a"
+                        type=field.type
+                        id=field.name
+                        valueBinding=field.value}}
+                {{/if}}
+                {{#if field.isFile}}
+                    <a class="ui-btn ui-btn-icon-right ui-icon-plus ui-btn-a ui-corner-all"
+                        {{bind-attr id="field.name"}}
+                        {{action "uploadFile" field target="view"}}>
+                            {{field.buttonText}}
+                    </a>
+                {{/if}}
+                {{#if field.isKey}}
+                    <div {{bind-attr id="field.name"}}
+                        class="mist-select"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u"
+                        data-theme="a">
+                        <h2>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h2>
+                        <ul data-role="listview">
+                            {{#each Mist.keysController.content}}
+                                <li data-icon="false" data-theme="a">
+                                    <a {{action "selectKey" this field target="view"}}>{{this.id}}</a>
+                                </li>
+                            {{/each}}
+                            <li data-icon="false" data-theme="d">
+                                <a {{action "createKeyClicked" field target="view"}}>Add Key</a>
                             </li>
-                        {{/each}}
-                        <li data-icon="false" data-theme="d">
-                            <a {{action "createKeyClicked" field target="view"}}>Add Key</a>
-                        </li>
-                    </ul>
-                </div>
-            {{/if}}
+                        </ul>
+                    </div>
+                {{/if}}
+                {{#if field.isRegion}}
+                    <div {{bind-attr id="field.name"}}
+                        class="mist-select"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u"
+                        data-theme="a">
+                        <h2>{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h2>
+                        <ul data-role="listview">
+                            {{#each view.providerRegions}}
+                                <li data-icon="false" data-theme="a">
+                                    <a {{action "selectRegion" this field target="view"}}>
+                                        {{this.title}}
+                                    </a>
+                                </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                {{/if}}
+            {{/unless}}
         {{/each}}
+
+        {{#if view.hasAdvanced}}
+            <div id="opentack-advanced-wrapper">
+                <select id="openstack-advanced" data-role="slider" data-theme="a"
+                {{action "advancedToggled" target="view" on="change"}}>
+                   <option value="0">Basic settings</option>
+                    <option value="1">Advanced settings</option>
+                </select>
+            </div>
+        {{/if}}
 
         {{#if Mist.backendsController.addingBackend}}
             <div class="ajax-loader"></div>
@@ -93,43 +125,6 @@
     </div>
 </div>
 
-<div id="aadd-backend-panel"
-     data-swipe-close="false"
-     class="side-panel"
-     data-role="panel"
-     data-position="right"
-     data-display="overlay"
-     data-theme="b">
-
-
-        <!--
-
-            OPENSTACK
-
-        -->
-
-        <div id="openstack-bundle" data-theme="a">
-            <div id="opentack-advanced-wrapper">
-                <select id="openstack-advanced" data-role="slider" data-theme="a"
-                {{action "advancedToggled" target="view" on="change"}}>
-                   <option value="0">Basic settings</option>
-                    <option value="1">Advanced settings</option>
-                </select>
-            </div>
-
-        </div>
-
-
-        <div id="baremetal-bundle">
-            <label>5. SSH Key:</label>
-        </div>
-
-        {{#if Mist.backendsController.addingBackend}}
-        <div class="ajax-loader"></div>
-        {{/if}}
-
-    </div>
-</div>
 
 {{view Mist.keyAddView}}
 
