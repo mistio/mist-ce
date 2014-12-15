@@ -901,7 +901,12 @@ def list_supported_providers(request):
     @param request: A simple GET request
     @return: Return all of our SUPPORTED PROVIDERS
     """
-    return {'supported_providers': config.SUPPORTED_PROVIDERS}
+
+    api_version = request.headers.get('Api-Version', 1)
+    if int(api_version) == 2:
+        return {'supported_providers': config.SUPPORTED_PROVIDERS_V_2}
+    else:
+        return {'supported_providers': config.SUPPORTED_PROVIDERS}
 
 
 @view_config(route_name='socketio', renderer='json')

@@ -135,38 +135,19 @@ SUPPORTED_PROVIDERS_V_2 = [
         'regions': []
     },
     # Rackspace
-
     {
-        'title': 'Rackspace DFW',
-        'provider': "%s:dfw" % Provider.RACKSPACE
-    },
-    {
-        'title': 'Rackspace ORD',
-        'provider' : "%s:ord" % Provider.RACKSPACE
-    },
-    {
-        'title': 'Rackspace IAD',
-        'provider' : "%s:iad" % Provider.RACKSPACE
-    },
-    {
-        'title': 'Rackspace LON',
-        'provider' : "%s:lon" % Provider.RACKSPACE
-    },
-    {
-        'title': 'Rackspace AU',
-        'provider' : "%s:syd" % Provider.RACKSPACE
-    },
-    {
-        'title': 'Rackspace HKG',
-        'provider' : "%s:hkg" % Provider.RACKSPACE
-    },
-    {
-        'title': 'Rackspace US (OLD)',
-        'provider' : "%s:us" % Provider.RACKSPACE_FIRST_GEN
-    },
-    {
-        'title': 'Rackspace UK (OLD)',
-        'provider' : "%s:uk" % Provider.RACKSPACE_FIRST_GEN
+        'title': 'Rackspace',
+        'provider': 'rackspace',
+        'regions': [
+            'dfw',
+            'ord',
+            'iad',
+            'lon',
+            'syd',
+            'hkg',
+            'rackspace_first_gen:us',
+            'rackspace_first_gen:uk'
+        ]
     },
     # Softlayer
     {
