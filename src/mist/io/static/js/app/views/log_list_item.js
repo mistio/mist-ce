@@ -35,10 +35,11 @@ define('app/views/log_list_item', ['app/views/list_item'],
                 forIn(this.log, function (value, property) {
                     if (property == 'time')
                         return;
-                    details.push({
-                        key: property,
-                        value: value instanceof Object ? JSON.stringify(value) : value
-                    });
+                    if (value !== undefined && value !== null)
+                        details.push({
+                            key: property,
+                            value: value instanceof Object ? JSON.stringify(value) : value
+                        });
                 })
                 return details.sort(function (a, b) {
                     if (a.key > b.key)
