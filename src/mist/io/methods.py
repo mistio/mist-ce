@@ -243,6 +243,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_hp(user, title, provider, params)
     elif provider == 'openstack':
         backend_id, backend = _add_backend_openstack(title, provider, params)
+    elif provider == 'vcloud':
+        backend_id, backend = _add_backend_vcloud(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -329,6 +331,35 @@ def _add_backend_bare_metal(user, title, provider, params):
                 user.save()
                 raise BackendUnauthorizedError(exc)
         user.save()
+
+
+def _add_backend_vcloud(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    host = params.get('host', '')
+    if not host:
+        raise RequiredParameterMissingError('host')
+
+    for prefix in ['https://', 'http://']:
+        host = host.strip(prefix)
+    host = host.split('/')[0]
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.apiurl = host
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
 
 
 def _add_backend_ec2(user, title, params):

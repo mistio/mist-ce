@@ -226,6 +226,12 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'Docker',
         'provider': Provider.DOCKER,
         'regions': []
+    },
+    # vCloud
+    {
+        'title': 'VMware vCloud',
+        'provider': Provider.VCLOUD,
+        'regions': []
     }
 ]
 
