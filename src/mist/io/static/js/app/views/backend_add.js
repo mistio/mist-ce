@@ -70,6 +70,40 @@ define('app/views/backend_add', ['app/views/panel'],
             },
 
 
+            autocompleteCredentials: function (provider) {
+
+                var fields = this.get('providerFields');
+
+                // Autocomplete credentials only for providers
+                // with regions
+                if (!fields.findBy('type', 'region'))
+                    return;
+
+                Mist.backendsController.content.some(function (backend) {
+
+                    // backend.provider == provider.provider won't work
+                    // because we still save backends in the database using
+                    // the old format for compatibility reasons
+                    if (backend.getSimpleProvider() == provider.provider) {
+
+                        if (provider.provider == 'ec2') {
+                            fields.findBy('name', 'api_key').set('value', backend.apikey);
+                            fields.findBy('name', 'api_secret').set('value', 'getsecretfromdb');
+                        }
+                        if (provider.provider == 'rackspace') {
+                            fields.findBy('name', 'username').set('value', backend.apikey);
+                            fields.findBy('name', 'api_key').set('value', 'getsecretfromdb');
+                        }
+                        if (provider.provider == 'hpcloud') {
+                            fields.findBy('name', 'username').set('value', backend.apikey);
+                            fields.findBy('name', 'api_key').set('value', 'getsecretfromdb');
+                            fields.findBy('name', 'tenant_name').set('value', backend.tenant_name);
+                        }
+                    }
+                });
+            },
+
+
             //
             //
             //  Actions
@@ -79,11 +113,12 @@ define('app/views/backend_add', ['app/views/panel'],
 
             actions: {
 
-                selectProvider: function (provider) {
+                selectProvider: function (provider, field) {
                     this.clear();
                     clearProviderFields(provider);
                     Mist.backendAddController.set('provider', provider);
                     $('#new-backend-provider').collapsible('collapse');
+                    this.autocompleteCredentials(provider);
                 },
 
 
