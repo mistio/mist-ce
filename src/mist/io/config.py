@@ -188,10 +188,6 @@ SUPPORTED_PROVIDERS_V_2 = [
                 'id': 'hkg'
             },
             {
-                'location': 'Dallas',
-                'id': 'dfw'
-            },
-            {
                 'location': 'US-First Gen',
                 'id': 'rackspace_first_gen:us'
             },
@@ -212,8 +208,14 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'HP Helion Cloud',
         'provider': Provider.HPCLOUD,
         'regions': [
-            'region-a.geo-1',
-            'region-b.geo-1'
+            {
+                'location': 'US West',
+                'id': 'region-a.geo-1'
+            },
+            {
+                'location': 'US East',
+                'id': 'region-b.geo-1'
+            }
         ]
     },
     # Docker
