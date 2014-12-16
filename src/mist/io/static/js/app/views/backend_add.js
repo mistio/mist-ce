@@ -33,16 +33,7 @@ define('app/views/backend_add', ['app/views/panel'],
 
             providerRegions: function () {
                 if (Mist.backendAddController.provider)
-                    return Mist.backendAddController.provider.regions.map(function (region) {
-                        return {
-                            title: region.split('_').map(function (word) {
-                                    if (word == 'ec2')
-                                            return word.toUpperCase();
-                                    return word.capitalize()
-                                }).join(' '),
-                            id: region,
-                        };
-                    });
+                    return Mist.backendAddController.provider.regions;
             }.property('Mist.backendAddController.provider'),
 
 
@@ -92,7 +83,7 @@ define('app/views/backend_add', ['app/views/panel'],
 
                 selectRegion: function (region, field) {
                     field.set('value', region.id);
-                    this.set('selectedRegion', region.title);
+                    this.set('selectedRegion', region.location);
                     $('#region').collapsible('collapse');
                 },
 
