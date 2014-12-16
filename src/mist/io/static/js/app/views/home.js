@@ -59,7 +59,7 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
                 if (Mist.graphsController.isOpen)
                     return;
-                if ( ! Mist.monitored_machines )
+                if (!Mist.monitored_machines)
                    return;
 
                 var datasources = [];

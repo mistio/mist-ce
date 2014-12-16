@@ -164,8 +164,9 @@ function program7(depth0,data) {
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
     'id': ("new-backend-first-field"),
     'data-theme': ("a"),
+    'placeholderBinding': ("view.firstFieldPlaceholder"),
     'valueBinding': ("Mist.backendAddController.newBackendFirstField")
-  },hashTypes:{'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'id': "STRING",'data-theme': "STRING",'placeholderBinding': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'placeholderBinding': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("\n\n                ");
   stack1 = helpers['if'].call(depth0, "view.secondFieldLabel", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -268,7 +269,14 @@ function program7(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendSecondField")
   },hashTypes:{'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n        </div>\n\n        ");
+  data.buffer.push("\n        </div>\n\n\n        <!--\n\n           Vcloud\n\n        -->\n\n        <div id=\"vcloud-bundle\" data-theme=\"a\">\n            <label for=\"new-backend-host\">4. Host:</label>\n            ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'id': ("new-backend-host"),
+    'data-theme': ("a"),
+    'placeholder': ("api.vcd.example.com"),
+    'valueBinding': ("Mist.backendAddController.newBackendHost")
+  },hashTypes:{'id': "STRING",'data-theme': "STRING",'placeholder': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'placeholder': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n        </div>\n\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.backendsController.addingBackend", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n        <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n            <a data-role=\"button\" ");

@@ -174,6 +174,11 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if 'hpcloudsvc' in apiurl:
             backend.apiurl = HPCLOUD_AUTH_URL
 
+        if provider == 'vcloud':
+            for prefix in ['https://', 'http://']:
+                backend.apiurl = backend.apiurl.strip(prefix)
+            backend.apiurl = backend.apiurl.split('/')[0] #need host, not url
+
         backend_id = backend.get_id()
         if backend_id in user.backends:
             raise BackendExistsError(backend_id)
@@ -973,6 +978,9 @@ def connect_provider(backend):
                       region=backend.region)
     elif backend.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(backend.apikey, backend.apisecret)
+    elif backend.provider == Provider.VCLOUD:
+        libcloud.security.VERIFY_SSL_CERT = False;
+        conn = driver(backend.apikey, backend.apisecret, host=backend.apiurl)
     elif backend.provider == Provider.DIGITAL_OCEAN:
         if backend.apikey == backend.apisecret:  # API v2
             conn = driver(backend.apisecret)
@@ -1009,7 +1017,8 @@ def get_machine_actions(machine_from_api, conn):
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE):
+                     Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
+                     Provider.VCLOUD):
         can_tag = False
 
     # for other states
@@ -1083,6 +1092,9 @@ def list_machines(user, backend_id):
         elif m.extra.get('DATACENTERID', None):
             # for Linode
             tags.append(config.LINODE_DATACENTERS[m.extra['DATACENTERID']])
+        elif m.extra.get('vdc', None):
+            # for vCloud
+            tags.append(m.extra['vdc'])
 
         image_id = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
@@ -1215,6 +1227,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_azure(conn, key_id, private_key,
                                              public_key, machine_name,
                                              image, size, location, cloud_service_name=None)
+    elif conn.type == Provider.VCLOUD:
+        node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                       machine_name, image, size,
@@ -1663,6 +1677,49 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
             raise MachineCreationError('Azure, got exception %s' % msg)
 
         return node
+
+
+def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks):
+    """Create a machine vCloud.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+    #we have the option to pass a guest customisation script as ex_vm_script. We'll pass
+    #the ssh key there
+
+    deploy_script = NamedTemporaryFile(delete=False)
+    deploy_script.write('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % key)
+    deploy_script.close()
+
+    # select the right network object
+    ex_network = None
+    try:
+        if networks:
+            network = networks[0]
+            available_networks = conn.ex_list_networks()
+            available_networks_ids = [net.id for net in available_networks]
+            if network in available_networks_ids:
+                ex_network = network
+    except:
+        pass
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            ex_vm_script=deploy_script.name,
+            ex_vm_network=ex_network,
+            ex_vm_fence='bridged',
+            ex_vm_ipmode='DHCP'
+        )
+    except Exception as e:
+            raise MachineCreationError("vCloud, got exception %s" % e)
+
+    return node
 
 
 def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
@@ -2189,7 +2246,7 @@ def list_networks(user, backend_id):
     conn = connect_provider(backend)
 
     ret = []
-    if conn.type in [Provider.NEPHOSCALE]:
+    if conn.type in [Provider.NEPHOSCALE, Provider.VCLOUD]:
         networks = conn.ex_list_networks()
 
         for network in networks:
