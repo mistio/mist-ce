@@ -1413,6 +1413,7 @@ var PROVIDER_MAP = {
             type: 'text',
             label: 'Port',
             optional: true,
+            defaultValue: '4243',
         },
         {
             name: 'auth_user',
