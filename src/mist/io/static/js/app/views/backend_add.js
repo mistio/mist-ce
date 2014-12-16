@@ -62,9 +62,10 @@ define('app/views/backend_add', ['app/views/panel'],
                 $('#backend-add-fields').hide();
                 Ember.run.next(this, function () {
                     $(this.panelId).trigger('create');
-                    Ember.run.next(function () {
-                        $('#backend-add-fields').show();
-                    });
+                    Ember.run.later(this, function () {
+                        if (Mist.backendAddController.provider)
+                            $('#backend-add-fields').fadeIn();
+                    }, 100);
                 });
             },
 

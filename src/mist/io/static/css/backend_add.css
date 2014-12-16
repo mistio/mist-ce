@@ -2,7 +2,7 @@
 /* Backend Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
 #backend-add label {
-    margin-top: 10px;
+    margin-top: 20px;
 }
 #backend-add .mist-select ul {
     max-height: 120px;
