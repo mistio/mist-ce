@@ -217,9 +217,9 @@ def add_backend_v_2(user, title, provider, params):
         trigger_session_update(user.email, ['backends'])
         return backend_id
     elif provider == 'ec2':
-        backend_id, backend = _add_backend_ec2(title, provider, params)
+        backend_id, backend = _add_backend_ec2(user, title, params)
     elif provider == 'rackspace':
-        backend_id, backend = _add_backend_rackspace(title, provider, params)
+        backend_id, backend = _add_backend_rackspace(user, title, provider, params)
     elif provider == 'nephoscale':
         backend_id, backend = _add_backend_nephoscale(title, provider, params)
     elif provider == 'digitalocean':
@@ -235,7 +235,7 @@ def add_backend_v_2(user, title, provider, params):
     elif provider == 'docker':
         backend_id, backend = _add_backend_docker(title, provider, params)
     elif provider == 'hpcloud':
-        backend_id, backend = _add_backend_hp(title, provider, params)
+        backend_id, backend = _add_backend_hp(user, title, provider, params)
     elif provider == 'openstack':
         backend_id, backend = _add_backend_openstack(title, provider, params)
     else:
@@ -326,7 +326,7 @@ def _add_backend_bare_metal(user, title, provider, params):
         user.save()
 
 
-def _add_backend_ec2(title, provider, params):
+def _add_backend_ec2(user, title, params):
         api_key = params.get('api_key', '')
         if not api_key:
             raise RequiredParameterMissingError('api_key')
@@ -339,6 +339,12 @@ def _add_backend_ec2(title, provider, params):
         if not region:
             raise RequiredParameterMissingError('region')
 
+        if api_secret == 'getsecretfromdb':
+            for backend_id in user.backends:
+                if api_key == user.backends[backend_id].apikey:
+                    api_secret = user.backends[backend_id].apisecret
+                    break
+
         backend = model.Backend()
         backend.title = title
         backend.provider = region
@@ -350,7 +356,7 @@ def _add_backend_ec2(title, provider, params):
         return backend_id, backend
 
 
-def _add_backend_rackspace(title, provider, params):
+def _add_backend_rackspace(user, title, provider, params):
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -365,6 +371,12 @@ def _add_backend_rackspace(title, provider, params):
 
     if 'rackspace_first_gen' in region:
         provider, region = region.split(':')[0], region.split(':')[1]
+
+    if api_key == 'getsecretfromdb':
+        for backend_id in user.backends:
+            if username == user.backends[backend_id].apikey:
+                api_key = user.backends[backend_id].apisecret
+                break
 
     backend = model.Backend()
     backend.title = title
@@ -521,7 +533,7 @@ def _add_backend_docker(title, provider, params):
     return backend_id, backend
 
 
-def _add_backend_hp(title, provider, params):
+def _add_backend_hp(user, title, provider, params):
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -541,6 +553,12 @@ def _add_backend_hp(title, provider, params):
     region = params.get('region', '')
     if not region:
         raise RequiredParameterMissingError('region')
+
+    if password == 'getsecretfromdb':
+        for backend_id in user.backends:
+            if username == user.backends[backend_id].apikey:
+                password = user.backends[backend_id].apisecret
+                break
 
     backend = model.Backend()
     backend.title = title
