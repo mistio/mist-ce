@@ -96,7 +96,7 @@ define('app/views/backend_add', ['app/views/panel'],
                         }
                         if (provider.provider == 'hpcloud') {
                             fields.findBy('name', 'username').set('value', backend.apikey);
-                            fields.findBy('name', 'api_key').set('value', 'getsecretfromdb');
+                            fields.findBy('name', 'password').set('value', 'getsecretfromdb');
                             fields.findBy('name', 'tenant_name').set('value', backend.tenant_name);
                         }
                     }

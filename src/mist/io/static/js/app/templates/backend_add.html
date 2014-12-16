@@ -23,6 +23,9 @@
             data-iconpos="right"
             data-theme="a">
             <h2>{{#if Mist.backendAddController.provider.title}}
+                   <span class="provider-icon-small">
+                        <span {{bind-attr class="Mist.backendAddController.provider.className"}}></span>
+                    </span>
                     {{Mist.backendAddController.provider.title}}
                 {{else}}
                     Select provider
@@ -32,6 +35,9 @@
                 {{#each Mist.backendsController.providerList}}
                     <li data-icon="false">
                         <a {{action "selectProvider" this target="view"}}>
+                            <span class="provider-icon-small">
+                                <span {{bind-attr class="this.className"}}></span>
+                            </span>
                             {{this.title}}
                         </a>
                     </li>
