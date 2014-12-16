@@ -1340,6 +1340,11 @@ var PROVIDER_MAP = {
 
     azure: [
         {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Azure',
+        },
+        {
             name: 'subscription_id',
             type: 'text',
         },
@@ -1352,6 +1357,11 @@ var PROVIDER_MAP = {
     ],
 
     bare_metal: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Bare Metal Server',
+        },
         {
             name: 'machine_ip',
             type: 'text',
@@ -1379,12 +1389,22 @@ var PROVIDER_MAP = {
 
     digitalocean: [
         {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'DigitalOcean',
+        },
+        {
             name: 'token',
             type: 'password',
-        }
+        },
     ],
 
     docker: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Docker',
+        },
         {
             name: 'docker_host',
             type: 'text',
@@ -1416,6 +1436,11 @@ var PROVIDER_MAP = {
             type: 'region',
         },
         {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'EC2',
+        },
+        {
             name: 'api_key',
             type: 'text',
         },
@@ -1426,6 +1451,11 @@ var PROVIDER_MAP = {
     ],
 
     gce: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Google Compute Engine',
+        },
         {
             name: 'email',
             type: 'text',
@@ -1448,6 +1478,11 @@ var PROVIDER_MAP = {
             type: 'region',
         },
         {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'HP Cloud',
+        },
+        {
             name: 'username',
             type: 'text',
         },
@@ -1463,12 +1498,22 @@ var PROVIDER_MAP = {
 
     linode: [
         {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Linode',
+        },
+        {
             name: 'api_key',
             type: 'text',
         }
     ],
 
     nephoscale: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Nephoscale',
+        },
         {
             name: 'username',
             type: 'text',
@@ -1480,6 +1525,11 @@ var PROVIDER_MAP = {
     ],
 
     openstack: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'OpenStack',
+        },
         {
             name: 'username',
             type: 'text',
@@ -1514,6 +1564,11 @@ var PROVIDER_MAP = {
             type: 'region',
         },
         {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Rackspace',
+        },
+        {
             name: 'username',
             type: 'text',
         },
@@ -1524,6 +1579,11 @@ var PROVIDER_MAP = {
     ],
 
     softlayer: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'SoftLayer',
+        },
         {
             name: 'username',
             type: 'text',
