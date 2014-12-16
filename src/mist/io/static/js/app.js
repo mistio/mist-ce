@@ -430,8 +430,6 @@ var loadApp = function (
                 field.isKey = true;
             if (field.type == 'region')
                 field.isRegion = true;
-            if (field.advanced == true)
-                field.optional = true;
             if (!field.label)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||
@@ -1360,7 +1358,7 @@ var PROVIDER_MAP = {
         {
             name: 'title',
             type: 'text',
-            defaultValue: 'Bare Metal Server',
+            defaultValue: 'Other Server',
         },
         {
             name: 'machine_ip',
@@ -1454,7 +1452,7 @@ var PROVIDER_MAP = {
         {
             name: 'title',
             type: 'text',
-            defaultValue: 'Google Compute Engine',
+            defaultValue: 'GCE',
         },
         {
             name: 'email',
@@ -1480,7 +1478,7 @@ var PROVIDER_MAP = {
         {
             name: 'title',
             type: 'text',
-            defaultValue: 'HP Cloud',
+            defaultValue: 'HP',
         },
         {
             name: 'username',
@@ -1549,13 +1547,8 @@ var PROVIDER_MAP = {
         {
             name: 'region',
             type: 'text',
-            advanced: true,
+            optional: true,
         },
-        {
-            name: 'compute_endpoint',
-            type: 'text',
-            advanced: true,
-        }
     ],
 
     rackspace: [

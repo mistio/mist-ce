@@ -39,6 +39,7 @@
             </ul>
         </div>
 
+        <div id="backend-add-fields">
         {{#each field in view.providerFields}}
             {{#unless field.advanced}}
                 <label {{bind-attr for="field.name"}}>
@@ -101,30 +102,7 @@
                 {{/if}}
             {{/unless}}
         {{/each}}
-
-        {{#if view.hasAdvanced}}
-            <div id="opentack-advanced-wrapper">
-                <select id="openstack-advanced" data-role="slider" data-theme="a"
-                {{action "advancedToggled" target="view" on="change"}}>
-                   <option value="0">Basic settings</option>
-                    <option value="1">Advanced settings</option>
-                </select>
-            </div>
-            <div id="backend-add-advanced">
-                {{#each field in view.providerFields}}
-                    {{#if field.advanced}}
-                        <label {{bind-attr for="field.name"}}>
-                            {{field.label}}:
-                        </label>
-                        {{view Mist.TextField
-                            data-theme="a"
-                            type=field.type
-                            id=field.name
-                            valueBinding=field.value}}
-                    {{/if}}
-                {{/each}}
-            </div>
-        {{/if}}
+        </div>
 
         {{#if Mist.backendsController.addingBackend}}
             <div class="ajax-loader"></div>

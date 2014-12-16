@@ -58,8 +58,13 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
             clear: function () {
+                $('#new-backend-provider').collapsible('collapse');
+                $('#backend-add-fields').hide();
                 Ember.run.next(this, function () {
                     $(this.panelId).trigger('create');
+                    Ember.run.next(function () {
+                        $('#backend-add-fields').show();
+                    });
                 });
             },
 
@@ -87,9 +92,9 @@ define('app/views/backend_add', ['app/views/panel'],
                     $('#region').collapsible('collapse');
 
                     // Append region to title
-                    this.get('providerFields')
-                        .findBy('name', 'title')
-                        .set('value', Mist.backendAddController.provider.title + ' ' + region.location);
+                    var fields = this.get('providerFields');
+                    var title = fields.findBy('name', 'title');
+                    title.set('value', title.defaultValue + ' ' + region.location);
                 },
 
 
