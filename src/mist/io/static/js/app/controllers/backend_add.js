@@ -48,14 +48,9 @@ define('app/controllers/backend_add', ['app/models/backend'],
 
                 var provider = this.get('provider');
                 var fields = getProviderFields(provider);
-                var title = provider.title;
-                if (provider.provider == 'openstack')
-                    title += ' ' + PROVIDER_MAP.openstack.findBy('name', 'tenant_name').value;
-                if (provider.provider.indexOf('hpcloud') > -1)
-                    title += ' ' + PROVIDER_MAP.hpcloud.findBy('name', 'tenant_name').value;
 
                 var payload = {
-                    title: title,
+                    title: provider.title,
                     provider: provider.provider,
                 };
                 fields.forEach(function (field) {
