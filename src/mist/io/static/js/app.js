@@ -430,6 +430,8 @@ var loadApp = function (
                 field.isKey = true;
             if (field.type == 'region')
                 field.isRegion = true;
+            if (field.optional)
+                field.placeholder = '(optional)';
             if (!field.label)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||
