@@ -191,7 +191,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
 
             providerList: function() {
-                return SUPPORTED_PROVIDERS.sortBy('title').map(function (provider) {
+                return SUPPORTED_PROVIDERS.map(function (provider) {
                     provider.className = 'provider-';
                     provider.className += provider.provider == 'bare_metal' ?
                         'baremetal' : provider.provider;
@@ -201,6 +201,10 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                         return 1;
                     if (b.provider == 'bare_metal')
                         return -1;
+                    if (a.title > b.title)
+                        return 1;
+                    if (a.title < b.title)
+                        return -1
                     return 0;
                 });
             }.property('providerList'),
