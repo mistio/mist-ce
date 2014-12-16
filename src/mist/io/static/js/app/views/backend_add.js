@@ -73,7 +73,7 @@ define('app/views/backend_add', ['app/views/panel'],
 
             actions: {
 
-                selectProvider: function(provider) {
+                selectProvider: function (provider) {
                     this.clear();
                     clearProviderFields(provider);
                     Mist.backendAddController.set('provider', provider);
@@ -85,6 +85,11 @@ define('app/views/backend_add', ['app/views/panel'],
                     field.set('value', region.id);
                     this.set('selectedRegion', region.location);
                     $('#region').collapsible('collapse');
+
+                    // Append region to title
+                    this.get('providerFields')
+                        .findBy('name', 'title')
+                        .set('value', Mist.backendAddController.provider.title + ' ' + region.location);
                 },
 
 
