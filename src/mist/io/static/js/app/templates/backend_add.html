@@ -111,22 +111,6 @@
         </div>
 
 
-        <!--
-
-           Vcloud
-
-        -->
-
-        <div id="vcloud-bundle" data-theme="a">
-            <label for="new-backend-host">4. Host:</label>
-            {{view Mist.TextField
-                   id="new-backend-host"
-                   data-theme="a"
-                   placeholder="api.vcd.example.com"
-                   valueBinding="Mist.backendAddController.newBackendHost"}}
-        </div>
-
-
         {{#if Mist.backendsController.addingBackend}}
             <div class="ajax-loader"></div>
         {{/if}}

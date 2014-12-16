@@ -1586,5 +1586,25 @@ var PROVIDER_MAP = {
             name: 'api_key',
             type: 'password',
         }
+    ],
+
+    vcloud: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'VMware vCloud'
+        },
+        {
+            name: 'username',
+            type: 'text'
+        },
+        {
+            name: 'password',
+            type: 'password'
+        },
+        {
+            name: 'host',
+            type: 'text'
+        }
     ]
 };
