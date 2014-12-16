@@ -2087,7 +2087,8 @@ def list_backends(user):
                     'region': backend.region,
                     # for Provider.RACKSPACE (the new Nova provider)
                     ## 'datacenter': backend.datacenter,
-                    'enabled': backend.enabled})
+                    'enabled': backend.enabled,
+                    'tenant_name': backend.tenant_name})
     return ret
 
 
