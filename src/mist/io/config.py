@@ -163,14 +163,42 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'Rackspace',
         'provider': 'rackspace',
         'regions': [
-            'dfw',
-            'ord',
-            'iad',
-            'lon',
-            'syd',
-            'hkg',
-            'rackspace_first_gen:us',
-            'rackspace_first_gen:uk'
+            {
+                'location': 'Dallas',
+                'id': 'dfw'
+            },
+            {
+                'location': 'Chicago',
+                'id': 'ord'
+            },
+            {
+                'location': 'N. Virginia',
+                'id': 'iad'
+            },
+            {
+                'location': 'London',
+                'id': 'lon'
+            },
+            {
+                'location': 'Sydney',
+                'id': 'syd'
+            },
+            {
+                'location': 'Hong Kong',
+                'id': 'hkg'
+            },
+            {
+                'location': 'Dallas',
+                'id': 'dfw'
+            },
+            {
+                'location': 'US-First Gen',
+                'id': 'rackspace_first_gen:us'
+            },
+            {
+                'location': 'UK-First Gen',
+                'id': 'rackspace_first_gen:uk'
+            },
         ]
     },
     # Softlayer
