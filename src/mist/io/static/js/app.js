@@ -1265,45 +1265,10 @@ function error() {
         console.error.apply(console, arguments);
 }
 
-
-function showGraphs() {
-
-    Mist.set('didShowGraphs', true);
-    require(['app/models/graph', 'app/models/datapoint'], function (Graph, Datapoint) {
-
-        var graph = Graph.create({
-            id: 'graph-' + parseInt(Math.random() * 10000),
-            title: 'Load for all servers',
-            datasources: [],
-        });
-
-        var metric = Mist.metricsController.getMetric('load.shortterm');
-
-        Mist.monitored_machines.forEach(function (machineTuple) {
-            var backend = Mist.backendsController.getBackend(machineTuple[0]);
-            if (!backend) return;
-            var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
-            if (!machine) return;
-            Mist.datasourcesController.addDatasource({
-                machine: machine,
-                metric: metric,
-                callback: function (success, datasource) {
-                    graph.addDatasource(datasource);
-                }
-            });
-        });
-
-        Mist.graphsController.open({
-            graphs: [graph],
-            config: {
-                canModify: true,
-                canControl: true,
-                canMinimize: true,
-            }
-        });
-    });
+function resetFileInputField (element) {
+    element.wrap('<form>').parent('form').trigger('reset');
+    element.unwrap();
 }
-
 
 //  GLOBAL DEFINITIONS
 

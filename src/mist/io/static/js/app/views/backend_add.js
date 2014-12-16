@@ -24,6 +24,22 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
             //
             //
+            //  Computer Properties
+            //
+            //
+
+
+            firstFieldPlaceholder: function () {
+                var provider = Mist.backendAddController.newBackendProvider;
+                if (provider) {
+                    if (provider.provider == 'vcloud')
+                        return 'user@org';
+                }
+            }.property('Mist.backendAddController.newBackendProvider'),
+
+
+            //
+            //
             //  Methods
             //
             //
@@ -47,6 +63,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                 $('#docker-bundle').hide();
                 $('#baremetal-bundle').hide();
                 $('#openstack-bundle').hide();
+                $('#vcloud-bundle').hide();
                 $('#new-backend-provider').collapsible('collapse');
                 $('#new-backend-second-field').attr('type', 'password');
                 $('#gce-bundle a').removeClass('ui-icon-check')
@@ -81,6 +98,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     $('#docker-bundle').hide();
                     $('#hpcloud-bundle').hide();
                     $('#non-hp-cloud').hide();
+                    $('#vcloud-bundle').hide();
 
                     if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('softlayer') > -1) {
                         this.set('firstFieldLabel', 'Username');
@@ -119,6 +137,11 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('secondFieldLabel', 'Password');
                         $('#opentack-advanced-wrapper').show();
                         $('#openstack-bundle').show();
+                    } else if (provider.provider.indexOf('vcloud') > -1) {
+                        this.set('firstFieldLabel', 'Username');
+                        this.set('secondFieldLabel', 'Password');
+                        $('#vcloud-bundle').show();
+                        Mist.backendAddController.set('newBackendHost', '');
                     } else if (provider.provider.indexOf('bare_metal') > -1) {
                         this.set('firstFieldLabel', 'Hostname');
                         this.set('secondFieldLabel', 'User');
@@ -169,7 +192,8 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                                 $('#gce-bundle a').removeClass('ui-icon-check')
                                     .addClass('ui-icon-carat-u');
                             }
-                        }
+                        },
+                        Mist.backendAddController.get('newBackendSecondField')
                     );
                 },
 
@@ -179,9 +203,11 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         function (uploadedFile) {
                             Mist.backendAddController.set('newBackendSecondField',
                                 uploadedFile);
-                        }
+                        },
+                        Mist.backendAddController.get('newBackendSecondField')
                     );
                 },
+
 
                 createKeyClicked: function() {
                     Mist.keyAddController.open( function (success, key) {
