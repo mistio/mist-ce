@@ -201,6 +201,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                         return 1;
                     if (b.provider == 'bare_metal')
                         return -1;
+                    return 0;
                 });
             }.property('providerList'),
 
