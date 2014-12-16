@@ -93,14 +93,38 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'EC2',
         'provider': 'ec2',
         'regions': [
-            Provider.EC2_AP_NORTHEAST,
-            Provider.EC2_AP_SOUTHEAST,
-            Provider.EC2_AP_SOUTHEAST2,
-            Provider.EC2_EU_WEST,
-            Provider.EC2_SA_EAST,
-            Provider.EC2_US_EAST,
-            Provider.EC2_US_WEST,
-            Provider.EC2_US_WEST_OREGON
+            {
+                'location': 'Tokyo',
+                'id': Provider.EC2_AP_NORTHEAST
+            },
+            {
+                'location': 'Singapore',
+                'id': Provider.EC2_AP_SOUTHEAST
+            },
+            {
+                'location': 'Sydney',
+                'id': Provider.EC2_AP_SOUTHEAST2
+            },
+            {
+                'location': 'Ireland',
+                'id': Provider.EC2_EU_WEST
+            },
+            {
+                'location': 'Sao Paulo',
+                'id': Provider.EC2_SA_EAST
+            },
+            {
+                'location': 'N. Virginia',
+                'id': Provider.EC2_US_EAST
+            },
+            {
+                'location': 'N. California',
+                'id': Provider.EC2_US_WEST
+            },
+            {
+                'location': 'Oregon',
+                'id': Provider.EC2_US_WEST_OREGON
+            },
         ]
     },
     # GCE
