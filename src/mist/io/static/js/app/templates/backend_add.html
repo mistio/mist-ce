@@ -110,6 +110,20 @@
                     <option value="1">Advanced settings</option>
                 </select>
             </div>
+            <div id="backend-add-advanced">
+                {{#each field in view.providerFields}}
+                    {{#if field.advanced}}
+                        <label {{bind-attr for="field.name"}}>
+                            {{field.label}}:
+                        </label>
+                        {{view Mist.TextField
+                            data-theme="a"
+                            type=field.type
+                            id=field.name
+                            valueBinding=field.value}}
+                    {{/if}}
+                {{/each}}
+            </div>
         {{/if}}
 
         {{#if Mist.backendsController.addingBackend}}

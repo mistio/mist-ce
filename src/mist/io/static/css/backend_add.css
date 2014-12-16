@@ -16,6 +16,10 @@
     width: 200px;
 }
 
+#backend-add-advanced {
+	display: none;
+}
+
 #backend-add #opentack-advanced-wrapper {
     text-align: center;
     margin-bottom: -20px;

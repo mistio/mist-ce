@@ -26,6 +26,11 @@ define('app/views/backend_add', ['app/views/panel'],
             }.property('Mist.backendAddController.provider'),
 
 
+            hasAdvanced: function () {
+                return !!this.get('providerFields').findBy('advanced');
+            }.property('providerFields'),
+
+
             providerRegions: function () {
                 if (Mist.backendAddController.provider)
                     return Mist.backendAddController.provider.regions.map(function (region) {
@@ -135,12 +140,7 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
                 advancedToggled: function () {
-                    var advanced = $('#non-hp-cloud');
-                    if (advanced.css('display') == 'none') {
-                        advanced.slideDown();
-                    } else {
-                        advanced.slideUp();
-                    }
+                    App.switchElementVisibility('backend-add-advanced');
                 }
             },
         });
