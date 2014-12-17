@@ -131,10 +131,14 @@ def backend_creds(context, backend):
         api_secret_input = context.browser.find_element_by_id("new-backend-second-field")
         api_secret_input.send_keys(context.credentials['EC2']['api_secret'])
     elif "NEPHOSCALE" in backend:
-        username_input = context.browser.find_element_by_id("new-backend-first-field")
-        username_input.send_keys(context.credentials['NEPHOSCALE']['username'])
-        api_key_input = context.browser.find_element_by_id("new-backend-second-field")
-        api_key_input.send_keys(context.credentials['NEPHOSCALE']['password'])
+        title = context.browser.find_element_by_id("title")
+        for i in range(20):
+            title.send_keys(u'\ue003')
+        title.send_keys("NephoScale")
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['NEPHOSCALE']['username'])
+        password = context.browser.find_element_by_id("password")
+        password.send_keys(context.credentials['NEPHOSCALE']['password'])
     elif "LINODE" in backend:
         api_key = context.browser.find_element_by_id("api_key")
         api_key.send_keys(context.credentials['LINODE']['api_key'])

@@ -21,10 +21,10 @@ Feature: Add second-tier backends
 #    | DigitalOcean          | DIGITALOCEAN |
 #    | Google Compute Engine | GCE          |
 #    | HP Helion Cloud       | HP           |
-    | Linode               | LINODE       |
+#    | Linode               | LINODE       |
+    | NephoScale           | NEPHOSCALE   |
 #    | Rackspace DFW        | RACKSPACE    |
 #    | SoftLayer            | SOFTLAYER    |
-#    | NephoScale           | NEPHOSCALE   |
 #    | Docker               | DOCKER       |
 #    | HP Helion Cloud - US East     | HP           |
 #    | HP Helion Cloud - US West     | HP           |
