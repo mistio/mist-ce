@@ -136,8 +136,8 @@ def backend_creds(context, backend):
         api_key_input = context.browser.find_element_by_id("new-backend-second-field")
         api_key_input.send_keys(context.credentials['NEPHOSCALE']['password'])
     elif "LINODE" in backend:
-        token_input = context.browser.find_element_by_id("new-backend-token")
-        token_input.send_keys(context.credentials['LINODE']['api_key'])
+        api_key = context.browser.find_element_by_id("api_key")
+        api_key.send_keys(context.credentials['LINODE']['api_key'])
     elif "DOCKER" in backend:
         username_input = context.browser.find_element_by_id("new-backend-docker-url")
         username_input.send_keys(context.credentials['DOCKER']['host'])
