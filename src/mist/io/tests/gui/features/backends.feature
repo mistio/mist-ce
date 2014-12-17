@@ -25,7 +25,8 @@ Feature: Add second-tier backends
 #    | NephoScale           | NEPHOSCALE   |
 #    | OpenStack            | OPENSTACK    |
 #    | Rackspace            | RACKSPACE    |
-    | SoftLayer            | SOFTLAYER    |
+#    | SoftLayer            | SOFTLAYER    |
+    | VMware vCloud        | VMWARE       |
 #    | Docker               | DOCKER       |
 #
 #    @backend-actions

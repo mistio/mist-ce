@@ -156,6 +156,13 @@ def backend_creds(context, backend):
     elif "DIGITALOCEAN" in backend:
         token_input = context.browser.find_element_by_id("token")
         token_input.send_keys(context.credentials['DIGITALOCEAN']['token'])
+    elif "VMWARE" in backend:
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['VMWARE']['username'])
+        password = context.browser.find_element_by_id("password")
+        password.send_keys(context.credentials['VMWARE']['password'])
+        host = context.browser.find_element_by_id("host")
+        host.send_keys(context.credentials['VMWARE']['host'])
 
 
 @when(u'I rename the backend to "{new_name}"')
