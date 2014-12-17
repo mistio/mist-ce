@@ -22,12 +22,11 @@ Feature: Add second-tier backends
 #    | Google Compute Engine | GCE          |
 #    | HP Helion Cloud       | HP           |
 #    | Linode               | LINODE       |
-    | NephoScale           | NEPHOSCALE   |
-#    | Rackspace DFW        | RACKSPACE    |
+#    | NephoScale           | NEPHOSCALE   |
+#    | OpenStack            | OPENSTACK    |
+    | Rackspace            | RACKSPACE    |
 #    | SoftLayer            | SOFTLAYER    |
 #    | Docker               | DOCKER       |
-#    | HP Helion Cloud - US East     | HP           |
-#    | HP Helion Cloud - US West     | HP           |
 #
 #    @backend-actions
 #    Scenario: Backend Actions
