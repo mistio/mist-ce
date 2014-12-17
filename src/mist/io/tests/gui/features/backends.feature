@@ -16,9 +16,10 @@ Feature: Add second-tier backends
     Then the "<provider>" backend should be added within 30 seconds
 
     Examples: Providers
-    | provider             | credentials  |
-    | Azure                | AZURE        |
-#    | DigitalOcean         | DIGITALOCEAN |
+    | provider              | credentials  |
+#    | Azure                 | AZURE        |
+#    | DigitalOcean          | DIGITALOCEAN |
+    | Google Compute Engine | GCE          |
 #    | Linode               | LINODE       |
 #    | Rackspace DFW        | RACKSPACE    |
 #    | SoftLayer            | SOFTLAYER    |

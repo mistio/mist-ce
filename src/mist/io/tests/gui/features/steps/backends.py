@@ -75,6 +75,22 @@ def backend_creds(context, backend):
         upload_area.send_keys(context.credentials['AZURE']['certificate'])
         file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
         file_upload_ok.click()
+    elif "GCE" in backend:
+        title = context.browser.find_element_by_id("title")
+        for i in range(1, 6):
+            title.send_keys(u'\ue003')
+        title.send_keys("Google Compute Engine")
+        email = context.browser.find_element_by_id("email")
+        email.send_keys(context.credentials['GCE']['email'])
+        project_id = context.browser.find_element_by_id("project_id")
+        project_id.send_keys(context.credentials['GCE']['project_id'])
+        add_key = context.browser.find_element_by_id("private_key")
+        add_key.click()
+        sleep(1)
+        upload_area = context.browser.find_element_by_id("upload-area")
+        upload_area.send_keys(context.credentials['GCE']['private_key'])
+        file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
+        file_upload_ok.click()
 
     elif "OPENSTACK" in backend:
         username_input = context.browser.find_element_by_id("new-backend-first-field")
@@ -119,7 +135,7 @@ def backend_creds(context, backend):
         username_input = context.browser.find_element_by_id("new-backend-docker-url")
         username_input.send_keys(context.credentials['DOCKER']['host'])
     elif "DIGITALOCEAN" in backend:
-        token_input = context.browser.find_element_by_id("new-backend-token")
+        token_input = context.browser.find_element_by_id("token")
         token_input.send_keys(context.credentials['DIGITALOCEAN']['token'])
 
 
