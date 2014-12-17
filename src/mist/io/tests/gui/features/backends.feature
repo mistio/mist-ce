@@ -24,8 +24,8 @@ Feature: Add second-tier backends
 #    | Linode               | LINODE       |
 #    | NephoScale           | NEPHOSCALE   |
 #    | OpenStack            | OPENSTACK    |
-    | Rackspace            | RACKSPACE    |
-#    | SoftLayer            | SOFTLAYER    |
+#    | Rackspace            | RACKSPACE    |
+    | SoftLayer            | SOFTLAYER    |
 #    | Docker               | DOCKER       |
 #
 #    @backend-actions

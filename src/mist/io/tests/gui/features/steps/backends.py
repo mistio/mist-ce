@@ -129,10 +129,10 @@ def backend_creds(context, backend):
         tenant_name = context.browser.find_element_by_id("tenant_name")
         tenant_name.send_keys(context.credentials['HP']['tenant_name'])
     elif "SOFTLAYER" in backend:
-        api_key_input = context.browser.find_element_by_id("new-backend-first-field")
-        api_key_input.send_keys(context.credentials['SOFTLAYER']['api_key'])
-        api_secret_input = context.browser.find_element_by_id("new-backend-second-field")
-        api_secret_input.send_keys(context.credentials['SOFTLAYER']['api_secret'])
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['SOFTLAYER']['username'])
+        api_key = context.browser.find_element_by_id("api_key")
+        api_key.send_keys(context.credentials['SOFTLAYER']['api_key'])
     elif "EC2" in backend:
         api_key_input = context.browser.find_element_by_id("new-backend-first-field")
         api_key_input.send_keys(context.credentials['EC2']['api_key'])
