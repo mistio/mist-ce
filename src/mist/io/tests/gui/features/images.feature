@@ -4,7 +4,7 @@ Feature: Actions for Images
   Background:
     Given backends credentials
     When I visit mist.io
-    Given "EC2 AP NORTHEAST" backend added
+    Given "EC2" backend added
 
   Scenario: Star image from Advanced search
     When I click the button that contains "Images"

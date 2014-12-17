@@ -134,10 +134,17 @@ def backend_creds(context, backend):
         api_key = context.browser.find_element_by_id("api_key")
         api_key.send_keys(context.credentials['SOFTLAYER']['api_key'])
     elif "EC2" in backend:
-        api_key_input = context.browser.find_element_by_id("new-backend-first-field")
-        api_key_input.send_keys(context.credentials['EC2']['api_key'])
-        api_secret_input = context.browser.find_element_by_id("new-backend-second-field")
-        api_secret_input.send_keys(context.credentials['EC2']['api_secret'])
+        context.execute_steps(u'When I click the button that contains "Select Region"')
+        context.execute_steps(u'When I click the button that contains "%s"' % context.credentials['EC2']['region'])
+        sleep(1)
+        title = context.browser.find_element_by_id("title")
+        for i in range(20):
+            title.send_keys(u'\ue003')
+        title.send_keys("EC2")
+        api_key = context.browser.find_element_by_id("api_key")
+        api_key.send_keys(context.credentials['EC2']['api_key'])
+        api_secret = context.browser.find_element_by_id("api_secret")
+        api_secret.send_keys(context.credentials['EC2']['api_secret'])
     elif "NEPHOSCALE" in backend:
         title = context.browser.find_element_by_id("title")
         for i in range(20):

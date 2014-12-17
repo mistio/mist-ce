@@ -27,6 +27,7 @@ Feature: Add second-tier backends
     | Rackspace            | RACKSPACE    |
     | SoftLayer            | SOFTLAYER    |
     | VMware vCloud        | VMWARE       |
+#    | EC2                  | EC2          |
 #    | Docker               | DOCKER       |
 
     @backend-actions
