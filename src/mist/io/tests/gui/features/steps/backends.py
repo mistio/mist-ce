@@ -64,7 +64,19 @@ def given_backend(context, backend):
 
 @when(u'I use my "{backend}" credentials')
 def backend_creds(context, backend):
-    if "OPENSTACK" in backend:
+    if "AZURE" in backend:
+        subscription_id = context.browser.find_element_by_id("subscription_id")
+        subscription_id.send_keys(context.credentials['AZURE']['subscription_id'])
+        sleep(1)
+        add_cert_button = context.browser.find_element_by_id("certificate")
+        add_cert_button.click()
+        sleep(1)
+        upload_area = context.browser.find_element_by_id("upload-area")
+        upload_area.send_keys(context.credentials['AZURE']['certificate'])
+        file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
+        file_upload_ok.click()
+
+    elif "OPENSTACK" in backend:
         username_input = context.browser.find_element_by_id("new-backend-first-field")
         username_input.send_keys(context.credentials['OPENSTACK']['username'])
         pass_input = context.browser.find_element_by_id("new-backend-second-field")
