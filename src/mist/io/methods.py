@@ -256,8 +256,12 @@ def add_backend_v_2(user, title, provider, params):
     if remove_on_error:
         try:
             conn = connect_provider(backend)
-        except:
-            raise BackendUnauthorizedError()
+        except InvalidCredsError as exc:
+            log.error("Error while adding backend: %r" % exc)
+            raise BackendUnauthorizedError("%r" % exc)
+        except Exception as exc:
+            log.error("Error while adding backend%r" % exc)
+            raise BackendUnavailableError("%r" % exc)
         try:
             machines = conn.list_nodes()
         except InvalidCredsError:
