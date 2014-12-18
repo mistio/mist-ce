@@ -151,8 +151,8 @@ function commitChanges {
         done
 
         # Make a timestamped links to build files
-        ln -sf $MIST_JS $js_build
-        ln -sf $MIST_CSS $css_build
+        ln -sf mist.js $js_build
+        ln -sf mist.css $css_build
         git add $js_build $css_build
 
         # Check if there is anything to commit
