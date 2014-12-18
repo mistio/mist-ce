@@ -1,88 +1,65 @@
-define('app/controllers/backend_add', ['app/models/backend', 'ember'],
-    /**
-     *  Backend Add Controller
-     *
-     *  @returns Class
-     */
+define('app/controllers/backend_add', ['app/models/backend'],
+    //
+    //  Backend Add Controller
+    //
+    //  @returns Class
+    //
     function (Backend) {
+
+        'use strict';
+
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             callback: null,
-            formReady: null,
-
-            newBackendKey: null,
-            newBackendPort: null,
-            newBackendProvider: null,
-            newBackendFirstField: null,
-            newBackendSecondField: null,
-            newBackendProjectName: null,
-            newBackendDockerURL: null,
-            newBackendHost: null,
-            newBackendOpenStackURL: null,
-            newBackendOpenStackRegion: null,
-            newBackendOpenStackTenant: null,
-            newBackendOpenStackComputeEndpoint: null,
+            provider: null,
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //
+            //  Methods
+            //
+            //
+
 
             open: function (callback) {
                 this._clear();
-                this._updateFormReady();
+                this.view.clear();
+                this.view.open();
                 this.set('callback', callback);
-
-                $('#add-backend-panel').panel('open');
-                Ember.run.next(function () {
-                    $('.ui-page-active').height($('.ui-panel-open').height());
-                    $('body').css('overflow', 'auto');
-
-                    //This is the advanced section of OpenStack, by default
-                    //hidden
-                    $('#openstack-advanced').val('0').slider('refresh');
-                    $('#non-hp-cloud').hide();
-                });
             },
 
 
             close: function () {
-                $('#add-backend-panel').panel('close');
                 this._clear();
+                this.view.close();
+                this.view.clear();
             },
 
 
             add: function () {
 
+                var provider = this.get('provider');
+                var fields = getProviderFields(provider);
+
+                var payload = {
+                    title: provider.title,
+                    provider: provider.provider,
+                };
+                fields.forEach(function (field) {
+                    payload[field.name] = field.value;
+                });
+
                 var that = this;
-                var projectName = this.newBackendOpenStackTenant || this.newBackendProjectName;
-
-                // Add tenant name to backend title for openstack and hpcloud
-                var provider = this.newBackendProvider.provider;
-                var title = this.newBackendProvider.title +
-                    (provider == 'openstack' || provider.indexOf('hpcloud') > -1 ?
-                        ' ' + this.newBackendOpenStackTenant : '');
-
                 Mist.backendsController.addBackend({
-
-                    APIKey: this.newBackendFirstField,
-                    APISecret: this.newBackendSecondField,
-                    title: title,
-                    provider: this.newBackendProvider.provider,
-                    APIURL: this.newBackendOpenStackURL || this.newBackendHost,
-                    region: this.newBackendOpenStackRegion,
-                    tenant: projectName,
-                    computeEndpont: this.newBackendOpenStackComputeEndpoint,
-                    dockerURL: this.newBackendDockerURL,
-                    port: this.newBackendPort,
-                    key: this.newBackendKey.id,
-
+                    payload: payload,
                     callback: function (success, backend) {
                         that._giveCallback(success, backend);
                         if (success) that.close();
@@ -91,108 +68,24 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             },
 
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
+            //
+            //
+            //  Pseudo-Private Methods
+            //
+            //
+
 
             _clear: function () {
-
-                this.set('callback', null)
-                    .set('newBackendPort', null)
-                    .set('newBackendFirstField', null)
-                    .set('newBackendSecondField', null)
-                    .set('newBackendOpenStackURL', null)
-                    .set('newBackendOpenStackRegion', null)
-                    .set('newBackendOpenStackTenant', null)
-                    .set('newBackendOpenStackComputeEndpoint', null)
-                    .set('newBackendDockerURL', null)
-                    .set('newBackendHost', null)
-                    .set('newBackendKey', {id: 'Select SSH Key'})
-                    .set('newBackendProvider', {title: 'Select provider'});
-
-                // These should be in a view :(
-                $('#new-backend-key').collapsible('collapse').collapsible('option', 'collapsedIcon', 'carat-d');
-                $('#new-backend-provider').collapsible('collapse').collapsible('option', 'collapsedIcon', 'carat-d');
-            },
-
-
-            _updateFormReady: function () {
-
-                // Filter out the "Select provider" dummy provider
-                if (! ('provider' in this.newBackendProvider)) {
-                    this.set('formReady', false);
-                    return;
-                }
-
-                var ready = false;
-
-                if (this.newBackendProvider.provider == 'docker') {
-                    if (this.newBackendDockerURL && this.newBackendPort) {
-                        ready = true;
-                    }
-                } else if (this.newBackendProvider.provider == 'linode') {
-                    if (this.newBackendSecondField && this.newBackendSecondField) {
-                        ready = true;
-                    }
-                } else if (this.newBackendProvider.provider == 'digitalocean') {
-                    if (this.newBackendSecondField) {
-                        ready = true;
-                    }
-                } else if (this.newBackendFirstField && this.newBackendSecondField) {
-
-                    ready = true;
-
-                    if (this.newBackendProvider.provider == 'openstack') { // Openstack
-                        if (!this.newBackendOpenStackURL || !this.newBackendOpenStackTenant) {
-                            ready = false;
-                        }
-                    } else if (this.newBackendProvider.provider.indexOf('hpcloud') > -1) { // HpCloud
-                        if (!this.newBackendOpenStackTenant) {
-                            ready = false;
-                        }
-                    } else if (this.newBackendProvider.provider == 'bare_metal') { // Baremetal
-                        if (!Mist.keysController.keyExists(this.newBackendKey.id)) {
-                            ready = false;
-                        }
-                    } else if (this.newBackendProvider.provider == 'gce') { // Google Compute Engine
-                        if (!this.newBackendProjectName) {
-                            ready = false;
-                        }
-                    } else if (this.newBackendProvider.provider == 'vcloud') { // Vcloud
-                        if (!this.newBackendHost) {
-                            ready = false;
-                        }
-                    }
-                }
-                this.set('formReady', ready);
+                this.setProperties({
+                    callback: null,
+                    provider: null,
+                });
             },
 
 
             _giveCallback: function (success, backend) {
                 if (this.callback) this.callback(success, backend);
             },
-
-
-            /**
-             *
-             *  Observers
-             *
-             */
-
-            formObserver: function () {
-                Ember.run.once(this, '_updateFormReady');
-            }.observes('newBackendKey',
-                       'newBackendProvider',
-                       'newBackendFirstField',
-                       'newBackendSecondField',
-                       'newBackendProjectName',
-                       'newBackendDockerURL',
-                       'newBackendPort',
-                       'newBackendOpenStackURL',
-                       'newBackendOpenStackTenant',
-                       'newBackendHost')
         });
     }
 );

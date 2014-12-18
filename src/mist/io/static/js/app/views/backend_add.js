@@ -1,25 +1,53 @@
-define('app/views/backend_add', ['app/views/templated', 'ember'],
+define('app/views/backend_add', ['app/views/panel'],
     //
-    //  Add Backend View
+    //  Backend Add View
     //
     //  @returns Class
     //
-    function(TemplatedView) {
+    function (PanelView) {
 
         'use strict';
 
-        return TemplatedView.extend({
+        return PanelView.extend({
+
+
+            selectedRegion: null,
 
 
             //
             //
-            //  Properties
+            //  Computed Properties
             //
             //
 
 
-            firstFieldLabel: 'API Key',
-            secondFieldLabel: 'API Secret',
+            providerFields: function () {
+                return getProviderFields(Mist.backendAddController.provider);
+            }.property('Mist.backendAddController.provider'),
+
+
+            hasAdvanced: function () {
+                return !!this.get('providerFields').findBy('advanced');
+            }.property('providerFields'),
+
+
+            providerRegions: function () {
+                if (Mist.backendAddController.provider)
+                    return Mist.backendAddController.provider.regions;
+            }.property('Mist.backendAddController.provider'),
+
+
+            isReady: function () {
+                var isReady = true
+                this.get('providerFields').some(function (field) {
+                    if (field.optional) return;
+                    if (field.value === undefined ||
+                        field.value === null ||
+                        field.value === '')
+                            return isReady = false;
+                });
+                return isReady;
+            }.property('providerFields.@each.value'),
 
 
             //
@@ -45,32 +73,49 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
             //
 
 
-            updateAddButton: function() {
-                if (Mist.backendsController.addingBackend || !Mist.backendAddController.formReady) {
-                    $('#new-backend-ok').addClass('ui-state-disabled');
-                } else {
-                    $('#new-backend-ok').removeClass('ui-state-disabled');
-                }
+            clear: function () {
+                $('#new-backend-provider').collapsible('collapse');
+                $('#backend-add-fields').hide();
+                Ember.run.next(this, function () {
+                    $(this.panelId).trigger('create');
+                    Ember.run.later(this, function () {
+                        if (Mist.backendAddController.provider)
+                            $('#backend-add-fields').fadeIn();
+                    }, 100);
+                });
             },
 
 
-            clear: function () {
+            autocompleteCredentials: function (provider) {
 
-                $('#gce-bundle').hide();
-                $('#azure-bundle').hide();
-                $('#tokenonly-bundle').hide();
-                $('#non-hp-cloud').hide();
-                $('#docker-bundle').hide();
-                $('#baremetal-bundle').hide();
-                $('#openstack-bundle').hide();
-                $('#vcloud-bundle').hide();
-                $('#new-backend-provider').collapsible('collapse');
-                $('#new-backend-second-field').attr('type', 'password');
-                $('#gce-bundle a').removeClass('ui-icon-check')
-                    .addClass('ui-icon-carat-u');
-                $('#common-bundle').show();
-                Ember.run.next(function () {
-                    $('#add-backend-panel').trigger('create');
+                var fields = this.get('providerFields');
+
+                // Autocomplete credentials only for providers
+                // with regions
+                if (!fields.findBy('type', 'region'))
+                    return;
+
+                Mist.backendsController.content.some(function (backend) {
+
+                    // backend.provider == provider.provider won't work
+                    // because we still save backends in the database using
+                    // the old format for compatibility reasons
+                    if (backend.getSimpleProvider() == provider.provider) {
+
+                        if (provider.provider == 'ec2') {
+                            fields.findBy('name', 'api_key').set('value', backend.apikey);
+                            fields.findBy('name', 'api_secret').set('value', 'getsecretfromdb');
+                        }
+                        if (provider.provider == 'rackspace') {
+                            fields.findBy('name', 'username').set('value', backend.apikey);
+                            fields.findBy('name', 'api_key').set('value', 'getsecretfromdb');
+                        }
+                        if (provider.provider == 'hpcloud') {
+                            fields.findBy('name', 'username').set('value', backend.apikey);
+                            fields.findBy('name', 'password').set('value', 'getsecretfromdb');
+                            fields.findBy('name', 'tenant_name').set('value', backend.tenant_name);
+                        }
+                    }
                 });
             },
 
@@ -84,137 +129,54 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
             actions: {
 
-                selectProvider: function(provider) {
-
-                    Mist.backendAddController._clear();
+                selectProvider: function (provider, field) {
                     this.clear();
-
-                    $('#new-backend-second-field').attr('type', 'password');
+                    clearProviderFields(provider);
+                    Mist.backendAddController.set('provider', provider);
                     $('#new-backend-provider').collapsible('collapse');
-                    $('#opentack-advanced-wrapper').hide();
-                    $('#openstack-bundle').hide();
-                    $('#tokenonly-bundle').hide();
-                    $('#baremetal-bundle').hide();
-                    $('#docker-bundle').hide();
-                    $('#hpcloud-bundle').hide();
-                    $('#non-hp-cloud').hide();
-                    $('#vcloud-bundle').hide();
-
-                    if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('softlayer') > -1) {
-                        this.set('firstFieldLabel', 'Username');
-                        this.set('secondFieldLabel', 'API Key');
-                    } else if (provider.provider.indexOf('nephoscale') > -1) {
-                        this.set('firstFieldLabel', 'Username');
-                        this.set('secondFieldLabel', 'Password');
-                    } else if (provider.provider.indexOf('digitalocean') > -1) {
-                        this.set('secondFieldLabel', 'Token');
-                        $('#common-bundle').hide();
-                        $('#tokenonly-bundle').show();
-                    } else if (provider.provider.indexOf('linode') > -1) {
-                        this.set('secondFieldLabel', 'API Key');
-                        $('#common-bundle').hide();
-                        $('#tokenonly-bundle').show();
-                    } else if (provider.provider.indexOf('gce') > -1) {
-                        this.set('firstFieldLabel', 'Email address');
-                        this.set('secondFieldLabel', '');
-                        $('#gce-bundle').show();
-                    } else if (provider.provider.indexOf('azure') > -1) {
-                        this.set('firstFieldLabel', 'Subscription ID');
-                        this.set('secondFieldLabel', '');
-                        $('#azure-bundle').show();
-                    } else if (provider.provider.indexOf('docker') > -1) {
-                        this.set('firstFieldLabel', 'BasicAuth User (optional)');
-                        this.set('secondFieldLabel', 'BasicAuth Password (optional)');
-                        $('#common-bundle').hide();
-                        $('#docker-bundle').show();
-                        Mist.backendAddController.set('newBackendPort', 4243);
-                    } else if (provider.provider.indexOf('hpcloud') > -1) {
-                        this.set('firstFieldLabel', 'Username');
-                        this.set('secondFieldLabel', 'Password');
-                        $('#hpcloud-bundle').show();
-                    } else if (provider.provider.indexOf('openstack') > -1) {
-                        this.set('firstFieldLabel', 'Username');
-                        this.set('secondFieldLabel', 'Password');
-                        $('#opentack-advanced-wrapper').show();
-                        $('#openstack-bundle').show();
-                    } else if (provider.provider.indexOf('vcloud') > -1) {
-                        this.set('firstFieldLabel', 'Username');
-                        this.set('secondFieldLabel', 'Password');
-                        $('#vcloud-bundle').show();
-                        Mist.backendAddController.set('newBackendHost', '');
-                    } else if (provider.provider.indexOf('bare_metal') > -1) {
-                        this.set('firstFieldLabel', 'Hostname');
-                        this.set('secondFieldLabel', 'User');
-                        Mist.backendAddController.set('newBackendSecondField', 'root');
-                        Mist.backendAddController.set('newBackendPort', 22);
-                        Ember.run.next(function () {
-                            $('#new-backend-key .ui-listview').listview('refresh');
-                            $('#new-backend-second-field').attr('type', '');
-                            $('#baremetal-bundle').show();
-                        });
-
-                    } else {
-                        this.set('firstFieldLabel', 'API Key');
-                        this.set('secondFieldLabel', 'API Secret');
-                    }
-
-                    Mist.backendAddController.set('newBackendProvider', provider);
-                    $('#new-backend-provider').collapsible('option', 'collapsedIcon', 'check');
-
-                    // Autocomplete credentials
-                    Mist.backendsController.content.some(function(backend) {
-                        if ((provider.provider.split('_')[0] == 'ec2' && backend.provider.split('_')[0] == 'ec2') ||
-                            (provider.provider.substr(0,9) == 'rackspace' && backend.provider.substr(0,9) == 'rackspace')) {
-                                Mist.backendAddController.set('newBackendFirstField', backend.apikey);
-                                Mist.backendAddController.set('newBackendSecondField', 'getsecretfromdb');
-                                return true;
-                            }
-                    });
+                    this.autocompleteCredentials(provider);
                 },
 
 
-                selectKey: function(key) {
-                    $('#new-backend-key').collapsible('collapse');
-                    Mist.backendAddController.set('newBackendKey', key);
+                selectRegion: function (region, field) {
+                    field.set('value', region.id);
+                    this.set('selectedRegion', region.location);
+                    $('#region').collapsible('collapse');
+
+                    // Append region to title
+                    var fields = this.get('providerFields');
+                    var title = fields.findBy('name', 'title');
+                    title.set('value', title.defaultValue + ' ' + region.location);
                 },
 
 
-                privateKeyClicked: function () {
-                    Mist.fileUploadController.open('Upload private key', 'Key',
+                uploadFile: function (field) {
+                    Mist.fileUploadController.open('Upload ' + field.label, field.label,
                         function (uploadedFile) {
-
-                            Mist.backendAddController.set('newBackendSecondField', uploadedFile);
-
-                            if (uploadedFile) {
-                                $('#gce-bundle a').addClass('ui-icon-check')
-                                    .removeClass('ui-icon-carat-u');
-                            } else {
-                                $('#gce-bundle a').removeClass('ui-icon-check')
-                                    .addClass('ui-icon-carat-u');
-                            }
+                            uploadedFile = uploadedFile.trim();
+                            field.set('value', uploadedFile);
+                            $('#' + field.name)
+                                .removeClass('ui-icon-plus')
+                                .removeClass('ui-icon-check')
+                                .addClass(uploadedFile ? 'ui-icon-check' : 'ui-icon-plus');
                         },
-                        Mist.backendAddController.get('newBackendSecondField')
+                        field.value
                     );
                 },
 
 
-                addCertificateClicked: function () {
-                    Mist.fileUploadController.open('Upload certificate', 'Certificate',
-                        function (uploadedFile) {
-                            Mist.backendAddController.set('newBackendSecondField',
-                                uploadedFile);
-                        },
-                        Mist.backendAddController.get('newBackendSecondField')
-                    );
+                selectKey: function (key, field) {
+                    $('#' + field.name).collapsible('collapse');
+                    field.set('value', key.id);
                 },
 
 
-                createKeyClicked: function() {
+                createKeyClicked: function (field) {
                     Mist.keyAddController.open( function (success, key) {
                         if (success) {
-                            Mist.backendAddController.set('newBackendKey', key);
-                            $('#new-backend-key').collapsible('collapse');
-                            $('#new-backend-key .ui-listview').listview('refresh');
+                            $('#' + field.name).collapsible('collapse');
+                            $('#' + field.name + ' .ui-listview').listview('refresh');
+                            field.set('value', key.id);
                         }
                     });
                 },
@@ -231,26 +193,9 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
 
                 advancedToggled: function () {
-                    var advanced = $('#non-hp-cloud');
-                    if (advanced.css('display') == 'none') {
-                        advanced.slideDown();
-                    } else {
-                        advanced.slideUp();
-                    }
+                    App.switchElementVisibility('backend-add-advanced');
                 }
             },
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
-
-            updateDoneButtonObserver: function() {
-                Ember.run.once(this, 'updateAddButton');
-            }.observes('Mist.backendsController.addingBackend', 'Mist.backendAddController.formReady')
         });
     }
 );

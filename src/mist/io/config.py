@@ -78,6 +78,162 @@ LINODE_DATACENTERS = {
     8: 'Tokyo, JP'
 }
 
+SUPPORTED_PROVIDERS_V_2 = [
+    # BareMetal
+    {
+        'title': 'Other Server',
+        'provider': 'bare_metal',
+        'regions': []
+    },
+    # Azure
+    {
+        'title': 'Azure',
+        'provider': Provider.AZURE,
+        'regions': []
+    },
+    # EC2
+    {
+        'title': 'EC2',
+        'provider': 'ec2',
+        'regions': [
+            {
+                'location': 'Tokyo',
+                'id': Provider.EC2_AP_NORTHEAST
+            },
+            {
+                'location': 'Singapore',
+                'id': Provider.EC2_AP_SOUTHEAST
+            },
+            {
+                'location': 'Sydney',
+                'id': Provider.EC2_AP_SOUTHEAST2
+            },
+            {
+                'location': 'Ireland',
+                'id': Provider.EC2_EU_WEST
+            },
+            {
+                'location': 'Sao Paulo',
+                'id': Provider.EC2_SA_EAST
+            },
+            {
+                'location': 'N. Virginia',
+                'id': Provider.EC2_US_EAST
+            },
+            {
+                'location': 'N. California',
+                'id': Provider.EC2_US_WEST
+            },
+            {
+                'location': 'Oregon',
+                'id': Provider.EC2_US_WEST_OREGON
+            },
+        ]
+    },
+    # GCE
+    {
+        'title': 'Google Compute Engine',
+        'provider': Provider.GCE,
+        'regions': []
+    },
+
+    # NephoScale
+    {
+        'title': 'NephoScale',
+        'provider': Provider.NEPHOSCALE,
+        'regions': []
+    },
+    # DigitalOcean
+    {
+        'title': 'DigitalOcean',
+        'provider': Provider.DIGITAL_OCEAN,
+        'regions': []
+    },
+    # Linode
+    {
+        'title': 'Linode',
+        'provider': Provider.LINODE,
+        'regions': []
+    },
+    # OpenStack TODO: re-enable & test
+    {
+        'title': 'OpenStack',
+        'provider': Provider.OPENSTACK,
+        'regions': []
+    },
+    # Rackspace
+    {
+        'title': 'Rackspace',
+        'provider': 'rackspace',
+        'regions': [
+            {
+                'location': 'Dallas',
+                'id': 'dfw'
+            },
+            {
+                'location': 'Chicago',
+                'id': 'ord'
+            },
+            {
+                'location': 'N. Virginia',
+                'id': 'iad'
+            },
+            {
+                'location': 'London',
+                'id': 'lon'
+            },
+            {
+                'location': 'Sydney',
+                'id': 'syd'
+            },
+            {
+                'location': 'Hong Kong',
+                'id': 'hkg'
+            },
+            {
+                'location': 'US-First Gen',
+                'id': 'rackspace_first_gen:us'
+            },
+            {
+                'location': 'UK-First Gen',
+                'id': 'rackspace_first_gen:uk'
+            },
+        ]
+    },
+    # Softlayer
+    {
+        'title': 'SoftLayer',
+        'provider': Provider.SOFTLAYER,
+        'regions': []
+    },
+    #HP Cloud
+    {
+        'title': 'HP Helion Cloud',
+        'provider': Provider.HPCLOUD,
+        'regions': [
+            {
+                'location': 'US West',
+                'id': 'region-a.geo-1'
+            },
+            {
+                'location': 'US East',
+                'id': 'region-b.geo-1'
+            }
+        ]
+    },
+    # Docker
+    {
+        'title': 'Docker',
+        'provider': Provider.DOCKER,
+        'regions': []
+    },
+    # vCloud
+    {
+        'title': 'VMware vCloud',
+        'provider': Provider.VCLOUD,
+        'regions': []
+    }
+]
 
 SUPPORTED_PROVIDERS = [
     # BareMetal
