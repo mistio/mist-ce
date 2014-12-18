@@ -1,1 +1,0 @@
-src/mist/io/static/build/mist.js
