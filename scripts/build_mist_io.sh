@@ -181,6 +181,9 @@ function commitChanges {
 
 function main {
     parseArgs $@
+    if [ ! -d "$WORKSPACE" ]; then
+        WORKSPACE=`pwd`
+    fi
     updateRepo
     prepareRJS
     buildHTML
