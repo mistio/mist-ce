@@ -169,7 +169,8 @@ function commitChanges {
             sed s%resources/mist.*%resources/mist-$TIME_NOW\.css\"%g -i $home_pt
 
             git commit -a -m "Automated build of mist.js & mist.css "
-            git push
+            BRANCH=`git branch | awk '/\*/ { print $2; }'`
+            git push -u origin ${BRANCH}
         else
             echo "Already committed"
             git stash
