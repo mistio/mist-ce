@@ -249,7 +249,7 @@
    :jsonparam string machine_ip: *(required)* IP of your server
    :jsonparam string machine_user: *(required)* User to connect with your server
    :jsonparam string machine_key: *(required)* The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.
-   :jsonparam string machine_port: *(optional)* By default it will be ```22```, but you can alter this if your ssh-server listen to another port 
+   :jsonparam string machine_port: *(optional)* By default it will be ```22```, but you can alter this if your ssh-server listen to another port
 
    **Example response**:
 
