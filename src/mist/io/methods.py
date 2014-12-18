@@ -269,7 +269,7 @@ def add_backend_v_2(user, title, provider, params):
     with user.lock_n_load():
         user.backends[backend_id] = backend
         user.save()
-    log.info("Backend with id '%s' added succesfully.", backend_id)
+    log.info("Backend with id '%s' added succesfully with Api-Version: 2.", backend_id)
     trigger_session_update(user.email, ['backends'])
     return backend_id
 
