@@ -36,12 +36,14 @@ Feature: Machines
 
     When I choose the "randomly_created" machine
     And I click the "Power" button
+    And I wait for 1 seconds
     And I click the "Reboot" button
     And I wait for 1 seconds
     And I click the "Yes" button
     Then "randomly_created" machine state should be "running" within 200 seconds
 
     When I click the "Power" button
+    And I wait for 1 seconds
     And I click the "Destroy" button
     And I wait for 1 seconds
     And I click the "Yes" button
