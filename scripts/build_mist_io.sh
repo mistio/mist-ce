@@ -169,7 +169,8 @@ function commitChanges {
             sed s%resources/mist.*%resources/mist-$TIME_NOW\.css\"%g -i $home_pt
 
             git commit -a -m "Automated build of mist.js & mist.css "
-            git push
+            BRANCH=`git branch | awk '/\*/ { print $2; }'`
+            git push -u origin ${BRANCH}
         else
             echo "Already committed"
             git stash
@@ -178,8 +179,29 @@ function commitChanges {
 }
 
 
+function checkDependencies {
+    command -v node
+    if [ $? == 1 ]; then
+        echo "Node is required! Cannot find node package"
+        exit 1
+    fi
+
+    command -v ember-precompile
+    if [ $? == 1 ]; then
+        echo "ember-precompile is required!"
+        echo ">>> npm install -g ember-precompile"
+        exit 1
+    fi
+
+}
+
+
 function main {
+    checkDependencies
     parseArgs $@
+    if [ ! -d "$WORKSPACE" ]; then
+        WORKSPACE=`pwd`
+    fi
     updateRepo
     prepareRJS
     buildHTML
