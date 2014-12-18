@@ -65,25 +65,12 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             addBackend: function (args) {
 
-                var key = Mist.keysController.keyExists(args.key) ? args.key : null;
+                var key = Mist.keysController.keyExists(args.payload.key) ? args.payload.key : null;
 
                 var that = this;
                 this.set('addingBackend', true);
-                Mist.ajax.POST('/backends', {
-                    'title'       : args.title,
-                    'provider'    : args.provider,
-                    'apikey'      : args.APIKey,
-                    'apisecret'   : args.APISecret,
-                    'apiurl'      : args.APIURL || args.dockerURL,
-                    'tenant_name' : args.tenant,
-                    'region'      : args.region,
-                    'machine_key' : key,
-                    'compute_endpoint' : args.computeEndpoint,
-                    'docker_port' : args.port,
-                    'machine_port': args.port,      // For bare-metal
-                    'machine_ip'  : args.APIKey,    // For bare-metal
-                    'machine_user': args.APISecret  // For bare-metal
-                }).success(function (backend) {
+                Mist.ajax.POST('/backends', args.payload)
+                .success(function (backend) {
                     that._addBackend(backend, key);
                 }).error(function (message) {
                     Mist.notificationController.notify(
@@ -204,7 +191,22 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
 
             providerList: function() {
-                return SUPPORTED_PROVIDERS.sortBy('title');
+                return SUPPORTED_PROVIDERS.map(function (provider) {
+                    provider.className = 'provider-';
+                    provider.className += provider.provider == 'bare_metal' ?
+                        'baremetal' : provider.provider;
+                    return provider;
+                }).sort(function (a, b) {
+                    if (a.provider == 'bare_metal')
+                        return 1;
+                    if (b.provider == 'bare_metal')
+                        return -1;
+                    if (a.title > b.title)
+                        return 1;
+                    if (a.title < b.title)
+                        return -1
+                    return 0;
+                });
             }.property('providerList'),
 
 
