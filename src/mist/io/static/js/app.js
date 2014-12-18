@@ -1,5 +1,5 @@
 startTimer();
-var a;
+
 // Define libraries
 require.config({
     baseUrl: 'resources/js/',
