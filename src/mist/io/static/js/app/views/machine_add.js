@@ -159,6 +159,11 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                         $('#create-machine-network').hide();
                         $('label[for=create-machine-script]').text('Script:');
                     }
+                    if (backend.get('isDocker')) {
+                        $('#create-machine-panel #location').hide();
+                    } else {
+                        $('#create-machine-panel #location').show();
+                    }
                 },
 
 

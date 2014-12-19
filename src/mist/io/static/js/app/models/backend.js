@@ -48,6 +48,11 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             }.property('provider'),
 
 
+            isDocker: function () {
+                return this.provider == 'docker';
+            }.property('provider'),
+
+
             hasNetworks: function () {
                 return this.provider == 'openstack' ||
                     this.provider == 'vcloud';

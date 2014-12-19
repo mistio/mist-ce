@@ -124,24 +124,25 @@
 
         <!-- Select Location -->
 
-        <label>Location:</label>
-        <div id="create-machine-location"
-             data-role="collapsible"
-             data-iconpos="right"
-             data-collapsed-icon="arrow-d"
-             data-expanded-icon="arrow-u"
-             data-theme="a"
-             class="mist-select">
-            <h2>{{Mist.machineAddController.newMachineLocation.name}}</h2>
-            <ul data-role="listview" data-theme="a">
-                {{#each Mist.machineAddController.newMachineProvider.locations.content}}
-                <li data-icon="false">
-                    <a {{action "selectLocation" this target="view"}}>{{this.name}}</a>
-                </li>
-                {{/each}}
-            </ul>
+        <div id="location">
+            <label>Location:</label>
+            <div id="create-machine-location"
+                 data-role="collapsible"
+                 data-iconpos="right"
+                 data-collapsed-icon="arrow-d"
+                 data-expanded-icon="arrow-u"
+                 data-theme="a"
+                 class="mist-select">
+                <h2>{{Mist.machineAddController.newMachineLocation.name}}</h2>
+                <ul data-role="listview" data-theme="a">
+                    {{#each Mist.machineAddController.newMachineProvider.locations.content}}
+                    <li data-icon="false">
+                        <a {{action "selectLocation" this target="view"}}>{{this.name}}</a>
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
         </div>
-
 
         <!-- Select Key -->
 
