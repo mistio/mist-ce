@@ -162,6 +162,16 @@
                    data-theme="a"
                    valueBinding="Mist.machineAddController.newMachineCommand"}}
 
+            <!-- Daemonize -->
+            <div id="create-machine-daemonize">
+                <label>
+                {{view Mist.Checkbox
+                   data-theme="a"
+                   data-mini="true"
+                   checkedBinding="Mist.machineAddController.newMachineDaemon"}}
+                Daemonize
+                </label>
+            </div>
         </div>
 
         <!-- Select Key -->
@@ -231,15 +241,7 @@
         </div>
 
         <div class="docker">
-            <!-- Deamonize -->
-            <div id="create-machine-deamonize">
-                <label>
-                {{view Mist.Checkbox
-                   data-theme="a"
-                   checkedBinding="Mist.machineAddController.newMachineDeamon"}}
-                Deamonize
-                </label>
-            </div>
+
         </div>
 
         <div id="create-machine-cost">
