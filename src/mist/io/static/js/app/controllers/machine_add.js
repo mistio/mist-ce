@@ -34,6 +34,7 @@ define('app/controllers/machine_add', ['ember'],
                 // In case page is scrolled, opening the
                 // panel introduces an unpleasant view.
                 // Scrolling to top fixes that
+                $('#create-machine-panel .docker').hide();
                 $('.ui-page-active').animate({scrollTop:0}, 'slow');
                 $('#create-machine-panel .ui-panel-inner').animate({scrollTop:0}, 'slow');
                 $('#create-machine-panel').panel('open');
