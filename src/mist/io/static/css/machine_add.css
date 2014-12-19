@@ -5,6 +5,9 @@
     min-width: 320px;
     width: 45%;
 }
+#create-machine-panel .docker {
+	display:none;
+}
 #create-machine-panel label {
     margin-top: 10px;
 }

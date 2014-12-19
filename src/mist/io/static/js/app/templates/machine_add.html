@@ -144,6 +144,26 @@
             </div>
         </div>
 
+        <!-- Docker Specific -->
+
+        <div class="docker">
+
+            <!-- Environment Vars -->
+            <label for="create-machine-env">Environment Variables:</label>
+            {{view Mist.TextArea
+                   id="create-machine-env"
+                   data-theme="a"
+                   valueBinding="Mist.machineAddController.newMachineEnv"}}
+
+            <!-- Command -->
+            <label for="create-machine-command">Command:</label>
+            {{view Mist.TextArea
+                   id="create-machine-command"
+                   data-theme="a"
+                   valueBinding="Mist.machineAddController.newMachineCommand"}}
+
+        </div>
+
         <!-- Select Key -->
 
         <label>Key:</label>
@@ -192,11 +212,13 @@
 
         <!-- Select Script -->
 
-        <label for="create-machine-script">Script:</label>
-        {{view Mist.TextArea
-               id="create-machine-script"
-               data-theme="a"
-               valueBinding="Mist.machineAddController.newMachineScript"}}
+        <div id="script">
+            <label for="create-machine-script">Script:</label>
+            {{view Mist.TextArea
+                   id="create-machine-script"
+                   data-theme="a"
+                   valueBinding="Mist.machineAddController.newMachineScript"}}
+        </div>
 
         <!-- Enable monitoring -->
         <div id="create-machine-monitoring" class="ui-state-disabled">
@@ -206,6 +228,18 @@
                checkedBinding="Mist.machineAddController.newMachineMonitoring"}}
             Enable monitoring
             </label>
+        </div>
+
+        <div class="docker">
+            <!-- Deamonize -->
+            <div id="create-machine-deamonize">
+                <label>
+                {{view Mist.Checkbox
+                   data-theme="a"
+                   checkedBinding="Mist.machineAddController.newMachineDeamon"}}
+                Deamonize
+                </label>
+            </div>
         </div>
 
         <div id="create-machine-cost">

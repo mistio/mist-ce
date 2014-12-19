@@ -148,6 +148,8 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     $('#create-machine-location').addClass('ui-state-disabled');
                     $('#create-machine-size').addClass('ui-state-disabled');
                     $('#create-machine-key').addClass('ui-state-disabled');
+                    $('#create-machine-panel .docker textarea').addClass('ui-state-disabled');
+                    $('#create-machine-panel .docker .ui-checkbox').addClass('ui-state-disabled');
                     $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
 
                     if (backend.get('hasNetworks')) {
@@ -161,8 +163,14 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     }
                     if (backend.get('isDocker')) {
                         $('#create-machine-panel #location').hide();
+                        $('#create-machine-panel .docker').show();
+                        $('#script').hide();
+                        $('#create-machine-monitoring').hide();
                     } else {
                         $('#create-machine-panel #location').show();
+                        $('#create-machine-panel .docker').hide();
+                        $('#script').show();
+                        $('#create-machine-monitoring').show();
                     }
                 },
 
@@ -180,6 +188,8 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                    $('#create-machine-location').addClass('ui-state-disabled');
                    $('#create-machine-size').removeClass('ui-state-disabled');
                    $('#create-machine-key').addClass('ui-state-disabled');
+                   $('#create-machine-panel .docker textarea').addClass('ui-state-disabled');
+                   $('#create-machine-panel .docker .ui-checkbox').addClass('ui-state-disabled');
                    $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
                 },
 
@@ -192,6 +202,8 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                                              .set('newMachineSize', size);
 
                     $('#create-machine-location').removeClass('ui-state-disabled');
+                    $('#create-machine-panel .docker textarea').removeClass('ui-state-disabled');
+                    $('#create-machine-panel .docker .ui-checkbox').removeClass('ui-state-disabled');
                     $('#create-machine-key').addClass('ui-state-disabled');
                     $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
 
@@ -249,6 +261,8 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 this.fieldIsReady('key');
 
                 Mist.machineAddController.set('newMachineKey', key);
+                $('#script').show();
+                $('#create-machine-monitoring').show();
                 $('#create-machine-monitoring').removeClass('ui-state-disabled');
                 $('#create-machine-network .ui-collapsible')
                     .removeClass('ui-state-disabled')
