@@ -153,11 +153,11 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     if (backend.get('hasNetworks')) {
                         if (backend.networks.content.length > 0) {
                             $('#create-machine-network').show();
-                            $('label[for=create-machine-script]').text('8. Script:');
+                            $('label[for=create-machine-script]').text('Script:');
                         }
                     } else {
                         $('#create-machine-network').hide();
-                        $('label[for=create-machine-script]').text('7. Script:');
+                        $('label[for=create-machine-script]').text('Script:');
                     }
                 },
 
