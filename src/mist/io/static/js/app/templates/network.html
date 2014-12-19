@@ -110,12 +110,13 @@
                                 <td>{{this.ipaddress}}</td>
                                 <td>
                                     <div class="reserved">
-                                        <select name="flip-7" id="flip-7" data-role="flipswitch" data-mini="true">
+                                        <select name="flip-7" id="flip-7" data-role="slider" data-mini="true"
+                                                {{action "reservedToggleSwitched" target="view" on="change"}}>
                                             <option value="off"></option>
                                             <option value="on">Reserved</option>
                                         </select>
                                     </div>
-                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+                                    <fieldset data-role="controlgroup" data-type="horizontal">
                                         <select name="machine-select" data-mini="true">
                                             <option value="#">{{this.server.name}}</option>
                                             <option value="#">Two</option>

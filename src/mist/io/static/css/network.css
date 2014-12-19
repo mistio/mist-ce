@@ -21,3 +21,7 @@
     float: right;
     margin: .5em;
 }
+
+#single-network-page .reserved .ui-slider {
+    width: 110px;
+}

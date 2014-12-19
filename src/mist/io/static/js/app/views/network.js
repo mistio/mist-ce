@@ -93,6 +93,10 @@ define('app/views/network', ['app/views/mistscreen'],
                             });
                         }
                     );
+                },
+
+                reservedToggleSwitched: function() {
+                    alert('yo!');
                 }
             },
 
