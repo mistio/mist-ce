@@ -53,7 +53,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             hasNetworks: function () {
                 return this.provider == 'openstack' ||
-                    this.provider == 'azure';
+                    this.provider == 'azure' || this.provider == 'vcloud';
             }.property('provider'),
 
             /**

@@ -1,5 +1,11 @@
 .. http:get:: /providers
 
+   In each GET API request, you have to include the ```Api-Version``` header
+
+   .. sourcecode:: http
+
+       {'Api-Version':2}
+
    List of all supported providers
 
    **Example request**:
@@ -14,107 +20,43 @@
 
    .. sourcecode:: http
 
-        {
-          "supported_providers": [
-            {
-              "provider": "bare_metal",
-              "title": "Bare Metal Server"
-            },
-            {
-              "provider": "ec2_ap_northeast",
-              "title": "EC2 AP NORTHEAST"
-            },
-            {
-              "provider": "ec2_ap_southeast",
-              "title": "EC2 AP SOUTHEAST"
-            },
-            {
-              "provider": "ec2_ap_southeast_2",
-              "title": "EC2 AP Sydney"
-            },
-            {
-              "provider": "ec2_eu_west",
-              "title": "EC2 EU Ireland"
-            },
-            {
-              "provider": "ec2_sa_east",
-              "title": "EC2 SA EAST"
-            },
-            {
-              "provider": "ec2_us_east",
-              "title": "EC2 US EAST"
-            },
-            {
-              "provider": "ec2_us_west",
-              "title": "EC2 US WEST"
-            },
-            {
-              "provider": "ec2_us_west_oregon",
-              "title": "EC2 US WEST OREGON"
-            },
-            {
-              "provider": "nephoscale",
-              "title": "NephoScale"
-            },
-            {
-              "provider": "digitalocean",
-              "title": "DigitalOcean"
-            },
-            {
-              "provider": "linode",
-              "title": "Linode"
-            },
-            {
-              "provider": "openstack",
-              "title": "OpenStack"
-            },
-            {
-              "provider": "rackspace:dfw",
-              "title": "Rackspace DFW"
-            },
-            {
-              "provider": "rackspace:ord",
-              "title": "Rackspace ORD"
-            },
-            {
-              "provider": "rackspace:iad",
-              "title": "Rackspace IAD"
-            },
-            {
-              "provider": "rackspace:lon",
-              "title": "Rackspace LON"
-            },
-            {
-              "provider": "rackspace:syd",
-              "title": "Rackspace AU"
-            },
-            {
-              "provider": "rackspace_first_gen:us",
-              "title": "Rackspace US (OLD)"
-            },
-            {
-              "provider": "rackspace_first_gen:uk",
-              "title": "Rackspace UK (OLD)"
-            },
-            {
-              "provider": "softlayer",
-              "title": "SoftLayer"
-            },
-            {
-              "provider": "openstack:az-1.region-a.geo-1",
-              "title": "HP Cloud US West AZ 1"
-            },
-            {
-              "provider": "openstack:az-2.region-a.geo-1",
-              "title": "HP Cloud US West AZ 2"
-            },
-            {
-              "provider": "openstack:az-3.region-a.geo-1",
-              "title": "HP Cloud US West AZ 3"
-            },
-            {
-              "provider": "openstack:region-b.geo-1",
-              "title": "HP Cloud US East"
-            }
-          ]
-        }
+    {u'supported_providers':
+    [
+      {u'provider': u'bare_metal',
+       u'regions': [],
+       u'title': u'Other Server'},
+      {u'provider': u'azure', u'regions': [], u'title': u'Azure'},
+      {u'provider': u'ec2',
+       u'regions': [{u'id': u'ec2_ap_northeast', u'location': u'Tokyo'},
+        {u'id': u'ec2_ap_southeast', u'location': u'Singapore'},
+        {u'id': u'ec2_ap_southeast_2', u'location': u'Sydney'},
+        {u'id': u'ec2_eu_west', u'location': u'Ireland'},
+        {u'id': u'ec2_sa_east', u'location': u'Sao Paulo'},
+        {u'id': u'ec2_us_east', u'location': u'N. Virginia'},
+        {u'id': u'ec2_us_west', u'location': u'N. California'},
+        {u'id': u'ec2_us_west_oregon', u'location': u'Oregon'}],
+       u'title': u'EC2'},
+      {u'provider': u'gce', u'regions': [], u'title': u'Google Compute Engine'},
+      {u'provider': u'nephoscale', u'regions': [], u'title': u'NephoScale'},
+      {u'provider': u'digitalocean', u'regions': [], u'title': u'DigitalOcean'},
+      {u'provider': u'linode', u'regions': [], u'title': u'Linode'},
+      {u'provider': u'openstack', u'regions': [], u'title': u'OpenStack'},
+      {u'provider': u'rackspace',
+       u'regions': [{u'id': u'dfw', u'location': u'Dallas'},
+        {u'id': u'ord', u'location': u'Chicago'},
+        {u'id': u'iad', u'location': u'N. Virginia'},
+        {u'id': u'lon', u'location': u'London'},
+        {u'id': u'syd', u'location': u'Sydney'},
+        {u'id': u'hkg', u'location': u'Hong Kong'},
+        {u'id': u'rackspace_first_gen:us', u'location': u'US-First Gen'},
+        {u'id': u'rackspace_first_gen:uk', u'location': u'UK-First Gen'}],
+       u'title': u'Rackspace'},
+      {u'provider': u'softlayer', u'regions': [], u'title': u'SoftLayer'},
+      {u'provider': u'hpcloud',
+       u'regions': [{u'id': u'region-a.geo-1', u'location': u'US West'},
+        {u'id': u'region-b.geo-1', u'location': u'US East'}],
+       u'title': u'HP Helion Cloud'},
+      {u'provider': u'docker', u'regions': [], u'title': u'Docker'},
+      {u'provider': u'vcloud', u'regions': [], u'title': u'VMware vCloud'}
+      ]
+      }
