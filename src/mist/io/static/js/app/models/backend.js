@@ -60,7 +60,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
 
             className: function () {
-                return PROVIDER_MAP[this.get('provider')].get('className');
+                return PROVIDER_MAP[this.getSimpleProvider()].get('className');
             }.property('provider'),
 
 
