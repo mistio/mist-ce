@@ -165,12 +165,10 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                         $('#create-machine-panel #location').hide();
                         $('#create-machine-panel .docker').show();
                         $('#script').hide();
-                        $('#create-machine-monitoring').hide();
                     } else {
                         $('#create-machine-panel #location').show();
                         $('#create-machine-panel .docker').hide();
                         $('#script').show();
-                        $('#create-machine-monitoring').show();
                     }
                 },
 
@@ -262,7 +260,6 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                 Mist.machineAddController.set('newMachineKey', key);
                 $('#script').show();
-                $('#create-machine-monitoring').show();
                 $('#create-machine-monitoring').removeClass('ui-state-disabled');
                 $('#create-machine-network .ui-collapsible')
                     .removeClass('ui-state-disabled')
