@@ -22,6 +22,7 @@ define('app/models/network', ['ember'],
             name: null,
             status: null,
             subnets: null,
+            ipaddresses: null,
             backend: null,
             selected: null,
         });

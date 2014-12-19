@@ -11,7 +11,6 @@
     </div>
 
     <div data-role="content" data-theme="c">
-        {{#if Mist.backendsController.hasOpenStack}}
         <a id="network-create-btn"
             class="responsive-button"
             data-role="button"
@@ -19,7 +18,6 @@
             data-iconpos="right"
             data-theme="d"
             {{action "createClicked" target="view"}}>Create</a>
-        {{/if}}
         <ul id="networks"
             data-role="listview"
             data-inset="true"

@@ -1,10 +1,23 @@
 /* Network View CSS
 ------------------------------------------------------------------------------*/
 
-#single-network-page .subnet-name {
+#single-network-page .subnet-name{
     background-color: #E8E8E8;
+}
+
+#single-network-page .usable-ips h4{
+    margin-top: 0px;
+}
+
+#single-network-page .usable-ips table {
+    width: 100%;
 }
 
 #single-network-page .single-action-footer {
 	display: block;
+}
+
+#single-network-page .reserved {
+    float: right;
+    margin: .5em;
 }

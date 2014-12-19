@@ -12,6 +12,8 @@ from hashlib import sha256
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
 
+from netaddr import IPSet, IPNetwork
+
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.base import NodeAuthSSHKey
@@ -1771,24 +1773,82 @@ def list_networks(user, backend_id):
     conn = connect_provider(backend)
 
     ret = []
+
+    ## Get the ip addreses of running machines to begin with, use cached 
+    ## list_machines response if there's a fresh one
+    #task = mist.io.tasks.ListMachines()
+    #task_result = task.smart_delay(user.email, backend_id, blocking=True)
+    #machines = task_result.get('machines', [])
+    
+    # Separate public & private ips, create ip2machine map
+    #public_ips = IPSet()
+    #private_ips = IPSet()
+    #ips = []
+    #ip2machine = {}
+    #for machine in machines:
+    #    for i in machine['public_ips']:
+    #        public_ips.add(i)
+    #    for i in machine['private_ips']:
+    #        private_ips.add(i)
+    #    #for i in machine['public_ips'] + machine['private_ips']:
+    #    #    ip2machine[i] = machine['id']
+
+    # Get the actual networks
     if conn.type in [Provider.NEPHOSCALE]:
         networks = conn.ex_list_networks()
-
         for network in networks:
-            ret.append({
-                'id': network.id,
-                'name': network.name,
-                'extra': network.extra,
-            })
-
-        return ret
+            ret.append(nephoscale_network_to_dict(network))
     elif conn.type in [Provider.OPENSTACK]:
         networks = conn.ex_list_neutron_networks()
         for network in networks:
             ret.append(openstack_network_to_dict(network))
-        return ret
-    else:
-        return ret
+    elif conn.type in [Provider.GCE]:
+        networks = conn.ex_list_networks()
+        for network in networks:
+            ret.append(gce_network_to_dict(network))
+    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST, 
+                       Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2, 
+                       Provider.EC2_EU, Provider.EC2_EU_WEST, 
+                       Provider.EC2_SA_EAST, Provider.EC2_US_EAST, 
+                       Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON]:
+        networks = conn.ex_list_networks()
+        for network in networks:
+            ret.append(ec2_network_to_dict(network))        
+    return ret
+
+
+def ec2_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['is_default'] = network.extra.get('is_default', False)
+    net['state'] = network.extra.get('state')
+    net['instance_tenancy'] = network.extra.get('instance_tenancy')
+    net['dhcp_options_id'] = network.extra.get('dhcp_options_id')
+    net['tags'] = network.extra.get('tags', [])
+    net['subnets'] = [{'name': network.cidr_block}]
+    return net
+
+
+def nephoscale_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['subnets'] = network.subnets
+    net['is_default'] = network.is_default
+    net['zone'] = network.zone
+    net['domain_type'] = network.domain_type
+    return net
+
+
+def gce_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['extra'] = network.extra
+    net['subnets'] = [{'name': network.cidr,
+                       'gateway_ip': network.extra.get('gatewayIPv4')}]
+    return net
 
 
 def openstack_network_to_dict(network):

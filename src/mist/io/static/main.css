@@ -4,7 +4,7 @@
 
 @import url('theme.css');
 @import url('images/sprite-build/sprites.css');
-@import url('jquery.mobile.structure-1.4.0.min.css');
+@import url('jquery.mobile.structure-1.4.5.min.css');
 
 @import url("css/key.css");
 @import url("css/home.css");
@@ -632,6 +632,9 @@ ul.checkbox-list li label {
 }
 .info-table tr {
     background-color: #F7F7F7;
+}
+.info-table tr.strong {
+    background-color: #E8E8E8;;
 }
 .info-table .ip {
     display: inline-block;

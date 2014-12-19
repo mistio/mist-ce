@@ -8,7 +8,7 @@ require.config({
         text: 'lib/require/text',
         ember: 'lib/ember-1.5.1.min',
         jquery: 'lib/jquery-2.1.1.min',
-        jqm: 'lib/jquery.mobile-1.4.2.min',
+        jqm: 'lib/jquery.mobile-1.4.5.min',
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
@@ -665,6 +665,8 @@ var loadApp = function (
         attributeBindings: [
             'data-mini',
             'data-theme',
+            'data-icon',
+            'data-icon-position',
             'data-disabled'
         ]
     });

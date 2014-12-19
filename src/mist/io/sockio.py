@@ -204,6 +204,9 @@ class MistNamespace(CustomNamespace):
             if routing_key == 'probe':
                 log.warn('send probe')
 
+            if routing_key == 'list_networks':
+                backend_id = msg.body['backend_id']                
+                log.warn('Got networks from %s' % self.user.backends[backend_id].title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = msg.body['machines']

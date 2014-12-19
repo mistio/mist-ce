@@ -327,7 +327,7 @@ class UserTask(Task):
             self._ut_cache = MemcacheClient(["127.0.0.1:11211"])
         return self._ut_cache
 
-    def smart_delay(self, *args, **kwargs):
+    def smart_delay(self, *args,  **kwargs):
         """Return cached result if it exists, send job to celery if needed"""
         # check cache
         id_str = json.dumps([self.task_key, args, kwargs])
@@ -337,12 +337,18 @@ class UserTask(Task):
             age = time() - cached['timestamp']
             if age > self.result_fresh:
                 amqp_log("%s: scheduling task" % id_str)
-                self.delay(*args, **kwargs)
+                if kwargs.pop('blocking', None):
+                    return self.execute(*args, **kwargs)
+                else:
+                    self.delay(*args, **kwargs)
             if age < self.result_expires:
                 amqp_log("%s: smart delay cache hit" % id_str)
                 return cached['payload']
         else:
-            self.delay(*args, **kwargs)
+            if kwargs.pop('blocking', None):
+                return self.execute(*args, **kwargs)
+            else:
+                self.delay(*args, **kwargs)
 
     def clear_cache(self, *args, **kwargs):
         id_str = json.dumps([self.task_key, args, kwargs])
@@ -475,9 +481,11 @@ class ListNetworks(UserTask):
     polling = False
 
     def execute(self, email, backend_id):
+        log.warn('Running list networks for user %s backend %s' % (email, backend_id))
         from mist.io import methods
         user = user_from_email(email)
         networks = methods.list_networks(user, backend_id)
+        log.warn('Returning list networks for user %s backend %s' % (email, backend_id))        
         return {'backend_id': backend_id, 'networks': networks}
 
 
@@ -489,9 +497,11 @@ class ListImages(UserTask):
     polling = False
 
     def execute(self, email, backend_id):
+        log.warn('Running list images for user %s backend %s' % (email, backend_id))        
         from mist.io import methods
         user = user_from_email(email)
         images = methods.list_images(user, backend_id)
+        log.warn('Returning list images for user %s backend %s' % (email, backend_id))                
         return {'backend_id': backend_id, 'images': images}
 
 

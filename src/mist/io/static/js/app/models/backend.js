@@ -47,6 +47,10 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 return this.provider == 'openstack';
             }.property('provider'),
 
+            isNephoscale: function () {
+                return this.provider == 'nephoscale';
+            }.property('provider'),
+
             hasNetworks: function () {
                 return this.provider == 'openstack' ||
                     this.provider == 'azure';

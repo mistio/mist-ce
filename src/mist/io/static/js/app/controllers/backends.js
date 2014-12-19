@@ -385,7 +385,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 Ember.run(this, function() {
                     var counter = 0;
                     this.content.forEach(function (backend) {
-                        if (backend.enabled && backend.provider == 'openstack')
+                        if (backend.enabled)
                             counter += backend.networkCount;
                     });
                     this.set('networkCount', counter);
