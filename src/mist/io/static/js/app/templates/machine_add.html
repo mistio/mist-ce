@@ -66,16 +66,32 @@
              data-expanded-icon="arrow-u"
              data-theme="a"
              class="mist-select">
-            <h2>{{Mist.machineAddController.newMachineImage.name}}</h2>
+            <h2>
+                {{#if Mist.machineAddController.newMachineImage.id}}
+                    <span class="image-icon-small">
+                        <span {{bind-attr class="Mist.machineAddController.newMachineImage.className"}}>
+                        </span>
+                    </span>
+                {{/if}}
+                {{Mist.machineAddController.newMachineImage.name}}
+            </h2>
             <ul data-role="listview" data-theme="a">
                 {{#each Mist.machineAddController.newMachineProvider.images.content}}
                     {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
                         <li data-icon="false">
+                            <span class="image-icon-small">
+                                <span {{bind-attr class="this.className"}}></span>
+                            </span>
                             <a {{action "selectImage" this target="view"}}>{{this.name}}</a>
                         </li>
                     {{else}} {{#if this.star}}
                         <li data-icon="false">
-                            <a {{action "selectImage" this target="view"}}>{{this.name}}</a>
+                            <a {{action "selectImage" this target="view"}}>
+                                <span class="image-icon-small">
+                                    <span {{bind-attr class="this.className"}}></span>
+                                </span>
+                                {{this.name}}
+                            </a>
                         </li>
                     {{/if}} {{/unless}}
                 {{/each}}

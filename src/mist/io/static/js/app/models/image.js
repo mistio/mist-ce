@@ -17,7 +17,11 @@ define('app/models/image', ['ember'],
 
             toggle: function (callback) {
                 this.backend.toggleImageStar(this, callback);
-            }
+            },
+
+            className: function () {
+                return 'image-' + this.backend.images.getImageOS(this.get('id'));
+            }.property('id'),
         });
     }
 );

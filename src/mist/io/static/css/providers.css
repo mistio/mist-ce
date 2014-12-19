@@ -9,13 +9,15 @@
     float: left;
 }
 
-.provider-icon-small {
+.provider-icon-small,
+.image-icon-small {
     float:left;
     width: 24px;
     height: 24px;
 }
 
-.provider-icon-small span {
+.provider-icon-small span,
+.image-icon-small span {
     display: block;
     height: 50px;
     width: 50px;
