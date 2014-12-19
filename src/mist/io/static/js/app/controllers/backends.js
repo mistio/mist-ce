@@ -192,9 +192,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS.map(function (provider) {
-                    provider.className = 'provider-';
-                    provider.className += provider.provider == 'bare_metal' ?
-                        'baremetal' : provider.provider;
+                    provider.className = PROVIDER_MAP[provider.provider].className;
                     return provider;
                 }).sort(function (a, b) {
                     if (a.provider == 'bare_metal')
