@@ -1024,6 +1024,16 @@ def connect_provider(backend):
             conn = driver(backend.apikey, backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
+    elif backend.provider == Provider.LIBVIRT:
+        # support the three ways to connect: local system, qemu+tcp, qemu+ssh
+        if backend.apisecret:
+            temp_key_file = NamedTemporaryFile(delete=False)
+            temp_key_file.write(backend.apisecret)
+            temp_key_file.close()
+            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=temp_key_file.name)
+
+        else:
+            conn = driver(backend.apiurl, user=backend.apikey)
     else:
         # ec2
         conn = driver(backend.apikey, backend.apisecret)
@@ -1053,7 +1063,7 @@ def get_machine_actions(machine_from_api, conn):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD):
+                     Provider.VCLOUD, Provider.LIBVIRT):
         can_tag = False
 
     # for other states
