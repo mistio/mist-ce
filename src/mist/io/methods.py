@@ -245,6 +245,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_openstack(title, provider, params)
     elif provider == 'vcloud':
         backend_id, backend = _add_backend_vcloud(title, provider, params)
+    elif provider == 'libvirt':
+        backend_id, backend = _add_backend_libvirt(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -275,6 +277,9 @@ def add_backend_v_2(user, title, provider, params):
         user.save()
     log.info("Backend with id '%s' added succesfully with Api-Version: 2.", backend_id)
     trigger_session_update(user.email, ['backends'])
+
+    # FIXME: associate libvirt hypervisor witht the ssh key
+
     return backend_id
 
 
@@ -567,6 +572,27 @@ def _add_backend_docker(title, provider, params):
     backend.apikey = auth_user
     backend.apisecret = auth_password
     backend.apiurl = docker_host
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_libvirt(title, provider, params):
+    apiurl = params.get('apiurl', '')
+    if not apiurl:
+        raise RequiredParameterMissingError('apiurl')
+
+    apikey = params.get('machine_user', 'root')
+
+    apisecret = params.get('machine_key', '')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = apikey
+    backend.apisecret = apisecret
+    backend.apiurl = apiurl
     backend.enabled = True
     backend_id = backend.get_id()
 
