@@ -1597,7 +1597,7 @@ var PROVIDER_MAP = {
             defaultValue: 'KVM (libvirt)',
         },
         {
-            name: 'apiurl',
+            name: 'machine_hostname',
             label: 'KVM hostname'
             type: 'text',
         },

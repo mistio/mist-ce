@@ -579,9 +579,9 @@ def _add_backend_docker(title, provider, params):
 
 
 def _add_backend_libvirt(title, provider, params):
-    apiurl = params.get('apiurl', '')
-    if not apiurl:
-        raise RequiredParameterMissingError('apiurl')
+    machine_hostname = params.get('machine_hostname', '')
+    if not machine_hostname:
+        raise RequiredParameterMissingError('machine_hostname')
 
     apikey = params.get('machine_user', 'root')
 
