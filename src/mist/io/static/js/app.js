@@ -1598,7 +1598,7 @@ var PROVIDER_MAP = {
         },
         {
             name: 'machine_hostname',
-            label: 'KVM hostname'
+            label: 'KVM hostname',
             type: 'text',
         },
         {
@@ -1607,7 +1607,7 @@ var PROVIDER_MAP = {
             label: 'ssh user',
             optional: true,
             defaultValue: 'root',
-        }
+        },
         {
             name: 'machine_key',
             type: 'ssh_key',
