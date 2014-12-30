@@ -246,7 +246,7 @@ def add_backend_v_2(user, title, provider, params):
     elif provider == 'vcloud':
         backend_id, backend = _add_backend_vcloud(title, provider, params)
     elif provider == 'libvirt':
-        backend_id, backend = _add_backend_libvirt(title, provider, params)
+        backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -578,7 +578,7 @@ def _add_backend_docker(title, provider, params):
     return backend_id, backend
 
 
-def _add_backend_libvirt(title, provider, params):
+def _add_backend_libvirt(user, title, provider, params):
     machine_hostname = params.get('machine_hostname', '')
     if not machine_hostname:
         raise RequiredParameterMissingError('machine_hostname')
@@ -586,13 +586,18 @@ def _add_backend_libvirt(title, provider, params):
     apikey = params.get('machine_user', 'root')
 
     apisecret = params.get('machine_key', '')
+    if apisecret:
+        if apisecret not in user.keypairs:
+            raise KeypairNotFoundError(apisecret)
+        apisecret = user.keypairs[apisecret].private
+
 
     backend = model.Backend()
     backend.title = title
     backend.provider = provider
     backend.apikey = apikey
     backend.apisecret = apisecret
-    backend.apiurl = apiurl
+    backend.apiurl = machine_hostname
     backend.enabled = True
     backend_id = backend.get_id()
 
