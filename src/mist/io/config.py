@@ -232,7 +232,15 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'VMware vCloud',
         'provider': Provider.VCLOUD,
         'regions': []
+    },
+    # libvirt
+    {
+        'title': 'KVM (via libvirt)',
+        'provider' : Provider.LIBVIRT,
+        'regions': []
     }
+
+
 ]
 
 SUPPORTED_PROVIDERS = [
@@ -361,13 +369,7 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'VMware vCloud',
         'provider' : Provider.VCLOUD
-    },
-    # libvirt
-    {
-        'title': 'libvirt (KVM/QEMU)',
-        'provider' : Provider.LIBVIRT
     }
-
 ]
 
 
