@@ -278,7 +278,12 @@ def add_backend_v_2(user, title, provider, params):
     log.info("Backend with id '%s' added succesfully with Api-Version: 2.", backend_id)
     trigger_session_update(user.email, ['backends'])
 
-    # FIXME: associate libvirt hypervisor witht the ssh key
+    if provider == 'libvirt' and backend.apisecret:
+    # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
+        key_id = params.get('machine_key')
+        node_id = backend.apiurl # id of the hypervisor is the hostname provided
+        username = backend.apikey
+        associate_key(user, key_id, backend_id, node_id, username=username)
 
     return backend_id
 
@@ -1124,6 +1129,11 @@ def get_machine_actions(machine_from_api, conn):
     if conn.type in [Provider.LINODE]:
         if machine_from_api.state is NodeState.PENDING:
         #after resize, node gets to pending mode, needs to be started
+            can_start = True
+
+    if conn.type in [Provider.LIBVIRT]:
+        if machine_from_api.state is NodeState.TERMINATED:
+        # in libvirt a terminated machine can be started
             can_start = True
 
     if conn.type is Provider.GCE:
