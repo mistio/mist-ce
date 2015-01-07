@@ -39,6 +39,10 @@ define('app/views/network', ['app/views/mistscreen'],
                     if (this.network.id) {
                         this.updateExtra();
                     }
+                    Ember.run.next(function(){
+                        $('#single-network-subnets').trigger('create');
+                        $('#single-network-subnets').collapsible();
+                    });
                 });
             }.on('didInsertElement'),
 
@@ -69,6 +73,7 @@ define('app/views/network', ['app/views/mistscreen'],
                         this.updateExtra();
                     }
                 });
+                $('#single-network-subnets').trigger('create');
             },
 
 
@@ -95,8 +100,11 @@ define('app/views/network', ['app/views/mistscreen'],
                     );
                 },
 
-                reservedToggleSwitched: function() {
-                    alert('yo!');
+                reservedToggleSwitched: function(a,b) {
+                    warn(a);
+                    warn(b);
+                    warn(this);
+                    warn(this.get('element'));
                 }
             },
 

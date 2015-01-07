@@ -81,6 +81,12 @@ define('app/controllers/networks', ['app/models/network'],
 
 
             _updateContent: function (networks) {
+
+                Ember.run.next(function(){
+                    $('#single-network-subnets').trigger('create');
+                    $('#single-network-subnets').collapsible();
+                });
+
                 Ember.run(this, function () {
 
                     // Remove deleted networks
@@ -105,6 +111,7 @@ define('app/controllers/networks', ['app/models/network'],
 
                     this.trigger('onNetworkListChange');
                 });
+
             },
 
 
