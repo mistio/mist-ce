@@ -35,9 +35,11 @@
                 {{#each Mist.backendsController.content}}
                     {{#if this.enabled}}
                         {{#unless this.isBareMetal}}
+                        {{#unless this.isLibvirt}}
                             <li data-icon="false">
                                 <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
                             </li>
+                        {{/unless}}
                         {{/unless}}
                     {{/if}}
                 {{/each}}
