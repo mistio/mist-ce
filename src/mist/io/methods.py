@@ -2290,7 +2290,7 @@ def list_networks(user, backend_id):
     #task_result = task.smart_delay(user.email, backend_id, blocking=True)
     #machines = task_result.get('machines', [])
     
-    # Separate public & private ips, create ip2machine map
+    ## Separate public & private ips, create ip2machine map
     #public_ips = IPSet()
     #private_ips = IPSet()
     #ips = []
@@ -2386,6 +2386,21 @@ def openstack_subnet_to_dict(subnet):
     net['gateway_ip'] = subnet.gateway_ip
 
     return net
+
+
+def associate_ip(user, backend_id, network_id, ip, machine_id=None, reserved=True):
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    conn = connect_provider(backend)
+    
+    if conn.type != Provider.NEPHOSCALE:
+        return False
+    
+    if conn.ex_associate_ip(ip, machine_id, reserved):
+        return True
+    else:
+        return False
 
 
 def create_network(user, backend_id, network, subnet):
