@@ -26,6 +26,7 @@ If you wish to install it in a virtual environment you'll also need::
 If you plan to support KVM via libvirt, you should install libvirt library:
 
     sudo aptitude install libvirt-bin libvirt-dev
+    ./bin/pip install libvirt-python
 
 In Red Hat based systems the following packages need to be installed:
    
