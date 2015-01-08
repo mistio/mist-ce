@@ -55,6 +55,19 @@ define('app/controllers/networks', ['app/models/network'],
             },
 
 
+			associateNetwork: function (args) {
+
+				var url = '/backends/' + this.backend.id +
+					'/networks/' + args.network.id;
+
+				var that = this;
+				that.set('associatingNetwork', true);
+				Mist.ajax.POST(url, {
+					machine: args.machine.id,
+					ip: args.ip,
+				})
+			},
+
             deleteNetwork: function (networkId, callback) {
 
                 var that = this;

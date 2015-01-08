@@ -117,13 +117,12 @@
                                             {{bind-attr selected="this.reserved"}}>Reserved</option>
                                         </select>
                                     </div>
-                                    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                                        {{view Ember.Select content=view.network.backend.machines.content
-                                            optionValuePath="content.name"
-                                            optionLabelPath="content.name"
-                                            prompt="-- unassigned --"
-                                            value=this.server.name}}
-                                    </fieldset>
+                                    <div>
+                                        <a class="assign-network-btn ui-btn ui-corner-all ui-btn-a"
+                                            {{action "assignButtonClicked" this target="view"}}>
+                                            {{this.server.name}}
+                                        </a>
+                                    </div>
 
                                 </td>
                             </tr>
@@ -139,6 +138,23 @@
 
         <div class="mid-padding"></div>
 
+    </div>
+
+    <div id="assign-machine"
+        class="tiny-popup"
+        data-role="popup"
+        data-overlay-theme="b"
+        data-transition="flip">
+
+        <ul data-role="listview">
+            {{#each view.network.backend.machines.content}}
+            <li data-icon="false">
+                <a {{action "assignMachine" this target="view"}}>
+                    {{this.name}}
+                </a>
+            </li>
+            {{/each}}
+        </ul>
     </div>
 
     {{view Mist.confirmationDialog}}

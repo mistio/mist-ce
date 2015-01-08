@@ -637,10 +637,10 @@ def associate_ip(request):
     network_id = request.matchdict['network']
     ip = request.json_body.get('ip')
     machine = request.json_body.get('machine')
-    machine = request.json_body.get('reserved', False)
+    reserved = request.json_body.get('reserved', False)
     user = user_from_request(request)
 
-    ret = methods.associate_ip(user, backend_id, network_id, ip, machine, 
+    ret = methods.associate_ip(user, backend_id, network_id, ip, machine,
                                reserved)
     if ret:
         return OK

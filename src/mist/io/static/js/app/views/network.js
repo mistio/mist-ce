@@ -20,6 +20,7 @@ define('app/views/network', ['app/views/mistscreen'],
 
             network: null,
             extra: null,
+            selectedIp: null,
 
 
             //
@@ -105,7 +106,30 @@ define('app/views/network', ['app/views/mistscreen'],
                     warn(b);
                     warn(this);
                     warn(this.get('element'));
-                }
+                },
+
+                assignButtonClicked: function (ip) {
+                    this.set('selectedIp', ip);
+                    $('#assign-machine').popup('reposition', {
+                        positionTo: this.$().find('.assign-network-btn')
+                    }).find('.ui-listview').listview('refresh');
+                    Ember.run.next(function () {
+                        $('#assign-machine').popup('open');
+                    });
+                },
+
+                assignMachine: function (machine) {
+                    var that = this;
+                    this.get('network').get('backend').get('networks').associateNetwork({
+                        network: this.get('network'),
+                        machine: machine.get('id'),
+                        ip: this.get('selectedIp'),
+                        callback: function (success) {
+                            $('#assign-machine').popup('close');
+                            that.get('selectedIp').get('server').set('name', machine.get('name'));
+                        }
+                    })
+                },
             },
 
 

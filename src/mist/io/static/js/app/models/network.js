@@ -25,6 +25,15 @@ define('app/models/network', ['ember'],
             ipaddresses: null,
             backend: null,
             selected: null,
+
+            load: function () {
+                var list = this.get('ipaddress_list_status') || [];
+                list.forEach(function (ip, index) {
+                    // Make ips observable objects
+                    ip = list[index] = Ember.Object.create(ip);
+                    ip.set('server', Ember.Object.create(ip.get('server')));
+                });
+            }.on('init')
         });
     }
 );
