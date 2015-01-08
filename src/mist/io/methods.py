@@ -205,6 +205,458 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
     return backend_id
 
 
+def add_backend_v_2(user, title, provider, params):
+    """
+    Version 2 of add_backend
+    Adds a new backend to the user and returns the backend_id
+    """
+    if not provider:
+        raise RequiredParameterMissingError("provider")
+    log.info("Adding new backend in provider '%s' with Api-Version: 2", provider)
+
+    baremetal = provider == 'bare_metal'
+
+    if provider == 'bare_metal':
+        backend_id = _add_backend_bare_metal(user, title, provider, params)
+        log.info("Backend with id '%s' added succesfully.", backend_id)
+        trigger_session_update(user.email, ['backends'])
+        return backend_id
+    elif provider == 'ec2':
+        backend_id, backend = _add_backend_ec2(user, title, params)
+    elif provider == 'rackspace':
+        backend_id, backend = _add_backend_rackspace(user, title, provider, params)
+    elif provider == 'nephoscale':
+        backend_id, backend = _add_backend_nephoscale(title, provider, params)
+    elif provider == 'digitalocean':
+        backend_id, backend = _add_backend_digitalocean(title, provider, params)
+    elif provider == 'softlayer':
+        backend_id, backend = _add_backend_softlayer(title, provider, params)
+    elif provider == 'gce':
+        backend_id, backend = _add_backend_gce(title, provider, params)
+    elif provider == 'azure':
+        backend_id, backend = _add_backend_azure(title, provider, params)
+    elif provider == 'linode':
+        backend_id, backend = _add_backend_linode(title, provider, params)
+    elif provider == 'docker':
+        backend_id, backend = _add_backend_docker(title, provider, params)
+    elif provider == 'hpcloud':
+        backend_id, backend = _add_backend_hp(user, title, provider, params)
+    elif provider == 'openstack':
+        backend_id, backend = _add_backend_openstack(title, provider, params)
+    elif provider == 'vcloud':
+        backend_id, backend = _add_backend_vcloud(title, provider, params)
+    else:
+        raise BadRequestError("Provider unknown.")
+
+    if backend_id in user.backends:
+        raise BackendExistsError(backend_id)
+
+    remove_on_error = params.get('remove_on_error', True)
+    # validate backend before adding
+    if remove_on_error:
+        try:
+            conn = connect_provider(backend)
+        except InvalidCredsError as exc:
+            log.error("Error while adding backend: %r" % exc)
+            raise BackendUnauthorizedError("%r" % exc)
+        except Exception as exc:
+            log.error("Error while adding backend%r" % exc)
+            raise BackendUnavailableError("%r" % exc)
+        try:
+            machines = conn.list_nodes()
+        except InvalidCredsError:
+            raise BackendUnauthorizedError()
+        except Exception as exc:
+            log.error("Error while trying list_nodes: %r", exc)
+            raise BackendUnavailableError()
+
+    with user.lock_n_load():
+        user.backends[backend_id] = backend
+        user.save()
+    log.info("Backend with id '%s' added succesfully with Api-Version: 2.", backend_id)
+    trigger_session_update(user.email, ['backends'])
+    return backend_id
+
+
+def _add_backend_bare_metal(user, title, provider, params):
+    """
+    Add a bare metal backend
+    """
+    machine_hostname = params.get('machine_ip', '')
+    if not machine_hostname:
+        raise RequiredParameterMissingError('machine_hostname')
+
+    remove_on_error = params.get('remove_on_error', True)
+    machine_key = params.get('machine_key', '')
+    machine_user = params.get('machine_user', '')
+
+    if remove_on_error:
+        if not machine_key:
+            raise RequiredParameterMissingError('machine_key')
+        if machine_key not in user.keypairs:
+            raise KeypairNotFoundError(machine_key)
+        if not machine_user:
+            machine_user = 'root'
+
+    try:
+        port = int(params.get('machine_port', 22))
+    except:
+        port = 22
+    machine = model.Machine()
+    machine.dns_name = machine_hostname
+    machine.ssh_port = port
+
+    machine.public_ips = [machine_hostname]
+    machine_id = machine_hostname.replace('.', '').replace(' ', '')
+    machine.name = machine_hostname
+    backend = model.Backend()
+    backend.title = machine_hostname
+    backend.provider = provider
+    backend.enabled = True
+    backend.machines[machine_id] = machine
+    backend_id = backend.get_id()
+
+    with user.lock_n_load():
+        if backend_id in user.backends:
+            raise BackendExistsError(backend_id)
+        user.backends[backend_id] = backend
+        # try to connect. this will either fail and we'll delete the
+        # backend, or it will work and it will create the association
+        if remove_on_error:
+            try:
+                ssh_command(
+                    user, backend_id, machine_id, machine_hostname, 'uptime',
+                    key_id=machine_key, username=machine_user, password=None,
+                    port=port
+                )
+            except MachineUnauthorizedError as exc:
+                # remove backend
+                del user.backends[backend_id]
+                user.save()
+                raise BackendUnauthorizedError(exc)
+        user.save()
+
+
+def _add_backend_vcloud(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    host = params.get('host', '')
+    if not host:
+        raise RequiredParameterMissingError('host')
+
+    for prefix in ['https://', 'http://']:
+        host = host.strip(prefix)
+    host = host.split('/')[0]
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.apiurl = host
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_ec2(user, title, params):
+        api_key = params.get('api_key', '')
+        if not api_key:
+            raise RequiredParameterMissingError('api_key')
+
+        api_secret = params.get('api_secret', '')
+        if not api_secret:
+            raise RequiredParameterMissingError('api_secret')
+
+        region = params.get('region', '')
+        if not region:
+            raise RequiredParameterMissingError('region')
+
+        if api_secret == 'getsecretfromdb':
+            for backend_id in user.backends:
+                if api_key == user.backends[backend_id].apikey:
+                    api_secret = user.backends[backend_id].apisecret
+                    break
+
+        backend = model.Backend()
+        backend.title = title
+        backend.provider = region
+        backend.apikey = api_key
+        backend.apisecret = api_secret
+        backend.enabled = True
+        backend_id = backend.get_id()
+
+        return backend_id, backend
+
+
+def _add_backend_rackspace(user, title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    region = params.get('region', '')
+    if not region:
+        raise RequiredParameterMissingError('region')
+
+    if 'rackspace_first_gen' in region:
+        provider, region = region.split(':')[0], region.split(':')[1]
+
+    if api_key == 'getsecretfromdb':
+        for backend_id in user.backends:
+            if username == user.backends[backend_id].apikey:
+                api_key = user.backends[backend_id].apisecret
+                break
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = api_key
+    backend.enabled = True
+    backend.region = region
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_nephoscale(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_softlayer(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = api_key
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_digitalocean(title, provider, params):
+    token = params.get('token', '')
+    if not token:
+        raise RequiredParameterMissingError('token')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = token
+    backend.apisecret = token
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_gce(title, provider, params):
+    email = params.get('email', '')
+    if not email:
+        raise RequiredParameterMissingError('email')
+
+    private_key = params.get('private_key', '')
+    if not private_key:
+        raise RequiredParameterMissingError('private_key')
+
+    project_id = params.get('project_id', '')
+    if not project_id:
+        raise RequiredParameterMissingError('project_id')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = email
+    backend.apisecret = private_key
+    backend.tenant_name = project_id
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_azure(title, provider, params):
+    subscription_id = params.get('subscription_id', '')
+    if not subscription_id:
+        raise RequiredParameterMissingError('subscription_id')
+
+    certificate = params.get('certificate', '')
+    if not certificate:
+        raise RequiredParameterMissingError('certificate')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = subscription_id
+    backend.apisecret = certificate
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_linode(title, provider, params):
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = api_key
+    backend.apisecret = api_key
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_docker(title, provider, params):
+    try:
+        docker_port = int(params.get('docker_port', 4243))
+    except:
+        docker_port = 4243
+
+    docker_host = params.get('docker_host', '')
+    if not docker_host:
+        raise RequiredParameterMissingError('docker_host')
+
+    auth_user = params.get('auth_user', '')
+    auth_password = params.get('auth_password', '')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.docker_port = docker_port
+    backend.apikey = auth_user
+    backend.apisecret = auth_password
+    backend.apiurl = docker_host
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_hp(user, title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    tenant_name = params.get('tenant_name', '')
+    if not tenant_name:
+        raise RequiredParameterMissingError('tenant_name')
+
+    apiurl = params.get('apiurl') or ''
+    if 'hpcloudsvc' in apiurl:
+            apiurl = HPCLOUD_AUTH_URL
+
+    region = params.get('region', '')
+    if not region:
+        raise RequiredParameterMissingError('region')
+
+    if password == 'getsecretfromdb':
+        for backend_id in user.backends:
+            if username == user.backends[backend_id].apikey:
+                password = user.backends[backend_id].apisecret
+                break
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.apiurl = apiurl
+    backend.region = region
+    backend.tenant_name = tenant_name
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_openstack(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    auth_url = params.get('auth_url')
+    if not auth_url:
+        raise RequiredParameterMissingError('auth_url')
+
+    if auth_url.endswith('/v2.0/'):
+        auth_url = auth_url.split('/v2.0/')[0]
+    elif auth_url.endswith('/v2.0'):
+        auth_url = auth_url.split('/v2.0')[0]
+
+    auth_url = auth_url.rstrip('/')
+
+    tenant_name = params.get('tenant_name', '')
+    if not tenant_name:
+        raise RequiredParameterMissingError('tenant_name')
+
+    region = params.get('region', '')
+    compute_endpoint = params.get('compute_endpoint', '')
+
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.apiurl = auth_url
+    backend.tenant_name = tenant_name
+    backend.region = region
+    backend.compute_endpoint = compute_endpoint
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
 def rename_backend(user, backend_id, new_name):
     """Renames backend with given backend_id."""
 
@@ -1727,7 +2179,8 @@ def list_backends(user):
                     'region': backend.region,
                     # for Provider.RACKSPACE (the new Nova provider)
                     ## 'datacenter': backend.datacenter,
-                    'enabled': backend.enabled})
+                    'enabled': backend.enabled,
+                    'tenant_name': backend.tenant_name})
     return ret
 
 

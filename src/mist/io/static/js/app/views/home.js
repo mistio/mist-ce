@@ -59,8 +59,8 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
                 if (Mist.graphsController.isOpen)
                     return;
-                if ( ! Mist.monitored_machines )
-                    return;
+                if (!Mist.monitored_machines)
+                   return;
 
                 var datasources = [];
                 var loadMetric = Mist.metricsController.getMetric('load.shortterm');
