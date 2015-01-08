@@ -310,12 +310,11 @@ def _add_backend_bare_metal(user, title, provider, params):
     machine_id = machine_hostname.replace('.', '').replace(' ', '')
     machine.name = machine_hostname
     backend = model.Backend()
-    backend.title = machine_hostname
+    backend.title = title or machine_hostname
     backend.provider = provider
     backend.enabled = True
     backend.machines[machine_id] = machine
     backend_id = backend.get_id()
-
     with user.lock_n_load():
         if backend_id in user.backends:
             raise BackendExistsError(backend_id)
@@ -335,7 +334,7 @@ def _add_backend_bare_metal(user, title, provider, params):
                 user.save()
                 raise BackendUnauthorizedError(exc)
         user.save()
-
+    return backend_id
 
 def _add_backend_vcloud(title, provider, params):
     username = params.get('username', '')
