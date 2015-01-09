@@ -122,7 +122,7 @@ define('app/views/network', ['app/views/mistscreen'],
                     var that = this;
                     this.get('network').get('backend').get('networks').associateNetwork({
                         network: this.get('network'),
-                        machine: machine.get('id'),
+                        machine: machine,
                         ip: this.get('selectedIp'),
                         callback: function (success) {
                             $('#assign-machine').popup('close');

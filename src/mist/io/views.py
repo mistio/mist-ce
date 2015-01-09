@@ -633,15 +633,16 @@ def delete_network(request):
 
 @view_config(route_name='network', request_method='POST')
 def associate_ip(request):
+
     backend_id = request.matchdict['backend']
     network_id = request.matchdict['network']
     ip = request.json_body.get('ip')
     machine = request.json_body.get('machine')
-    reserved = request.json_body.get('reserved', False)
+    assign = request.json_body.get('assign', True)
     user = user_from_request(request)
 
     ret = methods.associate_ip(user, backend_id, network_id, ip, machine,
-                               reserved)
+                               assign)
     if ret:
         return OK
     else:

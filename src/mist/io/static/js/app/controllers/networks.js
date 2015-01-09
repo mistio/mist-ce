@@ -57,14 +57,20 @@ define('app/controllers/networks', ['app/models/network'],
 
 			associateNetwork: function (args) {
 
+				var machineId;
+				if (args.machine.backend.provider == 'nephoscale')
+					machineId = args.machine.extra.id;
+				else
+					machineId = args.machine.id;
+
 				var url = '/backends/' + this.backend.id +
 					'/networks/' + args.network.id;
 
 				var that = this;
 				that.set('associatingNetwork', true);
 				Mist.ajax.POST(url, {
-					machine: args.machine.id,
-					ip: args.ip,
+					machine: machineId,
+					ip: args.ip.ipaddress,
 				})
 			},
 

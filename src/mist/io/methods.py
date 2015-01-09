@@ -2284,12 +2284,12 @@ def list_networks(user, backend_id):
 
     ret = []
 
-    ## Get the ip addreses of running machines to begin with, use cached 
+    ## Get the ip addreses of running machines to begin with, use cached
     ## list_machines response if there's a fresh one
     #task = mist.io.tasks.ListMachines()
     #task_result = task.smart_delay(user.email, backend_id, blocking=True)
     #machines = task_result.get('machines', [])
-    
+
     ## Separate public & private ips, create ip2machine map
     #public_ips = IPSet()
     #private_ips = IPSet()
@@ -2316,14 +2316,14 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret.append(gce_network_to_dict(network))
-    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST, 
-                       Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2, 
-                       Provider.EC2_EU, Provider.EC2_EU_WEST, 
-                       Provider.EC2_SA_EAST, Provider.EC2_US_EAST, 
+    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST,
+                       Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
+                       Provider.EC2_EU, Provider.EC2_EU_WEST,
+                       Provider.EC2_SA_EAST, Provider.EC2_US_EAST,
                        Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON]:
         networks = conn.ex_list_networks()
         for network in networks:
-            ret.append(ec2_network_to_dict(network))        
+            ret.append(ec2_network_to_dict(network))
     return ret
 
 
@@ -2388,19 +2388,16 @@ def openstack_subnet_to_dict(subnet):
     return net
 
 
-def associate_ip(user, backend_id, network_id, ip, machine_id=None, reserved=True):
+def associate_ip(user, backend_id, network_id, ip, machine_id=None, assign=True):
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     backend = user.backends[backend_id]
     conn = connect_provider(backend)
-    
+
     if conn.type != Provider.NEPHOSCALE:
         return False
-    
-    if conn.ex_associate_ip(ip, machine_id, reserved):
-        return True
-    else:
-        return False
+
+    return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
 
 
 def create_network(user, backend_id, network, subnet):
