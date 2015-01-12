@@ -474,7 +474,9 @@ def create_machine(request):
         ips = request.json_body.get('ips', None)
         monitoring = request.json_body.get('monitoring', False)
         networks = request.json_body.get('networks', [])
-        docker_env = request.json_body.get('docker_env', None)
+        docker_env = request.json_body.get('docker_env', [])
+        docker_command = request.json_body.get('docker_command', None)
+        docker_daemomize = request.json_body.get('docker_daemonize', False)
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -483,7 +485,7 @@ def create_machine(request):
                                  location_id, image_id, size_id, script,
                                  image_extra, disk, image_name, size_name,
                                  location_name, ips, monitoring, networks,
-                                 docker_env)
+                                 docker_env, docker_command, docker_daemomize)
     return ret
 
 
