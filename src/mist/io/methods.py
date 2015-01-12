@@ -60,7 +60,6 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
-GCE_IMAGES = ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']
 
 
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -2064,7 +2063,7 @@ def list_images(user, backend_id, term=None):
         elif conn.type == Provider.GCE:
             # Currently not other way to receive all images :(
             rest_images = conn.list_images()
-            for OS in GCE_IMAGES:
+            for OS in config.GCE_IMAGES:
                 try:
                     gce_images = conn.list_images(ex_project=OS)
                     rest_images += gce_images
