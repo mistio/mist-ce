@@ -153,14 +153,14 @@
             {{view Mist.TextArea
                    id="create-machine-env"
                    data-theme="a"
-                   valueBinding="Mist.machineAddController.newMachineEnv"}}
+                   valueBinding="Mist.machineAddController.newMachineDockerEnvironment"}}
 
             <!-- Command -->
             <label for="create-machine-command">Command:</label>
             {{view Mist.TextArea
                    id="create-machine-command"
                    data-theme="a"
-                   valueBinding="Mist.machineAddController.newMachineCommand"}}
+                   valueBinding="Mist.machineAddController.newMachineDockerCommand"}}
 
             <!-- Daemonize -->
             <div id="create-machine-daemonize">
@@ -168,7 +168,7 @@
                 {{view Mist.Checkbox
                    data-theme="a"
                    data-mini="true"
-                   checkedBinding="Mist.machineAddController.newMachineDaemon"}}
+                   checkedBinding="Mist.machineAddController.newMachineDockerDaemonize"}}
                 Daemonize
                 </label>
             </div>

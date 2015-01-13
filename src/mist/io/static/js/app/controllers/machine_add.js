@@ -144,6 +144,9 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineKey,
                         this.newMachineScript,
                         this.newMachineMonitoring,
+                        this.newMachineDockerEnvironment,
+                        this.newMachineDockerCommand,
+                        this.newMachineDockerDaemonize,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }

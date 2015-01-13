@@ -52,7 +52,8 @@ define('app/controllers/machines', ['app/models/machine'],
              *
              */
 
-            newMachine: function(name, image, size, location, key, script, monitoring) {
+            newMachine: function(name, image, size, location, key, script, monitoring,
+                dockerEnv, dockerCommand, dockerDaemonize) {
 
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -96,7 +97,11 @@ define('app/controllers/machines', ['app/models/machine'],
                         'location_name': location.name,
                         'monitoring' : monitoring,
                         // Openstack
-                        'networks': networks
+                        'networks': networks,
+                        // Docker
+                        'docker_env': dockerEnv.split('\n'),
+                        'docker_command': dockerCommand,
+                        'docker_daemonize': dockerDaemonize
                 }).success(function (machine) {
                     machine.backend = that.backend;
                     // Nephoscale returns machine id on request success,
