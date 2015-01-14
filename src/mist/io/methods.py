@@ -1160,8 +1160,7 @@ def list_machines(user, backend_id):
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
-                   docker_env=[], docker_command=None, docker_daemonize=False,
-                   ssh_port=22):
+                   docker_env=[], docker_command=None, ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1214,11 +1213,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if conn.type is Provider.DOCKER:
         if key_id:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
-                                          docker_env=docker_env, docker_command=docker_command,
-                                          docker_daemonize=docker_daemonize)
+                                          docker_env=docker_env, docker_command=docker_command)
         else:
             node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
-                                          docker_command=docker_command, docker_daemonize=docker_daemonize)
+                                          docker_command=docker_command)
         if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
@@ -1612,7 +1610,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
     return node
 
 def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env=[], docker_command=None,
-                           docker_daemonize=False, tty_attach=True):
+                           tty_attach=True):
     """Create a machine in docker.
 
     """
