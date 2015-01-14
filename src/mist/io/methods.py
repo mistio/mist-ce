@@ -60,7 +60,6 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
-GCE_IMAGES = ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']
 
 
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -320,12 +319,11 @@ def _add_backend_bare_metal(user, title, provider, params):
     machine_id = machine_hostname.replace('.', '').replace(' ', '')
     machine.name = machine_hostname
     backend = model.Backend()
-    backend.title = machine_hostname
+    backend.title = title or machine_hostname
     backend.provider = provider
     backend.enabled = True
     backend.machines[machine_id] = machine
     backend_id = backend.get_id()
-
     with user.lock_n_load():
         if backend_id in user.backends:
             raise BackendExistsError(backend_id)
@@ -345,7 +343,7 @@ def _add_backend_bare_metal(user, title, provider, params):
                 user.save()
                 raise BackendUnauthorizedError(exc)
         user.save()
-
+    return backend_id
 
 def _add_backend_vcloud(title, provider, params):
     username = params.get('username', '')
@@ -2116,7 +2114,7 @@ def list_images(user, backend_id, term=None):
         elif conn.type == Provider.GCE:
             # Currently not other way to receive all images :(
             rest_images = conn.list_images()
-            for OS in GCE_IMAGES:
+            for OS in config.GCE_IMAGES:
                 try:
                     gce_images = conn.list_images(ex_project=OS)
                     rest_images += gce_images
