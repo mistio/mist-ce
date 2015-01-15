@@ -112,7 +112,7 @@
                                 <td>
                                     <div class="reserved">
                                         <select name="reserved-slider" data-role="slider" data-mini="true"
-                                                {{action "reservedToggleSwitched" this.ipaddress value target="view" on="change"}}>
+                                                {{action "reservedToggleSwitched" this target="view" on="change"}}>
                                             <option></option>
                                             <option value="on"
                                             {{bind-attr selected="this.reserved"}}>Reserved</option>

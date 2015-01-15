@@ -101,11 +101,12 @@ define('app/views/network', ['app/views/mistscreen'],
                     );
                 },
 
-                reservedToggleSwitched: function(a,b) {
-                    warn(a);
-                    warn(b);
-                    warn(this);
-                    warn(this.get('element'));
+                reservedToggleSwitched: function(ip) {
+                    var that = this;
+                    this.get('network').get('backend').get('networks').reserveIP({
+                        network: this.get('network'),
+                        ip: ip
+                    });
                 },
 
                 assignButtonClicked: function (ip) {
@@ -129,7 +130,7 @@ define('app/views/network', ['app/views/mistscreen'],
                             if (success)
                                 that.get('selectedIp').get('server').set('name', machine.get('name'));
                         }
-                    })
+                    });
                 },
             },
 
