@@ -1076,7 +1076,7 @@ def connect_provider(backend):
     return conn
 
 
-def get_machine_actions(machine_from_api, conn):
+def get_machine_actions(machine_from_api, conn, extra):
     """Returns available machine actions based on backend type.
 
     Rackspace, Linode and openstack support the same options, but EC2 also
@@ -1137,6 +1137,12 @@ def get_machine_actions(machine_from_api, conn):
     if conn.type is Provider.GCE:
         can_start = False
         can_stop = False
+    
+    if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
+        # allow only reboot action for libvirt hypervisor
+        can_stop = False
+        can_destroy = False
+        can_start = False
 
     return {'can_stop': can_stop,
             'can_start': can_start,
@@ -1200,7 +1206,7 @@ def list_machines(user, backend_id):
                    'public_ips': m.public_ips,
                    'tags': tags,
                    'extra': m.extra}
-        machine.update(get_machine_actions(m, conn))
+        machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
 
     return ret
