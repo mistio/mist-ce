@@ -126,7 +126,8 @@ define('app/views/network', ['app/views/mistscreen'],
                         ip: this.get('selectedIp'),
                         callback: function (success) {
                             $('#assign-machine').popup('close');
-                            that.get('selectedIp').get('server').set('name', machine.get('name'));
+                            if (success)
+                                that.get('selectedIp').get('server').set('name', machine.get('name'));
                         }
                     })
                 },

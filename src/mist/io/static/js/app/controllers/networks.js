@@ -71,7 +71,11 @@ define('app/controllers/networks', ['app/models/network'],
 				Mist.ajax.POST(url, {
 					machine: machineId,
 					ip: args.ip.ipaddress,
-				})
+				}).error(function () {
+					Mist.notificationController.notify('Failed to associate ip ' + args.ip.ipaddress);
+				}).complete(function (success, data) {
+					if (args.callback) args.callback(success, data);
+				});
 			},
 
             deleteNetwork: function (networkId, callback) {
