@@ -1954,6 +1954,19 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
                 except:
                     return False
             else:
+                if conn.type == 'libvirt':
+                    if machine.extra.get('tags', {}).get('type', None) == 'hypervisor':
+                         # issue an ssh command for the libvirt hypervisor
+                        try:
+                            hostname = machine.public_ips[0]
+                            command = '$(command -v sudo) shutdown -r now'
+                            ssh_command(user, backend_id, machine_id, hostname, command)
+                            return True
+                        except:
+                            return False
+
+                    else:
+                       machine.reboot()
                 if conn.type == 'azure':
                     conn.reboot_node(machine, ex_cloud_service_name=cloud_service)
                 else:
