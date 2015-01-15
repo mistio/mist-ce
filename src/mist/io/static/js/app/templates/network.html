@@ -120,10 +120,13 @@
                                     <div>
                                         <a class="assign-network-btn ui-btn ui-corner-all ui-btn-a"
                                             {{action "assignButtonClicked" this target="view"}}>
-                                            {{this.server.name}}
+                                            {{#if this.server.name}}
+                                                {{this.server.name}}
+                                            {{else}}
+                                                unassigned
+                                            {{/if}}
                                         </a>
                                     </div>
-
                                 </td>
                             </tr>
                         {{/each}}

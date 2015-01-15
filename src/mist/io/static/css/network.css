@@ -25,3 +25,6 @@
 #single-network-page .reserved .ui-slider {
     width: 110px;
 }
+#single-network-page .assign-network-btn {
+    max-width: 250px;
+}
