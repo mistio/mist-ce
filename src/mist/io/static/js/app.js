@@ -314,6 +314,7 @@ var loadFiles = function (callback) {
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/rule_list',
+        'app/views/subnet_list_item',
         'app/views/user_menu',
     ], callback);
 };
@@ -390,6 +391,7 @@ var loadApp = function (
     RuleView,
     RuleEditView,
     RuleListView,
+    SubnetListItemView,
     UserMenuView,
     callback) {
 
@@ -593,6 +595,8 @@ var loadApp = function (
     });
 
     // Ember views
+    
+    App.SubnetListItemView = SubnetListItemView;
 
     App.set('homeView', Home);
     App.set('ruleView', RuleView);
