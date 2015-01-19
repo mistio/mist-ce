@@ -344,6 +344,12 @@ def _add_backend_vcloud(title, provider, params):
     if not password:
         raise RequiredParameterMissingError('password')
 
+    organization = params.get('organization', '')
+    if not organization:
+        raise RequiredParameterMissingError('organization')
+
+    username = '%s@%s' % (username, organization)
+
     host = params.get('host', '')
     if provider == 'vcloud':
         if not host:
@@ -353,10 +359,6 @@ def _add_backend_vcloud(title, provider, params):
         host = host.split('/')[0]
     elif provider == 'indonesian_vcloud':
         host = 'compute.idcloudonline.com'
-        organization = params.get('organization', '')
-        if not organization:
-            raise RequiredParameterMissingError('organization')
-        username = '%s@%s' % (username, organization)
 
     backend = model.Backend()
     backend.title = title

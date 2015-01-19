@@ -1600,16 +1600,20 @@ var PROVIDER_MAP = {
         },
         {
             name: 'username',
-            type: 'text',
-            placeholder: 'user@org',
+            type: 'text'
         },
         {
             name: 'password',
             type: 'password'
         },
         {
-            name: 'host',
+            name: 'organization',
             type: 'text'
+        },
+        {
+            name: 'host',
+            type: 'text',
+            label: 'Hostname',
         }
     ],
 
@@ -1621,8 +1625,7 @@ var PROVIDER_MAP = {
         },
         {
             name: 'username',
-            type: 'text',
-            defaultValue: 'admin',
+            type: 'text'
 
         },
         {
@@ -1631,8 +1634,7 @@ var PROVIDER_MAP = {
         },
         {
             name: 'organization',
-            type: 'text',
-            placeholder: 'Mist.io'
+            type: 'text'
         }
     ]
 };
