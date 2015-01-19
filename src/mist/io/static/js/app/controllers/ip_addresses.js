@@ -12,8 +12,29 @@ define('app/controllers/ip_addresses', [
 
         return BaseArrayController.extend({
 
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
+            network: null,
             model: IPAddressModel,
 
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            setContent: function (content) {
+                content.setEach('network', this.get('network'));
+                this._super(content);
+            }
         });
     }
 );

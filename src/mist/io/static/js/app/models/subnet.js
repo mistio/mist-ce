@@ -21,6 +21,7 @@ define('app/models/subnet', [
             //
 
 
+            network: null,
             ipAddresses: null,
 
 
@@ -32,9 +33,20 @@ define('app/models/subnet', [
 
 
             load: function (data) {
-                this.set('ipAddresses', IPAddressesController.create());
-                this._super(data);
+                this.set('ipAddresses',
+                    IPAddressesController.create({
+                        network: this.get('network')
+                    })
+                );
+                this.update(this);
             }.on('init'),
+
+
+            //
+            //
+            //  Methods
+            //
+            //
 
 
             update: function (data) {

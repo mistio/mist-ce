@@ -36,11 +36,11 @@ define('app/models/network', [
 
 
             load: function () {
-                this.setProperties({
-                    subnets: SubnetsController.create(),
-                    ipAddresses: IPAddressesController.create()
-                });
                 this._super();
+                this.setProperties({
+                    subnets: SubnetsController.create({ network: this }),
+                    ipAddresses: IPAddressesController.create({ network: this })
+                });
             }.on('init'),
 
 

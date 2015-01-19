@@ -37,6 +37,7 @@ define('app/controllers/networks', [
 				this._super(content);
 			},
 
+
 			associateNetwork: function (args) {
 
 				var machineId;

@@ -20,8 +20,21 @@ define('app/controllers/subnets', [
             //
 
 
-            model: SubnetModel
+            network: null,
+            model: SubnetModel,
 
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            setContent: function (content) {
+                content.setEach('network', this.get('network'));
+                this._super(content);
+            }
         });
     }
 );
