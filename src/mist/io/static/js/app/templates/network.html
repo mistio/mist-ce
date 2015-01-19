@@ -119,12 +119,12 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <a class="assign-network-btn ui-btn ui-corner-all ui-btn-a"
+                                        <a class="assign-network-btn ui-mini ui-btn-icon-right ui-icon-carat-d ui-btn ui-corner-all ui-btn-a"
                                             {{action "assignButtonClicked" this target="view"}}>
                                             {{#if this.server.name}}
                                                 {{this.server.name}}
                                             {{else}}
-                                                unassigned
+                                                -- unassigned --
                                             {{/if}}
                                         </a>
                                     </div>
