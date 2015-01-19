@@ -25,12 +25,12 @@
             data-filter-placeholder="Filter..."
             data-theme="c"
             class="checkbox-list">
-            {{#each Mist.backendsController.content}}
+            {{#each Mist.backendsController}}
                 {{#if this.enabled}}
-                  {{#each this.networks.content}}
-                      {{view Mist.networkListItemView
-                          networkBinding="this"
-                          class="checkbox-link"}}
+                  {{#each this.networks}}
+                        {{view Mist.networkListItemView
+                            networkBinding=this
+                            class="checkbox-link"}}
                   {{/each}}
                 {{/if}}
             {{/each}}
