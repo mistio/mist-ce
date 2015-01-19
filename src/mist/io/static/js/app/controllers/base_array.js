@@ -18,6 +18,7 @@ define('app/controllers/base_array', ['ember'],
             //
 
 
+            model: null,
             content: [],
 
 
@@ -83,6 +84,7 @@ define('app/controllers/base_array', ['ember'],
 
                 // Remove deleted objects
                 this.get('content').forEach(function (object) {
+
                     if (!content.findBy('id', object.id))
                         this._deleteObject(object);
                     }, this);
@@ -102,7 +104,7 @@ define('app/controllers/base_array', ['ember'],
 
             _addObject: function (object) {
                 Ember.run(this, function () {
-                    this.addObject(object);
+                    this.addObject(this.get('model').create(object));
                     this.trigger('onAdd', {
                         object: object
                     });
