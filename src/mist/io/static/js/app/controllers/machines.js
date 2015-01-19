@@ -53,7 +53,7 @@ define('app/controllers/machines', ['app/models/machine'],
              */
 
             newMachine: function(name, image, size, location, key, script, monitoring,
-                dockerEnv, dockerCommand, dockerDaemonize) {
+                dockerEnv, dockerCommand) {
 
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -101,7 +101,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         // Docker
                         'docker_env': dockerEnv.split('\n'),
                         'docker_command': dockerCommand,
-                        'docker_daemonize': dockerDaemonize
                 }).success(function (machine) {
                     machine.backend = that.backend;
                     // Nephoscale returns machine id on request success,
