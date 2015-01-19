@@ -9,6 +9,8 @@ var
 .mr.developer.cfg
 .installed.cfg
 *.pyc
+*~
+settings*
 *.pyo
 *.egg-info
 src/libcloud
