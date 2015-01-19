@@ -1,6 +1,6 @@
 define('app/controllers/base_array', ['ember'],
     //
-    //  Object Collection Utility
+    //  Base Array Controller
     //
     //  @returns Class
     //
