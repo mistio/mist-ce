@@ -1,5 +1,5 @@
 define('app/models/subnet', [
-        'app/models/base'
+        'app/models/base',
         'app/controllers/ip_addresses'
     ],
     //

@@ -1,14 +1,17 @@
-define('app/controllers/networks', ['app/models/network'],
+define('app/controllers/networks', [
+		'app/controllers/base_array',
+		'app/models/network'
+	],
 	//
 	//  Networks Controller
 	//
 	//	@returns Class
 	//
-	function (Network) {
+	function (BaseArrayController, NetworkModel) {
 
 		'use strict';
 
-		return Ember.ArrayController.extend(Ember.Evented, {
+		return BaseArrayController.extend(Ember.Evented, {
 
 
 			//
@@ -18,23 +21,8 @@ define('app/controllers/networks', ['app/models/network'],
 			//
 
 
-			content: null,
-			loading: null,
 			backend: null,
-
-
-            //
-            //
-            //  Initialization
-            //
-            //
-
-
-            init: function () {
-                this._super();
-                this.set('content', []);
-                this.set('loading', true);
-            },
+			model: NetworkModel,
 
 
             //
@@ -42,12 +30,6 @@ define('app/controllers/networks', ['app/models/network'],
             //  Methods
             //
             //
-
-
-            load: function (networks) {
-                this._updateContent(networks);
-                this.set('loading', false);
-            },
 
 
             getNetwork: function (networkId) {
@@ -99,7 +81,7 @@ define('app/controllers/networks', ['app/models/network'],
 
 
             deleteNetwork: function (networkId, callback) {
-				
+
                 var that = this;
                 that.set('deletingNetwork', true);
                 var url = '/backends/' + this.backend.id +
@@ -114,88 +96,6 @@ define('app/controllers/networks', ['app/models/network'],
                     if (callback) callback(success, message);
                 });
             },
-
-
-            //
-            //
-            //  Pseudo-Private Methods
-            //
-            //
-
-
-            _updateContent: function (networks) {
-
-                Ember.run.next(function(){
-                    $('#single-network-subnets').trigger('create');
-                    $('#single-network-subnets').collapsible();
-                });
-
-                Ember.run(this, function () {
-
-                    // Remove deleted networks
-                    this.content.forEach(function (network) {
-                        if (!networks.findBy('id', network.id))
-                            this.content.removeObject(network);
-                    }, this);
-
-                    networks.forEach(function (network) {
-
-                        var oldNetwork = this.getNetwork(network.id);
-
-                        if (oldNetwork)
-                            // Update existing networks
-                            forIn(network, function (value, property) {
-                                oldNetwork.set(property, value);
-                            });
-                        else
-                            // Add new networks
-                            this._addNetwork(network);
-                    }, this);
-
-                    this.trigger('onNetworkListChange');
-                });
-
-            },
-
-
-            _addNetwork: function (network) {
-                Ember.run(this, function () {
-                    network.backend = this.backend;
-                    this.content.addObject(Network.create(network));
-                    this.trigger('onNetworkAdd');
-                });
-            },
-
-
-            _deleteNetwork: function (networkId) {
-                Ember.run(this, function () {
-                    this.content.removeObject(this.getNetwork(networkId));
-                    this.trigger('onNetworkDelete');
-                });
-            },
-
-
-            _updateSelectedNetworks: function() {
-                Ember.run(this, function() {
-                    var newSelectedNetworks = this.content.filter(function (network) {
-                        return network.selected;
-                    });
-                    this.set('selectedNetworks', newSelectedNetworks);
-                    this.trigger('onSelectedNetworksChange');
-                });
-            },
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
-
-            selectedNetworksObserver: function() {
-                Ember.run.once(this, '_updateSelectedNetworks');
-            }.observes('content.@each.selected')
 		});
 	}
 );

@@ -1,14 +1,18 @@
-define('app/models/network', ['ember'],
+define('app/models/network', [
+        'app/models/base',
+        'app/controllers/ip_addresses',
+        'app/controllers/subnets'
+    ],
     //
     //  Network Model
     //
     //  @returns Class
     //
-    function () {
+    function (BaseModel, IPAddressesController, SubnetsController) {
 
         'use strict';
 
-        return Ember.Object.extend({
+        return BaseModel.extend({
 
 
             //
@@ -18,15 +22,17 @@ define('app/models/network', ['ember'],
             //
 
 
-            id: null,
-            name: null,
             status: null,
             subnets: null,
-            ipaddresses: null,
+            ipAddresses: null,
             backend: null,
             selected: null,
 
             load: function () {
+                this.setProperties({
+                    subnets: SubnetsController.create(),
+                    ipAddresses: IPAddressesController.create()
+                });
                 var list = this.get('ipaddress_list_status') || [];
                 list.forEach(function (ip, index) {
                     // Make ips observable objects

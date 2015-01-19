@@ -939,7 +939,7 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_networks', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.networks.load(data.networks);
+            backend.networks.setContent(data.networks);
     })
     .on('monitoring',function (data){
         Mist.monitoringController._updateMonitoringData(data);

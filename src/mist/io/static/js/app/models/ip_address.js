@@ -32,7 +32,7 @@ define('app/models/ip_address', ['app/models/base'],
 
             assignedServer: function () {
 
-            }.property('value', 'server')
+            }.property('value', 'server'),
 
 
             isReserved: function () {
@@ -61,7 +61,7 @@ define('app/models/ip_address', ['app/models/base'],
 
             },
 
-            
+
             unassign: function () {
 
             }
