@@ -131,7 +131,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
 
             getNetwork: function (networkId) {
-                return this.networks.getNetwork(networkId);
+                return this.networks.getObject(networkId);
             },
 
 

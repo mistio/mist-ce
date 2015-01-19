@@ -12,6 +12,14 @@ define('app/controllers/subnets', [
 
         return BaseArrayController.extend({
 
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
             model: SubnetModel
 
         });

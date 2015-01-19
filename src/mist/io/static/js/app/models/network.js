@@ -24,22 +24,33 @@ define('app/models/network', [
 
             status: null,
             subnets: null,
-            ipAddresses: null,
             backend: null,
-            selected: null,
+            ipAddresses: null,
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
 
             load: function () {
                 this.setProperties({
                     subnets: SubnetsController.create(),
                     ipAddresses: IPAddressesController.create()
                 });
-                var list = this.get('ipaddress_list_status') || [];
-                list.forEach(function (ip, index) {
-                    // Make ips observable objects
-                    ip = list[index] = Ember.Object.create(ip);
-                    ip.set('server', Ember.Object.create(ip.get('server')));
-                });
-            }.on('init')
+                this._super();
+            }.on('init'),
+
+
+            update: function (data) {
+                if (data.subnets) {
+                    this.get('subnets').setContent(data.subnets);
+                    delete data.subnets;
+                }
+                this._super(data);
+            }
         });
     }
 );

@@ -31,10 +31,18 @@ define('app/models/subnet', [
             //
 
 
-            load: function () {
+            load: function (data) {
                 this.set('ipAddresses', IPAddressesController.create());
+                this._super(data);
             }.on('init'),
 
+
+            update: function (data) {
+                if (data.ipaddress_list_status) {
+                    this.get('ipAddresses').setContent(data.ipaddress_list_status);
+                }
+                this._super(data);
+            }
         });
     }
 );
