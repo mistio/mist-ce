@@ -430,8 +430,10 @@ var loadApp = function (
                 field.isKey = true;
             if (field.type == 'region')
                 field.isRegion = true;
+            if (!field.placeholder)
+                field.placeholder = "";
             if (field.optional)
-                field.placeholder = '(optional)';
+                field.placeholder += '(optional)';
             if (!field.label)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||
@@ -1598,7 +1600,8 @@ var PROVIDER_MAP = {
         },
         {
             name: 'username',
-            type: 'text'
+            type: 'text',
+            placeholder: 'user@org',
         },
         {
             name: 'password',
@@ -1607,6 +1610,29 @@ var PROVIDER_MAP = {
         {
             name: 'host',
             type: 'text'
+        }
+    ],
+
+    indonesian_vcloud: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Indonesian Cloud'
+        },
+        {
+            name: 'username',
+            type: 'text',
+            defaultValue: 'admin',
+
+        },
+        {
+            name: 'password',
+            type: 'password'
+        },
+        {
+            name: 'organization',
+            type: 'text',
+            placeholder: 'Mist.io'
         }
     ]
 };
