@@ -47,6 +47,9 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 return this.provider == 'openstack';
             }.property('provider'),
 
+            isLibvirt: function () {
+                return this.get('provider') == 'libvirt';
+            }.property('provider'),
 
             hasNetworks: function () {
                 return this.provider == 'openstack' ||
