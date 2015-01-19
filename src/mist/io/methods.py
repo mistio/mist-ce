@@ -242,7 +242,7 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_hp(user, title, provider, params)
     elif provider == 'openstack':
         backend_id, backend = _add_backend_openstack(title, provider, params)
-    elif provider == 'vcloud':
+    elif provider in ['vcloud', 'indonesian_vcloud']:
         backend_id, backend = _add_backend_vcloud(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
@@ -345,12 +345,18 @@ def _add_backend_vcloud(title, provider, params):
         raise RequiredParameterMissingError('password')
 
     host = params.get('host', '')
-    if not host:
-        raise RequiredParameterMissingError('host')
-
-    for prefix in ['https://', 'http://']:
-        host = host.strip(prefix)
-    host = host.split('/')[0]
+    if provider == 'vcloud':
+        if not host:
+            raise RequiredParameterMissingError('host')
+        for prefix in ['https://', 'http://']:
+            host = host.strip(prefix)
+        host = host.split('/')[0]
+    elif provider == 'indonesian_vcloud':
+        host = 'compute.idcloudonline.com'
+        organization = params.get('organization', '')
+        if not organization:
+            raise RequiredParameterMissingError('organization')
+        username = '%s@%s' % (username, organization)
 
     backend = model.Backend()
     backend.title = title
@@ -1011,7 +1017,7 @@ def connect_provider(backend):
                       region=backend.region)
     elif backend.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(backend.apikey, backend.apisecret)
-    elif backend.provider == Provider.VCLOUD:
+    elif backend.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         libcloud.security.VERIFY_SSL_CERT = False;
         conn = driver(backend.apikey, backend.apisecret, host=backend.apiurl)
     elif backend.provider == Provider.DIGITAL_OCEAN:
@@ -1051,7 +1057,7 @@ def get_machine_actions(machine_from_api, conn):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD):
+                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD):
         can_tag = False
 
     # for other states
@@ -1260,7 +1266,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_azure(conn, key_id, private_key,
                                              public_key, machine_name,
                                              image, size, location, cloud_service_name=None)
-    elif conn.type == Provider.VCLOUD:
+    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
@@ -2279,7 +2285,7 @@ def list_networks(user, backend_id):
     conn = connect_provider(backend)
 
     ret = []
-    if conn.type in [Provider.NEPHOSCALE, Provider.VCLOUD]:
+    if conn.type in [Provider.NEPHOSCALE, Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         networks = conn.ex_list_networks()
 
         for network in networks:
