@@ -9,6 +9,8 @@ define('app/views/subnet_list_item', ['app/views/list_item'],
 
         return ListItemView.extend({
 
+            tagName: 'div'
+            
         });
     }
 );
