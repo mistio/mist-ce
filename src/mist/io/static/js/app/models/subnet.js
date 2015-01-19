@@ -1,6 +1,6 @@
 define('app/models/subnet', [
-    'app/models/base'
-    'app/controllers/ip_addresses'
+        'app/models/base'
+        'app/controllers/ip_addresses'
     ],
     //
     //  Subnet Model
