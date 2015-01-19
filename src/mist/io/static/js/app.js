@@ -595,7 +595,7 @@ var loadApp = function (
     });
 
     // Ember views
-    
+
     App.SubnetListItemView = SubnetListItemView;
 
     App.set('homeView', Home);
