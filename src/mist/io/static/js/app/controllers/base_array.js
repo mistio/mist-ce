@@ -19,7 +19,7 @@ define('app/controllers/base_array', ['ember'],
 
 
             model: null,
-            content: [],
+            content: null,
 
 
             //
@@ -32,7 +32,6 @@ define('app/controllers/base_array', ['ember'],
             selectedObjects: function () {
                 return this.get('content').filterBy('selected', true);
             }.property('content.@each.selected'),
-
 
 
             //
@@ -84,21 +83,20 @@ define('app/controllers/base_array', ['ember'],
 
                 // Remove deleted objects
                 this.get('content').forEach(function (object) {
-
                     if (!content.findBy('id', object.id))
                         this._deleteObject(object);
-                    }, this);
+                }, this);
 
-                    // Update existing objects or add new ones
-                    content.forEach(function (object) {
-                        if (this.objectExists(object.id)) {
-                            this._updateObject(object);
-                        } else {
-                            this._addObject(object);
-                        }
-                    }, this);
+                // Update existing objects or add new ones
+                content.forEach(function (object) {
+                    if (this.objectExists(object.id)) {
+                        this._updateObject(object);
+                    } else {
+                        this._addObject(object);
+                    }
+                }, this);
 
-                    this.trigger('onChange');
+                this.trigger('onChange');
             },
 
 

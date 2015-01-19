@@ -32,11 +32,6 @@ define('app/controllers/networks', [
             //
 
 
-            getNetwork: function (networkId) {
-                return this.content.findBy('id', networkId);
-            },
-
-
 			associateNetwork: function (args) {
 
 				var machineId;
