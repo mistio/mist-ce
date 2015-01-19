@@ -22,6 +22,8 @@ define('app/controllers/machine_add', ['ember'],
             newMachineLocation: null,
             newMachineProvider: null,
             newMachineMonitoring: true,
+            newMachineDockerCommand: null,
+            newMachineDockerEnvironment: null,
 
 
             /**
@@ -174,7 +176,9 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
-                    .set('newMachineProvider', {'title' : 'Select Provider'});
+                    .set('newMachineProvider', {'title' : 'Select Provider'})
+                    .set('newMachineDockerEnvironment', '')
+                    .set('newMachineDockerCommand', '');
              },
 
 
