@@ -233,13 +233,18 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider': Provider.VCLOUD,
         'regions': []
     },
+    # Indonesian vCloud
+    {
+        'title': 'Indonesian Cloud',
+        'provider': Provider.INDONESIAN_VCLOUD,
+        'regions': []
+    },
     # libvirt
     {
         'title': 'KVM (via libvirt)',
         'provider' : Provider.LIBVIRT,
         'regions': []
     }
-
 
 ]
 
