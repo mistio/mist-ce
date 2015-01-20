@@ -57,14 +57,6 @@ define('app/views/backend_add', ['app/views/panel'],
             //
 
 
-            firstFieldPlaceholder: function () {
-                var provider = Mist.backendAddController.newBackendProvider;
-                if (provider) {
-                    if (provider.provider == 'vcloud')
-                        return 'user@org';
-                }
-            }.property('Mist.backendAddController.newBackendProvider'),
-
 
             //
             //

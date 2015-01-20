@@ -58,13 +58,15 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             hasNetworks: function () {
                 return this.provider == 'openstack' ||
-                    this.provider == 'vcloud';
+                    this.provider == 'vcloud' ||
+                    this.provider == 'indonesian_vcloud';
             }.property('provider'),
 
 
             className: function () {
                 return PROVIDER_MAP[this.getSimpleProvider()].get('className');
             }.property('provider'),
+
 
 
             /**
@@ -187,6 +189,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 if (this.provider.indexOf('openstack') == 0) return 'openstack';
                 if (this.provider.indexOf('rackspace') == 0) return 'rackspace';
                 if (this.provider.indexOf('bare_metal') == 0) return 'baremetal';
+                if (this.provider.indexOf('indonesian_vcloud') == 0) return 'indonesian';
                 return this.provider;
             },
 

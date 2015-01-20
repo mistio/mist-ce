@@ -168,6 +168,8 @@ def backend_creds(context, backend):
         username.send_keys(context.credentials['VMWARE']['username'])
         password = context.browser.find_element_by_id("password")
         password.send_keys(context.credentials['VMWARE']['password'])
+        password = context.browser.find_element_by_id("organization")
+        password.send_keys(context.credentials['VMWARE']['organization'])
         host = context.browser.find_element_by_id("host")
         host.send_keys(context.credentials['VMWARE']['host'])
 
