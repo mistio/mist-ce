@@ -1664,7 +1664,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
             raise MachineCreationError("Softlayer, got exception %s" % e)
     return node
 
-def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env=[], docker_command=None,
+def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
                            tty_attach=True):
     """Create a machine in docker.
 
@@ -1677,7 +1677,14 @@ def _create_machine_docker(conn, machine_name, image, script=None, public_key=No
             environment = []
 
         if docker_env:
-            environment += docker_env
+            # docker_env is a dict, and we must convert it ot be in the form:
+            # [ "key=value", "key=value"...]
+            docker_environment = ["%s=%s" % (key, value) for key, value in docker_env.iteritems()]
+            environment += docker_environment
+
+        log.warn("===========================")
+        log.warn(environment)
+        log.warn("===========================")
 
         node = conn.create_node(
             name=machine_name,
