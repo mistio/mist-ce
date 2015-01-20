@@ -39,44 +39,217 @@
 
 .. http:post:: /backends
 
-   Add Backend
+   In each POST API request, you have to include the ```Api-Version``` header
 
-   **Example request**:
+   .. sourcecode:: http
 
-   Add EC2 Backend
+       {'Api-Version':2}
+
+
+   **Add EC2 Backend**:
 
    .. sourcecode:: http
 
         {
             "title":"EC2 AP Sydney",
             "provider":"ec2_ap_southeast_2",
-            "apikey":"POIHJOINPOIMIQCIHA",
-            "apisecret":"09jLlilkjIU087JKHgjhguy90ur"
+            "api_key":"POIHJOINPOIMIQCIHA",
+            "api_secret":"09jLlilkjIU087JKHgjhguy90ur"
         }
 
-   Add Openstack Backend
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string api_key: *(required)* EC2 API Key
+   :jsonparam string api_secret: *(required)* EC2 API Secret
+
+   **Add Openstack Backend**:
 
    .. sourcecode:: http
 
         {
             "title":"OpenStack",
             "provider":"openstack",
-            "apikey":"myuser",
-            "apisecret":"superstronpassword",
-            "apiurl":"http://31.53.71.90:5000/v2.0",
+            "username":"myuser",
+            "password":"superstronpassword",
+            "auth_url":"http://31.53.71.90:5000/v2.0",
             "tenant_name":"mist"
         }
 
-   :jsonparam string title:  *required* Title of the backend
-   :jsonparam string provider: *required* Provider as found in supported providers list
-   :jsonparam string apikey: APIKEY or username (depending on the provider)
-   :jsonparam string apisecret: APISECRET or password (depending on the provider)
-   :jsonparam string apiurl: APIURL needed by Openstack and HP Cloud
-   :jsonparam string tenant_name: Tenant needed by Openstack and HP Cloud
-   :jsonparam string machine_ip: Ip address needed when adding Bare Metal Server
-   :jsonparam string machine_key: Id of ssh key needed when adding Bare Metal Server
-   :jsonparam string machine_user: User for Bare Metal Server
-   :jsonparam string region: Necessary only if there is a custom Openstack region
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string username: *(required)* Username for Openstack
+   :jsonparam string password: *(required)* Password for Openstack
+   :jsonparam string auth_url: *(required)* Openstack Auth URL
+   :jsonparam string tenant_name: *(required)* Tenant name
+   :jsonparam string compute_endpoint: *(optional)* In case you have a custom endpoint for your Openstack installation
+   :jsonparam string region: *(optional)* Specify a region of your Openstack installation
+
+   **Add Rackspace backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"MyRackspace",
+            "provider":"rackspace:ord",
+            "username":"myuser",
+            "api_key":"oinoh*jhbJHVJHV77t8"
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string username: *(required)* Rackspace username
+   :jsonparam string api_key: *(required)* Rackspace API Key
+
+   **Add Nephoscale backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"MyNephoBackend",
+            "provider":"nephoscale",
+            "username":"myuser",
+            "password":"nephopass"
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string username: *(required)* Nephoscale username
+   :jsonparam string password: *(required)* Nephoscale password
+
+   **Add Softlayer backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"MySoftLayerBackend",
+            "provider":"softlayer",
+            "username":"myuser",
+            "api_key":"oinoh*jhbJHVJHV77t8"
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string username: *(required)* Softlayer username
+   :jsonparam string api_key: *(required)* Softlayer API Key
+
+   **Add Digital Ocean backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"DigiBackend",
+            "provider":"digitalocean",
+            "token":"dodjhLKJHiuyghv98756fugjhg7687uygjhgjgj",
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string token: *(required)* Generated Token from Digital Ocean
+
+
+   **Add Google Compute Engine backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"MyGCE",
+            "provider":"gce",
+            "email":"0728979879798-908uioiui098098um0h75hb3l7lpj49r2q@developer.gserviceaccount.com",
+            "project_id":"gifted-electron-100",
+            "private_key":"-----BEGIN RSA PRIVATE KEY-----MIICXQIBAAKBgQDhU3C5COPsJ2XQadX6g1xAt6JCxW5CNkTnN81Z6RwBf6HeMUah..."
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string email: *(required)* Email Address generated by your GCE account
+   :jsonparam string project_id: *(required)* You GCE Project's ID
+   :jsonparam string private_key: *(required)* The Private Key you have generated for your GCE account
+
+   **Add Azure backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"MyAzure",
+            "provider":"azure",
+            "subscription_id":"9087dsfhkjhakjfh-0987098hhjk-ohafkjhkjhkjah",
+            "certificate":"-----BEGIN......."
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string subscription_id: *(required)* Subscription ID for your Azure account
+   :jsonparam string certificate: *(required)* The Certificate you have generated for your Azure account
+
+   **Add Linode backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"Linode",
+            "provider":"linode",
+            "api_key":"dodjhLKJHiuyghv98756fugjhg7687uygjhgjgj",
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string api_key: *(required)* The API Key for your Linode account
+
+   **Add Docker backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"MyDocher",
+            "provider":"docker",
+            "docker_host":"http://10.0.0.1",
+            "docker_port":"4243"
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string docker_host: *(required)* The host of your Docker
+   :jsonparam string docker_port: *(optional)* The port on which your Docker API is exposed to. By default will be ```4243```
+   :jsonparam string auth_user: *(optional)* In case you have set up a basic auth in front of Docker, this will be the Auth User
+   :jsonparam string auth_password: *(optional)* In case you have set up a basic auth in front of Docker, this will be the Auth Password
+
+   **Add HP Cloud backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"HP",
+            "provider":"hpcloud:region-a.geo-1",
+            "username":"myuser",
+            "password":"hppass",
+            "tenant_name":"mytenant"
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string username: *(required)* Username for your HP Cloud Account
+   :jsonparam string password: *(required)* Password for your HP Cloud Account
+   :jsonparam string tenant_name: *(required)* Tenant name for your HP Cloud Account
+
+   **Add Single Server/Bare Metal backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"MyServer",
+            "provider":"bare_metal",
+            "machine_ip":"10.0.0.1",
+            "machine_user":"root",
+            "machine_key":"mySSHKey",
+            "machine_port":"22"
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string machine_ip: *(required)* IP of your server
+   :jsonparam string machine_user: *(required)* User to connect with your server
+   :jsonparam string machine_key: *(required)* The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.
+   :jsonparam string machine_port: *(optional)* By default it will be ```22```, but you can alter this if your ssh-server listen to another port
 
    **Example response**:
 

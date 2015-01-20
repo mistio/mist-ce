@@ -10,26 +10,31 @@ Feature: Add second-tier backends
     When I click the "Add backend" button
     And I click the button that contains "Select provider"
     And I click the "<provider>" button
+    And I wait for 1 seconds
     And I use my "<credentials>" credentials
     And I click the "Add" button
     Then the "<provider>" backend should be added within 30 seconds
 
     Examples: Providers
-    | provider             | credentials  |
-    | DigitalOcean         | DIGITALOCEAN |
+    | provider              | credentials  |
+    | Azure                 | AZURE        |
+    | DigitalOcean          | DIGITALOCEAN |
+    | Google Compute Engine | GCE          |
+    | HP Helion Cloud       | HP           |
     | Linode               | LINODE       |
-    | Rackspace DFW        | RACKSPACE    |
-    | SoftLayer            | SOFTLAYER    |
     | NephoScale           | NEPHOSCALE   |
-    | Docker               | DOCKER       |
-    | HP Helion Cloud - US East     | HP           |
-    | HP Helion Cloud - US West     | HP           |
+#    | OpenStack            | OPENSTACK    |
+    | Rackspace            | RACKSPACE    |
+    | SoftLayer            | SOFTLAYER    |
+    | VMware vCloud        | VMWARE       |
+#    | EC2                  | EC2          |
+#    | Docker               | DOCKER       |
 
     @backend-actions
     Scenario: Backend Actions
-      Given "Rackspace DFW" backend added
+      Given "Rackspace" backend added
 
-      When I click the "Rackspace DFW" button
+      When I click the "Rackspace" button
       And I rename the backend to "Renamed"
       And I wait for 1 seconds
       And I click the "Back" button inside the "Edit backend" popup

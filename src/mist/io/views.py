@@ -85,7 +85,7 @@ def home(request):
     return {
         'project': 'mist.io',
         'email': json.dumps(user.email),
-        'supported_providers': json.dumps(config.SUPPORTED_PROVIDERS),
+        'supported_providers': json.dumps(config.SUPPORTED_PROVIDERS_V_2),
         'core_uri': json.dumps(config.CORE_URI),
         'auth': json.dumps(bool(user.mist_api_token)),
         'js_build': json.dumps(config.JS_BUILD),
@@ -187,39 +187,50 @@ def add_backend(request):
     for key in params.keys():
         if type(params[key]) in [unicode, str]:
             params[key] = params[key].rstrip().lstrip()
+
+    api_version = request.headers.get('Api-Version', 1)
     title = params.get('title', '')
     provider = params.get('provider', '')
-    apikey = params.get('apikey', '')
-    apisecret = params.get('apisecret', '')
-    apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
-    tenant_name = params.get('tenant_name', '')
-    # following params are for baremetal
-    machine_hostname = params.get('machine_ip', '')
-    machine_key = params.get('machine_key', '')
-    machine_user = params.get('machine_user', '')
-    remove_on_error = params.get('remove_on_error', True)
-    try:
-        docker_port = int(params.get('docker_port', 4243))
-    except:
-        docker_port = 4243
-    try:
-        ssh_port = int(params.get('machine_port', 22))
-    except:
-        ssh_port = 22
-    region = params.get('region', '')
-    compute_endpoint = params.get('compute_endpoint', '')
-    # TODO: check if all necessary information was provided in the request
+
+    if not provider:
+        raise RequiredParameterMissingError('provider')
 
     user = user_from_request(request)
-    backend_id = methods.add_backend(
-        user, title, provider, apikey, apisecret, apiurl,
-        tenant_name=tenant_name,
-        machine_hostname=machine_hostname, machine_key=machine_key,
-        machine_user=machine_user, region=region,
-        compute_endpoint=compute_endpoint, port=ssh_port,
-        docker_port=docker_port,
-        remove_on_error=remove_on_error,
-    )
+
+    if int(api_version) == 2:
+        backend_id = methods.add_backend_v_2(user, title, provider, params)
+    else:
+        apikey = params.get('apikey', '')
+        apisecret = params.get('apisecret', '')
+        apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
+        tenant_name = params.get('tenant_name', '')
+        # following params are for baremetal
+        machine_hostname = params.get('machine_ip', '')
+        machine_key = params.get('machine_key', '')
+        machine_user = params.get('machine_user', '')
+        remove_on_error = params.get('remove_on_error', True)
+        try:
+            docker_port = int(params.get('docker_port', 4243))
+        except:
+            docker_port = 4243
+        try:
+            ssh_port = int(params.get('machine_port', 22))
+        except:
+            ssh_port = 22
+        region = params.get('region', '')
+        compute_endpoint = params.get('compute_endpoint', '')
+        # TODO: check if all necessary information was provided in the request
+
+        backend_id = methods.add_backend(
+            user, title, provider, apikey, apisecret, apiurl,
+            tenant_name=tenant_name,
+            machine_hostname=machine_hostname, machine_key=machine_key,
+            machine_user=machine_user, region=region,
+            compute_endpoint=compute_endpoint, port=ssh_port,
+            docker_port=docker_port,
+            remove_on_error=remove_on_error,
+        )
+
     backend = user.backends[backend_id]
     return {
         'index': len(user.backends) - 1,
@@ -890,7 +901,12 @@ def list_supported_providers(request):
     @param request: A simple GET request
     @return: Return all of our SUPPORTED PROVIDERS
     """
-    return {'supported_providers': config.SUPPORTED_PROVIDERS}
+
+    api_version = request.headers.get('Api-Version', 1)
+    if int(api_version) == 2:
+        return {'supported_providers': config.SUPPORTED_PROVIDERS_V_2}
+    else:
+        return {'supported_providers': config.SUPPORTED_PROVIDERS}
 
 
 @view_config(route_name='socketio', renderer='json')

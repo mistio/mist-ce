@@ -306,6 +306,7 @@ ul.checkbox-list li label {
 .checkbox-link .ui-checkbox {
     margin: 0 !important;
     float:left;
+    clear: both;
 }
 .checkbox-link .ui-checkbox input {
     display: none;

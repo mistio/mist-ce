@@ -150,8 +150,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     $('#create-machine-key').addClass('ui-state-disabled');
                     $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
 
-                    // Openstack networks
-                    if (backend.provider == 'openstack') {
+                    if (backend.get('hasNetworks')) {
                         if (backend.networks.content.length > 0) {
                             $('#create-machine-network').show();
                             $('label[for=create-machine-script]').text('8. Script:');
@@ -209,17 +208,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
 
                 selectKey: function (key) {
-
-                    this.fieldIsReady('key');
-
-                    Mist.machineAddController.set('newMachineKey', key);
-                    $('#create-machine-monitoring').removeClass('ui-state-disabled');
-                    $('#create-machine-network .ui-collapsible')
-                        .removeClass('ui-state-disabled')
-                        .parent()
-                        .trigger('create')
-                        .find('label')
-                        .removeClass('ui-corner-all');
+                    this._selectKey(key)
                 },
 
 
@@ -234,10 +223,10 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 createKeyClicked: function () {
                     var that = this;
                     Mist.keyAddController.open(function (success, key) {
-                        that.fieldIsReady('key');
-                        Mist.machineAddController.set('newMachineKey', key);
+                        that._selectKey(key);
                     });
                 },
+
 
                 backClicked: function () {
                     Mist.machineAddController.close();
@@ -247,6 +236,21 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 launchClicked: function () {
                     Mist.machineAddController.add();
                 }
+            },
+
+
+            _selectKey: function (key) {
+
+                this.fieldIsReady('key');
+
+                Mist.machineAddController.set('newMachineKey', key);
+                $('#create-machine-monitoring').removeClass('ui-state-disabled');
+                $('#create-machine-network .ui-collapsible')
+                    .removeClass('ui-state-disabled')
+                    .parent()
+                    .trigger('create')
+                    .find('label')
+                    .removeClass('ui-corner-all');
             },
 
 
