@@ -1222,7 +1222,8 @@ def list_machines(user, backend_id):
 
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
-                   size_name, location_name, ips, monitoring, networks=[], ssh_port=22):
+                   size_name, location_name, ips, monitoring, networks=[],
+                   docker_env=[], docker_command=None, ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1274,9 +1275,11 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
     if conn.type is Provider.DOCKER:
         if key_id:
-            node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
+            node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
+                                          docker_env=docker_env, docker_command=docker_command)
         else:
-            node = _create_machine_docker(conn, machine_name, image_id, script)
+            node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
+                                          docker_command=docker_command)
         if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
@@ -1669,7 +1672,8 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
             raise MachineCreationError("Softlayer, got exception %s" % e)
     return node
 
-def _create_machine_docker(conn, machine_name, image, script, public_key=None, tty_attach=True):
+def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
+                           tty_attach=True):
     """Create a machine in docker.
 
     """
@@ -1678,11 +1682,18 @@ def _create_machine_docker(conn, machine_name, image, script, public_key=None, t
         if public_key:
             environment = ['PUBLIC_KEY=%s' % public_key.strip()]
         else:
-            environment = None
+            environment = []
+
+        if docker_env:
+            # docker_env is a dict, and we must convert it ot be in the form:
+            # [ "key=value", "key=value"...]
+            docker_environment = ["%s=%s" % (key, value) for key, value in docker_env.iteritems()]
+            environment += docker_environment
+
         node = conn.create_node(
             name=machine_name,
             image=image,
-            command=script,
+            command=docker_command,
             environment=environment,
             tty=tty_attach
         )

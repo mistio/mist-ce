@@ -418,6 +418,9 @@ var loadApp = function (
 
     // Parse PROVIDER_MAP to generate template friendly fields
     forIn(PROVIDER_MAP, function (fields, title) {
+        PROVIDER_MAP[title].className = 'provider-';
+        PROVIDER_MAP[title].className += title == 'bare_metal' ?
+            'baremetal' : title;
         fields.forEach(function (field, index) {
             field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
             field.value = field.defaultValue || '';

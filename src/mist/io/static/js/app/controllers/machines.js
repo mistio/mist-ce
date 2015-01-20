@@ -52,7 +52,8 @@ define('app/controllers/machines', ['app/models/machine'],
              *
              */
 
-            newMachine: function(name, image, size, location, key, script, monitoring) {
+            newMachine: function(name, image, size, location, key, script, monitoring,
+                dockerEnv, dockerCommand) {
 
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -79,6 +80,16 @@ define('app/controllers/machines', ['app/models/machine'],
                         networks.push(network.id);
                 });
 
+                // Construct docerEnv dict
+                var environment = null;
+                if (dockerEnv.length) {
+                    environment = {};
+                    dockerEnv.split('\n').forEach(function (definition) {
+                        definition = definition.split('=');
+                        environment[definition[0]] = definition[1];
+                    });
+                }
+
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
                         'name': name,
@@ -96,7 +107,10 @@ define('app/controllers/machines', ['app/models/machine'],
                         'location_name': location.name,
                         'monitoring' : monitoring,
                         // Openstack
-                        'networks': networks
+                        'networks': networks,
+                        // Docker
+                        'docker_env': environment,
+                        'docker_command': dockerCommand,
                 }).success(function (machine) {
                     machine.backend = that.backend;
                     // Nephoscale returns machine id on request success,

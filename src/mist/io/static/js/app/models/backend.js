@@ -51,10 +51,22 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 return this.get('provider') == 'libvirt';
             }.property('provider'),
 
+            isDocker: function () {
+                return this.provider == 'docker';
+            }.property('provider'),
+
+
             hasNetworks: function () {
                 return this.provider == 'openstack' ||
-                    this.provider == 'vcloud' || this.provider == 'indonesian_vcloud';
-            }.property(''),
+                    this.provider == 'vcloud' ||
+                    this.provider == 'indonesian_vcloud';
+            }.property('provider'),
+
+
+            className: function () {
+                return PROVIDER_MAP[this.getSimpleProvider()].get('className');
+            }.property('provider'),
+
 
 
             /**

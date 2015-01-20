@@ -22,6 +22,8 @@ define('app/controllers/machine_add', ['ember'],
             newMachineLocation: null,
             newMachineProvider: null,
             newMachineMonitoring: true,
+            newMachineDockerCommand: null,
+            newMachineDockerEnvironment: null,
 
 
             /**
@@ -34,6 +36,7 @@ define('app/controllers/machine_add', ['ember'],
                 // In case page is scrolled, opening the
                 // panel introduces an unpleasant view.
                 // Scrolling to top fixes that
+                $('#create-machine-panel .docker').hide();
                 $('.ui-page-active').animate({scrollTop:0}, 'slow');
                 $('#create-machine-panel .ui-panel-inner').animate({scrollTop:0}, 'slow');
                 $('#create-machine-panel').panel('open');
@@ -107,7 +110,7 @@ define('app/controllers/machine_add', ['ember'],
                         Mist.notificationController.timeNotify('The name can contain only letters, numbers, and hyphens. The name must start with a letter and must end with a letter or a number.', 7000);
                         return;
                     }
-                }                
+                }
                 if (providerName == 'Google Compute Engine') {
                     var re = /^[0-9a-z-]*$/;
                     if (!re.test(machineName)) {
@@ -143,6 +146,8 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineKey,
                         this.newMachineScript,
                         this.newMachineMonitoring,
+                        this.newMachineDockerEnvironment.trim(),
+                        this.newMachineDockerCommand,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }
@@ -171,7 +176,9 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
-                    .set('newMachineProvider', {'title' : 'Select Provider'});
+                    .set('newMachineProvider', {'title' : 'Select Provider'})
+                    .set('newMachineDockerEnvironment', '')
+                    .set('newMachineDockerCommand', '');
              },
 
 
