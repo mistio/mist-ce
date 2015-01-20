@@ -80,6 +80,16 @@ define('app/controllers/machines', ['app/models/machine'],
                         networks.push(network.id);
                 });
 
+                // Construct docerEnv dict
+                var environment = null;
+                if (dockerEnv.length) {
+                    environment = {};
+                    dockerEnv.split('\n').forEach(function (definition) {
+                        definition = definition.split('=');
+                        environment[definition[0]] = definition[1];
+                    });
+                }
+
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
                         'name': name,
@@ -99,7 +109,7 @@ define('app/controllers/machines', ['app/models/machine'],
                         // Openstack
                         'networks': networks,
                         // Docker
-                        'docker_env': dockerEnv.length ? dockerEnv.split('\n') : null,
+                        'docker_env': environment,
                         'docker_command': dockerCommand,
                 }).success(function (machine) {
                     machine.backend = that.backend;
