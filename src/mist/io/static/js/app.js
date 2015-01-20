@@ -1593,6 +1593,33 @@ var PROVIDER_MAP = {
         }
     ],
 
+    libvirt: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'KVM (libvirt)',
+        },
+        {
+            name: 'machine_hostname',
+            label: 'KVM hostname',
+            type: 'text',
+        },
+        {
+            name: 'machine_user',
+            type: 'text',
+            label: 'ssh user',
+            optional: true,
+            defaultValue: 'root',
+        },
+        {
+            name: 'machine_key',
+            type: 'ssh_key',
+            label: 'ssh key',
+            optional: true,
+        },
+
+    ],
+
     vcloud: [
         {
             name: 'title',

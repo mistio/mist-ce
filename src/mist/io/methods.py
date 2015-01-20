@@ -244,6 +244,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_openstack(title, provider, params)
     elif provider == 'vcloud':
         backend_id, backend = _add_backend_vcloud(title, provider, params)
+    elif provider == 'libvirt':
+        backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -274,6 +276,14 @@ def add_backend_v_2(user, title, provider, params):
         user.save()
     log.info("Backend with id '%s' added succesfully with Api-Version: 2.", backend_id)
     trigger_session_update(user.email, ['backends'])
+
+    if provider == 'libvirt' and backend.apisecret:
+    # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
+        key_id = params.get('machine_key')
+        node_id = backend.apiurl # id of the hypervisor is the hostname provided
+        username = backend.apikey
+        associate_key(user, key_id, backend_id, node_id, username=username)
+
     return backend_id
 
 
@@ -565,6 +575,32 @@ def _add_backend_docker(title, provider, params):
     backend.apikey = auth_user
     backend.apisecret = auth_password
     backend.apiurl = docker_host
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+def _add_backend_libvirt(user, title, provider, params):
+    machine_hostname = params.get('machine_hostname', '')
+    if not machine_hostname:
+        raise RequiredParameterMissingError('machine_hostname')
+
+    apikey = params.get('machine_user', 'root')
+
+    apisecret = params.get('machine_key', '')
+    if apisecret:
+        if apisecret not in user.keypairs:
+            raise KeypairNotFoundError(apisecret)
+        apisecret = user.keypairs[apisecret].private
+
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = apikey
+    backend.apisecret = apisecret
+    backend.apiurl = machine_hostname
     backend.enabled = True
     backend_id = backend.get_id()
 
@@ -1022,6 +1058,16 @@ def connect_provider(backend):
             conn = driver(backend.apikey, backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
+    elif backend.provider == Provider.LIBVIRT:
+        # support the three ways to connect: local system, qemu+tcp, qemu+ssh
+        if backend.apisecret:
+            temp_key_file = NamedTemporaryFile(delete=False)
+            temp_key_file.write(backend.apisecret)
+            temp_key_file.close()
+            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=temp_key_file.name)
+
+        else:
+            conn = driver(backend.apiurl, user=backend.apikey)
     else:
         # ec2
         conn = driver(backend.apikey, backend.apisecret)
@@ -1030,7 +1076,7 @@ def connect_provider(backend):
     return conn
 
 
-def get_machine_actions(machine_from_api, conn):
+def get_machine_actions(machine_from_api, conn, extra):
     """Returns available machine actions based on backend type.
 
     Rackspace, Linode and openstack support the same options, but EC2 also
@@ -1051,7 +1097,7 @@ def get_machine_actions(machine_from_api, conn):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD):
+                     Provider.VCLOUD, Provider.LIBVIRT):
         can_tag = False
 
     # for other states
@@ -1083,9 +1129,20 @@ def get_machine_actions(machine_from_api, conn):
         #after resize, node gets to pending mode, needs to be started
             can_start = True
 
+    if conn.type in [Provider.LIBVIRT]:
+        if machine_from_api.state is NodeState.TERMINATED:
+        # in libvirt a terminated machine can be started
+            can_start = True
+
     if conn.type is Provider.GCE:
         can_start = False
         can_stop = False
+    
+    if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
+        # allow only reboot action for libvirt hypervisor
+        can_stop = False
+        can_destroy = False
+        can_start = False
 
     return {'can_stop': can_stop,
             'can_start': can_start,
@@ -1149,7 +1206,7 @@ def list_machines(user, backend_id):
                    'public_ips': m.public_ips,
                    'tags': tags,
                    'extra': m.extra}
-        machine.update(get_machine_actions(m, conn))
+        machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
 
     return ret
@@ -1905,6 +1962,19 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
                 except:
                     return False
             else:
+                if conn.type == 'libvirt':
+                    if machine.extra.get('tags', {}).get('type', None) == 'hypervisor':
+                         # issue an ssh command for the libvirt hypervisor
+                        try:
+                            hostname = machine.public_ips[0]
+                            command = '$(command -v sudo) shutdown -r now'
+                            ssh_command(user, backend_id, machine_id, hostname, command)
+                            return True
+                        except:
+                            return False
+
+                    else:
+                       machine.reboot()
                 if conn.type == 'azure':
                     conn.reboot_node(machine, ex_cloud_service_name=cloud_service)
                 else:
