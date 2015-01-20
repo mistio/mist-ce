@@ -85,22 +85,24 @@ define('app/controllers/base_array', ['ember'],
 
             _updateContent: function (content) {
 
-                // Remove deleted objects
-                this.get('content').forEach(function (object) {
-                    if (!content.findBy('id', object.id))
-                        this._deleteObject(object);
-                }, this);
+                Ember.run(this, function () {
+                    // Remove deleted objects
+                    this.get('content').forEach(function (object) {
+                        if (!content.findBy('id', object.id))
+                            this._deleteObject(object);
+                    }, this);
 
-                // Update existing objects or add new ones
-                content.forEach(function (object) {
-                    if (this.objectExists(object.id)) {
-                        this._updateObject(object);
-                    } else {
-                        this._addObject(object);
-                    }
-                }, this);
+                    // Update existing objects or add new ones
+                    content.forEach(function (object) {
+                        if (this.objectExists(object.id)) {
+                            this._updateObject(object);
+                        } else {
+                            this._addObject(object);
+                        }
+                    }, this);
 
-                this.trigger('onChange');
+                    this.trigger('onChange');
+                });
             },
 
 
