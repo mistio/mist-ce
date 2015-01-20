@@ -80,7 +80,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.images.on('onImageListChange', this, '_updateImageCount');
                     this.machines.on('onMachineListChange', this, '_updateMachineCount');
                     this.locations.on('onLocationListChange', this, '_updateLocationCount');
-                    this.networks.on('onNetworkListChange', this, '_updateNetworkCount');
+                    this.networks.on('onChange', this, '_updateNetworkCount');
                     this.machines.on('onSelectedMachinesChange', this, '_updateSelectedMachines');
                     this.networks.on('onSelectedNetworksChange', this, '_updateSelectedNetworks');
 
