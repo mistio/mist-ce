@@ -20,6 +20,7 @@ define('app/controllers/base_array', ['ember'],
 
             model: null,
             content: null,
+            passOnProperties: [],
 
 
             //
@@ -44,7 +45,7 @@ define('app/controllers/base_array', ['ember'],
             load: function () {
                 this.setProperties({
                     loading: true,
-                    content: new Array()
+                    content: new Array(),
                 });
             }.on('init'),
 
@@ -57,6 +58,9 @@ define('app/controllers/base_array', ['ember'],
 
 
             setContent: function (content) {
+                this.get('passOnProperties').forEach(function (property) {
+                    content.setEach(property, this.get(property));
+                }, this);
                 this._updateContent(content);
                 this.set('loading', false);
             },

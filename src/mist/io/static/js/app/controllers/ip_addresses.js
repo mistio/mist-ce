@@ -6,35 +6,16 @@ define('app/controllers/ip_addresses', [
     //  IP Addresses Controller
     //
     //  @returns Class
+    //
     function (BaseArrayController, IPAddressModel) {
 
         'use strict';
 
         return BaseArrayController.extend({
 
-
-            //
-            //
-            //  Properties
-            //
-            //
-
-
-            network: null,
             model: IPAddressModel,
+            passOnProperties: ['network']
 
-
-            //
-            //
-            //  Methods
-            //
-            //
-
-
-            setContent: function (content) {
-                content.setEach('network', this.get('network'));
-                this._super(content);
-            }
         });
     }
 );

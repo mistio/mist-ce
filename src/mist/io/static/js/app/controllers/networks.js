@@ -23,6 +23,7 @@ define('app/controllers/networks', [
 
 			backend: null,
 			model: NetworkModel,
+			passOnProperties: ['backend'],
 
 
             //
@@ -30,12 +31,6 @@ define('app/controllers/networks', [
             //  Methods
             //
             //
-
-
-			setContent: function (content) {
-				content.setEach('backend', this.get('backend'));
-				this._super(content);
-			},
 
 
 			associateNetwork: function (args) {
