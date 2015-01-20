@@ -99,7 +99,7 @@ define('app/controllers/machines', ['app/models/machine'],
                         // Openstack
                         'networks': networks,
                         // Docker
-                        'docker_env': dockerEnv.split('\n'),
+                        'docker_env': dockerEnv.length ? dockerEnv.split('\n') : null,
                         'docker_command': dockerCommand,
                 }).success(function (machine) {
                     machine.backend = that.backend;

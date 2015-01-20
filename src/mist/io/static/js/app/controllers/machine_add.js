@@ -146,7 +146,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineKey,
                         this.newMachineScript,
                         this.newMachineMonitoring,
-                        this.newMachineDockerEnvironment,
+                        this.newMachineDockerEnvironment.trim(),
                         this.newMachineDockerCommand,
                         function(success, machine) {
                             that._giveCallback(success, machine);
