@@ -101,7 +101,7 @@
         </div>
 
         <!-- Select Size -->
-
+        <div id="size">
         <label>Size:</label>
         <div id="create-machine-size"
              data-role="collapsible"
@@ -122,6 +122,7 @@
                 </li>
                 {{/each}}
             </ul>
+        </div>
         </div>
 
         <!-- Select Location -->
@@ -168,6 +169,7 @@
 
         <!-- Select Key -->
 
+        <div id="key">
         <label>Key:</label>
         <div id="create-machine-key"
              data-role="collapsible"
@@ -187,6 +189,7 @@
                     <a {{action "createKeyClicked" target="view"}}>Add Key</a>
                 </li>
             </ul>
+        </div>
         </div>
 
         <!-- Select Networks -->
@@ -226,14 +229,10 @@
         <div id="create-machine-monitoring" class="ui-state-disabled">
             <label>
             {{view Mist.Checkbox
-               data-theme="a"
+                data-theme="a"
                checkedBinding="Mist.machineAddController.newMachineMonitoring"}}
             Enable monitoring
             </label>
-        </div>
-
-        <div class="docker">
-
         </div>
 
         <div id="create-machine-cost">

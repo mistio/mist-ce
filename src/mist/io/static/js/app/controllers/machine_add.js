@@ -193,12 +193,19 @@ define('app/controllers/machine_add', ['ember'],
                 }
 
                 // SSH key and location are optional for docker
-                if (this.newMachineProvider.provider != 'docker')
+                if (this.newMachineProvider.provider != 'docker') {
                     if (Mist.keysController.keyExists(this.newMachineKey.id) &&
                         this.newMachineLocation.id)
                             formReady = true;
                     else
                         formReady = false;
+                }
+
+                if (this.newMachineImage.id &&
+                    this.newMachineImage.get('isMist')) {
+                        if (!Mist.keysController.keyExists(this.newMachineKey.id))
+                            formReady=false;
+                }
 
                 this.set('formReady', formReady);
             },
