@@ -26,7 +26,8 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
                         reserve: !ip.reserved,
                         callback: function (success) {
                             if (!success)
-                                $select.val(ip.reserved ? "on" : "off").slider('refresh');
+                                $select.find('select').val(ip.reserved ? "on" : "off")
+                                    .slider('refresh');
                             $select.removeClass('ui-state-disabled');
                         }
                     });
