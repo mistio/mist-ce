@@ -36,21 +36,26 @@ define('app/models/network', [
 
 
             load: function () {
-                this._super();
+                var subnets = this.get('subnets')
                 this.setProperties({
                     subnets: SubnetsController.create({ network: this }),
                     ipAddresses: IPAddressesController.create({ network: this })
                 });
+                this._updateSubnets(subnets);
             }.on('init'),
 
 
             update: function (data) {
                 if (data.subnets) {
-                    this.get('subnets').setContent(data.subnets);
+                    this._updateSubnets(data.subnets);
                     delete data.subnets;
                 }
                 this._super(data);
-            }
+            },
+
+            _updateSubnets: function (subnets) {
+                this.get('subnets').setContent(subnets);
+            },
         });
     }
 );

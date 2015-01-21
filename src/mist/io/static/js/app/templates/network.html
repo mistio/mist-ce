@@ -4,7 +4,7 @@
 
         <a href="#/networks" class="responsive-button" data-icon="arrow-l">Networks</a>
 
-        <h1>{{unbound name}}</h1>
+        <h1>{{name}}</h1>
 
         {{view Mist.userMenuView}}
 
@@ -19,26 +19,26 @@
             <table class="info-table">
                 <tr>
                     <td>Name</td>
-                    <td>{{unbound name}}</td>
+                    <td>{{name}}</td>
                 </tr>
                 <tr>
                     <td>Id</td>
-                    <td>{{unbound id}}</td>
+                    <td>{{id}}</td>
                 </tr>
                 {{#if status}}
                 <tr>
                     <td>Status</td>
-                    <td>{{unbound status}}</td>
+                    <td>{{status}}</td>
                 </tr>
                 {{/if}}
             </table>
 
         </div>
 
-        {{#if view.network.subnets}}
+        {{#if subnets}}
         <div id="single-network-subnets" data-role="collapsible" data-collapsed="false">
 
-            <h3>Subnets ({{unbound subnets.length}})</h3>
+            <h3>Subnets ({{subnets.length}})</h3>
 
             {{#each subnets}}
                 {{view "subnetListItem" model=this}}
@@ -57,10 +57,10 @@
         data-transition="flip">
 
         <ul data-role="listview">
-            {{#each view.network.backend.machines.content}}
+            {{#each backend.machines}}
             <li data-icon="false">
                 <a {{action "assignMachine" this target="view"}}>
-                    {{this.name}}
+                    {{name}}
                 </a>
             </li>
             {{/each}}
@@ -68,7 +68,8 @@
     </div>
 
     {{view Mist.confirmationDialog}}
-    {{#if view.network.backend.isOpenStack}}
+    
+    {{#if backend.isOpenStack}}
     <div class="single-action-footer" data-role="footer" data-theme="b">
         <a class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete"
             {{action "deleteClicked" target="view"}}>

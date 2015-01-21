@@ -1,32 +1,32 @@
 <table class="info-table">
-    {{#if this.name}}
+    {{#if name}}
     <tr>
         <td class="subnet-name">Name</td>
-        <td class="subnet-name">{{unbound this.name}}</td>
+        <td class="subnet-name">{{name}}</td>
     </tr>
     {{/if}}
-    {{#if this.id}}
+    {{#if id}}
     <tr>
         <td>Id</td>
-        <td>{{unbound this.id}}</td>
+        <td>{{id}}</td>
     </tr>
     {{/if}}
     {{#if this.zone}}
     <tr>
         <td>Zone</td>
-        <td>{{unbound this.zone.name}}</td>
+        <td>{{this.zone.name}}</td>
     </tr>
     {{/if}}
     {{#if this.cidr}}
     <tr>
         <td>Cidr</td>
-        <td>{{unbound this.cidr}}</td>
+        <td>{{this.cidr}}</td>
     </tr>
     {{/if}}
     {{#if this.enable_dhcp}}
     <tr>
         <td>DHCP Enabled</td>
-        <td>{{unbound this.enable_dhcp}}</td>
+        <td>{{this.enable_dhcp}}</td>
     </tr>
     {{/if}}
     {{#if this.gateway_ip}}
@@ -57,38 +57,38 @@
         </tr>
         {{/if}}
 
-        {{#if this.ipaddress_list_status}}
+        {{#if ipAddresses}}
         <tr>
             <td class="usable-ips" colspan="2">
-                <h4>Usable ip addresses ({{this.ipaddress_list_status.length}})</h4>
+                <h4>Usable ip addresses ({{ipAddresses.length}})</h4>
                 <table>
-                    {{#each this.ipaddress_list_status}}
+                    {{#each ipAddresses}}
                     <tr {{bind-attr class="this.address"}}>
-                        <td>{{unbound this.ipaddress}}</td>
-                        <td>
-                            <div class="reserved">
-                                <select name="reserved-slider" data-role="slider" data-mini="true"
-                                {{action "reservedToggleSwitched" this target="this" on="change"}}>
-                                <option></option>
-                                <option value="on"
-                                {{bind-attr selected="this.reserved"}}>Reserved</option>
-                            </select>
-                        </div>
-                        <div>
-                            <a class="assign-network-btn ui-mini ui-btn-icon-right ui-icon-carat-d ui-btn ui-corner-all ui-btn-a"
-                            {{action "assignButtonClicked" this target="this"}}>
-                            {{#if this.server.name}}
-                            {{this.server.name}}
-                            {{else}}
-                            -- unassigned --
-                            {{/if}}
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            {{/each}}
-        </table>
-    </td>
-</tr>
-{{/if}}
+                        <td>{{this.ipaddress}}</td>
+                            <td>
+                                <div class="reserved">
+                                    <select name="reserved-slider" data-role="slider" data-mini="true"
+                                    {{action "reservedToggleSwitched" this target="this" on="change"}}>
+                                    <option></option>
+                                    <option value="on"
+                                    {{bind-attr selected="this.reserved"}}>Reserved</option>
+                                </select>
+                            </div>
+                            <div>
+                                <a class="assign-network-btn ui-mini ui-btn-icon-right ui-icon-carat-d ui-btn ui-corner-all ui-btn-a"
+                                    {{action "assignButtonClicked" this target="this"}}>
+                                    {{#if this.server.name}}
+                                        {{this.server.name}}
+                                    {{else}}
+                                        -- unassigned --
+                                    {{/if}}
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {{/each}}
+            </table>
+        </td>
+    </tr>
+    {{/if}}
 </table>

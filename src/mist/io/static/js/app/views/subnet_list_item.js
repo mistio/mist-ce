@@ -3,6 +3,7 @@ define('app/views/subnet_list_item', ['app/views/list_item'],
     //  Subnet List Item View
     //
     //  @returns Class
+    //
     function (ListItemView) {
 
         'use strict';
@@ -10,7 +11,7 @@ define('app/views/subnet_list_item', ['app/views/list_item'],
         return ListItemView.extend({
 
             tagName: 'div'
-            
+
         });
     }
 );
