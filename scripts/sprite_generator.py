@@ -19,16 +19,18 @@
 import os,shutil, ConfigParser
 
 from PIL import Image
+import time
 #import Image # used for PIP, now we use Pillow
 
 #print "Sprite Generator"
 
-# Iniitalized Variables
+# Iniitalized Variablies
 imageWidth = 0
 imageHeight = 0
 padding = 0
 rootObjects = {}
 backgroundObjects = []
+spriteName="icon-sprite-%d.png" % time.time()
 
 # find the root path by looking for the .sprite_generator file.
 def getRootPath(path):
@@ -65,7 +67,7 @@ if(rootPath):
     inputPath = os.path.join(rootPath, *inputPathAr)
     outputPath = os.path.join(rootPath, *outputPathAr)
 
-    outputImage = os.path.join(outputPath, "icon-sprite.png")
+    outputImage = os.path.join(outputPath, spriteName)
     outputStyle = os.path.join(outputPath, "sprites.css")
 
 
@@ -237,7 +239,7 @@ for root in rootObjects:
     print "Root Object:", root
     index = 0
     size = rootObjects[root][0]['size']
-    Css("%s { background-image: url('%s') !important; width: %spx; height: %spx; } " % (root, "icon-sprite.png", size[0], size[1]))
+    Css("%s { background-image: url('%s') !important; width: %spx; height: %spx; } " % (root, spriteName, size[0], size[1]))
 
     for obj in rootObjects[root]:
         left = index*size[0]
@@ -271,4 +273,3 @@ f.close()
 
 image.save(outputImage)
 print "Done."
-
