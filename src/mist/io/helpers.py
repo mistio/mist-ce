@@ -143,16 +143,20 @@ def parse_ping(stdout):
     return {}
 
 
-def amqp_publish(exchange, routing_key, data):
+def amqp_publish(exchange, routing_key, data,
+                 ex_type='fanout', ex_declare=False):
     connection = Connection()
     channel = connection.channel()
+    if ex_declare:
+        channel.exchange_declare(exchange=exchange, type=ex_type)
     msg = Message(json.dumps(data))
     channel.basic_publish(msg, exchange=exchange, routing_key=routing_key)
     channel.close()
     connection.close()
 
 
-def amqp_subscribe(exchange, queue, callback):
+def amqp_subscribe(exchange, callback, queue='',
+                   ex_type='fanout', routing_keys=None):
     def json_parse_dec(func):
         @functools.wraps(func)
         def wrapped(msg):
@@ -163,14 +167,15 @@ def amqp_subscribe(exchange, queue, callback):
             return func(msg)
         return wrapped
 
-    if not queue:
-        queue = "mist-tmp_%d" % random.randrange(2 ** 20)
-
     connection = Connection()
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange, type='fanout')
-    channel.queue_declare(queue, exclusive=True)
-    channel.queue_bind(queue, exchange)
+    channel.exchange_declare(exchange=exchange, type=ex_type)
+    resp = channel.queue_declare(queue, exclusive=True)
+    if not routing_keys:
+        channel.queue_bind(resp.queue, exchange)
+    else:
+        for routing_key in routing_keys:
+            channel.queue_bind(resp.queue, exchange, routing_key=routing_key)
     channel.basic_consume(queue=queue,
                           callback=json_parse_dec(callback),
                           no_ack=True)
@@ -206,7 +211,7 @@ def amqp_publish_user(user, routing_key, data):
 
 
 def amqp_subscribe_user(user, queue, callback):
-    amqp_subscribe(_amqp_user_exchange(user), queue, callback)
+    amqp_subscribe(_amqp_user_exchange(user), callback, queue)
 
 
 def amqp_user_listening(user):
@@ -241,7 +246,7 @@ def amqp_log_listen():
         ## print msg.delivery_info.get('routing_key')
         print msg.body
 
-    amqp_subscribe('mist_debug', None, echo)
+    amqp_subscribe('mist_debug', echo)
 
 
 class StdStreamCapture(object):
