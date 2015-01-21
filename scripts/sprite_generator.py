@@ -24,7 +24,7 @@ import time
 
 #print "Sprite Generator"
 
-# Iniitalized Variablies
+# Iniitalized Variables
 imageWidth = 0
 imageHeight = 0
 padding = 0

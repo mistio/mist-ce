@@ -876,7 +876,7 @@ var loadImages = function (callback) {
     .split("(")[1] // remove "url()" wrapper
     .split(")")[0]
     .replace(/\"/g, ""); // remove extra quotes
-    info(url);
+
     // Hardcode images not on the spritesheet
     var images = [
         url,
