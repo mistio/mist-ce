@@ -871,12 +871,12 @@ var loadImages = function (callback) {
     // Spritesheet's name includes a timestamp each
     // time we generate it. So we use this "hack" to
     // get it's path and preload it
-    var dummy = $('<div class="user"></div>')
+    var dummy = $('<div class="user"></div>').appendTo('body');
     var url = dummy.css('background-image')
     .split("(")[1] // remove "url()" wrapper
     .split(")")[0]
     .replace(/\"/g, ""); // remove extra quotes
-
+    dummy.remove();
     // Hardcode images not on the spritesheet
     var images = [
         url,
