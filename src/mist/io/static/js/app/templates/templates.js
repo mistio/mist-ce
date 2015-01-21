@@ -1626,13 +1626,13 @@ function program24(depth0,data) {
   data.buffer.push("\n            </h2>\n            <ul data-role=\"listview\" data-theme=\"a\">\n                ");
   stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.images.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            </ul>\n        </div>\n\n        <!-- Select Size -->\n\n        <label>Size:</label>\n        <div id=\"create-machine-size\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h2>");
+  data.buffer.push("\n            </ul>\n        </div>\n\n        <!-- Select Size -->\n        <div id=\"size\">\n        <label>Size:</label>\n        <div id=\"create-machine-size\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h2>");
   stack1 = helpers._triageMustache.call(depth0, "Mist.machineAddController.newMachineSize.name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</h2>\n            <ul data-role=\"listview\" data-theme=\"a\">\n                ");
   stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.sizes.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(16, program16, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            </ul>\n        </div>\n\n        <!-- Select Location -->\n\n        <div id=\"location\">\n            <label>Location:</label>\n            <div id=\"create-machine-location\"\n                 data-role=\"collapsible\"\n                 data-iconpos=\"right\"\n                 data-collapsed-icon=\"arrow-d\"\n                 data-expanded-icon=\"arrow-u\"\n                 data-theme=\"a\"\n                 class=\"mist-select\">\n                <h2>");
+  data.buffer.push("\n            </ul>\n        </div>\n        </div>\n\n        <!-- Select Location -->\n\n        <div id=\"location\">\n            <label>Location:</label>\n            <div id=\"create-machine-location\"\n                 data-role=\"collapsible\"\n                 data-iconpos=\"right\"\n                 data-collapsed-icon=\"arrow-d\"\n                 data-expanded-icon=\"arrow-u\"\n                 data-theme=\"a\"\n                 class=\"mist-select\">\n                <h2>");
   stack1 = helpers._triageMustache.call(depth0, "Mist.machineAddController.newMachineLocation.name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</h2>\n                <ul data-role=\"listview\" data-theme=\"a\">\n                    ");
@@ -1650,7 +1650,7 @@ function program24(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.machineAddController.newMachineDockerCommand")
   },hashTypes:{'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n\n        </div>\n\n        <!-- Select Key -->\n\n        <label>Key:</label>\n        <div id=\"create-machine-key\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h2>");
+  data.buffer.push("\n\n        </div>\n\n        <!-- Select Key -->\n\n        <div id=\"key\">\n        <label>Key:</label>\n        <div id=\"create-machine-key\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h2>");
   stack1 = helpers._triageMustache.call(depth0, "Mist.machineAddController.newMachineKey.id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</h2>\n            <ul data-role=\"listview\" data-theme=\"a\">\n                ");
@@ -1660,7 +1660,7 @@ function program24(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "createKeyClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Add Key</a>\n                </li>\n            </ul>\n        </div>\n\n        <!-- Select Networks -->\n\n        <div id=\"create-machine-network\">\n            <label>Networks:</label>\n            <div data-role=\"collapsible\"\n                    data-iconpos=\"right\"\n                    data-collapsed-icon=\"arrow-d\"\n                    data-expanded-icon=\"arrow-u\"\n                    data-theme=\"a\"\n                    class=\"mist-select\">\n                <h2>Networks</h2>\n                <fieldset data-role=\"controlgroup\" data-theme=\"a\">\n                    ");
+  data.buffer.push(">Add Key</a>\n                </li>\n            </ul>\n        </div>\n        </div>\n\n        <!-- Select Networks -->\n\n        <div id=\"create-machine-network\">\n            <label>Networks:</label>\n            <div data-role=\"collapsible\"\n                    data-iconpos=\"right\"\n                    data-collapsed-icon=\"arrow-d\"\n                    data-expanded-icon=\"arrow-u\"\n                    data-theme=\"a\"\n                    class=\"mist-select\">\n                <h2>Networks</h2>\n                <fieldset data-role=\"controlgroup\" data-theme=\"a\">\n                    ");
   stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.networks.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(22, program22, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                </fieldset>\n            </div>\n        </div>\n\n        <!-- Select Script -->\n\n        <div id=\"script\">\n            <label for=\"create-machine-script\">Script:</label>\n            ");
@@ -1674,7 +1674,7 @@ function program24(depth0,data) {
     'data-theme': ("a"),
     'checkedBinding': ("Mist.machineAddController.newMachineMonitoring")
   },hashTypes:{'data-theme': "STRING",'checkedBinding': "STRING"},hashContexts:{'data-theme': depth0,'checkedBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n            Enable monitoring\n            </label>\n        </div>\n\n        <div class=\"docker\">\n\n        </div>\n\n        <div id=\"create-machine-cost\">\n        ");
+  data.buffer.push("\n            Enable monitoring\n            </label>\n        </div>\n\n        <div id=\"create-machine-cost\">\n        ");
   stack1 = helpers['if'].call(depth0, "view.price", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(24, program24, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </div>\n\n        <div class=\"ok-cancel\" data-role=\"ui-grid-a\" >\n            <div class=\"ui-block-a\">\n                <a data-role=\"button\"\n                   data-theme=\"a\"\n                   ");
