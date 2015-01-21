@@ -57,10 +57,10 @@
         data-transition="flip">
 
         <ul data-role="listview">
-            {{#each backend.machines}}
+            {{#each view.network.backend.machines.content}}
             <li data-icon="false">
                 <a {{action "assignMachine" this target="view"}}>
-                    {{name}}
+                    {{this.name}}
                 </a>
             </li>
             {{/each}}
@@ -68,7 +68,7 @@
     </div>
 
     {{view Mist.confirmationDialog}}
-    
+
     {{#if backend.isOpenStack}}
     <div class="single-action-footer" data-role="footer" data-theme="b">
         <a class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete"

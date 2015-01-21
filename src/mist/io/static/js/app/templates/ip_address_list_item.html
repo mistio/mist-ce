@@ -15,6 +15,7 @@
             ui-btn
             ui-corner-all
             ui-btn-a"
+            {{bind-attr id="view.domID"}}
             {{action "assignClicked" target="view"}}>
                 {{#if server.name}}
                     {{server.name}}

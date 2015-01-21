@@ -11,6 +11,9 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
         return ListItemView.extend({
 
             tagName: 'tr',
+            domID: function () {
+                return '_' + this.get('model').get('id').replace(/\./g, '');
+            }.property('controller.model.id'),
 
             actions: {
 
@@ -30,15 +33,14 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
                 },
 
                 assignClicked: function () {
-                    /*
                     var ip = this.get('model');
-                    ip.get('parentView').set('selectedIp', ip);
-                    $('#assign-machine').popup('reposition', {
-                        positionTo: this.$().find('.assign-network-btn');
-                    }).find('.ui-listview').listview('refresh');
+                    this.get('parentView').get('parentView').set('selectedIp', ip);
+                    $('#assign-machine')
+                        .popup('option', 'positionTo', '#' + this.get('domID'))
+                        .find('.ui-listview').listview('refresh');
                     Ember.run.next(function () {
                         $('#assign-machine').popup('open');
-                    });*/
+                    });
                 }
             }
         });

@@ -31,17 +31,9 @@ define('app/models/ip_address', ['app/models/base'],
 
             reserve: function (args) {
                 this.get('network').get('backend').get('networks').reserveIP({
-                    callback: args ? args.callback : null,
-                    reserve: true,
-                    ip: this,
-                });
-            },
-
-
-            unreserve: function (args) {
-                this.get('network').get('backend').get('networks').reserveIP({
-                    callback: args ? args.callback : null,
-                    reserve: false,
+                    callback: args.callback,
+                    reserve: args.reserve,
+                    network: this.get('network'),
                     ip: this,
                 });
             },

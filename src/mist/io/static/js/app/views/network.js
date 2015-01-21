@@ -100,6 +100,21 @@ define('app/views/network', ['app/views/mistscreen'],
                         }
                     );
                 },
+
+                assignMachine: function (machine) {
+                    var that = this;
+                    this.get('network').get('backend').get('networks').associateNetwork({
+                        network: this.get('network'),
+                        machine: machine,
+                        ip: this.get('selectedIp'),
+                        callback: function (success) {
+                            $('#assign-machine').popup('close');
+                            if (success)
+                                that.get('selectedIp').get('server').set('name', machine.get('name'));
+                            }
+                        }
+                    );
+                },
             },
 
 

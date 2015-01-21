@@ -61,7 +61,7 @@ define('app/controllers/networks', [
 			reserveIP: function (args) {
 
 				var url = '/backends/' + this.backend.id +
-				'/networks/' + this.id;
+				'/networks/' + args.network.id;
 
 				var that = this;
 				that.set('reservingIP',  true);
