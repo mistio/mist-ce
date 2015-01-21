@@ -283,8 +283,9 @@ var loadFiles = function (callback) {
         'app/views/graph_list_control',
         'app/views/graph_list_item',
         'app/views/home',
-        'app/views/image_list',
         'app/views/image_list_item',
+        'app/views/image_list',
+        'app/views/ip_address_list_item',
         'app/views/key',
         'app/views/key_add',
         'app/views/key_edit',
@@ -360,8 +361,9 @@ var loadApp = function (
     GraphListControlView,
     GraphListItemView,
     Home,
-    ImageListView,
     ImageListItem,
+    ImageListView,
+    IPAddressListItemView,
     SingleKeyView,
     KeyAddView,
     KeyEditDialog,
@@ -597,6 +599,7 @@ var loadApp = function (
     // Ember views
 
     App.SubnetListItemView = SubnetListItemView;
+    App.IpAddressListItemView = IPAddressListItemView;
 
     App.set('homeView', Home);
     App.set('ruleView', RuleView);

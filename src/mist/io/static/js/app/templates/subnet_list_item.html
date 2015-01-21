@@ -63,29 +63,7 @@
                 <h4>Usable ip addresses ({{ipAddresses.length}})</h4>
                 <table>
                     {{#each ipAddresses}}
-                    <tr {{bind-attr class="this.address"}}>
-                        <td>{{this.ipaddress}}</td>
-                            <td>
-                                <div class="reserved">
-                                    <select name="reserved-slider" data-role="slider" data-mini="true"
-                                    {{action "reservedToggleSwitched" this target="this" on="change"}}>
-                                    <option></option>
-                                    <option value="on"
-                                    {{bind-attr selected="this.reserved"}}>Reserved</option>
-                                </select>
-                            </div>
-                            <div>
-                                <a class="assign-network-btn ui-mini ui-btn-icon-right ui-icon-carat-d ui-btn ui-corner-all ui-btn-a"
-                                    {{action "assignButtonClicked" this target="this"}}>
-                                    {{#if this.server.name}}
-                                        {{this.server.name}}
-                                    {{else}}
-                                        -- unassigned --
-                                    {{/if}}
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
+                        {{view "ipAddressListItem" model=this}}
                     {{/each}}
             </table>
         </td>

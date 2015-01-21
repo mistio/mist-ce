@@ -1,0 +1,26 @@
+<td>{{ipaddress}}</td>
+<td>
+    <div class="reserved">
+        <select name="reserved-slider" data-role="slider" data-mini="true"
+            {{action "reservedToggled" target="this" on="change"}}>
+            <option></option>
+            <option value="on" {{bind-attr selected="reserved"}}>Reserved</option>
+        </select>
+    </div>
+    <div>
+        <a class="assign-network-btn
+            ui-mini
+            ui-btn-icon-right
+            ui-icon-carat-d
+            ui-btn
+            ui-corner-all
+            ui-btn-a"
+            {{action "assignClicked" target="view"}}>
+                {{#if server.name}}
+                    {{server.name}}
+                {{else}}
+                    -- unassigned --
+                {{/if}}
+        </a>
+    </div>
+</td>
