@@ -100,38 +100,6 @@ define('app/views/network', ['app/views/mistscreen'],
                         }
                     );
                 },
-
-                reservedToggleSwitched: function(ip) {
-                    var that = this;
-                    this.get('network').get('backend').get('networks').reserveIP({
-                        network: this.get('network'),
-                        ip: ip
-                    });
-                },
-
-                assignButtonClicked: function (ip) {
-                    this.set('selectedIp', ip);
-                    $('#assign-machine').popup('reposition', {
-                        positionTo: this.$().find('.assign-network-btn')
-                    }).find('.ui-listview').listview('refresh');
-                    Ember.run.next(function () {
-                        $('#assign-machine').popup('open');
-                    });
-                },
-
-                assignMachine: function (machine) {
-                    var that = this;
-                    this.get('network').get('backend').get('networks').associateNetwork({
-                        network: this.get('network'),
-                        machine: machine,
-                        ip: this.get('selectedIp'),
-                        callback: function (success) {
-                            $('#assign-machine').popup('close');
-                            if (success)
-                                that.get('selectedIp').get('server').set('name', machine.get('name'));
-                        }
-                    });
-                },
             },
 
 

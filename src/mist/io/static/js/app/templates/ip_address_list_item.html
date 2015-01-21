@@ -2,8 +2,8 @@
 <td>
     <div class="reserved">
         <select name="reserved-slider" data-role="slider" data-mini="true"
-            {{action "reservedToggled" target="this" on="change"}}>
-            <option></option>
+            {{action "reservedToggled" target="view" on="change"}}>
+            <option value="off">Unreserved</option>
             <option value="on" {{bind-attr selected="reserved"}}>Reserved</option>
         </select>
     </div>

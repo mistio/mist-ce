@@ -59,16 +59,18 @@ define('app/controllers/networks', [
 
 
 			reserveIP: function (args) {
+
 				var url = '/backends/' + this.backend.id +
-				'/networks/' + args.network.id;
+				'/networks/' + this.id;
 
 				var that = this;
 				that.set('reservingIP',  true);
 				Mist.ajax.POST(url, {
 					ip: args.ip.ipaddress,
-					assign: !args.ip.reserved
+					assign: args.reserve
 				}).error(function () {
-					Mist.notificationController.notify('Failed to reserve ip ' + args.ip.ipaddress);
+					Mist.notificationController.notify('Failed to reserve ip ' +
+						args.ip.ipaddress);
 				}).complete(function (success, data) {
 					that.set('reservingIP',  false);
 					if (args.callback) args.callback(success, data);

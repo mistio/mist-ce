@@ -25,35 +25,26 @@ define('app/models/ip_address', ['app/models/base'],
 
             //
             //
-            //  Computed Properties
-            //
-            //
-
-
-            assignedServer: function () {
-
-            }.property('value', 'server'),
-
-
-            isReserved: function () {
-
-            }.property('reserved'),
-
-
-            //
-            //
             //  Methods
             //
             //
 
 
-            reserve: function () {
-
+            reserve: function (args) {
+                this.get('network').get('backend').get('networks').reserveIP({
+                    callback: args ? args.callback : null,
+                    reserve: true,
+                    ip: this,
+                });
             },
 
 
-            unreserve: function () {
-
+            unreserve: function (args) {
+                this.get('network').get('backend').get('networks').reserveIP({
+                    callback: args ? args.callback : null,
+                    reserve: false,
+                    ip: this,
+                });
             },
 
 
