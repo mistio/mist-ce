@@ -17,20 +17,28 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
                 reservedToggled: function () {
 
                     var ip = this.get('model');
-                    var $this = this.$();
-                    var $select = $this.find('select')
-                    $select.parent().addClass('ui-state-disabled');
-
-                    var that =  this;
+                    var $select = this.$().find('select').parent();
+                    $select.addClass('ui-state-disabled');
                     ip.reserve({
                         reserve: !ip.reserved,
                         callback: function (success) {
-                            if (!success) {
+                            if (!success)
                                 $select.val(ip.reserved ? "on" : "off").slider('refresh');
-                            }
-                            $select.parent().removeClass('ui-state-disabled');
+                            $select.removeClass('ui-state-disabled');
                         }
                     });
+                },
+
+                assignClicked: function () {
+                    /*
+                    var ip = this.get('model');
+                    ip.get('parentView').set('selectedIp', ip);
+                    $('#assign-machine').popup('reposition', {
+                        positionTo: this.$().find('.assign-network-btn');
+                    }).find('.ui-listview').listview('refresh');
+                    Ember.run.next(function () {
+                        $('#assign-machine').popup('open');
+                    });*/
                 }
             }
         });

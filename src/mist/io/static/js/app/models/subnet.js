@@ -51,6 +51,9 @@ define('app/models/subnet', [
 
             update: function (data) {
                 if (data.ipaddress_list_status) {
+                    data.ipaddress_list_status.forEach(function (ip) {
+                        ip.id = ip.ipaddress;
+                    })
                     this.get('ipAddresses').setContent(data.ipaddress_list_status);
                 }
                 this._super(data);

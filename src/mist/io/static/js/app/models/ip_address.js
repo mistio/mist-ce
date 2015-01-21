@@ -18,7 +18,6 @@ define('app/models/ip_address', ['app/models/base'],
             //
 
 
-            value: null,
             server: null,
             reserved: null,
 
