@@ -542,7 +542,11 @@ Terminal.bindKeys = function(document) {
   // If we click somewhere other than a
   // terminal, unfocus the terminal.
   on(document, 'mousedown', function(ev) {
-    Terminal.disableDesignMode();
+
+    if (Terminal.disableDesignMode instanceof Function) {
+      Terminal.disableDesignMode();
+    }
+
     if (!Terminal.focus) return;
 
     var el = ev.target || ev.srcElement;
