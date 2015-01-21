@@ -868,10 +868,18 @@ var loadApp = function (
 
 var loadImages = function (callback) {
 
-    // Hardcode images not on the spritesheet,
-    // including the spritesheet itself
+    // Spritesheet's name includes a timestamp each
+    // time we generate it. So we use this "hack" to
+    // get it's path and preload it
+    var dummy = $('<div class="user"></div>').appendTo('body');
+    var url = dummy.css('background-image')
+    .split("(")[1] // remove "url()" wrapper
+    .split(")")[0]
+    .replace(/\"/g, ""); // remove extra quotes
+    dummy.remove();
+    // Hardcode images not on the spritesheet
     var images = [
-        'resources/images/sprite-build/icon-sprite.png',
+        url,
         'resources/images/ajax-loader.gif',
         'resources/images/spinner.gif',
     ];
