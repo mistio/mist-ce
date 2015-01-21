@@ -49,6 +49,8 @@ def given_backend(context, backend):
         creds = "DOCKER"
     elif "digitalocean" in backend.lower():
         creds = "DIGITALOCEAN"
+    elif "indonesian" in backend.lower():
+        creds = "INDONESIAN"
     else:
         assert False, u'Could not find credentials for %s' % backend
 
@@ -158,8 +160,8 @@ def backend_creds(context, backend):
         api_key = context.browser.find_element_by_id("api_key")
         api_key.send_keys(context.credentials['LINODE']['api_key'])
     elif "DOCKER" in backend:
-        username_input = context.browser.find_element_by_id("new-backend-docker-url")
-        username_input.send_keys(context.credentials['DOCKER']['host'])
+        host = context.browser.find_element_by_id("docker_host")
+        host.send_keys(context.credentials['DOCKER']['host'])
     elif "DIGITALOCEAN" in backend:
         token_input = context.browser.find_element_by_id("token")
         token_input.send_keys(context.credentials['DIGITALOCEAN']['token'])
@@ -168,10 +170,17 @@ def backend_creds(context, backend):
         username.send_keys(context.credentials['VMWARE']['username'])
         password = context.browser.find_element_by_id("password")
         password.send_keys(context.credentials['VMWARE']['password'])
-        password = context.browser.find_element_by_id("organization")
-        password.send_keys(context.credentials['VMWARE']['organization'])
+        organization = context.browser.find_element_by_id("organization")
+        organization.send_keys(context.credentials['VMWARE']['organization'])
         host = context.browser.find_element_by_id("host")
         host.send_keys(context.credentials['VMWARE']['host'])
+    elif "INDONESIAN" in backend:
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['INDONESIAN']['username'])
+        password = context.browser.find_element_by_id("password")
+        password.send_keys(context.credentials['INDONESIAN']['password'])
+        organization = context.browser.find_element_by_id("organization")
+        organization.send_keys(context.credentials['INDONESIAN']['organization'])
 
 
 @when(u'I rename the backend to "{new_name}"')
