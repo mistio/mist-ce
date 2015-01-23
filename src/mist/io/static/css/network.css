@@ -28,3 +28,10 @@
 #single-network-page .assign-network-btn {
     max-width: 150px;
 }
+
+#single-network-page .reserved .ajax-loader {
+    display: inline-block;
+    position: relative;
+    top: -1em;
+    left: 4.7em;
+}

@@ -1,11 +1,16 @@
 <td>{{ipaddress}}</td>
 <td>
     <div class="reserved">
-        <select name="reserved-slider" data-role="slider" data-mini="true"
-            {{action "reservedToggled" target="view" on="change"}}>
-            <option value="off">Unreserved</option>
-            <option value="on" {{bind-attr selected="reserved"}}>Reserved</option>
-        </select>
+        {{#if isTogglingReserve}}
+            <span class="ajax-loader"></span>
+        {{/if}}
+        <span {{bind-attr class="isTogglingReserve:ui-state-disabled"}}>
+            <select name="reserved-slider" data-role="slider" data-mini="true"
+                {{action "reservedToggled" target="view" on="change"}}>
+                <option value="off">Unreserved</option>
+                <option value="on" {{bind-attr selected="reserved"}}>Reserved</option>
+            </select>
+        <span>
     </div>
     <div>
         <a class="assign-network-btn

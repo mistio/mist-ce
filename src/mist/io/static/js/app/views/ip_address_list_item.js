@@ -18,17 +18,14 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
             actions: {
 
                 reservedToggled: function () {
-
                     var ip = this.get('model');
-                    var $select = this.$().find('select').parent();
-                    $select.addClass('ui-state-disabled');
+                    var $select = this.$().find('select');
                     ip.reserve({
                         reserve: !ip.reserved,
                         callback: function (success) {
                             if (!success)
-                                $select.find('select').val(ip.reserved ? "on" : "off")
+                                $select.val(ip.reserved ? "on" : "off")
                                     .slider('refresh');
-                            $select.removeClass('ui-state-disabled');
                         }
                     });
                 },

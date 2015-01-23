@@ -65,6 +65,7 @@ define('app/controllers/networks', [
 
 				var that = this;
 				that.set('reservingIP',  true);
+				args.ip.set('isTogglingReserve', true);
 				Mist.ajax.POST(url, {
 					ip: args.ip.ipaddress,
 					assign: args.reserve
@@ -73,6 +74,7 @@ define('app/controllers/networks', [
 						args.ip.ipaddress);
 				}).complete(function (success, data) {
 					that.set('reservingIP',  false);
+					args.ip.set('isTogglingReserve', false);
 					if (args.callback) args.callback(success, data);
 				});
 			},
