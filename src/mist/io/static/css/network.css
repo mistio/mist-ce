@@ -19,7 +19,6 @@
 
 #single-network-page .reserved {
     float: right;
-    margin: .5em;
 }
 
 #single-network-page .reserved .ui-slider {
@@ -37,9 +36,7 @@
     z-index: 10;
 }
 
-#single-network-page .associate .ajax-loader  {
-    display: inline-block;
-    position: relative;
-    left: 1em;
-    top: 2px;
+#single-network-page  .assign-network-btn.associating.ui-btn:after {
+    background-image: url("../images/spinner.gif");
+    background-color: transparent;
 }

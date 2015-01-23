@@ -14,10 +14,11 @@
     </div>
     <div class="associate">
         <span {{bind-attr class="isAssociating:ui-state-disabled"}}>
-            <a
-                {{bind-attr id="view.domID" class="isAssociating::ui-icon-carat-d
-                    isAssociating::ui-btn-icon-right
+            <a {{bind-attr id="view.domID" class="isAssociating:associating
+                    isAssociating::ui-icon-carat-d
+                    isAssociating:ui-state-disabled
                     :assign-network-btn
+                    :ui-btn-icon-right
                     :ui-mini
                     :ui-btn
                     :ui-corner-all
@@ -27,9 +28,6 @@
                         {{server.name}}
                     {{else}}
                         -- unassigned --
-                    {{/if}}
-                    {{#if isAssociating}}
-                    <span class="ajax-loader"></span>
                     {{/if}}
             </a>
         </span>
