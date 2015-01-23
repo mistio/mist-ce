@@ -49,6 +49,8 @@ def given_backend(context, backend):
         creds = "DOCKER"
     elif "digitalocean" in backend.lower():
         creds = "DIGITALOCEAN"
+    elif "indonesian" in backend.lower():
+        creds = "INDONESIAN"
     else:
         assert False, u'Could not find credentials for %s' % backend
 
@@ -64,51 +66,121 @@ def given_backend(context, backend):
 
 @when(u'I use my "{backend}" credentials')
 def backend_creds(context, backend):
-    if "OPENSTACK" in backend:
-        username_input = context.browser.find_element_by_id("new-backend-first-field")
-        username_input.send_keys(context.credentials['OPENSTACK']['username'])
-        pass_input = context.browser.find_element_by_id("new-backend-second-field")
-        pass_input.send_keys(context.credentials['OPENSTACK']['password'])
-        auth_url_input = context.browser.find_element_by_id("new-backend-openstack-url")
-        auth_url_input.send_keys(context.credentials['OPENSTACK']['auth_url'])
-        tenant_input = context.browser.find_element_by_id("new-backend-openstack-tenant")
-        tenant_input.send_keys(context.credentials['OPENSTACK']['tenant'])
+    if "AZURE" in backend:
+        subscription_id = context.browser.find_element_by_id("subscription_id")
+        subscription_id.send_keys(context.credentials['AZURE']['subscription_id'])
+        sleep(1)
+        add_cert_button = context.browser.find_element_by_id("certificate")
+        add_cert_button.click()
+        sleep(1)
+        upload_area = context.browser.find_element_by_id("upload-area")
+        upload_area.send_keys(context.credentials['AZURE']['certificate'])
+        file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
+        file_upload_ok.click()
+    elif "GCE" in backend:
+        title = context.browser.find_element_by_id("title")
+        for i in range(1, 6):
+            title.send_keys(u'\ue003')
+        title.send_keys("Google Compute Engine")
+        email = context.browser.find_element_by_id("email")
+        email.send_keys(context.credentials['GCE']['email'])
+        project_id = context.browser.find_element_by_id("project_id")
+        project_id.send_keys(context.credentials['GCE']['project_id'])
+        add_key = context.browser.find_element_by_id("private_key")
+        add_key.click()
+        sleep(1)
+        upload_area = context.browser.find_element_by_id("upload-area")
+        upload_area.send_keys(context.credentials['GCE']['private_key'])
+        file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
+        file_upload_ok.click()
+
+    elif "OPENSTACK" in backend:
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['OPENSTACK']['username'])
+        password = context.browser.find_element_by_id("password")
+        password.send_keys(context.credentials['OPENSTACK']['password'])
+        auth_url = context.browser.find_element_by_id("auth_url")
+        auth_url.send_keys(context.credentials['OPENSTACK']['auth_url'])
+        tenant_name = context.browser.find_element_by_id("tenant_name")
+        tenant_name.send_keys(context.credentials['OPENSTACK']['tenant_name'])
     elif "RACKSPACE" in backend:
-        username_input = context.browser.find_element_by_id("new-backend-first-field")
-        username_input.send_keys(context.credentials['RACKSPACE']['username'])
-        api_key_input = context.browser.find_element_by_id("new-backend-second-field")
-        api_key_input.send_keys(context.credentials['RACKSPACE']['api_secret'])
+        context.execute_steps(u'When I click the button that contains "Select Region"')
+        context.execute_steps(u'When I click the button that contains "%s"' %
+                              context.credentials['RACKSPACE']['region'])
+        sleep(1)
+        title = context.browser.find_element_by_id("title")
+        for i in range(20):
+            title.send_keys(u'\ue003')
+        title.send_keys("Rackspace")
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['RACKSPACE']['username'])
+        api_key = context.browser.find_element_by_id("api_key")
+        api_key.send_keys(context.credentials['RACKSPACE']['api_key'])
     elif "HP" in backend:
-        username_input = context.browser.find_element_by_id("new-backend-first-field")
-        username_input.send_keys(context.credentials['HP']['username'])
-        pass_input = context.browser.find_element_by_id("new-backend-second-field")
-        pass_input.send_keys(context.credentials['HP']['password'])
-        tenant_input = context.browser.find_element_by_id("new-backend-hpcloud-tenant")
-        tenant_input.send_keys(context.credentials['HP']['tenant'])
+        context.execute_steps(u'When I click the button that contains "Select Region"')
+        context.execute_steps(u'When I click the button that contains "%s"' % context.credentials['HP']['region'])
+        sleep(1)
+        title = context.browser.find_element_by_id("title")
+        for i in range(20):
+            title.send_keys(u'\ue003')
+        title.send_keys("HP Helion Cloud")
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['HP']['username'])
+        password = context.browser.find_element_by_id("password")
+        password.send_keys(context.credentials['HP']['password'])
+        tenant_name = context.browser.find_element_by_id("tenant_name")
+        tenant_name.send_keys(context.credentials['HP']['tenant_name'])
     elif "SOFTLAYER" in backend:
-        api_key_input = context.browser.find_element_by_id("new-backend-first-field")
-        api_key_input.send_keys(context.credentials['SOFTLAYER']['api_key'])
-        api_secret_input = context.browser.find_element_by_id("new-backend-second-field")
-        api_secret_input.send_keys(context.credentials['SOFTLAYER']['api_secret'])
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['SOFTLAYER']['username'])
+        api_key = context.browser.find_element_by_id("api_key")
+        api_key.send_keys(context.credentials['SOFTLAYER']['api_key'])
     elif "EC2" in backend:
-        api_key_input = context.browser.find_element_by_id("new-backend-first-field")
-        api_key_input.send_keys(context.credentials['EC2']['api_key'])
-        api_secret_input = context.browser.find_element_by_id("new-backend-second-field")
-        api_secret_input.send_keys(context.credentials['EC2']['api_secret'])
+        context.execute_steps(u'When I click the button that contains "Select Region"')
+        context.execute_steps(u'When I click the button that contains "%s"' % context.credentials['EC2']['region'])
+        sleep(1)
+        title = context.browser.find_element_by_id("title")
+        for i in range(20):
+            title.send_keys(u'\ue003')
+        title.send_keys("EC2")
+        api_key = context.browser.find_element_by_id("api_key")
+        api_key.send_keys(context.credentials['EC2']['api_key'])
+        api_secret = context.browser.find_element_by_id("api_secret")
+        api_secret.send_keys(context.credentials['EC2']['api_secret'])
     elif "NEPHOSCALE" in backend:
-        username_input = context.browser.find_element_by_id("new-backend-first-field")
-        username_input.send_keys(context.credentials['NEPHOSCALE']['username'])
-        api_key_input = context.browser.find_element_by_id("new-backend-second-field")
-        api_key_input.send_keys(context.credentials['NEPHOSCALE']['password'])
+        title = context.browser.find_element_by_id("title")
+        for i in range(20):
+            title.send_keys(u'\ue003')
+        title.send_keys("NephoScale")
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['NEPHOSCALE']['username'])
+        password = context.browser.find_element_by_id("password")
+        password.send_keys(context.credentials['NEPHOSCALE']['password'])
     elif "LINODE" in backend:
-        token_input = context.browser.find_element_by_id("new-backend-token")
-        token_input.send_keys(context.credentials['LINODE']['api_key'])
+        api_key = context.browser.find_element_by_id("api_key")
+        api_key.send_keys(context.credentials['LINODE']['api_key'])
     elif "DOCKER" in backend:
-        username_input = context.browser.find_element_by_id("new-backend-docker-url")
-        username_input.send_keys(context.credentials['DOCKER']['host'])
+        host = context.browser.find_element_by_id("docker_host")
+        host.send_keys(context.credentials['DOCKER']['host'])
     elif "DIGITALOCEAN" in backend:
-        token_input = context.browser.find_element_by_id("new-backend-token")
+        token_input = context.browser.find_element_by_id("token")
         token_input.send_keys(context.credentials['DIGITALOCEAN']['token'])
+    elif "VMWARE" in backend:
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['VMWARE']['username'])
+        password = context.browser.find_element_by_id("password")
+        password.send_keys(context.credentials['VMWARE']['password'])
+        organization = context.browser.find_element_by_id("organization")
+        organization.send_keys(context.credentials['VMWARE']['organization'])
+        host = context.browser.find_element_by_id("host")
+        host.send_keys(context.credentials['VMWARE']['host'])
+    elif "INDONESIAN" in backend:
+        username = context.browser.find_element_by_id("username")
+        username.send_keys(context.credentials['INDONESIAN']['username'])
+        password = context.browser.find_element_by_id("password")
+        password.send_keys(context.credentials['INDONESIAN']['password'])
+        organization = context.browser.find_element_by_id("organization")
+        organization.send_keys(context.credentials['INDONESIAN']['organization'])
 
 
 @when(u'I rename the backend to "{new_name}"')

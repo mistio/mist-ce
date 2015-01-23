@@ -20,13 +20,12 @@
     top: 4px;
 }
 
-#image-list-page .ui-checkbox-off:after {
+#image-list-page ul .ui-checkbox-off:after {
     background-color: rgba(0,0,0,0) !important;
     background-repeat: no-repeat !important;
 }
 
-#image-list-page .ui-checkbox-on:after {
+#image-list-page ul .ui-checkbox-on:after {
     background-color: rgba(0,0,0,0) !important;
     background-repeat: no-repeat !important;
 }
-

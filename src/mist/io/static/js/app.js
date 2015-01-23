@@ -416,6 +416,38 @@ var loadApp = function (
     );
     window.Mist = App;
 
+    // Parse PROVIDER_MAP to generate template friendly fields
+    forIn(PROVIDER_MAP, function (fields, title) {
+        PROVIDER_MAP[title].className = 'provider-';
+        PROVIDER_MAP[title].className += title == 'bare_metal' ?
+            'baremetal' : title;
+        fields.forEach(function (field, index) {
+            field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
+            field.value = field.defaultValue || '';
+            if (field.type == 'text' ||
+                field.type == 'password')
+                field.isText = true;
+            if (field.type == 'file')
+                field.isFile = true;
+            if (field.type == 'ssh_key')
+                field.isKey = true;
+            if (field.type == 'region')
+                field.isRegion = true;
+            if (!field.placeholder)
+                field.placeholder = "";
+            if (field.optional)
+                field.placeholder += '(optional)';
+            if (!field.label)
+                field.label = field.name.split('_').map(function (word) {
+                    if (word == 'api' ||
+                        word == 'url' ||
+                        word == 'id')
+                        return word.toUpperCase();
+                    return word.capitalize()
+                }).join(' ');
+        });
+    });
+
     // Ember routes and routers
 
     App.Router.map(function() {
@@ -836,10 +868,18 @@ var loadApp = function (
 
 var loadImages = function (callback) {
 
-    // Hardcode images not on the spritesheet,
-    // including the spritesheet itself
+    // Spritesheet's name includes a timestamp each
+    // time we generate it. So we use this "hack" to
+    // get it's path and preload it
+    var dummy = $('<div class="user"></div>').appendTo('body');
+    var url = dummy.css('background-image')
+    .split("(")[1] // remove "url()" wrapper
+    .split(")")[0]
+    .replace(/\"/g, ""); // remove extra quotes
+    dummy.remove();
+    // Hardcode images not on the spritesheet
     var images = [
-        'resources/images/sprite-build/icon-sprite.png',
+        url,
         'resources/images/ajax-loader.gif',
         'resources/images/spinner.gif',
     ];
@@ -1027,7 +1067,7 @@ function Ajax (csrfToken) {
                     type: type,
                     headers: {
                         'Csrf-Token': csrfToken,
-                        'Api-Version': 1,
+                        'Api-Version': 2,
                     },
                     complete: function(jqXHR) {
                         var success = (jqXHR.status == 200);
@@ -1265,45 +1305,28 @@ function error() {
         console.error.apply(console, arguments);
 }
 
-
-function showGraphs() {
-
-    Mist.set('didShowGraphs', true);
-    require(['app/models/graph', 'app/models/datapoint'], function (Graph, Datapoint) {
-
-        var graph = Graph.create({
-            id: 'graph-' + parseInt(Math.random() * 10000),
-            title: 'Load for all servers',
-            datasources: [],
-        });
-
-        var metric = Mist.metricsController.getMetric('load.shortterm');
-
-        Mist.monitored_machines.forEach(function (machineTuple) {
-            var backend = Mist.backendsController.getBackend(machineTuple[0]);
-            if (!backend) return;
-            var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
-            if (!machine) return;
-            Mist.datasourcesController.addDatasource({
-                machine: machine,
-                metric: metric,
-                callback: function (success, datasource) {
-                    graph.addDatasource(datasource);
-                }
-            });
-        });
-
-        Mist.graphsController.open({
-            graphs: [graph],
-            config: {
-                canModify: true,
-                canControl: true,
-                canMinimize: true,
-            }
-        });
-    });
+function resetFileInputField (element) {
+    element.wrap('<form>').parent('form').trigger('reset');
+    element.unwrap();
 }
 
+function getProviderFields (provider) {
+    var providerFields = [];
+    if (provider && provider.provider) {
+        var providerTitle = provider.provider;
+        forIn(PROVIDER_MAP, function (fields, title) {
+            if (providerTitle.indexOf(title) > -1)
+                providerFields = fields;
+        });
+    }
+    return providerFields;
+}
+
+function clearProviderFields (provider) {
+    getProviderFields(provider).forEach(function (field) {
+        field.set('value', field.defaultValue || '');
+    });
+}
 
 //  GLOBAL DEFINITIONS
 
@@ -1325,3 +1348,331 @@ var DIALOG_TYPES = {
     DONE_BACK: 3,
 };
 
+
+var PROVIDER_MAP = {
+
+    azure: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Azure',
+        },
+        {
+            name: 'subscription_id',
+            type: 'text',
+        },
+        {
+            name: 'certificate',
+            type: 'file',
+            label: 'Certificate file',
+            buttonText: 'Add Certificate',
+        }
+    ],
+
+    bare_metal: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Other Server',
+        },
+        {
+            name: 'machine_ip',
+            type: 'text',
+            label: 'Hostname',
+        },
+        {
+            name: 'machine_user',
+            type: 'text',
+            label: 'User',
+            defaultValue: 'root',
+        },
+        {
+            name: 'machine_port',
+            type: 'text',
+            label: 'Port',
+            defaultValue: '22',
+            optional: true,
+        },
+        {
+            name: 'machine_key',
+            type: 'ssh_key',
+            label: 'SSH Key',
+        }
+    ],
+
+    digitalocean: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'DigitalOcean',
+        },
+        {
+            name: 'token',
+            type: 'password',
+        },
+    ],
+
+    docker: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Docker',
+        },
+        {
+            name: 'docker_host',
+            type: 'text',
+            label: 'Host',
+        },
+        {
+            name: 'docker_port',
+            type: 'text',
+            label: 'Port',
+            optional: true,
+            defaultValue: '4243',
+        },
+        {
+            name: 'auth_user',
+            type: 'text',
+            label: 'BasicAuth User',
+            optional: true,
+        },
+        {
+            name: 'auth_password',
+            type: 'password',
+            label: 'BasicAuth Password',
+            optional: true,
+        }
+    ],
+
+    ec2: [
+        {
+            name: 'region',
+            type: 'region',
+        },
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'EC2',
+        },
+        {
+            name: 'api_key',
+            type: 'text',
+        },
+        {
+            name: 'api_secret',
+            type: 'password',
+        }
+    ],
+
+    gce: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'GCE',
+        },
+        {
+            name: 'email',
+            type: 'text',
+            label: 'Email address',
+        },
+        {
+            name: 'private_key',
+            type: 'file',
+            buttonText: 'Add key',
+        },
+        {
+            name: 'project_id',
+            type: 'text',
+        }
+    ],
+
+    hpcloud: [
+        {
+            name: 'region',
+            type: 'region',
+        },
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'HP',
+        },
+        {
+            name: 'username',
+            type: 'text',
+        },
+        {
+            name: 'password',
+            type: 'password',
+        },
+        {
+            name: 'tenant_name',
+            type: 'text',
+        }
+    ],
+
+    linode: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Linode',
+        },
+        {
+            name: 'api_key',
+            type: 'text',
+        }
+    ],
+
+    nephoscale: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Nephoscale',
+        },
+        {
+            name: 'username',
+            type: 'text',
+        },
+        {
+            name: 'password',
+            type: 'password',
+        }
+    ],
+
+    openstack: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'OpenStack',
+        },
+        {
+            name: 'username',
+            type: 'text',
+        },
+        {
+            name: 'password',
+            type: 'password',
+        },
+        {
+            name: 'auth_url',
+            type: 'text',
+        },
+        {
+            name: 'tenant_name',
+            type: 'text',
+        },
+        {
+            name: 'region',
+            type: 'text',
+            optional: true,
+        },
+    ],
+
+    rackspace: [
+        {
+            name: 'region',
+            type: 'region',
+        },
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Rackspace',
+        },
+        {
+            name: 'username',
+            type: 'text',
+        },
+        {
+            name: 'api_key',
+            type: 'password',
+        }
+    ],
+
+    softlayer: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'SoftLayer',
+        },
+        {
+            name: 'username',
+            type: 'text',
+        },
+        {
+            name: 'api_key',
+            type: 'password',
+        }
+    ],
+
+    libvirt: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'KVM (libvirt)',
+        },
+        {
+            name: 'machine_hostname',
+            label: 'KVM hostname',
+            type: 'text',
+        },
+        {
+            name: 'machine_user',
+            type: 'text',
+            label: 'ssh user',
+            optional: true,
+            defaultValue: 'root',
+        },
+        {
+            name: 'machine_key',
+            type: 'ssh_key',
+            label: 'ssh key',
+            optional: true,
+        },
+
+    ],
+
+    vcloud: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'VMware vCloud'
+        },
+        {
+            name: 'username',
+            type: 'text'
+        },
+        {
+            name: 'password',
+            type: 'password'
+        },
+        {
+            name: 'organization',
+            type: 'text'
+        },
+        {
+            name: 'host',
+            type: 'text',
+            label: 'Hostname',
+        }
+    ],
+
+    indonesian_vcloud: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Indonesian Cloud'
+        },
+        {
+            name: 'username',
+            type: 'text'
+
+        },
+        {
+            name: 'password',
+            type: 'password'
+        },
+        {
+            name: 'organization',
+            type: 'text'
+        }
+    ]
+};

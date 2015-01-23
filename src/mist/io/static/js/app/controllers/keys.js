@@ -72,7 +72,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                 }).complete(function (success, key) {
                     that.set('addingKey', false);
                     if (args.callback)
-                        args.callback(success, that.getKey(key.id));
+                        args.callback(success, that.getKey(key ? key.id : null));
                 });
             },
 
