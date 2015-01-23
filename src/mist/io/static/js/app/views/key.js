@@ -131,16 +131,17 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine'],
                 displayClicked: function () {
                     Mist.keysController.getPrivateKey(this.key.id, function (success, keyPrivate) {
                         if (success) {
-                            $('#private-key-popup').popup('open');
-                            $('#private-key').val(keyPrivate);
+                            Mist.dialogController.open({
+                                type: DIALOG_TYPES.BACK,
+                                head: 'Private Key',
+                                body: [
+                                    {
+                                        command: keyPrivate
+                                    }
+                                ],
+                            });
                         }
                     });
-                },
-
-
-                backClicked: function () {
-                    $('#private-key-popup').popup('close');
-                    $('#private-key').val('');
                 },
 
 
