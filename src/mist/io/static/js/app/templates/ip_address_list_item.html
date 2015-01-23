@@ -1,32 +1,37 @@
 <td>{{ipaddress}}</td>
 <td>
     <div class="reserved">
-        {{#if isTogglingReserve}}
-            <span class="ajax-loader"></span>
-        {{/if}}
         <span {{bind-attr class="isTogglingReserve:ui-state-disabled"}}>
+            {{#if isTogglingReserve}}
+                <span class="ajax-loader"></span>
+            {{/if}}
             <select name="reserved-slider" data-role="slider" data-mini="true"
                 {{action "reservedToggled" target="view" on="change"}}>
-                <option value="off">Unreserved</option>
+                <option value="off"></option>
                 <option value="on" {{bind-attr selected="reserved"}}>Reserved</option>
             </select>
         <span>
     </div>
-    <div>
-        <a class="assign-network-btn
-            ui-mini
-            ui-btn-icon-right
-            ui-icon-carat-d
-            ui-btn
-            ui-corner-all
-            ui-btn-a"
-            {{bind-attr id="view.domID"}}
-            {{action "assignClicked" target="view"}}>
-                {{#if server.name}}
-                    {{server.name}}
-                {{else}}
-                    -- unassigned --
-                {{/if}}
-        </a>
+    <div class="associate">
+        <span {{bind-attr class="isAssociating:ui-state-disabled"}}>
+            <a
+                {{bind-attr id="view.domID" class="isAssociating::ui-icon-carat-d
+                    isAssociating::ui-btn-icon-right
+                    :assign-network-btn
+                    :ui-mini
+                    :ui-btn
+                    :ui-corner-all
+                    :ui-btn-a"}}
+                {{action "assignClicked" target="view"}}>
+                    {{#if server.name}}
+                        {{server.name}}
+                    {{else}}
+                        -- unassigned --
+                    {{/if}}
+                    {{#if isAssociating}}
+                    <span class="ajax-loader"></span>
+                    {{/if}}
+            </a>
+        </span>
     </div>
 </td>

@@ -30,8 +30,16 @@
 }
 
 #single-network-page .reserved .ajax-loader {
-    display: inline-block;
     position: relative;
     top: -1em;
-    left: 4.7em;
+    left: 7.7em;
+    display: inline-block;
+    z-index: 10;
+}
+
+#single-network-page .associate .ajax-loader  {
+    display: inline-block;
+    position: relative;
+    left: 1em;
+    top: 2px;
 }

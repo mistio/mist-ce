@@ -33,7 +33,7 @@ define('app/controllers/networks', [
             //
 
 
-			associateNetwork: function (args) {
+			associateIP: function (args) {
 
 				var machineId;
 				if (args.machine.backend.provider == 'nephoscale')
@@ -45,14 +45,17 @@ define('app/controllers/networks', [
 					'/networks/' + args.network.id;
 
 				var that = this;
-				that.set('associatingNetwork',  true);
+				that.set('associatingIP',  true);
+				args.ip.set('isAssociating', true);
 				Mist.ajax.POST(url, {
 					machine: machineId,
 					ip: args.ip.ipaddress,
 				}).error(function () {
-					Mist.notificationController.notify('Failed to associate ip ' + args.ip.ipaddress);
+					Mist.notificationController.notify('Failed to associate ip ' +
+						args.ip.ipaddress);
 				}).complete(function (success, data) {
-					that.set('associatingNetwork',  false);
+					that.set('associatingIP',  false);
+					args.ip.set('isAssociating', false);
 					if (args.callback) args.callback(success, data);
 				});
 			},
