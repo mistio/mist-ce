@@ -23,7 +23,7 @@ Feature: Add second-tier backends
     | HP Helion Cloud       | HP           |
     | Linode               | LINODE       |
     | NephoScale           | NEPHOSCALE   |
-#    | OpenStack            | OPENSTACK    |
+    | OpenStack            | OPENSTACK    |
     | Rackspace            | RACKSPACE    |
     | SoftLayer            | SOFTLAYER    |
     | VMware vCloud        | VMWARE       |
