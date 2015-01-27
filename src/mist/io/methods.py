@@ -576,11 +576,17 @@ def _add_backend_docker(title, provider, params):
     auth_user = params.get('auth_user', '')
     auth_password = params.get('auth_password', '')
 
+    # tls auth
+    key_file = params.get('key_file', '')
+    cert_file = params.get('cert_file', '')
+
     backend = model.Backend()
     backend.title = title
     backend.provider = provider
     backend.docker_port = docker_port
     backend.apikey = auth_user
+    backend.key_file = key_file
+    backend.cert_file = cert_file
     backend.apisecret = auth_password
     backend.apiurl = docker_host
     backend.enabled = True
@@ -1048,7 +1054,18 @@ def connect_provider(backend):
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
     elif backend.provider == Provider.DOCKER:
-        conn = driver(backend.apikey, backend.apisecret, backend.apiurl, backend.docker_port)
+        libcloud.security.VERIFY_SSL_CERT = False;
+        if backend.key_file and backend.cert_file:
+            # tls auth, needs to pass the key and cert as files
+            key_temp_file = NamedTemporaryFile(delete=False)
+            key_temp_file.write(backend.key_file)
+            key_temp_file.close()
+            cert_temp_file = NamedTemporaryFile(delete=False)
+            cert_temp_file.write(backend.cert_file)
+            cert_temp_file.close()
+            conn = driver(host=backend.apiurl, port=backend.docker_port, key_file=key_temp_file.name, cert_file=cert_temp_file.name)
+        else:
+            conn = driver(backend.apikey, backend.apisecret, backend.apiurl, backend.docker_port)
     elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
                               Provider.RACKSPACE]:
         conn = driver(backend.apikey, backend.apisecret,
@@ -1073,7 +1090,6 @@ def connect_provider(backend):
             temp_key_file.write(backend.apisecret)
             temp_key_file.close()
             conn = driver(backend.apiurl, user=backend.apikey, ssh_key=temp_key_file.name)
-
         else:
             conn = driver(backend.apiurl, user=backend.apikey)
     else:
@@ -1145,7 +1161,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     if conn.type is Provider.GCE:
         can_start = False
         can_stop = False
-    
+
     if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
         # allow only reboot action for libvirt hypervisor
         can_stop = False
