@@ -51,7 +51,7 @@ define('app/views/network', ['app/views/mistscreen'],
             unload: function() {
 
                 // Remove event listeners
-                Mist.backendsController.off('onNetworksListChange', this, 'load');
+                Mist.backendsController.off('onNetworkListChange', this, 'load');
 
             }.on('willDestroyElement'),
 
