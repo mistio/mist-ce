@@ -56,7 +56,7 @@ define('app/views/metric_add', ['app/views/popup'],
                 this.close();
                 var that = this;
                 Ember.run.later(function () {
-                    Mist.notificationController.messagebox.open({
+                    Mist.notificationController.messageBox.open({
                         title: 'SSH key missing',
                         paragraphs: [
                             'Please add a key to your server ' +

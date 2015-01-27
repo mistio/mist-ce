@@ -155,9 +155,6 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 /* Popup
 -----------------------------------------------------------------------------------------------------------*/
-.ui-popup {
-    min-width: 300px;
-}
 .ui-popup .ui-content {
     padding: 12px 16px;
 }
@@ -653,7 +650,7 @@ ul.checkbox-list li label {
 
 /* Dialog
 ------------------------------------------------------------------------------*/
-#dialog-popup .command-container {
+.command-container {
     white-space: pre;
     text-align: left;
     max-height: 250px;

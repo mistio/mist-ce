@@ -2,7 +2,7 @@
 /* Metric Add Custom Popup CSS
 -----------------------------------------------------------------------------------------------------------*/
 #metric-add-custom-popup {
-    width: 360px;
+    width: 38em;
 }
 
 #metric-add-custom-popup label {
@@ -61,4 +61,3 @@
     overflow: scroll;
     max-height: 9em;
 }
-
