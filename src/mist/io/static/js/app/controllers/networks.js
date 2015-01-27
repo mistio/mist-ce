@@ -91,7 +91,7 @@ define('app/controllers/networks', [
                     '/networks/' + networkId;
                 Mist.ajax.DELETE(url)
                 .success(function () {
-                    that._deleteNetwork(networkId);
+                    that._deleteObject(that.getObject(networkId));
                 }).error(function (message) {
                     Mist.notificationController.notify(message);
                 }).complete(function (success, message) {

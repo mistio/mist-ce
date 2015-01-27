@@ -82,7 +82,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.locations.on('onLocationListChange', this, '_updateLocationCount');
                     this.networks.on('onChange', this, '_updateNetworkCount');
                     this.machines.on('onSelectedMachinesChange', this, '_updateSelectedMachines');
-                    this.networks.on('onSelectedNetworksChange', this, '_updateSelectedNetworks');
+                    this.networks.on('onSelectedChange', this, '_updateSelectedNetworks');
 
                     // Add observers
                     this.sizes.addObserver('loading', this, function () {
@@ -252,7 +252,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             _updateSelectedNetworks: function () {
                 Ember.run(this, function () {
-                    this.set('selectedNetworks', this.networks.selectedNetworks);
+                    this.set('selectedNetworks', this.networks.get('selectedObjects'));
                     this.trigger('onSelectedNetworksChange');
                 });
             },

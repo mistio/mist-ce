@@ -134,6 +134,20 @@ define('app/controllers/base_array', ['ember'],
                     });
                 });
             },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            selectedObserver: function () {
+                Ember.run.once(this, function () {
+                    this.trigger('onSelectedChange');
+                });
+            }.observes('content.@each.selected')
         })
     }
 );
