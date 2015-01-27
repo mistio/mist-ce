@@ -10,10 +10,6 @@
     margin-top: 20px;
 }
 
-#metric-add-custom-popup label:first-child {
-    margin-top: 0;
-}
-
 #custom-plugin-advanced {
     display: none;
     margin-bottom: 25px;
@@ -27,24 +23,10 @@
     width: 100%;
 }
 
-#metric-add-custom-popup .ok-cancel a {
-    width: 130px;
-}
-
-@media only screen and (max-width: 360px) {
-
-    #metric-add-custom-popup {
-        width: 320px;
-    }
-
-    #metric-add-custom-popup .ok-cancel a {
-        width: 103px;
-    }
-}
-
 #custom-plugin-script {
     max-height: 145px !important;
     font-family: monospace;
+    margin-top: -1em;
 }
 
 #metric-add-custom-popup #custom-plugin-error {
@@ -60,4 +42,11 @@
     border: 2px solid #FF0;
     overflow: scroll;
     max-height: 9em;
+}
+
+#metric-add-custom-popup .ui-block-a {
+    padding-right: 5px
+}
+#metric-add-custom-popup .ui-block-b {
+    padding-left: 5px
 }
