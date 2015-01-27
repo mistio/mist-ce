@@ -102,14 +102,14 @@ define('app/views/network', ['app/views/mistscreen'],
                 },
 
                 assignMachine: function (machine) {
-                    var that = this;
+                    var ip = this.get('selectedIp');
                     this.get('network').get('backend').get('networks').associateIP({
                         network: this.get('network'),
                         machine: machine,
-                        ip: this.get('selectedIp'),
+                        ip: ip,
                         callback: function (success) {
                             if (success)
-                                that.get('selectedIp').get('server').set('name', machine.get('name'));
+                                ip.get('server').set('name', machine.get('name'));
                         }
                     });
                     $('#assign-machine').popup('close');

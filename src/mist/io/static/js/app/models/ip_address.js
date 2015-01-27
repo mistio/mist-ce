@@ -24,6 +24,18 @@ define('app/models/ip_address', ['app/models/base'],
 
             //
             //
+            //  Initialization
+            //
+            //
+
+
+            load: function (data) {
+                this.update(this);
+            }.on('init'),
+
+
+            //
+            //
             //  Methods
             //
             //
@@ -39,13 +51,13 @@ define('app/models/ip_address', ['app/models/base'],
             },
 
 
-            assign: function (machine) {
-
-            },
-
-
-            unassign: function () {
-
+            update: function (data) {
+                if (data.server) {
+                    data.server = Ember.Object.create(data.server);
+                } else {
+                    data.server = Ember.Object.create({name: null});
+                }
+                this._super(data);
             }
         });
     }
