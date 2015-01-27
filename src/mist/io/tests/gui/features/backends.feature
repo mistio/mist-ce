@@ -30,6 +30,7 @@ Feature: Add second-tier backends
     | Indonesian Cloud     | INDONESIAN   |
 #    | EC2                  | EC2          |
     | Docker               | DOCKER       |
+    | KVM (via libvirt)    | LIBVIRT      |
 
     @backend-actions
     Scenario: Backend Actions
