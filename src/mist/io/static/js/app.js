@@ -1430,6 +1430,21 @@ var PROVIDER_MAP = {
             optional: true,
             defaultValue: '4243',
         },
+
+        {
+            name: 'key_file',
+            type: 'file',
+            buttonText: 'Add key',
+            label: 'private key pem file',
+            optional: true
+        },
+        {
+            name: 'cert_file',
+            type: 'file',
+            buttonText: 'Add certificate',
+            label: 'certificate file',
+            optional: true
+        },
         {
             name: 'auth_user',
             type: 'text',
