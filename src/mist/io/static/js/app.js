@@ -1435,14 +1435,14 @@ var PROVIDER_MAP = {
             name: 'key_file',
             type: 'file',
             buttonText: 'Add key',
-            label: 'private key pem file',
+            label: '.pem key file (tls auth)',
             optional: true
         },
         {
             name: 'cert_file',
             type: 'file',
             buttonText: 'Add certificate',
-            label: 'certificate file',
+            label: '.pem certificate file (tls auth)',
             optional: true
         },
         {
