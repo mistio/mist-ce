@@ -48,6 +48,17 @@ define('app/views/backend_add', ['app/views/panel'],
                 });
                 return isReady;
             }.property('providerFields.@each.value'),
+<<<<<<< HEAD
+=======
+
+
+            //
+            //
+            //  Computer Properties
+            //
+            //
+
+>>>>>>> master
 
 
             //
@@ -57,6 +68,7 @@ define('app/views/backend_add', ['app/views/panel'],
             //
 
 
+<<<<<<< HEAD
             firstFieldPlaceholder: function () {
                 var provider = Mist.backendAddController.newBackendProvider;
                 if (provider) {
@@ -88,6 +100,23 @@ define('app/views/backend_add', ['app/views/panel'],
 
             autocompleteCredentials: function (provider) {
 
+=======
+            clear: function () {
+                $('#new-backend-provider').collapsible('collapse');
+                $('#backend-add-fields').hide();
+                Ember.run.next(this, function () {
+                    $(this.panelId).trigger('create');
+                    Ember.run.later(this, function () {
+                        if (Mist.backendAddController.provider)
+                            $('#backend-add-fields').fadeIn();
+                    }, 100);
+                });
+            },
+
+
+            autocompleteCredentials: function (provider) {
+
+>>>>>>> master
                 var fields = this.get('providerFields');
 
                 // Autocomplete credentials only for providers

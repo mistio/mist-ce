@@ -62,7 +62,6 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
-GCE_IMAGES = ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']
 
 
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -245,8 +244,10 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_hp(user, title, provider, params)
     elif provider == 'openstack':
         backend_id, backend = _add_backend_openstack(title, provider, params)
-    elif provider == 'vcloud':
+    elif provider in ['vcloud', 'indonesian_vcloud']:
         backend_id, backend = _add_backend_vcloud(title, provider, params)
+    elif provider == 'libvirt':
+        backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -277,6 +278,17 @@ def add_backend_v_2(user, title, provider, params):
         user.save()
     log.info("Backend with id '%s' added succesfully with Api-Version: 2.", backend_id)
     trigger_session_update(user.email, ['backends'])
+<<<<<<< HEAD
+=======
+
+    if provider == 'libvirt' and backend.apisecret:
+    # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
+        key_id = params.get('machine_key')
+        node_id = backend.apiurl # id of the hypervisor is the hostname provided
+        username = backend.apikey
+        associate_key(user, key_id, backend_id, node_id, username=username)
+
+>>>>>>> master
     return backend_id
 
 
@@ -312,12 +324,19 @@ def _add_backend_bare_metal(user, title, provider, params):
     machine_id = machine_hostname.replace('.', '').replace(' ', '')
     machine.name = machine_hostname
     backend = model.Backend()
+<<<<<<< HEAD
     backend.title = machine_hostname
+=======
+    backend.title = title or machine_hostname
+>>>>>>> master
     backend.provider = provider
     backend.enabled = True
     backend.machines[machine_id] = machine
     backend_id = backend.get_id()
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
     with user.lock_n_load():
         if backend_id in user.backends:
             raise BackendExistsError(backend_id)
@@ -337,7 +356,11 @@ def _add_backend_bare_metal(user, title, provider, params):
                 user.save()
                 raise BackendUnauthorizedError(exc)
         user.save()
+<<<<<<< HEAD
 
+=======
+    return backend_id
+>>>>>>> master
 
 def _add_backend_vcloud(title, provider, params):
     username = params.get('username', '')
@@ -348,6 +371,7 @@ def _add_backend_vcloud(title, provider, params):
     if not password:
         raise RequiredParameterMissingError('password')
 
+<<<<<<< HEAD
     host = params.get('host', '')
     if not host:
         raise RequiredParameterMissingError('host')
@@ -355,6 +379,23 @@ def _add_backend_vcloud(title, provider, params):
     for prefix in ['https://', 'http://']:
         host = host.strip(prefix)
     host = host.split('/')[0]
+=======
+    organization = params.get('organization', '')
+    if not organization:
+        raise RequiredParameterMissingError('organization')
+
+    username = '%s@%s' % (username, organization)
+
+    host = params.get('host', '')
+    if provider == 'vcloud':
+        if not host:
+            raise RequiredParameterMissingError('host')
+        for prefix in ['https://', 'http://']:
+            host = host.strip(prefix)
+        host = host.split('/')[0]
+    elif provider == 'indonesian_vcloud':
+        host = 'compute.idcloudonline.com'
+>>>>>>> master
 
     backend = model.Backend()
     backend.title = title
@@ -575,6 +616,35 @@ def _add_backend_docker(title, provider, params):
     return backend_id, backend
 
 
+<<<<<<< HEAD
+=======
+def _add_backend_libvirt(user, title, provider, params):
+    machine_hostname = params.get('machine_hostname', '')
+    if not machine_hostname:
+        raise RequiredParameterMissingError('machine_hostname')
+
+    apikey = params.get('machine_user', 'root')
+
+    apisecret = params.get('machine_key', '')
+    if apisecret:
+        if apisecret not in user.keypairs:
+            raise KeypairNotFoundError(apisecret)
+        apisecret = user.keypairs[apisecret].private
+
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = apikey
+    backend.apisecret = apisecret
+    backend.apiurl = machine_hostname
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
+>>>>>>> master
 def _add_backend_hp(user, title, provider, params):
     username = params.get('username', '')
     if not username:
@@ -1015,7 +1085,11 @@ def connect_provider(backend):
                       region=backend.region)
     elif backend.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(backend.apikey, backend.apisecret)
+<<<<<<< HEAD
     elif backend.provider == Provider.VCLOUD:
+=======
+    elif backend.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+>>>>>>> master
         libcloud.security.VERIFY_SSL_CERT = False;
         conn = driver(backend.apikey, backend.apisecret, host=backend.apiurl)
     elif backend.provider == Provider.DIGITAL_OCEAN:
@@ -1026,6 +1100,16 @@ def connect_provider(backend):
             conn = driver(backend.apikey, backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
+    elif backend.provider == Provider.LIBVIRT:
+        # support the three ways to connect: local system, qemu+tcp, qemu+ssh
+        if backend.apisecret:
+            temp_key_file = NamedTemporaryFile(delete=False)
+            temp_key_file.write(backend.apisecret)
+            temp_key_file.close()
+            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=temp_key_file.name)
+
+        else:
+            conn = driver(backend.apiurl, user=backend.apikey)
     else:
         # ec2
         conn = driver(backend.apikey, backend.apisecret)
@@ -1034,7 +1118,7 @@ def connect_provider(backend):
     return conn
 
 
-def get_machine_actions(machine_from_api, conn):
+def get_machine_actions(machine_from_api, conn, extra):
     """Returns available machine actions based on backend type.
 
     Rackspace, Linode and openstack support the same options, but EC2 also
@@ -1055,7 +1139,11 @@ def get_machine_actions(machine_from_api, conn):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
+<<<<<<< HEAD
                      Provider.VCLOUD):
+=======
+                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT):
+>>>>>>> master
         can_tag = False
 
     # for other states
@@ -1087,9 +1175,20 @@ def get_machine_actions(machine_from_api, conn):
         #after resize, node gets to pending mode, needs to be started
             can_start = True
 
+    if conn.type in [Provider.LIBVIRT]:
+        if machine_from_api.state is NodeState.TERMINATED:
+        # in libvirt a terminated machine can be started
+            can_start = True
+
     if conn.type is Provider.GCE:
         can_start = False
         can_stop = False
+
+    if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
+        # allow only reboot action for libvirt hypervisor
+        can_stop = False
+        can_destroy = False
+        can_start = False
 
     return {'can_stop': can_stop,
             'can_start': can_start,
@@ -1153,7 +1252,7 @@ def list_machines(user, backend_id):
                    'public_ips': m.public_ips,
                    'tags': tags,
                    'extra': m.extra}
-        machine.update(get_machine_actions(m, conn))
+        machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
 
     return ret
@@ -1161,7 +1260,8 @@ def list_machines(user, backend_id):
 
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
-                   size_name, location_name, ips, monitoring, networks=[], ssh_port=22):
+                   size_name, location_name, ips, monitoring, networks=[],
+                   docker_env=[], docker_command=None, ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1213,9 +1313,17 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
     if conn.type is Provider.DOCKER:
         if key_id:
+<<<<<<< HEAD
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
         else:
             node = _create_machine_docker(conn, machine_name, image_id, script)
+=======
+            node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
+                                          docker_env=docker_env, docker_command=docker_command)
+        else:
+            node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
+                                          docker_command=docker_command)
+>>>>>>> master
         if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
@@ -1264,7 +1372,11 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_azure(conn, key_id, private_key,
                                              public_key, machine_name,
                                              image, size, location, cloud_service_name=None)
+<<<<<<< HEAD
     elif conn.type == Provider.VCLOUD:
+=======
+    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+>>>>>>> master
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
@@ -1608,7 +1720,12 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
             raise MachineCreationError("Softlayer, got exception %s" % e)
     return node
 
+<<<<<<< HEAD
 def _create_machine_docker(conn, machine_name, image, script, public_key=None, tty_attach=True):
+=======
+def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
+                           tty_attach=True):
+>>>>>>> master
     """Create a machine in docker.
 
     """
@@ -1617,11 +1734,18 @@ def _create_machine_docker(conn, machine_name, image, script, public_key=None, t
         if public_key:
             environment = ['PUBLIC_KEY=%s' % public_key.strip()]
         else:
-            environment = None
+            environment = []
+
+        if docker_env:
+            # docker_env is a dict, and we must convert it ot be in the form:
+            # [ "key=value", "key=value"...]
+            docker_environment = ["%s=%s" % (key, value) for key, value in docker_env.iteritems()]
+            environment += docker_environment
+
         node = conn.create_node(
             name=machine_name,
             image=image,
-            command=script,
+            command=docker_command,
             environment=environment,
             tty=tty_attach
         )
@@ -1901,6 +2025,19 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
                 except:
                     return False
             else:
+                if conn.type == 'libvirt':
+                    if machine.extra.get('tags', {}).get('type', None) == 'hypervisor':
+                         # issue an ssh command for the libvirt hypervisor
+                        try:
+                            hostname = machine.public_ips[0]
+                            command = '$(command -v sudo) shutdown -r now'
+                            ssh_command(user, backend_id, machine_id, hostname, command)
+                            return True
+                        except:
+                            return False
+
+                    else:
+                       machine.reboot()
                 if conn.type == 'azure':
                     conn.reboot_node(machine, ex_cloud_service_name=cloud_service)
                 else:
@@ -2067,7 +2204,7 @@ def list_images(user, backend_id, term=None):
         elif conn.type == Provider.GCE:
             # Currently not other way to receive all images :(
             rest_images = conn.list_images()
-            for OS in GCE_IMAGES:
+            for OS in config.GCE_IMAGES:
                 try:
                     gce_images = conn.list_images(ex_project=OS)
                     rest_images += gce_images
@@ -2283,6 +2420,7 @@ def list_networks(user, backend_id):
     conn = connect_provider(backend)
 
     ret = []
+<<<<<<< HEAD
 
     ## Get the ip addreses of running machines to begin with, use cached
     ## list_machines response if there's a fresh one
@@ -2305,6 +2443,9 @@ def list_networks(user, backend_id):
 
     # Get the actual networks
     if conn.type in [Provider.NEPHOSCALE]:
+=======
+    if conn.type in [Provider.NEPHOSCALE, Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+>>>>>>> master
         networks = conn.ex_list_networks()
         for network in networks:
             ret.append(nephoscale_network_to_dict(network))

@@ -52,9 +52,22 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             }.property('provider'),
 
             hasNetworks: function () {
-                return this.provider == 'openstack' || this.provider == 'nephoscale' ||
-                    this.provider == 'azure' || this.provider == 'vcloud' || this.provider == 'ec2';
+                return  ['openstack', 'nephoscale', 'azure', 'vcloud', 'ec2', 'gce', 'indonesian_vcloud']
+                    .indexOf(this.provider) > -1;
             }.property('provider'),
+
+            isLibvirt: function () {
+                return this.get('provider') == 'libvirt';
+            }.property('provider'),
+
+            isDocker: function () {
+                return this.provider == 'docker';
+            }.property('provider'),
+
+            className: function () {
+                return 'provider-' + this.getSimpleProvider();
+            }.property('provider'),
+
 
             /**
              *
@@ -176,6 +189,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 if (this.provider.indexOf('openstack') == 0) return 'openstack';
                 if (this.provider.indexOf('rackspace') == 0) return 'rackspace';
                 if (this.provider.indexOf('bare_metal') == 0) return 'baremetal';
+                if (this.provider.indexOf('indonesian_vcloud') == 0) return 'indonesian';
                 return this.provider;
             },
 

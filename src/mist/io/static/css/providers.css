@@ -9,13 +9,23 @@
     float: left;
 }
 
+<<<<<<< HEAD
 .provider-icon-small {
+=======
+.provider-icon-small,
+.image-icon-small {
+>>>>>>> master
     float:left;
     width: 24px;
     height: 24px;
 }
 
+<<<<<<< HEAD
 .provider-icon-small span {
+=======
+.provider-icon-small span,
+.image-icon-small span {
+>>>>>>> master
     display: block;
     height: 50px;
     width: 50px;

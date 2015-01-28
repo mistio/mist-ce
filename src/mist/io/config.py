@@ -232,6 +232,18 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'VMware vCloud',
         'provider': Provider.VCLOUD,
         'regions': []
+    },
+    # Indonesian vCloud
+    {
+        'title': 'Indonesian Cloud',
+        'provider': Provider.INDONESIAN_VCLOUD,
+        'regions': []
+    },
+    # libvirt
+    {
+        'title': 'KVM (via libvirt)',
+        'provider' : Provider.LIBVIRT,
+        'regions': []
     }
 ]
 
@@ -245,7 +257,7 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'Azure',
         'provider': Provider.AZURE
-    },    
+    },
     # EC2
     {
         'title': 'EC2 AP NORTHEAST',
@@ -506,3 +518,15 @@ DOCKER_IMAGES = {
     'mist/opensuse-13.1': 'OpenSUSE 13.1',
     'mist/fedora-20': 'Fedora 20',
 }
+
+GCE_IMAGES = ['debian-cloud',
+              'centos-cloud',
+              'suse-cloud',
+              'rhel-cloud',
+              'coreos-cloud',
+              'gce-nvme',
+              'google-containers',
+              'opensuse-cloud',
+              'suse-cloud',
+              'ubuntu-os-cloud',
+              'windows-cloud']

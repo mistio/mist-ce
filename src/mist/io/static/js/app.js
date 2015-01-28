@@ -422,6 +422,9 @@ var loadApp = function (
 
     // Parse PROVIDER_MAP to generate template friendly fields
     forIn(PROVIDER_MAP, function (fields, title) {
+        PROVIDER_MAP[title].className = 'provider-';
+        PROVIDER_MAP[title].className += title == 'bare_metal' ?
+            'baremetal' : title;
         fields.forEach(function (field, index) {
             field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
             field.value = field.defaultValue || '';
@@ -434,8 +437,10 @@ var loadApp = function (
                 field.isKey = true;
             if (field.type == 'region')
                 field.isRegion = true;
+            if (!field.placeholder)
+                field.placeholder = "";
             if (field.optional)
-                field.placeholder = '(optional)';
+                field.placeholder += '(optional)';
             if (!field.label)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||
@@ -873,10 +878,18 @@ var loadApp = function (
 
 var loadImages = function (callback) {
 
-    // Hardcode images not on the spritesheet,
-    // including the spritesheet itself
+    // Spritesheet's name includes a timestamp each
+    // time we generate it. So we use this "hack" to
+    // get it's path and preload it
+    var dummy = $('<div class="user"></div>').appendTo('body');
+    var url = dummy.css('background-image')
+    .split("(")[1] // remove "url()" wrapper
+    .split(")")[0]
+    .replace(/\"/g, ""); // remove extra quotes
+    dummy.remove();
+    // Hardcode images not on the spritesheet
     var images = [
-        'resources/images/sprite-build/icon-sprite.png',
+        url,
         'resources/images/ajax-loader.gif',
         'resources/images/spinner.gif',
     ];
@@ -1600,6 +1613,32 @@ var PROVIDER_MAP = {
         }
     ],
 
+    libvirt: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'KVM (libvirt)',
+        },
+        {
+            name: 'machine_hostname',
+            label: 'KVM hostname',
+            type: 'text',
+        },
+        {
+            name: 'machine_user',
+            type: 'text',
+            label: 'ssh user',
+            optional: true,
+            defaultValue: 'root',
+        },
+        {
+            name: 'machine_key',
+            type: 'ssh_key',
+            label: 'ssh key',
+            optional: true,
+        },
+
+    ],
     vcloud: [
         {
             name: 'title',
@@ -1615,7 +1654,33 @@ var PROVIDER_MAP = {
             type: 'password'
         },
         {
+            name: 'organization',
+            type: 'text'
+        },
+        {
             name: 'host',
+            type: 'text',
+            label: 'Hostname',
+        }
+    ],
+
+    indonesian_vcloud: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Indonesian Cloud'
+        },
+        {
+            name: 'username',
+            type: 'text'
+
+        },
+        {
+            name: 'password',
+            type: 'password'
+        },
+        {
+            name: 'organization',
             type: 'text'
         }
     ]

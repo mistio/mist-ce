@@ -27,8 +27,9 @@ Feature: Add second-tier backends
     | Rackspace            | RACKSPACE    |
     | SoftLayer            | SOFTLAYER    |
     | VMware vCloud        | VMWARE       |
+    | Indonesian Cloud     | INDONESIAN   |
 #    | EC2                  | EC2          |
-#    | Docker               | DOCKER       |
+    | Docker               | DOCKER       |
 
     @backend-actions
     Scenario: Backend Actions
