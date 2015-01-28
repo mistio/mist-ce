@@ -46,11 +46,15 @@ define('app/models/network', [
 
 
             update: function (data) {
-                if (data.subnets) {
-                    this._updateSubnets(data.subnets);
-                    delete data.subnets;
+                // Do not modify original data because it introduces
+                // debuging problems
+                var newData = data.slice();
+
+                if (newData.subnets) {
+                    this._updateSubnets(newData.subnets);
+                    delete newData.subnets;
                 }
-                this._super(data);
+                this._super(newData);
             },
 
             _updateSubnets: function (subnets) {
