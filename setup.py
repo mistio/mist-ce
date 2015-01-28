@@ -24,7 +24,7 @@ requires = [
     'gevent-socketio',
     'gevent-subprocess',
     'amqp',
-    'netaddr'
+    'netaddr',
     'amqp'
 ]
 
