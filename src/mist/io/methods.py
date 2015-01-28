@@ -2397,6 +2397,14 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret.append(nephoscale_network_to_dict(network))
+    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+        networks = conn.ex_list_networks()
+        for network in networks:
+            ret.append({
+                'id': network.id,
+                'name': network.name,
+                'extra': network.extra,
+            })
     elif conn.type in [Provider.OPENSTACK]:
         networks = conn.ex_list_neutron_networks()
         for network in networks:
