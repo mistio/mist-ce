@@ -69,18 +69,6 @@ define('app/views/backend_add', ['app/views/panel'],
                 });
             },
 
-            clear: function () {
-                $('#new-backend-provider').collapsible('collapse');
-                $('#backend-add-fields').hide();
-                Ember.run.next(this, function () {
-                    $(this.panelId).trigger('create');
-                    Ember.run.later(this, function () {
-                        if (Mist.backendAddController.provider)
-                            $('#backend-add-fields').fadeIn();
-                    }, 100);
-                });
-            },
-
 
             autocompleteCredentials: function (provider) {
                 var fields = this.get('providerFields');
