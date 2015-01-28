@@ -297,10 +297,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 this.fieldIsReady('key');
 
                 Mist.machineAddController.set('newMachineKey', key);
-<<<<<<< HEAD
-=======
                 $('#script').show();
->>>>>>> master
                 $('#create-machine-monitoring').removeClass('ui-state-disabled');
                 $('#create-machine-network .ui-collapsible')
                     .removeClass('ui-state-disabled')

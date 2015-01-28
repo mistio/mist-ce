@@ -48,34 +48,6 @@ define('app/views/backend_add', ['app/views/panel'],
                 });
                 return isReady;
             }.property('providerFields.@each.value'),
-<<<<<<< HEAD
-=======
-
-
-            //
-            //
-            //  Computer Properties
-            //
-            //
-
->>>>>>> master
-
-
-            //
-            //
-            //  Computer Properties
-            //
-            //
-
-
-<<<<<<< HEAD
-            firstFieldPlaceholder: function () {
-                var provider = Mist.backendAddController.newBackendProvider;
-                if (provider) {
-                    if (provider.provider == 'vcloud')
-                        return 'user@org';
-                }
-            }.property('Mist.backendAddController.newBackendProvider'),
 
 
             //
@@ -97,10 +69,6 @@ define('app/views/backend_add', ['app/views/panel'],
                 });
             },
 
-
-            autocompleteCredentials: function (provider) {
-
-=======
             clear: function () {
                 $('#new-backend-provider').collapsible('collapse');
                 $('#backend-add-fields').hide();
@@ -115,8 +83,6 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
             autocompleteCredentials: function (provider) {
-
->>>>>>> master
                 var fields = this.get('providerFields');
 
                 // Autocomplete credentials only for providers
@@ -228,4 +194,3 @@ define('app/views/backend_add', ['app/views/panel'],
         });
     }
 );
-

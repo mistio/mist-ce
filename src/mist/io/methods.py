@@ -278,8 +278,6 @@ def add_backend_v_2(user, title, provider, params):
         user.save()
     log.info("Backend with id '%s' added succesfully with Api-Version: 2.", backend_id)
     trigger_session_update(user.email, ['backends'])
-<<<<<<< HEAD
-=======
 
     if provider == 'libvirt' and backend.apisecret:
     # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
@@ -288,7 +286,6 @@ def add_backend_v_2(user, title, provider, params):
         username = backend.apikey
         associate_key(user, key_id, backend_id, node_id, username=username)
 
->>>>>>> master
     return backend_id
 
 
@@ -324,19 +321,12 @@ def _add_backend_bare_metal(user, title, provider, params):
     machine_id = machine_hostname.replace('.', '').replace(' ', '')
     machine.name = machine_hostname
     backend = model.Backend()
-<<<<<<< HEAD
-    backend.title = machine_hostname
-=======
     backend.title = title or machine_hostname
->>>>>>> master
     backend.provider = provider
     backend.enabled = True
     backend.machines[machine_id] = machine
     backend_id = backend.get_id()
-<<<<<<< HEAD
 
-=======
->>>>>>> master
     with user.lock_n_load():
         if backend_id in user.backends:
             raise BackendExistsError(backend_id)
@@ -356,11 +346,8 @@ def _add_backend_bare_metal(user, title, provider, params):
                 user.save()
                 raise BackendUnauthorizedError(exc)
         user.save()
-<<<<<<< HEAD
-
-=======
     return backend_id
->>>>>>> master
+
 
 def _add_backend_vcloud(title, provider, params):
     username = params.get('username', '')
@@ -371,15 +358,6 @@ def _add_backend_vcloud(title, provider, params):
     if not password:
         raise RequiredParameterMissingError('password')
 
-<<<<<<< HEAD
-    host = params.get('host', '')
-    if not host:
-        raise RequiredParameterMissingError('host')
-
-    for prefix in ['https://', 'http://']:
-        host = host.strip(prefix)
-    host = host.split('/')[0]
-=======
     organization = params.get('organization', '')
     if not organization:
         raise RequiredParameterMissingError('organization')
@@ -395,7 +373,6 @@ def _add_backend_vcloud(title, provider, params):
         host = host.split('/')[0]
     elif provider == 'indonesian_vcloud':
         host = 'compute.idcloudonline.com'
->>>>>>> master
 
     backend = model.Backend()
     backend.title = title
@@ -616,8 +593,6 @@ def _add_backend_docker(title, provider, params):
     return backend_id, backend
 
 
-<<<<<<< HEAD
-=======
 def _add_backend_libvirt(user, title, provider, params):
     machine_hostname = params.get('machine_hostname', '')
     if not machine_hostname:
@@ -644,7 +619,6 @@ def _add_backend_libvirt(user, title, provider, params):
     return backend_id, backend
 
 
->>>>>>> master
 def _add_backend_hp(user, title, provider, params):
     username = params.get('username', '')
     if not username:
@@ -1085,11 +1059,7 @@ def connect_provider(backend):
                       region=backend.region)
     elif backend.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(backend.apikey, backend.apisecret)
-<<<<<<< HEAD
-    elif backend.provider == Provider.VCLOUD:
-=======
     elif backend.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
->>>>>>> master
         libcloud.security.VERIFY_SSL_CERT = False;
         conn = driver(backend.apikey, backend.apisecret, host=backend.apiurl)
     elif backend.provider == Provider.DIGITAL_OCEAN:
@@ -1139,11 +1109,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-<<<<<<< HEAD
-                     Provider.VCLOUD):
-=======
                      Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT):
->>>>>>> master
         can_tag = False
 
     # for other states
@@ -1313,17 +1279,11 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
     if conn.type is Provider.DOCKER:
         if key_id:
-<<<<<<< HEAD
-            node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key)
-        else:
-            node = _create_machine_docker(conn, machine_name, image_id, script)
-=======
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
                                           docker_env=docker_env, docker_command=docker_command)
         else:
             node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
                                           docker_command=docker_command)
->>>>>>> master
         if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
@@ -1372,11 +1332,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_azure(conn, key_id, private_key,
                                              public_key, machine_name,
                                              image, size, location, cloud_service_name=None)
-<<<<<<< HEAD
-    elif conn.type == Provider.VCLOUD:
-=======
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
->>>>>>> master
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
         node = _create_machine_linode(conn, key_id, private_key, public_key,
@@ -1720,12 +1676,8 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
             raise MachineCreationError("Softlayer, got exception %s" % e)
     return node
 
-<<<<<<< HEAD
-def _create_machine_docker(conn, machine_name, image, script, public_key=None, tty_attach=True):
-=======
 def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
                            tty_attach=True):
->>>>>>> master
     """Create a machine in docker.
 
     """
@@ -2420,7 +2372,6 @@ def list_networks(user, backend_id):
     conn = connect_provider(backend)
 
     ret = []
-<<<<<<< HEAD
 
     ## Get the ip addreses of running machines to begin with, use cached
     ## list_machines response if there's a fresh one
@@ -2443,9 +2394,6 @@ def list_networks(user, backend_id):
 
     # Get the actual networks
     if conn.type in [Provider.NEPHOSCALE]:
-=======
-    if conn.type in [Provider.NEPHOSCALE, Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
->>>>>>> master
         networks = conn.ex_list_networks()
         for network in networks:
             ret.append(nephoscale_network_to_dict(network))
