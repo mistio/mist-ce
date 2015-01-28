@@ -46,9 +46,10 @@ define('app/models/network', [
 
 
             update: function (data) {
+
                 // Do not modify original data because it introduces
                 // debuging problems
-                var newData = data.slice();
+                var newData = Ember.Object.create(data);
 
                 if (newData.subnets) {
                     this._updateSubnets(newData.subnets);

@@ -11,21 +11,32 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
         return ListItemView.extend({
 
             tagName: 'tr',
+            pendingToggle: null,
             domID: function () {
                 return '_' + this.get('model').get('id').replace(/\./g, '');
             }.property('controller.model.id'),
 
+            updateReservedToggle: function (reserved) {
+                this.set('pendingToggle', true);
+                this.$().find('select').val(
+                    this.get('model').get('reserved') ? "on" : "off"
+                ).slider('refresh');
+            },
+
             actions: {
 
                 reservedToggled: function () {
+                    if (this.get('pendingToggle')) {
+                        this.set('pendingToggle', false);
+                        return;
+                    }
                     var ip = this.get('model');
-                    var $select = this.$().find('select');
+                    var that = this;
                     ip.reserve({
                         reserve: !ip.reserved,
                         callback: function (success) {
                             if (!success)
-                                $select.val(ip.reserved ? "on" : "off")
-                                    .slider('refresh');
+                                that.updateReservedToggle();
                         }
                     });
                 },
@@ -40,7 +51,11 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
                         $('#assign-machine').popup('open');
                     });
                 }
-            }
+            },
+
+            reservedObserver: function () {
+                Ember.run.once(this, 'updateReservedToggle');
+            }.observes('model.reserved')
         });
     }
 );
