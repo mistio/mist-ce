@@ -66,7 +66,7 @@ class MistInventory(object):
         machines = self._list_machines(backend_id)
         for machine in machines:
             if machine['id'] == machine_id:
-                name = machine['name']
+                name = machine['name'].replace(' ', '_')
                 ips = [ip for ip in machine['public_ips'] if ':' not in ip]
                 if not name:
                     name = machine_id

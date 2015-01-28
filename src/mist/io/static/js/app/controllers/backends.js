@@ -192,9 +192,14 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS.map(function (provider) {
+
                     provider.className = 'provider-';
-                    provider.className += provider.provider == 'bare_metal' ?
-                        'baremetal' : provider.provider;
+                    if (provider.provider == 'bare_metal')
+                        provider.className += 'baremetal';
+                    else if (provider.provider == 'indonesian_vcloud')
+                        provider.className += 'indonesian';
+                    else
+                        provider.className += provider.provider;
                     return provider;
                 }).sort(function (a, b) {
                     if (a.provider == 'bare_metal')
