@@ -189,17 +189,15 @@ define('app/views/backend_add', ['app/views/panel'],
                     var interval = 250;
                     var on = this.$().find('select').val() == 1;
                     if (on) {
-                        $('.off').hide(interval, function () {
-                            Ember.run.next(function () {
-                                $('.on').show(interval);
-                            });
-                        });
+                        $('.off').fadeOut(interval);
+                        Ember.run.later(function () {
+                            $('.on').fadeIn(interval);
+                        }, interval - 50);
                     } else {
-                        $('.on').hide(interval, function () {
-                            Ember.run.next(function () {
-                                $('.off').show(interval);
-                            });
-                        });
+                        $('.on').fadeOut(interval);
+                        Ember.run.later(function () {
+                            $('.off').fadeIn(interval);
+                        }, interval - 50);
                     }
                 }
             },
