@@ -41,6 +41,7 @@ define('app/views/backend_add', ['app/views/panel'],
                 var isReady = true
                 this.get('providerFields').some(function (field) {
                     if (field.optional) return;
+                    if (field.isSlider) return;
                     if (field.value === undefined ||
                         field.value === null ||
                         field.value === '')
