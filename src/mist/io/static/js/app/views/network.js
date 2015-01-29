@@ -20,6 +20,7 @@ define('app/views/network', ['app/views/mistscreen'],
 
             network: null,
             extra: null,
+            selectedIp: null,
 
 
             //
@@ -39,6 +40,10 @@ define('app/views/network', ['app/views/mistscreen'],
                     if (this.network.id) {
                         this.updateExtra();
                     }
+                    Ember.run.next(function(){
+                        $('#single-network-subnets').trigger('create');
+                        $('#single-network-subnets').collapsible();
+                    });
                 });
             }.on('didInsertElement'),
 
@@ -46,7 +51,7 @@ define('app/views/network', ['app/views/mistscreen'],
             unload: function() {
 
                 // Remove event listeners
-                Mist.backendsController.off('onNetworksListChange', this, 'load');
+                Mist.backendsController.off('onNetworkListChange', this, 'load');
 
             }.on('willDestroyElement'),
 
@@ -69,6 +74,7 @@ define('app/views/network', ['app/views/mistscreen'],
                         this.updateExtra();
                     }
                 });
+                $('#single-network-subnets').trigger('create');
             },
 
 
@@ -93,7 +99,21 @@ define('app/views/network', ['app/views/mistscreen'],
                             });
                         }
                     );
-                }
+                },
+
+                assignMachine: function (machine) {
+                    var ip = this.get('selectedIp');
+                    this.get('network').get('backend').get('networks').associateIP({
+                        network: this.get('network'),
+                        machine: machine,
+                        ip: ip,
+                        callback: function (success) {
+                            if (success)
+                                ip.get('server').set('name', machine.get('name'));
+                        }
+                    });
+                    $('#assign-machine').popup('close');
+                },
             },
 
 

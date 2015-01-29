@@ -52,14 +52,6 @@ define('app/views/backend_add', ['app/views/panel'],
 
             //
             //
-            //  Computer Properties
-            //
-            //
-
-
-
-            //
-            //
             //  Methods
             //
             //
@@ -79,7 +71,6 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
             autocompleteCredentials: function (provider) {
-
                 var fields = this.get('providerFields');
 
                 // Autocomplete credentials only for providers
@@ -191,4 +182,3 @@ define('app/views/backend_add', ['app/views/panel'],
         });
     }
 );
-

@@ -11,7 +11,6 @@
     </div>
 
     <div data-role="content" data-theme="c">
-
         <a id="network-create-btn"
             class="responsive-button"
             data-role="button"
@@ -19,7 +18,6 @@
             data-iconpos="right"
             data-theme="d"
             {{action "createClicked" target="view"}}>Create</a>
-
         <ul id="networks"
             data-role="listview"
             data-inset="true"
@@ -27,15 +25,13 @@
             data-filter-placeholder="Filter..."
             data-theme="c"
             class="checkbox-list">
-            {{#each Mist.backendsController.content}}
+            {{#each Mist.backendsController}}
                 {{#if this.enabled}}
-                    {{#if this.isOpenStack}}
-                      {{#each this.networks.content}}
-                          {{view Mist.networkListItemView
-                              networkBinding="this"
-                              class="checkbox-link"}}
-                      {{/each}}
-                    {{/if}}
+                  {{#each this.networks}}
+                        {{view Mist.networkListItemView
+                            networkBinding=this
+                            class="checkbox-link"}}
+                  {{/each}}
                 {{/if}}
             {{/each}}
         </ul>

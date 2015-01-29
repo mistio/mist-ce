@@ -12,6 +12,8 @@ from hashlib import sha256
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
 
+from netaddr import IPSet, IPNetwork
+
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.base import NodeAuthSSHKey
@@ -324,6 +326,7 @@ def _add_backend_bare_metal(user, title, provider, params):
     backend.enabled = True
     backend.machines[machine_id] = machine
     backend_id = backend.get_id()
+
     with user.lock_n_load():
         if backend_id in user.backends:
             raise BackendExistsError(backend_id)
@@ -344,6 +347,7 @@ def _add_backend_bare_metal(user, title, provider, params):
                 raise BackendUnauthorizedError(exc)
         user.save()
     return backend_id
+
 
 def _add_backend_vcloud(title, provider, params):
     username = params.get('username', '')
@@ -1145,7 +1149,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     if conn.type is Provider.GCE:
         can_start = False
         can_stop = False
-    
+
     if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
         # allow only reboot action for libvirt hypervisor
         can_stop = False
@@ -2368,24 +2372,90 @@ def list_networks(user, backend_id):
     conn = connect_provider(backend)
 
     ret = []
-    if conn.type in [Provider.NEPHOSCALE, Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        networks = conn.ex_list_networks()
 
+    ## Get the ip addreses of running machines to begin with, use cached
+    ## list_machines response if there's a fresh one
+    #task = mist.io.tasks.ListMachines()
+    #task_result = task.smart_delay(user.email, backend_id, blocking=True)
+    #machines = task_result.get('machines', [])
+
+    ## Separate public & private ips, create ip2machine map
+    #public_ips = IPSet()
+    #private_ips = IPSet()
+    #ips = []
+    #ip2machine = {}
+    #for machine in machines:
+    #    for i in machine['public_ips']:
+    #        public_ips.add(i)
+    #    for i in machine['private_ips']:
+    #        private_ips.add(i)
+    #    #for i in machine['public_ips'] + machine['private_ips']:
+    #    #    ip2machine[i] = machine['id']
+
+    # Get the actual networks
+    if conn.type in [Provider.NEPHOSCALE]:
+        networks = conn.ex_list_networks()
+        for network in networks:
+            ret.append(nephoscale_network_to_dict(network))
+    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+        networks = conn.ex_list_networks()
         for network in networks:
             ret.append({
                 'id': network.id,
                 'name': network.name,
                 'extra': network.extra,
             })
-
-        return ret
     elif conn.type in [Provider.OPENSTACK]:
         networks = conn.ex_list_neutron_networks()
         for network in networks:
             ret.append(openstack_network_to_dict(network))
-        return ret
-    else:
-        return ret
+    elif conn.type in [Provider.GCE]:
+        networks = conn.ex_list_networks()
+        for network in networks:
+            ret.append(gce_network_to_dict(network))
+    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST,
+                       Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
+                       Provider.EC2_EU, Provider.EC2_EU_WEST,
+                       Provider.EC2_SA_EAST, Provider.EC2_US_EAST,
+                       Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON]:
+        networks = conn.ex_list_networks()
+        for network in networks:
+            ret.append(ec2_network_to_dict(network))
+    return ret
+
+
+def ec2_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['is_default'] = network.extra.get('is_default', False)
+    net['state'] = network.extra.get('state')
+    net['instance_tenancy'] = network.extra.get('instance_tenancy')
+    net['dhcp_options_id'] = network.extra.get('dhcp_options_id')
+    net['tags'] = network.extra.get('tags', [])
+    net['subnets'] = [{'name': network.cidr_block}]
+    return net
+
+
+def nephoscale_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['subnets'] = network.subnets
+    net['is_default'] = network.is_default
+    net['zone'] = network.zone
+    net['domain_type'] = network.domain_type
+    return net
+
+
+def gce_network_to_dict(network):
+    net = {}
+    net['name'] = network.name
+    net['id'] = network.id
+    net['extra'] = network.extra
+    net['subnets'] = [{'name': network.cidr,
+                       'gateway_ip': network.extra.get('gatewayIPv4')}]
+    return net
 
 
 def openstack_network_to_dict(network):
@@ -2413,6 +2483,18 @@ def openstack_subnet_to_dict(subnet):
     net['gateway_ip'] = subnet.gateway_ip
 
     return net
+
+
+def associate_ip(user, backend_id, network_id, ip, machine_id=None, assign=True):
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    conn = connect_provider(backend)
+
+    if conn.type != Provider.NEPHOSCALE:
+        return False
+
+    return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
 
 
 def create_network(user, backend_id, network, subnet):

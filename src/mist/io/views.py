@@ -634,6 +634,24 @@ def delete_network(request):
     return OK
 
 
+@view_config(route_name='network', request_method='POST')
+def associate_ip(request):
+
+    backend_id = request.matchdict['backend']
+    network_id = request.matchdict['network']
+    ip = request.json_body.get('ip')
+    machine = request.json_body.get('machine')
+    assign = request.json_body.get('assign', True)
+    user = user_from_request(request)
+
+    ret = methods.associate_ip(user, backend_id, network_id, ip, machine,
+                               assign)
+    if ret:
+        return OK
+    else:
+        return Response("Bad Request", 400)
+
+
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """Probes a machine using ping and ssh to collect metrics.
@@ -644,12 +662,8 @@ def probe(request):
     machine_id = request.matchdict['machine']
     backend_id = request.matchdict['backend']
     host = request.json_body.get('host', None)
-    key_id = request.json_body.get('key', None)
-    # FIXME: simply don't pass a key parameter
-    if key_id == 'undefined':
-        key_id = None
-
     ssh_user = request.params.get('ssh_user', '')
+    key_id = request.json_body.get('key', None)
     # FIXME: simply don't pass a key parameter
     if key_id == 'undefined':
         key_id = ''

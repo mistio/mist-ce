@@ -23,6 +23,8 @@ requires = [
     'gevent',
     'gevent-socketio',
     'gevent-subprocess',
+    'amqp',
+    'netaddr',
     'amqp'
 ]
 
@@ -55,4 +57,3 @@ setup(name='mist.io',
       main = mist.io:main
       """,
       )
-

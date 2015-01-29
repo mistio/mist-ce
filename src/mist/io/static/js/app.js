@@ -8,7 +8,7 @@ require.config({
         text: 'lib/require/text',
         ember: 'lib/ember-1.5.1.min',
         jquery: 'lib/jquery-2.1.1.min',
-        jqm: 'lib/jquery.mobile-1.4.2.min',
+        jqm: 'lib/jquery.mobile-1.4.5.min',
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
@@ -283,8 +283,9 @@ var loadFiles = function (callback) {
         'app/views/graph_list_control',
         'app/views/graph_list_item',
         'app/views/home',
-        'app/views/image_list',
         'app/views/image_list_item',
+        'app/views/image_list',
+        'app/views/ip_address_list_item',
         'app/views/key',
         'app/views/key_add',
         'app/views/key_edit',
@@ -314,6 +315,7 @@ var loadFiles = function (callback) {
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/rule_list',
+        'app/views/subnet_list_item',
         'app/views/user_menu',
     ], callback);
 };
@@ -359,8 +361,9 @@ var loadApp = function (
     GraphListControlView,
     GraphListItemView,
     Home,
-    ImageListView,
     ImageListItem,
+    ImageListView,
+    IPAddressListItemView,
     SingleKeyView,
     KeyAddView,
     KeyEditDialog,
@@ -390,6 +393,7 @@ var loadApp = function (
     RuleView,
     RuleEditView,
     RuleListView,
+    SubnetListItemView,
     UserMenuView,
     callback) {
 
@@ -599,6 +603,9 @@ var loadApp = function (
 
     // Ember views
 
+    App.SubnetListItemView = SubnetListItemView;
+    App.IpAddressListItemView = IPAddressListItemView;
+
     App.set('homeView', Home);
     App.set('ruleView', RuleView);
     App.set('loginView', LoginView);
@@ -696,7 +703,10 @@ var loadApp = function (
     App.Checkbox = Ember.Checkbox.extend({
         attributeBindings: [
             'data-mini',
-            'data-theme'
+            'data-theme',
+            'data-icon',
+            'data-icon-position',
+            'data-disabled'
         ]
     });
     App.TextField = Ember.TextField.extend({
@@ -945,7 +955,7 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_networks', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.networks.load(data.networks);
+            backend.networks.setContent(data.networks);
     })
     .on('monitoring',function (data){
         Mist.monitoringController._updateMonitoringData(data);
@@ -1629,7 +1639,6 @@ var PROVIDER_MAP = {
         },
 
     ],
-
     vcloud: [
         {
             name: 'title',
