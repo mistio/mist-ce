@@ -14,7 +14,6 @@
 
 #backend-add .ui-slider {
     width: 100%;
-    margin-top: 20px;
     margin-bottom: -10px;
 }
 
@@ -33,6 +32,10 @@
 
 #backend-add .on {
     display: none;
+}
+
+#backend-add .off {
+    margin-top: 20px;
 }
 
 #backend-add .on,

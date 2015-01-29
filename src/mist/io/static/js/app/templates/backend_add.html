@@ -47,11 +47,12 @@
 
         <div id="backend-add-fields">
         {{#each field in view.providerFields}}
-            {{#unless field.isSlider}}
                 <span {{bind-attr class="field.className"}}>
-                <label {{bind-attr for="field.name"}}>
-                    {{field.label}}:
-                </label>
+                {{#if field.label}}
+                    <label {{bind-attr for="field.name"}}>
+                        {{field.label}}:
+                    </label>
+                {{/if}}
                 {{#if field.isText}}
                     {{view Mist.TextField
                         data-theme="a"
@@ -108,14 +109,14 @@
                         </ul>
                     </div>
                 {{/if}}
+                {{#if field.isSlider}}
+                    <select class="toggle-field" data-theme="a" data-role="slider"
+                    {{action "switchToggled" on="change" target="view"}}>
+                        <option value="0">{{unbound field.offLabel}}</option>
+                        <option value="1">{{unbound field.onLabel}}</option>
+                    </select>
+                {{/if}}
                 </span>
-            {{else}}
-                <select class="toggle-field" data-theme="a" data-role="slider"
-                {{action "switchToggled" on="change" target="view"}}>
-                    <option value="0">{{unbound field.offLabel}}</option>
-                    <option value="1">{{unbound field.onLabel}}</option>
-                </select>
-            {{/unless}}
         {{/each}}
         </div>
 

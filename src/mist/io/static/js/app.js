@@ -1340,7 +1340,7 @@ function parseProviderMap () {
                 field.placeholder = "";
             if (field.optional)
                 field.placeholder += '(optional)';
-            if (!field.label && field.name)
+            if (!field.label && !field.buttonText &&  field.name)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||
                         word == 'url' ||
@@ -1456,21 +1456,20 @@ var PROVIDER_MAP = {
         },
         {
             type: 'slider',
-            offLabel: 'TLS Auth',
-            onLabel: 'Basic Auth',
+            label: 'Authentication',
+            offLabel: 'TLS',
+            onLabel: 'Basic',
             off: [
                 {
                     name: 'key_file',
                     type: 'file',
-                    buttonText: 'Add key',
-                    label: '.pem key file (tls auth)',
+                    buttonText: 'Add pem key',
                     optional: true
                 },
                 {
                     name: 'cert_file',
                     type: 'file',
-                    buttonText: 'Add certificate',
-                    label: '.pem certificate file (tls auth)',
+                    buttonText: 'Add pem certificate',
                     optional: true
                 },
             ],
@@ -1478,13 +1477,13 @@ var PROVIDER_MAP = {
                 {
                     name: 'auth_user',
                     type: 'text',
-                    label: 'BasicAuth User',
+                    label: 'User',
                     optional: true,
                 },
                 {
                     name: 'auth_password',
                     type: 'password',
-                    label: 'BasicAuth Password',
+                    label: 'Password',
                     optional: true,
                 }
             ]
