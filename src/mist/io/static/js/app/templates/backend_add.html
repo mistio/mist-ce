@@ -47,7 +47,8 @@
 
         <div id="backend-add-fields">
         {{#each field in view.providerFields}}
-            {{#unless field.advanced}}
+            {{#unless field.isSlider}}
+                <span {{bind-attr class="field.className"}}>
                 <label {{bind-attr for="field.name"}}>
                     {{field.label}}:
                 </label>
@@ -107,6 +108,13 @@
                         </ul>
                     </div>
                 {{/if}}
+                </span>
+            {{else}}
+                <select class="toggle-field" data-role="slider"
+                {{action "switchToggled" on="change" target="view"}}>
+                    <option value="0">{{unbound field.offLabel}}</option>
+                    <option value="1">{{unbound field.onLabel}}</option>
+                </select>
             {{/unless}}
         {{/each}}
         </div>

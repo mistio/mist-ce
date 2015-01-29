@@ -184,11 +184,24 @@ define('app/views/backend_add', ['app/views/panel'],
                 },
 
 
-                advancedToggled: function () {
-                    App.switchElementVisibility('backend-add-advanced');
+                switchToggled: function () {
+                    var interval = 250;
+                    var on = this.$().find('select').val() == 1;
+                    if (on) {
+                        $('.off').hide(interval, function () {
+                            Ember.run.next(function () {
+                                $('.on').show(interval);
+                            });
+                        });
+                    } else {
+                        $('.on').hide(interval, function () {
+                            Ember.run.next(function () {
+                                $('.off').show(interval);
+                            });
+                        });
+                    }
                 }
             },
         });
     }
 );
-

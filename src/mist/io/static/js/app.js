@@ -414,39 +414,10 @@ var loadApp = function (
         (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
         .test(navigator.userAgent)
     );
-    window.Mist = App;
 
-    // Parse PROVIDER_MAP to generate template friendly fields
-    forIn(PROVIDER_MAP, function (fields, title) {
-        PROVIDER_MAP[title].className = 'provider-';
-        PROVIDER_MAP[title].className += title == 'bare_metal' ?
-            'baremetal' : title;
-        fields.forEach(function (field, index) {
-            field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
-            field.value = field.defaultValue || '';
-            if (field.type == 'text' ||
-                field.type == 'password')
-                field.isText = true;
-            if (field.type == 'file')
-                field.isFile = true;
-            if (field.type == 'ssh_key')
-                field.isKey = true;
-            if (field.type == 'region')
-                field.isRegion = true;
-            if (!field.placeholder)
-                field.placeholder = "";
-            if (field.optional)
-                field.placeholder += '(optional)';
-            if (!field.label)
-                field.label = field.name.split('_').map(function (word) {
-                    if (word == 'api' ||
-                        word == 'url' ||
-                        word == 'id')
-                        return word.toUpperCase();
-                    return word.capitalize()
-                }).join(' ');
-        });
-    });
+    parseProviderMap();
+
+    window.Mist = App;
 
     // Ember routes and routers
 
@@ -1328,6 +1299,59 @@ function clearProviderFields (provider) {
     });
 }
 
+function parseProviderMap () {
+    // Parse PROVIDER_MAP to generate template friendly fields
+
+    // Append nested fields into main array
+    forIn(PROVIDER_MAP, function (fields, title) {
+        fields.forEach(function (field) {
+            if (field.type == 'slider') {
+                field.on.forEach(function (f) {
+                    f.className = 'on';
+                    fields.push(f);
+                });
+                field.off.forEach(function (f) {
+                    f.className = 'off';
+                    fields.push(f);
+                });
+            }
+        });
+    });
+
+    forIn(PROVIDER_MAP, function (fields, title) {
+        PROVIDER_MAP[title].className = 'provider-';
+        PROVIDER_MAP[title].className += title == 'bare_metal' ?
+            'baremetal' : title;
+        fields.forEach(function (field, index) {
+            field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
+            field.value = field.defaultValue || '';
+            if (field.type == 'slider')
+                field.isSlider = true;
+            if (field.type == 'text' ||
+                field.type == 'password')
+                field.isText = true;
+            if (field.type == 'file')
+                field.isFile = true;
+            if (field.type == 'ssh_key')
+                field.isKey = true;
+            if (field.type == 'region')
+                field.isRegion = true;
+            if (!field.placeholder)
+                field.placeholder = "";
+            if (field.optional)
+                field.placeholder += '(optional)';
+            if (!field.label && field.name)
+                field.label = field.name.split('_').map(function (word) {
+                    if (word == 'api' ||
+                        word == 'url' ||
+                        word == 'id')
+                            return word.toUpperCase();
+                    return word.capitalize()
+                }).join(' ');
+        });
+    });
+}
+
 //  GLOBAL DEFINITIONS
 
 var DISPLAYED_DATAPOINTS = 60;
@@ -1430,33 +1454,41 @@ var PROVIDER_MAP = {
             optional: true,
             defaultValue: '4243',
         },
-
         {
-            name: 'key_file',
-            type: 'file',
-            buttonText: 'Add key',
-            label: '.pem key file (tls auth)',
-            optional: true
+            type: 'slider',
+            offLabel: 'TLS Auth',
+            onLabel: 'Basic Auth',
+            off: [
+                {
+                    name: 'key_file',
+                    type: 'file',
+                    buttonText: 'Add key',
+                    label: '.pem key file (tls auth)',
+                    optional: true
+                },
+                {
+                    name: 'cert_file',
+                    type: 'file',
+                    buttonText: 'Add certificate',
+                    label: '.pem certificate file (tls auth)',
+                    optional: true
+                },
+            ],
+            on: [
+                {
+                    name: 'auth_user',
+                    type: 'text',
+                    label: 'BasicAuth User',
+                    optional: true,
+                },
+                {
+                    name: 'auth_password',
+                    type: 'password',
+                    label: 'BasicAuth Password',
+                    optional: true,
+                }
+            ]
         },
-        {
-            name: 'cert_file',
-            type: 'file',
-            buttonText: 'Add certificate',
-            label: '.pem certificate file (tls auth)',
-            optional: true
-        },
-        {
-            name: 'auth_user',
-            type: 'text',
-            label: 'BasicAuth User',
-            optional: true,
-        },
-        {
-            name: 'auth_password',
-            type: 'password',
-            label: 'BasicAuth Password',
-            optional: true,
-        }
     ],
 
     ec2: [
