@@ -1457,23 +1457,25 @@ var PROVIDER_MAP = {
         {
             type: 'slider',
             label: 'Authentication',
-            offLabel: 'TLS',
-            onLabel: 'Basic',
-            off: [
+            onLabel: 'TLS',
+            offLabel: 'Basic',
+            on: [
                 {
                     name: 'key_file',
                     type: 'file',
-                    buttonText: 'Add pem key',
+                    label: 'PEM Key',
+                    buttonText: 'Add key',
                     optional: true
                 },
                 {
                     name: 'cert_file',
                     type: 'file',
-                    buttonText: 'Add pem certificate',
+                    label: 'PEM Certificate',
+                    buttonText: 'Add certificate',
                     optional: true
                 },
             ],
-            on: [
+            off: [
                 {
                     name: 'auth_user',
                     type: 'text',

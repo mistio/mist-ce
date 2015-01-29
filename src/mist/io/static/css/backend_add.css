@@ -41,10 +41,10 @@
     display: none;
 }
 
-#backend-add .off {
+#backend-add .on {
     margin-top: 20px;
 }
 
-#backend-add .off label {
-    display: none
+#backend-add .on label {
+    display: none;
 }
