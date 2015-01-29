@@ -1340,7 +1340,7 @@ function parseProviderMap () {
                 field.placeholder = "";
             if (field.optional)
                 field.placeholder += '(optional)';
-            if (!field.label && !field.buttonText &&  field.name)
+            if (!field.label &&  field.name)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||
                         word == 'url' ||

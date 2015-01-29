@@ -47,10 +47,10 @@
 
         <div id="backend-add-fields">
         {{#each field in view.providerFields}}
-                <span {{bind-attr class="field.className"}}>
+                <div {{bind-attr class="field.className :field"}}>
                 {{#if field.label}}
                     <label {{bind-attr for="field.name"}}>
-                        {{field.label}}:
+                        {{unbound field.label}}:
                     </label>
                 {{/if}}
                 {{#if field.isText}}
@@ -65,7 +65,7 @@
                     <a class="ui-btn ui-btn-icon-right ui-icon-plus ui-btn-a ui-corner-all"
                         {{bind-attr id="field.name"}}
                         {{action "uploadFile" field target="view"}}>
-                            {{field.buttonText}}
+                            {{unbound field.buttonText}}
                     </a>
                 {{/if}}
                 {{#if field.isKey}}
@@ -116,7 +116,7 @@
                         <option value="1">{{unbound field.onLabel}}</option>
                     </select>
                 {{/if}}
-                </span>
+            </div>
         {{/each}}
         </div>
 
