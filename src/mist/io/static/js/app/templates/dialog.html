@@ -69,6 +69,11 @@
                 <a class="ui-btn ui-btn-a ui-corner-all"
                     {{action "confirm" target="view"}}>OK</a>
 
+            {{else}}{{#if view.isBack}}
+
+                <a class="ui-btn ui-btn-a ui-corner-all"
+                    {{action "confirm" target="view"}}>Back</a>
+
             {{else}}
 
                 <div class="ok-cancel
@@ -103,7 +108,7 @@
 
                 </div>
 
-            {{/if}}
+            {{/if}}{{/if}}
 
         </div>
     </div>

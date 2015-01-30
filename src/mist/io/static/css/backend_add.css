@@ -8,9 +8,6 @@
     max-height: 120px;
     overflow-y: scroll;
 }
-#backend-add .ok-cancel {
-    margin-top: 30px;
-}
 
 #backend-add .ui-slider {
     width: 200px;

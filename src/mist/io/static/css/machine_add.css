@@ -15,16 +15,6 @@
     max-height: 120px;
     overflow-y: scroll;
 }
-#create-machine-panel .ok-cancel > div {
-	width: 50%;
-	padding: 0;
-}
-#create-machine-panel .ok-cancel .ui-btn {
-	width: 100% !important;
-	margin: 0;
-	padding-left: 0;
-	padding-right: 0;
-}
 #create-machine-panel .ok-cancel div:first-child .ui-btn {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;

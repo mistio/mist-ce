@@ -1356,6 +1356,7 @@ var DIALOG_TYPES = {
     OK_CANCEL: 1,
     YES_NO: 2,
     DONE_BACK: 3,
+    BACK: 4,
 };
 
 

@@ -21,3 +21,11 @@
     left: 10px;
     position: relative;
 }
+
+#single-key-page #dialog-popup {
+    width: 32em !important
+}
+
+#single-key-page #dialog.large-popup {
+    width: 100% !important;
+}

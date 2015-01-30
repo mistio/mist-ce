@@ -167,24 +167,12 @@ textarea#private-key, #manual-monitoring-popup textarea {
 .small-popup {
     width: 240px !important;
 }
-.small-popup .ok-cancel a,
-.small-popup .ok-cancel button {
-    width: 70px !important;
-}
 .mid-popup {
     width: 255px !important;
     max-width: 99%;
 }
-.mid-popup .ok-cancel a,
-.mid-popup .ok-cancel button {
-    width: 77px !important;
-}
 .large-popup {
     width: 290px !important;
-}
-.large-popup .ok-cancel a,
-.large-popup .ok-cancel button {
-    width: 95px !important;
 }
 .huge-popup {
     width: 100% !important;
@@ -213,23 +201,12 @@ textarea#private-key, #manual-monitoring-popup textarea {
 .side-panel .ui-panel-inner {
     padding: 7px;
 }
-.side-panel .ok-cancel a,
-.side-panel .ok-cancel button {
-    width: 102px !important;
-}
-
 .ui-panel-dismiss-open.ui-panel-dismiss-position-right {
     right: 325px;
 }
 
 .ui-panel-inner {
     padding: 10px !important;
-}
-
-@media only screen and  (max-width: 718px) {
-    .side-panel .ok-cancel a, .side-panel .ok-cancel button {
-        width: 98px !important;
-    }
 }
 
 /* Filtered list headers
@@ -440,23 +417,12 @@ ul.checkbox-list li label {
     width: 355px !important;
     max-width: 99%;
 }
-#confirmation-popup  .ok-cancel a,
-#confirmation-popup  .ok-cancel button {
-    width: 126px !important;
-}
-
 .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
     border-right-width: 2px;
 }
 
 #confirmation-popup p {
     text-align: center;
-}
-
-@media only screen and  (max-width: 386px) {
-    #confirmation-popup .ok-cancel button {
-        width: 93px !important;
-    }
 }
 /* Other
 -----------------------------------------------------------------------------------------------------------*/
@@ -611,9 +577,16 @@ ul.checkbox-list li label {
     width: 100%;
     margin: 0;
     padding-bottom: 0 !important;
+    box-sizing: border-box;
+}
+.ok-cancel a,
+.ok-cancel button {
+    width: 50% !important;
+    box-sizing: border-box !important;
 }
 .ok-cancel > .ui-controlgroup-controls {
     width: 100%;
+    box-sizing: border-box;
 }
 
 /* Info table
@@ -653,7 +626,7 @@ ul.checkbox-list li label {
 
 /* Dialog
 ------------------------------------------------------------------------------*/
-#dialog-popup .command-container {
+.command-container {
     white-space: pre;
     text-align: left;
     max-height: 250px;
@@ -664,7 +637,3 @@ ul.checkbox-list li label {
     font-family: monospace;
     font-size: 11px;
 }
-
-
-
-
