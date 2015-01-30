@@ -509,17 +509,35 @@ function program8(depth0,data) {
 
 function program10(depth0,data) {
   
+  var stack1;
+  stack1 = helpers['if'].call(depth0, "view.isBack", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(13, program13, data),fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  else { data.buffer.push(''); }
+  }
+function program11(depth0,data) {
+  
+  var buffer = '';
+  data.buffer.push("\n\n                <a class=\"ui-btn ui-btn-a ui-corner-all\"\n                    ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "confirm", {hash:{
+    'target': ("view")
+  },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(">Back</a>\n\n            ");
+  return buffer;
+  }
+
+function program13(depth0,data) {
+  
   var buffer = '', stack1;
   data.buffer.push("\n\n                <div class=\"ok-cancel\n                        ui-controlgroup\n                        ui-controlgroup-horizontal\n                        ui-group-theme-a\n                        ui-corner-all\"\n                    data-role=\"controlgroup\"\n                    data-type=\"horizontal\">\n\n                    ");
-  stack1 = helpers['if'].call(depth0, "view.isOKCancel", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.isOKCancel", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(14, program14, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n                    ");
-  stack1 = helpers['if'].call(depth0, "view.isYesNo", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(13, program13, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.isYesNo", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(16, program16, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n                </div>\n\n            ");
   return buffer;
   }
-function program11(depth0,data) {
+function program14(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                        <a class=\"ui-btn\"\n                            ");
@@ -534,7 +552,7 @@ function program11(depth0,data) {
   return buffer;
   }
 
-function program13(depth0,data) {
+function program16(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                        <a class=\"ui-btn ui-btn-d\"\n                            ");
@@ -1310,11 +1328,7 @@ function program6(depth0,data) {
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyEditView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("\n\n    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n\n\n    <!--\n     Since the private key is very sensitive information, it should be\n     erased as soon as the popup is closed. We set the data-dismissible\n     attribute to false to make sure that user will click the \"Back\" button\n     to leave the popup (which will remove the private key from the textarea)\n    -->\n    <div id=\"private-key-popup\"\n         class=\"medium-popup\"\n         data-role=\"popup\"\n         data-overlay-theme=\"b\"\n         data-transition=\"flip\"\n         data-dismissible=\"false\">\n        <div data-role=\"header\" data-theme=\"b\">\n            <h1>Private Key</h1>\n        </div>\n        <div data-role=\"content\">\n            <textarea id=\"private-key\" readonly=\"readonly\" onclick=\"this.focus();this.select()\"></textarea>\n            <a data-role=\"button\" ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
-    'target': ("view")
-  },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Back</a>\n        </div>\n    </div>\n\n    <div class=\"dual-action-footer\" data-role=\"footer\" data-theme=\"b\">\n        <table><tbody><tr><td>\n            <a data-role=\"button\" data-icon=\"edit\" ");
+  data.buffer.push("\n\n    <div class=\"dual-action-footer\" data-role=\"footer\" data-theme=\"b\">\n        <table><tbody><tr><td>\n            <a data-role=\"button\" data-icon=\"edit\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "renameClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
@@ -1747,15 +1761,15 @@ function program24(depth0,data) {
   data.buffer.push("\n            Enable monitoring\n            </label>\n        </div>\n\n        <div id=\"create-machine-cost\">\n        ");
   stack1 = helpers['if'].call(depth0, "view.price", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(24, program24, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n        </div>\n\n        <div class=\"ok-cancel\" data-role=\"ui-grid-a\" >\n            <div class=\"ui-block-a\">\n                <a data-role=\"button\"\n                   data-theme=\"a\"\n                   ");
+  data.buffer.push("\n        </div>\n\n        <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\" >\n                <a data-role=\"button\"\n                   data-theme=\"a\"\n                   ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Back</a>\n            </div>\n            <div class=\"ui-block-b\">\n                <button id=\"create-machine-ok\"\n                        data-theme=\"d\"\n                        ");
+  data.buffer.push(">Back</a>\n                <a id=\"create-machine-ok\"\n                    data-role=\"button\"\n                        data-theme=\"d\"\n                        ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "launchClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Launch!</button>\n            </div>\n        </div>\n    </div>\n</div>\n\n");
+  data.buffer.push(">Launch!</a>\n        </div>\n    </div>\n</div>\n\n");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyAddView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("\n");
   return buffer;
@@ -2847,22 +2861,23 @@ function program1(depth0,data) {
   data.buffer.push("\n                <div class=\"ajax-loader\"></div>\n            ");
   }
 
-  data.buffer.push("\n<div id=\"metric-add-custom-screen\" class=\"ui-popup-screen ui-screen-hidden ui-overlay-a\"></div>\n<div id=\"metric-add-custom-popup\"\n     class=\"ui-popup-container ui-popup-hidden ui-body-inherit ui-corner-all\">\n\n    <div id=\"metric-add-custom\"\n         class=\"ui-popup ui-corner-all ui-overlay-shadow\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\"\n         data-position-to=\"#add-metric-btn\">\n\n        <div class=\"ui-header ui-bar-b\">\n            <h1 class=\"ui-title\">Add custom metric</h1>\n        </div>\n        <div class=\"ui-content\">\n\n            <label for=\"custom-plugin-name\">Name:</label>\n            ");
+  data.buffer.push("\n<div id=\"metric-add-custom-screen\" class=\"ui-popup-screen ui-screen-hidden ui-overlay-a\"></div>\n<div id=\"metric-add-custom-popup\"\n     class=\"ui-popup-container ui-popup-hidden ui-body-inherit ui-corner-all\">\n\n    <div id=\"metric-add-custom\"\n         class=\"ui-popup ui-corner-all ui-overlay-shadow\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\"\n         data-position-to=\"#add-metric-btn\">\n\n        <div class=\"ui-header ui-bar-b\">\n            <h1 class=\"ui-title\">Add custom metric</h1>\n        </div>\n        <div class=\"ui-content\">\n\n            <div class=\"ui-grid-a\">\n                <div class=\"ui-block-a\">\n                    <label for=\"custom-plugin-name\">Name:</label>\n                    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
     'id': ("custom-plugin-name"),
+    'placeholder': ("e.g. my metric"),
     'valueBinding': ("Mist.metricAddCustomController.metric.name")
-  },hashTypes:{'id': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n\n            <label for=\"custom-plugin-script\">Python script:</label>\n            <pre id=\"custom-plugin-error\"></pre>\n            ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.TextArea", {hash:{
-    'id': ("custom-plugin-script"),
-    'valueBinding': ("Mist.metricAddCustomController.metric.script")
-  },hashTypes:{'id': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n\n            <label for=\"custom-plugin-unit\">Unit:</label>\n            ");
+  },hashTypes:{'id': "STRING",'placeholder': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'placeholder': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n                </div>\n                <div class=\"ui-block-b\">\n                    <label for=\"custom-plugin-unit\">Unit:</label>\n                    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
     'id': ("custom-plugin-unit"),
     'placeholder': ("e.g. bytes (optional)"),
     'valueBinding': ("Mist.metricAddCustomController.metric.unit")
   },hashTypes:{'id': "STRING",'placeholder': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'placeholder': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n                </div>\n            </div>\n            <label for=\"custom-plugin-script\">Python script:</label>\n            <pre id=\"custom-plugin-error\"></pre>\n            ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.TextArea", {hash:{
+    'id': ("custom-plugin-script"),
+    'valueBinding': ("Mist.metricAddCustomController.metric.script")
+  },hashTypes:{'id': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("\n\n            <select id=\"advanced-toggle\" data-role=\"slider\" data-theme=\"a\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "advancedToggled", {hash:{
     'target': ("view"),
