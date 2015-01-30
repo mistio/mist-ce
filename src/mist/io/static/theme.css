@@ -297,10 +297,10 @@ html .ui-bar-a .ui-btn:visited,
 html .ui-body-a .ui-btn:visited,
 html body .ui-group-theme-a .ui-btn:visited,
 html head + body .ui-btn.ui-btn-a:visited {
-	background-color: #fafafa /*{a-bup-background-color}*/;
+	background-color: #fbfbfb /*{a-bup-background-color}*/;
 	border-color: #eee /*{a-bup-border}*/;
 	color: #000000 /*{a-bup-color}*/;
-	text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #fafafa /*{a-bup-shadow-color}*/;
+	text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #fbfbfb /*{a-bup-shadow-color}*/;
 }
 /* Button hover */
 .ui-page-theme-a .ui-btn:hover,
