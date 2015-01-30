@@ -9,29 +9,30 @@
     {{/if}}
     &nbsp;</a>
 
-<div id="user-menu-popup" data-role="popup" data-position-to="#me-btn" data-theme="b" data-overlay-theme="b" data-transition="flip">
+<div id="user-menu-popup" class="ui-mini" data-role="popup" data-position-to="#me-btn" data-theme="c" data-overlay-theme="a" data-transition="flip">
 
     <div data-role="content">
 
-        <div>{{EMAIL}}</div>
+        <div id="user-email">{{EMAIL}}</div>
 
         <a href="https://mistio.zendesk.com/access/login"
            target="_blank"
            data-role="button"
+           data-theme="b"
            data-mini="true">Support</a>
 
         {{#if Mist.authenticated}}
 
-            <a data-role="button" data-mini="true"
+            <a data-role="button" data-mini="true" data-theme="b"
                {{bind-attr href="view.accountUrl"}}
                {{bind-attr target="view.isNotCore"}}>Account</a>
 
             {{#if Mist.isCore}}
-                <button data-mini="true" {{action "logoutClicked" target="view"}}>Logout</a>
+                <button data-theme="b" data-mini="true" {{action "logoutClicked" target="view"}}>Logout</a>
             {{/if}}
         {{else}}
             {{#unless Mist.isCore}}
-                <button data-mini="true" {{action "loginClicked" target="view"}}>Login</a>
+                <button data-theme="b" data-mini="true" {{action "loginClicked" target="view"}}>Login</a>
             {{/unless}}
         {{/if}}
 

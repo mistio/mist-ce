@@ -214,7 +214,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
 -----------------------------------------------------------------------------------------------------------*/
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable {
-    margin: 10px 118px -44px 118px !important;
+    margin: 10px 8em -44px 118px !important;
     position: relative;
     top: -49px;
 }
@@ -474,6 +474,15 @@ ul.checkbox-list li label {
     width: 36px;
     height: 36px;
     margin-right: 7px;
+}
+
+#user-menu-popup button {
+    width: 77px;
+}
+
+#user-menu-popup #user-email {
+    text-align: center;
+    margin: .5em 0 1em;
 }
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
