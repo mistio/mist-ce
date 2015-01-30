@@ -1,4 +1,4 @@
-<div id="single-network-page" data-role="page" class="ui-page-active" data-theme="c">
+<div id="single-network-page" data-role="page" class="ui-page-active">
 
     <div data-role="header" data-theme="b">
 
@@ -10,11 +10,11 @@
 
     </div>
 
-    <div data-role="content" data-theme="c">
+    <div data-role="content" data-theme="a">
 
         <div id="single-network-info" data-role="collapsible" data-collapsed="false">
 
-            <h3>Network Information</h3>
+            <h4>Network Information</h4>
 
             <table class="info-table">
                 <tr>
@@ -37,8 +37,7 @@
 
         {{#if subnets}}
         <div id="single-network-subnets" data-role="collapsible" data-collapsed="false">
-
-            <h3>Subnets ({{subnets.length}})</h3>
+            <h4>Subnets ({{subnets.length}})</h4>
 
             {{#each subnets}}
                 {{view "subnetListItem" model=this}}

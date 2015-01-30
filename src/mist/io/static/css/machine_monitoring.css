@@ -17,7 +17,7 @@
     text-align: center;
     font-weight:bold;
     color: #404040;
-    background: linear-gradient(to bottom,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
+    background-color: #eee; /* W3C */
 }
 
 .graph .grid-x .tick {
@@ -58,8 +58,6 @@
 #graphBar{
     margin: 10px 0;
     min-height: 50px;
-    border:1px solid #ccc;
-    background: #e0e0e1;
     padding: 5px 10px 0px;
 }
 
@@ -91,6 +89,7 @@
     margin-left: 5px;
     padding: 0 10px;
     width: 10px;
+    border-width: 0px;
 }
 
 .graph > .header > .closeBtn:hover{
@@ -106,7 +105,6 @@
     background: transparent;
     border: 0;
     border-radius: 0;
-
 
     right: 60px;
     bottom: 0px;
@@ -125,10 +123,6 @@
 
 }
 
-.graph > .header > select:hover{
-    background: linear-gradient(to bottom,  rgba(224,224,224,1) 0%,rgba(206,206,206,1) 100%); /* W3C */
-}
-
 .graph svg {
     font: 10px Arial;
     font-weight: bold;
@@ -139,8 +133,8 @@
 
 .graph .hideAnimeLine,
 .graph svg {
-    background-color: #F9F9F9;
-    fill: #F9F9F9;
+    fill: #fff;
+    background-color: #fff;
 }
 
     /*, .x-axis line*/
@@ -171,26 +165,7 @@
     background-color: #eee;
 }
 
-
-/*
-path {
-    stroke: steelblue;
-    stroke-width: 2;
-    fill: lightsteelblue;
-}
-
-line {
-    stroke: black;
-}
-circle.mark{
-    stroke: steelblue;
-    fill: #fff;
-}
-*/
-
 #machine-monitoring #machine-monitoring-disabled {
-    background: #e0e0e1;
-    border-radius: 0 0 5px 5px;
     padding: 30px 10px 30px 10px;
 }
 

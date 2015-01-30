@@ -5,14 +5,12 @@
 .rules-container {
     padding: 0;
     margin: 0 !important;
-    background: #e8e8e9;
-    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #eee;
 }
 
 .rule-box, .key-box {
     overflow: hidden;
     padding: 6px 10px;
-    border-top: 1px solid #ccc;
 }
 
 .rule-box {

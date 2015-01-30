@@ -3,22 +3,19 @@
     class="side-panel"
     data-role="panel"
     data-position="right"
-    data-display="overlay"
-    data-theme="b">
+    data-display="overlay">
 
-    <div data-role="header">
+    <div data-role="header" data-theme="b">
         <h1>Create Network</h1>
     </div>
 
-    <div data-role="content" data-theme="b">
+    <div data-role="content" data-theme="a">
 
         <!--
             Select Backend
 
             Allow only openstack backends for now
         -->
-
-
         <div id="network-create-backend-wrapper">
 
             <label for="network-create-backend">Backend:</label>
@@ -31,7 +28,7 @@
                 data-theme="a"
                 class="mist-select">
 
-                <h2>
+                <h4>
                     {{#with Mist.networkCreateController.network}}
                         {{#if backend}}
                             {{backend.title}}
@@ -39,7 +36,7 @@
                             Select backend
                         {{/if}}
                     {{/with}}
-                </h2>
+                </h4>
 
                 <ul data-role="listview" data-theme="a">
 
@@ -63,8 +60,6 @@
         <!--
             Select Network Name
         -->
-
-
         <div id="network-create-name-wrapper">
 
             <label for="network-create-name">Network Name:</label>
@@ -91,9 +86,9 @@
                 data-theme="a"
                 class="mist-select">
 
-                <h2>
+                <h4>
                     {{Mist.networkCreateController.adminStateUpToText}}
-                </h2>
+                </h4>
 
                 <ul data-role="listview" data-theme="a">
                     <li data-icon="false">
@@ -133,8 +128,6 @@
                 <!--
                     Select Subnet Name
                 -->
-
-
                 <div id="network-create-subnet-name-wrapper">
                     <label for="network-create-subnet-name">Subnet Name:</label>
                     {{view Mist.TextField
@@ -147,8 +140,6 @@
                 <!--
                     Select Network Address
                 -->
-
-
                 <div id="network-create-subnet-address-wrapper">
                     <label for="network-create-subnet-address">Network Address (CIDR):</label>
                     {{view Mist.TextField
@@ -159,13 +150,9 @@
 
 
                 <div id="network-create-subnet-other-wrapper">
-
-
                     <!--
                         Select IP Version
                     -->
-
-
                     <div id="network-create-subnet-ipv-wrapper">
                         <label>IP Version:</label>
                         <div id="network-create-subnet-ipv"
@@ -176,9 +163,9 @@
                             data-theme="a"
                             class="mist-select">
 
-                            <h2>
+                            <h4>
                                 {{Mist.networkCreateController.network.subnet.ipv}}
-                            </h2>
+                            </h4>
 
                             <ul data-role="listview" data-theme="a">
                                 <li data-icon="false">
@@ -199,7 +186,6 @@
                     <!--
                         Enable Gateway
                     -->
-
                     <div>
                         <div id="network-create-subnet-gateway-ip-wrapper">
                             <label for="network-create-subnet-gateway-ip">Gateway IP:</label>
@@ -221,8 +207,6 @@
                     <!--
                         Enable DHCP
                     -->
-
-
                     {{view Mist.Checkbox
                         data-theme="a"
                         id="network-create-subnet-dhcp"
@@ -235,7 +219,6 @@
                     <!--
                         Allocation Pools
                     -->
-
                     <label for="network-create-subnet-allocation-pools">
                         Allocation Pools:
                     </label>
@@ -243,35 +226,6 @@
                         id="network-create-subnet-allocation-pools"
                         data-theme="a"
                         valueBinding="Mist.networkCreateController.network.subnet.allocationPools"}}
-
-
-                    <!--
-                        DNS Servers
-                    --
-
-
-                    <label for="network-create-subnet-dns">
-                        DNS Name Servers:
-                    </label>
-                    {{!view Mist.TextArea
-                        id="network-create-subnet-dns"
-                        data-theme="a"
-                        valueBinding="Mist.networkCreateController.network.subnet.DNS"}}
-
-                    <!--
-                        Host Routes
-                    --
-
-
-                    <label for="network-create-subnet-host-routes">
-                        Host Routes:
-                    </label>
-                    {{!view Mist.TextArea
-                        id="network-create-subnet-host-routes"
-                        data-theme="a"
-                        valueBinding="Mist.networkCreateController.network.subnet.hostRoutes"}}
-                    -->
-
                 </div>
             </div>
         </div>

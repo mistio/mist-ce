@@ -39,8 +39,8 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
 
             hasOpenStack: function () {
-                return !!this.content.findBy('isOpenStack', true);
-            }.property('content.@each.isOpenStack'),
+                return !!this.content.filterBy('enabled', true).findBy('isOpenStack', true);
+            }.property('content.@each.isOpenStack', 'content.@each.enabled'),
 
             hasNetworks: function () {
                 return !!this.content.findBy('hasNetworks', true);

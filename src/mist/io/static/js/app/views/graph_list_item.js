@@ -184,7 +184,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             autoResize: function () {
-                this.changeWidth(this.$().width());
+                this.changeWidth(this.$().find('.graph').width());
             },
 
 
@@ -424,7 +424,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             setupGraph: function () {
 
                 this.id = this.graph.id;
-                this.width = this.$().width();
+                this.width = this.$().find('.graph').width();
 
                  // Calculate Aspect Ratio Of Height
                 var fixedHeight = this.width * SIZE_RATIO; // (160 / 1280)

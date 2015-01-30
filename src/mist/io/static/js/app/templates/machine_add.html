@@ -4,13 +4,13 @@
      data-role="panel"
      data-position="right"
      data-display="overlay"
-     data-theme="b">
+     data-theme="c">
 
     <div data-role="header">
         <h1 class="ui-title">Create Machine</h1>
     </div>
 
-    <div data-role="content" data-theme="b">
+    <div data-role="content" data-theme="a">
 
         <!-- Select Name -->
 
@@ -30,14 +30,14 @@
             data-expanded-icon="arrow-u"
             data-theme="a"
             class="mist-select">
-            <h2>{{#if Mist.machineAddController.newMachineProvider.provider}}
+            <h4>{{#if Mist.machineAddController.newMachineProvider.provider}}
                    <span class="provider-icon-small">
                         <span {{bind-attr class="Mist.machineAddController.newMachineProvider.className"}}>
                         </span>
                     </span>
                 {{/if}}
                 {{Mist.machineAddController.newMachineProvider.title}}
-            </h2>
+            </h4>
             <ul data-role="listview" data-theme="a">
                 {{#each Mist.backendsController.content}}
                     {{#if this.enabled}}
@@ -68,7 +68,7 @@
              data-expanded-icon="arrow-u"
              data-theme="a"
              class="mist-select">
-            <h2>
+            <h4>
                 {{#if Mist.machineAddController.newMachineImage.id}}
                     <span class="image-icon-small">
                         <span {{bind-attr class="Mist.machineAddController.newMachineImage.className"}}>
@@ -76,7 +76,7 @@
                     </span>
                 {{/if}}
                 {{Mist.machineAddController.newMachineImage.name}}
-            </h2>
+            </h4>
             <ul data-role="listview" data-theme="a">
                 {{#each Mist.machineAddController.newMachineProvider.images.content}}
                     {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
@@ -110,7 +110,7 @@
              data-expanded-icon="arrow-u"
              data-theme="a"
              class="mist-select">
-            <h2>{{Mist.machineAddController.newMachineSize.name}}</h2>
+            <h4>{{Mist.machineAddController.newMachineSize.name}}</h4>
             <ul data-role="listview" data-theme="a">
                 {{#each Mist.machineAddController.newMachineProvider.sizes.content}}
                 <li data-icon="false">
@@ -136,7 +136,7 @@
                  data-expanded-icon="arrow-u"
                  data-theme="a"
                  class="mist-select">
-                <h2>{{Mist.machineAddController.newMachineLocation.name}}</h2>
+                <h4>{{Mist.machineAddController.newMachineLocation.name}}</h4>
                 <ul data-role="listview" data-theme="a">
                     {{#each Mist.machineAddController.newMachineProvider.locations.content}}
                     <li data-icon="false">
@@ -178,7 +178,7 @@
              data-expanded-icon="arrow-u"
              data-theme="a"
              class="mist-select">
-            <h2>{{Mist.machineAddController.newMachineKey.id}}</h2>
+            <h4>{{Mist.machineAddController.newMachineKey.id}}</h4>
             <ul data-role="listview" data-theme="a">
                 {{#each Mist.keysController.content}}
                     <li data-icon="false">
@@ -202,7 +202,7 @@
                     data-expanded-icon="arrow-u"
                     data-theme="a"
                     class="mist-select">
-                <h2>Networks</h2>
+                <h4>Networks</h4>
                 <fieldset data-role="controlgroup" data-theme="a">
                     {{#each Mist.machineAddController.newMachineProvider.networks.content}}
                         <input {{bind-attr id="this.id" name="this.id" checked="this.selected"}}
