@@ -93,6 +93,7 @@ body {
 #monitoring-collapsible .ui-collapsible-content {
     padding: .5%;
     border: 1px solid #f8f8f8;
+    overflow: visible;
 }
 .ui-mobile, .ui-mobile body {
     height: 0 !important;

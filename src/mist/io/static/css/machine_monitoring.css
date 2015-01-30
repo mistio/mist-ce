@@ -1,6 +1,7 @@
 .graph {
     margin-top: 6px;
     margin-bottom: 20px;
+    overflow: hidden;
 }
 
 #GraphsArea .valuePopUp{
