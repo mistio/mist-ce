@@ -134,6 +134,16 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 } catch (e) {}
             },
 
+            valueText: function(currentValue){
+                if(currentValue>=1073741824)                               // (1024*1024*1024)
+                    return (currentValue/1073741824).toFixed(2) +'G'; // (1024*1024*1024)
+                else if(currentValue>=1048576)                             // (1024*1024)
+                    return (currentValue/1048576).toFixed(2) +'M';    // (1024*1024)
+                else if(currentValue>=1024)
+                    return (currentValue/1024).toFixed(2) + 'K';
+                else
+                    return currentValue.toFixed(2);
+            },
 
             clearData: function () {
                 this.graph.datasources.forEach(function (datasource) {
@@ -186,7 +196,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             autoResize: function () {
-                this.changeWidth(this.$().width());
+                this.changeWidth(this.$().find('.graph').width());
             },
 
 
@@ -253,7 +263,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             /*
             *
             * Setups event listeners for mouse,
-            * also creates interval for popup value update
+            * also creates interval for graph value update
             */
             setupMouseOver: function () {
 
@@ -276,9 +286,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 var mouseY = 0;
                 var isVisible = false;
                 var updateInterval;
-                var valuePopUp = $('.valuePopUp');
 
-                var updatePopUpValue = function (graph) {
+                var updateGraphValue = function (graph) {
 
                     if (graph.view.isHidden)
                         return;
@@ -317,7 +326,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                         // Fix for the area that has not defined data
                         if(displayedData.length == 0 || displayedData[minValueIndex].value == null || displayedData[minValueIndex+1].value == null ){
-                            $('#' + graph.id + ' .valuePopUp').text('No Data');
+                            $('#' + graph.id + ' .graphValue').html('-&nbsp;');
                             return;
                         }
 
@@ -331,45 +340,29 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                         // Value has a small loss of presition. We don't let it be less than 0
                         currentValue < 0 ? 0 : currentValue;
-
-                        // Fix For Big Numbers
-                        var valueText = '';
-                        if(currentValue>=1073741824)                               // (1024*1024*1024)
-                            valueText = (currentValue/1073741824).toFixed(2) +'G'; // (1024*1024*1024)
-                        else if(currentValue>=1048576)                             // (1024*1024)
-                            valueText = (currentValue/1048576).toFixed(2) +'M';    // (1024*1024)
-                        else if(currentValue>=1024)
-                            valueText = (currentValue/1024).toFixed(2) + 'K';
-                        else if(that.yAxisValueFormat == '%')
-                            valueText = currentValue.toFixed(2) + '%';
-                        else
-                            valueText = currentValue.toFixed(2);
-
                         // Update Value Text
-                        $('#' + graph.id + ' .valuePopUp').text(valueText);
+                        $('#' + graph.id + ' .graphValue').text(that.valueText(currentValue));
                     } else {
 
                         if(isVisible){
                             $('.selectorLine').hide(0);
-                            valuePopUp.hide(0);
                             isVisible = false;
                         }
                     }
                 };
 
-                var updatePopUpValues = function() {
+                var updateGraphValues = function() {
                     // Check if mouse left from element without clearing interval
                     if($('#graphs:hover').length <= 0)
                     {
-                       clearUpdatePopUp();
-                       return;
+                       clearSelectorLine();
                     }
 
                     Mist.graphsController.content.forEach(function (graph) {
-                        updatePopUpValue(graph);
+                        updateGraphValue(graph);
                     });
                 };
-                var updatePopUpOffset = function(event) {
+                var updateSelectorLine = function(event) {
                     var svg = $('#'+ that.graph.id).children('svg');
                     mouseX = event.pageX - svg.offset().left;
                     mouseY = event.pageY - svg.offset().top;
@@ -378,29 +371,19 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     mouseOverLine.attr('x1', mouseX)
                                  .attr('x2', mouseX);
 
-                    // Make popup appear at left side when it is at the right edge
-                    var popupWidth = valuePopUp.width();
-                    var xAlign = (event.pageX + popupWidth >= window.innerWidth-15) ? - (popupWidth + 5) : 5;
-
-                    // Update popup cords
-                    valuePopUp
-                        .css('left', (event.clientX + xAlign) + 'px')
-                        .css('top', mouseY-svg.height() + 'px')
-                        .show(0);
-                    updatePopUpValues();
+                    // Update graph current values
+                    updateGraphValues();
 
                 };
 
-                var clearUpdatePopUp = function() {
+                var clearSelectorLine = function() {
 
                     isVisible = false;
 
                     // We check for none display before we hide because jquery will 'show' the element instead
                     // (possible jquery bug ?)
                     $('.selectorLine').hide(0);
-
-                    valuePopUp.hide(0);
-
+                    $('.graphValue').html('-&nbsp;');
                     // Clear Interval
                     window.clearInterval(updateInterval);
                 };
@@ -409,18 +392,18 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // Mouse Events
                 $('#' + this.graph.id).children('svg').mouseenter(function() {
                     // Setup Interval
-                    updateInterval = window.setInterval(updatePopUpValues,500);
+                    updateInterval = window.setInterval(updateGraphValues,500);
                 });
 
-                $('#' + this.graph.id).children('svg').mouseleave(clearUpdatePopUp);
-                $('#' + this.graph.id).children('svg').mousemove(updatePopUpOffset);
+                $('#' + this.graph.id).children('svg').mouseleave(clearSelectorLine);
+                $('#' + this.graph.id).children('svg').mousemove(updateSelectorLine);
             },
 
 
             setupGraph: function () {
 
                 this.id = this.graph.id;
-                this.width = this.$().width();
+                this.width = this.$().find('.graph').width();
 
                  // Calculate Aspect Ratio Of Height
                 var fixedHeight = this.width * SIZE_RATIO; // (160 / 1280)
@@ -582,6 +565,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         this.valueline(datapoints) ||
                             'M 0 0' // Fix for 'Error: Problem parsing d='' ' in webkit
                 });
+
             },
 
             /**
@@ -693,6 +677,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         })
                         .push();
 
+                    // Update graph value
+                    if ($('.selectorLine:visible').length == 0 && this.graph.displayedData && Object.keys(this.graph.displayedData).length) {
+                        var currentMetric = this.graph.displayedData[Object.keys(this.graph.displayedData)[0]];
+                        var currentValue = currentMetric.length ? currentMetric[currentMetric.length-1].value : null;
+                        if (currentValue != null)
+                            $('#' + this.graph.id + ' .graphValue').html(this.valueText(currentValue));
+                    }
                 } else {
 
                     // Update Graph Elements

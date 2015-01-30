@@ -662,8 +662,8 @@ def probe(request):
     machine_id = request.matchdict['machine']
     backend_id = request.matchdict['backend']
     host = request.json_body.get('host', None)
-    ssh_user = request.params.get('ssh_user', '')
     key_id = request.json_body.get('key', None)
+    ssh_user = request.params.get('ssh_user', '')
     # FIXME: simply don't pass a key parameter
     if key_id == 'undefined':
         key_id = ''

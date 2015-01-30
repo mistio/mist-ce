@@ -1,4 +1,4 @@
-<div id="single-key-page" data-role="page" class="ui-page-active" data-theme="c">
+<div id="single-key-page" data-role="page" class="ui-page-active">
 
     <div data-role="header" data-theme="b">
 
@@ -10,38 +10,38 @@
 
     </div>
 
-    <div data-role="content" data-theme="c">
+    <div data-role="content" data-theme="a">
 
         {{#if Mist.keysController.loading}}
         <div class="ajax-loader"></div>
         {{/if}}
 
          <div data-role="collapsible" data-collapsed="false">
-            <h3>Public Key
+            <h4>Public Key
                 {{#if Mist.keysController.gettingPublicKey}}
                 <div class="ajax-loader"></div>
                 {{/if}}
-            </h3>
+            </h4>
             <input id="public-key" type="text" readonly="readonly" onclick="this.focus();this.select()"/>
         </div>
 
         <div data-role="collapsible">
-            <h3>Private key
+            <h4>Private key
                 {{#if Mist.keysController.gettingPrivateKey}}
                 <div class="ajax-loader"></div>
                 {{/if}}
-            </h3>
+            </h4>
             <a data-role="button" {{action "displayClicked" target="view"}}>Display</a>
         </div>
 
         {{#if machines}}
         <div id="single-key-machines" data-role="collapsible">
 
-            <h3>Machines
+            <h4>Machines
                 {{#if Mist.backendsController.loadingMachines}}
                 <div class="ajax-loader"></div>
                 {{/if}}
-            </h3>
+            </h4>
             <ul data-role="listview" class="checkbox-list" data-inset="true">
                 {{#each view.machines}}
                     {{view Mist.machineListItemView

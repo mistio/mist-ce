@@ -42,6 +42,8 @@ define('app/views/machine_keys', ['app/views/controlled','ember'],
 
 
                 associateClicked: function () {
+                    $('#non-associated-keys-popup').popup('option',
+                        'positionTo', '#mist-manage-keys');
                     $('#non-associated-keys-popup').popup('open');
                 },
 

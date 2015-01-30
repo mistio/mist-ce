@@ -39,7 +39,7 @@ define('app/controllers/key_add', ['ember'],
 
             open: function (callback) {
                 this._clear();
-                this.view.open();
+                this.view.open('#add-key-btn');
                 this.set('callback', callback);
             },
 

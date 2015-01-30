@@ -4,15 +4,15 @@
     data-role="panel"
     data-position="right"
     data-display="overlay"
-    data-theme="b">
+    data-theme="c">
 
     <div data-role="header">
         <h1>Add backend</h1>
-        <a class="ui-btn-right" data-icon="info" data-iconpos="notext" data-theme="b"
+        <a class="ui-btn-right" data-icon="info" data-iconpos="notext" data-theme="a"
             target="_blank" href="https://mistio.zendesk.com/hc/en-us"></a>
     </div>
 
-    <div data-role="content" data-theme="b">
+    <div data-role="content" data-theme="a">
 
         <label>Provider:</label>
         <div id="new-backend-provider"
@@ -22,7 +22,7 @@
             data-expanded-icon="carat-u"
             data-iconpos="right"
             data-theme="a">
-            <h2>{{#if Mist.backendAddController.provider.title}}
+            <h4>{{#if Mist.backendAddController.provider.title}}
                    <span class="provider-icon-small">
                         <span {{bind-attr class="Mist.backendAddController.provider.className"}}></span>
                     </span>
@@ -30,7 +30,7 @@
                 {{else}}
                     Select provider
                 {{/if}}
-            </h2>
+            </h4>
             <ul class="mist-select" data-role="listview" data-theme="a">
                 {{#each Mist.backendsController.providerList}}
                     <li data-icon="false">
@@ -76,7 +76,7 @@
                         data-collapsed-icon="carat-d"
                         data-expanded-icon="carat-u"
                         data-theme="a">
-                        <h2>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h2>
+                        <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
                         <ul data-role="listview">
                             {{#each Mist.keysController.content}}
                                 <li data-icon="false" data-theme="a">
@@ -97,7 +97,7 @@
                         data-collapsed-icon="carat-d"
                         data-expanded-icon="carat-u"
                         data-theme="a">
-                        <h2>{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h2>
+                        <h4>{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
                         <ul data-role="listview">
                             {{#each view.providerRegions}}
                                 <li data-icon="false" data-theme="a">

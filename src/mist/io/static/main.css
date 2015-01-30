@@ -2,10 +2,9 @@
 /* Import css files
 -----------------------------------------------------------------------------------------------------------*/
 
-@import url('theme.css');
 @import url('images/sprite-build/sprites.css');
 @import url('jquery.mobile.structure-1.4.5.min.css');
-
+@import url('theme.css');
 @import url("css/key.css");
 @import url("css/home.css");
 @import url("css/rules.css");
@@ -92,7 +91,9 @@ body {
     padding: .5% 1%;
 }
 #monitoring-collapsible .ui-collapsible-content {
-    padding: .5%
+    padding: .5%;
+    border: 1px solid #f8f8f8;
+    overflow: visible;
 }
 .ui-mobile, .ui-mobile body {
     height: 0 !important;
@@ -199,23 +200,24 @@ textarea#private-key, #manual-monitoring-popup textarea {
     min-height: 0;
 }
 .side-panel .ui-panel-inner {
-    padding: 7px;
+    padding: 0;
 }
+
 .ui-panel-dismiss-open.ui-panel-dismiss-position-right {
     right: 325px;
 }
 
-.ui-panel-inner {
-    padding: 10px !important;
+.ui-panel-dismiss-open.ui-panel-dismiss-position-right {
+    right: 325px;
 }
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable {
-    margin: 10px 118px -44px 118px !important;
+    margin: 3em 8em -3em 118px !important;
     position: relative;
-    top: -49px;
+    top: -3.1em;
 }
 
 #machine-list-page .ui-filterable input,
@@ -227,23 +229,22 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 /* Checkbox list
 -----------------------------------------------------------------------------------------------------------*/
-ul.checkbox-list li {
-    background: #eeeeee /*{c-bup-background-color}*/ linear-gradient( #fff /*{c-bup-background-start}*/, #f1f1f1 /*{c-bup-background-end}*/) !important;
-    border: 1px #ccc solid;
-    margin-top: -1px;
-}
-ul.checkbox-list li:hover {
-    background: #dfdfdf linear-gradient( #f6f6f6 /*{c-bhover-background-start}*/, #e0e0e0 /*{c-bhover-background-end}*/) !important;
-}
-ul.checkbox-list li a {
-    padding-left: 0px !important;
-}
 ul.checkbox-list li a.has-monitoring:after {
     opacity: 1;
 }
 .ui-icon-carat-r:after {
     background-color: #666;
     opacity: .6;
+}
+ul.checkbox-list {
+    box-shadow: none;
+    background-color: #fafafa;
+}
+ul.checkbox-list li{
+    border: 1px solid #eee;
+}
+ul.checkbox-list li:hover {
+    background-color: #eee;
 }
 ul.checkbox-list li a:focus {
     box-shadow: none !important;
@@ -254,6 +255,7 @@ ul.checkbox-list li a, ul.checkbox-list li a:hover, ul.checkbox-list label, ul.c
 }
 ul.checkbox-list .ui-grid-b {
     padding-top: 12px;
+    overflow: visible;
 }
 ul.checkbox-list li a,
 ul.checkbox-list li a:active,
@@ -266,7 +268,7 @@ ul.checkbox-list li label {
 /* Checkbox link
 -----------------------------------------------------------------------------------------------------------*/
 .checkbox-link a {
-    height: 40px;
+    height: 41px;
 }
 .checkbox-link h3 {
     width: 65%;
@@ -278,7 +280,7 @@ ul.checkbox-list li label {
 }
 .checkbox-link .ui-checkbox {
     margin: 0 !important;
-    float:left;
+    float: left;
     clear: both;
 }
 .checkbox-link .ui-checkbox input {
@@ -379,7 +381,8 @@ ul.checkbox-list li label {
 }
 
 .mist-select .ui-collapsible-content {
-    margin: 0 3px !important;
+    margin: 0px !important;
+    box-shadow: 0 0 12px #3388cc /*{a-active-background-color}*/ !important;
     padding-top: 0;
 }
 
@@ -472,6 +475,11 @@ ul.checkbox-list li label {
     width: 36px;
     height: 36px;
     margin-right: 7px;
+}
+
+#user-menu-popup #user-email {
+    text-align: center;
+    margin: .5em 0 1em;
 }
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
@@ -589,6 +597,10 @@ ul.checkbox-list li label {
     box-sizing: border-box;
 }
 
+#backend-delete-confirm .ok-cancel {
+    margin-bottom: 1em;
+}
+
 /* Info table
 ------------------------------------------------------------------------------*/
 .info-table {
@@ -636,4 +648,15 @@ ul.checkbox-list li label {
 #dialog-popup .duration {
     font-family: monospace;
     font-size: 11px;
+}
+
+/* Border radius override */
+.ui-corner-all {
+    -webkit-border-radius: .25em /*{global-radii-blocks}*/;
+    border-radius: .25em /*{global-radii-blocks}*/;
+}
+
+/* Body border override */
+.ui-body-a {
+    border-width: 0px;
 }

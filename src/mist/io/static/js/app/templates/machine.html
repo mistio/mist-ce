@@ -1,4 +1,4 @@
-<div id="single-machine-page" data-role="page" class="ui-page-active" data-theme="c">
+<div id="single-machine-page" data-role="page" class="ui-page-active" data-theme="a">
 
     <div data-role="header" data-theme="b">
 
@@ -70,7 +70,7 @@
         </span>
     </div>
 
-    <div data-role="content" data-theme="c">
+    <div data-role="content" data-theme="a">
 
 
         <!--
@@ -82,7 +82,7 @@
 
         <div id="monitoring-collapsible" data-role="collapsible" data-collapsed="false">
 
-            <h3>Monitoring</h3>
+            <h4>Monitoring</h4>
 
             {{view Mist.machineMonitoringView
                 machineBinding="view.machine"}}
@@ -99,7 +99,7 @@
 
         <div data-role="collapsible" data-collapsed="false">
 
-            <h3>Basic Info</h3>
+            <h4>Basic Info</h4>
 
             <table class="info-table">
                 <tr>
@@ -203,7 +203,7 @@
         {{#if view.metadata}}
             <div id="single-machine-metadata" data-role="collapsible">
 
-                <h3>Full metadata list</h3>
+                <h4>Full metadata list</h4>
 
                 <table class="info-table">
                     {{#each view.metadata}}
