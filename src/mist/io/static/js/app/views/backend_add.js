@@ -41,6 +41,7 @@ define('app/views/backend_add', ['app/views/panel'],
                 var isReady = true
                 this.get('providerFields').some(function (field) {
                     if (field.optional) return;
+                    if (field.isSlider) return;
                     if (field.value === undefined ||
                         field.value === null ||
                         field.value === '')
@@ -175,8 +176,20 @@ define('app/views/backend_add', ['app/views/panel'],
                 },
 
 
-                advancedToggled: function () {
-                    App.switchElementVisibility('backend-add-advanced');
+                switchToggled: function () {
+                    var interval = 250;
+                    var on = this.$().find('select').val() == 1;
+                    if (on) {
+                        $('.off').fadeOut(interval);
+                        Ember.run.later(function () {
+                            $('.on').fadeIn(interval);
+                        }, interval - 50);
+                    } else {
+                        $('.on').fadeOut(interval);
+                        Ember.run.later(function () {
+                            $('.off').fadeIn(interval);
+                        }, interval - 50);
+                    }
                 }
             },
         });

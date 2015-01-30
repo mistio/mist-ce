@@ -62,28 +62,6 @@
 
     {{view Mist.confirmationDialog}}
 
-
-    <!--
-     Since the private key is very sensitive information, it should be
-     erased as soon as the popup is closed. We set the data-dismissible
-     attribute to false to make sure that user will click the "Back" button
-     to leave the popup (which will remove the private key from the textarea)
-    -->
-    <div id="private-key-popup"
-         class="medium-popup"
-         data-role="popup"
-         data-overlay-theme="b"
-         data-transition="flip"
-         data-dismissible="false">
-        <div data-role="header" data-theme="b">
-            <h1>Private Key</h1>
-        </div>
-        <div data-role="content">
-            <textarea id="private-key" readonly="readonly" onclick="this.focus();this.select()"></textarea>
-            <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
-        </div>
-    </div>
-
     <div class="dual-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
             <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
