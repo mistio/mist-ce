@@ -61,7 +61,10 @@ class CustomNamespace(BaseNamespace):
         # all the classes and mixins in the order of the MRO which creates
         # weird issues when trying to subclass. Use init instead because it
         # is called only once and can use super.
-        pass
+        try:
+            super(CustomNamespace, self).init()
+        except AttributeError:
+            pass
 
     def disconnect(self, silent=False):
         if multi_user:
@@ -79,6 +82,7 @@ class CustomNamespace(BaseNamespace):
 
 class ShellNamespace(CustomNamespace):
     def init(self):
+        super(ShellNamespace, self).init()
         self.channel = None
         self.ssh_info = {}
 
@@ -143,6 +147,7 @@ class ShellNamespace(CustomNamespace):
 
 class MistNamespace(CustomNamespace):
     def init(self):
+        super(MistNamespace, self).init()
         self.update_greenlet = None
         self.running_machines = set()
 
