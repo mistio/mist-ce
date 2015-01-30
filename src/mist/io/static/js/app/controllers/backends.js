@@ -39,9 +39,12 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
 
             hasOpenStack: function () {
-                return !!this.content.findBy('isOpenStack', true);
-            }.property('content.@each.isOpenStack'),
+                return !!this.content.filterBy('enabled', true).findBy('isOpenStack', true);
+            }.property('content.@each.isOpenStack', 'content.@each.enabled'),
 
+            hasNetworks: function () {
+                return !!this.content.findBy('hasNetworks', true);
+            }.property('content.@each.hasNetworks'),
 
             //
             //
@@ -192,7 +195,6 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS.map(function (provider) {
-
                     provider.className = 'provider-';
                     if (provider.provider == 'bare_metal')
                         provider.className += 'baremetal';
@@ -389,7 +391,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 Ember.run(this, function() {
                     var counter = 0;
                     this.content.forEach(function (backend) {
-                        if (backend.enabled && backend.provider == 'openstack')
+                        if (backend.enabled)
                             counter += backend.networkCount;
                     });
                     this.set('networkCount', counter);

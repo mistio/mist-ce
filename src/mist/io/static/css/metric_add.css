@@ -36,8 +36,9 @@
 
 #metric-add .ajax-loader {
     width: 100%;
-    margin-top: -14px;
+    margin-top: -24px;
     margin-bottom: 14px;
+    padding-bottom: 30px;
 }
 
 #metric-add .ui-content .ui-body-a {

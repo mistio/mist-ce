@@ -21,6 +21,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
         var MIN_GRAPH_HEIGHT = 100;
         var SIZE_RATIO = 0.15;
+        var ANIMATION_FPS = 12;
+        var ANIMATION_DURATION = 9;
 
         return TemplatedView.extend({
 
@@ -66,6 +68,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             load: function () {
 
                 Ember.run.next(this, function () {
+
                     // Add event handlers
                     this.graph.on('onDatasourceAdd', this, 'updateSVG');
                     this.graph.on('onDatasourceRemove', this, 'updateSVG');
@@ -97,7 +100,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             showFetchingStats: function () {
                 if (!this.svg) return;
-                $('#' + this.id + ' .fetching-stats-loader').fadeIn(400);
+                this.$().find('.fetching-stats-loader').show(400);
                 this.graph.datasources.forEach(function (datasource) {
                     var line = d3.select('#' + this.id + ' .' + datasource.id);
                     if (line.attr('class').indexOf('gray') == -1)
@@ -108,7 +111,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
             hideFetchingStats: function () {
                 if (!this.svg) return;
-                $('#' + this.id + ' .fetching-stats-loader').fadeOut(400);
+                this.$().find('.fetching-stats-loader').hide(400);
                 this.graph.datasources.forEach(function (datasource) {
                     var line = d3.select('#' + this.id + ' .' + datasource.id);
                     line.attr('class', line.attr('class').replace('gray', ''));
@@ -119,9 +122,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             updateSVG: function () {
                 this.set('svg', SvgSet(this));
                 var datasources = this.graph.datasources;
-                datasources.forEach(function (datasource) {
-                    $('#' + this.graph.id + ' .' + datasource.id)
-                        .addClass(getColor(datasources.indexOf(datasource)));
+                datasources.forEach(function (datasource, index) {
+                    this.$().find('.' + datasource.id).addClass(getColor(index));
                 }, this);
             },
 
@@ -132,6 +134,16 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 } catch (e) {}
             },
 
+            valueText: function(currentValue){
+                if(currentValue>=1073741824)                               // (1024*1024*1024)
+                    return (currentValue/1073741824).toFixed(2) +'G'; // (1024*1024*1024)
+                else if(currentValue>=1048576)                             // (1024*1024)
+                    return (currentValue/1048576).toFixed(2) +'M';    // (1024*1024)
+                else if(currentValue>=1024)
+                    return (currentValue/1024).toFixed(2) + 'K';
+                else
+                    return currentValue.toFixed(2);
+            },
 
             clearData: function () {
                 this.graph.datasources.forEach(function (datasource) {
@@ -184,7 +196,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
 
             autoResize: function () {
-                this.changeWidth(this.$().width());
+                this.changeWidth(this.$().find('.graph').width());
             },
 
 
@@ -220,7 +232,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.updateScale();
 
                 // Update x-axis based on new height
-                this.svg.axis.x.legend.attr('transform', 'translate(0,' + (this.height - this.margin.bottom) + ')');
+                setTranslate(this.svg.axis.x.legend, 0, this.height - this.margin.bottom);
 
                 // Update y-axis line
                 this.svg.axis.x.line.attr('y1', this.height - this.margin.bottom + 2)
@@ -230,11 +242,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 this.svg.axis.y.line.attr('y2', this.height - this.margin.bottom + 3);
 
                 // Update Grids
-                this.svg.grid.x.attr('transform', 'translate(' +
-                        this.margin.left + ',' + this.height + ')');
-
-                this.svg.grid.y.attr('transform', 'translate(' +
-                        this.margin.left + ',' + this.margin.top + ')');
+                setTranslate(this.svg.grid.x, this.margin.left, this.height);
+                setTranslate(this.svg.grid.y, this.margin.left, this.margin.top);
 
                 // Update mouse over size
                 this.svg.canvas
@@ -254,7 +263,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             /*
             *
             * Setups event listeners for mouse,
-            * also creates interval for popup value update
+            * also creates interval for graph value update
             */
             setupMouseOver: function () {
 
@@ -278,9 +287,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 var isVisible = false;
                 var updateInterval;
 
-                var updatePopUpValue = function(graph) {
-                    // Update popup when it is over value line
-                    graph = Mist.graphsController.getGraph(graph.id);
+                var updateGraphValue = function (graph) {
 
                     if (graph.view.isHidden)
                         return;
@@ -319,10 +326,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                         // Fix for the area that has not defined data
                         if(displayedData.length == 0 || displayedData[minValueIndex].value == null || displayedData[minValueIndex+1].value == null ){
-                            $('#' + graph.id + ' .valuePopUp').text('No Data');
+                            $('#' + graph.id + ' .graphValue').html('-&nbsp;');
                             return;
                         }
-
 
                         // Distanse between value before cursor and after cursor
                         var distance = displayedData[minValueIndex+1].value  - displayedData[minValueIndex].value;
@@ -334,44 +340,29 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
 
                         // Value has a small loss of presition. We don't let it be less than 0
                         currentValue < 0 ? 0 : currentValue;
-
-                        // Fix For Big Numbers
-                        var valueText = '';
-                        if(currentValue>=1073741824)                               // (1024*1024*1024)
-                            valueText = (currentValue/1073741824).toFixed(2) +'G'; // (1024*1024*1024)
-                        else if(currentValue>=1048576)                             // (1024*1024)
-                            valueText = (currentValue/1048576).toFixed(2) +'M';    // (1024*1024)
-                        else if(currentValue>=1024)
-                            valueText = (currentValue/1024).toFixed(2) + 'K';
-                        else if(that.yAxisValueFormat == '%')
-                            valueText = currentValue.toFixed(2) + '%';
-                        else
-                            valueText = currentValue.toFixed(2);
-
                         // Update Value Text
-                        $('#' + graph.id + ' .valuePopUp').text(valueText);
+                        $('#' + graph.id + ' .graphValue').text(that.valueText(currentValue));
                     } else {
 
                         if(isVisible){
                             $('.selectorLine').hide(0);
-                            $('.valuePopUp').hide(0);
                             isVisible = false;
                         }
                     }
                 };
 
-                var updatePopUpValues = function() {
+                var updateGraphValues = function() {
                     // Check if mouse left from element without clearing interval
                     if($('#graphs:hover').length <= 0)
                     {
-                       clearUpdatePopUp();
-                       return;
+                       clearSelectorLine();
                     }
-                    $('#graphs .graph').each(function(i,g){
-                        updatePopUpValue(g);
+
+                    Mist.graphsController.content.forEach(function (graph) {
+                        updateGraphValue(graph);
                     });
                 };
-                var updatePopUpOffset = function(event) {
+                var updateSelectorLine = function(event) {
                     var svg = $('#'+ that.graph.id).children('svg');
                     mouseX = event.pageX - svg.offset().left;
                     mouseY = event.pageY - svg.offset().top;
@@ -380,31 +371,19 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     mouseOverLine.attr('x1', mouseX)
                                  .attr('x2', mouseX);
 
-                    // Make popup appear at left side when it is at the right edge
-                    var popupWidth = $('.valuePopUp').width();
-                    var xAlign = (event.pageX + popupWidth >= window.innerWidth-15) ? - (popupWidth + 5) : 5;
-
-                    // Update popup cords
-                    $('.valuePopUp')
-                        .css('left', (event.clientX + xAlign) + 'px');
-
-                    $('.valuePopUp')
-                        .css('top', mouseY-svg.height() + 'px');
-                    $('.valuePopUp').show(0);
-                    updatePopUpValues();
+                    // Update graph current values
+                    updateGraphValues();
 
                 };
 
-                var clearUpdatePopUp = function() {
+                var clearSelectorLine = function() {
 
                     isVisible = false;
 
                     // We check for none display before we hide because jquery will 'show' the element instead
                     // (possible jquery bug ?)
                     $('.selectorLine').hide(0);
-
-                    $('.valuePopUp').hide(0);
-
+                    $('.graphValue').html('-&nbsp;');
                     // Clear Interval
                     window.clearInterval(updateInterval);
                 };
@@ -413,18 +392,18 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // Mouse Events
                 $('#' + this.graph.id).children('svg').mouseenter(function() {
                     // Setup Interval
-                    updateInterval = window.setInterval(updatePopUpValues,500);
+                    updateInterval = window.setInterval(updateGraphValues,500);
                 });
 
-                $('#' + this.graph.id).children('svg').mouseleave(clearUpdatePopUp);
-                $('#' + this.graph.id).children('svg').mousemove(updatePopUpOffset);
+                $('#' + this.graph.id).children('svg').mouseleave(clearSelectorLine);
+                $('#' + this.graph.id).children('svg').mousemove(updateSelectorLine);
             },
 
 
             setupGraph: function () {
 
                 this.id = this.graph.id;
-                this.width = this.$().width();
+                this.width = this.$().find('.graph').width();
 
                  // Calculate Aspect Ratio Of Height
                 var fixedHeight = this.width * SIZE_RATIO; // (160 / 1280)
@@ -586,6 +565,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         this.valueline(datapoints) ||
                             'M 0 0' // Fix for 'Error: Problem parsing d='' ' in webkit
                 });
+
             },
 
             /**
@@ -654,15 +634,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 // Animate line, axis and grid
                 if (this.animationEnabled && !this.clearAnimPending) {
 
-                    // Animation values
-                    var fps  = 12;
-                    var duration = 9;
-
                     this.svg.value.lines.forEach(function (line) {
                         line.animation
-                            .select(line)
-                            .fps(fps)
-                            .duration(duration)
                             .points(this.valuesDistance, 0, 0, 0)
                             .data(this.valueLinePaths[line.id])
                             .before(function (data) {
@@ -674,9 +647,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     // If this is a single line graph, show area path
                     if (this.graph.datasources.length == 1) {
                         this.svg.value.area.animation
-                            .select(this.svg.value.area)
-                            .fps(fps)
-                            .duration(duration)
                             .points(this.valuesDistance,0, 0,0)
                             .data(valueAreaPath)
                             .before(function(data){
@@ -686,33 +656,34 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     }
 
                     this.svg.axis.x.legend.animation
-                                    .select(this.svg.axis.x.legend)
-                                    .fps(fps)
-                                    .duration(duration)
-                                    .points(( this.margin.left + this.valuesDistance),(this.height - this.margin.bottom +2), this.margin.left,(this.height - this.margin.bottom +2))
-                                    .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: this.labelFormat})
-                                    .before(function(data){
-                                        this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat, that.timeDisplayed));
-                                        this.d3Selector.selectAll('text')
-                                                       .style('text-anchor', 'end')
-                                                       .attr('x','-10');
-                                        that.svg.axis.y.legend.call(data.modelY);
-                                    })
-                                    .push();
+                        .points(( this.margin.left + this.valuesDistance),(this.height - this.margin.bottom +2), this.margin.left,(this.height - this.margin.bottom +2))
+                        .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: this.labelFormat})
+                        .before(function(data){
+                            this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat, that.timeDisplayed));
+                            this.d3Selector.selectAll('text')
+                                           .style('text-anchor', 'end')
+                                           .attr('x','-10');
+                            that.svg.axis.y.legend.call(data.modelY);
+                        })
+                        .push();
 
                     this.svg.grid.x.animation
-                                    .select(this.svg.grid.x)
-                                    .fps(fps)
-                                    .duration(duration)
-                                    .points((this.margin.left + this.valuesDistance),this.height, this.margin.left,this.height)
-                                    .data({modelX: modelGridX,modelY: modelGridY})
-                                    .before(function(data){
-                                        this.d3Selector.call(labelTicksFixed(data.modelX, null, that.timeDisplayed));
-                                        // Y grid should change when x changes
-                                        that.svg.grid.y.call(data.modelY);
-                                    })
-                                    .push();
+                        .points((this.margin.left + this.valuesDistance),this.height, this.margin.left,this.height)
+                        .data({modelX: modelGridX,modelY: modelGridY})
+                        .before(function(data){
+                            this.d3Selector.call(labelTicksFixed(data.modelX, null, that.timeDisplayed));
+                            // Y grid should change when x changes
+                            that.svg.grid.y.call(data.modelY);
+                        })
+                        .push();
 
+                    // Update graph value
+                    if ($('.selectorLine:visible').length == 0 && this.graph.displayedData && Object.keys(this.graph.displayedData).length) {
+                        var currentMetric = this.graph.displayedData[Object.keys(this.graph.displayedData)[0]];
+                        var currentValue = currentMetric.length ? currentMetric[currentMetric.length-1].value : null;
+                        if (currentValue != null)
+                            $('#' + this.graph.id + ' .graphValue').html(this.valueText(currentValue));
+                    }
                 } else {
 
                     // Update Graph Elements
@@ -722,7 +693,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                     if (this.graph.datasources.length == 1) {
                         this.svg.value.area.attr('d', valueAreaPath);
                     }
-                    this.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,this.abelFormat, this.timeDisplayed));
+                    this.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,this.labelFormat, this.timeDisplayed));
                     this.svg.axis.x.legend.selectAll('text')
                            .style('text-anchor', 'end')
                            .attr('x','-10');
@@ -734,13 +705,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         // Wait for 50ms for animation to finishes its changes
                         window.setTimeout(function(){
                             that.svg.value.lines.forEach(function (line) {
-                                line.attr('transform', 'translate(' + 0 + ')');
+                                setTranslate(line, 0);
                             });
                             if (that.graph.datasources.length == 1) {
-                                that.svg.value.area.attr('transform', 'translate(' + 0 + ')');
+                                setTranslate(that.svg.value.area, 0);
                             }
-                            that.svg.axis.x.legend.attr('transform', 'translate(' + that.margin.left + ',' + (that.height - that.margin.bottom + 2) + ')');
-                            that.svg.grid.x.attr('transform', 'translate(' + that.margin.left + ',' + that.height + ')');
+                            setTranslate(that.svg.axis.x.legend, that.margin.left, that.height - that.margin.bottom + 2);
+                            setTranslate(that.svg.grid.x, that.margin.left, that.height);
                             that.clearAnimPending = false;
                         }, 50);
                     }
@@ -828,13 +799,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             // Popuplate value lines
             args.graph.datasources.forEach(function (datasource) {
                 var line = Line(args, datasource);
-                line.animation = new Animation();
+                line.animation = new Animation(line);
                 line.id = datasource.id;
                 svg.value.lines.push(line);
             });
-            svg.grid.x.animation = new Animation();
-            svg.value.area.animation = new Animation();
-            svg.axis.x.legend.animation = new Animation();
+            svg.grid.x.animation = new Animation(svg.grid.x);
+            svg.value.area.animation = new Animation(svg.value.area);
+            svg.axis.x.legend.animation = new Animation(svg.axis.x.legend);
 
             return svg;
         };
@@ -978,13 +949,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
          * @constructor
          * @param {number} bufferSize - The max length of the buffer (default : 3 animations)
          */
-        function Animation(bufferSize){
+        function Animation(d3Selector, bufferSize){
 
             function _Animation() {
 
-                this.d3Selector = null;
-                this.fps        = null;
-                this.duration   = null;
+                this.d3Selector = d3Selector;
+                this.fps        = ANIMATION_FPS;
+                this.duration   = ANIMATION_DURATION;
                 this.data       = null;
                 this.before     = null;
                 this.after      = null;
@@ -1084,21 +1055,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 return buffer;
             }
 
-            this.select = function (d3Selector) {
-                current_animation.d3Selector = d3Selector;
-                return this;
-            }
-
-            this.fps = function (fps) {
-                current_animation.fps = fps;
-                return this;
-            }
-
-            this.duration = function (duration) {
-                current_animation.duration = duration;
-                return this;
-            }
-
             this.points = function (startPointX, startPointY, stopPointX, stopPointY) {
                 current_animation.startPoint = {x: startPointX, y: startPointY};
                 current_animation.stopPoint  = {x: stopPointX,  y: stopPointY};
@@ -1115,7 +1071,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 return this;
             }
 
-            this.after = function (callback){
+            this.after = function (callback) {
                 current_animation.after = callback;
                 return this;
             }
@@ -1125,7 +1081,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                 current_animation = new _Animation();
             }
 
-            this.clearBuffer = function(stopCurrent) {
+            this.clearBuffer = function (stopCurrent) {
                 if ((typeof stopCurrent == 'undefined' || stopCurrent) && buffer.length > 0 ) {
                     buffer[0].stop();
                 }
@@ -1177,6 +1133,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
             while (num > length)
                 num -= length;
             return map[num];
+        }
+
+        function setTranslate(element, x, y) {
+            element.attr('transform', 'translate(' + x +
+                (y !== undefined ? ',' + y : '' ) +')');
         }
     }
 );

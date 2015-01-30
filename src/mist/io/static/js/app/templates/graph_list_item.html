@@ -8,9 +8,7 @@
 
         <div class="title">
             {{view.graph.title}}
-            {{#if view.graph.unit}}
-                ({{view.graph.unit}})
-            {{/if}}
+            <div class="graphValue">-&nbsp;</div>{{#if view.graph.unit}}{{view.graph.unit}}{{/if}}
         </div>
 
         {{#if view.graph.pendingCreation}}
@@ -74,8 +72,6 @@
         <line class="axisLine y"></line>
         <g class="y-axis"></g>
     </svg>
-
-    <div class="valuePopUp"></div>
 
     <!--
         Graph Secondary Legend Header

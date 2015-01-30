@@ -12,36 +12,51 @@
     width: 100%;
 }
 
-#history-control {
-    width: 230px;
-    height: 55px;
-    display: inline-block;
-}
-
-#history-control a, #graph-list-control .ui-select {
-    margin: .5%;
+#single-machine-page #history-control {
+    width: 50%;
+    float: right;
+    margin-top: -68px;
+    margin-right: -6px;
 }
 
 #history-control-stream {
-    width: 50px;
+    float: right;
+    margin: 0;
+    line-height: 21px;
+    border-radius: 0;
+}
+
+#home-page .graphValue {
+    display: none;
+}
+
+.graphValue {
+    font-weight: normal;
 }
 
 #history-control div {
     text-align: center;
+    margin: 0;
+    border-width: 1px 0px;
 }
 
 #history-control a.time {
     width: 65px;
-    height: 35px;
-    border-radius: 0.3em;
+    height: 39px;
+    border-radius: 0em;
+    float: right;
+    margin: 0;
 }
 
 #time-window-control {
     float: right;
+    margin: 0;
+    border-radius: 0;
+    border-left-width: 0;
 }
 
 #time-window-control .ui-btn {
-    height: 20px;
+    height: 24px;
 }
 
 #time-window-control span {
@@ -55,6 +70,21 @@
 
 #add-metric-btn {
     display: inline-block;
+}
+
+/* Conditional for > 400px */
+@media only screen and (min-width: 800px) {
+    .graph {
+        width: 50%;
+        float: left;
+    }
+    #graphBar {
+        display: block;
+        clear: both;
+    }
+    #home-page .graph {
+        width: 100%;
+    }
 }
 
 /* Conditional for < 400px */

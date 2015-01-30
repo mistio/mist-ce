@@ -1,4 +1,4 @@
-<div id="home-page" data-role="page" class="ui-page-active ui-page ui-page-theme-c">
+<div id="home-page" data-role="page" class="ui-page-active ui-page">
 
     <!-- Page header -->
 
@@ -12,7 +12,7 @@
 
     <!-- Page Body -->
 
-    <div role="main" class="ui-content" data-theme="a">
+    <div role="main" class="ui-content" data-theme="c">
 
         <!-- Add backend button -->
 
@@ -43,12 +43,11 @@
             <li class="ui-li-has-count ui-first-child">
 
                 <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/machines">
-
-                    Machines
-
                     <span class="ui-li-count ui-body-inherit">
                         {{Mist.backendsController.machineCount}}
                     </span>
+                    Machines
+
                 </a>
             </li>
 
@@ -57,27 +56,25 @@
             <li class="ui-li-has-count">
 
                 <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/images">
-
-                    Images
-
                     <span class="ui-li-count ui-body-inherit">
                         {{Mist.backendsController.imageCount}}
                     </span>
+                    Images
                 </a>
             </li>
 
             <!-- Networks link -->
 
-            {{#if Mist.backendsController.hasOpenStack}}
+            {{#if Mist.backendsController.hasNetworks}}
             <li class="ui-li-has-count">
 
                 <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/networks">
 
-                    Networks
-
                     <span class="ui-li-count ui-body-inherit">
                         {{Mist.backendsController.networkCount}}
                     </span>
+                    Networks
+
                 </a>
             </li>
             {{/if}}
@@ -87,12 +84,11 @@
             <li class="ui-li-has-count ui-last-child">
 
                 <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/keys">
-
-                    Keys
-
                     <span class="ui-li-count ui-body-inherit">
                         {{Mist.keysController.content.length}}
                     </span>
+                    Keys
+
                 </a>
             </li>
         </ul>

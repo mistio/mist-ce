@@ -47,7 +47,9 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
             //
 
 
-            open: function () {
+            open: function (position) {
+                if (position)
+                    $(this.popupId).popup('option', 'positionTo', position);
                 $(this.popupId).popup('open');
             },
 
