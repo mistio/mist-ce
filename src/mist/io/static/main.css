@@ -476,8 +476,12 @@ ul.checkbox-list li label {
     margin-right: 7px;
 }
 
-#user-menu-popup .ui-btn {
+#user-menu-popup a.ui-btn {
     width: 80px;
+}
+
+#user-menu-popup button {
+    width: 107px;
 }
 
 #user-menu-popup #user-email {
