@@ -613,7 +613,7 @@ def _add_backend_libvirt(user, title, provider, params):
         apisecret = user.keypairs[apisecret].private
 
     try:
-        port = int(params.get('machine_port', 22))
+        port = int(params.get('ssh_port', 22))
     except:
         port = 22
     backend = model.Backend()
