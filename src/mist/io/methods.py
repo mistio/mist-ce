@@ -612,7 +612,10 @@ def _add_backend_libvirt(user, title, provider, params):
             raise KeypairNotFoundError(apisecret)
         apisecret = user.keypairs[apisecret].private
 
-
+    try:
+        port = int(params.get('machine_port', 22))
+    except:
+        port = 22
     backend = model.Backend()
     backend.title = title
     backend.provider = provider
@@ -620,6 +623,7 @@ def _add_backend_libvirt(user, title, provider, params):
     backend.apisecret = apisecret
     backend.apiurl = machine_hostname
     backend.enabled = True
+    backend.ssh_port = port
     backend_id = backend.get_id()
 
     return backend_id, backend
@@ -1093,7 +1097,7 @@ def connect_provider(backend):
             temp_key_file = NamedTemporaryFile(delete=False)
             temp_key_file.write(backend.apisecret)
             temp_key_file.close()
-            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=temp_key_file.name)
+            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=temp_key_file.name, ssh_port=backend.ssh_port)
         else:
             conn = driver(backend.apiurl, user=backend.apikey)
     else:
