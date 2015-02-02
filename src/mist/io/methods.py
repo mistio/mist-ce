@@ -1757,6 +1757,19 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     else:
         ex_ssh_key_ids = [str(server_key.id)]
 
+    # check if location allows the private_networking setting
+    private_networking = False
+    try:
+        locations = conn.list_locations()
+        for loc in locations:
+            if loc.id == location.id:
+                if 'private_networking' in loc.extra:
+                    private_networking = True
+                break
+    except:
+        # do not break if this fails for some reason
+        pass
+        
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -1766,12 +1779,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 ex_ssh_key_ids=ex_ssh_key_ids,
                 location=location,
                 ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['root']*5,
-                #attempt to fix the Connection reset by peer exception
-                #that is (most probably) created due to a race condition
-                #while deploy_node establishes a connection and the
-                #ssh server is restarted on the created node
-                private_networking=True,
+                private_networking=private_networking,
             )
         except Exception as e:
             raise MachineCreationError("Digital Ocean, got exception %s" % e)
