@@ -1,14 +1,17 @@
-define('app/controllers/networks', ['app/models/network'],
+define('app/controllers/networks', [
+		'app/controllers/base_array',
+		'app/models/network'
+	],
 	//
 	//  Networks Controller
 	//
 	//	@returns Class
 	//
-	function (Network) {
+	function (BaseArrayController, NetworkModel) {
 
 		'use strict';
 
-		return Ember.ArrayController.extend(Ember.Evented, {
+		return BaseArrayController.extend(Ember.Evented, {
 
 
 			//
@@ -18,23 +21,9 @@ define('app/controllers/networks', ['app/models/network'],
 			//
 
 
-			content: null,
-			loading: null,
 			backend: null,
-
-
-            //
-            //
-            //  Initialization
-            //
-            //
-
-
-            init: function () {
-                this._super();
-                this.set('content', []);
-                this.set('loading', true);
-            },
+			model: NetworkModel,
+			passOnProperties: ['backend'],
 
 
             //
@@ -44,15 +33,54 @@ define('app/controllers/networks', ['app/models/network'],
             //
 
 
-            load: function (networks) {
-                this._updateContent(networks);
-                this.set('loading', false);
-            },
+			associateIP: function (args) {
+
+				var machineId;
+				if (args.machine.backend.provider == 'nephoscale')
+					machineId = args.machine.extra.id;
+				else
+					machineId = args.machine.id;
+
+				var url = '/backends/' + this.backend.id +
+					'/networks/' + args.network.id;
+
+				var that = this;
+				that.set('associatingIP',  true);
+				args.ip.set('isAssociating', true);
+				Mist.ajax.POST(url, {
+					machine: machineId,
+					ip: args.ip.ipaddress,
+				}).error(function () {
+					Mist.notificationController.notify('Failed to associate ip ' +
+						args.ip.ipaddress);
+				}).complete(function (success, data) {
+					that.set('associatingIP',  false);
+					args.ip.set('isAssociating', false);
+					if (args.callback) args.callback(success, data);
+				});
+			},
 
 
-            getNetwork: function (networkId) {
-                return this.content.findBy('id', networkId);
-            },
+			reserveIP: function (args) {
+
+				var url = '/backends/' + this.backend.id +
+				'/networks/' + args.network.id;
+
+				var that = this;
+				that.set('reservingIP',  true);
+				args.ip.set('isTogglingReserve', true);
+				Mist.ajax.POST(url, {
+					ip: args.ip.ipaddress,
+					assign: args.reserve
+				}).error(function () {
+					Mist.notificationController.notify('Failed to reserve ip ' +
+						args.ip.ipaddress);
+				}).complete(function (success, data) {
+					that.set('reservingIP',  false);
+					args.ip.set('isTogglingReserve', false);
+					if (args.callback) args.callback(success, data);
+				});
+			},
 
 
             deleteNetwork: function (networkId, callback) {
@@ -63,7 +91,7 @@ define('app/controllers/networks', ['app/models/network'],
                     '/networks/' + networkId;
                 Mist.ajax.DELETE(url)
                 .success(function () {
-                    that._deleteNetwork(networkId);
+                    that._deleteObject(that.getObject(networkId));
                 }).error(function (message) {
                     Mist.notificationController.notify(message);
                 }).complete(function (success, message) {
@@ -71,81 +99,6 @@ define('app/controllers/networks', ['app/models/network'],
                     if (callback) callback(success, message);
                 });
             },
-
-
-            //
-            //
-            //  Pseudo-Private Methods
-            //
-            //
-
-
-            _updateContent: function (networks) {
-                Ember.run(this, function () {
-
-                    // Remove deleted networks
-                    this.content.forEach(function (network) {
-                        if (!networks.findBy('id', network.id))
-                            this.content.removeObject(network);
-                    }, this);
-
-                    networks.forEach(function (network) {
-
-                        var oldNetwork = this.getNetwork(network.id);
-
-                        if (oldNetwork)
-                            // Update existing networks
-                            forIn(network, function (value, property) {
-                                oldNetwork.set(property, value);
-                            });
-                        else
-                            // Add new networks
-                            this._addNetwork(network);
-                    }, this);
-
-                    this.trigger('onNetworkListChange');
-                });
-            },
-
-
-            _addNetwork: function (network) {
-                Ember.run(this, function () {
-                    network.backend = this.backend;
-                    this.content.addObject(Network.create(network));
-                    this.trigger('onNetworkAdd');
-                });
-            },
-
-
-            _deleteNetwork: function (networkId) {
-                Ember.run(this, function () {
-                    this.content.removeObject(this.getNetwork(networkId));
-                    this.trigger('onNetworkDelete');
-                });
-            },
-
-
-            _updateSelectedNetworks: function() {
-                Ember.run(this, function() {
-                    var newSelectedNetworks = this.content.filter(function (network) {
-                        return network.selected;
-                    });
-                    this.set('selectedNetworks', newSelectedNetworks);
-                    this.trigger('onSelectedNetworksChange');
-                });
-            },
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
-
-            selectedNetworksObserver: function() {
-                Ember.run.once(this, '_updateSelectedNetworks');
-            }.observes('content.@each.selected')
 		});
 	}
 );

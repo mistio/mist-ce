@@ -1,10 +1,42 @@
 /* Network View CSS
 ------------------------------------------------------------------------------*/
 
-#single-network-page .subnet-name {
+#single-network-page .subnet-name{
     background-color: #E8E8E8;
+}
+
+#single-network-page .usable-ips h4{
+    margin-top: 0px;
+}
+
+#single-network-page .usable-ips table {
+    width: 100%;
 }
 
 #single-network-page .single-action-footer {
 	display: block;
+}
+
+#single-network-page .reserved {
+    float: right;
+}
+
+#single-network-page .reserved .ui-slider {
+    width: 110px;
+}
+#single-network-page .assign-network-btn {
+    max-width: 150px;
+}
+
+#single-network-page .reserved .ajax-loader {
+    position: relative;
+    top: -1em;
+    left: 7.7em;
+    display: inline-block;
+    z-index: 10;
+}
+
+#single-network-page  .assign-network-btn.associating.ui-btn:after {
+    background-image: url("../images/spinner.gif");
+    background-color: transparent;
 }

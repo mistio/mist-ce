@@ -245,7 +245,6 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider' : Provider.LIBVIRT,
         'regions': []
     }
-
 ]
 
 SUPPORTED_PROVIDERS = [

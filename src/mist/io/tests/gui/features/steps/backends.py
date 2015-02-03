@@ -51,6 +51,8 @@ def given_backend(context, backend):
         creds = "DIGITALOCEAN"
     elif "indonesian" in backend.lower():
         creds = "INDONESIAN"
+    elif "libvirt" in backend.lower():
+        creds = "LIBVIRT"
     else:
         assert False, u'Could not find credentials for %s' % backend
 
@@ -181,6 +183,28 @@ def backend_creds(context, backend):
         password.send_keys(context.credentials['INDONESIAN']['password'])
         organization = context.browser.find_element_by_id("organization")
         organization.send_keys(context.credentials['INDONESIAN']['organization'])
+    elif "LIBVIRT" in backend:
+        title = context.browser.find_element_by_id("title")
+        for i in range(20):
+            title.send_keys(u'\ue003')
+        title.send_keys("KVM (via libvirt)")
+        hostname = context.browser.find_element_by_id("machine_hostname")
+        hostname.send_keys(context.credentials['LIBVIRT']['hostname'])
+        key_button = context.browser.find_element_by_id("machine_key")
+        key_button.click()
+        sleep(2)
+        context.execute_steps(u"""
+        When I click the button that contains "Add Key"
+        """)
+        sleep(2)
+        key_name = context.browser.find_element_by_id("key-add-id")
+        key_name.send_keys("libvirt")
+        upload = context.browser.find_element_by_id("key-add-upload")
+        upload.send_keys(context.credentials['LIBVIRT']['key_path'])
+        sleep(1)
+        key_add_button = context.browser.find_element_by_id("key-add-ok")
+        key_add_button.click()
+        sleep(5)
 
 
 @when(u'I rename the backend to "{new_name}"')

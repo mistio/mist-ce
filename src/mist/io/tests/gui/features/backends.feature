@@ -23,13 +23,14 @@ Feature: Add second-tier backends
     | HP Helion Cloud       | HP           |
     | Linode               | LINODE       |
     | NephoScale           | NEPHOSCALE   |
-#    | OpenStack            | OPENSTACK    |
+    | OpenStack            | OPENSTACK    |
     | Rackspace            | RACKSPACE    |
     | SoftLayer            | SOFTLAYER    |
     | VMware vCloud        | VMWARE       |
     | Indonesian Cloud     | INDONESIAN   |
 #    | EC2                  | EC2          |
     | Docker               | DOCKER       |
+    | KVM (via libvirt)    | LIBVIRT      |
 
     @backend-actions
     Scenario: Backend Actions

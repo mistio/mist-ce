@@ -1,4 +1,4 @@
-<div id="single-network-page" data-role="page" class="ui-page-active" data-theme="c">
+<div id="single-network-page" data-role="page" class="ui-page-active">
 
     <div data-role="header" data-theme="b">
 
@@ -10,11 +10,11 @@
 
     </div>
 
-    <div data-role="content" data-theme="c">
+    <div data-role="content" data-theme="a">
 
         <div id="single-network-info" data-role="collapsible" data-collapsed="false">
 
-            <h3>Network Information</h3>
+            <h4>Network Information</h4>
 
             <table class="info-table">
                 <tr>
@@ -25,72 +25,55 @@
                     <td>Id</td>
                     <td>{{id}}</td>
                 </tr>
+                {{#if status}}
                 <tr>
                     <td>Status</td>
                     <td>{{status}}</td>
                 </tr>
+                {{/if}}
             </table>
 
         </div>
 
+        {{#if subnets}}
         <div id="single-network-subnets" data-role="collapsible" data-collapsed="false">
-
-            <h3>Subnets ({{subnets.length}})</h3>
+            <h4>Subnets ({{subnets.length}})</h4>
 
             {{#each subnets}}
-                <table class="info-table">
-                    <tr>
-                        <td class="subnet-name">Name</td>
-                        <td class="subnet-name">{{this.name}}</td>
-                    </tr>
-                    <tr>
-                        <td>Id</td>
-                        <td>{{this.id}}</td>
-                    </tr>
-                    <tr>
-                        <td>Cidr</td>
-                        <td>{{this.cidr}}</td>
-                    </tr>
-                    <tr>
-                        <td>DHCP Enabled</td>
-                        <td>{{this.enable_dhcp}}</td>
-                    </tr>
-                    <tr>
-                        <td>Gateway IP</td>
-                        <td>{{this.gateway_ip}}
-                    </tr>
-                    {{#if this.dns_nameservers.length}}
-                        <td>DNS Nameservers</td>
-                        <td>
-                            {{#each this.dns_nameservers}}
-                                <div class="ip">{{this}}</div>
-                            {{/each}}
-                        </td>
-                    {{/if}}
-                    {{#if allocation_pools.length}}
-                        <td>Allocation pools</td>
-                        <td>
-                            {{#each this.allocation_pools}}
-                                <div class="ip">{{this.start}}</div> -
-                                <div class="ip">{{this.end}}</div>
-                            {{/each}}
-                        </td>
-                    {{/if}}
-                </table>
+                {{view "subnetListItem" model=this}}
             {{/each}}
         </div>
+        {{/if}}
 
         <div class="mid-padding"></div>
 
     </div>
 
+    <div id="assign-machine"
+        class="tiny-popup"
+        data-role="popup"
+        data-overlay-theme="b"
+        data-transition="flip">
+
+        <ul data-role="listview">
+            {{#each view.network.backend.machines.content}}
+            <li data-icon="false">
+                <a {{action "assignMachine" this target="view"}}>
+                    {{this.name}}
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+
     {{view Mist.confirmationDialog}}
 
+    {{#if backend.isOpenStack}}
     <div class="single-action-footer" data-role="footer" data-theme="b">
         <a class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete"
             {{action "deleteClicked" target="view"}}>
                 Delete
         </a>
     </div>
-
+    {{/if}}
 </div>

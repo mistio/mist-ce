@@ -52,6 +52,8 @@
         position: relative;
         bottom: 6px;
         font-size: 0.9em;
+        margin-left: -17px;
+        width: 50% !important;
     }
 
     .machine-tags {

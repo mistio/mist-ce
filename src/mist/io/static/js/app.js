@@ -8,7 +8,7 @@ require.config({
         text: 'lib/require/text',
         ember: 'lib/ember-1.5.1.min',
         jquery: 'lib/jquery-2.1.1.min',
-        jqm: 'lib/jquery.mobile-1.4.2.min',
+        jqm: 'lib/jquery.mobile-1.4.5.min',
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
@@ -284,8 +284,9 @@ var loadFiles = function (callback) {
         'app/views/graph_list_control',
         'app/views/graph_list_item',
         'app/views/home',
-        'app/views/image_list',
         'app/views/image_list_item',
+        'app/views/image_list',
+        'app/views/ip_address_list_item',
         'app/views/key',
         'app/views/key_add',
         'app/views/key_edit',
@@ -317,6 +318,7 @@ var loadFiles = function (callback) {
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/rule_list',
+        'app/views/subnet_list_item',
         'app/views/user_menu',
     ], callback);
 };
@@ -363,8 +365,9 @@ var loadApp = function (
     GraphListControlView,
     GraphListItemView,
     Home,
-    ImageListView,
     ImageListItem,
+    ImageListView,
+    IPAddressListItemView,
     SingleKeyView,
     KeyAddView,
     KeyEditDialog,
@@ -396,6 +399,7 @@ var loadApp = function (
     RuleView,
     RuleEditView,
     RuleListView,
+    SubnetListItemView,
     UserMenuView,
     callback) {
 
@@ -420,39 +424,10 @@ var loadApp = function (
         (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
         .test(navigator.userAgent)
     );
-    window.Mist = App;
 
-    // Parse PROVIDER_MAP to generate template friendly fields
-    forIn(PROVIDER_MAP, function (fields, title) {
-        PROVIDER_MAP[title].className = 'provider-';
-        PROVIDER_MAP[title].className += title == 'bare_metal' ?
-            'baremetal' : title;
-        fields.forEach(function (field, index) {
-            field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
-            field.value = field.defaultValue || '';
-            if (field.type == 'text' ||
-                field.type == 'password')
-                field.isText = true;
-            if (field.type == 'file')
-                field.isFile = true;
-            if (field.type == 'ssh_key')
-                field.isKey = true;
-            if (field.type == 'region')
-                field.isRegion = true;
-            if (!field.placeholder)
-                field.placeholder = "";
-            if (field.optional)
-                field.placeholder += '(optional)';
-            if (!field.label)
-                field.label = field.name.split('_').map(function (word) {
-                    if (word == 'api' ||
-                        word == 'url' ||
-                        word == 'id')
-                        return word.toUpperCase();
-                    return word.capitalize()
-                }).join(' ');
-        });
-    });
+    parseProviderMap();
+
+    window.Mist = App;
 
     // Ember routes and routers
 
@@ -619,6 +594,9 @@ var loadApp = function (
 
     // Ember views
 
+    App.SubnetListItemView = SubnetListItemView;
+    App.IpAddressListItemView = IPAddressListItemView;
+
     App.set('homeView', Home);
     App.set('ruleView', RuleView);
     App.set('loginView', LoginView);
@@ -719,7 +697,10 @@ var loadApp = function (
     App.Checkbox = Ember.Checkbox.extend({
         attributeBindings: [
             'data-mini',
-            'data-theme'
+            'data-theme',
+            'data-icon',
+            'data-icon-position',
+            'data-disabled'
         ]
     });
     App.TextField = Ember.TextField.extend({
@@ -1038,7 +1019,7 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_networks', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.networks.load(data.networks);
+            backend.networks.setContent(data.networks);
     })
     .on('monitoring',function (data){
         Mist.monitoringController._updateMonitoringData(data);
@@ -1575,6 +1556,59 @@ function clearProviderFields (provider) {
     });
 }
 
+function parseProviderMap () {
+    // Parse PROVIDER_MAP to generate template friendly fields
+
+    // Append nested fields into main array
+    forIn(PROVIDER_MAP, function (fields, title) {
+        fields.forEach(function (field) {
+            if (field.type == 'slider') {
+                field.on.forEach(function (f) {
+                    f.className = 'on';
+                    fields.push(f);
+                });
+                field.off.forEach(function (f) {
+                    f.className = 'off';
+                    fields.push(f);
+                });
+            }
+        });
+    });
+
+    forIn(PROVIDER_MAP, function (fields, title) {
+        PROVIDER_MAP[title].className = 'provider-';
+        PROVIDER_MAP[title].className += title == 'bare_metal' ?
+            'baremetal' : title;
+        fields.forEach(function (field, index) {
+            field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
+            field.value = field.defaultValue || '';
+            if (field.type == 'slider')
+                field.isSlider = true;
+            if (field.type == 'text' ||
+                field.type == 'password')
+                field.isText = true;
+            if (field.type == 'file')
+                field.isFile = true;
+            if (field.type == 'ssh_key')
+                field.isKey = true;
+            if (field.type == 'region')
+                field.isRegion = true;
+            if (!field.placeholder)
+                field.placeholder = "";
+            if (field.optional)
+                field.placeholder += '(optional)';
+            if (!field.label &&  field.name)
+                field.label = field.name.split('_').map(function (word) {
+                    if (word == 'api' ||
+                        word == 'url' ||
+                        word == 'id')
+                            return word.toUpperCase();
+                    return word.capitalize()
+                }).join(' ');
+        });
+    });
+}
+
 //  GLOBAL DEFINITIONS
 
 var DISPLAYED_DATAPOINTS = 60;
@@ -1594,6 +1628,7 @@ var DIALOG_TYPES = {
     OK_CANCEL: 1,
     YES_NO: 2,
     DONE_BACK: 3,
+    BACK: 4,
 };
 
 
@@ -1679,17 +1714,41 @@ var PROVIDER_MAP = {
             defaultValue: '4243',
         },
         {
-            name: 'auth_user',
-            type: 'text',
-            label: 'BasicAuth User',
-            optional: true,
+            type: 'slider',
+            label: 'Authentication',
+            onLabel: 'TLS',
+            offLabel: 'Basic',
+            on: [
+                {
+                    name: 'key_file',
+                    type: 'file',
+                    label: 'PEM Key',
+                    buttonText: 'Add key',
+                    optional: true
+                },
+                {
+                    name: 'cert_file',
+                    type: 'file',
+                    label: 'PEM Certificate',
+                    buttonText: 'Add certificate',
+                    optional: true
+                },
+            ],
+            off: [
+                {
+                    name: 'auth_user',
+                    type: 'text',
+                    label: 'User',
+                    optional: true,
+                },
+                {
+                    name: 'auth_password',
+                    type: 'password',
+                    label: 'Password',
+                    optional: true,
+                }
+            ]
         },
-        {
-            name: 'auth_password',
-            type: 'password',
-            label: 'BasicAuth Password',
-            optional: true,
-        }
     ],
 
     ec2: [
@@ -1877,7 +1936,6 @@ var PROVIDER_MAP = {
         },
 
     ],
-
     vcloud: [
         {
             name: 'title',

@@ -4,13 +4,13 @@
     data-role="panel"
     data-position="right"
     data-display="overlay"
-    data-theme="b">
+    data-theme="c">
 
     <div data-role="header">
         <h1>Manage Keys</h1>
     </div>
 
-    <div data-role="content" data-theme="b">
+    <div data-role="content" data-theme="c">
 
         <a id="associate-btn" data-role="button"
             class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
@@ -44,18 +44,12 @@
     data-overlay-theme="b"
     data-transition="flip"
     data-position-to="#machine-keys"
-    data-theme="b">
-
-    <div data-role="header">
-        <h1>Actions</h1>
-    </div>
-
-    <div data-role="content">
-        <a class="ui-btn ui-btn-a ui-corner-all" {{action "removeClicked" target="view"}}>Remove</a>
-        <a class="ui-btn ui-btn-a ui-corner-all" {{action "probeClicked" target="view"}}>Probe</a>
-        <a class="ui-btn ui-btn-a ui-corner-all" {{action "viewClicked" target="view"}}>View</a>
-        <a class="ui-btn ui-btn-a ui-corner-all" {{action "cancelClicked" target="view"}}>Cancel</a>
-    </div>
+    data-theme="a">
+    <ul data-role="listview">
+        <li data-icon="false"><a {{action "removeClicked" target="view"}}>Remove</a></li>
+        <li data-icon="false"><a {{action "probeClicked" target="view"}}>Probe</a></li>
+        <li data-icon="false"><a {{action "viewClicked" target="view"}}>View</a></li>
+    </ul>
 </div>
 
 <div id="non-associated-keys-popup"
@@ -80,13 +74,13 @@
 <div id="machine-userPort-popup"
     class="large-popup"
     data-role="popup"
-    data-theme="b"
+    data-theme="c"
     data-overlay-theme="b"
     data-position-to="#machine-keys-panel"
     data-transition="flip">
 
     <div data-role="header">
-        <h2>SSH user & port</h2>
+        <h2>SSH user &amp; port</h2>
     </div>
 
     <div data-role="content">

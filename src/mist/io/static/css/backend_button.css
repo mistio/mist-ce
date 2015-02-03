@@ -4,7 +4,6 @@
 #backend-buttons {
     display: block;
     margin-top: -51px;
-    margin-right: 165px;
 }
 #backend-buttons .ui-controlgroup-controls a {
     padding: 13px 10px 10px 40px !important;
@@ -16,22 +15,23 @@
         top: 1px;
     }
 }
-#backend-buttons .ui-controlgroup-controls .ui-btn {
-    padding: 10px 0 9px !important;
-}
 #backend-buttons .ui-controlgroup-controls {
     margin-bottom: 18px;
     display: block;
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn {
-    border: 1px solid #C0C0C0;
+    border: 1px solid #fafafa;
     margin-top: 10px;
+    padding: 10px 0 9px !important;
+    background-color: transparent;
 }
-@media only screen and  (max-width: 460px) {
-    #backend-buttons .ui-controlgroup-controls .ui-btn {
-        border-radius: 0px;
-    }
+#backend-buttons .ui-controlgroup-controls .ui-btn:hover {
+    background-color: #eee;
 }
+#backend-buttons .ui-controlgroup-controls .ui-btn:active {
+    background-color: #fff;
+}
+
 #backend-buttons .ui-icon-waiting {
     background-image: url("../states/load-white-solid.gif") !important;
     background-position: 9px 9px !important;

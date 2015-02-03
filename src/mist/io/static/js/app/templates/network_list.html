@@ -1,4 +1,4 @@
-<div id="network-list-page" data-role="page" class="ui-page-active" data-theme="c">
+<div id="network-list-page" data-role="page" class="ui-page-active">
 
     <div data-role="header" data-theme="b">
 
@@ -10,16 +10,16 @@
 
     </div>
 
-    <div data-role="content" data-theme="c">
-
+    <div data-role="content" data-theme="a">
         <a id="network-create-btn"
-            class="responsive-button"
+            {{bind-attr
+                class="Mist.backendsController.hasOpenStack::ui-disabled
+                :responsive-button"}}
             data-role="button"
             data-icon="plus"
             data-iconpos="right"
             data-theme="d"
             {{action "createClicked" target="view"}}>Create</a>
-
         <ul id="networks"
             data-role="listview"
             data-inset="true"
@@ -27,15 +27,13 @@
             data-filter-placeholder="Filter..."
             data-theme="c"
             class="checkbox-list">
-            {{#each Mist.backendsController.content}}
+            {{#each Mist.backendsController}}
                 {{#if this.enabled}}
-                    {{#if this.isOpenStack}}
-                      {{#each this.networks.content}}
-                          {{view Mist.networkListItemView
-                              networkBinding="this"
-                              class="checkbox-link"}}
-                      {{/each}}
-                    {{/if}}
+                  {{#each this.networks}}
+                        {{view Mist.networkListItemView
+                            networkBinding=this
+                            class="checkbox-link"}}
+                  {{/each}}
                 {{/if}}
             {{/each}}
         </ul>

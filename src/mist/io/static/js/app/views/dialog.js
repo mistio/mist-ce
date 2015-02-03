@@ -33,6 +33,11 @@ define('app/views/dialog', ['app/views/popup'],
             }.property('Mist.dialogController.type'),
 
 
+            isBack: function () {
+                return Mist.dialogController.type == DIALOG_TYPES.BACK;
+            }.property('Mist.dialogController.type'),
+
+
             //
             //
             //  Methods
