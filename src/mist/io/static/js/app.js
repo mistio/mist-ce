@@ -1441,13 +1441,17 @@ function forIn () {
     var thisArg = arguments.length == 3 ? arguments[0] : undefined;
 
     if (!(object instanceof Object))
-        return;
+        return false;
 
     var keys = Object.keys(object);
     var keysLength = keys.length;
-    for (var i = 0; i < keysLength; i++)
-        callback.call(thisArg, object[keys[i]], keys[i]);
-}
+    for (var i = 0; i < keysLength; i++) {
+        var ret = callback.call(thisArg, object[keys[i]], keys[i]);
+        if (ret === true)
+            return true;
+    }
+    return false;
+};
 
 
 // Calculates maximum chars that can be displayed into a fixed width
