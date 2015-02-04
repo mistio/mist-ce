@@ -1,12 +1,17 @@
 define('app/views/log_list', ['app/views/mistscreen'],
     //
-    //  Promo List View
+    //  Log List View
     //
     //  @returns Class
     //
     function (PageView) {
 
         'use strict';
+
+        var MIN_LOGS_DISPLAYED = 30;
+        var MAX_LOGS_REQUESTED = 300;
+        var LOGS_REQUEST_INTERVAL = 500;
+        var EVENT_TYPES = ['job', 'shell', 'request', 'session', 'incident'];
 
         return PageView.extend({
 
@@ -18,20 +23,20 @@ define('app/views/log_list', ['app/views/mistscreen'],
             //
 
 
-            isPolling: false,
-            socket: null,
-            filterValue: null,
-            genericTextFilter: null,
+            forceFlag: 'all',
+            filterString: '',
+            noMoreLogs: false,
+            lastLogTimestamp: null,
 
-            lastLogTime: null,
-            firstLogTime: null,
+            showErrors: null,
 
-            searchJobs: null,
-            searchShell: null,
-            searchErrors: null,
-            searchRequests: null,
-            searchSessions: null,
-            searchIncidents: null,
+            includeTypes: [],
+            includeFilters: [],
+            includeEmails: [],
+
+            excludeTypes: [],
+            excludeFilters: [],
+            excludeEmails: [],
 
 
             //
@@ -42,37 +47,18 @@ define('app/views/log_list', ['app/views/mistscreen'],
 
 
             load: function () {
-                var that = this;
-                this.set('socket', Socket_({
-                    namespace: '/logs',
-                    keepAlive: false,
-                    onConnect: function () {
-                        that.set('filterValue', that.get('filterValue') || '');
-                        that.set('isPolling', true);
-                    },
-                    onInit: function (socket) {
-                        socket.on('logs', function (logs) {
-                            that.handleSocketResponse(logs);
-                        });
-                    },
-                }));
-
-                Ember.run.later(function () {
-                    $(window).on('scroll', function (e) {
-                        that.set('pageYOffset', window.pageYOffset);
-                    });
-                }, 1000);
-
-                this.updateLogTime();
-                this.updateCheckboxClasses();
-                Mist.logsController._setContent([]);
+                this._initializeController();
+                this._initializeScrolling();
+                this._initializeSocket();
+                this._updateLogTime();
+                this.search();
+                Mist.l = this;
             }.on('didInsertElement'),
 
 
             unload: function () {
-                this.get('socket').kill();
-                $(window).off('scroll');
-                Mist.logsController._setContent([]);
+                Mist.get('logs').off('logs', this.handleResponse);
+                Mist.get('logs').off('event', this.handleStream);
             }.on('willDestroyElement'),
 
 
@@ -83,29 +69,183 @@ define('app/views/log_list', ['app/views/mistscreen'],
             //
 
 
-            setLogTimeRange: function (newLogs) {
+            search: function () {
+                if (!Mist.logs.socket.socket.connected)  {
+                    Ember.run.later(this, function () {
+                        this.search();
+                    }, 350);
+                    return;
+                }
+                if (this.get('noMoreLogs'))
+                    return;
+                this.set('fetchingHistory', true);
+                this._processFilterString();
+                Mist.logs.emit('get_logs',  this._generatePayload());
+            },
 
-                var firstLogTime = 0;
-                var lastLogTime = Date.now();
-                var logsContent = Mist.logsController.content;
-                if (logsContent.length) {
-                    firstLogTime = logsContent[0].time;
-                    lastLogTime = logsContent[logsContent.length - 1].time;
+
+            handleResponse: function (logs) {
+                if (logs.length)
+                    this.set('lastLogTimestamp', logs[logs.length - 1].time);
+                else
+                    this.set('noMoreLogs', true);
+                this.set('fetchingHistory', false);
+                Ember.run(this, function () {
+                    Mist.logsController._appendContent(
+                        this.filter(logs)
+                    );
+                });
+                if (logs.length && Mist.logsController.content.length < MIN_LOGS_DISPLAYED) {
+                    this.set('disableScrollFetch', true);
+                    Ember.run.later(this, function () {
+                        this.search();
+                    }, LOGS_REQUEST_INTERVAL);
+                } else {
+                    this.set('disableScrollFetch', false);
                 }
-                if (newLogs.length) {
-                    if (firstLogTime < newLogs[0].time)
-                        firstLogTime = newLogs[0].time;
-                    if (lastLogTime > newLogs[newLogs.length - 1].time)
-                        lastLogTime = newLogs[newLogs.length - 1].time;
-                }
-                this.setProperties({
-                    firstLogTime: firstLogTime,
-                    lastLogTime: lastLogTime,
+            },
+
+
+            handleStream: function (log) {
+                Ember.run(this, function () {
+                    Mist.logsController._prependContent(
+                        this.filter([log])
+                    )
                 });
             },
 
 
-            updateLogTime: function () {
+            filter: function (logs) {
+
+                logs = slice(logs);
+
+                if (this.get('showErrors') != null)
+                    this._filterErrors(logs, this.get('showErrors'));
+
+                if (this.get('includeTypes').length)
+                    this._filterInTypes(logs, this.get('includeTypes'));
+
+                if (this.get('excludeTypes').length)
+                    this._filterOutTypes(logs, this.get('excludeTypes'));
+
+                if (this.get('includeEmails').length)
+                    this._filterInEmails(logs, this.get('includeEmails'));
+
+                if (this.get('excludeEmails').length)
+                    this._filterOutEmails(logs, this.get('excludeEmails'));
+
+                if (this.get('includeTerms').length)
+                    this._filterInTerms(logs, this.get('includeTerms'));
+
+                if (this.get('excludeTerms').length)
+                    this._filterOutTerms(logs, this.get('excludeTerms'));
+
+                return logs;
+            },
+
+
+            //
+            //
+            //  Pseudo-Private Methods
+            //
+            //
+
+
+            _initializeSocket: function () {
+                Mist.get('logs').on('logs', this, this.handleResponse);
+                Mist.get('logs').on('event', this, this.handleStream);
+            },
+
+
+            _initializeController: function () {
+                Mist.logsController.clear();
+            },
+
+
+            _initializeScrolling: function () {
+                var that = this;
+                Ember.run.later(function () {
+                    $(window).on('scroll', function (e) {
+                        Ember.run.once(function () {
+                            if (Mist.isScrolledToBottom() &&
+                                !that.disableScrollFetch &&
+                                !that.fetchingHistory) {
+                                    that.search();
+                            }
+                        });
+                    });
+               }, 1000);
+            },
+
+
+            _processFilterString: function () {
+
+                // Prepare filter
+                var filter = this.get('filterString').trim().toLowerCase().split(' ').map(function (term) {
+                    return term.trim();
+                }).unique().removeObject("");
+
+                // Extract include terms
+                var includeTerms = filter.filter(function (word) {
+                    return word.charAt(0) !== '!';
+                });
+                filter = filter.removeObjects(includeTerms);
+
+                // Extract exclude terms
+                var excludeTerms = filter.map(function (word) {
+                    return word.slice(1); // remove "!" char
+                });
+
+                // Extract include types
+                var includeTypes = includeTerms.filter(function (term) {
+                    return EVENT_TYPES.indexOf(term) > -1;
+                }, this);
+                includeTerms.removeObjects(includeTypes);
+
+                // Extract exclude types
+                var excludeTypes = excludeTerms.filter(function (term) {
+                    return EVENT_TYPES.indexOf(term) > -1;
+                }, this);
+                excludeTerms.removeObjects(excludeTypes);
+
+                // Extract include emails
+                var includeEmails = includeTerms.filter(function (term) {
+                    var result = term.match(EMAIL_REGEX);
+                    return result ? result[0] : false;
+                });
+                includeTerms.removeObjects(includeEmails);
+
+                // Extract exclude emails
+                var excludeEmails = excludeTerms.filter(function (term) {
+                    var result = term.match(EMAIL_REGEX);
+                    return result ? result[0] : false;
+                });
+                excludeTerms.removeObjects(excludeEmails);
+
+                // Show Errors
+                var showErrors = null;
+                if (includeTerms.indexOf('error') > -1) {
+                    showErrors = true;
+                    includeTerms.removeObject('error');
+                }
+                if (excludeTerms.indexOf('error') > -1) {
+                    showErrors =  false;
+                    excludeTerms.removeObject('error');
+                }
+
+                this.setProperties({
+                    showErrors: showErrors,
+                    includeTerms: includeTerms,
+                    excludeTerms: excludeTerms,
+                    includeTypes: includeTypes,
+                    excludeTypes: excludeTypes,
+                    includeEmails: includeEmails,
+                    excludeEmails: excludeEmails,
+                });
+            },
+
+
+            _updateLogTime: function () {
                 if (this.$()) {
                     Ember.run(this, function () {
                         Mist.logsController.content.forEach(function (log) {
@@ -113,178 +253,136 @@ define('app/views/log_list', ['app/views/mistscreen'],
                             log.propertyDidChange('time');
                         });
                     });
-                    Ember.run.later(this, this.updateLogTime, 10 * TIME_MAP.SECOND);
+                    Ember.run.later(this, this._updateLogTime, 10 * TIME_MAP.SECOND);
                 }
             },
 
 
-            handleSocketResponse: function (logs) {
+            _generatePayload: function () {
 
-                Ember.run(this, function () {
+                var payload = {limit: MAX_LOGS_REQUESTED};
 
-                    this.setLogTimeRange(logs);
+                if (this.get('showErrors') != null)
+                    payload.error = this.get('showErrors');
 
-                    this.set('searching', false);
+                if (this.get('includeTypes').length == 1 &&
+                    !this.get('excludeTypes').length)
+                        payload.event_type = this.get('includeTypes')[0];
 
-                    if (this.get('payload').start !== null)
-                        logs.removeObjects(logs.filterBy('time', this.get('payload').start));
-                    if (this.genericTextFilter.length) {
-                        logs = logs.filter(function (log) {
-                            return this.genericTextFilter.every(function (filter) {
-                                var keepLog = false;
-                                forIn(this, log, function (value) {
-                                    if (typeof value == 'string')
-                                        if (value.toLowerCase().indexOf(filter) > -1)
-                                            keepLog = true;
-                                });
-                                return keepLog;
+                if (this.get('includeEmails').length == 1 &&
+                    !this.get('excludeEmails').length)
+                        payload.email = this.get('includeEmails')[0];
+
+                if (this.get('lastLogTimestamp'))
+                    payload.stop = this.get('lastLogTimestamp');
+
+                var forceFlag = this.get('forceFlag');
+                if (forceFlag != 'all') {
+                    if (forceFlag == 'error')
+                        payload.error = true;
+                    else
+                        payload.event_type = forceFlag;
+                }
+
+                return payload;
+            },
+
+
+            _filterErrors: function (logs, showErrors) {
+                logs.removeObjects(
+                    logs.rejectBy('error', showErrors)
+                );
+            },
+
+
+            _filterInTypes: function (logs, types) {
+                logs.removeObjects(
+                    logs.filter(function (log) {
+                        return types.indexOf(log.type) == -1;
+                    })
+                );
+            },
+
+
+            _filterOutTypes: function (logs, types) {
+                types.forEach(function (type) {
+                    logs.removeObjects(
+                        logs.filterBy('type', type)
+                    );
+                });
+            },
+
+
+            _filterInEmails: function (logs, emails) {
+                logs.removeObjects(
+                    logs.filter(function (log) {
+                        return emails.indexOf(log.email) == -1;
+                    })
+                );
+            },
+
+
+            _filterOutEmails: function (logs, emails) {
+                emails.forEach(function (email) {
+                    logs.removeObjects(
+                        logs.filterBy('email', email)
+                    );
+                });
+            },
+
+
+            _filterInTerms: function (logs, terms) {
+                logs.removeObjects(
+                    logs.filter(function (log) {
+                        return terms.some(function (term) {
+                            return !forIn(log, function (value) {
+                                return textInString(term, value);
+                            })
+                        })
+                    })
+                );
+            },
+
+
+            _filterOutTerms: function (logs, terms) {
+                logs.removeObjects(
+                    logs.filter(function (log) {
+                        return terms.some(function (term) {
+                            return forIn(log, function (value) {
+                                return textInString(term, value);
                             });
-                        }, this);
-
-                        // Filter rejected terms
-                        var rejectedLogs = logs.filter(function (log) {
-                            return this.rejectTerms.any(function (filter) {
-                                var rejectLog = false;
-                                forIn(this, log, function (value) {
-                                    if (typeof value == 'string')
-                                        if (value.toLowerCase().indexOf(filter) > -1)
-                                            rejectLog = true;
-                                });
-                                return rejectLog;
-                            });
-                        }, this);
-                        logs.removeObjects(rejectedLogs);
-                    }
-                    if (this.get('fetchingHistory')) {
-                        Mist.logsController._appendContent(logs);
-                        this.set('fetchingHistory', false);
-                    } else {
-                        Mist.logsController._prependContent(logs);
-                    }
-                    return;
-                    if (Mist.logsController.content.length < 30)
-                        Ember.run.later(this, function () {
-                            this.fetchHistory(200);
-                        }, 500);
-                });
+                        })
+                    })
+                );
             },
-
-
-            search: function () {
-
-                var terms = this.get('filterValue').trim().toLowerCase().split(' ');
-
-                var rejectTerms = terms.filter(function (term) {
-                    return term.charAt(0) == '!';
-                });
-                terms.removeObjects(rejectTerms);
-                rejectTerms = rejectTerms.map(function (term) {
-                    return term.slice(1);
-                });
-
-                // Generate payload
-                var payload = {};
-                if (terms.indexOf('error') > -1 || this.get('searchErrors')) {
-                    payload.error = true;
-                    terms.removeObject('error');
-                }
-                if (terms.indexOf('job') > -1 || this.get('searchJobs')) {
-                    payload.event_type = 'job';
-                    terms.removeObject('job');
-                }
-                if (terms.indexOf('request') > -1 || this.get('searchRequests')) {
-                    payload.event_type = 'request';
-                    terms.removeObject('request');
-                }
-                if (terms.indexOf('incident') > -1 || this.get('searchIncidents')) {
-                    payload.event_type = 'incident';
-                    terms.removeObject('incident');
-                }
-                if (terms.indexOf('session') > -1 || this.get('searchSessions')) {
-                    payload.event_type = 'session';
-                    terms.removeObject('session');
-                }
-                if (terms.indexOf('shell') > -1 || this.get('searchShell')) {
-                    payload.event_type = 'shell';
-                    terms.removeObject('shell');
-                }
-
-                payload.email = Mist.email;
-
-                Mist.logsController._setContent([]);
-                this.set('searching', true);
-                this.set('payload', payload)
-                this.set('genericTextFilter', terms);
-                this.set('rejectTerms', rejectTerms);
-                this.get('socket').emit('get_logs', payload);
-            },
-
-
-            windowScrolled: function () {
-                if (Mist.isScrolledToTop())
-                    this.continuePoll();
-                else {
-                    this.set('isPolling', false);
-                    if (Mist.isScrolledToBottom())
-                        this.fetchHistory();
-                }
-            },
-
-
-            continuePoll: function () {
-                if (this.get('isPolling'))
-                    return;
-                this.set('isPolling', true);
-                var payload = this.get('payload');
-                payload.start = this.get('firstLogTime');
-                delete payload.stop;
-                this.get('socket').emit('get_logs', payload);
-            },
-
-
-            fetchHistory: function (limit) {
-                if (this.get('fetchingHistory'))
-                    return;
-                this.set('fetchingHistory', true);
-                var payload = this.get('payload');
-                delete payload.start;
-                if (limit) payload.limit = limit;
-                payload.stop = this.get('lastLogTime');
-                this.get('socket').emit('get_logs', this.get('payload'))
-            },
-
-
-            updateCheckboxClasses: function () {
-                Ember.run.next(function () {
-                    $('.ui-radio label').removeClass('ui-btn-d');
-                    $('.ui-radio :checked').parent().find('label').addClass('ui-btn-d');
-                });
-            },
-
-
-            //
-            //
-            //  Actions
-            //
-            //
 
 
             actions: {
 
-                updateFilterFlags: function () {
-                    var all = $('#event-all').is(":checked");
-                    var error = $('#event-error').is(":checked");
-                    this.setProperties({
-                        searchJobs: all || error ? false : $('#event-jobs').is(":checked"),
-                        searchShell: all || error ? false : $('#event-shell').is(":checked"),
-                        searchRequests: all || error ? false : $('#event-requests').is(":checked"),
-                        searchSessions: all || error ? false : $('#event-sessions').is(":checked"),
-                        searchIncidents: all || error ? false : $('#event-incidents').is(":checked"),
-                        searchErrors: error,
+                updateFilterFlags: function (flag) {
+                    var newFilterString = this.get('filterString');
+                    var flags = slice(EVENT_TYPES);
+                    flags.push('error');
+                    flags.forEach(function (f) {
+                        newFilterString = newFilterString.replace('!'+f, '').replace(f, '');
                     });
-                    this.updateCheckboxClasses();
-                },
+                    this.set('filterString', newFilterString.trim().replace(/\s\s/g, ' '));
+                    this.set('forceFlag', flag);
+                    this.newSearch(1);
+                }
             },
+
+
+            newSearch: function (interval) {
+               var that = this;
+               clearTimeout(this.searchLock);
+               this.set('searchLock', setTimeout(function () {
+                   Mist.logsController.clear();
+                   that.set('noMoreLogs', false);
+                   that.set('lastLogTimestamp', null);
+                   that.search();
+               }, interval || 700))
+           },
 
 
             //
@@ -294,25 +392,16 @@ define('app/views/log_list', ['app/views/mistscreen'],
             //
 
 
-            filterValueObserver: function () {
-
-                var that = this;
-                clearTimeout(this.filterLock);
-                this.set('filterLock', setTimeout(function () {
-                    that.search();
-                }, 1000));
-            }.observes('filterValue',
-                'searchJobs',
-                'searchRequests',
-                'searchIncidents',
-                'searchErrors',
-                'searchShell',
-                'searchSessions'),
-
-
-            scrollObserver: function () {
-                Ember.run.once(this, 'windowScrolled');
-            }.observes('pageYOffset')
+            filterStringObserver: function () {
+                Ember.run.once(this, 'newSearch');
+            }.observes('filterString')
         });
+
+
+        function textInString (text, str) {
+            if (typeof str != 'string')
+                return false;
+            return str.toLowerCase().indexOf(text) > -1;
+        }
     }
 );
