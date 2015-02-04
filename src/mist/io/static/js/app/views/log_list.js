@@ -144,7 +144,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
                 var forceFlag = this.get('forceFlag');
                 if (forceFlag != 'all') {
                     if (forceFlag == 'error')
-                        this._filterErrors(logs, forceFlag);
+                        this._filterErrors(logs, true);
                     else
                         this._filterInTypes(logs, forceFlag);
                 }
