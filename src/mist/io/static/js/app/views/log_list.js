@@ -57,8 +57,9 @@ define('app/views/log_list', ['app/views/mistscreen'],
 
 
             unload: function () {
-                Mist.get('logs').off('logs', this.handleResponse);
-                Mist.get('logs').off('event', this.handleStream);
+                this._initializeController();
+                Mist.get('logs').off('logs', this, this.handleResponse);
+                Mist.get('logs').off('event', this, this.handleStream);
             }.on('willDestroyElement'),
 
 

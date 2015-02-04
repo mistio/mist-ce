@@ -1,6 +1,6 @@
 define('app/controllers/logs', ['app/models/log', 'ember'],
     //
-    //  Users Controller
+    //  Logs Controller
     //
     //  @returns Class
     //
@@ -20,7 +20,6 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
 
             content: [],
             loading: null,
-            userRequest: null,
 
 
             //
