@@ -141,6 +141,14 @@ define('app/views/log_list', ['app/views/mistscreen'],
                 if (this.get('excludeTerms').length)
                     this._filterOutTerms(logs, this.get('excludeTerms'));
 
+                var forceFlag = this.get('forceFlag');
+                if (forceFlag != 'all') {
+                    if (forceFlag == 'error')
+                        this._filterErrors(logs, forceFlag);
+                    else
+                        this._filterInTypes(logs, forceFlag);
+                }
+
                 return logs;
             },
 
