@@ -90,8 +90,8 @@
     border-top: 3px solid #eee;
 }
 
-#log-list-page .details .td > div {
+#log-list-page .details td > div {
     max-height: 300px;
     white-space: pre;
-    overflow: scroll;
+    overflow: auto;
 }
