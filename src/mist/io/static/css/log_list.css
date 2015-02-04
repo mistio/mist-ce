@@ -41,7 +41,7 @@
 }
 
 #log-list-page .filter-wrapper .ui-input-text {
-    margin-left: 29.5em;
+    margin-left: 32.5em;
     margin-top: 2px;
     position: relative;
     top: 7px;
@@ -84,4 +84,8 @@
 
 #log-list-page .details table td:last-child {
     width: 66%;
+}
+
+.no-logs {
+    border-top: 3px solid #eee;
 }

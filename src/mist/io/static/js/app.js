@@ -1,5 +1,7 @@
 startTimer();
 
+DEBUG_SOCKET = false;
+
 // Define libraries
 require.config({
     baseUrl: 'resources/js/',
@@ -173,7 +175,7 @@ var appLoader = {
             }
         },
         'load socket': {
-            before: ['init app'],
+            before: [],
             exec: function () {
                 require(['socket'], function () {
                     appLoader.complete('load socket');
@@ -197,7 +199,7 @@ var appLoader = {
             }
         },
         'init app': {
-            before: ['load templates'],
+            before: ['load templates', 'init connections'],
             exec: function () {
                 loadApp.apply(null, appLoader.buffer.files.concat([function () {
                     appLoader.complete('init app');
@@ -205,7 +207,7 @@ var appLoader = {
             }
         },
         'init connections': {
-            before: ['load socket'],
+            before: ['load socket', 'load ember'],
             exec: function () {
                 appLoader.buffer.ajax = Ajax(CSRF_TOKEN);
                 appLoader.buffer.socket = Socket({
@@ -419,7 +421,6 @@ var loadApp = function (
     });
 
     // Globals
-    App.set('debugSocket', false);
     App.set('debugStats', false);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
@@ -936,8 +937,6 @@ var loadApp = function (
         var sec = prt_date.getSeconds();
         return App.getMonthName(prt_date) + ' ' + prt_date.getDate() + ', ' + prt_date.getFullYear() + ", " + (hour < 10 ? '0' : '') + hour + ':' + (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
     };
-
-    window.EventHandler = Ember.Object.extend(Ember.Evented, {});
 };
 
 
@@ -1252,7 +1251,7 @@ function Socket (args) {
             // information and then call the original callback function
             // (which is saved in cb variable)
             callback = function (data) {
-                if (Mist.debugSocket)
+                if (DEBUG_SOCKET)
                     info(Mist.prettyTime(new Date()) +
                         ' | ' + namespace + '/' + event + ' ', data);
                 cb(data);
@@ -1279,6 +1278,8 @@ function Socket (args) {
 
 function Socket_ (args) {
 
+    if (!window.EventHandler)
+        window.EventHandler = Ember.Object.extend(Ember.Evented, {});
 
     return Ember.Object.extend({
 
@@ -1408,7 +1409,7 @@ function Socket_ (args) {
 
 
         _log: function () {
-            if (!Mist.get('debugSocket'))
+            if (!DEBUG_SOCKET)
                 return;
             var args = slice(arguments);
             var preText = Mist.prettyTime(new Date()) +
