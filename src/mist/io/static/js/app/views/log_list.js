@@ -146,7 +146,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
                     if (forceFlag == 'error')
                         this._filterErrors(logs, true);
                     else
-                        this._filterInTypes(logs, forceFlag);
+                        this._filterInTypes(logs, [forceFlag]);
                 }
 
                 return logs;
