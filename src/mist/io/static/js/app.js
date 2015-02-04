@@ -223,6 +223,9 @@ var appLoader = {
                 appLoader.buffer.logs = new Socket_({
                     keepAlive: true,
                     namespace: '/logs',
+                    onInit: function (socket) {
+                        socket.emit('ready');
+                    }
                 });
             }
         },
