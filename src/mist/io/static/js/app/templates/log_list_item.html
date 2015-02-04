@@ -32,6 +32,16 @@
                 <td>{{view.backendTitle}}</td>
             </tr>
             {{/if}}
+            {{#if view.machineLink}}
+            <tr>
+                <td>Machine</td>
+                <td>
+                    {{#link-to "machine" view.machineLink class="ui-btn ui-btn-icon-right ui-icon-carat-r"}}
+                        {{unbound view.machineLink.name}}
+                    {{/link-to}}
+                </td>
+            </td>
+            {{/if}}
             {{#each view.details}}
                 <tr>
                     <td>{{unbound this.key}}</td>

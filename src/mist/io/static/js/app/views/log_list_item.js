@@ -93,6 +93,14 @@ define('app/views/log_list_item', ['app/views/list_item'],
             }.property('log.backend_id'),
 
 
+            machineLink: function () {
+                var log = this.get('log');
+                var backendId = log.get('backend_id');
+                var machineId = log.get('machine_id');
+                return Mist.backendsController.getMachine(machineId, backendId);
+            }.property('log.machine_id'),
+
+
             //
             //
             //  Initialization
@@ -115,6 +123,7 @@ define('app/views/log_list_item', ['app/views/list_item'],
             actions: {
 
                 toggleCollapse: function () {
+                    this.propertyDidChange('machineLink');
                     if (this.get('isCollapsed')) {
                         this.set('isCollapsed', false);
                         this.$().find('.details').slideDown();
