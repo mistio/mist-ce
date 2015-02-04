@@ -1272,7 +1272,6 @@ function Socket (args) {
 //
 
 
-
 function Socket_ (args) {
 
 
@@ -1344,7 +1343,7 @@ function Socket_ (args) {
         kill: function () {
             this.set('keepAlive', false);
             var socket = this.get('socket');
-            socket.disconnect();
+            socket.socket.disconnect();
             if (socket.$events)
                 for (event in socket.$events)
                     delete socket.$events[event];
@@ -1364,7 +1363,8 @@ function Socket_ (args) {
 
             if (socket.socket.connected) {
                 this._log('connected');
-                callback();
+                if (callback instanceof Function)
+                    callback();
                 if (this.onConnect instanceof Function)
                     this.onConnect(this);
             } else if (socket.socket.connecting) {
