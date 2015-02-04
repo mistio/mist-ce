@@ -20,7 +20,7 @@
                     value="on"
                     checked="checked"
                     type="radio"
-                    {{action "updateFilterFlags" on="change" target="view"}}>
+                    {{action "updateFilterFlags" "all" on="change" target="view"}}>
                 <label for="event-all">All</label>
 
                 <input name="event"
@@ -28,7 +28,7 @@
                     data-mini="true"
                     value="off"
                     type="radio"
-                    {{action "updateFilterFlags" on="change" target="view"}}>
+                    {{action "updateFilterFlags" "job" on="change" target="view"}}>
                 <label for="event-jobs">Jobs</label>
 
                 <input name="event"
@@ -36,7 +36,7 @@
                     data-mini="true"
                     value="off"
                     type="radio"
-                    {{action "updateFilterFlags" on="change" target="view"}}>
+                    {{action "updateFilterFlags" "request" on="change" target="view"}}>
                 <label for="event-requests">Requests</label>
 
                 <input name="event"
@@ -44,7 +44,7 @@
                     data-mini="true"
                     value="off"
                     type="radio"
-                    {{action "updateFilterFlags" on="change" target="view"}}>
+                    {{action "updateFilterFlags" "incident" on="change" target="view"}}>
                 <label for="event-incidents">Incidents</label>
 
                 <input name="event"
@@ -52,7 +52,7 @@
                     data-mini="true"
                     value="off"
                     type="radio"
-                    {{action "updateFilterFlags" on="change" target="view"}}>
+                    {{action "updateFilterFlags" "session" on="change" target="view"}}>
                 <label for="event-sessions">Sessions</label>
 
                 <input name="event"
@@ -60,7 +60,7 @@
                     data-mini="true"
                     value="off"
                     type="radio"
-                    {{action "updateFilterFlags" on="change" target="view"}}>
+                    {{action "updateFilterFlags" "shell" on="change" target="view"}}>
                 <label for="event-shell">Shell</label>
 
                 <input name="event"
@@ -68,10 +68,10 @@
                     data-mini="true"
                     value="off"
                     type="radio"
-                    {{action "updateFilterFlags" on="change" target="view"}}>
+                    {{action "updateFilterFlags" "error" on="change" target="view"}}>
                 <label for="event-error">Errors</label>
             </fieldset>
-            {{view Mist.TextField id="log-filter" valueBinding="view.filterValue" placeholder="Filter logs..."}}
+            {{view Mist.TextField id="log-filter" valueBinding="view.filterString" placeholder="Filter logs..."}}
         </div>
 
         {{#if view.searching}}
@@ -82,7 +82,7 @@
             data-role="listview"
             data-enhanced="true"
             data-inset="true">
-            {{#each Mist.logsController.content}}
+            {{#each Mist.logsController}}
                 {{view Mist.logListItemView logBinding="this"}}
             {{/each}}
         </ul>
@@ -91,6 +91,9 @@
             <div class="ajax-loader"></div>
         {{/if}}
 
+        {{#if view.noMoreLogs}}
+            <div class="no-logs"></div>
+        {{/if}}
         <div class="mid-padding"></div>
     </div>
 </div>

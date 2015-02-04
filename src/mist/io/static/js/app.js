@@ -173,7 +173,7 @@ var appLoader = {
             }
         },
         'load socket': {
-            before: [],
+            before: ['init app'],
             exec: function () {
                 require(['socket'], function () {
                     appLoader.complete('load socket');
@@ -218,13 +218,18 @@ var appLoader = {
                             socket.emit('ready');
                     },
                 });
+                appLoader.buffer.logs = new Socket_({
+                    keepAlive: true,
+                    namespace: '/logs',
+                });
             }
         },
         'init socket events': {
-            before: ['init connections', 'init app'],
+            before: ['init connections'],
             exec: function () {
                 Mist.set('ajax', appLoader.buffer.ajax);
                 Mist.set('socket', appLoader.buffer.socket);
+                Mist.set('logs', appLoader.buffer.logs);
                 appLoader.complete('init socket events');
             }
         },
