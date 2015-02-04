@@ -227,7 +227,7 @@ var appLoader = {
             }
         },
         'init socket events': {
-            before: ['init connections'],
+            before: ['init connections', 'init app'],
             exec: function () {
                 Mist.set('ajax', appLoader.buffer.ajax);
                 Mist.set('socket', appLoader.buffer.socket);
