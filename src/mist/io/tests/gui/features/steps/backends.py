@@ -14,6 +14,7 @@ def load_backend_credentials(context):
 
 @given(u'"{backend}" backend added')
 def given_backend(context, backend):
+    backend_buttons = []
     end_time = time() + 5
     while time() < end_time:
         try:

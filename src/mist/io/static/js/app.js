@@ -1,5 +1,7 @@
 startTimer();
 
+DEBUG_SOCKET = false;
+
 // Define libraries
 require.config({
     baseUrl: 'resources/js/',
@@ -197,7 +199,7 @@ var appLoader = {
             }
         },
         'init app': {
-            before: ['load templates'],
+            before: ['load templates', 'init connections'],
             exec: function () {
                 loadApp.apply(null, appLoader.buffer.files.concat([function () {
                     appLoader.complete('init app');
@@ -205,7 +207,7 @@ var appLoader = {
             }
         },
         'init connections': {
-            before: ['load socket'],
+            before: ['load socket', 'load ember'],
             exec: function () {
                 appLoader.buffer.ajax = Ajax(CSRF_TOKEN);
                 appLoader.buffer.socket = Socket({
@@ -218,6 +220,13 @@ var appLoader = {
                             socket.emit('ready');
                     },
                 });
+                appLoader.buffer.logs = new Socket_({
+                    keepAlive: true,
+                    namespace: '/logs',
+                    onInit: function (socket) {
+                        socket.emit('ready');
+                    }
+                });
             }
         },
         'init socket events': {
@@ -225,6 +234,7 @@ var appLoader = {
             exec: function () {
                 Mist.set('ajax', appLoader.buffer.ajax);
                 Mist.set('socket', appLoader.buffer.socket);
+                Mist.set('logs', appLoader.buffer.logs);
                 appLoader.complete('init socket events');
             }
         },
@@ -258,6 +268,7 @@ var loadFiles = function (callback) {
         'app/controllers/key_edit',
         'app/controllers/keys',
         'app/controllers/login',
+        'app/controllers/logs',
         'app/controllers/machine_add',
         'app/controllers/machine_keys',
         'app/controllers/machine_power',
@@ -291,6 +302,8 @@ var loadFiles = function (callback) {
         'app/views/key_edit',
         'app/views/key_list',
         'app/views/key_list_item',
+        'app/views/log_list',
+        'app/views/log_list_item',
         'app/views/login',
         'app/views/machine',
         'app/views/machine_add',
@@ -336,6 +349,7 @@ var loadApp = function (
     KeyEditController,
     KeysController,
     LoginController,
+    LogsController,
     MachineAddController,
     MachineKeysController,
     MachinePowerController,
@@ -369,6 +383,8 @@ var loadApp = function (
     KeyEditDialog,
     KeyListView,
     KeyListItemView,
+    LogListView,
+    LogListItemView,
     LoginView,
     SingleMachineView,
     MachineAddDialog,
@@ -408,7 +424,6 @@ var loadApp = function (
     });
 
     // Globals
-    App.set('debugSocket', false);
     App.set('debugStats', false);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
@@ -439,6 +454,7 @@ var loadApp = function (
         this.route('key', {
             path : '/keys/:key_id'
         });
+        this.route('logs');
         this.route('missing', { path: "/*path" });
     });
 
@@ -564,6 +580,19 @@ var loadApp = function (
         }
     });
 
+    App.LogsRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - logs';
+            });
+        },
+        exit: function () {
+            Mist.logsController.content.forEach(function (log) {
+                 log.set('selected', false);
+            });
+        }
+    });
+
     App.MissingRoute = Ember.Route.extend({
         activate: function () {
             Ember.run.next(function () {
@@ -580,6 +609,7 @@ var loadApp = function (
     App.set('homeView', Home);
     App.set('ruleView', RuleView);
     App.set('loginView', LoginView);
+    App.set('logListView', LogListView);
     App.set('keyAddView', KeyAddView);
     App.set('keyView', SingleKeyView);
     App.set('missingView', MissingView);
@@ -608,6 +638,7 @@ var loadApp = function (
     App.set('keyListItemView', KeyListItemView);
     App.set('dialogView', DialogView);
     App.set('ruleListView', RuleListView);
+    App.set('logListItemView', LogListItemView);
     App.set('machineListView', MachineListView);
     App.set('imageListItemView', ImageListItem);
     App.set('machineAddView', MachineAddDialog);
@@ -625,6 +656,7 @@ var loadApp = function (
     // Ember controllers
 
     App.set('keysController', KeysController.create());
+    App.set('logsController', LogsController.create());
     App.set('loginController', LoginController.create());
     App.set('rulesController', RulesController.create());
     App.set('keyAddController', KeyAddController.create());
@@ -728,6 +760,10 @@ var loadApp = function (
         return view.constructor.toString().split('.')[1].split('View')[0];
     };
 
+    App.isScrolledToTop = function () {
+        return window.pageYOffset <= 20;
+    };
+
     App.capitalize = function (string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
@@ -742,6 +778,11 @@ var loadApp = function (
             newArray.push(App.capitalize(string));
         });
         return newArray;
+    };
+
+    App.getSortMonthName = function (date) {
+        return ['Jan','Feb','Mar','Apr','May','Jun','Jul',
+        'Aug','Sep','Oct','Nov','Dec'][date.getMonth()];
     };
 
     App.decapitalizeArray = function (array) {
@@ -843,6 +884,62 @@ var loadApp = function (
         }
         return [string];
     };
+
+    App.dateFromNow = function (date) {
+
+        // Convert timestamps to date
+        if (!(date instanceof Date))
+            date = new Date(parseInt(date) * 1000);
+
+        var now = new Date();
+        var diff = now - date;
+        var ret = '';
+
+        if (diff < 10 * TIME_MAP.SECOND)
+            ret = 'Now';
+
+        else if (diff < TIME_MAP.MINUTE)
+            ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
+
+        else if (diff < TIME_MAP.HOUR)
+            ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
+
+        else if (diff < TIME_MAP.DAY)
+            ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
+
+        else if (diff < 2 * TIME_MAP.DAY)
+            ret = 'Yesterday';
+
+        else if (diff < TIME_MAP.YEAR)
+            ret = Mist.getSortMonthName(date) + ' ' + date.getUTCDate();
+
+        if (ret.indexOf('sec') > -1 ||
+            ret.indexOf('min') > -1 ||
+            ret.indexOf('hour') > -1) {
+
+            // Add 's' for plural
+            if (ret.split(' ')[0] != '1')
+                ret = ret + 's';
+
+            ret = ret + ' ago';
+        }
+
+        return ret;
+    };
+
+    App.getMonthName = function (date) {
+        return ['January','February','March','April','May','June','July',
+        'August','September','October','November','December'][date.getMonth()];
+    };
+
+    App.prettyDateTime = function(date) {
+        date = parseInt(date);
+        var prt_date = new Date(date*1000);
+        var hour = prt_date.getHours();
+        var min = prt_date.getMinutes();
+        var sec = prt_date.getSeconds();
+        return App.getMonthName(prt_date) + ' ' + prt_date.getDate() + ', ' + prt_date.getFullYear() + ", " + (hour < 10 ? '0' : '') + hour + ':' + (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
+    };
 };
 
 
@@ -896,6 +993,9 @@ var setupSocketEvents = function (socket, callback) {
 
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);
+    })
+    .on('list_logs', function (logs) {
+        Mist.logsController.load(logs);
     })
     .on('list_backends', function (backends) {
         Mist.backendsController.load(backends);
@@ -1154,7 +1254,7 @@ function Socket (args) {
             // information and then call the original callback function
             // (which is saved in cb variable)
             callback = function (data) {
-                if (Mist.debugSocket)
+                if (DEBUG_SOCKET)
                     info(Mist.prettyTime(new Date()) +
                         ' | ' + namespace + '/' + event + ' ', data);
                 cb(data);
@@ -1171,6 +1271,158 @@ function Socket (args) {
     return socket;
 }
 
+
+//
+//  TODO (gtsop): Get rid of the previous wrapper
+//  Socket Wrapper v2
+//
+//
+
+
+function Socket_ (args) {
+
+    if (!window.EventHandler)
+        window.EventHandler = Ember.Object.extend(Ember.Evented, {});
+
+    return Ember.Object.extend({
+
+
+        //
+        //
+        //  Properties
+        //
+        //
+
+
+        events: null,
+        socket: null,
+        namespace: null,
+
+
+        //
+        //
+        //  Public Methods
+        //
+        //
+
+
+        load: function (args) {
+
+            this._log('initializing');
+            this._parseArguments(args);
+            this.set('socket', io.connect(this.get('namespace')));
+            this.set('events', EventHandler.create());
+
+            var that = this;
+            this._connect(function () {
+                that._handleDisconnection();
+                if (that.onInit instanceof Function)
+                    that.onInit(that);
+            });
+        }.on('init'),
+
+
+        on: function (event) {
+            var that = this;
+            var events = this.get('events');
+            var socket = this.get('socket');
+
+            events.on.apply(events, arguments);
+            if (!socket.$events || !socket.$events[event])
+                socket.on(event, function (response) {
+                    that._log('RECEIVE', response);
+                    events.trigger.call(events, event, response);
+                });
+        },
+
+
+        off: function () {
+            var events = this.get('events');
+            events.off.apply(events, arguments);
+        },
+
+
+        emit: function () {
+            this._log('EMIT', slice(arguments));
+            var socket = this.get('socket');
+            socket.emit.apply(socket, arguments);
+        },
+
+
+        kill: function () {
+            this.set('keepAlive', false);
+            var socket = this.get('socket');
+            socket.socket.disconnect();
+            if (socket.$events)
+                for (event in socket.$events)
+                    delete socket.$events[event];
+        },
+
+
+        //
+        //
+        //  Private Methods
+        //
+        //
+
+
+        _connect: function (callback) {
+
+            var socket = this.get('socket');
+
+            if (socket.socket.connected) {
+                this._log('connected');
+                if (callback instanceof Function)
+                    callback();
+                if (this.onConnect instanceof Function)
+                    this.onConnect(this);
+            } else if (socket.socket.connecting) {
+                this._log('connecting');
+                this._reconnect(callback);
+            } else {
+                socket.socket.connect();
+                this._reconnect(callback);
+            }
+        },
+
+
+        _reconnect: function (callback) {
+            Ember.run.later(this, function () {
+                this._connect(callback);
+            }, 500);
+        },
+
+
+        _parseArguments: function (args) {
+            forIn(this, args, function (value, property) {
+                this.set(property, value);
+            });
+        },
+
+
+        _handleDisconnection: function () {
+            var that = this;
+            this.get('socket').on('disconnect', function () {
+                that._log('disconnected');
+                // keep socket connections alive by default
+                if (that.get('keepAlive') !== undefined ? that.get('keepAlive') : true)
+                    that._reconnect();
+            });
+        },
+
+
+        _log: function () {
+            if (!DEBUG_SOCKET)
+                return;
+            var args = slice(arguments);
+            var preText = Mist.prettyTime(new Date()) +
+                ' | ' + this.get('namespace');
+            args.unshift(preText);
+            console.log.apply(console, args);
+        },
+
+    }).create(args);
+}
 
 function virtualKeyboardHeight () {
     var keyboardHeight = 0;
@@ -1198,13 +1450,17 @@ function forIn () {
     var thisArg = arguments.length == 3 ? arguments[0] : undefined;
 
     if (!(object instanceof Object))
-        return;
+        return false;
 
     var keys = Object.keys(object);
     var keysLength = keys.length;
-    for (var i = 0; i < keysLength; i++)
-        callback.call(thisArg, object[keys[i]], keys[i]);
-}
+    for (var i = 0; i < keysLength; i++) {
+        var ret = callback.call(thisArg, object[keys[i]], keys[i]);
+        if (ret === true)
+            return true;
+    }
+    return false;
+};
 
 
 // Calculates maximum chars that can be displayed into a fixed width
@@ -1285,6 +1541,10 @@ function error() {
     if (LOGLEVEL > 0)
         console.error.apply(console, arguments);
 }
+
+function slice (args) {
+    return Array.prototype.slice.call(args);
+};
 
 function resetFileInputField (element) {
     element.wrap('<form>').parent('form').trigger('reset');
@@ -1373,6 +1633,7 @@ var TIME_MAP = {
     DAY: 24 * 60 * 60 * 1000,
     WEEK: 7 * 24 * 60 * 60 * 1000,
     MONTH: 30 * 24 * 60 * 60 * 1000,
+    YEAR: 12 * 30 * 24 * 60 * 60 * 1000,
 };
 
 var DIALOG_TYPES = {
@@ -1383,6 +1644,17 @@ var DIALOG_TYPES = {
     BACK: 4,
 };
 
+var EMAIL_REGEX = /(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
+
+Array.prototype.unique = function() {
+    var unique = [];
+    for (var i = 0; i < this.length; i++) {
+        if (unique.indexOf(this[i]) == -1) {
+            unique.push(this[i]);
+        }
+    }
+    return unique;
+};
 
 var PROVIDER_MAP = {
 

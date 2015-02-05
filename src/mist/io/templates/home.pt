@@ -105,6 +105,9 @@
     <script type="text/x-handlebars" data-template-name="keys">
         {{view Mist.keyListView}}
     </script>
+    <script type="text/x-handlebars" data-template-name="logs">
+        {{view Mist.logListView}}
+    </script>
     <script type="text/x-handlebars" data-template-name="key">
         {{view Mist.keyView}}
     </script>
