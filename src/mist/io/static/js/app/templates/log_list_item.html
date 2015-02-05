@@ -1,0 +1,53 @@
+<span {{bind-attr class="view.collapsedClass"}}>
+    <a class="ui-btn" {{action "toggleCollapse" target="view"}}>
+
+        <div class="ui-grid-b">
+            <div class="ui-block-a">
+                <div>
+                    {{unbound view.formatedAction}}{{#if view.isIncident}}: {{unbound view.log.condition}}
+                    {{/if}}
+                </div>
+                {{#if view.log.error}}
+                    <div class="ui-btn-icon-notext ui-icon-alert error"></div>
+                {{/if}}
+            </div>
+            <div class="ui-block-b">
+                <div class="tag">{{unbound view.log.type}}</div>
+            </div>
+            <div class="ui-block-c">
+                <div>{{view.prettyTime}}</div>
+            </div>
+        </div>
+    </a>
+
+    <div class="details info-table">
+        <table>
+            <tr>
+                <td>Date</td>
+                <td>{{unbound view.fullPrettyTime}}</td>
+            </tr>
+            {{#if view.backendTitle}}
+            <tr>
+                <td>Backend Title</td>
+                <td>{{view.backendTitle}}</td>
+            </tr>
+            {{/if}}
+            {{#if view.machineLink}}
+            <tr>
+                <td>Machine</td>
+                <td>
+                    {{#link-to "machine" view.machineLink class="ui-btn ui-btn-icon-right ui-icon-carat-r"}}
+                        {{unbound view.machineLink.name}}
+                    {{/link-to}}
+                </td>
+            </td>
+            {{/if}}
+            {{#each view.details}}
+                <tr>
+                    <td>{{unbound this.key}}</td>
+                    <td><div>{{unbound this.value}}</div></td>
+                </tr>
+            {{/each}}
+        </table>
+    </div>
+</span>
