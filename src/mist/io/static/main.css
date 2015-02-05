@@ -91,7 +91,7 @@ body {
     padding: .5% 1%;
 }
 #monitoring-collapsible .ui-collapsible-content {
-    padding: .5%;
+    padding: 0 .5% .5%;
     border: 1px solid #f8f8f8;
     overflow: visible;
 }
