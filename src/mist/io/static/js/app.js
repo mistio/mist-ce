@@ -1681,6 +1681,13 @@ var PROVIDER_MAP = {
             defaultValue: 'root',
         },
         {
+            name: 'ssh_port',
+            type: 'text',
+            label: 'ssh port',
+            optional: true,
+            defaultValue: '22',
+        },
+        {
             name: 'machine_key',
             type: 'ssh_key',
             label: 'ssh key',
