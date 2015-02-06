@@ -24,6 +24,7 @@
     position: relative;
     left: -19px;
     transform: scale(0.4, 0.4);
+    -webkit-transform: scale(0.4,0.4);
     bottom: 15px;
 }
 
