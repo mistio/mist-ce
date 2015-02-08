@@ -762,11 +762,6 @@ var loadApp = function (
         return newArray;
     };
 
-    App.getSortMonthName = function (date) {
-        return ['Jan','Feb','Mar','Apr','May','Jun','Jul',
-        'Aug','Sep','Oct','Nov','Dec'][date.getMonth()];
-    };
-
     App.decapitalizeArray = function (array) {
         var newArray = [];
         array.forEach(function(string) {
