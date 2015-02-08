@@ -57,12 +57,12 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
 
             prettyTime: function () {
-                return new Date(this.get('log').get('time')).getTimeFromNow();
+                return this.get('log').get('date').getTimeFromNow();
             }.property('log.time'),
 
 
             fullPrettyTime: function () {
-                return new Date(this.get('log').get('time')).getPrettyDateTime();
+                return this.get('log').get('date').getPrettyDateTime();
             }.property('log.time'),
 
 
