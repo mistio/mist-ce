@@ -62,7 +62,7 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
 
             fullPrettyTime: function () {
-                return Mist.prettyDateTime(this.get('log').get('time'));
+                return new Date(this.get('log').get('time')).getPrettyDateTime();
             }.property('log.time'),
 
 

@@ -908,20 +908,6 @@ var loadApp = function (
 
         return ret;
     };
-
-    App.getMonthName = function (date) {
-        return ['January','February','March','April','May','June','July',
-        'August','September','October','November','December'][date.getMonth()];
-    };
-
-    App.prettyDateTime = function(date) {
-        date = parseInt(date);
-        var prt_date = new Date(date*1000);
-        var hour = prt_date.getHours();
-        var min = prt_date.getMinutes();
-        var sec = prt_date.getSeconds();
-        return App.getMonthName(prt_date) + ' ' + prt_date.getDate() + ', ' + prt_date.getFullYear() + ", " + (hour < 10 ? '0' : '') + hour + ':' + (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
-    };
 };
 
 
@@ -1611,14 +1597,8 @@ function parseProviderMap () {
 //
 //
 
-
 Date.prototype.getPrettyTime = function () {
 
-    // Returns a string with the current time in a reader friendly
-    // format. The day and month are prepended if necessary
-
-    var month = this.getMonth();
-    var day = this.getUTCDate();
     var hour = this.getHours();
     var min = this.getMinutes();
     var sec = this.getSeconds();
@@ -1627,14 +1607,21 @@ Date.prototype.getPrettyTime = function () {
         (min < 10 ? '0' : '') + min + ':' +
         (sec < 10 ? '0' : '') + sec;
 
-    if (day != new Date().getUTCDate() ||
-        month != new Date().getMonth()) {
-            ret = day + '/' + month + ' ' + ret;
-    }
-
     return ret;
 }
 
+Date.prototype.getPrettyDate = function () {
+    return this.getMonthName() + ' ' + this.getDate() + ', ' + this.getFullYear();
+}
+
+Date.prototype.getPrettyDateTime = function () {
+    return this.getPrettyDate() + ', ' + this.getPrettyTime();
+}
+
+Date.prototype.getMonthName = function () {
+    return ['January','February','March','April','May','June','July',
+        'August','September','October','November','December'][this.getMonth()];
+}
 
 Array.prototype.unique = function() {
     var unique = [];
