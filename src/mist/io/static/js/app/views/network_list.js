@@ -66,8 +66,8 @@ define('app/views/network_list', ['app/views/mistscreen'],
 
                 deleteClicked: function () {
 
-                    var networkNames = Mist.arrayToListString(
-                        Mist.backendsController.selectedNetworks, 'name');
+                    var networkNames = Mist.backendsController
+                        .selectedNetworks.toStringByProperty('name');
 
                     Mist.confirmationController.setUp('Delete networks',
                         'Are you sure you want to delete these networks: '

@@ -139,9 +139,9 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 // Log requests ///////////////////////////////
                 if (Mist.debugStats) {
                     info('Requesting stats from: ' +
-                        Mist.prettyTime(new Date(args.from)) +
+                        new Date(args.from).getPrettyDateTime() +
                         ' until: ' +
-                        Mist.prettyTime(new Date(args.until)));
+                        new Date(args.until).getPrettyDateTime());
                 }
                 ////////////////////////////////////////////////
 

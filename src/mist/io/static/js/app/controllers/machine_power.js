@@ -47,7 +47,7 @@ define('app/controllers/machine_power', ['ember'],
                 $('#machine-power-popup').popup('close');
 
 
-                var machineNames = Mist.arrayToListString(this.machines, 'name');
+                var machineNames = this.machines.toStringByProperty('name');
 
                 // Show confirmation popup
                 var that = this;
