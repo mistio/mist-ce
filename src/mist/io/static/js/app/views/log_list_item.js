@@ -57,7 +57,7 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
 
             prettyTime: function () {
-                return Mist.dateFromNow(this.get('log').get('time'));
+                return new Date(this.get('log').get('time')).getTimeFromNow();
             }.property('log.time'),
 
 

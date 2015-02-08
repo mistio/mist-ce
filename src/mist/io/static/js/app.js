@@ -866,48 +866,6 @@ var loadApp = function (
         }
         return [string];
     };
-
-    App.dateFromNow = function (date) {
-
-        // Convert timestamps to date
-        if (!(date instanceof Date))
-            date = new Date(parseInt(date) * 1000);
-
-        var now = new Date();
-        var diff = now - date;
-        var ret = '';
-
-        if (diff < 10 * TIME_MAP.SECOND)
-            ret = 'Now';
-
-        else if (diff < TIME_MAP.MINUTE)
-            ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
-
-        else if (diff < TIME_MAP.HOUR)
-            ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
-
-        else if (diff < TIME_MAP.DAY)
-            ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
-
-        else if (diff < 2 * TIME_MAP.DAY)
-            ret = 'Yesterday';
-
-        else if (diff < TIME_MAP.YEAR)
-            ret = Mist.getSortMonthName(date) + ' ' + date.getUTCDate();
-
-        if (ret.indexOf('sec') > -1 ||
-            ret.indexOf('min') > -1 ||
-            ret.indexOf('hour') > -1) {
-
-            // Add 's' for plural
-            if (ret.split(' ')[0] != '1')
-                ret = ret + 's';
-
-            ret = ret + ' ago';
-        }
-
-        return ret;
-    };
 };
 
 
@@ -1597,6 +1555,7 @@ function parseProviderMap () {
 //
 //
 
+
 Date.prototype.getPrettyTime = function () {
 
     var hour = this.getHours();
@@ -1618,9 +1577,50 @@ Date.prototype.getPrettyDateTime = function () {
     return this.getPrettyDate() + ', ' + this.getPrettyTime();
 }
 
-Date.prototype.getMonthName = function () {
+Date.prototype.getMonthName = function (short) {
+    if (short)
+        return ['Jan','Feb','Mar','Apr','May','Jun','Jul',
+            'Aug','Sep','Oct','Nov','Dec'][this.getMonth()];
     return ['January','February','March','April','May','June','July',
         'August','September','October','November','December'][this.getMonth()];
+}
+
+Date.prototype.getTimeFromNow = function () {
+
+    var now = new Date();
+    var diff = now - this;
+    var ret = '';
+
+    if (diff < 10 * TIME_MAP.SECOND)
+        ret = 'Now';
+
+    else if (diff < TIME_MAP.MINUTE)
+        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
+
+    else if (diff < TIME_MAP.HOUR)
+        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
+
+    else if (diff < TIME_MAP.DAY)
+        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
+
+    else if (diff < 2 * TIME_MAP.DAY)
+        ret = 'Yesterday';
+
+    else if (diff < TIME_MAP.YEAR)
+        ret = this.getMonthName(true) +  ' ' + this.getDate();
+
+    if (ret.indexOf('sec') > -1 ||
+        ret.indexOf('min') > -1 ||
+        ret.indexOf('hour') > -1) {
+
+        // Add 's' for plural
+        if (ret.split(' ')[0] != '1')
+            ret = ret + 's';
+
+        ret = ret + ' ago';
+    }
+
+    return ret;
 }
 
 Array.prototype.unique = function() {
