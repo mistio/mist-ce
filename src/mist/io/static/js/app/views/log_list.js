@@ -192,7 +192,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
                 // Prepare filter
                 var filter = this.get('filterString').trim().toLowerCase().split(' ').map(function (term) {
                     return term.trim();
-                }).unique().removeObject("");
+                }).uniq().removeObject('');
 
                 // Extract include terms
                 var includeTerms = filter.filter(function (word) {
