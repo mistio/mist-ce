@@ -835,16 +835,6 @@ var loadApp = function (
             element.slideUp();
     };
 
-    App.arrayToListString = function(array, attribute) {
-        var listString = '';
-        array.forEach(function(item, index) {
-            listString += item[attribute];
-            if (index < array.length - 1)
-                listString += ', ';
-        });
-        return listString;
-    };
-
     App.splitWords = function (string) {
         if (string.indexOf('-') > -1)
             return string.split('-');
@@ -1617,6 +1607,14 @@ Date.prototype.getTimeFromNow = function () {
 
     return ret;
 }
+
+
+Array.prototype.toStringByProperty = function (property) {
+    return this.map(function (object) {
+        return object[property];
+    }).join(', ');
+}
+
 
 //  GLOBAL DEFINITIONS
 
