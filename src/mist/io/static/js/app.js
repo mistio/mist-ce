@@ -738,24 +738,6 @@ var loadApp = function (
 
     // Mist functions
 
-    App.prettyTime = function(date) {
-
-        var showDate = false;
-        if (date.getMonth() != new Date().getMonth()) {
-            showDate = true;
-            var day = date.getUTCDate();
-            var month = date.getMonth();
-        }
-
-        var hour = date.getHours();
-        var min = date.getMinutes();
-        var sec = date.getSeconds();
-        return (showDate ? day + '/' + month + ' ': '') +
-            (hour < 10 ? '0' : '') + hour + ':' +
-            (min < 10 ? '0' : '') + min + ':' +
-            (sec < 10 ? '0' : '') + sec;
-    };
-
     App.getViewName = function (view) {
         return view.constructor.toString().split('.')[1].split('View')[0];
     };
@@ -1255,7 +1237,7 @@ function Socket (args) {
             // (which is saved in cb variable)
             callback = function (data) {
                 if (DEBUG_SOCKET)
-                    info(Mist.prettyTime(new Date()) +
+                    info(new Date().getPrettyTime() +
                         ' | ' + namespace + '/' + event + ' ', data);
                 cb(data);
             };
@@ -1415,7 +1397,7 @@ function Socket_ (args) {
             if (!DEBUG_SOCKET)
                 return;
             var args = slice(arguments);
-            var preText = Mist.prettyTime(new Date()) +
+            var preText = new Date().getPrettyTime() +
                 ' | ' + this.get('namespace');
             args.unshift(preText);
             console.log.apply(console, args);
@@ -1622,6 +1604,49 @@ function parseProviderMap () {
     });
 }
 
+
+//
+//
+//  PROTOTYPE EXTENTIONS
+//
+//
+
+
+Date.prototype.getPrettyTime = function () {
+
+    // Returns a string with the current time in a reader friendly
+    // format. The day and month are prepended if necessary
+
+    var month = this.getMonth();
+    var day = this.getUTCDate();
+    var hour = this.getHours();
+    var min = this.getMinutes();
+    var sec = this.getSeconds();
+
+    var ret = (hour < 10 ? '0' : '') + hour + ':' +
+        (min < 10 ? '0' : '') + min + ':' +
+        (sec < 10 ? '0' : '') + sec;
+
+    if (day != new Date().getUTCDate() ||
+        month != new Date().getMonth()) {
+            ret = day + '/' + month + ' ' + ret;
+    }
+
+    return ret;
+}
+
+
+Array.prototype.unique = function() {
+    var unique = [];
+    for (var i = 0; i < this.length; i++) {
+        if (unique.indexOf(this[i]) == -1) {
+            unique.push(this[i]);
+        }
+    }
+    return unique;
+};
+
+
 //  GLOBAL DEFINITIONS
 
 var DISPLAYED_DATAPOINTS = 60;
@@ -1645,16 +1670,6 @@ var DIALOG_TYPES = {
 };
 
 var EMAIL_REGEX = /(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
-
-Array.prototype.unique = function() {
-    var unique = [];
-    for (var i = 0; i < this.length; i++) {
-        if (unique.indexOf(this[i]) == -1) {
-            unique.push(this[i]);
-        }
-    }
-    return unique;
-};
 
 var PROVIDER_MAP = {
 
