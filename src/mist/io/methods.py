@@ -2173,17 +2173,6 @@ def list_images(user, backend_id, term=None):
                 image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
             ec2_images += conn.list_images(ex_owner="amazon")
             ec2_images += conn.list_images(ex_owner="self")
-        elif conn.type == Provider.GCE:
-            # Currently not other way to receive all images :(
-            rest_images = conn.list_images()
-            for OS in config.GCE_IMAGES:
-                try:
-                    gce_images = conn.list_images(ex_project=OS)
-                    rest_images += gce_images
-                except:
-                    #eg ResourceNotFoundError
-                    pass
-            rest_images = [image for image in rest_images if not image.extra['deprecated']]
         elif conn.type == Provider.AZURE:
             # do not show Microsoft Windows images
             # from Azure's response we can't know which images are default
