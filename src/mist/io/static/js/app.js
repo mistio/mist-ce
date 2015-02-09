@@ -1,6 +1,8 @@
 startTimer();
 
 DEBUG_SOCKET = false;
+DEBUG_STATS = false;
+DEBUG_LOGS = false;
 
 // Define libraries
 require.config({
@@ -424,7 +426,6 @@ var loadApp = function (
     });
 
     // Globals
-    App.set('debugStats', false);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
