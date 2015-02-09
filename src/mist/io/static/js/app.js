@@ -418,7 +418,7 @@ var loadApp = function (
     RuleListView,
     ScriptView,
     ScriptListView,
-    ScriptListitemView,
+    ScriptListItemView,
     SubnetListItemView,
     UserMenuView,
     callback) {
