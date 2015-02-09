@@ -293,6 +293,10 @@ define('app/views/log_list', ['app/views/mistscreen'],
                         payload.event_type = forceFlag;
                 }
 
+                if (DEBUG_LOGS) {
+                    info('Requesting logs:', payload)
+                }
+
                 return payload;
             },
 
