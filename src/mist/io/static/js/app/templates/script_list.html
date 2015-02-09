@@ -12,32 +12,27 @@
 
     <div data-role="content" data-theme="a">
 
-        <a id="select-scripts-btn"
-           class="responsive-button"
-           data-role="button"
-           data-icon="arrow-d"
-           {{action "selectClicked" target="view"}}>Select</a>
+        <div class="list-wrapper">
 
-        <a id="add-script-btn"
-           class="responsive-button"
-           data-role="button"
-           data-icon="plus"
-           data-iconpos="right"
-           data-theme="d"
-           {{action "addClicked" target="view"}}>Add</a>
+            <a id="select-scripts-btn"
+               class="responsive-btn ui-btn ui-btn-icon-left ui-icon-arrow-d ui-corner-all"
+               {{action "selectClicked" target="view"}}>Select</a>
 
-        <ul data-role="listview"
-            data-filter="true"
-            data-inset="true"
-            data-filter-placeholder="Filter..."
-            class="checkbox-list">
-            {{#each Mist.scriptsController}}
-                {{view "scriptListItem" model="this" class="checkbox-link"}}
-            {{/each}}
-        </ul>
+            <a id="add-script-btn"
+               class="responsive-btn ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
+               {{action "addClicked" target="view"}}>Add</a>
 
+            <ul data-role="listview"
+                data-filter="true"
+                data-inset="true"
+                data-filter-placeholder="Filter Scripts..."
+                class="checkbox-list">
+                {{#each Mist.scriptsController}}
+                    {{view "scriptListItem" model="this" class="checkbox-link"}}
+                {{/each}}
+            </ul>
+        </div>
         <div class="mid-padding"></div>
-
     </div>
 
     {{view Mist.dialogView}}
