@@ -2173,6 +2173,12 @@ def list_images(user, backend_id, term=None):
                 image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
             ec2_images += conn.list_images(ex_owner="amazon")
             ec2_images += conn.list_images(ex_owner="self")
+        elif conn.type == Provider.GCE:
+            rest_images = conn.list_images()
+            for gce_image in rest_images:
+                if gce_image.extra.get('licenses'):
+                    gce_image.extra['licenses'] = None
+            # GCE has some objects in extra so we make sure they are not passed
         elif conn.type == Provider.AZURE:
             # do not show Microsoft Windows images
             # from Azure's response we can't know which images are default
