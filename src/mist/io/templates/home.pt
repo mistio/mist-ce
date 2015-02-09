@@ -105,11 +105,17 @@
     <script type="text/x-handlebars" data-template-name="keys">
         {{view Mist.keyListView}}
     </script>
-    <script type="text/x-handlebars" data-template-name="logs">
-        {{view Mist.logListView}}
-    </script>
     <script type="text/x-handlebars" data-template-name="key">
         {{view Mist.keyView}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="scripts">
+        {{view "scriptList"}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="script">
+        {{view "scrtipt"}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="logs">
+        {{view Mist.logListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="missing">
         {{view Mist.missingView}}

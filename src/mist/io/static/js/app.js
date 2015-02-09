@@ -463,6 +463,10 @@ var loadApp = function (
         this.route('key', {
             path : '/keys/:key_id'
         });
+        this.route('scripts');
+        this.route('script', {
+            path : '/scripts/:script_id'
+        });
         this.route('logs');
         this.route('missing', { path: "/*path" });
     });
