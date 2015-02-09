@@ -180,7 +180,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     $('#create-machine-panel .docker .ui-checkbox').addClass('ui-state-disabled');
                     $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
 
-                    if (backend.get('hasNetworks')) {
+                    if (backend.get('requiresNetworkOnCreation')) {
                         if (backend.networks.content.length > 0) {
                             $('#create-machine-network').show();
                             $('label[for=create-machine-script]').text('Script:');
