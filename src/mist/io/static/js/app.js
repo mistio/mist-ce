@@ -331,6 +331,7 @@ var loadFiles = function (callback) {
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/rule_list',
+        'app/views/script',
         'app/views/script_list',
         'app/views/script_list_item',
         'app/views/subnet_list_item',
@@ -415,6 +416,7 @@ var loadApp = function (
     RuleView,
     RuleEditView,
     RuleListView,
+    ScriptView,
     ScriptListView,
     ScriptListitemView,
     SubnetListItemView,
@@ -610,6 +612,7 @@ var loadApp = function (
 
     // Ember views
 
+    App.ScriptView = ScriptView;
     App.ScriptListView = ScriptListView;
     App.ScriptListItemView = ScriptListItemView;
     App.SubnetListItemView = SubnetListItemView;
