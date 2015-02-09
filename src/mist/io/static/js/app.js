@@ -284,6 +284,7 @@ var loadFiles = function (callback) {
         'app/controllers/notification',
         'app/controllers/rule_edit',
         'app/controllers/rules',
+        'app/controllers/scripts',
         'app/views/backend_add',
         'app/views/backend_button',
         'app/views/backend_edit',
@@ -367,6 +368,7 @@ var loadApp = function (
     NotificationController,
     RuleEditController,
     RulesController,
+    ScriptsController,
     BackendAdd,
     BackendButton,
     BackendEdit,
@@ -690,7 +692,7 @@ var loadApp = function (
     App.set('machinePowerController', MachinePowerController.create());
     App.set('networkCreateController', NetworkCreateController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
-
+    App.set('scriptsController', ScriptsController.create());
 
     // Ember custom widgets
 
