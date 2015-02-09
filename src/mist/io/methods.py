@@ -1166,10 +1166,6 @@ def get_machine_actions(machine_from_api, conn, extra):
         # in libvirt a terminated machine can be started
             can_start = True
 
-    if conn.type is Provider.GCE:
-        can_start = False
-        can_stop = False
-
     if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
         # allow only reboot action for libvirt hypervisor
         can_stop = False
