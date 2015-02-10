@@ -87,7 +87,7 @@ generateScript(){
         echo -ne "\rGenerating compilation statements ($i/$FILE_COUNT)"
         filename=$(basename "$f")
         filename="${filename%.*}"
-        var="Ember.TEMPLATES['$filename/html']"
+        var="Ember.TEMPLATES['$filename']"
         value="Ember.Handlebars.compile(arguments[$((i-1))]);"
         echo "        $var = $value" >> $OUT_PATH
     done
