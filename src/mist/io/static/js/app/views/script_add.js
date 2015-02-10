@@ -10,10 +10,13 @@ define('app/views/script_add', ['app/views/panel'],
 
         return PanelView.extend({
 
-            load: function () {
-                Mist.p = this;
-                info(this.get('panelId'));
-            }.on('didInsertElement')
+            isReady: function () {
+                var script = Mist.scriptAddController.get('newScript');
+                return script.get('name').length && script.get('url').length;
+            }.property(
+                'Mist.scriptAddController.newScript.name',
+                'Mist.scriptAddController.newScript.url'
+            )
         });
     }
 );

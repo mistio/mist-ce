@@ -12,7 +12,17 @@
 
     <div data-role="content" data-theme="a">
 
-        I regret nothing
+        <label for="script-name">Name:</label>
+        {{view Mist.TextField
+            data-theme="a"
+            id="script-name"
+            valueBinding=Mist.scriptAddController.newScript.name}}
+
+        <label for="script-url">Url:</label>
+        {{view Mist.TextField
+            data-theme="a"
+            id="script-url"
+            valueBinding=Mist.scriptAddController.newScript.url}}
 
         {{#if Mist.scriptsController.addingScript}}
             <div class="ajax-loader"></div>
