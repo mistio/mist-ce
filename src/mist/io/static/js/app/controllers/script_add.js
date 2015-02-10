@@ -12,11 +12,15 @@ define('app/controllers/script_add', ['ember'],
 
             newScript: Ember.Object.create({
                 name: '',
-                url: ''
+                url: '',
+                type: {},
+                entryPoint: '',
+                text: ''
             }),
 
             open: function () {
                 this.clear();
+                this.view.selectType(this.get('newScript').get('type'));
                 this.view.open();
             },
 
@@ -28,7 +32,10 @@ define('app/controllers/script_add', ['ember'],
             clear: function () {
                 this.get('newScript').setProperties({
                     name: '',
-                    url: ''
+                    url: '',
+                    type: this.view.get('scriptTypes')[0],
+                    entryPoint: '',
+                    text: '',
                 });
             },
         });
