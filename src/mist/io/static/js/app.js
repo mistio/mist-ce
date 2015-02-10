@@ -378,7 +378,7 @@ var loadApp = function (
     ImageListItem,
     ImageListView,
     IPAddressListItemView,
-    SingleKeyView,
+    KeyView,
     KeyAddView,
     KeyEditDialog,
     KeyListView,
@@ -386,7 +386,7 @@ var loadApp = function (
     LogListView,
     LogListItemView,
     LoginView,
-    SingleMachineView,
+    MachineView,
     MachineAddDialog,
     MachineKeysView,
     MachineKeysListItemView,
@@ -611,11 +611,14 @@ var loadApp = function (
     App.set('loginView', LoginView);
     App.set('logListView', LogListView);
     App.set('keyAddView', KeyAddView);
-    App.set('keyView', SingleKeyView);
-    App.set('missingView', MissingView);
+    App.KeyView = KeyView;
+    //App.set('keyView', SingleKeyView);
+    App.MissingView = MissingView;
+    //App.set('missingView', MissingView);
     App.set('metricNodeView', MetricNodeView);
     App.set('keyListView', KeyListView);
-    App.set('networkView', NetworkView);
+    App.NetworkView = NetworkView;
+    //App.set('networkView', NetworkView);
     App.set('userMenuView', UserMenuView);
     App.set('keyEditView', KeyEditDialog);
     App.set('backendAddView', BackendAdd);
@@ -626,7 +629,8 @@ var loadApp = function (
     App.set('fileUploadView', FileUploadView);
     App.set('messageboxView', MessageBoxView);
     App.set('machineMonitoringView', MachineMonitoringView);
-    App.set('machineView', SingleMachineView);
+    App.MachineView = MachineView;
+    //App.set('machineView', SingleMachineView);
     App.set('graphListView', GraphListView);
     App.set('graphListBarView', GraphListBarView);
     App.set('graphListControlView', GraphListControlView);
