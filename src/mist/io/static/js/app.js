@@ -284,6 +284,7 @@ var loadFiles = function (callback) {
         'app/controllers/notification',
         'app/controllers/rule_edit',
         'app/controllers/rules',
+        'app/controllers/script_add',
         'app/controllers/scripts',
         'app/views/backend_add',
         'app/views/backend_button',
@@ -332,6 +333,7 @@ var loadFiles = function (callback) {
         'app/views/rule_edit',
         'app/views/rule_list',
         'app/views/script',
+        'app/views/script_add',
         'app/views/script_list',
         'app/views/script_list_item',
         'app/views/subnet_list_item',
@@ -369,6 +371,7 @@ var loadApp = function (
     NotificationController,
     RuleEditController,
     RulesController,
+    ScriptAddController,
     ScriptsController,
     BackendAdd,
     BackendButton,
@@ -417,6 +420,7 @@ var loadApp = function (
     RuleEditView,
     RuleListView,
     ScriptView,
+    ScriptAddView,
     ScriptListView,
     ScriptListItemView,
     SubnetListItemView,
@@ -616,6 +620,7 @@ var loadApp = function (
 
     // Ember views
 
+    App.ScriptAddView = ScriptAddView;
     App.ScriptView = ScriptView;
     App.ScriptListView = ScriptListView;
     App.ScriptListItemView = ScriptListItemView;
@@ -700,6 +705,7 @@ var loadApp = function (
     App.set('networkCreateController', NetworkCreateController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
     App.set('scriptsController', ScriptsController.create());
+    App.set('scriptAddController', ScriptAddController.create());
 
     // Ember custom widgets
 
@@ -755,7 +761,9 @@ var loadApp = function (
     // Mist functions
 
     App.getViewName = function (view) {
-        return view.constructor.toString().split('.')[1].split('View')[0];
+        var name = view.constructor.toString().split('.')[1].split('View')[0];
+        // Ensure compatibility with new view name convention
+        return name.charAt(0).toLowerCase() + name.slice(1)
     };
 
     App.isScrolledToTop = function () {

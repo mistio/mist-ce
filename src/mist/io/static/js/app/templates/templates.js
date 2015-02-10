@@ -48,6 +48,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/rule_edit.html',
         'text!app/templates/rule.html',
         'text!app/templates/rule_list.html',
+        'text!app/templates/script_add.html',
         'text!app/templates/script_list.html',
         'text!app/templates/subnet_list_item.html',
         'text!app/templates/user_menu.html',
@@ -98,9 +99,10 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[43]);
         Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[44]);
         Ember.TEMPLATES['rule_list/html'] = Ember.Handlebars.compile(arguments[45]);
-        Ember.TEMPLATES['script_list/html'] = Ember.Handlebars.compile(arguments[46]);
-        Ember.TEMPLATES['subnet_list_item/html'] = Ember.Handlebars.compile(arguments[47]);
-        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[48]);
+        Ember.TEMPLATES['script_add/html'] = Ember.Handlebars.compile(arguments[46]);
+        Ember.TEMPLATES['script_list/html'] = Ember.Handlebars.compile(arguments[47]);
+        Ember.TEMPLATES['subnet_list_item/html'] = Ember.Handlebars.compile(arguments[48]);
+        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[49]);
         callback();
       });
       return;
