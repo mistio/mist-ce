@@ -2280,7 +2280,7 @@ def list_backends(user):
     ret = []
     for backend_id in user.backends:
         backend = user.backends[backend_id]
-        ret.append({'id': backend_id,
+        info = {'id': backend_id,
                     'apikey': backend.apikey,
                     'title': backend.title or backend.provider,
                     'provider': backend.provider,
@@ -2291,7 +2291,13 @@ def list_backends(user):
                     # for Provider.RACKSPACE (the new Nova provider)
                     ## 'datacenter': backend.datacenter,
                     'enabled': backend.enabled,
-                    'tenant_name': backend.tenant_name})
+                    'tenant_name': backend.tenant_name}
+
+        if backend.provider == 'docker':
+            info['docker_port'] = backend.docker_port
+
+        ret.append(info)
+
     return ret
 
 

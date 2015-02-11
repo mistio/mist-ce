@@ -9,6 +9,7 @@ from time import time
 from StringIO import StringIO
 
 import paramiko
+import websocket
 import socket
 
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
@@ -30,7 +31,7 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 
-class Shell(object):
+class ParamikoShell(object):
     """sHell
 
     This class takes care of all SSH related issues. It initiates a connection
@@ -353,3 +354,76 @@ class Shell(object):
 
     def __del__(self):
         self.disconnect()
+
+
+class DockerShell(object):
+    """
+    Docker Shell achieved through the docker hosts API, by opening a websocket
+    """
+    def __init__(self, host):
+        self.host = host
+        self.channel = websocket.WebSocket()
+
+    def autoconfigure(self, user, backend_id, machine_id, **kwargs):
+        log.info("autoconfiguring DockerShell for machine %s:%s",
+                 backend_id, machine_id)
+        if backend_id not in user.backends:
+            raise BackendNotFoundError(backend_id)
+
+        backend = user.backends[backend_id]
+        docker_port = backend.docker_port
+
+        uri = "ws://%s:%s/containers/%s/attach/ws?logs=1&stream=1&stdin=1&stdout=1&stderr=1" % \
+              (self.host, docker_port, machine_id)
+
+        try:
+            self.channel = self.channel.connect(uri)
+        except websocket.WebSocketException:
+            raise MachineUnauthorizedError()
+
+
+class Shell(object):
+    """
+    Proxy Shell Class to distinguish wether we are talking about Docker or Pramiko Shell
+    """
+    def __init__(self, host, provider=None, username=None, key=None, password=None, port=22, enforce_paramiko=False):
+        """
+
+        :param provider: If docker, then DockerShell
+        :param host: Host of machine/docker
+        :param enforce_paramiko: If True, then Paramiko even for Docker containers. This is useful
+        if we want SSH Connection to Docker containers
+        :return:
+        """
+
+        self._shell = None
+        self.host = host
+
+        if provider == 'docker' and not enforce_paramiko:
+            self._shell = DockerShell(host)
+        else:
+            self._shell = ParamikoShell(host, username=username, key=key, password=password, port=port)
+            self.ssh = self._shell.ssh
+
+    def autoconfigure(self, user, backend_id, machine_id, key_id=None,
+                      username=None, password=None, port=22):
+
+        if isinstance(self._shell, ParamikoShell):
+            return self._shell.autoconfigure(user, backend_id, machine_id, key_id=key_id,
+                                             username=username, password=password, port=port)
+
+    def connect(self, username, key=None, password=None, port=22):
+        if isinstance(self._shell, ParamikoShell):
+            self._shell.connect(username, key=key, password=password, port=port)
+
+    def disconnect(self):
+        if isinstance(self._shell, ParamikoShell):
+            self._shell.disconnect()
+
+    def command(self, cmd, pty=True):
+        if isinstance(self._shell, ParamikoShell):
+            return self._shell.command(cmd, pty=pty)
+
+    def command_stream(self, cmd):
+        if isinstance(self._shell, ParamikoShell):
+            yield self._shell.command_stream(cmd)
