@@ -85,6 +85,7 @@ class ShellNamespace(CustomNamespace):
         super(ShellNamespace, self).init()
         self.channel = None
         self.ssh_info = {}
+        self.provider = ''
 
     def on_shell_open(self, data):
         if self.ssh_info:
@@ -103,6 +104,10 @@ class ShellNamespace(CustomNamespace):
                 self.user, data['backend_id'], data['machine_id']
             )
         except Exception as exc:
+            log.info('------------------')
+            log.info("GOT EXCEPTION")
+            log.info('------------------')
+            log.info(str(exc))
             if isinstance(exc, MachineUnauthorizedError):
                 err = 'Permission denied (publickey).'
             else:
@@ -112,10 +117,11 @@ class ShellNamespace(CustomNamespace):
             self.disconnect()
             return
         self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
-        provider = data.get('provider', '')
-        if provider != 'docker':
+        self.provider = data.get('provider', '')
+        if self.provider != 'docker':
             self.channel = self.shell.ssh.invoke_shell('xterm', data['cols'], data['rows'])
-
+        else:
+            self.channel = self.shell.channel
         self.spawn(self.get_ssh_data)
 
     def on_shell_data(self, data):
@@ -130,9 +136,20 @@ class ShellNamespace(CustomNamespace):
 
     def get_ssh_data(self):
         try:
+            log.info('--------------')
+            log.info("GOT INTO GET SSH DATA")
+            if self.provider == 'docker':
+                self.channel.send('uptime\n')
             while True:
+                log.info('GOT INTO HERE1')
                 wait_read(self.channel.fileno())
-                data = self.channel.recv(1024).decode('utf-8','ignore')
+                log.info('GOT INTO HERE2')
+                try:
+                    data = self.channel.recv(1024).decode('utf-8','ignore')
+                except TypeError:
+                    log.info('GOT INTO HERE3')
+                    data = self.channel.recv().decode('utf-8','ignore')
+
                 if not len(data):
                     return
                 self.emit_shell_data(data)
