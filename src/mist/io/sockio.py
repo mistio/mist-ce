@@ -97,7 +97,7 @@ class ShellNamespace(CustomNamespace):
             'rows': data['rows'],
         }
         log.info("opened shell")
-        self.shell = Shell(data['host'])
+        self.shell = Shell(data['host'], provider=data.get('provider', ''))
         try:
             key_id, ssh_user = self.shell.autoconfigure(
                 self.user, data['backend_id'], data['machine_id']
