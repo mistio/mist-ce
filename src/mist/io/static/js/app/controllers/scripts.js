@@ -19,11 +19,10 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 that.set('addingScript', true);
                 Mist.ajax.POST('/scripts/', {
                     'name': args.script.name,
-                    'type': args.script.type.value,
-                    'source': args.script.source.value,
-                    'url': args.script.url,
+                    'exec_type': args.script.type.value,
+                    'locaction_type': args.script.source.value,
                     'entry_point': args.script.entryPoint,
-                    'script': args.script.script
+                    'script': args.script.script || args.script.url
                 }).success(function (script) {
                     that._addObject(script);
                 }).error(function (message) {
