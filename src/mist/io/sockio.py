@@ -98,15 +98,13 @@ class ShellNamespace(CustomNamespace):
             'rows': data['rows'],
         }
         log.info("opened shell")
+        self.provider = data.get('provider', '')
         self.shell = Shell(data['host'], provider=data.get('provider', ''))
         try:
             key_id, ssh_user = self.shell.autoconfigure(
                 self.user, data['backend_id'], data['machine_id']
             )
         except Exception as exc:
-            log.info('------------------')
-            log.info("GOT EXCEPTION")
-            log.info('------------------')
             log.info(str(exc))
             if isinstance(exc, MachineUnauthorizedError):
                 err = 'Permission denied (publickey).'
@@ -117,11 +115,7 @@ class ShellNamespace(CustomNamespace):
             self.disconnect()
             return
         self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
-        self.provider = data.get('provider', '')
-        if self.provider != 'docker':
-            self.channel = self.shell.ssh.invoke_shell('xterm', data['cols'], data['rows'])
-        else:
-            self.channel = self.shell.channel
+        self.channel = self.shell.invoke_shell('xterm', data['cols'], data['rows'])
         self.spawn(self.get_ssh_data)
 
     def on_shell_data(self, data):
@@ -136,19 +130,11 @@ class ShellNamespace(CustomNamespace):
 
     def get_ssh_data(self):
         try:
-            log.info('--------------')
-            log.info("GOT INTO GET SSH DATA")
             if self.provider == 'docker':
                 self.channel.send('uptime\n')
             while True:
-                log.info('GOT INTO HERE1')
                 wait_read(self.channel.fileno())
-                log.info('GOT INTO HERE2')
-                try:
-                    data = self.channel.recv(1024).decode('utf-8','ignore')
-                except TypeError:
-                    log.info('GOT INTO HERE3')
-                    data = self.channel.recv().decode('utf-8','ignore')
+                data = self.shell.recv(1024).decode('utf-8', 'ignore')
 
                 if not len(data):
                     return

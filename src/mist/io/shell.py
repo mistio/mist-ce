@@ -362,7 +362,7 @@ class DockerShell(object):
     """
     def __init__(self, host):
         self.host = host
-        self.channel = websocket.WebSocket()
+        self.ws = websocket.WebSocket()
         self.uri = ""
 
     def autoconfigure(self, user, backend_id, machine_id, **kwargs):
@@ -377,29 +377,22 @@ class DockerShell(object):
         self.uri = "ws://%s:%s/containers/%s/attach/ws?logs=1&stream=1&stdin=1&stdout=1&stderr=1" % \
                    (self.host, docker_port, machine_id)
 
-        log.info('----------------')
-        log.info("GOT INTO SELF.URI")
-        log.info('----------------')
         log.info(self.uri)
 
+        self.connect()
+
+        # This need in order to be consistent with the ParamikoShell
+        return None, None
+
+    def connect(self):
         try:
-            self.channel.connect(self.uri)
+            self.ws.connect(self.uri)
         except websocket.WebSocketException:
             raise MachineUnauthorizedError()
-        except Exception as exc:
-            log.info('--------------------')
-            log.info('GOT EXCEPTION')
-            log.info(exc)
-
-
-        return "", ""
 
     def disconnect(self, **kwargs):
         try:
-            log.info('------------------')
-            log.info('closing Docker Websockert')
-            log.info('-------------')
-            self.channel.close()
+            self.ws.close()
         except:
             pass
 
@@ -409,7 +402,7 @@ class DockerShell(object):
 
 class Shell(object):
     """
-    Proxy Shell Class to distinguish wether we are talking about Docker or Pramiko Shell
+    Proxy Shell Class to distinguish weather we are talking about Docker or Pramiko Shell
     """
     def __init__(self, host, provider=None, username=None, key=None, password=None, port=22, enforce_paramiko=False):
         """
@@ -423,16 +416,12 @@ class Shell(object):
 
         self._shell = None
         self.host = host
-
-        log.info('--------------------')
-        log.info(provider)
-        log.info('--------------------')
+        self.channel = None
 
         if provider == 'docker' and not enforce_paramiko:
             self._shell = DockerShell(host)
         else:
             self._shell = ParamikoShell(host, username=username, key=key, password=password, port=port)
-            self.ssh = self._shell.ssh
 
     def autoconfigure(self, user, backend_id, machine_id, key_id=None,
                       username=None, password=None, port=22):
@@ -440,17 +429,27 @@ class Shell(object):
         if isinstance(self._shell, ParamikoShell):
             return self._shell.autoconfigure(user, backend_id, machine_id, key_id=key_id,
                                              username=username, password=password, port=port)
-        else:
-            log.info("GOT IN HERE")
-            key_id, ssh_user = self._shell.autoconfigure(user, backend_id, machine_id)
-            log.info("KEY_ID:%s SSH_USER:%s" % (key_id, ssh_user))
-            self.channel=self._shell.channel
-            log.info("READY TO GET OYT")
-            return key_id, ssh_user
+        elif isinstance(self._shell, DockerShell):
+            return self._shell.autoconfigure(user, backend_id, machine_id)
 
     def connect(self, username, key=None, password=None, port=22):
         if isinstance(self._shell, ParamikoShell):
             self._shell.connect(username, key=key, password=password, port=port)
+        elif isinstance(self._shell, DockerShell):
+            self._shell.connect()
+
+    def invoke_shell(self, term='xterm', cols=None, rows=None):
+        if isinstance(self._shell, ParamikoShell):
+            self._shell.ssh.invoke_shell(term, cols, rows)
+            return self._shell.ssh
+        elif isinstance(self._shell, DockerShell):
+            return self._shell.ws
+
+    def recv(self, default=1024):
+        if isinstance(self._shell, ParamikoShell):
+            return self._shell.ssh.recv(default)
+        elif isinstance(self._shell, DockerShell):
+            return self._shell.ws.recv()
 
     def disconnect(self):
             self._shell.disconnect()
