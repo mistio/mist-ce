@@ -48,7 +48,14 @@ define('app/views/script_add', ['app/views/panel'],
 
             isReady: function () {
                 var script = Mist.scriptAddController.get('newScript');
-                return script.get('name') && script.get('url');
+                var name = script.get('name');
+                var type = script.get('type');
+                var source = script.get('source');
+                if (!type || !source || !name)
+                    return false;
+                if (source.value == 'inline')
+                    return script.get('script');
+                return script.get('url');
             }.property(
                 'Mist.scriptAddController.newScript.name',
                 'Mist.scriptAddController.newScript.url'
