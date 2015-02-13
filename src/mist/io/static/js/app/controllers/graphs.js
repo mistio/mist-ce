@@ -118,10 +118,10 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _clear: function () {
                 this.setProperties({
-                    'isOpen': null,
+                    'isOpen': false,
                     'content': [],
                 });
-                this.config.setProperties({
+                this.get('config').setProperties({
                     canModify: true,
                     canControl: true,
                     canMinimize: true,
@@ -135,7 +135,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _fetchStats: function (args) {
 
-                if (this.isClosed) return;
+                if (!this.get('isOpen')) return;
 
                 if (DEBUG_STATS) {
                     info('Requesting stats from: ' +
