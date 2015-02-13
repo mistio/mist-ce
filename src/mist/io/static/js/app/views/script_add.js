@@ -146,6 +146,10 @@ define('app/views/script_add', ['app/views/panel'],
 
                 backClicked: function () {
                     Mist.scriptAddController.close();
+                },
+
+                addClicked: function () {
+                    Mist.scriptAddController.add();
                 }
             },
 

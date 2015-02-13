@@ -27,6 +27,18 @@ define('app/controllers/script_add', ['ember'],
                 this.view.open();
             },
 
+            add: function () {
+                var that = this;
+                Mist.scriptsController.addScript({
+                    script: that.get('newScript'),
+                    callback: function (success) {
+                        if (success)
+                            that.close();
+                    }
+                })
+            },
+
+
             close: function () {
                 this.clear();
                 this.view.close();
