@@ -29,6 +29,9 @@ exception handler.
 """
 
 
+import traceback
+
+
 class MistError(Exception):
     """All custom mist exceptions should subclass this one.
 
@@ -39,7 +42,11 @@ class MistError(Exception):
     msg = "Mist Error"
     http_code = 500
 
-    def __init__(self, msg=None):
+    def __init__(self, msg=None, exc=None):
+        if exc is None and isinstance(msg, Exception):
+            msg, exc = repr(msg), msg
+        self.orig_exc = exc if isinstance(exc, Exception) else None
+        self.orig_traceback = traceback.format_exc()
         msg = "%s: %s" % (self.msg, msg) if msg is not None else self.msg
         super(MistError, self).__init__(msg)
 
