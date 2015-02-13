@@ -2021,3 +2021,69 @@ var PROVIDER_MAP = {
         }
     ]
 };
+
+/*
+var SCRIPT_ADD_FIELDS = [
+    {
+        name: 'name',
+        type: 'text'
+    },
+    {
+        name: 'type',
+        type: 'select',
+        options: [
+            {
+                value: 'executable',
+                selected: true
+            },
+            {
+                value: 'ansible'
+            }
+        ]
+    },
+    {
+        name: 'source',
+        type: 'select',
+        options: [
+            {
+                value: 'github',
+                selected: true
+            },
+            {
+                value: 'url',
+            },
+            {
+                value: 'inline'
+            }
+        ]
+    },
+    {
+        conditional: {
+            source: 'url',
+            source: 'github'
+        },
+        fields: [
+            {
+                name: 'url',
+                type: 'text'
+            },
+            {
+                name: 'entry_point',
+                type: 'text',
+                optional: true
+            }
+        ]
+    },
+    {
+        conditional: {
+            source: 'inline'
+        },
+        fields: [
+            {
+                name: 'script',
+                type: 'text'
+            }
+        ]
+    }
+];
+*/

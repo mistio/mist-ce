@@ -8,6 +8,8 @@ define('app/controllers/script_add', ['ember'],
 
         'use strict';
 
+        var GITHUB_URL = 'https://github.com/';
+
         return Ember.Object.extend({
 
             newScript: Ember.Object.create({
@@ -15,12 +17,13 @@ define('app/controllers/script_add', ['ember'],
                 url: '',
                 type: {},
                 entryPoint: '',
-                text: ''
+                text: '',
+                source: {}
             }),
 
             open: function () {
                 this.clear();
-                this.view.selectType(this.get('newScript').get('type'));
+                this.view.clear();
                 this.view.open();
             },
 
@@ -33,11 +36,27 @@ define('app/controllers/script_add', ['ember'],
                 this.get('newScript').setProperties({
                     name: '',
                     url: '',
-                    type: this.view.get('scriptTypes')[0],
+                    type: '',
                     entryPoint: '',
                     text: '',
+                    source: ''
                 });
             },
+
+
+            sourceObserver: function () {
+                this.get('newScript').setProperties({
+                    url: '',
+                    entryPoint: '',
+                })
+            }.observes('newScript.source'),
+
+
+            urlObserver: function () {
+                if (this.get('newScript').get('source').value == 'github')
+                    if (this.get('newScript').get('url').indexOf(GITHUB_URL) != 0)
+                        this.get('newScript').set('url', GITHUB_URL);
+            }.observes('newScript.url', 'newScript.source')
         });
     }
 );

@@ -10,55 +10,150 @@ define('app/views/script_add', ['app/views/panel'],
 
         return PanelView.extend({
 
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
             scriptTypes: [{
+                label: 'Ansible Playbook',
+                value: 'ansible'
+            }, {
+                label: 'Executable',
+                value: 'executable'
+            }],
+
+
+            scriptSources: [{
                 label: 'Github',
                 value: 'github'
             }, {
-                label: 'Url',
-                value: 'url'
+                label: 'URL',
+                value: 'url',
             }, {
-                label: 'File',
-                value: 'file'
+                label: 'Inline',
+                value: 'inline'
             }],
 
-            load: function () {
-                this.$('.type').hide();
-            }.on('didInsertElement'),
+
+            //
+            //
+            //  Computed Properties
+            //
+            //
+
+
+            isReady: function () {
+                var script = Mist.scriptAddController.get('newScript');
+                return script.get('name') && script.get('url');
+            }.property(
+                'Mist.scriptAddController.newScript.name',
+                'Mist.scriptAddController.newScript.url'
+            ),
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            clear: function () {
+                this.$('.source').hide();
+                this.hideTypeSelect();
+                this.closeTypeSelect();
+                this.hideSourceSelect();
+                this.closeSourceSelect();
+            },
+
 
             selectType: function (type) {
-                if (type.value == Mist.scriptAddController.get('newScript').get('value'))
-                    return;
-                this.$('.type').hide();
-                this.$('.'+type.value).show();
-                this.$('.ui-collapsible').collapsible('collapse');
+                this.closeTypeSelect();
+                this.showSourceSelect();
                 Mist.scriptAddController.get('newScript').set('type', type);
             },
 
+
+            selectSource: function (source) {
+                this.closeSourceSelect();
+                this.showSourceBundle(source);
+                Mist.scriptAddController.get('newScript').set('source', source);
+            },
+
+
+            showTypeSelect: function () {
+                this.$('#script-add-type').slideDown();
+            },
+
+
+            hideTypeSelect: function () {
+                this.$('#script-add-type').hide();
+            },
+
+            closeTypeSelect: function () {
+                this.$('#script-add-type .mist-select').collapsible('collapse');
+            },
+
+
+            hideSourceSelect: function () {
+                this.$('#script-add-source').hide()
+            },
+
+
+            showSourceSelect: function () {
+                this.$('#script-add-source').slideDown();
+            },
+
+
+            closeSourceSelect: function () {
+                this.$('#script-add-source .mist-select').collapsible('collapse');
+            },
+
+
+            showSourceBundle: function (source) {
+                this.$('.source').hide();
+                this.$('.'+source.value).slideDown();
+            },
+
+
+            //
+            //
+            //  Actions
+            //
+            //
+
+
             actions: {
-                typeSelected: function (type) {
+
+                selectType: function (type) {
                     this.selectType(type);
                 },
-                uploadFile: function (field) {
-                    Mist.fileUploadController.open('Upload Script', 'Script',
-                        function (uploadedFile) {
-                            uploadedFile = uploadedFile.trim();
-                            Mist.scriptAddController.get('newScript').set('text', uploadedFile);
-                        },
-                        Mist.scriptAddController.get('newScript').get('text')
-                    );
+
+                selectSource: function (source) {
+                    this.selectSource(source);
                 },
+
                 backClicked: function () {
                     Mist.scriptAddController.close();
                 }
             },
 
-            isReady: function () {
-                var script = Mist.scriptAddController.get('newScript');
-                return script.get('name').length && script.get('url').length;
-            }.property(
-                'Mist.scriptAddController.newScript.name',
-                'Mist.scriptAddController.newScript.url'
-            )
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            nameObserver: function () {
+                if (Mist.scriptAddController.newScript.name)
+                    this.showTypeSelect();
+            }.observes('Mist.scriptAddController.newScript.name'),
         });
     }
 );
