@@ -1166,10 +1166,6 @@ def get_machine_actions(machine_from_api, conn, extra):
         # in libvirt a terminated machine can be started
             can_start = True
 
-    if conn.type is Provider.GCE:
-        can_start = False
-        can_stop = False
-
     if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
         # allow only reboot action for libvirt hypervisor
         can_stop = False
@@ -2182,16 +2178,11 @@ def list_images(user, backend_id, term=None):
             ec2_images += conn.list_images(ex_owner="amazon")
             ec2_images += conn.list_images(ex_owner="self")
         elif conn.type == Provider.GCE:
-            # Currently not other way to receive all images :(
             rest_images = conn.list_images()
-            for OS in config.GCE_IMAGES:
-                try:
-                    gce_images = conn.list_images(ex_project=OS)
-                    rest_images += gce_images
-                except:
-                    #eg ResourceNotFoundError
-                    pass
-            rest_images = [image for image in rest_images if not image.extra['deprecated']]
+            for gce_image in rest_images:
+                if gce_image.extra.get('licenses'):
+                    gce_image.extra['licenses'] = None
+            # GCE has some objects in extra so we make sure they are not passed
         elif conn.type == Provider.AZURE:
             # do not show Microsoft Windows images
             # from Azure's response we can't know which images are default
