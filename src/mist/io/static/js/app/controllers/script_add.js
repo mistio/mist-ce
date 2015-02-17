@@ -51,18 +51,10 @@ define('app/controllers/script_add', ['ember'],
                     type: '',
                     entryPoint: '',
                     text: '',
-                    source: ''
+                    source: '',
+                    script: ''
                 });
             },
-
-
-            sourceObserver: function () {
-                this.get('newScript').setProperties({
-                    url: '',
-                    entryPoint: '',
-                })
-            }.observes('newScript.source'),
-
 
             urlObserver: function () {
                 if (this.get('newScript').get('source').value == 'github')

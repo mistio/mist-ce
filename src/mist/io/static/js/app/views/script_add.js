@@ -8,6 +8,16 @@ define('app/views/script_add', ['app/views/panel'],
 
         'use strict';
 
+        var DEFAULT_URL = 'http://';
+        var DEFAULT_GITHUB_URL = 'https://github.com/owner/repo';
+        var DEFAULT_SCRIPT = '#!/bin/bash\necho "hello world"';
+        var DEFAULT_ANSIBLE_SCRIPT = '- name: Dummy ansible playbook\n' +
+            '   hosts: localhost\n' +
+            '   tasks:\n' +
+            '    - name: Dummy task\n' +
+            '      debug:\n' +
+            '        msg: "Hello World"\n';
+
         return PanelView.extend({
 
 
@@ -82,13 +92,32 @@ define('app/views/script_add', ['app/views/panel'],
                 this.closeTypeSelect();
                 this.showSourceSelect();
                 Mist.scriptAddController.get('newScript').set('type', type);
+                this.setScript();
+            },
+
+
+            setScript: function () {
+                var newScript = Mist.scriptAddController.get('newScript');
+                var type = newScript.get('type');
+                if (type.value == 'ansible')
+                    newScript.set('script', DEFAULT_ANSIBLE_SCRIPT);
+                if (type.value == 'executable')
+                    newScript.set('script', DEFAULT_SCRIPT);
             },
 
 
             selectSource: function (source) {
                 this.closeSourceSelect();
                 this.showSourceBundle(source);
-                Mist.scriptAddController.get('newScript').set('source', source);
+                var newScript = Mist.scriptAddController.get('newScript');
+                newScript.set('source', source);
+                if (source.value == 'url')
+                    newScript.set('url', DEFAULT_URL);
+                if (source.value == 'github')
+                    newScript.set('url', DEFAULT_GITHUB_URL);
+                if (source.value == 'inline')
+                    this.setScript();
+
             },
 
 
