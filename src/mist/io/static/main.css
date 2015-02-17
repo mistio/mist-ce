@@ -2,9 +2,9 @@
 /* Import css files
 -----------------------------------------------------------------------------------------------------------*/
 
-@import url('images/sprite-build/sprites.css');
 @import url('jquery.mobile.structure-1.4.5.min.css');
 @import url('theme.css');
+@import url('images/sprite-build/sprites.css');
 @import url("css/key.css");
 @import url("css/home.css");
 @import url("css/rules.css");
