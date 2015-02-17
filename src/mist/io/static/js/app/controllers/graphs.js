@@ -380,22 +380,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                             return;
                         }
 
-                        // Calculate new time boundaries
-                        var oldFrom = this.parent.fetchStatsArgs.from;
-                        var oldUntil = this.parent.fetchStatsArgs.until;
-
-                        var middle = oldFrom + ((oldUntil - oldFrom) / 2);
-
-                        var newFrom = middle - (newTimeWindow / 2);
-                        var newUntil = middle + (newTimeWindow / 2);
-
-                        if (this.parent.history.isInFuture(newUntil))
-                            this.parent.stream.start();
-                        else
-                            this.parent._fetchStats({
-                                from: newFrom,
-                                until: newUntil,
-                            });
+                        this.parent.stream.start();
                     }
                 }
             }),
