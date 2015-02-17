@@ -361,7 +361,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 //
 
 
-                change: function (newTimeWindow, forceChange) {
+                change: function (newTimeWindow, forceChange, rangeStart, rangeEnd) {
 
                     var newTimeWindow = TIME_WINDOW_MAP[newTimeWindow];
                     var oldTimeWindow = this.parent.config.timeWindow;

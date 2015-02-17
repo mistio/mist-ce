@@ -224,10 +224,29 @@ define('app/views/machine_monitoring',
                     Mist.graphsController.stream.stop();
                 },
 
+                rangeBackClicked: function () {
+                    this.$('#pick-range').popup('close');
+                },
+
+                rangeOkClicked: function () {
+                    var rangeStart = this.$('#pick-range #range-start').val();
+                    var rangeStop = this.$('#pick-range #range-stop').val();
+                    info(rangeStart, rangeStop);
+                    this.$('#pick-range').popup('close');
+                },
 
                 timeWindowChanged: function () {
                     var newTimeWindow = $('#time-window-control select').val();
-                    Mist.graphsController.resolution.change(newTimeWindow);
+                    if (newTimeWindow != 'range'){
+                        Mist.graphsController.resolution.change(newTimeWindow);
+                    } else {
+                        var justAGraph = Mist.graphsController.content[0];
+                        var startTime = justAGraph.getFirstDatapoint().time;
+                        var endTime = justAGraph.getLastDatapoint().time;
+                        $('#pick-range #range-start').val(startTime);
+                        $('#pick-range #range-stop').val(endTime);
+                        this.$('#pick-range').popup('open');
+                    }
 
                     // Update cookie
                     var entry = Mist.cookiesController.getSingleMachineEntry(
@@ -459,11 +478,11 @@ define('app/views/machine_monitoring',
                         canModify: true,
                         canControl: true,
                         canMinimize: true,
-                        timeWindow: cookie.timeWindow,
                     }
                 });
 
                 Ember.run.next(function () {
+                    return;
                     $('#time-window-control select')
                         .val(cookie.timeWindow)
                         .trigger('change');

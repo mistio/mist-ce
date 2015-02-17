@@ -48,6 +48,7 @@
                     <option value="day">last 1 day</option>
                     <option value="week">last 1 week</option>
                     <option value="month">last 1 month</option>
+                    <option value="range">Range</option>
             </select>
         </div>
 
@@ -65,4 +66,61 @@
             {{action "backClicked" target="view.actionProxy"}}>
         </a>
     </div>
+
+    <!--
+        Pick Range Popup
+    -->
+
+    <div id="pick-range-screen"
+        class="ui-popup-screen ui-overlay-b ui-screen-hidden">
+    </div>
+    <div id="pick-range-popup"
+        class="flip
+            ui-popup-container
+            ui-popup-hidden
+            ui-popup-truncate">
+        <div id="pick-range"
+            class="small-popup
+                ui-popup
+                ui-body-inherit
+                ui-overlay-shadow
+                ui-corner-all"
+            data-role="popup"
+            data-enhanced="true"
+            data-position-to="origin"
+            data-transition="flip">
+
+            <div class="ui-header ui-bar-b" role="banner">
+                <h1 class="ui-title">Select Range</h1>
+            </div>
+            <div class="ui-content ui-body-a" role="main">
+                <label>From</label>
+                {{view Mist.TextField
+                    id="range-start"
+                    placeholder="range start"}}
+                <label>To</label>
+                {{view Mist.TextField
+                    id="range-stop"
+                    placeholder="range stop"}}
+                <div class="ok-cancel
+                        ui-controlgroup
+                        ui-controlgroup-horizontal
+                        ui-group-theme-a
+                        ui-corner-all"
+                    data-role="controlgroup"
+                    data-type="horizontal">
+
+                    <a class="ui-btn"
+                        {{action "rangeBackClicked" target="view.actionProxy"}}>
+                            Back
+                    </a>
+                    <a id="key-add-ok" class="ui-btn ui-btn-d"
+                        {{action "rangeOkClicked" target="view.actionProxy"}}>
+                            OK
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
