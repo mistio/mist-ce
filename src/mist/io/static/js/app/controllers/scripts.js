@@ -17,10 +17,10 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
 
                 var that = this;
                 that.set('addingScript', true);
-                Mist.ajax.POST('/scripts/', {
+                Mist.ajax.POST('/scripts', {
                     'name': args.script.name,
                     'exec_type': args.script.type.value,
-                    'locaction_type': args.script.source.value,
+                    'location_type': args.script.source.value,
                     'entry_point': args.script.entryPoint,
                     'script': args.script.script || args.script.url
                 }).success(function (script) {
