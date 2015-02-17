@@ -102,6 +102,7 @@
             <h4>Basic Info</h4>
 
             <table class="info-table">
+                <tbody>
                 <tr>
                     <td>Last probed</td>
                     <td> {{#if probing}}
@@ -197,6 +198,7 @@
                         <td>{{value}}</td>
                     </tr>
                 {{/each}}
+            </tbody>
             </table>
         </div>
 
@@ -206,12 +208,14 @@
                 <h4>Full metadata list</h4>
 
                 <table class="info-table">
+                    <tbody>
                     {{#each view.metadata}}
                         <tr>
                             <td>{{key}}</td>
                             <td>{{value}}</td>
                         </tr>
                     {{/each}}
+                    </tbody>
                 </table>
 
             </div>

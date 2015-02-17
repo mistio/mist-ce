@@ -26,6 +26,10 @@ define('app/models/log', ['ember'],
             machineId: null,
             mode: null,
 
+
+            load: function () {
+                this.set('date', new Date(this.get('time') * 1000));
+            }.on('init'),
         });
     }
 );

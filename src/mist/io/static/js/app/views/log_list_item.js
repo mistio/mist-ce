@@ -57,12 +57,12 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
 
             prettyTime: function () {
-                return Mist.dateFromNow(this.get('log').get('time'));
+                return this.get('log').get('date').getTimeFromNow();
             }.property('log.time'),
 
 
             fullPrettyTime: function () {
-                return Mist.prettyDateTime(this.get('log').get('time'));
+                return this.get('log').get('date').getPrettyDateTime();
             }.property('log.time'),
 
 

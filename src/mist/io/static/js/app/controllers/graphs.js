@@ -136,14 +136,12 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 if (this.isClosed) return;
 
-                // Log requests ///////////////////////////////
-                if (Mist.debugStats) {
+                if (DEBUG_STATS) {
                     info('Requesting stats from: ' +
-                        Mist.prettyTime(new Date(args.from)) +
+                        new Date(args.from).getPrettyDateTime() +
                         ' until: ' +
-                        Mist.prettyTime(new Date(args.until)));
+                        new Date(args.until).getPrettyDateTime());
                 }
-                ////////////////////////////////////////////////
 
                 this._clearPendingRequests();
                 this.setProperties({

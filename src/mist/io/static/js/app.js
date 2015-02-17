@@ -1,6 +1,8 @@
 startTimer();
 
 DEBUG_SOCKET = false;
+DEBUG_STATS = false;
+DEBUG_LOGS = false;
 
 // Define libraries
 require.config({
@@ -8,7 +10,7 @@ require.config({
     waitSeconds: 200,
     paths: {
         text: 'lib/require/text',
-        ember: 'lib/ember-1.5.1.min',
+        ember: 'lib/ember-1.6.0.min',
         jquery: 'lib/jquery-2.1.1.min',
         jqm: 'lib/jquery.mobile-1.4.5.min',
         handlebars: 'lib/handlebars-1.3.0.min',
@@ -424,7 +426,6 @@ var loadApp = function (
     });
 
     // Globals
-    App.set('debugStats', false);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
@@ -738,24 +739,6 @@ var loadApp = function (
 
     // Mist functions
 
-    App.prettyTime = function(date) {
-
-        var showDate = false;
-        if (date.getMonth() != new Date().getMonth()) {
-            showDate = true;
-            var day = date.getUTCDate();
-            var month = date.getMonth();
-        }
-
-        var hour = date.getHours();
-        var min = date.getMinutes();
-        var sec = date.getSeconds();
-        return (showDate ? day + '/' + month + ' ': '') +
-            (hour < 10 ? '0' : '') + hour + ':' +
-            (min < 10 ? '0' : '') + min + ':' +
-            (sec < 10 ? '0' : '') + sec;
-    };
-
     App.getViewName = function (view) {
         return view.constructor.toString().split('.')[1].split('View')[0];
     };
@@ -778,11 +761,6 @@ var loadApp = function (
             newArray.push(App.capitalize(string));
         });
         return newArray;
-    };
-
-    App.getSortMonthName = function (date) {
-        return ['Jan','Feb','Mar','Apr','May','Jun','Jul',
-        'Aug','Sep','Oct','Nov','Dec'][date.getMonth()];
     };
 
     App.decapitalizeArray = function (array) {
@@ -858,16 +836,6 @@ var loadApp = function (
             element.slideUp();
     };
 
-    App.arrayToListString = function(array, attribute) {
-        var listString = '';
-        array.forEach(function(item, index) {
-            listString += item[attribute];
-            if (index < array.length - 1)
-                listString += ', ';
-        });
-        return listString;
-    };
-
     App.splitWords = function (string) {
         if (string.indexOf('-') > -1)
             return string.split('-');
@@ -883,62 +851,6 @@ var loadApp = function (
             return App.splitWords(string);
         }
         return [string];
-    };
-
-    App.dateFromNow = function (date) {
-
-        // Convert timestamps to date
-        if (!(date instanceof Date))
-            date = new Date(parseInt(date) * 1000);
-
-        var now = new Date();
-        var diff = now - date;
-        var ret = '';
-
-        if (diff < 10 * TIME_MAP.SECOND)
-            ret = 'Now';
-
-        else if (diff < TIME_MAP.MINUTE)
-            ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
-
-        else if (diff < TIME_MAP.HOUR)
-            ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
-
-        else if (diff < TIME_MAP.DAY)
-            ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
-
-        else if (diff < 2 * TIME_MAP.DAY)
-            ret = 'Yesterday';
-
-        else if (diff < TIME_MAP.YEAR)
-            ret = Mist.getSortMonthName(date) + ' ' + date.getUTCDate();
-
-        if (ret.indexOf('sec') > -1 ||
-            ret.indexOf('min') > -1 ||
-            ret.indexOf('hour') > -1) {
-
-            // Add 's' for plural
-            if (ret.split(' ')[0] != '1')
-                ret = ret + 's';
-
-            ret = ret + ' ago';
-        }
-
-        return ret;
-    };
-
-    App.getMonthName = function (date) {
-        return ['January','February','March','April','May','June','July',
-        'August','September','October','November','December'][date.getMonth()];
-    };
-
-    App.prettyDateTime = function(date) {
-        date = parseInt(date);
-        var prt_date = new Date(date*1000);
-        var hour = prt_date.getHours();
-        var min = prt_date.getMinutes();
-        var sec = prt_date.getSeconds();
-        return App.getMonthName(prt_date) + ' ' + prt_date.getDate() + ', ' + prt_date.getFullYear() + ", " + (hour < 10 ? '0' : '') + hour + ':' + (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
     };
 };
 
@@ -1255,7 +1167,7 @@ function Socket (args) {
             // (which is saved in cb variable)
             callback = function (data) {
                 if (DEBUG_SOCKET)
-                    info(Mist.prettyTime(new Date()) +
+                    info(new Date().getPrettyTime() +
                         ' | ' + namespace + '/' + event + ' ', data);
                 cb(data);
             };
@@ -1415,7 +1327,7 @@ function Socket_ (args) {
             if (!DEBUG_SOCKET)
                 return;
             var args = slice(arguments);
-            var preText = Mist.prettyTime(new Date()) +
+            var preText = new Date().getPrettyTime() +
                 ' | ' + this.get('namespace');
             args.unshift(preText);
             console.log.apply(console, args);
@@ -1622,6 +1534,89 @@ function parseProviderMap () {
     });
 }
 
+
+//
+//
+//  PROTOTYPE EXTENTIONS
+//
+//
+
+
+Date.prototype.getPrettyTime = function () {
+
+    var hour = this.getHours();
+    var min = this.getMinutes();
+    var sec = this.getSeconds();
+
+    var ret = (hour < 10 ? '0' : '') + hour + ':' +
+        (min < 10 ? '0' : '') + min + ':' +
+        (sec < 10 ? '0' : '') + sec;
+
+    return ret;
+}
+
+Date.prototype.getPrettyDate = function () {
+    return this.getMonthName() + ' ' + this.getDate() + ', ' + this.getFullYear();
+}
+
+Date.prototype.getPrettyDateTime = function () {
+    return this.getPrettyDate() + ', ' + this.getPrettyTime();
+}
+
+Date.prototype.getMonthName = function (short) {
+    if (short)
+        return ['Jan','Feb','Mar','Apr','May','Jun','Jul',
+            'Aug','Sep','Oct','Nov','Dec'][this.getMonth()];
+    return ['January','February','March','April','May','June','July',
+        'August','September','October','November','December'][this.getMonth()];
+}
+
+Date.prototype.getTimeFromNow = function () {
+
+    var now = new Date();
+    var diff = now - this;
+    var ret = '';
+
+    if (diff < 10 * TIME_MAP.SECOND)
+        ret = 'Now';
+
+    else if (diff < TIME_MAP.MINUTE)
+        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
+
+    else if (diff < TIME_MAP.HOUR)
+        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
+
+    else if (diff < TIME_MAP.DAY)
+        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
+
+    else if (diff < 2 * TIME_MAP.DAY)
+        ret = 'Yesterday';
+
+    else if (diff < TIME_MAP.YEAR)
+        ret = this.getMonthName(true) +  ' ' + this.getDate();
+
+    if (ret.indexOf('sec') > -1 ||
+        ret.indexOf('min') > -1 ||
+        ret.indexOf('hour') > -1) {
+
+        // Add 's' for plural
+        if (ret.split(' ')[0] != '1')
+            ret = ret + 's';
+
+        ret = ret + ' ago';
+    }
+
+    return ret;
+}
+
+
+Array.prototype.toStringByProperty = function (property) {
+    return this.map(function (object) {
+        return object[property];
+    }).join(', ');
+}
+
+
 //  GLOBAL DEFINITIONS
 
 var DISPLAYED_DATAPOINTS = 60;
@@ -1645,16 +1640,6 @@ var DIALOG_TYPES = {
 };
 
 var EMAIL_REGEX = /(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
-
-Array.prototype.unique = function() {
-    var unique = [];
-    for (var i = 0; i < this.length; i++) {
-        if (unique.indexOf(this[i]) == -1) {
-            unique.push(this[i]);
-        }
-    }
-    return unique;
-};
 
 var PROVIDER_MAP = {
 

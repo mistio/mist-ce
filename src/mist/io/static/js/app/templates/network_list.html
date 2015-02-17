@@ -31,7 +31,7 @@
                 {{#if this.enabled}}
                   {{#each this.networks}}
                         {{view Mist.networkListItemView
-                            networkBinding=this
+                            networkBinding="this"
                             class="checkbox-link"}}
                   {{/each}}
                 {{/if}}

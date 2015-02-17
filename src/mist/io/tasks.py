@@ -368,10 +368,14 @@ class UserTask(Task):
         if cached_err:
             # task has been failing recently
             if seq_id != cached_err['seq_id']:
-                # other sequence of task already handling this error flow
-                # This is not working! Passing instead
-                #return
-                pass
+                if seq_id:
+                    # other sequence of tasks has taken over
+                    return
+                else:
+                    # taking over from other sequence
+                    cached_err = None
+                    # cached err will be deleted or overwritten in a while
+                    #self.memcache.delete(cache_key + 'error')
         if not amqp_user_listening(email):
             # noone is waiting for result, stop trying, but flush cached erros
             if cached_err:
@@ -485,7 +489,7 @@ class ListNetworks(UserTask):
         from mist.io import methods
         user = user_from_email(email)
         networks = methods.list_networks(user, backend_id)
-        log.warn('Returning list networks for user %s backend %s' % (email, backend_id))        
+        log.warn('Returning list networks for user %s backend %s' % (email, backend_id))
         return {'backend_id': backend_id, 'networks': networks}
 
 
@@ -497,11 +501,11 @@ class ListImages(UserTask):
     polling = False
 
     def execute(self, email, backend_id):
-        log.warn('Running list images for user %s backend %s' % (email, backend_id))        
+        log.warn('Running list images for user %s backend %s' % (email, backend_id))
         from mist.io import methods
         user = user_from_email(email)
         images = methods.list_images(user, backend_id)
-        log.warn('Returning list images for user %s backend %s' % (email, backend_id))                
+        log.warn('Returning list images for user %s backend %s' % (email, backend_id))
         return {'backend_id': backend_id, 'images': images}
 
 
