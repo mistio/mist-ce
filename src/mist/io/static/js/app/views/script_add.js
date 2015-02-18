@@ -68,7 +68,10 @@ define('app/views/script_add', ['app/views/panel'],
                 return script.get('url');
             }.property(
                 'Mist.scriptAddController.newScript.name',
-                'Mist.scriptAddController.newScript.url'
+                'Mist.scriptAddController.newScript.source',
+                'Mist.scriptAddController.newScript.type',
+                'Mist.scriptAddController.newScript.url',
+                'Mist.scriptAddController.newScript.script'
             ),
 
 
@@ -117,7 +120,6 @@ define('app/views/script_add', ['app/views/panel'],
                     newScript.set('url', DEFAULT_GITHUB_URL);
                 if (source.value == 'inline')
                     this.setScript();
-
             },
 
 
