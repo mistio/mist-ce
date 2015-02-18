@@ -170,6 +170,8 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     var value = this.$('#script select').val();
                     this.$('.script-option').hide();
                     this.$('.'+value).show();
+                    Mist.machineAddController.set('newMachineScript', '');
+                    Mist.machineAddController.set('newMachineScriptParams', '');
                     Mist.machineAddController.set('hasScript', value == 'advanced');
                 },
 
