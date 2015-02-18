@@ -1172,11 +1172,20 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_destroy = False
         can_start = False
 
+    if conn.type in (config.EC2_PROVIDERS, Provider.LINODE,
+                     Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
+                     Provider.DOCKER):
+        can_rename = True
+    else:
+        can_rename = False
+
+
     return {'can_stop': can_stop,
             'can_start': can_start,
             'can_destroy': can_destroy,
             'can_reboot': can_reboot,
-            'can_tag': can_tag}
+            'can_tag': can_tag,
+            'can_rename': can_rename}
 
 
 def list_machines(user, backend_id):
@@ -1769,7 +1778,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     except:
         # do not break if this fails for some reason
         pass
-        
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
