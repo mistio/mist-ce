@@ -33,6 +33,21 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 })
             },
 
+            deleteScript: function (args) {
+                var that = this;
+                that.set('deletingScript', true);
+                Mist.ajax.DELETE('/scripts/' + args.script.id, {
+                }).success(function () {
+                    that._deleteObject(args.script);
+                }).error(function (message) {
+                    Mist.notificationController.notify(message);
+                }).complete(function (success) {
+                    that.set('deletingScript', false);
+                    if (args.callback)
+                        args.callback(success);
+                })
+            },
+
             runScript: function (args) {
                 var that = this;
                 that.set('runningScript', true);

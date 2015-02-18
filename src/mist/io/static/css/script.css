@@ -4,3 +4,6 @@
 #single-script-page .ui-collapsible {
     clear: both;
 }
+#single-script-page .dual-action-footer {
+    display: block;
+}

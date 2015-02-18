@@ -650,6 +650,7 @@ var loadApp = function (
 
     // Ember views
 
+    App.DialogView = DialogView;
     App.ScriptAddView = ScriptAddView;
     App.ScriptView = ScriptView;
     App.ScriptRunView = ScriptRunView;

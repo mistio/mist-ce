@@ -19,10 +19,15 @@ define('app/views/script', ['app/views/mistscreen'],
 
 
             isInline: function () {
-                var script = this.get('controller').get('model');
+                var script = this.get('model');
                 if (!script.id) return false;
                 return script.get('source') == 'inline';
             }.property('controller.model.source'),
+
+
+            model: function () {
+                return this.get('controller').get('model');
+            }.property('controller.model'),
 
 
             //
@@ -61,7 +66,7 @@ define('app/views/script', ['app/views/mistscreen'],
                 this.updateModel();
 
                 if (Mist.scriptsController.objectExists(
-                    this.get('controller').get('model').id)) {
+                    this.get('model').id)) {
                         // Nothing else matters
                 }
             },
@@ -74,9 +79,45 @@ define('app/views/script', ['app/views/mistscreen'],
             },
 
 
+            //
+            //
+            //  Actions
+            //
+            //
+
+
             actions: {
+
                 runClicked: function () {
-                    Mist.scriptRunController.open(this.get('controller').get('model'));
+                    Mist.scriptRunController.open(this.get('model'));
+                },
+
+                deleteClicked: function () {
+
+                    var script = this.get('model');
+
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Delete script',
+                        body: [
+                            {
+                                paragraph: 'Are you sure you want to delete "' +
+                                    script.name + '" ?'
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (!didConfirm) return;
+                            Mist.scriptsController.deleteScript({
+                                script: script,
+                                callback: function (success) {
+                                    if (!success) return;
+                                    Ember.run.later(function () {
+                                        Mist.Router.router.transitionTo('scripts');
+                                    }, 300);
+                                }
+                            })
+                        }
+                    });
                 }
             }
         });
