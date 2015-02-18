@@ -39,7 +39,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 Mist.ajax.POST('/scripts/' + args.script.script.id, {
                     'machine_id': args.script.machine.id,
                     'backend_id': args.script.machine.backend.id,
-                    'params': encodeURIComponent(args.script.parameters)
+                    'params': args.script.parameters
                 }).error(function (message) {
                     Mist.notificationController.notify(message);
                 }).complete(function (success) {
