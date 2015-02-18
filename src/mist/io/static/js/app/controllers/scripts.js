@@ -20,7 +20,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                     'name': args.script.name,
                     'exec_type': args.script.type.value,
                     'location_type': args.script.source.value,
-                    'entry_point': args.script.entryPoint,
+                    'entrypoint': args.script.entryPoint,
                     'script': args.script.type.value == 'inline' ? args.script.script : args.script.url
                 }).success(function (script) {
                     that._addObject(script);
