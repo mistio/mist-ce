@@ -282,6 +282,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                 selectScript: function (script) {
                     Mist.machineAddController.set('newMachineScript', script);
+                    $('#create-machine-script-select').collapsible('collapse');
                 },
 
                 toggleNetworkSelection: function (network) {
