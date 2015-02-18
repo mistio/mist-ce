@@ -84,16 +84,13 @@ define('app/views/script_add', ['app/views/panel'],
 
             clear: function () {
                 this.$('.source').hide();
-                this.hideTypeSelect();
                 this.closeTypeSelect();
-                this.hideSourceSelect();
                 this.closeSourceSelect();
             },
 
 
             selectType: function (type) {
                 this.closeTypeSelect();
-                this.showSourceSelect();
                 Mist.scriptAddController.get('newScript').set('type', type);
                 this.setScript();
             },
@@ -123,27 +120,8 @@ define('app/views/script_add', ['app/views/panel'],
             },
 
 
-            showTypeSelect: function () {
-                this.$('#script-add-type').slideDown();
-            },
-
-
-            hideTypeSelect: function () {
-                this.$('#script-add-type').hide();
-            },
-
             closeTypeSelect: function () {
                 this.$('#script-add-type .mist-select').collapsible('collapse');
-            },
-
-
-            hideSourceSelect: function () {
-                this.$('#script-add-source').hide()
-            },
-
-
-            showSourceSelect: function () {
-                this.$('#script-add-source').slideDown();
             },
 
 
@@ -183,19 +161,6 @@ define('app/views/script_add', ['app/views/panel'],
                     Mist.scriptAddController.add();
                 }
             },
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
-
-            nameObserver: function () {
-                if (Mist.scriptAddController.newScript.name)
-                    this.showTypeSelect();
-            }.observes('Mist.scriptAddController.newScript.name'),
         });
     }
 );

@@ -926,6 +926,13 @@ var handleMobileInit = function () {
 
 var setupSocketEvents = function (socket, callback) {
 
+    //  This is a temporary ajax-request to get the scripts.
+    //  It should be converted into a "list_scripts" socket handler
+    //  as soon as the backend supports it
+    Mist.ajax.GET('/scripts').success(function (scripts) {
+        Mist.scriptsController.setContent(scripts);
+    });
+
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);
     })

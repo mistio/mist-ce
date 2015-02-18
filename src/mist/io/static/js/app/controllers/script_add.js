@@ -21,11 +21,13 @@ define('app/controllers/script_add', ['ember'],
                 source: {}
             }),
 
+
             open: function () {
                 this.clear();
                 this.view.clear();
                 this.view.open();
             },
+
 
             add: function () {
                 var that = this;
@@ -44,17 +46,19 @@ define('app/controllers/script_add', ['ember'],
                 this.view.close();
             },
 
+
             clear: function () {
                 this.get('newScript').setProperties({
                     name: '',
                     url: '',
-                    type: '',
+                    type: this.view.scriptTypes[1],
                     entryPoint: '',
                     text: '',
                     source: '',
                     script: ''
                 });
             },
+
 
             urlObserver: function () {
                 if (this.get('newScript').get('source').value == 'github')

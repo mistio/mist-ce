@@ -459,6 +459,11 @@ ul.checkbox-list li label {
     margin-right: 9.5em;
 }
 
+.list-wrapper ul {
+    position: relative;
+    top: -2em;
+}
+
 @media only screen and (max-width: 550px) {
 
     .list-wrapper .ui-filterable {

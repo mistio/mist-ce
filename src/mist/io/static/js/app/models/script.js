@@ -9,7 +9,12 @@ define('app/models/script', ['app/models/base'],
         'use sctrict';
 
         return BaseModel.extend({
-        
+
+            convertProperties: {
+                'script_id': 'id',
+                'exec_type': 'type'
+            }
+
         });
     }
 );
