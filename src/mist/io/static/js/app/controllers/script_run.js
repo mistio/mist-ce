@@ -18,7 +18,7 @@ define('app/controllers/script_run', ['ember'],
             open: function () {
                 this.clear();
                 this.view.open();
-            }
+            },
 
             close: function () {
                 this.view.close();

@@ -52,6 +52,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/script.html',
         'text!app/templates/script_list.html',
         'text!app/templates/script_list_item.html',
+        'text!app/templates/script_run.html',
         'text!app/templates/subnet_list_item.html',
         'text!app/templates/user_menu.html',
       ], function () {
@@ -105,8 +106,9 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['script/html'] = Ember.Handlebars.compile(arguments[47]);
         Ember.TEMPLATES['script_list/html'] = Ember.Handlebars.compile(arguments[48]);
         Ember.TEMPLATES['script_list_item/html'] = Ember.Handlebars.compile(arguments[49]);
-        Ember.TEMPLATES['subnet_list_item/html'] = Ember.Handlebars.compile(arguments[50]);
-        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[51]);
+        Ember.TEMPLATES['script_run/html'] = Ember.Handlebars.compile(arguments[50]);
+        Ember.TEMPLATES['subnet_list_item/html'] = Ember.Handlebars.compile(arguments[51]);
+        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[52]);
         callback();
       });
       return;

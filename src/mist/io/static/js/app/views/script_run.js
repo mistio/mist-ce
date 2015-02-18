@@ -1,4 +1,4 @@
-define('app/views/script_run', ['app/views/panel'].
+define('app/views/script_run', ['app/views/panel'],
     //
     //  Script Run View
     //

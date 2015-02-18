@@ -336,6 +336,7 @@ var loadFiles = function (callback) {
         'app/views/script',
         'app/views/script_add',
         'app/views/script_list',
+        'app/views/script_run',
         'app/views/script_list_item',
         'app/views/subnet_list_item',
         'app/views/user_menu',
