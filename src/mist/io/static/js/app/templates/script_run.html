@@ -1,0 +1,37 @@
+<div id="script-run"
+    data-swipe-close="false"
+    class="side-panel"
+    data-role="panel"
+    data-position="right"
+    data-display="overlay"
+    data-theme="c">
+
+    <div data-role="header">
+        <h1>Run script</h1>
+    </div>
+
+    <div data-role="content" data-theme="a">
+
+        <div></div>
+
+        <div class="form-field">
+            <label for="script-params">Parameters:</label>
+            {{view Mist.TextArea
+                data-theme="a"
+                placeholder="optional"
+                id="script-params"
+                valueBinding=Mist.scriptRunController.scriptToRun.parameters}}
+        </div>
+
+        {{#if Mist.scriptsController.runningScript}}
+            <div class="ajax-loader"></div>
+        {{/if}}
+
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" {{action "backClicked" target="view"}} data-theme="a">Back</a>
+            <a id="new-script-ok" data-theme="d"
+                {{bind-attr class="view.isReady::ui-state-disabled :ui-btn :ui-btn-d"}}
+                {{action "runClicked" target="view"}}>Run</a>
+        </div>
+    </div>
+</div>
