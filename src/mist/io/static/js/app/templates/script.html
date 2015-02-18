@@ -20,6 +20,37 @@
            class="responsive-btn ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all ui-shadow"
            {{action "runClicked" target="view"}}>Run</a>
 
+       <div data-role="collapsible" data-collapsed="false">
+
+           <h4>Basic Info</h4>
+
+           <table class="info-table">
+           <tbody>
+               <tr>
+                   <td>Type</td>
+                   <td>{{type}}</td>
+               </tr>
+               {{#if entrypoint}}
+                   <tr>
+                       <td>Entry Point</td>
+                       <td>{{entrypoint}}</td>
+                   </tr>
+               {{/if}}
+               {{#if view.isInline}}
+               <tr>
+                   <td>Script</td>
+                   <td><div class="command-container">{{script}}</div></td>
+               </tr>
+               {{else}}
+               <tr>
+                   <td>Url</td>
+                   <td>{{script}}</td>
+               </tr>
+               {{/if}}
+           </tbody>
+           </table>
+       </div>
+
         <div class="large-padding"></div>
 
     </div>

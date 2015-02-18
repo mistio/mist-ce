@@ -575,9 +575,7 @@ var loadApp = function (
             });
         },
         exit: function () {
-            Mist.keysController.content.forEach(function (key) {
-                 key.set('selected', false);
-            });
+            Mist.keysController.content.setEach('selected', false);
         }
     });
 
@@ -607,10 +605,37 @@ var loadApp = function (
                 document.title = 'mist.io - logs';
             });
         },
-        exit: function () {
-            Mist.logsController.content.forEach(function (log) {
-                 log.set('selected', false);
+    });
+
+
+    App.ScriptsRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - scripts';
             });
+        },
+        exit: function () {
+            Mist.scriptsController.setEach('selected', false);
+        }
+    });
+
+    App.ScriptRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(this, function () {
+                var model = this.modelFor('script');
+                var id = model._id || model.id;
+                var script = Mist.scriptsController.getObject(id);
+                document.title = 'mist.io - ' + (script ? script.id : id);
+            });
+        },
+        redirect: function (script) {
+            Mist.scriptsController.set('scriptRequest', script._id);
+        },
+        model: function (args) {
+            var id = args.script_id;
+            if (Mist.scriptsController.loading)
+                return {_id: id};
+            return Mist.scriptsController.getObject(id);
         }
     });
 

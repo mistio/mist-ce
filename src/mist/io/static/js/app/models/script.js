@@ -12,7 +12,8 @@ define('app/models/script', ['app/models/base'],
 
             convertProperties: {
                 'script_id': 'id',
-                'exec_type': 'type'
+                'exec_type': 'type',
+                'location_type': 'source',
             }
 
         });

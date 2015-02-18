@@ -1,3 +1,6 @@
 #single-script-page #run-script-btn {
     float: right;
 }
+#single-script-page .ui-collapsible {
+    clear: both;
+}

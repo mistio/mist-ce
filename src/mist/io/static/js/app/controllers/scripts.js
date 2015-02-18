@@ -12,7 +12,6 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
 
             model: ScriptModel,
 
-
             addScript: function (args) {
 
                 var that = this;
@@ -22,7 +21,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                     'exec_type': args.script.type.value,
                     'location_type': args.script.source.value,
                     'entry_point': args.script.entryPoint,
-                    'script': args.script.script || args.script.url
+                    'script': args.script.type.value == 'inline' ? args.script.script : args.script.url
                 }).success(function (script) {
                     that._addObject(script);
                 }).error(function (message) {
@@ -48,8 +47,14 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                     if (args.callback)
                         args.callback(success);
                 });
-            }
+            },
 
+
+            getRequestedScript: function() {
+                if (this.scriptRequest) {
+                    return this.getObject(this.scriptRequest);
+                }
+            },
         });
     }
 );
