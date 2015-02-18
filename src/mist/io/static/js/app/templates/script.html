@@ -16,15 +16,17 @@
             <div class="ajax-loader"></div>
         {{/if}}
 
-        <a id="add-script-btn"
+        <a id="run-script-btn"
            class="responsive-btn ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all ui-shadow"
-           {{action "addClicked" target="view"}}>Add</a>
+           {{action "runClicked" target="view"}}>Run</a>
 
         <div class="large-padding"></div>
 
     </div>
 
     {{view Mist.dialogView}}
+
+    {{view "scriptRun"}}
 
     {{view Mist.confirmationDialog}}
 
