@@ -11,12 +11,14 @@ define('app/controllers/script_run', ['ember'],
         return Ember.Object.extend({
 
             scriptToRun: Ember.Object.create({
+                script: {},
                 machine: '',
                 parameters: ''
             }),
 
-            open: function () {
+            open: function (script) {
                 this.clear();
+                this.get('scriptToRun').set('script', script);
                 this.view.open();
             },
 
@@ -27,13 +29,21 @@ define('app/controllers/script_run', ['ember'],
 
             clear: function () {
                 this.get('scriptToRun').setProperties({
+                    script: {},
                     machine: '',
                     parameters: '',
                 });
             },
 
             run: function () {
-                Mist.scriptsController.run(this.get('scriptToRun'));
+                var that = this;
+                Mist.scriptsController.runScript({
+                    script: this.get('scriptToRun'),
+                    callback: function (success) {
+                        if (success)
+                            that.close();
+                    }
+                });
             },
 
         });

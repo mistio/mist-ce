@@ -32,6 +32,22 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                     if (args.callback)
                         args.callback(success);
                 })
+            },
+
+            runScript: function (args) {
+                var that = this;
+                that.set('runningScript', true);
+                Mist.ajax.POST('/scripts/' + args.script.script.id, {
+                    'machine_id': args.script.machine.id,
+                    'backend_id': args.script.machine.backend.id,
+                    'params': encodeURIComponent(args.script.parameters)
+                }).error(function (message) {
+                    Mist.notificationController.notify(message);
+                }).complete(function (success) {
+                    that.set('runningScript', false);
+                    if (args.callback)
+                        args.callback(success);
+                });
             }
 
         });

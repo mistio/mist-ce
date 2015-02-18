@@ -12,13 +12,46 @@
 
     <div data-role="content" data-theme="a">
 
-        <div></div>
+        <div class="form-field">
+            <label>Machine:</label>
+            <div id="script-run-machine"
+                data-role="collapsible"
+                data-iconpos="right"
+                data-collapsed-icon="arrow-d"
+                data-expanded-icon="arrow-u"
+                data-theme="a"
+                class="mist-select">
+                <h4>
+                    {{#with Mist.scriptRunController.scriptToRun}}
+                        {{#if this.machine}}
+                            {{this.machine.name}}
+                        {{else}}
+                            Select
+                        {{/if}}
+                    {{/with}}
+                </h4>
+                <ul data-role="listview" data-theme="a">
+                    {{#each Mist.backendsController.content}}
+                    {{#if this.enabled}}
+                        {{#each this.machines.content}}
+                        {{#if this.probed}}
+                            <li data-icon="false">
+                                <a {{action "machineClicked" this target="view"}}>
+                                    {{this.name}}
+                                </a>
+                            </li>
+                        {{/if}}
+                        {{/each}}
+                    {{/if}}
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
 
         <div class="form-field">
-            <label for="script-params">Parameters:</label>
+            <label for="script-params">Parameters (optional):</label>
             {{view Mist.TextArea
                 data-theme="a"
-                placeholder="optional"
                 id="script-params"
                 valueBinding=Mist.scriptRunController.scriptToRun.parameters}}
         </div>

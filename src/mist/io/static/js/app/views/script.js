@@ -10,6 +10,13 @@ define('app/views/script', ['app/views/mistscreen'],
 
         return PageView.extend({
 
+            actions: {
+                runClicked: function () {
+                    info(this.get('controller').get('model'));
+                    info(this.get('model'));
+                    Mist.scriptRunController.open(this.get('controller').get('model'));
+                }
+            }
         });
     }
 );
