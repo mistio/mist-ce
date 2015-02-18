@@ -21,7 +21,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                     'exec_type': args.script.type.value,
                     'location_type': args.script.source.value,
                     'entrypoint': args.script.entryPoint,
-                    'script': args.script.type.value == 'inline' ? args.script.script : args.script.url
+                    'script': args.script.type.source == 'inline' ? args.script.script : args.script.url
                 }).success(function (script) {
                     that._addObject(script);
                 }).error(function (message) {

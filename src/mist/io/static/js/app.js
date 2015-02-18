@@ -442,6 +442,7 @@ var loadApp = function (
     });
 
     // Globals
+    App.set('betaFeatures', window.BETA_FEATURES || true);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);

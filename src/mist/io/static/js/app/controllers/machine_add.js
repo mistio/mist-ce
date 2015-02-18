@@ -148,6 +148,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineMonitoring,
                         this.newMachineDockerEnvironment.trim(),
                         this.newMachineDockerCommand,
+                        this.newMachineScriptParams,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }
@@ -178,7 +179,9 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineLocation', {'name' : 'Select Location'})
                     .set('newMachineProvider', {'title' : 'Select Provider'})
                     .set('newMachineDockerEnvironment', '')
-                    .set('newMachineDockerCommand', '');
+                    .set('newMachineDockerCommand', '')
+                    .set('newMachineScriptParams', '');
+                this.view.clear();
              },
 
 
