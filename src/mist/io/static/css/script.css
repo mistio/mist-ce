@@ -7,3 +7,13 @@
 #single-script-page .dual-action-footer {
     display: block;
 }
+#single-script-page ul {
+    margin-top: 1em;
+}
+#single-script-page ul li {
+    padding: 0;
+}
+
+#single-script-page ul li a {
+    margin: 0;
+}

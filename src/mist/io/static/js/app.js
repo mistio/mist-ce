@@ -340,6 +340,7 @@ var loadFiles = function (callback) {
         'app/views/script_list',
         'app/views/script_run',
         'app/views/script_list_item',
+        'app/views/script_log_list',
         'app/views/subnet_list_item',
         'app/views/user_menu',
     ], callback);
@@ -431,6 +432,7 @@ var loadApp = function (
     ScriptListView,
     ScriptRunView,
     ScriptListItemView,
+    ScriptLogListView,
     SubnetListItemView,
     UserMenuView,
     callback) {
@@ -655,12 +657,14 @@ var loadApp = function (
     // Ember views
 
     App.DialogView = DialogView;
+    App.LogListItemView = LogListItemView;
     App.ScriptAddView = ScriptAddView;
     App.ScriptView = ScriptView;
     App.ScriptEditView = ScriptEditView;
     App.ScriptRunView = ScriptRunView;
     App.ScriptListView = ScriptListView;
     App.ScriptListItemView = ScriptListItemView;
+    App.ScriptLogListView = ScriptLogListView;
     App.SubnetListItemView = SubnetListItemView;
     App.IpAddressListItemView = IPAddressListItemView;
 
