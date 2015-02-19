@@ -64,6 +64,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
              load: function () {
 
                 // Add event listeners
+                Mist.scriptsController.on('onChange', this, 'renderFields');
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
                 Mist.backendsController.on('onImageListChange', this, 'renderFields');
 
@@ -77,6 +78,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
              unload: function () {
 
                 // Remove event listeners
+                Mist.scriptsController.off('onChange', this, 'renderFields');
                 Mist.keysController.off('onKeyListChange', this, 'renderFields');
                 Mist.backendsController.off('onImageListChange', this, 'renderFields');
 
@@ -88,6 +90,14 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
              *  Methods
              *
              */
+
+
+             clear: function () {
+                 this.$('select').val('basic').slider('refresh');
+                 this.$('.script-option').hide();
+                 this.$('.basic').show();
+             },
+
 
              fieldIsReady: function (field) {
                 $('#create-machine-' + field).collapsible('option', 'collapsedIcon', 'check')
@@ -156,6 +166,15 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
              */
 
             actions: {
+
+                switchToggled: function () {
+                    var value = this.$('#script select').val();
+                    this.$('.script-option').hide();
+                    this.$('.'+value).show();
+                    Mist.machineAddController.set('newMachineScript', '');
+                    Mist.machineAddController.set('newMachineScriptParams', '');
+                    Mist.machineAddController.set('hasScript', value == 'advanced');
+                },
 
 
                 selectProvider: function (backend) {
@@ -264,6 +283,10 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     this._selectKey(key)
                 },
 
+                selectScript: function (script) {
+                    Mist.machineAddController.set('newMachineScript', script);
+                    $('#create-machine-script-select').collapsible('collapse');
+                },
 
                 toggleNetworkSelection: function (network) {
                     network.set('selected', !network.selected);

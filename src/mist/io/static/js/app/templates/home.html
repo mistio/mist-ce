@@ -92,6 +92,20 @@
                 </a>
             </li>
 
+            <!-- Scripts link -->
+
+            {{#if Mist.betaFeatures}}
+            <li class="ui-li-has-count">
+
+                <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/scripts">
+                    <span class="ui-li-count ui-body-inherit">
+                        {{Mist.scriptsController.length}}
+                    </span>
+                    Scripts
+
+                </a>
+            </li>
+            {{/if}}
 
             <!-- Logs link -->
 

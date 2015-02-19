@@ -284,6 +284,10 @@ var loadFiles = function (callback) {
         'app/controllers/notification',
         'app/controllers/rule_edit',
         'app/controllers/rules',
+        'app/controllers/script_add',
+        'app/controllers/script_edit',
+        'app/controllers/script_run',
+        'app/controllers/scripts',
         'app/views/backend_add',
         'app/views/backend_button',
         'app/views/backend_edit',
@@ -330,6 +334,13 @@ var loadFiles = function (callback) {
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/rule_list',
+        'app/views/script',
+        'app/views/script_add',
+        'app/views/script_edit',
+        'app/views/script_list',
+        'app/views/script_run',
+        'app/views/script_list_item',
+        'app/views/script_log_list',
         'app/views/subnet_list_item',
         'app/views/user_menu',
     ], callback);
@@ -365,6 +376,10 @@ var loadApp = function (
     NotificationController,
     RuleEditController,
     RulesController,
+    ScriptAddController,
+    ScriptEditController,
+    ScriptRunController,
+    ScriptsController,
     BackendAdd,
     BackendButton,
     BackendEdit,
@@ -411,6 +426,13 @@ var loadApp = function (
     RuleView,
     RuleEditView,
     RuleListView,
+    ScriptView,
+    ScriptAddView,
+    ScriptEditView,
+    ScriptListView,
+    ScriptRunView,
+    ScriptListItemView,
+    ScriptLogListView,
     SubnetListItemView,
     UserMenuView,
     callback) {
@@ -426,6 +448,7 @@ var loadApp = function (
     });
 
     // Globals
+    App.set('betaFeatures', window.BETA_FEATURES || false);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
@@ -454,6 +477,10 @@ var loadApp = function (
         this.route('keys');
         this.route('key', {
             path : '/keys/:key_id'
+        });
+        this.route('scripts');
+        this.route('script', {
+            path : '/scripts/:script_id'
         });
         this.route('logs');
         this.route('missing', { path: "/*path" });
@@ -555,9 +582,7 @@ var loadApp = function (
             });
         },
         exit: function () {
-            Mist.keysController.content.forEach(function (key) {
-                 key.set('selected', false);
-            });
+            Mist.keysController.content.setEach('selected', false);
         }
     });
 
@@ -587,12 +612,40 @@ var loadApp = function (
                 document.title = 'mist.io - logs';
             });
         },
-        exit: function () {
-            Mist.logsController.content.forEach(function (log) {
-                 log.set('selected', false);
+    });
+
+    if (Mist.betaFeatures) {
+    App.ScriptsRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - scripts';
             });
+        },
+        exit: function () {
+            Mist.scriptsController.setEach('selected', false);
         }
     });
+
+    App.ScriptRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(this, function () {
+                var model = this.modelFor('script');
+                var id = model._id || model.id;
+                var script = Mist.scriptsController.getObject(id);
+                document.title = 'mist.io - ' + (script ? script.id : id);
+            });
+        },
+        redirect: function (script) {
+            Mist.scriptsController.set('scriptRequest', script._id);
+        },
+        model: function (args) {
+            var id = args.script_id;
+            if (Mist.scriptsController.loading)
+                return {_id: id};
+            return Mist.scriptsController.getObject(id);
+        }
+    });
+    }
 
     App.MissingRoute = Ember.Route.extend({
         activate: function () {
@@ -604,6 +657,15 @@ var loadApp = function (
 
     // Ember views
 
+    App.DialogView = DialogView;
+    App.LogListItemView = LogListItemView;
+    App.ScriptAddView = ScriptAddView;
+    App.ScriptView = ScriptView;
+    App.ScriptEditView = ScriptEditView;
+    App.ScriptRunView = ScriptRunView;
+    App.ScriptListView = ScriptListView;
+    App.ScriptListItemView = ScriptListItemView;
+    App.ScriptLogListView = ScriptLogListView;
     App.SubnetListItemView = SubnetListItemView;
     App.IpAddressListItemView = IPAddressListItemView;
 
@@ -684,7 +746,10 @@ var loadApp = function (
     App.set('machinePowerController', MachinePowerController.create());
     App.set('networkCreateController', NetworkCreateController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
-
+    App.set('scriptsController', ScriptsController.create());
+    App.set('scriptAddController', ScriptAddController.create());
+    App.set('scriptRunController', ScriptRunController.create());
+    App.set('scriptEditController', ScriptEditController.create());
 
     // Ember custom widgets
 
@@ -740,7 +805,9 @@ var loadApp = function (
     // Mist functions
 
     App.getViewName = function (view) {
-        return view.constructor.toString().split('.')[1].split('View')[0];
+        var name = view.constructor.toString().split('.')[1].split('View')[0];
+        // Ensure compatibility with new view name convention
+        return name.charAt(0).toLowerCase() + name.slice(1)
     };
 
     App.isScrolledToTop = function () {
@@ -902,6 +969,13 @@ var handleMobileInit = function () {
 
 
 var setupSocketEvents = function (socket, callback) {
+
+    //  This is a temporary ajax-request to get the scripts.
+    //  It should be converted into a "list_scripts" socket handler
+    //  as soon as the backend supports it
+    Mist.ajax.GET('/scripts').success(function (scripts) {
+        Mist.scriptsController.setContent(scripts);
+    });
 
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);
@@ -1074,7 +1148,7 @@ function Ajax (csrfToken) {
                 };
 
                 if (data && Object.keys(data).length != 0)
-                    ajaxObject.data = JSON.stringify(data)
+                    ajaxObject.data = JSON.stringify(data);
 
                 $.ajax(ajaxObject);
 
@@ -1998,3 +2072,69 @@ var PROVIDER_MAP = {
         }
     ]
 };
+
+/*
+var SCRIPT_ADD_FIELDS = [
+    {
+        name: 'name',
+        type: 'text'
+    },
+    {
+        name: 'type',
+        type: 'select',
+        options: [
+            {
+                value: 'executable',
+                selected: true
+            },
+            {
+                value: 'ansible'
+            }
+        ]
+    },
+    {
+        name: 'source',
+        type: 'select',
+        options: [
+            {
+                value: 'github',
+                selected: true
+            },
+            {
+                value: 'url',
+            },
+            {
+                value: 'inline'
+            }
+        ]
+    },
+    {
+        conditional: {
+            source: 'url',
+            source: 'github'
+        },
+        fields: [
+            {
+                name: 'url',
+                type: 'text'
+            },
+            {
+                name: 'entry_point',
+                type: 'text',
+                optional: true
+            }
+        ]
+    },
+    {
+        conditional: {
+            source: 'inline'
+        },
+        fields: [
+            {
+                name: 'script',
+                type: 'text'
+            }
+        ]
+    }
+];
+*/

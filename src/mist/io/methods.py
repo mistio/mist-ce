@@ -1243,7 +1243,8 @@ def list_machines(user, backend_id):
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
-                   docker_env=[], docker_command=None, ssh_port=22):
+                   docker_env=[], docker_command=None, ssh_port=22,
+                   script_id='', script_params=''):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1367,19 +1368,26 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
-        mist.io.tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id,
-                                      node.extra.get('username'), node.extra.get('password'), public_key)
+        mist.io.tasks.azure_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('username'), node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params,
+        )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
-        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id, node.extra.get('password'), public_key)
+        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params,
+        )
     elif key_id:
-        if script or monitoring:
-            mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id)
+        if script or script_id or monitoring:
+            mist.io.tasks.post_deploy_steps.delay(
+                user.email, backend_id, node.id, monitoring, script, key_id,
+                script_id=script_id, script_params=script_params,
+            )
 
     return {'id': node.id,
             'name': node.name,
@@ -1769,7 +1777,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     except:
         # do not break if this fails for some reason
         pass
-        
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
