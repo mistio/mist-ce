@@ -71,6 +71,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
 
 
             search: function () {
+
                 if (!Mist.logs.socket.socket.connected)  {
                     Ember.run.later(this, function () {
                         this.search();

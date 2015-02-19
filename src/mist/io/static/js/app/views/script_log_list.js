@@ -11,7 +11,12 @@ define('app/views/script_log_list', ['app/views/log_list'],
         return LogListView.extend({
 
             filterString: Ember.computed.alias('controller.model.id'),
-            
+
+            search: function () {
+                if (this.get('filterString') === undefined)
+                    return;
+                this._super();
+            }
         });
     }
 );
