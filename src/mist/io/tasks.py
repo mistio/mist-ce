@@ -87,19 +87,23 @@ def ssh_command(email, backend_id, machine_id, host, command,
 
 @app.task(bind=True, default_retry_delay=3*60)
 def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
-                      key_id=None, username=None, password=None, port=22):
+                      key_id=None, username=None, password=None, port=22,
+                      script_id='', script_params=''):
     from mist.io.methods import ssh_command, connect_provider, enable_monitoring
     from mist.io.methods import notify_user, notify_admin
     if multi_user:
         from mist.core.methods import enable_monitoring
+        from mist.core.tasks import run_script
         from mist.core.helpers import log_event
     else:
         from mist.io.methods import enable_monitoring
         log_event = lambda *args, **kwargs: None
 
     user = user_from_email(email)
+    tmp_log = lambda msg, *args: log.error('Post deploy: %s' % msg, *args)
+    tmp_log('Entering post deploy steps for %s %s %s',
+            user.email, backend_id, machine_id)
     try:
-
         # find the node we're looking for and get its hostname
         conn = connect_provider(user.backends[backend_id])
         nodes = conn.list_nodes()
@@ -108,12 +112,14 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             if n.id == machine_id:
                 node = n
                 break
+        tmp_log('run list_machines')
 
         if node and len(node.public_ips):
             # filter out IPv6 addresses
             ips = filter(lambda ip: ':' not in ip, node.public_ips)
             host = ips[0]
         else:
+            tmp_log('ip not found, retrying')
             raise self.retry(exc=Exception(), countdown=120, max_retries=5)
 
         try:
@@ -121,16 +127,24 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             shell = Shell(host)
             # connect with ssh even if no command, to create association
             # to be able to enable monitoring
+            tmp_log('attempting to connect to shell')
             key_id, ssh_user = shell.autoconfigure(
                 user, backend_id, node.id, key_id, username, password, port
             )
+            tmp_log('connected to shell')
 
             backend = user.backends[backend_id]
             msg = "Backend:\n  Name: %s\n  Id: %s\n" % (backend.title,
                                                         backend_id)
             msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name,
                                                              node.id)
-            if command:
+            if script_id and multi_user:
+                tmp_log('will run script_id %s', script_id)
+                run_script.run(user.email, script_id, backend_id, machine_id,
+                               params=script_params, host=host)
+                tmp_log('executed script_id %s', script_id)
+            elif command:
+                tmp_log('will run command %s', command)
                 log_dict = {
                     'email': email,
                     'event_type': 'job',
@@ -145,6 +159,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 log_event(action='deployment_script_started', **log_dict)
                 start_time = time()
                 retval, output = shell.command(command)
+                tmp_log('executed command %s', command)
                 execution_time = time() - start_time
                 output = output.decode('utf-8','ignore')
                 title = "Deployment script %s" % ('failed' if retval
@@ -178,8 +193,10 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
 
         except (ServiceUnavailableError, SSHException) as exc:
+            tmp_log(repr(exc))
             raise self.retry(exc=exc, countdown=60, max_retries=5)
     except Exception as exc:
+        tmp_log(repr(exc))
         if str(exc).startswith('Retry'):
             raise
         notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
