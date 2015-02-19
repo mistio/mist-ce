@@ -94,6 +94,7 @@ def home(request):
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
         'is_core': json.dumps(False),
         'csrf_token': json.dumps(""),
+        'beta_features': json.dumps(False),
     }
 
 
