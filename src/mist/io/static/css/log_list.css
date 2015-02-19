@@ -47,11 +47,6 @@
     top: 7px;
 }
 
-.log-list li {
-    padding: 0;
-    border:none;
-}
-
 .log-list a .ui-block-a {
     text-align: left;
 }
@@ -94,4 +89,17 @@
     max-height: 300px;
     white-space: pre;
     overflow: auto;
+}
+
+.log-list ul {
+    margin-top: 1em;
+}
+
+.log-list ul li {
+    padding: 0 !important;
+    border: none !important;
+}
+
+.log-list ul li a {
+    margin: 0 !important;
 }
