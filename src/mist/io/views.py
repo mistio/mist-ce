@@ -94,6 +94,7 @@ def home(request):
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
         'is_core': json.dumps(False),
         'csrf_token': json.dumps(""),
+        'beta_features': json.dumps(False),
     }
 
 
@@ -476,6 +477,8 @@ def create_machine(request):
         networks = request.json_body.get('networks', [])
         docker_env = request.json_body.get('docker_env', [])
         docker_command = request.json_body.get('docker_command', None)
+        script_id = request.json_body.get('script_id', '')
+        script_params = request.json_body.get('script_params', '')
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -484,7 +487,9 @@ def create_machine(request):
                                  location_id, image_id, size_id, script,
                                  image_extra, disk, image_name, size_name,
                                  location_name, ips, monitoring, networks,
-                                 docker_env, docker_command)
+                                 docker_env, docker_command,
+                                 script_id=script_id,
+                                 script_params=script_params)
     return ret
 
 
