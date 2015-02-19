@@ -243,7 +243,7 @@ for root in rootObjects:
 
     for obj in rootObjects[root]:
         left = index*size[0]
-        Css("%s { background-position: -%spx -%spx !important; } \n" % (obj['selector'], left, top)  )
+        Css("%s { background-position: -%spx -%spx; } \n" % (obj['selector'], left, top)  )
 
         newImage = Image.open(obj['file']);
         image.paste(newImage, (left, top))

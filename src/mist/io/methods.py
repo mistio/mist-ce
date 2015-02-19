@@ -188,15 +188,15 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if remove_on_error:
             try:
                 conn = connect_provider(backend)
-            except:
-                raise BackendUnauthorizedError()
+            except Exception as exc:
+                raise BackendUnauthorizedError(exc=exc)
             try:
                 machines = conn.list_nodes()
             except InvalidCredsError:
                 raise BackendUnauthorizedError()
             except Exception as exc:
                 log.error("Error while trying list_nodes: %r", exc)
-                raise BackendUnavailableError()
+                raise BackendUnavailableError(exc=exc)
 
         with user.lock_n_load():
             user.backends[backend_id] = backend
@@ -261,17 +261,17 @@ def add_backend_v_2(user, title, provider, params):
             conn = connect_provider(backend)
         except InvalidCredsError as exc:
             log.error("Error while adding backend: %r" % exc)
-            raise BackendUnauthorizedError("%r" % exc)
+            raise BackendUnauthorizedError(exc)
         except Exception as exc:
             log.error("Error while adding backend%r" % exc)
-            raise BackendUnavailableError("%r" % exc)
+            raise BackendUnavailableError(exc)
         try:
             machines = conn.list_nodes()
         except InvalidCredsError:
             raise BackendUnauthorizedError()
         except Exception as exc:
             log.error("Error while trying list_nodes: %r", exc)
-            raise BackendUnavailableError()
+            raise BackendUnavailableError(exc=exc)
 
     with user.lock_n_load():
         user.backends[backend_id] = backend
@@ -1166,10 +1166,6 @@ def get_machine_actions(machine_from_api, conn, extra):
         # in libvirt a terminated machine can be started
             can_start = True
 
-    if conn.type is Provider.GCE:
-        can_start = False
-        can_stop = False
-
     if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
         # allow only reboot action for libvirt hypervisor
         can_stop = False
@@ -1196,7 +1192,7 @@ def list_machines(user, backend_id):
         raise BackendUnauthorizedError()
     except Exception as exc:
         log.error("Error while running list_nodes: %r", exc)
-        raise BackendUnavailableError()
+        raise BackendUnavailableError(exc=exc)
 
     ret = []
     for m in machines:
@@ -1247,7 +1243,8 @@ def list_machines(user, backend_id):
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
-                   docker_env=[], docker_command=None, ssh_port=22):
+                   docker_env=[], docker_command=None, ssh_port=22,
+                   script_id='', script_params=''):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1371,19 +1368,26 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
-        mist.io.tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id,
-                                      node.extra.get('username'), node.extra.get('password'), public_key)
+        mist.io.tasks.azure_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('username'), node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params,
+        )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
-        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id, node.extra.get('password'), public_key)
+        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params,
+        )
     elif key_id:
-        if script or monitoring:
-            mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id)
+        if script or script_id or monitoring:
+            mist.io.tasks.post_deploy_steps.delay(
+                user.email, backend_id, node.id, monitoring, script, key_id,
+                script_id=script_id, script_params=script_params,
+            )
 
     return {'id': node.id,
             'name': node.name,
@@ -1429,7 +1433,7 @@ def _create_machine_rackspace(conn, public_key, machine_name,
                                 location=location, ex_keyname=server_key)
         return node
     except Exception as e:
-        raise MachineCreationError("Rackspace, got exception %r" % e)
+        raise MachineCreationError("Rackspace, got exception %r" % e, exc=e)
 
 
 def _create_machine_openstack(conn, private_key, public_key, machine_name,
@@ -1479,7 +1483,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
                 ex_keyname=server_key,
                 networks=chosen_networks)
         except Exception as e:
-            raise MachineCreationError("OpenStack, got exception %s" % e)
+            raise MachineCreationError("OpenStack, got exception %s" % e, e)
     return node
 
 
@@ -1521,7 +1525,7 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
                 max_tries=1,
                 ex_keyname=server_key)
         except Exception as e:
-            raise MachineCreationError("HP Cloud, got exception %s" % e)
+            raise MachineCreationError("HP Cloud, got exception %s" % e, e)
     return node
 
 
@@ -1545,7 +1549,7 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
             else:
                 log.error('Failed to import key.')
                 raise BackendUnavailableError("Failed to import key "
-                                              "(ec2-only): %r" % exc)
+                                              "(ec2-only): %r" % exc, exc=exc)
 
     # create security group
     name = config.EC2_SECURITYGROUP.get('name', '')
@@ -1558,7 +1562,7 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
         if 'Duplicate' in exc.message:
             log.info('Security group already exists, not doing anything.')
         else:
-            raise InternalServerError("Couldn't create security group")
+            raise InternalServerError("Couldn't create security group", exc)
 
     with get_temp_file(private_key) as tmp_key_path:
         #deploy_node wants path for ssh private key
@@ -1574,7 +1578,7 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
                 ex_securitygroup=config.EC2_SECURITYGROUP['name']
             )
         except Exception as e:
-            raise MachineCreationError("EC2, got exception %s" % e)
+            raise MachineCreationError("EC2, got exception %s" % e, e)
 
     return node
 
@@ -1646,7 +1650,7 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key,
                 ips=ips
             )
         except Exception as e:
-            raise MachineCreationError("Nephoscale, got exception %s" % e)
+            raise MachineCreationError("Nephoscale, got exception %s" % e, e)
         return node
 
 
@@ -1693,7 +1697,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
                 sshKeys=server_key
             )
         except Exception as e:
-            raise MachineCreationError("Softlayer, got exception %s" % e)
+            raise MachineCreationError("Softlayer, got exception %s" % e, e)
     return node
 
 def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
@@ -1722,7 +1726,7 @@ def _create_machine_docker(conn, machine_name, image, script=None, public_key=No
             tty=tty_attach
         )
     except Exception as e:
-        raise MachineCreationError("Docker, got exception %s" % e)
+        raise MachineCreationError("Docker, got exception %s" % e, e)
 
     return node
 
@@ -1761,6 +1765,19 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     else:
         ex_ssh_key_ids = [str(server_key.id)]
 
+    # check if location allows the private_networking setting
+    private_networking = False
+    try:
+        locations = conn.list_locations()
+        for loc in locations:
+            if loc.id == location.id:
+                if 'private_networking' in loc.extra:
+                    private_networking = True
+                break
+    except:
+        # do not break if this fails for some reason
+        pass
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -1770,15 +1787,10 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 ex_ssh_key_ids=ex_ssh_key_ids,
                 location=location,
                 ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['root']*5,
-                #attempt to fix the Connection reset by peer exception
-                #that is (most probably) created due to a race condition
-                #while deploy_node establishes a connection and the
-                #ssh server is restarted on the created node
-                private_networking=True,
+                private_networking=private_networking,
             )
         except Exception as e:
-            raise MachineCreationError("Digital Ocean, got exception %s" % e)
+            raise MachineCreationError("Digital Ocean, got exception %s" % e, e)
 
         return node
 
@@ -1807,7 +1819,7 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value).group(2)
             except:
                 msg = e
-            raise MachineCreationError('Azure, got exception %s' % msg)
+            raise MachineCreationError('Azure, got exception %s' % msg, e)
 
         return node
 
@@ -1850,7 +1862,7 @@ def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks
             ex_vm_ipmode='DHCP'
         )
     except Exception as e:
-            raise MachineCreationError("vCloud, got exception %s" % e)
+            raise MachineCreationError("vCloud, got exception %s" % e, e)
 
     return node
 
@@ -1879,7 +1891,7 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
                 ex_metadata=metadata
             )
         except Exception as e:
-            raise MachineCreationError("Google Compute Engine, got exception %s" % e)
+            raise MachineCreationError("Google Compute Engine, got exception %s" % e, e)
     return node
 
 
@@ -1905,7 +1917,7 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
                 ssh_key=tmp_key_path
             )
         except Exception as e:
-            raise MachineCreationError("Linode, got exception %s" % e)
+            raise MachineCreationError("Linode, got exception %s" % e, e)
     return node
 
 
@@ -2174,16 +2186,11 @@ def list_images(user, backend_id, term=None):
             ec2_images += conn.list_images(ex_owner="amazon")
             ec2_images += conn.list_images(ex_owner="self")
         elif conn.type == Provider.GCE:
-            # Currently not other way to receive all images :(
             rest_images = conn.list_images()
-            for OS in config.GCE_IMAGES:
-                try:
-                    gce_images = conn.list_images(ex_project=OS)
-                    rest_images += gce_images
-                except:
-                    #eg ResourceNotFoundError
-                    pass
-            rest_images = [image for image in rest_images if not image.extra['deprecated']]
+            for gce_image in rest_images:
+                if gce_image.extra.get('licenses'):
+                    gce_image.extra['licenses'] = None
+            # GCE has some objects in extra so we make sure they are not passed
         elif conn.type == Provider.AZURE:
             # do not show Microsoft Windows images
             # from Azure's response we can't know which images are default
@@ -2222,7 +2229,7 @@ def list_images(user, backend_id, term=None):
                       or term in img.name.lower()][:40]
     except Exception as e:
         log.error(repr(e))
-        raise BackendUnavailableError(backend_id)
+        raise BackendUnavailableError(backend_id, e)
 
     ret = [{'id': image.id,
             'extra': image.extra,
@@ -2329,8 +2336,8 @@ def list_sizes(user, backend_id):
             sizes.extend(dedicated)
         else:
             sizes = conn.list_sizes()
-    except:
-        raise BackendUnavailableError(backend_id)
+    except Exception as exc:
+        raise BackendUnavailableError(backend_id, exc)
 
     ret = []
     for size in sizes:
@@ -2549,7 +2556,7 @@ def create_network(user, backend_id, network, subnet):
     try:
         new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
     except Exception as e:
-        raise NetworkCreationError("Got error r%" % e)
+        raise NetworkCreationError("Got error r%" % e, e)
 
     ret = dict()
     if subnet:
@@ -2642,8 +2649,8 @@ def set_machine_metadata(user, backend_id, machine_id, tag):
             machine = Node(machine_id, name='', state=0, public_ips=[],
                            private_ips=[], driver=conn)
             conn.ex_create_tags(machine, pair)
-        except:
-            raise BackendUnavailableError(backend_id)
+        except Exception as exc:
+            raise BackendUnavailableError(backend_id, exc)
     else:
         machine = None
         try:
@@ -2651,22 +2658,22 @@ def set_machine_metadata(user, backend_id, machine_id, tag):
                 if node.id == machine_id:
                     machine = node
                     break
-        except:
-            raise BackendUnavailableError(backend_id)
+        except Exception as exc:
+            raise BackendUnavailableError(backend_id, exc)
         if not machine:
             raise MachineNotFoundError(machine_id)
         if conn.type == 'gce':
             try:
                 machine.extra['tags'].append(tag)
                 conn.ex_set_node_tags(machine, machine.extra['tags'])
-            except:
-                raise InternalServerError("error creating tag")
+            except Exception as exc:
+                raise InternalServerError("error creating tag", exc)
         else:
             try:
                 machine.extra['metadata'].update(pair)
                 conn.ex_set_metadata(machine, machine.extra['metadata'])
-            except:
-                raise InternalServerError("error creating tag")
+            except Exception as exc:
+                raise InternalServerError("error creating tag", exc)
 
 
 def delete_machine_metadata(user, backend_id, machine_id, tag):
@@ -2703,8 +2710,8 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
             if node.id == machine_id:
                 machine = node
                 break
-    except:
-        raise BackendUnavailableError(backend_id)
+    except Exception as exc:
+        raise BackendUnavailableError(backend_id, exc)
     if not machine:
         raise MachineNotFoundError(machine_id)
 
@@ -2720,16 +2727,16 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
 
         try:
             conn.ex_delete_tags(machine, pair)
-        except:
-            raise BackendUnavailableError("Error deleting metadata in EC2")
+        except Exception as exc:
+            raise BackendUnavailableError("Error deleting metadata in EC2", exc)
 
     else:
         if conn.type == 'gce':
             try:
                 machine.extra['tags'].remove(tag)
                 conn.ex_set_node_tags(machine, machine.extra['tags'])
-            except:
-                raise InternalServerError("Error while updating metadata")
+            except Exception as exc:
+                raise InternalServerError("Error while updating metadata", exc)
         else:
             tags = machine.extra.get('metadata', None)
             key = None
@@ -2744,7 +2751,7 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
             try:
                 conn.ex_set_metadata(machine, tags)
             except:
-                BackendUnavailableError("Error while updating metadata")
+                raise BackendUnavailableError("Error while updating metadata")
 
 
 def check_monitoring(user):
@@ -3015,7 +3022,7 @@ def find_metrics(user, backend_id, machine_id):
         raise SSLError()
     except Exception as exc:
         log.error("Exception requesting find_metrics: %r", exc)
-        raise ServiceUnavailableError()
+        raise ServiceUnavailableError(exc=exc)
     if not resp.ok:
         log.error("Error in find_metrics %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
@@ -3034,7 +3041,7 @@ def assoc_metric(user, backend_id, machine_id, metric_id):
         raise SSLError()
     except Exception as exc:
         log.error("Exception requesting assoc_metric: %r", exc)
-        raise ServiceUnavailableError()
+        raise ServiceUnavailableError(exc=exc)
     if not resp.ok:
         log.error("Error in assoc_metric %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
@@ -3053,7 +3060,7 @@ def disassoc_metric(user, backend_id, machine_id, metric_id):
         raise SSLError()
     except Exception as exc:
         log.error("Exception requesting disassoc_metric: %r", exc)
-        raise ServiceUnavailableError()
+        raise ServiceUnavailableError(exc=exc)
     if not resp.ok:
         log.error("Error in disassoc_metric %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
@@ -3077,7 +3084,7 @@ def update_metric(user, metric_id, name=None, unit=None,
         raise SSLError()
     except Exception as exc:
         log.error("Exception updating metric: %r", exc)
-        raise ServiceUnavailableError()
+        raise ServiceUnavailableError(exc=exc)
     if not resp.ok:
         log.error("Error updating metric %d:%s", resp.status_code, resp.text)
         raise BadRequestError(resp.text)

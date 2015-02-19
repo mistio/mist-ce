@@ -1,4 +1,5 @@
 <table class="info-table">
+    <tbody>
     {{#if name}}
     <tr>
         <td class="subnet-name">Name</td>
@@ -62,11 +63,14 @@
             <td class="usable-ips" colspan="2">
                 <h4>Usable ip addresses ({{ipAddresses.length}})</h4>
                 <table>
+                    <tbody>
                     {{#each ipAddresses}}
                         {{view "ipAddressListItem" model=this}}
                     {{/each}}
+                    </tbody>
             </table>
         </td>
     </tr>
     {{/if}}
+    </tbody>
 </table>

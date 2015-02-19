@@ -53,7 +53,7 @@ define('app/controllers/machines', ['app/models/machine'],
              */
 
             newMachine: function(name, image, size, location, key, script, monitoring,
-                dockerEnv, dockerCommand) {
+                dockerEnv, dockerCommand, scriptParams) {
 
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -95,7 +95,9 @@ define('app/controllers/machines', ['app/models/machine'],
                         'name': name,
                         'key': key ? key.id : null,
                         'size': size.id,
-                        'script': script,
+                        'script': script.id ? undefined : script,
+                        'script_id': script.id || undefined,
+                        'script_params': scriptParams,
                         'image': image.id,
                         'location': location.id,
                         // Linode specific
