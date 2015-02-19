@@ -214,8 +214,9 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
 
 
 @app.task(bind=True, default_retry_delay=2*60)
-def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, command,
-                      key_id, username, password, public_key):
+def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
+                            command, key_id, username, password, public_key,
+                            script_id='', script_params=''):
     from mist.io.methods import ssh_command, connect_provider, enable_monitoring
     from mist.io.methods import notify_user, notify_admin
     user = user_from_email(email)
@@ -268,9 +269,11 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
 
             ssh.close()
 
-            if command or monitoring:
-                post_deploy_steps.delay(email, backend_id, machine_id,
-                                          monitoring, command, key_id)
+            if command or script_id or monitoring:
+                post_deploy_steps.delay(
+                    email, backend_id, machine_id, monitoring, command, key_id,
+                    script_id=script_id, script_params=script_params,
+                )
 
         except Exception as exc:
             raise self.retry(exc=exc, countdown=10, max_retries=15)
@@ -280,8 +283,10 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring, com
 
 
 @app.task(bind=True, default_retry_delay=2*60)
-def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id, monitoring, command,
-                      key_id, password, public_key, username='root'):
+def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
+                                          monitoring, command, key_id,
+                                          password, public_key, username='root',
+                                          script_id='', script_params=''):
     from mist.io.methods import ssh_command, connect_provider, enable_monitoring
     from mist.io.methods import notify_user, notify_admin
     user = user_from_email(email)
@@ -319,9 +324,11 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id, m
 
             ssh.close()
 
-            if command or monitoring:
-                post_deploy_steps.delay(email, backend_id, machine_id,
-                                          monitoring, command, key_id)
+            if command or script_id or monitoring:
+                post_deploy_steps.delay(
+                    email, backend_id, machine_id, monitoring, command, key_id,
+                    script_id=script_id, script_params=script_params,
+                )
 
         except Exception as exc:
             raise self.retry(exc=exc, countdown=10, max_retries=15)
