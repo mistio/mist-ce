@@ -93,6 +93,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
 
              clear: function () {
+                 this.$('select').val('basic').slider('refresh');
                  this.$('.script-option').hide();
                  this.$('.basic').show();
              },
