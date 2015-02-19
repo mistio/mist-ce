@@ -448,7 +448,7 @@ var loadApp = function (
     });
 
     // Globals
-    App.set('betaFeatures', window.BETA_FEATURES || true);
+    App.set('betaFeatures', window.BETA_FEATURES || false);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
@@ -614,7 +614,7 @@ var loadApp = function (
         },
     });
 
-
+    if (Mist.betaFeatures) {
     App.ScriptsRoute = Ember.Route.extend({
         activate: function () {
             Ember.run.next(function () {
@@ -645,6 +645,7 @@ var loadApp = function (
             return Mist.scriptsController.getObject(id);
         }
     });
+    }
 
     App.MissingRoute = Ember.Route.extend({
         activate: function () {

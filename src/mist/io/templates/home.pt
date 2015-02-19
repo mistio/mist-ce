@@ -23,6 +23,7 @@
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script tal:content="string: var EMAIL=${email}" />
     <script tal:content="string: var CSRF_TOKEN=${csrf_token}" />
+    <script tal:content="string: var BETA_FEATURES=${beta_features}" />
 
     <script src="resources/js/lib/require/require.js"></script>
 
