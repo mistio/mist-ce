@@ -49,6 +49,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/rule.html',
         'text!app/templates/rule_list.html',
         'text!app/templates/script_add.html',
+        'text!app/templates/script_edit.html',
         'text!app/templates/script.html',
         'text!app/templates/script_list.html',
         'text!app/templates/script_list_item.html',
@@ -103,12 +104,13 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[44]);
         Ember.TEMPLATES['rule_list/html'] = Ember.Handlebars.compile(arguments[45]);
         Ember.TEMPLATES['script_add/html'] = Ember.Handlebars.compile(arguments[46]);
-        Ember.TEMPLATES['script/html'] = Ember.Handlebars.compile(arguments[47]);
-        Ember.TEMPLATES['script_list/html'] = Ember.Handlebars.compile(arguments[48]);
-        Ember.TEMPLATES['script_list_item/html'] = Ember.Handlebars.compile(arguments[49]);
-        Ember.TEMPLATES['script_run/html'] = Ember.Handlebars.compile(arguments[50]);
-        Ember.TEMPLATES['subnet_list_item/html'] = Ember.Handlebars.compile(arguments[51]);
-        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[52]);
+        Ember.TEMPLATES['script_edit/html'] = Ember.Handlebars.compile(arguments[47]);
+        Ember.TEMPLATES['script/html'] = Ember.Handlebars.compile(arguments[48]);
+        Ember.TEMPLATES['script_list/html'] = Ember.Handlebars.compile(arguments[49]);
+        Ember.TEMPLATES['script_list_item/html'] = Ember.Handlebars.compile(arguments[50]);
+        Ember.TEMPLATES['script_run/html'] = Ember.Handlebars.compile(arguments[51]);
+        Ember.TEMPLATES['subnet_list_item/html'] = Ember.Handlebars.compile(arguments[52]);
+        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[53]);
         callback();
       });
       return;

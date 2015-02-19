@@ -48,6 +48,22 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 })
             },
 
+            renameScript: function (args) {
+                var that = this;
+                that.set('renamingScript', true);
+                Mist.ajax.PUT('/scripts/' + args.script.id, {
+                    new_name: args.newName
+                }).success(function () {
+                    that._renameScript(args.script, args.newName);
+                }).error(function (message) {
+                    Mist.notificationController.notify(message);
+                }).complete(function (success) {
+                    that.set('renamingScript', false);
+                    if (args.callback)
+                        args.callback(success);
+                });
+            },
+
             runScript: function (args) {
                 var that = this;
                 that.set('runningScript', true);
@@ -70,6 +86,16 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                     return this.getObject(this.scriptRequest);
                 }
             },
+
+
+            _renameScript: function (script, name) {
+                Ember.run(this, function () {
+                    script.set('name', name);
+                    this.trigger('onRename', {
+                        script: script
+                    });
+                });
+            }
         });
     }
 );

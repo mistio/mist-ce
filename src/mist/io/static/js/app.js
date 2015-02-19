@@ -285,6 +285,7 @@ var loadFiles = function (callback) {
         'app/controllers/rule_edit',
         'app/controllers/rules',
         'app/controllers/script_add',
+        'app/controllers/script_edit',
         'app/controllers/script_run',
         'app/controllers/scripts',
         'app/views/backend_add',
@@ -335,6 +336,7 @@ var loadFiles = function (callback) {
         'app/views/rule_list',
         'app/views/script',
         'app/views/script_add',
+        'app/views/script_edit',
         'app/views/script_list',
         'app/views/script_run',
         'app/views/script_list_item',
@@ -374,6 +376,7 @@ var loadApp = function (
     RuleEditController,
     RulesController,
     ScriptAddController,
+    ScriptEditController,
     ScriptRunController,
     ScriptsController,
     BackendAdd,
@@ -424,6 +427,7 @@ var loadApp = function (
     RuleListView,
     ScriptView,
     ScriptAddView,
+    ScriptEditView,
     ScriptListView,
     ScriptRunView,
     ScriptListItemView,
@@ -653,6 +657,7 @@ var loadApp = function (
     App.DialogView = DialogView;
     App.ScriptAddView = ScriptAddView;
     App.ScriptView = ScriptView;
+    App.ScriptEditView = ScriptEditView;
     App.ScriptRunView = ScriptRunView;
     App.ScriptListView = ScriptListView;
     App.ScriptListItemView = ScriptListItemView;
@@ -739,6 +744,7 @@ var loadApp = function (
     App.set('scriptsController', ScriptsController.create());
     App.set('scriptAddController', ScriptAddController.create());
     App.set('scriptRunController', ScriptRunController.create());
+    App.set('scriptEditController', ScriptEditController.create());
 
     // Ember custom widgets
 

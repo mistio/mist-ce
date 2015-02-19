@@ -92,6 +92,12 @@ define('app/views/script', ['app/views/mistscreen'],
                     Mist.scriptRunController.open(this.get('model'));
                 },
 
+
+                renameClicked: function () {
+                    Mist.scriptEditController.open(this.get('model'));
+                },
+
+
                 deleteClicked: function () {
 
                     var script = this.get('model');
@@ -111,9 +117,7 @@ define('app/views/script', ['app/views/mistscreen'],
                                 script: script,
                                 callback: function (success) {
                                     if (!success) return;
-                                    Ember.run.later(function () {
-                                        Mist.Router.router.transitionTo('scripts');
-                                    }, 300);
+                                    Mist.Router.router.transitionTo('scripts');
                                 }
                             })
                         }
