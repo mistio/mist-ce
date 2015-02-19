@@ -7,13 +7,13 @@
 #single-script-page .dual-action-footer {
     display: block;
 }
-#single-script-page ul {
+#single-script-page .log-list ul {
     margin-top: 1em;
 }
-#single-script-page ul li {
+#single-script-page .log-list ul li {
     padding: 0;
 }
 
-#single-script-page ul li a {
+#single-script-page .log-list ul li a {
     margin: 0;
 }
