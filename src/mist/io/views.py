@@ -91,7 +91,6 @@ def home(request):
         'js_build': json.dumps(config.JS_BUILD),
         'css_build': config.CSS_BUILD,
         'js_log_level': json.dumps(config.JS_LOG_LEVEL),
-        'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
         'is_core': json.dumps(False),
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
