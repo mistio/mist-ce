@@ -11,17 +11,17 @@
 
     <div data-role="content" data-theme="a">
         {{#if Mist.machinePowerController.canStart}}
-        <a data-role="button" data-theme="d" {{action "actionClicked" "start" target="view"}}>Start</a>
+        <a class="ui-btn ui-btn-d ui-shadow ui-corner-all" {{action "actionClicked" "start" target="view"}}>Start</a>
         {{/if}}
         {{#if Mist.machinePowerController.canShutdown}}
-        <a data-role="button" data-theme="d" {{action "actionClicked" "shutdown" target="view"}}>Shutdown</a>
+        <a class="ui-btn ui-btn-d ui-shadow ui-corner-all" {{action "actionClicked" "shutdown" target="view"}}>Shutdown</a>
         {{/if}}
         {{#if Mist.machinePowerController.canReboot}}
-        <a data-role="button" data-theme="d" {{action "actionClicked" "reboot" target="view"}}>Reboot</a>
+        <a class="ui-btn ui-btn-d ui-shadow ui-corner-all" {{action "actionClicked" "reboot" target="view"}}>Reboot</a>
         {{/if}}
         {{#if Mist.machinePowerController.canDestroy}}
-        <a data-role="button" data-theme="d" {{action "actionClicked" "destroy" target="view"}}>Destroy</a>
+        <a class="ui-btn ui-btn-d ui-shadow ui-corner-all" {{action "actionClicked" "destroy" target="view"}}>Destroy</a>
         {{/if}}
-        <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
+        <a class="ui-btn ui-shadow ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
     </div>
 </div>
