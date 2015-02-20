@@ -8,7 +8,7 @@ define('app/views/script_list_item', ['app/views/list_item'],
 
         'use sctrict';
 
-        return ListItemView.extend({
+        return App.ScriptListItemView = ListItemView.extend({
 
             updateCheckbox: function () {
                 var element = this.$('input.ember-checkbox');

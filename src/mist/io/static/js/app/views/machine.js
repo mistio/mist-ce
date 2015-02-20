@@ -4,11 +4,11 @@ define('app/views/machine', ['app/views/mistscreen'],
     //
     //  @returns Class
     //
-    function(MistScreen) {
+    function(PageView) {
 
         'use strict';
 
-        return MistScreen.extend({
+        return App.MachineView = PageView.extend({
 
 
             //

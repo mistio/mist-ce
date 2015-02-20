@@ -86,28 +86,28 @@
         {{outlet}}
     </script>
     <script type="text/x-handlebars" data-template-name="index">
-        {{view Mist.homeView}}
+        {{view "home"}}
     </script>
     <script type="text/x-handlebars" data-template-name="machines">
-        {{view Mist.machineListView}}
+        {{view "machineList"}}
     </script>
     <script type="text/x-handlebars" data-template-name="images">
-        {{view Mist.imageListView}}
+        {{view "imageList"}}
     </script>
     <script type="text/x-handlebars" data-template-name="networks">
-        {{view Mist.networkListView}}
+        {{view "networkList"}}
     </script>
     <script type="text/x-handlebars" data-template-name="network">
-        {{view Mist.networkView}}
+        {{view "network"}}
     </script>
     <script type="text/x-handlebars" data-template-name="machine">
-        {{view Mist.machineView}}
+        {{view "machine"}}
     </script>
     <script type="text/x-handlebars" data-template-name="keys">
-        {{view Mist.keyListView}}
+        {{view "keyList"}}
     </script>
     <script type="text/x-handlebars" data-template-name="key">
-        {{view Mist.keyView}}
+        {{view "key"}}
     </script>
     <script type="text/x-handlebars" data-template-name="scripts">
         {{view "scriptList"}}
@@ -116,10 +116,10 @@
         {{view "scrtipt"}}
     </script>
     <script type="text/x-handlebars" data-template-name="logs">
-        {{view Mist.logListView}}
+        {{view "logList"}}
     </script>
     <script type="text/x-handlebars" data-template-name="missing">
-        {{view Mist.missingView}}
+        {{view "missing"}}
     </script>
 
 </body>

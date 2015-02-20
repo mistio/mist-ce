@@ -10,7 +10,7 @@
 
         <h1>{{name}}</h1>
 
-        {{view Mist.userMenuView}}
+        {{view "userMenu"}}
 
     </div>
 
@@ -84,8 +84,7 @@
 
             <h4>Monitoring</h4>
 
-            {{view Mist.machineMonitoringView
-                machineBinding="view.machine"}}
+            {{view "machineMonitoring" machineBinding="view.machine"}}
 
         </div>
 
@@ -225,19 +224,19 @@
 
     </div>
 
-    {{view Mist.dialogView}}
+    {{view "dialog"}}
 
-    {{view Mist.metricAddView}}
+    {{view "metricAdd"}}
 
-    {{view Mist.machineKeysView}}
+    {{view "machineKeys"}}
 
-    {{view Mist.machineTagsView}}
+    {{view "machineTags"}}
 
-    {{view Mist.machineShellView}}
+    {{view "machineShell"}}
 
-    {{view Mist.machinePowerView position="#single-machine-power-btn"}}
+    {{view "machinePower" position="#single-machine-power-btn"}}
 
-    {{view Mist.confirmationDialog}}
+    {{view "confirmationDialog"}}
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>

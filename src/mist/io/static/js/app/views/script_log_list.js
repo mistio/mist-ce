@@ -8,7 +8,7 @@ define('app/views/script_log_list', ['app/views/log_list'],
 
         'use strict';
 
-        return LogListView.extend({
+        return App.ScriptLogListView = LogListView.extend({
 
             filterString: Ember.computed.alias('controller.model.id'),
 

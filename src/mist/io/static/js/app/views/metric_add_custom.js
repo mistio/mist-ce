@@ -8,7 +8,7 @@ define('app/views/metric_add_custom', ['app/views/popup'],
 
         'use strict';
 
-        return PopupView.extend({
+        return App.MetricAddCustomView = PopupView.extend({
 
 
             //
