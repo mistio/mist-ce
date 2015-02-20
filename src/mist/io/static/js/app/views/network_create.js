@@ -10,7 +10,7 @@ define('app/views/network_create', ['app/views/panel'],
 
         var SLIDE_DOWN_DELAY = 130;
 
-        return PanelView.extend({
+        return App.NetworkCreateView = PanelView.extend({
 
 
             createSubnet: false,

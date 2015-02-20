@@ -1,11 +1,11 @@
-define('app/views/login', ['app/views/templated', 'ember'],
+define('app/views/login', ['app/views/templated'],
     /**
      *  Login View
      *
      *  @returns Class
      */
     function (TemplatedView) {
-        return TemplatedView.extend({
+        return App.LoginView = TemplatedView.extend({
 
             /**
              *
@@ -21,11 +21,11 @@ define('app/views/login', ['app/views/templated', 'ember'],
                 }
             },
 
-            
+
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
 
             keyUp: function(e) {
@@ -33,22 +33,22 @@ define('app/views/login', ['app/views/templated', 'ember'],
                     if (Mist.loginController.formReady) {
                         Mist.loginController.login();
                     }
-                } 
+                }
             },
 
             actions: {
-    
-    
+
+
                 backClicked: function() {
                     Mist.loginController.close();
                 },
-                
+
                 loginClicked: function() {
                     Mist.loginController.login();
                 }
             },
-            
-            
+
+
             /**
              *
              *  Observers

@@ -8,7 +8,7 @@ define('app/views/backend_button', ['app/views/templated'],
 
         'use strict';
 
-        return TemplatedView.extend({
+        return App.BackendButtonView = TemplatedView.extend({
 
 
             //

@@ -5,7 +5,7 @@ define('app/views/confirmation_dialog', ['app/views/templated', 'ember'],
      * @returns Class
      */
     function(TemplatedView) {
-        return TemplatedView.extend({
+        return App.ConfirmationDialogView = TemplatedView.extend({
 
             attributeBindings: ['data-role',],
 
@@ -13,7 +13,7 @@ define('app/views/confirmation_dialog', ['app/views/templated', 'ember'],
                 yesClicked: function() {
                     Mist.confirmationController.confirm();
                 },
-                
+
                 noClicked: function() {
             	   $('#confirmation-popup').popup('close');
                 }

@@ -4,8 +4,8 @@ define('app/views/key_list', ['app/views/mistscreen'],
      *
      *  @returns Class
      */
-    function (MistScreen) {
-        return MistScreen.extend({
+    function (PageView) {
+        return App.KeyListView = PageView.extend({
 
             /**
              *

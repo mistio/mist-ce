@@ -18,7 +18,7 @@ define('app/views/script_add', ['app/views/panel'],
             '      debug:\n' +
             '        msg: "Hello World"\n';
 
-        return PanelView.extend({
+        return App.ScriptAddView = PanelView.extend({
 
 
             //
