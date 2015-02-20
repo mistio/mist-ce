@@ -314,11 +314,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         var translate = 0;
                         if (that.animationEnabled) {
                             translate =  $('#' + graph.id).find('.valueLine > path').attr('transform');
-                            translate = + translate.slice(10,translate.indexOf(','));
+                            if (translate != undefined )
+                                translate = + translate.slice(10,translate.indexOf(','));
                         }
 
                         // hack previous code
-                        var displayedData = graph.displayedData[Object.keys(graph.displayedData)[0]];
+                        if (graph.displayedData != undefined)
+                            var displayedData = graph.displayedData[Object.keys(graph.displayedData)[0]];
                         var xCoordinates = that.xCoordinates[Object.keys(that.xCoordinates)[0]];
 
                         // Measurement That is less than curson x

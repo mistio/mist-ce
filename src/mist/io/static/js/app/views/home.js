@@ -83,7 +83,7 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
                 Mist.graphsController.open({
                     graphs: [Graph.create({
-                        title: 'Load for all monitored servers',
+                        title: 'Load on all monitored machines',
                         datasources: datasources,
                     })],
                     config: {

@@ -3,7 +3,7 @@
 -----------------------------------------------------------------------------------------------------------*/
 #home-page #add-backend-btn {
     float: right;
-    margin-top: 10px;
+    margin-right: 0px;
     margin-bottom: 0;
 }
 #home-page .ui-listview {
@@ -18,4 +18,61 @@
     #home-page .ui-listview .ajax-loader {
         margin-top: -19px;
     }
+}
+
+#home-page .ui-grid-a {
+   margin-top: -20px;
+}
+
+#home-page ul.incidents {
+    margin-top: 1em;
+    margin-left: 1em;
+    max-height: 174px;
+    overflow-y: scroll;
+}
+
+@media (max-width: 35em) {
+    #home-page ul.incidents {
+        margin-left: 0;
+        margin-top: 0;
+    }
+}
+
+ul.incidents span.time {
+    float: right;
+    font-weight: bold;
+    opacity: .75;
+    margin-bottom: -5px;
+}
+
+ul.incidents .ui-icon-alert:after, #machines .ui-icon-alert:after {
+    background-color: indianred;
+}
+
+ul.incidents .ui-icon-check:after {
+    background-color: rgba(33, 133, 89, 0.4);
+}
+
+#machines .ui-icon-check:after {
+    background-color: rgba(33, 133, 89, .6);
+}
+
+ul.incidents li a.ui-btn{
+    font-weight: normal;
+    white-space: normal;
+    padding-left: 16px !important;
+    padding-right: 42px !important;
+}
+
+ul.incidents li a.ui-btn:after {
+    right: 8px !important;
+}
+
+
+ul.incidents li a .machine {
+    font-weight: bold;
+}
+
+#home-page .ui-body {
+    padding: 0;
 }

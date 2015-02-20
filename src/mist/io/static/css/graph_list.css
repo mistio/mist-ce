@@ -14,7 +14,7 @@
 
 #single-machine-page #history-control {
     float: right;
-    margin-top: -61px;
+    margin-top: -56px;
     margin-right: -7px;
 }
 
@@ -33,22 +33,24 @@
     font-weight: normal;
 }
 
-#history-control div {
+#history-control div.ui-select {
     text-align: center;
     margin: 0;
     border-width: 1px 0px;
+    width: 100%;
+    margin-top: -56px;
+    min-width: 190px;
 }
 
 #history-control a.time {
     width: 65px;
     height: 39px;
     border-radius: 0em;
-    float: right;
-    margin: 0;
+    margin: -5px -5px 0px 0px;
+    z-index: 10;
 }
 
 #time-window-control {
-    float: right;
     margin: 0;
     border-radius: 0;
     border-left-width: 0;
@@ -59,9 +61,13 @@
 }
 
 #time-window-control span {
-    padding: 3px;
+    padding: 5px;
 }
 
+#history-control-forward {
+    float: right;
+    margin-top: -57px !important;
+}
 .graph-button {
     display: inline-block;
     width: 150px;

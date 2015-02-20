@@ -4,12 +4,10 @@
         Control Widget
     -->
 
-    {{#if Mist.graphsController.config.canControl}}
-        <div id="top-history">
-            {{view Mist.graphListControlView
-                actionProxyBinding="view.actionProxy"}}
-        </div>
-    {{/if}}
+    <div id="top-history">
+        {{view Mist.graphListControlView
+            actionProxyBinding="view.actionProxy"}}
+    </div>
 
     <!--
         Graphs
@@ -30,9 +28,5 @@
     {{#if Mist.graphsController.config.canMinimize}}
         {{view Mist.graphListBarView
             actionProxyBinding="view.actionProxy"}}
-    {{/if}}
-
-    {{#if Mist.graphsController.config.canControl}}
-        <div id="bottom-history"></div>
     {{/if}}
 {{/if}}

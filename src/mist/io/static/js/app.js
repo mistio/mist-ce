@@ -1033,7 +1033,7 @@ var setupSocketEvents = function (socket, callback) {
         if (machine.id) {
             dialogBody.push({
                 link: machine.name,
-                class: 'ui-btn ui-btn-icon-right ui-icon-carat-r ui-mini ui-corner-all',
+                class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 href: '#/machines/' + machineId,
                 closeDialog: true,
             });
@@ -1739,7 +1739,7 @@ var PROVIDER_MAP = {
         {
             name: 'title',
             type: 'text',
-            defaultValue: 'Other Server',
+            defaultValue: 'SSH',
         },
         {
             name: 'machine_ip',

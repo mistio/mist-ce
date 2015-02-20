@@ -3,6 +3,32 @@
     <div id="history-control" class="ui-mini">
 
         <!--
+            Back Button
+        -->
+        <a id="history-control-back"
+            class="time
+                ui-btn
+                ui-mini
+                ui-corner-all
+                ui-btn-inline
+                ui-btn-icon-notext
+                ui-icon-arrow-l"
+            {{action "backClicked" target="view.actionProxy"}}>
+        </a>
+
+        <div id="time-window-control" class="ui-mini">
+            <select data-inline="true" data-shadow="false" data-mini="true"
+                {{action "timeWindowChanged" on="change" target="view.actionProxy"}}>
+                    <option value="minutes" selected='true'>last 10 mins</option>
+                    <option value="hour">last hour</option>
+                    <option value="day">last day</option>
+                    <option value="week">last week</option>
+                    <option value="month">last month</option>
+                    <option value="ft">from / to</option>
+            </select>
+        </div>
+
+        <!--
             Stream Toggle
         -->
         {{#if Mist.graphsController.stream.isStreaming}}
@@ -16,15 +42,7 @@
                     Pause
             </a-->
         {{else}}
-            <a id="history-control-stream"
-                class="ui-btn
-                    ui-mini
-                    ui-btn-b
-                    ui-corner-all
-                    ui-btn-inline"
-                {{action "resetClicked" target="view.actionProxy"}}>
-                    Reset
-            </a>
+
             <!--
                 Forward Button
             -->
@@ -40,29 +58,5 @@
             </a>
         {{/if}}
 
-        <div id="time-window-control" class="ui-mini">
-            <select data-inline="true" data-shadow="false" data-mini="true"
-                {{action "timeWindowChanged" on="change" target="view.actionProxy"}}>
-                    <option value="minutes" selected='true'>10 minutes</option>
-                    <option value="hour">1 hour</option>
-                    <option value="day">1 day</option>
-                    <option value="week">1 week</option>
-                    <option value="month">1 month</option>
-            </select>
-        </div>
-
-        <!--
-            Back Button
-        -->
-        <a id="history-control-back"
-            class="time
-                ui-btn
-                ui-mini
-                ui-corner-all
-                ui-btn-inline
-                ui-btn-icon-notext
-                ui-icon-arrow-l"
-            {{action "backClicked" target="view.actionProxy"}}>
-        </a>
     </div>
 </div>

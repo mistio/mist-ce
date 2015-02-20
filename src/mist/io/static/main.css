@@ -236,12 +236,9 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 /* Checkbox list
 -----------------------------------------------------------------------------------------------------------*/
-ul.checkbox-list li a.has-monitoring:after {
-    opacity: 1;
-}
 .ui-icon-carat-r:after {
     background-color: #666;
-    opacity: .6;
+    background-image: none;
 }
 ul.checkbox-list {
     box-shadow: none;
