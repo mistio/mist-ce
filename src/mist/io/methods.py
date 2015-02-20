@@ -1166,10 +1166,6 @@ def get_machine_actions(machine_from_api, conn, extra):
         # in libvirt a terminated machine can be started
             can_start = True
 
-    if conn.type is Provider.GCE:
-        can_start = False
-        can_stop = False
-
     if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
         # allow only reboot action for libvirt hypervisor
         can_stop = False
@@ -1247,7 +1243,8 @@ def list_machines(user, backend_id):
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
-                   docker_env=[], docker_command=None, ssh_port=22):
+                   docker_env=[], docker_command=None, ssh_port=22,
+                   script_id='', script_params=''):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1371,19 +1368,26 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
-        mist.io.tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id,
-                                      node.extra.get('username'), node.extra.get('password'), public_key)
+        mist.io.tasks.azure_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('username'), node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params,
+        )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
-        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id, node.extra.get('password'), public_key)
+        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params,
+        )
     elif key_id:
-        if script or monitoring:
-            mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id)
+        if script or script_id or monitoring:
+            mist.io.tasks.post_deploy_steps.delay(
+                user.email, backend_id, node.id, monitoring, script, key_id,
+                script_id=script_id, script_params=script_params,
+            )
 
     return {'id': node.id,
             'name': node.name,
@@ -1761,6 +1765,19 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     else:
         ex_ssh_key_ids = [str(server_key.id)]
 
+    # check if location allows the private_networking setting
+    private_networking = False
+    try:
+        locations = conn.list_locations()
+        for loc in locations:
+            if loc.id == location.id:
+                if 'private_networking' in loc.extra:
+                    private_networking = True
+                break
+    except:
+        # do not break if this fails for some reason
+        pass
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -1770,12 +1787,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 ex_ssh_key_ids=ex_ssh_key_ids,
                 location=location,
                 ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['root']*5,
-                #attempt to fix the Connection reset by peer exception
-                #that is (most probably) created due to a race condition
-                #while deploy_node establishes a connection and the
-                #ssh server is restarted on the created node
-                private_networking=True,
+                private_networking=private_networking,
             )
         except Exception as e:
             raise MachineCreationError("Digital Ocean, got exception %s" % e, e)
@@ -2174,16 +2186,11 @@ def list_images(user, backend_id, term=None):
             ec2_images += conn.list_images(ex_owner="amazon")
             ec2_images += conn.list_images(ex_owner="self")
         elif conn.type == Provider.GCE:
-            # Currently not other way to receive all images :(
             rest_images = conn.list_images()
-            for OS in config.GCE_IMAGES:
-                try:
-                    gce_images = conn.list_images(ex_project=OS)
-                    rest_images += gce_images
-                except:
-                    #eg ResourceNotFoundError
-                    pass
-            rest_images = [image for image in rest_images if not image.extra['deprecated']]
+            for gce_image in rest_images:
+                if gce_image.extra.get('licenses'):
+                    gce_image.extra['licenses'] = None
+            # GCE has some objects in extra so we make sure they are not passed
         elif conn.type == Provider.AZURE:
             # do not show Microsoft Windows images
             # from Azure's response we can't know which images are default

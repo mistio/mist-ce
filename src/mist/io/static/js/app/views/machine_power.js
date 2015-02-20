@@ -1,11 +1,11 @@
-define('app/views/machine_power', ['app/views/templated','ember'],
+define('app/views/machine_power', ['app/views/templated'],
     /**
      *  Machine Power View
      *
      *  @returns Class
      */
     function (TemplatedView) {
-        return TemplatedView.extend({
+        return App.MachinePowerView = TemplatedView.extend({
 
             /**
              *

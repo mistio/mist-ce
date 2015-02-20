@@ -15,11 +15,11 @@
 
         <div id="graphs-wrapper"
             {{bind-attr class="view.pendingFirstStats:hidden"}}>
-                {{view Mist.graphListView
+                {{view "graphList"
                     actionProxyBinding="view"}}
         </div>
 
-        {{view Mist.ruleListView rulesBinding="view.rules"}}
+        {{view "ruleList" rulesBinding="view.rules"}}
 
         <div id="monitoring-bottom-btns">
             <div data-rule="ui-grid-a">
@@ -100,4 +100,4 @@
        </div>
     {{/if}}
 </div>
-{{view Mist.ruleEditView metricsBinding="this.metrics"}}
+{{view "ruleEdit" metricsBinding="this.metrics"}}

@@ -6,7 +6,7 @@
 
         <h1>Networks</h1>
 
-        {{view Mist.userMenuView}}
+        {{view "userMenu"}}
 
     </div>
 
@@ -30,8 +30,8 @@
             {{#each Mist.backendsController}}
                 {{#if this.enabled}}
                   {{#each this.networks}}
-                        {{view Mist.networkListItemView
-                            networkBinding=this
+                        {{view "networkListItem"
+                            networkBinding="this"
                             class="checkbox-link"}}
                   {{/each}}
                 {{/if}}
@@ -42,8 +42,8 @@
 
     </div>
 
-    {{view Mist.networkCreateView}}
-    {{view Mist.confirmationDialog}}
+    {{view "networkCreate"}}
+    {{view "confirmationDialog"}}
 
     <div class="single-action-footer" data-role="footer" data-theme="b">
         <a class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete"

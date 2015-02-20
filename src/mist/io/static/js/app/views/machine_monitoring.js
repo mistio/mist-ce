@@ -14,7 +14,7 @@ define('app/views/machine_monitoring',
 
         'use strict';
 
-        return TemplatedView.extend({
+        return App.MachineMonitoringView = TemplatedView.extend({
 
 
             //
@@ -634,7 +634,7 @@ define('app/views/machine_monitoring',
                     this.showMonitoring();
                 else
                     this.hideMonitoring();
-            }.observes('machine.hasMonitoring'),
+            }.observes('machine.hasMonitoring').on('didInsertElement'),
 
 
             metricsObsever: function () {

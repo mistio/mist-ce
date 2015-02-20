@@ -10,7 +10,7 @@
 
         <h1>{{name}}</h1>
 
-        {{view Mist.userMenuView}}
+        {{view "userMenu"}}
 
     </div>
 
@@ -84,8 +84,7 @@
 
             <h4>Monitoring</h4>
 
-            {{view Mist.machineMonitoringView
-                machineBinding="view.machine"}}
+            {{view "machineMonitoring" machineBinding="view.machine"}}
 
         </div>
 
@@ -102,6 +101,7 @@
             <h4>Basic Info</h4>
 
             <table class="info-table">
+                <tbody>
                 <tr>
                     <td>Last probed</td>
                     <td> {{#if probing}}
@@ -197,6 +197,7 @@
                         <td>{{value}}</td>
                     </tr>
                 {{/each}}
+            </tbody>
             </table>
         </div>
 
@@ -206,12 +207,14 @@
                 <h4>Full metadata list</h4>
 
                 <table class="info-table">
+                    <tbody>
                     {{#each view.metadata}}
                         <tr>
                             <td>{{key}}</td>
                             <td>{{value}}</td>
                         </tr>
                     {{/each}}
+                    </tbody>
                 </table>
 
             </div>
@@ -221,19 +224,19 @@
 
     </div>
 
-    {{view Mist.dialogView}}
+    {{view "dialog"}}
 
-    {{view Mist.metricAddView}}
+    {{view "metricAdd"}}
 
-    {{view Mist.machineKeysView}}
+    {{view "machineKeys"}}
 
-    {{view Mist.machineTagsView}}
+    {{view "machineTags"}}
 
-    {{view Mist.machineShellView}}
+    {{view "machineShell"}}
 
-    {{view Mist.machinePowerView position="#single-machine-power-btn"}}
+    {{view "machinePower" position="#single-machine-power-btn"}}
 
-    {{view Mist.confirmationDialog}}
+    {{view "confirmationDialog"}}
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>

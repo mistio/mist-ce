@@ -8,7 +8,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
         'use strict'
 
-        return TemplatedView.extend({
+        return App.RuleView = TemplatedView.extend({
 
 
             //
