@@ -1294,6 +1294,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
+
+    machine_name = machine_name_validator(conn.type, machine_name)
     if conn.type is Provider.DOCKER:
         if key_id:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
@@ -3433,3 +3435,45 @@ def get_deploy_collectd_manual_command(uuid, password, monitor):
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
+
+
+def machine_name_validator(provider, name):
+    """
+    Validates machine names before creating a machine
+    Provider specific
+    """
+    if not name and provider not in config.EC2_PROVIDERS:
+        raise MachineNameValidationError("machine name cannot be empty")
+    if provider is Provider.DOCKER:
+        pass
+    elif provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
+        pass
+    elif provider in [Provider.OPENSTACK]:
+        pass
+    elif provider is Provider.HPCLOUD:
+        pass
+    elif provider in config.EC2_PROVIDERS:
+        if len(name) > 255:
+            raise MachineNameValidationError("machine name max chars allowed is 255")
+    elif provider is Provider.NEPHOSCALE:
+        pass
+    elif provider is Provider.GCE:
+        pass
+    elif provider is Provider.SOFTLAYER:
+        pass
+    elif provider is Provider.DIGITAL_OCEAN:
+        if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and dots")
+    elif provider == Provider.AZURE:
+        pass
+    elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+        pass
+    elif provider is Provider.LINODE:
+        if len(name) < 3:
+            raise MachineNameValidationError("machine name should be at least 3 chars")
+        if not re.search(r'^[0-9a-zA-Z][0-9a-zA-Z-_]+[0-9a-zA-Z]$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and underscores. Must begin and end with letters or numbers, " + \
+                "and be at least 3 characters long")
+    return name
