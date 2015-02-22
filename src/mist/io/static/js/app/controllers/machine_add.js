@@ -118,15 +118,6 @@ define('app/controllers/machine_add', ['ember'],
                         return;
                     }
                 }
-                if (providerName == 'Linode') {
-                    var re = /^[0-9a-zA-Z-_]*$/;
-                    if (!re.test(machineName)) {
-                        Mist.notificationController.timeNotify(
-                            'A Linode label may only contain ASCII letters or numbers, dashes and underscores. Must ' +
-                            'begin and end with letters or numbers, and be at least 3 characters long', 7000);
-                        return;
-                    }
-                }
                 if (providerName == 'SoftLayer') {
                     var re = /^[0-9a-zA-Z.-]*$/;
                     if (machineName.length > 253 || !re.test(machineName)) {
