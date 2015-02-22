@@ -1174,7 +1174,7 @@ def get_machine_actions(machine_from_api, conn, extra):
 
     if conn.type in (config.EC2_PROVIDERS, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
-                     Provider.DOCKER):
+                     Provider.DOCKER, Provider.OPENSTACK, Provider.RACKSPACE):
         can_rename = True
     else:
         can_rename = False
