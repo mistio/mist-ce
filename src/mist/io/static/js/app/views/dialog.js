@@ -8,7 +8,7 @@ define('app/views/dialog', ['app/views/popup'],
 
         'use strict';
 
-        return PopupView.extend({
+        return App.DialogView = PopupView.extend({
 
 
             //

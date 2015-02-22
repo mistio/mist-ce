@@ -25,6 +25,18 @@ define('app/models/base', ['ember'],
 
             //
             //
+            //  Initialization
+            //
+            //
+
+
+            load: function () {
+                this._convertProperties();
+            }.on('init'),
+
+
+            //
+            //
             //  Methods
             //
             //
@@ -33,6 +45,26 @@ define('app/models/base', ['ember'],
             update: function (data) {
                 forIn(this, data, function (value, key) {
                     this.set(key, value);
+                });
+                this._convertProperties();
+            },
+
+
+            //
+            //
+            //  Pseudo-Private methods
+            //
+            //
+
+
+            _convertProperties: function () {
+                var properties = this.get('convertProperties');
+                if (!properties)
+                    return;
+                forIn(this, properties, function (after, before) {
+                    this.set(after, this.get(before));
+                    this.set(before, undefined);
+                    delete this[before];
                 });
             }
         });

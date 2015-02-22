@@ -13,7 +13,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
         var LOGS_REQUEST_INTERVAL = 500;
         var EVENT_TYPES = ['job', 'shell', 'request', 'session', 'incident'];
 
-        return PageView.extend({
+        return App.LogListView = PageView.extend({
 
 
             //
@@ -71,6 +71,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
 
 
             search: function () {
+
                 if (!Mist.logs.socket.socket.connected)  {
                     Ember.run.later(this, function () {
                         this.search();
@@ -291,6 +292,10 @@ define('app/views/log_list', ['app/views/mistscreen'],
                         payload.error = true;
                     else
                         payload.event_type = forceFlag;
+                }
+
+                if (DEBUG_LOGS) {
+                    info('Requesting logs:', payload)
                 }
 
                 return payload;

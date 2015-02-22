@@ -28,9 +28,6 @@
     margin-bottom: 10px;
     text-align: center;
 }
-#create-machine-script {
-    height: auto !important;
-}
 #create-machine-network {
 	display: none;
 }
@@ -42,4 +39,18 @@
 }
 #create-machine-network .ui-collapsible-content {
 	padding: 0;
+}
+#create-machine-panel #script .ui-slider {
+    width: 40%;
+    float: right;
+}
+#create-machine-panel #script label {
+    float: left;
+}
+#create-machine-panel #script textarea {
+    height: auto !important;
+    clear: both;
+}
+#create-machine-panel #script .ui-collapsible {
+    clear:both;
 }

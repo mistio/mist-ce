@@ -56,6 +56,11 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     .indexOf(this.provider) > -1;
             }.property('provider'),
 
+            requiresNetworkOnCreation: function () {
+                return  ['openstack', 'vcloud', 'indonesian_vcloud']
+                    .indexOf(this.provider) > -1;
+            }.property('provider'),
+
             isLibvirt: function () {
                 return this.get('provider') == 'libvirt';
             }.property('provider'),

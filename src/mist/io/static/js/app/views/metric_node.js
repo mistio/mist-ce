@@ -8,7 +8,7 @@ define('app/views/metric_node', ['app/views/templated'],
 
         'use strict';
 
-        return TemplatedView.extend({
+        return App.MetricNodeView = TemplatedView.extend({
 
 
             //

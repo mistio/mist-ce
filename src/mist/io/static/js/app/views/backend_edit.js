@@ -8,7 +8,7 @@ define('app/views/backend_edit', ['app/views/popup'],
 
         'use strict';
 
-        return PopupView.extend({
+        return App.BackendEditView = PopupView.extend({
 
 
             //

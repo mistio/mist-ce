@@ -8,7 +8,7 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
         'use strict';
 
-        return ListItemView.extend({
+        return App.LogListItemView = ListItemView.extend({
 
 
             //

@@ -6,7 +6,7 @@
 
         <h1>Images</h1>
 
-        {{view Mist.userMenuView}}
+        {{view "userMenu"}}
 
     </div>
 
@@ -30,7 +30,7 @@
             data-inset="true"
             class="checkbox-list">
             {{#each view.renderedImages}}
-                {{view Mist.imageListItemView imageBinding="this" class="checkbox-link" }}
+                {{view "imageListItem" imageBinding="this" class="checkbox-link" }}
             {{/each}}
         </ul>
 
@@ -52,8 +52,8 @@
 
     </div>
 
-    {{view Mist.dialogView}}
+    {{view "dialog"}}
 
-    {{view Mist.machineAddView}}
+    {{view "machineAdd"}}
 
 </div>

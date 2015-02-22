@@ -354,7 +354,10 @@ class OODict(object):
         return type(self)(deepcopy(self._dict, memo))
 
     def as_dict(self):
-        return {key: self.__getattribute__(key) for key in self.keys()}
+        d = {}
+        for key in self.keys():
+            d[key] = self.__getattribute__(key)
+        return d
 
 
 class FieldsSequence(object):
@@ -475,7 +478,9 @@ class FieldsDict(FieldsSequence, MutableMapping):
             yield key
 
     def __repr__(self):
-        d = {key: self[key] for key in self.keys()}
+        d = {}
+        for key in self.keys():
+            d[key] = self[key]
         return "%s: %r" % (type(self), d)
 
     def __str__(self):
