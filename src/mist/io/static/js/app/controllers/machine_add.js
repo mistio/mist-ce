@@ -97,13 +97,6 @@ define('app/controllers/machine_add', ['ember'],
                         }
                     }
                 }
-                if (providerName == 'DigitalOcean') {
-                    var re = /^[0-9a-zA-Z-.]*$/;
-                    if (!re.test(machineName)) {
-                        Mist.notificationController.timeNotify('Characters allowed are a-z, A-Z, 0-9, . and -', 7000);
-                        return;
-                    }
-                }
                 if (providerName == 'Azure') {
                     var re = /^[0-9a-zA-Z-]*$/;
                     if (!re.test(machineName)) {
