@@ -74,7 +74,7 @@
 
                         <!-- Scripts link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/scripts">
+                            <a class="ui-btn" href="#/scripts">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.scriptsController.length}}
                                 </span>
@@ -111,7 +111,7 @@
 
         <div data-role="collapsible" data-collapsed="false">
            <h4>Activity log</h4>
-           {{view "LogList"}}
+           {{view "Mist.logListView"}}
         </div>
         {{/if}}
     </div>

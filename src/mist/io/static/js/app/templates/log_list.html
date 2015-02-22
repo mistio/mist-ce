@@ -1,99 +1,86 @@
-<div id="log-list-page" data-role="page" class="ui-page-active ui-page ui-page-theme-a log-list">
+<div class="log-list">
+    <div class="filter-wrapper">
+        <fieldset data-role="controlgroup" data-type="horizontal">
 
-    <div class="ui-header ui-bar-b">
+            <input name="event"
+                id="event-all"
+                data-mini="true"
+                value="on"
+                checked="checked"
+                type="radio"
+                {{action "updateFilterFlags" "all" on="change" target="view"}}>
+            <label for="event-all">All</label>
 
-        <a class="ui-btn ui-btn-left ui-btn-icon-left ui-icon-home
-            ui-corner-all responsive-button" href="#">Home</a>
+            <input name="event"
+                id="event-jobs"
+                data-mini="true"
+                value="off"
+                type="radio"
+                {{action "updateFilterFlags" "job" on="change" target="view"}}>
+            <label for="event-jobs">Jobs</label>
 
-        <h1 class="ui-title">Logs</h1>
+            <input name="event"
+                id="event-requests"
+                data-mini="true"
+                value="off"
+                type="radio"
+                {{action "updateFilterFlags" "request" on="change" target="view"}}>
+            <label for="event-requests">Requests</label>
 
+            <input name="event"
+                id="event-incidents"
+                data-mini="true"
+                value="off"
+                type="radio"
+                {{action "updateFilterFlags" "incident" on="change" target="view"}}>
+            <label for="event-incidents">Incidents</label>
+
+            <input name="event"
+                id="event-sessions"
+                data-mini="true"
+                value="off"
+                type="radio"
+                {{action "updateFilterFlags" "session" on="change" target="view"}}>
+            <label for="event-sessions">Sessions</label>
+
+            <input name="event"
+                id="event-shell"
+                data-mini="true"
+                value="off"
+                type="radio"
+                {{action "updateFilterFlags" "shell" on="change" target="view"}}>
+            <label for="event-shell">Shell</label>
+
+            <input name="event"
+                id="event-error"
+                data-mini="true"
+                value="off"
+                type="radio"
+                {{action "updateFilterFlags" "error" on="change" target="view"}}>
+            <label for="event-error">Errors</label>
+        </fieldset>
+        {{view Mist.TextField id="log-filter" valueBinding="view.filterString" placeholder="Filter logs..."}}
     </div>
 
-    <div role="main" class="ui-content" data-theme="c">
+    {{#if view.searching}}
+        <div class="ajax-loader"></div>
+    {{/if}}
 
-        <div class="filter-wrapper">
-            <fieldset data-role="controlgroup" data-type="horizontal">
+    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
+        data-role="listview"
+        data-enhanced="true"
+        data-inset="true">
+        {{#each Mist.logsController}}
+            {{view Mist.logListItemView logBinding="this"}}
+        {{/each}}
+    </ul>
 
-                <input name="event"
-                    id="event-all"
-                    data-mini="true"
-                    value="on"
-                    checked="checked"
-                    type="radio"
-                    {{action "updateFilterFlags" "all" on="change" target="view"}}>
-                <label for="event-all">All</label>
+    {{#if view.fetchingHistory}}
+        <div class="ajax-loader"></div>
+    {{/if}}
 
-                <input name="event"
-                    id="event-jobs"
-                    data-mini="true"
-                    value="off"
-                    type="radio"
-                    {{action "updateFilterFlags" "job" on="change" target="view"}}>
-                <label for="event-jobs">Jobs</label>
-
-                <input name="event"
-                    id="event-requests"
-                    data-mini="true"
-                    value="off"
-                    type="radio"
-                    {{action "updateFilterFlags" "request" on="change" target="view"}}>
-                <label for="event-requests">Requests</label>
-
-                <input name="event"
-                    id="event-incidents"
-                    data-mini="true"
-                    value="off"
-                    type="radio"
-                    {{action "updateFilterFlags" "incident" on="change" target="view"}}>
-                <label for="event-incidents">Incidents</label>
-
-                <input name="event"
-                    id="event-sessions"
-                    data-mini="true"
-                    value="off"
-                    type="radio"
-                    {{action "updateFilterFlags" "session" on="change" target="view"}}>
-                <label for="event-sessions">Sessions</label>
-
-                <input name="event"
-                    id="event-shell"
-                    data-mini="true"
-                    value="off"
-                    type="radio"
-                    {{action "updateFilterFlags" "shell" on="change" target="view"}}>
-                <label for="event-shell">Shell</label>
-
-                <input name="event"
-                    id="event-error"
-                    data-mini="true"
-                    value="off"
-                    type="radio"
-                    {{action "updateFilterFlags" "error" on="change" target="view"}}>
-                <label for="event-error">Errors</label>
-            </fieldset>
-            {{view Mist.TextField id="log-filter" valueBinding="view.filterString" placeholder="Filter logs..."}}
-        </div>
-
-        {{#if view.searching}}
-            <div class="ajax-loader"></div>
-        {{/if}}
-
-        <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
-            data-role="listview"
-            data-enhanced="true"
-            data-inset="true">
-            {{#each Mist.logsController}}
-                {{view Mist.logListItemView logBinding="this"}}
-            {{/each}}
-        </ul>
-
-        {{#if view.fetchingHistory}}
-            <div class="ajax-loader"></div>
-        {{/if}}
-
-        {{#if view.noMoreLogs}}
-            <div class="no-logs"></div>
-        {{/if}}
-        <div class="mid-padding"></div>
-    </div>
+    {{#if view.noMoreLogs}}
+        <div class="no-logs"></div>
+    {{/if}}
+    <div class="mid-padding"></div>
 </div>
