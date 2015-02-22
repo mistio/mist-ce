@@ -157,6 +157,7 @@ var appLoader = {
             before: [],
             exec: function () {
                 require(['ember'], function () {
+                    extendEmberView();
                     appLoader.complete('load ember');
                 });
             },
@@ -689,38 +690,8 @@ var loadApp = function (
 
     // Mist functions
 
-    App.getViewName = function (view) {
-        var name = view.constructor.toString().split('.')[1].split('View')[0];
-        // Ensure compatibility with new view name convention
-        return name.charAt(0).toLowerCase() + name.slice(1)
-    };
-
     App.isScrolledToTop = function () {
         return window.pageYOffset <= 20;
-    };
-
-    App.capitalize = function (string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    };
-
-    App.decapitalize = function (string) {
-        return string.charAt(0).toLowerCase() + string.slice(1);
-    };
-
-    App.capitalizeArray = function (array) {
-        var newArray = [];
-        array.forEach(function(string) {
-            newArray.push(App.capitalize(string));
-        });
-        return newArray;
-    };
-
-    App.decapitalizeArray = function (array) {
-        var newArray = [];
-        array.forEach(function(string) {
-            newArray.push(App.decapitalize(string));
-        });
-        return newArray;
     };
 
     App.isScrolledToBottom = function(){
@@ -786,23 +757,6 @@ var loadApp = function (
             element.slideDown();
         else
             element.slideUp();
-    };
-
-    App.splitWords = function (string) {
-        if (string.indexOf('-') > -1)
-            return string.split('-');
-        else if (string.indexOf('_') > -1)
-            return string.split('_');
-        else if (string.indexOf(' ') > -1)
-            return string.split(' ');
-        else if (string.match(/([a-z])([A-Z])/g)) {
-            var wordJoints = string.match(/([a-z])([A-Z])/g);
-            wordJoints.forEach(function(joint) {
-                string = string.replace(joint, joint[0] + '_' + joint[1]);
-            });
-            return App.splitWords(string);
-        }
-        return [string];
     };
 };
 
@@ -1393,7 +1347,6 @@ function getTime () {
     return Date.now() - startTime;
 };
 
-
 // Console aliases
 function log() {
     if (LOGLEVEL > 3)
@@ -1502,6 +1455,24 @@ function parseProviderMap () {
 //
 //
 
+
+var extendEmberView = function () {
+
+    Ember.View.prototype.getName = function () {
+        return this.constructor.toString().split('.')[1].split('View')[0];
+    };
+    Ember.View.prototype.getWidgetID = function () {
+        return '#' + this.getName().dasherize();
+    }
+    Ember.View.prototype.getControllerName = function () {
+        return this.getName().decapitalize() + 'Controller';
+    }
+};
+
+
+String.prototype.decapitalize = function () {
+    return this.charAt(0).toLowerCase() + this.slice(1);
+}
 
 Date.prototype.getPrettyTime = function () {
 
