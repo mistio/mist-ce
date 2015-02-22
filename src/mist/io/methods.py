@@ -1927,7 +1927,7 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
     thing that changes is the action. This helper function saves us some code.
 
     """
-    actions = ('start', 'stop', 'reboot', 'destroy', 'resize')
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename')
 
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
@@ -2000,6 +2000,8 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
                 conn.ex_stop_node(machine)
         elif action is 'resize':
             conn.ex_resize_node(node, plan_id)
+        elif action is 'rename':
+            conn.ex_rename_node(node, name)
         elif action is 'reboot':
             if bare_metal:
                 try:
@@ -2089,6 +2091,11 @@ def stop_machine(user, backend_id, machine_id):
 def reboot_machine(user, backend_id, machine_id):
     """Reboots a machine on a certain backend."""
     _machine_action(user, backend_id, machine_id, 'reboot')
+
+
+def rename_machine(user, backend_id, machine_id, name):
+    """Renames a machine on a certain backend."""
+    _machine_action(user, backend_id, machine_id, 'rename')
 
 
 def resize_machine(user, backend_id, machine_id, plan_id):
