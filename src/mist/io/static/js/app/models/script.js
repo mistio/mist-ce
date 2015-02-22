@@ -6,7 +6,7 @@ define('app/models/script', ['app/models/base'],
     //
     function (BaseModel) {
 
-        'use sctrict';
+        'use strict';
 
         return BaseModel.extend({
 
