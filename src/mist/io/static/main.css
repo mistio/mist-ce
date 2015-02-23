@@ -171,6 +171,9 @@ textarea#private-key, #manual-monitoring-popup textarea {
 }
 .tiny-popup {
     width: 150px !important;
+    /* only for machine keys*/
+    overflow: auto;
+    max-height: 268px;
 }
 .small-popup {
     width: 240px !important;
