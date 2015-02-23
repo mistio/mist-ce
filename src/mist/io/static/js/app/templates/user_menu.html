@@ -1,13 +1,12 @@
 <a id="me-btn"
    class="ui-btn-right"
-   data-role="button"
    {{action "meClicked" target="view"}}>
     {{#if view.gravatarURL}}
         <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
     {{else}}
         <div class="gravatar-image user"></div>
     {{/if}}
-    &nbsp;</a>
+    </a>
 
 <div id="user-menu-popup" class="ui-mini" data-role="popup" data-position-to="#me-btn" data-theme="c" data-overlay-theme="b" data-transition="flip">
 
@@ -17,23 +16,24 @@
 
         <a href="https://mistio.zendesk.com/access/login"
            target="_blank"
-           data-role="button"
-           data-theme="b"
-           data-mini="true">Support</a>
+           class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-mini"
+        >Support</a>
 
         {{#if Mist.authenticated}}
 
-            <a data-role="button" data-mini="true" data-theme="b"
+            <a class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-mini"
                {{bind-attr href="view.accountUrl"}}
                {{bind-attr target="view.isNotCore"}}>Account</a>
 
 
             {{#if Mist.isCore}}
-                <a data-role="button" data-theme="b" data-mini="true" {{action "logoutClicked" target="view"}}>Logout</a>
+                <a class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-mini"
+                   {{action "logoutClicked" target="view"}}>Logout</a>
             {{/if}}
         {{else}}
             {{#unless Mist.isCore}}
-                <a data-role="button" data-theme="b" data-mini="true" {{action "loginClicked" target="view"}}>Login</a>
+                <a class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-mini"
+                   {{action "loginClicked" target="view"}}>Login</a>
             {{/unless}}
         {{/if}}
 

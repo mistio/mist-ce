@@ -31,7 +31,7 @@
                 <div class="ajax-loader"></div>
                 {{/if}}
             </h4>
-            <a data-role="button" {{action "displayClicked" target="view"}}>Display</a>
+            <a class="ui-btn ui-shadow ui-corner-all" {{action "displayClicked" target="view"}}>Display</a>
         </div>
 
         {{#if machines}}
@@ -64,9 +64,9 @@
 
     <div class="dual-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
-            <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
+            <a class="ui-btn ui-btn-icon-left ui-icon-edit ui-corner-all" {{action "renameClicked" target="view"}}>Rename</a>
         </td><td>
-            <a data-role="button" data-icon="delete" {{action "deleteClicked" target="view"}}>Delete</a>
+            <a class="ui-btn ui-btn-icon-left ui-icon-delete ui-corner-all" {{action "deleteClicked" target="view"}}>Delete</a>
         </td></tr></tbody></table>
     </div>
 
