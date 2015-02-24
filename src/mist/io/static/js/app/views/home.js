@@ -4,11 +4,11 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
     //
     //  @returns Class
     //
-    function (MistScreen, Graph) {
+    function (PageView, Graph) {
 
         'use strict';
 
-        return MistScreen.extend({
+        return App.HomeView = PageView.extend({
 
 
             //

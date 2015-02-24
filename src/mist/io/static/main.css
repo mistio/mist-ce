@@ -297,14 +297,14 @@ ul.checkbox-list li label {
     border: none;
     height: 41px;
 }
-.checkbox-link .tag {
+.tag {
     border: 1px solid #bfbfbf;
     margin: 1px;
     color: #555 !important;
     padding: 1px 7px;
-    float: right;
     font-size: 12px;
     font-weight: normal;
+    display: inline-block;
 }
 
 #image-list .checkbox-link .tag {

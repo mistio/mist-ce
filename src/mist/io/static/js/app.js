@@ -1,5 +1,7 @@
 startTimer();
 
+window.App = new Object();
+
 DEBUG_SOCKET = false;
 DEBUG_STATS = false;
 DEBUG_LOGS = false;
@@ -203,9 +205,9 @@ var appLoader = {
         'init app': {
             before: ['load templates', 'init connections'],
             exec: function () {
-                loadApp.apply(null, appLoader.buffer.files.concat([function () {
+                loadApp.apply(null, [function () {
                     appLoader.complete('init app');
-                }]));
+                }].concat(appLoader.buffer.files));
             }
         },
         'init connections': {
@@ -347,6 +349,7 @@ var loadFiles = function (callback) {
 };
 
 var loadApp = function (
+    callback,
     TemplatesBuild,
     BackendAddController,
     BackendEditController,
@@ -379,63 +382,7 @@ var loadApp = function (
     ScriptAddController,
     ScriptEditController,
     ScriptRunController,
-    ScriptsController,
-    BackendAdd,
-    BackendButton,
-    BackendEdit,
-    ConfirmationDialog,
-    DialogView,
-    FileUploadView,
-    GraphButtonView,
-    GraphListView,
-    GraphListBarView,
-    GraphListControlView,
-    GraphListItemView,
-    Home,
-    ImageListItem,
-    ImageListView,
-    IPAddressListItemView,
-    SingleKeyView,
-    KeyAddView,
-    KeyEditDialog,
-    KeyListView,
-    KeyListItemView,
-    LogListView,
-    LogListItemView,
-    LoginView,
-    SingleMachineView,
-    MachineAddDialog,
-    MachineKeysView,
-    MachineKeysListItemView,
-    MachineListView,
-    MachineListItem,
-    MachineMonitoringView,
-    MachinePowerView,
-    MachineShellView,
-    MachineTagsView,
-    MachineTagsListItemView,
-    MessageBoxView,
-    MetricAddView,
-    MetricAddCustomView,
-    MissingView,
-    MetricNodeView,
-    NetworkView,
-    NetworkCreateView,
-    NetworkListView,
-    NetworkListItemView,
-    RuleView,
-    RuleEditView,
-    RuleListView,
-    ScriptView,
-    ScriptAddView,
-    ScriptEditView,
-    ScriptListView,
-    ScriptRunView,
-    ScriptListItemView,
-    ScriptLogListView,
-    SubnetListItemView,
-    UserMenuView,
-    callback) {
+    ScriptsController) {
 
     // Hide error boxes on page unload
     window.onbeforeunload = function() {
@@ -443,12 +390,11 @@ var loadApp = function (
     };
 
     // Ember Application
-    App = Ember.Application.create({
-        ready: callback
-    });
+    App.ready = callback;
+    App = Ember.Application.create(App);
 
     // Globals
-    App.set('betaFeatures', window.BETA_FEATURES || false);
+    App.set('betaFeatures', !!window.BETA_FEATURES);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
@@ -654,67 +600,6 @@ var loadApp = function (
             });
         },
     });
-
-    // Ember views
-
-    App.DialogView = DialogView;
-    App.LogListItemView = LogListItemView;
-    App.ScriptAddView = ScriptAddView;
-    App.ScriptView = ScriptView;
-    App.ScriptEditView = ScriptEditView;
-    App.ScriptRunView = ScriptRunView;
-    App.ScriptListView = ScriptListView;
-    App.ScriptListItemView = ScriptListItemView;
-    App.ScriptLogListView = ScriptLogListView;
-    App.SubnetListItemView = SubnetListItemView;
-    App.IpAddressListItemView = IPAddressListItemView;
-
-    App.set('homeView', Home);
-    App.set('ruleView', RuleView);
-    App.set('loginView', LoginView);
-    App.set('logListView', LogListView);
-    App.set('keyAddView', KeyAddView);
-    App.set('keyView', SingleKeyView);
-    App.set('missingView', MissingView);
-    App.set('metricNodeView', MetricNodeView);
-    App.set('keyListView', KeyListView);
-    App.set('networkView', NetworkView);
-    App.set('userMenuView', UserMenuView);
-    App.set('keyEditView', KeyEditDialog);
-    App.set('backendAddView', BackendAdd);
-    App.set('ruleEditView', RuleEditView);
-    App.set('metricAddView', MetricAddView);
-    App.set('backendEditView', BackendEdit);
-    App.set('imageListView', ImageListView);
-    App.set('fileUploadView', FileUploadView);
-    App.set('messageboxView', MessageBoxView);
-    App.set('machineMonitoringView', MachineMonitoringView);
-    App.set('machineView', SingleMachineView);
-    App.set('graphListView', GraphListView);
-    App.set('graphListBarView', GraphListBarView);
-    App.set('graphListControlView', GraphListControlView);
-    App.set('graphListItemView', GraphListItemView);
-    App.set('networkCreateView', NetworkCreateView);
-    App.set('networkListView', NetworkListView);
-    App.set('machineKeysView', MachineKeysView);
-    App.set('machineTagsView', MachineTagsView);
-    App.set('keyListItemView', KeyListItemView);
-    App.set('dialogView', DialogView);
-    App.set('ruleListView', RuleListView);
-    App.set('logListItemView', LogListItemView);
-    App.set('machineListView', MachineListView);
-    App.set('imageListItemView', ImageListItem);
-    App.set('machineAddView', MachineAddDialog);
-    App.set('backendButtonView', BackendButton);
-    App.set('graphButtonView', GraphButtonView);
-    App.set('networkListItemView', NetworkListItemView);
-    App.set('machinePowerView', MachinePowerView);
-    App.set('machineShellView', MachineShellView);
-    App.set('machineListItemView', MachineListItem);
-    App.set('confirmationDialog', ConfirmationDialog);
-    App.set('metricAddCustomView', MetricAddCustomView);
-    App.set('machineKeysListItemView', MachineKeysListItemView);
-    App.set('machineTagsListItemView', MachineTagsListItemView);
 
     // Ember controllers
 
@@ -970,12 +855,14 @@ var handleMobileInit = function () {
 
 var setupSocketEvents = function (socket, callback) {
 
+    if (Mist.betaFeatures) {
     //  This is a temporary ajax-request to get the scripts.
     //  It should be converted into a "list_scripts" socket handler
     //  as soon as the backend supports it
     Mist.ajax.GET('/scripts').success(function (scripts) {
         Mist.scriptsController.setContent(scripts);
     });
+    }
 
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);

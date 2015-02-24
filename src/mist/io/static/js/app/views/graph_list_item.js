@@ -32,7 +32,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         var ANIMATION_FPS = 12;
         var ANIMATION_DURATION = 9;
 
-        return TemplatedView.extend({
+        return App.GraphListItemView = TemplatedView.extend({
 
 
             //

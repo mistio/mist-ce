@@ -66,12 +66,12 @@
         <div class="ajax-loader"></div>
     {{/if}}
 
-    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
+    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow ui-mini"
         data-role="listview"
         data-enhanced="true"
         data-inset="true">
         {{#each Mist.logsController}}
-            {{view Mist.logListItemView logBinding="this"}}
+            {{view "logListItem" logBinding="this"}}
         {{/each}}
     </ul>
 

@@ -1,14 +1,14 @@
-define('app/views/machine_tags', ['app/views/templated', 'ember'],
+define('app/views/machine_tags', ['app/views/templated'],
     /**
      *  Machine Tags View
      *
      *  @returns Class
      */
     function (TemplatedView) {
-        return TemplatedView.extend({
+        return App.MachineTagsView = TemplatedView.extend({
 
             /**
-             * 
+             *
              *  Actions
              *
              */
