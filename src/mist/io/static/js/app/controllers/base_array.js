@@ -6,7 +6,7 @@ define('app/controllers/base_array', ['ember'],
     //
     function () {
 
-        'use scrict';
+        'use strict';
 
         return Ember.ArrayController.extend(Ember.Evented, {
 
