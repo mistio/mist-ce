@@ -6,7 +6,7 @@ define('app/views/script_list_item', ['app/views/list_item'],
     //
     function (ListItemView) {
 
-        'use sctrict';
+        'use strict';
 
         return App.ScriptListItemView = ListItemView.extend({
 
