@@ -1005,6 +1005,12 @@ function program5(depth0,data) {
   return buffer;
   }
 
+function program7(depth0,data) {
+  
+  
+  data.buffer.push("\n            <li class=\"ui-li-has-count ui-last-child\">\n\n                <a class=\"ui-btn ui-btn-icon-right ui-icon-carat-r\" href=\"#/logs\">\n\n                    Logs\n\n                </a>\n            </li>\n            ");
+  }
+
   data.buffer.push("<div id=\"home-page\" data-role=\"page\" class=\"ui-page-active ui-page\">\n\n    <!-- Page header -->\n\n    <div class=\"ui-header ui-bar-b\">\n\n        <h1 class=\"ui-title\">mist.io</h1>\n\n        ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <!-- Page Body -->\n\n    <div role=\"main\" class=\"ui-content\" data-theme=\"c\">\n\n        <!-- Add backend button -->\n\n        <a id=\"add-backend-btn\" class=\"ui-link ui-btn ui-btn-d ui-icon-plus\n            ui-btn-icon-right ui-shadow ui-corner-all\"\n            ");
@@ -1029,7 +1035,10 @@ function program5(depth0,data) {
   data.buffer.push("\n                    </span>\n                    Keys\n\n                </a>\n            </li>\n\n            <!-- Scripts link -->\n\n            ");
   stack1 = helpers['if'].call(depth0, "Mist.betaFeatures", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            <!-- Logs link -->\n\n            <li class=\"ui-li-has-count ui-last-child\">\n\n                <a class=\"ui-btn ui-btn-icon-right ui-icon-carat-r\" href=\"#/logs\">\n\n                    Logs\n\n                </a>\n            </li>\n        </ul>\n\n        ");
+  data.buffer.push("\n\n            <!-- Logs link -->\n            ");
+  stack1 = helpers.unless.call(depth0, "Mist.isCore", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n        </ul>\n\n        ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "graphList", {hash:{
     'actionProxyBinding': ("view")
   },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
