@@ -13,7 +13,7 @@ from base64 import b64encode
 
 from memcache import Client as MemcacheClient
 
-from celery import Task
+from celery import Celery, Task
 
 from amqp import Message
 from amqp.connection import Connection
@@ -36,11 +36,13 @@ try:  # Multi-user environment
     from mist.core import config
     multi_user = True
     cert_path = "src/mist.io/cacert.pem"
+    celery_cfg = 'mist.core.celery_config'
 except ImportError:  # Standalone mist.io
     from mist.io.helpers import user_from_email
     from mist.io import config
     multi_user = False
     cert_path = "cacert.pem"
+    celery_cfg = 'mist.io.celery_config'
 
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_user_listening
@@ -54,6 +56,10 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
+
+
+app = Celery('tasks')
+app.conf.update(**config.CELERY_SETTINGS)
 
 
 @app.task
