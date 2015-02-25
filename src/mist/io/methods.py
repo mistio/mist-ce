@@ -2891,6 +2891,8 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "fi;"
        "echo -------- && "
        "/sbin/ifconfig;"
+       "echo -------- &&"
+       "/bin/df -Pah;"
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
     )
@@ -2900,7 +2902,7 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 
     cmd_output = ssh_command(user, backend_id, machine_id,
                              host, command, key_id=key_id)
-    cmd_output = cmd_output.replace('\r\n','').split('--------')
+    cmd_output = cmd_output.replace('\r','').split('--------')
     log.warn(cmd_output)
     uptime_output = cmd_output[1]
     loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
@@ -2908,10 +2910,16 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     uptime = cmd_output[2]
     cores = cmd_output[3]
     ips = re.findall('inet addr:(\S+)', cmd_output[4])
+    m = re.findall('((?:[0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2})', cmd_output[4])
     if '127.0.0.1' in ips:
         ips.remove('127.0.0.1')
+    macs = {}
+    for i in range(0, len(ips)):
+        macs[ips[i]] = m[i]
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
+
+
     return {
         'uptime': uptime,
         'loadavg': loadavg,
@@ -2919,6 +2927,8 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         'users': users,
         'pub_ips': pub_ips,
         'priv_ips': priv_ips,
+        'macs': macs,
+        'df': cmd_output[5],
         'timestamp': time(),
     }
 

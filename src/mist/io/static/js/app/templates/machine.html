@@ -134,7 +134,7 @@
                                 <div {{bind-attr class="loadavg1 :led"}}>
                                 </div>
                             </div>
-                            {{loadavg}} - {{loadavg5}}
+                            {{loadavg}} {{#if cores}}- {{cores}} cores {{/if}}- {{loadavg5}} 
                         </td>
                     </tr>
                 {{/if}}
@@ -190,6 +190,10 @@
                             {{/each}}
                         </td>
                     </tr>
+                {{/if}}
+                {{#if view.machine.df}}
+                    <tr>
+                        <td colspan="2"><div class="df">{{view.machine.df}}</div></td>
                 {{/if}}
                 {{#each view.basicInfo}}
                     <tr>
