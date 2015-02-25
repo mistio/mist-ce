@@ -157,6 +157,13 @@ define('app/controllers/images', ['app/models/image'],
                 var os = 'generic';
                 var image = this.getImage(imageId);
 
+                OS_MAP.some(function (pair) {
+                    return pair[0].some(function (key) {
+                        if (imageId.toLowerCase().indexOf(key) > -1)
+                            return os = pair[1];
+                    });
+                });
+
                 if (!image) return os;
                 OS_MAP.some(function (pair) {
                     return pair[0].some(function (key) {
