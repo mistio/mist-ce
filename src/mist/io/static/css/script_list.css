@@ -1,1 +1,7 @@
-/* nothing to do here yet */
+#script-list-page .list-wrapper .tag {
+  float: none;
+  margin: 0 auto;
+}
+#script-list-page .list-wrapper .ui-block-b {
+  text-align: center;
+}
