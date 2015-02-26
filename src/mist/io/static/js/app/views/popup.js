@@ -30,13 +30,7 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
 
             init: function () {
                 this._super();
-                this.set('popupId', '#' +
-                    Mist.decapitalizeArray(
-                        Mist.splitWords(
-                            Mist.getViewName(this)
-                        )
-                    ).join('-')
-                );
+                this.set('popupId', this.getWidgetID());
             },
 
 
