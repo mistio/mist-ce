@@ -108,7 +108,7 @@
             {{/if}}
 
             <!-- Logs link -->
-
+            {{#unless Mist.isCore}}
             <li class="ui-li-has-count ui-last-child">
 
                 <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/logs">
@@ -117,6 +117,7 @@
 
                 </a>
             </li>
+            {{/unless}}
         </ul>
 
         {{view "graphList" actionProxyBinding="view"}}

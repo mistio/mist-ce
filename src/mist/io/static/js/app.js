@@ -393,6 +393,7 @@ var loadApp = function (
     // Ember Application
     App.ready = callback;
     App = Ember.Application.create(App);
+    window.Mist  = App;
 
     // Globals
     App.set('betaFeatures', !!window.BETA_FEATURES);
@@ -406,8 +407,6 @@ var loadApp = function (
     );
 
     parseProviderMap();
-
-    window.Mist = App;
 
     // Ember routes and routers
 
@@ -484,7 +483,6 @@ var loadApp = function (
             return Mist.backendsController.getNetwork(id);
         }
     });
-
 
     App.MachinesRoute = Ember.Route.extend({
         activate: function() {
