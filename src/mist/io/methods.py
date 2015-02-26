@@ -1294,6 +1294,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
+
+    machine_name = machine_name_validator(conn.type, machine_name)
     if conn.type is Provider.DOCKER:
         if key_id:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
@@ -2889,6 +2891,8 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "fi;"
        "echo -------- && "
        "/sbin/ifconfig;"
+       "echo -------- &&"
+       "/bin/df -Pah;"
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
     )
@@ -2898,7 +2902,7 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 
     cmd_output = ssh_command(user, backend_id, machine_id,
                              host, command, key_id=key_id)
-    cmd_output = cmd_output.replace('\r\n','').split('--------')
+    cmd_output = cmd_output.replace('\r','').split('--------')
     log.warn(cmd_output)
     uptime_output = cmd_output[1]
     loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
@@ -2906,10 +2910,16 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     uptime = cmd_output[2]
     cores = cmd_output[3]
     ips = re.findall('inet addr:(\S+)', cmd_output[4])
+    m = re.findall('((?:[0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2})', cmd_output[4])
     if '127.0.0.1' in ips:
         ips.remove('127.0.0.1')
+    macs = {}
+    for i in range(0, len(ips)):
+        macs[ips[i]] = m[i]
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
+
+
     return {
         'uptime': uptime,
         'loadavg': loadavg,
@@ -2917,6 +2927,8 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         'users': users,
         'pub_ips': pub_ips,
         'priv_ips': priv_ips,
+        'macs': macs,
+        'df': cmd_output[5],
         'timestamp': time(),
     }
 
@@ -3433,3 +3445,45 @@ def get_deploy_collectd_manual_command(uuid, password, monitor):
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
+
+
+def machine_name_validator(provider, name):
+    """
+    Validates machine names before creating a machine
+    Provider specific
+    """
+    if not name and provider not in config.EC2_PROVIDERS:
+        raise MachineNameValidationError("machine name cannot be empty")
+    if provider is Provider.DOCKER:
+        pass
+    elif provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
+        pass
+    elif provider in [Provider.OPENSTACK]:
+        pass
+    elif provider is Provider.HPCLOUD:
+        pass
+    elif provider in config.EC2_PROVIDERS:
+        if len(name) > 255:
+            raise MachineNameValidationError("machine name max chars allowed is 255")
+    elif provider is Provider.NEPHOSCALE:
+        pass
+    elif provider is Provider.GCE:
+        pass
+    elif provider is Provider.SOFTLAYER:
+        pass
+    elif provider is Provider.DIGITAL_OCEAN:
+        if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and dots")
+    elif provider == Provider.AZURE:
+        pass
+    elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+        pass
+    elif provider is Provider.LINODE:
+        if len(name) < 3:
+            raise MachineNameValidationError("machine name should be at least 3 chars")
+        if not re.search(r'^[0-9a-zA-Z][0-9a-zA-Z-_]+[0-9a-zA-Z]$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and underscores. Must begin and end with letters or numbers, " + \
+                "and be at least 3 characters long")
+    return name
