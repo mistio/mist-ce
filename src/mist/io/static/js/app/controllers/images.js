@@ -156,11 +156,16 @@ define('app/controllers/images', ['app/models/image'],
 
                 var os = 'generic';
                 var image = this.getImage(imageId);
+                var imageCred;
+
+                if(!!image)
+                    imageCred = image.name;
+                else
+                    imageCred = imageId;
 
                 OS_MAP.some(function (pair) {
                     return pair[0].some(function (key) {
-                        if ((imageId.toLowerCase().indexOf(key) > -1) || (
-                            (!!image) && (image.name.toLowerCase().indexOf(key) > -1)) )
+                        if (imageCred.toLowerCase().indexOf(key) > -1)
                             return os = pair[1];
                     });
                 });
