@@ -30,12 +30,14 @@ define('app/views/machine_list_item', ['app/views/list_item'],
             },
 
             monitoringIcon: function() {
-                if (this.machine.hasMonitoring)
-                    return 'ui-icon-check';
-                else
+                if (this.machine.hasMonitoring){
+                    if (this.machine.hasOpenIncident)
+                        return 'ui-icon-alert';
+                    else
+                        return 'ui-icon-check';
+                } else
                     return 'ui-icon-none';
-                //else if (alert)
-                //    return 'ui-icon-alert';
+
             }.property('machine.hasMonitoring'),
 
 

@@ -88,6 +88,7 @@
 
             <div class="ui-block-b">
                 <div class="ui-body">
+                {{#if Mist.monitored_machines.length}}
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents">
                         <li class="ui-li-divider ui-bar-c ui-first-child">Incidents</li>
                         <li class="ui-bar-b">
@@ -102,7 +103,7 @@
                             <a class="ui-btn ui-btn-icon-right ui-icon-check" href="#/machines/didid"><span class="machine">testbox1</span>: net tx &gt; 5MBps for 17 mins <span class="time">2d ago</span></a>
                         </li>
                     </ul>
-
+                {{/if}}
                 </div>
             </div>
         </div><!-- /grid-a -->
