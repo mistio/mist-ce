@@ -28,7 +28,7 @@ define('app/views/templated', ['ember'],
                     )
                 ).join('_')
 
-                this.set('template', Ember.TEMPLATES[templateName + '/html']);
+                this.set('template', Ember.TEMPLATES[templateName]);
             }
         });
     }
