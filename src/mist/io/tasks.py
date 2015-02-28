@@ -619,12 +619,14 @@ def undeploy_collectd(email, backend_id, machine_id):
 
 
 @app.task
-def create_machine_async(user, backend_id, key_id, machine_name, location_id, 
+def create_machine_async(email, backend_id, key_id, machine_name, location_id, 
                          image_id, size_id, script, image_extra, disk, 
                           image_name, size_name, location_name, ips, monitoring,
                           networks, docker_env, docker_command, 
                           script_id=None, script_params=None,
                           quantity=1, persist=False, job_id=None):
+    from multiprocessing.dummy import Pool as ThreadPool
+    from mist.io.methods import create_machine
     log.warn('MULTICREATE ASYNC %d' % quantity)
 
     if multi_user:
@@ -632,9 +634,31 @@ def create_machine_async(user, backend_id, key_id, machine_name, location_id,
     else:
         log_event = lambda *args, **kwargs: None
 
+
+    log_event(email, 'job', 'async_machine_creation_started', job_id=job_id,
+              backend_id=backend_id, script_id=script_id, quantity=quantity)
+
     from time import sleep
     sleep(20)
-    log_event(email, 'job', 'async_machine_creation_finished', job_id=job_id, 
-              backend_id=backend_id, machine_id=machine_id, script_id=script_id, 
-              quantity=quantity)
-    
+    THREAD_COUNT = 5
+    pool = ThreadPool(THREAD_COUNT)
+
+    names = []
+    for i in range(1, quantity+1):
+        names.append('%s-%d' % (machine_name,i))
+
+    user = user_from_email(email)
+    specs = []
+    for name in names:
+        specs.append((user, backend_id, key_id, name, location_id, image_id,
+                      size_id, script, image_extra, disk, image_name, size_name,
+                      ))
+
+    def create_machine_wrapper(args):
+        return create_machine(*args)
+
+    pool.map(create_machine_wrapper, specs)
+    pool.close()
+    pool.join()
+    log_event(email, 'job', 'async_machine_creation_finished', job_id=job_id,
+              backend_id=backend_id, script_id=script_id, quantity=quantity)
