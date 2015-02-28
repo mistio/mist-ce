@@ -402,8 +402,7 @@ class UserTask(Task):
                     #self.memcache.delete(cache_key + 'error')
         if not amqp_user_listening(email):
             # noone is waiting for result, stop trying, but flush cached erros
-            if cached_err:
-                self.memcache.delete(cache_key + 'error')
+            self.memcache.delete(cache_key + 'error')
             return
         # check cache to stop iteration if other sequence has started
         cached = self.memcache.get(cache_key)
@@ -443,8 +442,7 @@ class UserTask(Task):
             amqp_log("%s: error %r, rerun %s" % (id_str, exc, rerun))
             return
         else:
-            if cached_err:
-                self.memcache.delete(cache_key + 'error')
+            self.memcache.delete(cache_key + 'error')
         cached = {'timestamp': time(), 'payload': data, 'seq_id': seq_id}
         ok = amqp_publish_user(email, routing_key=self.task_key, data=data)
         if not ok:
