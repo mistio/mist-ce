@@ -1365,10 +1365,11 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
+    job = None
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
-        mist.io.tasks.azure_post_create_steps.delay(
+        job = mist.io.tasks.azure_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params,
@@ -1377,24 +1378,28 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
-        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
+        job = mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params,
         )
     elif key_id:
         if script or script_id or monitoring:
-            mist.io.tasks.post_deploy_steps.delay(
+            job = mist.io.tasks.post_deploy_steps.delay(
                 user.email, backend_id, node.id, monitoring, script, key_id,
                 script_id=script_id, script_params=script_params,
             )
 
-    return {'id': node.id,
+
+    ret = {'id': node.id,
             'name': node.name,
             'extra': node.extra,
             'public_ips': node.public_ips,
             'private_ips': node.private_ips,
+            'job_id': job and job.id or None,
             }
+
+    return ret
 
 
 def _create_machine_rackspace(conn, public_key, machine_name,

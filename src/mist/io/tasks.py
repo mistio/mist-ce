@@ -616,3 +616,13 @@ def undeploy_collectd(email, backend_id, machine_id):
     user = user_from_email(email)
     import mist.io.methods
     mist.io.methods.undeploy_collectd(user, backend_id, machine_id)
+
+
+@app.task
+def create_machine_async(user, backend_id, key_id, machine_name, location_id, 
+                         image_id, size_id, script, image_extra, disk, 
+                          image_name, size_name, location_name, ips, monitoring,
+                          networks, docker_env, docker_command, 
+                          script_id=None, script_params=None,
+                          quantity=1, persist=False, job_id=None):
+    log.warn('MULTICREATE ASYNC %d' % quantity)

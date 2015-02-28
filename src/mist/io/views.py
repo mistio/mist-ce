@@ -479,17 +479,38 @@ def create_machine(request):
         docker_command = request.json_body.get('docker_command', None)
         script_id = request.json_body.get('script_id', '')
         script_params = request.json_body.get('script_params', '')
+        async = request.json_body.get('async', False)
+        quantity = request.json_body.get('quantity', 1)
+        persist = request.json_body.get('persist', False)
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
     user = user_from_request(request)
-    ret = methods.create_machine(user, backend_id, key_id, machine_name,
-                                 location_id, image_id, size_id, script,
-                                 image_extra, disk, image_name, size_name,
-                                 location_name, ips, monitoring, networks,
-                                 docker_env, docker_command,
-                                 script_id=script_id,
-                                 script_params=script_params)
+    if not async:
+        ret = methods.create_machine(user, backend_id, key_id, machine_name,
+                                     location_id, image_id, size_id, script,
+                                     image_extra, disk, image_name, size_name,
+                                     location_name, ips, monitoring, networks,
+                                     docker_env, docker_command,
+                                     script_id=script_id,
+                                     script_params=script_params)
+    else:
+        import uuid
+        job_id = uuid.uuid4().hex
+        from mist.io import tasks
+        tasks.create_machine_async.delay(user, backend_id, key_id, 
+                                         machine_name, location_id, image_id, 
+                                         size_id, script, image_extra, disk, 
+                                         image_name, size_name, location_name, ips, 
+                                         monitoring, networks,
+                                         docker_env, docker_command,
+                                         script_id=script_id,
+                                         script_params=script_params,
+                                         quantity=quantity,
+                                         persist=persist,
+                                         job_id=job_id)
+        ret = {'job_id': job_id}
+
     return ret
 
 
