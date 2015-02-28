@@ -626,3 +626,15 @@ def create_machine_async(user, backend_id, key_id, machine_name, location_id,
                           script_id=None, script_params=None,
                           quantity=1, persist=False, job_id=None):
     log.warn('MULTICREATE ASYNC %d' % quantity)
+
+    if multi_user:
+        from mist.core.helpers import log_event
+    else:
+        log_event = lambda *args, **kwargs: None
+
+    from time import sleep
+    sleep(20)
+    log_event(email, 'job', 'async_machine_creation_finished', job_id=job_id, 
+              backend_id=backend_id, machine_id=machine_id, script_id=script_id, 
+              quantity=quantity)
+    
