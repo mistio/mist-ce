@@ -498,16 +498,14 @@ def create_machine(request):
         import uuid
         job_id = uuid.uuid4().hex
         from mist.io import tasks
-        tasks.create_machine_async.delay(user, backend_id, key_id, 
+        tasks.create_machine_async.delay(user.email, backend_id, key_id, 
                                          machine_name, location_id, image_id, 
                                          size_id, script, image_extra, disk, 
-                                         image_name, size_name, location_name, ips, 
-                                         monitoring, networks,
-                                         docker_env, docker_command,
-                                         script_id=script_id,
+                                         image_name, size_name, location_name, 
+                                         ips, monitoring, networks, docker_env, 
+                                         docker_command, script_id=script_id,
                                          script_params=script_params,
-                                         quantity=quantity,
-                                         persist=persist,
+                                         quantity=quantity, persist=persist,
                                          job_id=job_id)
         ret = {'job_id': job_id}
 
