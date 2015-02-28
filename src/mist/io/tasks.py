@@ -652,7 +652,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
     for name in names:
         specs.append((user, backend_id, key_id, name, location_id, image_id,
                       size_id, script, image_extra, disk, image_name, size_name,
-                      ))
+                      location_name, ips, monitoring, networks, docker_env, 
+                      docker_command, 22, script_id, script_params))
 
     def create_machine_wrapper(args):
         return create_machine(*args)
@@ -662,3 +663,4 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
     pool.join()
     log_event(email, 'job', 'async_machine_creation_finished', job_id=job_id,
               backend_id=backend_id, script_id=script_id, quantity=quantity)
+
