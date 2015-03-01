@@ -281,7 +281,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
 
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
-                script_id=script_id, script_params=script_params, job_id)
+                script_id=script_id, script_params=script_params, job_id=job_id)
 
         except Exception as exc:
             raise self.retry(exc=exc, countdown=10, max_retries=15)
@@ -334,7 +334,7 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
 
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
-                script_id=script_id, script_params=script_params, job_id
+                script_id=script_id, script_params=script_params, job_id=job_id
             )
 
         except Exception as exc:
