@@ -162,7 +162,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             if script_id and multi_user:
                 tmp_log('will run script_id %s', script_id)
                 run_script.run(user.email, script_id, backend_id, machine_id,
-                               params=script_params, host=host)
+                               params=script_params, host=host, job_id=job_id)
                 tmp_log('executed script_id %s', script_id)
             elif command:
                 tmp_log('will run command %s', command)
@@ -196,7 +196,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 try:
                     enable_monitoring(user, backend_id, node.id,
                         name=node.name, dns_name=node.extra.get('dns_name',''),
-                        public_ips=ips, no_ssh=False, dry=False,
+                        public_ips=ips, no_ssh=False, dry=False, job_id=job_id
                     )
                 except Exception as e:
                     print repr(e)
@@ -295,7 +295,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
 def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
                                           monitoring, command, key_id,
                                           password, public_key, username='root',
-                                          script_id='', script_params='', 
+                                          script_id='', script_params='',
                                           job_id = None):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
@@ -619,10 +619,10 @@ def undeploy_collectd(email, backend_id, machine_id):
 
 
 @app.task
-def create_machine_async(email, backend_id, key_id, machine_name, location_id, 
-                         image_id, size_id, script, image_extra, disk, 
+def create_machine_async(email, backend_id, key_id, machine_name, location_id,
+                         image_id, size_id, script, image_extra, disk,
                           image_name, size_name, location_name, ips, monitoring,
-                          networks, docker_env, docker_command, 
+                          networks, docker_env, docker_command,
                           script_id=None, script_params=None,
                           quantity=1, persist=False, job_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
@@ -653,7 +653,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
     for name in names:
         specs.append((user, backend_id, key_id, name, location_id, image_id,
                       size_id, script, image_extra, disk, image_name, size_name,
-                      location_name, ips, monitoring, networks, docker_env, 
+                      location_name, ips, monitoring, networks, docker_env,
                       docker_command, 22, script_id, script_params, job_id))
 
     def create_machine_wrapper(args):

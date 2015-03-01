@@ -2773,7 +2773,7 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False, dry=False):
+                      no_ssh=False, dry=False, **kwargs):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
@@ -2875,7 +2875,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     return ret
 
 
-def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='', 
+def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='',
                    shell=None):
     """Ping and SSH to machine and collect various metrics."""
 
