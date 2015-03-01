@@ -637,7 +637,9 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
 
 
     log_event(email, 'job', 'async_machine_creation_started', job_id=job_id,
-              backend_id=backend_id, script_id=script_id, quantity=quantity)
+              backend_id=backend_id, script=script, script_id=script_id,
+              script_params=script_params, monitoring=monitoring,
+              persist=persist, quantity=quantity)
 
     THREAD_COUNT = 5
     pool = ThreadPool(THREAD_COUNT)
