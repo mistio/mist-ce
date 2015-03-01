@@ -486,6 +486,9 @@ def create_machine(request):
         raise RequiredParameterMissingError(e)
 
     user = user_from_request(request)
+    import uuid
+    job_id = uuid.uuid4().hex
+    from mist.io import tasks
     if not async:
         ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                      location_id, image_id, size_id, script,
@@ -493,11 +496,8 @@ def create_machine(request):
                                      location_name, ips, monitoring, networks,
                                      docker_env, docker_command,
                                      script_id=script_id,
-                                     script_params=script_params)
+                                     script_params=script_params, job_id=job_id)
     else:
-        import uuid
-        job_id = uuid.uuid4().hex
-        from mist.io import tasks
         tasks.create_machine_async.delay(user.email, backend_id, key_id, 
                                          machine_name, location_id, image_id, 
                                          size_id, script, image_extra, disk, 

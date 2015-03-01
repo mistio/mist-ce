@@ -1244,7 +1244,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
-                   script_id='', script_params=''):
+                   script_id='', script_params='', job_id = None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1365,30 +1365,30 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
-    job = None
+
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
-        job = mist.io.tasks.azure_post_create_steps.delay(
+        mist.io.tasks.azure_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params,
+            script_id=script_id, script_params=script_params, job_id = job_id
         )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
-        job = mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
+        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params,
+            script_id=script_id, script_params=script_params, job_id = job_id
         )
     elif key_id:
-        if script or script_id or monitoring:
-            job = mist.io.tasks.post_deploy_steps.delay(
-                user.email, backend_id, node.id, monitoring, script, key_id,
-                script_id=script_id, script_params=script_params,
-            )
+        mist.io.tasks.post_deploy_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            script_id=script_id, script_params=script_params,
+            job_id = job_id
+        )
 
 
     ret = {'id': node.id,
@@ -1396,7 +1396,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             'extra': node.extra,
             'public_ips': node.public_ips,
             'private_ips': node.private_ips,
-            'job_id': job and job.id or None,
+            'job_id': job_id,
             }
 
     return ret
@@ -2873,7 +2873,8 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     return ret
 
 
-def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
+def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='', 
+                   shell=None):
     """Ping and SSH to machine and collect various metrics."""
 
     # run SSH commands
@@ -2901,8 +2902,12 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     if key_id:
         log.warn('probing with key %s' % key_id)
 
-    cmd_output = ssh_command(user, backend_id, machine_id,
-                             host, command, key_id=key_id)
+    if not shell:
+        cmd_output = ssh_command(user, backend_id, machine_id,
+                                 host, command, key_id=key_id)
+    else:
+        retval, cmd_output = shell.command(command)
+
     cmd_output = cmd_output.replace('\r\n','').split('--------')
     log.warn(cmd_output)
     uptime_output = cmd_output[1]
