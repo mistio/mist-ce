@@ -659,7 +659,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
         try:
             node = create_machine(*args)
             log_event(email, 'job', 'machine_creation_succeeded', job_id=job_id,
-              backend_id=backend_id, machine_id=node.id, machine_name=name)
+              backend_id=backend_id, machine_name=name)
         except MachineCreationError as e:
             log_event(email, 'job', 'machine_creation_failed', job_id=job_id,
               backend_id=backend_id, machine_name=name, error=e)
