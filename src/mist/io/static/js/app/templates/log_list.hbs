@@ -7,6 +7,8 @@
 
         <h1 class="ui-title">Logs</h1>
 
+        {{view "userMenu"}}
+
     </div>
 
     <div role="main" class="ui-content" data-theme="c">
@@ -83,7 +85,7 @@
             data-enhanced="true"
             data-inset="true">
             {{#each Mist.logsController}}
-                {{view Mist.logListItemView logBinding="this"}}
+                {{view "logListItem" logBinding="this"}}
             {{/each}}
         </ul>
 

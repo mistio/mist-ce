@@ -7,7 +7,7 @@ define('app/views/script_run', ['app/views/panel'],
 
         'use strict';
 
-        return PanelView.extend({
+        return App.ScriptRunView = PanelView.extend({
 
             isReady: function () {
                 return Mist.scriptRunController.scriptToRun.machine.id;

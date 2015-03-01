@@ -8,7 +8,7 @@ define('app/views/script', ['app/views/mistscreen'],
 
         'use strict';
 
-        return PageView.extend({
+        return App.ScriptView = PageView.extend({
 
 
             //

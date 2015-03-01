@@ -13,7 +13,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
         var LOGS_REQUEST_INTERVAL = 500;
         var EVENT_TYPES = ['job', 'shell', 'request', 'session', 'incident'];
 
-        return PageView.extend({
+        return App.LogListView = PageView.extend({
 
 
             //

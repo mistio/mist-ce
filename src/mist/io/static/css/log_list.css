@@ -85,7 +85,7 @@
     border-top: 3px solid #eee;
 }
 
-.log-list .details td > div {
+.log-list .details td > div, td > div.df {
     max-height: 300px;
     white-space: pre;
     overflow: auto;

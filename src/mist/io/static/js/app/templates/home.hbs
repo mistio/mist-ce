@@ -6,7 +6,7 @@
 
         <h1 class="ui-title">mist.io</h1>
 
-        {{view Mist.userMenuView}}
+        {{view "userMenu"}}
 
     </div>
 
@@ -28,7 +28,7 @@
             class="ui-controlgroup ui-controlgroup-horizontal ui-corner-all">
 
             {{#each Mist.backendsController.content}}
-                {{view Mist.backendButtonView backendBinding="this"
+                {{view "backendButton" backendBinding="this"
                        class="ui-btn ui-input-btn ui-corner-all ui-shadow"}}
             {{/each}}
 
@@ -108,7 +108,7 @@
             {{/if}}
 
             <!-- Logs link -->
-
+            {{#unless Mist.isCore}}
             <li class="ui-li-has-count ui-last-child">
 
                 <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/logs">
@@ -117,16 +117,17 @@
 
                 </a>
             </li>
+            {{/unless}}
         </ul>
 
-        {{view Mist.graphListView actionProxyBinding="view"}}
+        {{view "graphList" actionProxyBinding="view"}}
 
     </div>
 
-    {{view Mist.dialogView}}
+    {{view "dialog"}}
 
-    {{view Mist.backendAddView}}
+    {{view "backendAdd"}}
 
-    {{view Mist.backendEditView}}
+    {{view "backendEdit"}}
 
 </div>

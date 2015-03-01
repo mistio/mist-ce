@@ -1,4 +1,4 @@
-define('app/views/messagebox', ['app/views/templated', 'ember'],
+define('app/views/messagebox', ['app/views/templated'],
     //
     //  Message Box View
     //
@@ -8,7 +8,7 @@ define('app/views/messagebox', ['app/views/templated', 'ember'],
 
         'use strict';
 
-        return TemplatedView.extend({
+        return App.MessageBoxView = TemplatedView.extend({
 
 
             //

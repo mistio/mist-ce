@@ -1,11 +1,11 @@
-define('app/views/machine_add', ['app/views/templated', 'ember'],
+define('app/views/machine_add', ['app/views/templated'],
     /**
      *  Machine Add View
      *
      *  @returns Class
      */
     function (TemplatedView) {
-        return TemplatedView.extend({
+        return App.MachineAddView = TemplatedView.extend({
 
             /**
              *  Properties

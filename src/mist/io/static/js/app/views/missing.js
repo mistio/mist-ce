@@ -8,8 +8,7 @@ define('app/views/missing', ['app/views/templated'],
 
         'use strict';
 
-        return TemplatedView.extend({
+        return App.MissingView =  TemplatedView.extend({});
 
-        });
     }
 );
