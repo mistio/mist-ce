@@ -25,7 +25,6 @@ import ansible.utils.template
 from ansible import callbacks
 from ansible import utils
 
-from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
 from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
