@@ -209,7 +209,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
                     log_event('enable_monitoring_failed',
                               error=repr(e), **log_dict)
-            log_event(action='post_deploy_completed', error=error, **log_dict)
+            log_event(action='post_deploy_finished', error=error, **log_dict)
 
         except (ServiceUnavailableError, SSHException) as exc:
             tmp_log(repr(exc))
@@ -223,7 +223,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
         log_event(
             email=email,
             event_type='job',
-            action='post_deploy_completed',
+            action='post_deploy_finished',
             backend_id=backend_id,
             machine_id=machine_id,
             enable_monitoring=bool(monitoring),
@@ -642,7 +642,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
         from mist.core.helpers import log_event
     else:
         log_event = lambda *args, **kwargs: None
-
+    job_id = job_id or uuid.uuid4().hex
 
     log_event(email, 'job', 'async_machine_creation_started', job_id=job_id,
               backend_id=backend_id, script=script, script_id=script_id,
@@ -665,17 +665,19 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                       docker_command, 22, script_id, script_params, job_id))
 
     def create_machine_wrapper(args):
+        error = False
         try:
             node = create_machine(*args)
-            log_event(email, 'job', 'machine_creation_succeeded', job_id=job_id,
-              backend_id=backend_id, machine_name=name)
-        except MachineCreationError as e:
-            log_event(email, 'job', 'machine_creation_failed', job_id=job_id,
-              backend_id=backend_id, machine_name=name, error=e)
+        except MachineCreationError as exc:
+            error = str(exc)
+        except Exception as exc:
+            error = repr(exc)
+        finally:
+            name = args[3]
+            log_event(email, 'job', 'machine_creation_finished', job_id=job_id,
+                      backend_id=backend_id, machine_name=name, error=error)
 
     pool.map(create_machine_wrapper, specs)
-    pool.close()
     pool.join()
-    log_event(email, 'job', 'async_machine_creation_finished', job_id=job_id,
-              backend_id=backend_id, script_id=script_id, quantity=quantity)
+    pool.close()
 
