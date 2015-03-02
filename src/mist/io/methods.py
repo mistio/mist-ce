@@ -2983,7 +2983,7 @@ def notify_user(user, title, message="", **kwargs):
         if 'output' in kwargs:
             output += '%s\n' % kwargs['output']
         if 'retval' in kwargs:
-            output += 'returned with exit code %d.\n' % kwargs['retval']
+            output += 'returned with exit code %s.\n' % kwargs['retval']
         payload['output'] = output
     amqp_publish_user(user, routing_key='notify', data=payload)
 

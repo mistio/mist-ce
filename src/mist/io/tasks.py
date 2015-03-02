@@ -202,7 +202,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
                     notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
                     log_event('enable_monitoring_failed',
-                              error=repr(exc), **log_dict)
+                              error=repr(e), **log_dict)
 
         except (ServiceUnavailableError, SSHException) as exc:
             tmp_log(repr(exc))
