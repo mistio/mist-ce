@@ -207,7 +207,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     error = True
                     notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
                     notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
-                    log_event('enable_monitoring_failed',
+                    log_event(action='enable_monitoring_failed',
                               error=repr(e), **log_dict)
             log_event(action='post_deploy_finished', error=error, **log_dict)
 
