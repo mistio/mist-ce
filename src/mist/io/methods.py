@@ -908,15 +908,25 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
     # succesful connection
     if not host:
         if not associated:
-            with user.lock_n_load():
-                assoc = [backend_id,
-                         machine_id,
-                         0,
-                         username,
-                         False,
-                         port]
-                user.keypairs[key_id].machines.append(assoc)
-                user.save()
+            for i in range(3):
+                try:
+                    with user.lock_n_load():
+                        assoc = [backend_id,
+                                 machine_id,
+                                 0,
+                                 username,
+                                 False,
+                                 port]
+                        user.keypairs[key_id].machines.append(assoc)
+                        user.save()
+                except:
+                    if i == 2:
+                        log.error('zzzzzz: failed to recover from previous race conditions')
+                        raise
+                    else:
+                        log.error('zzzzzz: trying to recover from race condition')
+                else:
+                    break
             trigger_session_update(user.email, ['keys'])
         return
 
