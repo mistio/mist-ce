@@ -298,7 +298,20 @@ define('app/views/log_list', ['app/views/mistscreen'],
                     info('Requesting logs:', payload)
                 }
 
+                this._injectExtraParams(payload);
+
                 return payload;
+            },
+
+
+            _injectExtraParams: function (payload) {
+                var extraParams = this.get('extraParams');
+                if (!extraParams)
+                    return;
+                forIn(extraParams, function (value, name) {
+                    info(name, value, extraParams.get(name));
+                    payload[name] = extraParams.get(name);
+                });
             },
 
 
