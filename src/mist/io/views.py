@@ -489,24 +489,19 @@ def create_machine(request):
     import uuid
     job_id = uuid.uuid4().hex
     from mist.io import tasks
+    args = (backend_id, key_id, machine_name,
+            location_id, image_id, size_id, script,
+            image_extra, disk, image_name, size_name,
+            location_name, ips, monitoring, networks,
+            docker_env, docker_command)
+    kwargs = {'script_id': script_id, 'script_params':script_params,
+              'job_id': job_id}
     if not async:
-        ret = methods.create_machine(user, backend_id, key_id, machine_name,
-                                     location_id, image_id, size_id, script,
-                                     image_extra, disk, image_name, size_name,
-                                     location_name, ips, monitoring, networks,
-                                     docker_env, docker_command,
-                                     script_id=script_id,
-                                     script_params=script_params, job_id=job_id)
+        ret = methods.create_machine(user, *args, **kwargs)
     else:
-        tasks.create_machine_async.delay(user.email, backend_id, key_id, 
-                                         machine_name, location_id, image_id, 
-                                         size_id, script, image_extra, disk, 
-                                         image_name, size_name, location_name, 
-                                         ips, monitoring, networks, docker_env, 
-                                         docker_command, script_id=script_id,
-                                         script_params=script_params,
-                                         quantity=quantity, persist=persist,
-                                         job_id=job_id)
+        args = (user.email, ) + args
+        kwargs.update({'quantity': quantity, 'persist': persist})
+        tasks.create_machine_async.apply_async(args, kwargs, countdown=2)
         ret = {'job_id': job_id}
 
     return ret
