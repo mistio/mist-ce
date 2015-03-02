@@ -309,7 +309,6 @@ define('app/views/log_list', ['app/views/mistscreen'],
                 if (!extraParams)
                     return;
                 forIn(extraParams, function (value, name) {
-                    info(name, value, extraParams.get(name));
                     payload[name] = extraParams.get(name);
                 });
             },
