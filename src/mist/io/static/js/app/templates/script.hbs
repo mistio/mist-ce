@@ -26,6 +26,12 @@
 
            <table class="info-table">
            <tbody>
+             {{#if description}}
+                 <tr>
+                     <td>Description</td>
+                     <td>{{description}}</td>
+                 </tr>
+             {{/if}}
                <tr>
                    <td>Type</td>
                    <td>{{type}}</td>
