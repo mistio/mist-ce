@@ -158,10 +158,14 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                                                         backend_id)
             msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name,
                                                              node.id)
+            error = False
             if script_id and multi_user:
                 tmp_log('will run script_id %s', script_id)
-                run_script.run(user.email, script_id, backend_id, machine_id,
-                               params=script_params, host=host, job_id=job_id)
+                ret = run_script.run(
+                    user.email, script_id, backend_id, machine_id,
+                    params=script_params, host=host, job_id=job_id
+                )
+                error = ret['error']
                 tmp_log('executed script_id %s', script_id)
             elif command:
                 tmp_log('will run command %s', command)
@@ -173,6 +177,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 output = output.decode('utf-8','ignore')
                 title = "Deployment script %s" % ('failed' if retval
                                                   else 'succeeded')
+                error = retval > 0
                 notify_user(user, title,
                             backend_id=backend_id,
                             machine_id=machine_id,
@@ -199,10 +204,12 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     )
                 except Exception as e:
                     print repr(e)
+                    error = True
                     notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
                     notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
                     log_event('enable_monitoring_failed',
                               error=repr(e), **log_dict)
+            log_event(action='post_deploy_completed', error=error, **log_dict)
 
         except (ServiceUnavailableError, SSHException) as exc:
             tmp_log(repr(exc))
@@ -216,7 +223,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
         log_event(
             email=email,
             event_type='job',
-            action='deployment_script_failed',
+            action='post_deploy_completed',
             backend_id=backend_id,
             machine_id=machine_id,
             enable_monitoring=bool(monitoring),
