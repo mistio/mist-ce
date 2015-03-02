@@ -219,11 +219,13 @@
 
         <div id="script">
             {{#if Mist.betaFeatures}}
+            {{#if Mist.scriptsController.length}}
                 <select class="toggle-field ui-mini" data-theme="a" data-role="slider"
                 {{action "switchToggled" on="change" target="view"}}>
                     <option value="basic">basic</option>
                     <option value="advanced">advanced</option>
                 </select>
+            {{/if}}
             {{/if}}
             <label for="create-machine-script">Script:</label>
             <div class="script-option basic">
@@ -289,4 +291,4 @@
     </div>
 </div>
 
-{{view Mist.keyAddView}}
+{{view "keyAdd"}}

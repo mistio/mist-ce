@@ -44,7 +44,7 @@ setupPaths(){
 
     TEMPLATES_DIR="$ROOT_DIR/$TEMPLATES_DIR"
     OUT_PATH="$TEMPLATES_DIR/templates.js"
-    FILE_COUNT=`eval ls -l $TEMPLATES_DIR | grep .html | wc -l | tr -d ' '`
+    FILE_COUNT=`eval ls -l $TEMPLATES_DIR | grep .hbs | wc -l | tr -d ' '`
 }
 
 
@@ -63,11 +63,11 @@ generateScript(){
     # Make sure the script doesn't run when JS_BUILD is true
     echo "    if (!JS_BUILD) {" >> $OUT_PATH
 
-    # Require all html files
+    # Require all hbs files
     echo "      require([" >> $OUT_PATH
 
     i=0
-    for f in $TEMPLATES_DIR"/"*.html
+    for f in $TEMPLATES_DIR"/"*.hbs
     do
         i=$((i + 1))
         echo -ne "\rGenerating require parameters ($i/$FILE_COUNT)"
@@ -81,13 +81,13 @@ generateScript(){
     echo "      ], function () {" >> $OUT_PATH
 
     i=0
-    for f in $TEMPLATES_DIR"/"*.html
+    for f in $TEMPLATES_DIR"/"*.hbs
     do
         i=$((i + 1))
         echo -ne "\rGenerating compilation statements ($i/$FILE_COUNT)"
         filename=$(basename "$f")
         filename="${filename%.*}"
-        var="Ember.TEMPLATES['$filename/html']"
+        var="Ember.TEMPLATES['$filename']"
         value="Ember.Handlebars.compile(arguments[$((i-1))]);"
         echo "        $var = $value" >> $OUT_PATH
     done
@@ -122,7 +122,7 @@ compileTemplates(){
 
     # Compile templates
     i=0
-    for f in $TEMPLATES_DIR"/"*.html
+    for f in $TEMPLATES_DIR"/"*.hbs
     do
         i=$((i + 1))
         echo -ne "\rCompiling templates ($i/$FILE_COUNT)"

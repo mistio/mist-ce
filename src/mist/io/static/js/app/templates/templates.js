@@ -2,122 +2,122 @@ define('app/templates/templates', ['ember'], function() {
   return function (callback) {
     if (!JS_BUILD) {
       require([
-        'text!app/templates/backend_add.html',
-        'text!app/templates/backend_button.html',
-        'text!app/templates/backend_edit.html',
-        'text!app/templates/confirmation_dialog.html',
-        'text!app/templates/dialog.html',
-        'text!app/templates/file_upload.html',
-        'text!app/templates/graph_button.html',
-        'text!app/templates/graph_list_bar.html',
-        'text!app/templates/graph_list_control.html',
-        'text!app/templates/graph_list.html',
-        'text!app/templates/graph_list_item.html',
-        'text!app/templates/home.html',
-        'text!app/templates/image_list.html',
-        'text!app/templates/image_list_item.html',
-        'text!app/templates/ip_address_list_item.html',
-        'text!app/templates/key_add.html',
-        'text!app/templates/key_edit.html',
-        'text!app/templates/key.html',
-        'text!app/templates/key_list.html',
-        'text!app/templates/key_list_item.html',
-        'text!app/templates/login.html',
-        'text!app/templates/log_list.html',
-        'text!app/templates/log_list_item.html',
-        'text!app/templates/machine_add.html',
-        'text!app/templates/machine.html',
-        'text!app/templates/machine_keys.html',
-        'text!app/templates/machine_keys_list_item.html',
-        'text!app/templates/machine_list.html',
-        'text!app/templates/machine_list_item.html',
-        'text!app/templates/machine_monitoring.html',
-        'text!app/templates/machine_power.html',
-        'text!app/templates/machine_shell.html',
-        'text!app/templates/machine_tags.html',
-        'text!app/templates/machine_tags_list_item.html',
-        'text!app/templates/messagebox.html',
-        'text!app/templates/metric_add_custom.html',
-        'text!app/templates/metric_add.html',
-        'text!app/templates/metric_node.html',
-        'text!app/templates/missing.html',
-        'text!app/templates/network_create.html',
-        'text!app/templates/network.html',
-        'text!app/templates/network_list.html',
-        'text!app/templates/network_list_item.html',
-        'text!app/templates/rule_edit.html',
-        'text!app/templates/rule.html',
-        'text!app/templates/rule_list.html',
-        'text!app/templates/script_add.html',
-        'text!app/templates/script_edit.html',
-        'text!app/templates/script.html',
-        'text!app/templates/script_list.html',
-        'text!app/templates/script_list_item.html',
-        'text!app/templates/script_log_list.html',
-        'text!app/templates/script_run.html',
-        'text!app/templates/subnet_list_item.html',
-        'text!app/templates/user_menu.html',
+        'text!app/templates/backend_add.hbs',
+        'text!app/templates/backend_button.hbs',
+        'text!app/templates/backend_edit.hbs',
+        'text!app/templates/confirmation_dialog.hbs',
+        'text!app/templates/dialog.hbs',
+        'text!app/templates/file_upload.hbs',
+        'text!app/templates/graph_button.hbs',
+        'text!app/templates/graph_list_bar.hbs',
+        'text!app/templates/graph_list_control.hbs',
+        'text!app/templates/graph_list.hbs',
+        'text!app/templates/graph_list_item.hbs',
+        'text!app/templates/home.hbs',
+        'text!app/templates/image_list.hbs',
+        'text!app/templates/image_list_item.hbs',
+        'text!app/templates/ip_address_list_item.hbs',
+        'text!app/templates/key_add.hbs',
+        'text!app/templates/key_edit.hbs',
+        'text!app/templates/key.hbs',
+        'text!app/templates/key_list.hbs',
+        'text!app/templates/key_list_item.hbs',
+        'text!app/templates/login.hbs',
+        'text!app/templates/log_list.hbs',
+        'text!app/templates/log_list_item.hbs',
+        'text!app/templates/machine_add.hbs',
+        'text!app/templates/machine.hbs',
+        'text!app/templates/machine_keys.hbs',
+        'text!app/templates/machine_keys_list_item.hbs',
+        'text!app/templates/machine_list.hbs',
+        'text!app/templates/machine_list_item.hbs',
+        'text!app/templates/machine_monitoring.hbs',
+        'text!app/templates/machine_power.hbs',
+        'text!app/templates/machine_shell.hbs',
+        'text!app/templates/machine_tags.hbs',
+        'text!app/templates/machine_tags_list_item.hbs',
+        'text!app/templates/messagebox.hbs',
+        'text!app/templates/metric_add_custom.hbs',
+        'text!app/templates/metric_add.hbs',
+        'text!app/templates/metric_node.hbs',
+        'text!app/templates/missing.hbs',
+        'text!app/templates/network_create.hbs',
+        'text!app/templates/network.hbs',
+        'text!app/templates/network_list.hbs',
+        'text!app/templates/network_list_item.hbs',
+        'text!app/templates/rule_edit.hbs',
+        'text!app/templates/rule.hbs',
+        'text!app/templates/rule_list.hbs',
+        'text!app/templates/script_add.hbs',
+        'text!app/templates/script_edit.hbs',
+        'text!app/templates/script.hbs',
+        'text!app/templates/script_list.hbs',
+        'text!app/templates/script_list_item.hbs',
+        'text!app/templates/script_log_list.hbs',
+        'text!app/templates/script_run.hbs',
+        'text!app/templates/subnet_list_item.hbs',
+        'text!app/templates/user_menu.hbs',
       ], function () {
-        Ember.TEMPLATES['backend_add/html'] = Ember.Handlebars.compile(arguments[0]);
-        Ember.TEMPLATES['backend_button/html'] = Ember.Handlebars.compile(arguments[1]);
-        Ember.TEMPLATES['backend_edit/html'] = Ember.Handlebars.compile(arguments[2]);
-        Ember.TEMPLATES['confirmation_dialog/html'] = Ember.Handlebars.compile(arguments[3]);
-        Ember.TEMPLATES['dialog/html'] = Ember.Handlebars.compile(arguments[4]);
-        Ember.TEMPLATES['file_upload/html'] = Ember.Handlebars.compile(arguments[5]);
-        Ember.TEMPLATES['graph_button/html'] = Ember.Handlebars.compile(arguments[6]);
-        Ember.TEMPLATES['graph_list_bar/html'] = Ember.Handlebars.compile(arguments[7]);
-        Ember.TEMPLATES['graph_list_control/html'] = Ember.Handlebars.compile(arguments[8]);
-        Ember.TEMPLATES['graph_list/html'] = Ember.Handlebars.compile(arguments[9]);
-        Ember.TEMPLATES['graph_list_item/html'] = Ember.Handlebars.compile(arguments[10]);
-        Ember.TEMPLATES['home/html'] = Ember.Handlebars.compile(arguments[11]);
-        Ember.TEMPLATES['image_list/html'] = Ember.Handlebars.compile(arguments[12]);
-        Ember.TEMPLATES['image_list_item/html'] = Ember.Handlebars.compile(arguments[13]);
-        Ember.TEMPLATES['ip_address_list_item/html'] = Ember.Handlebars.compile(arguments[14]);
-        Ember.TEMPLATES['key_add/html'] = Ember.Handlebars.compile(arguments[15]);
-        Ember.TEMPLATES['key_edit/html'] = Ember.Handlebars.compile(arguments[16]);
-        Ember.TEMPLATES['key/html'] = Ember.Handlebars.compile(arguments[17]);
-        Ember.TEMPLATES['key_list/html'] = Ember.Handlebars.compile(arguments[18]);
-        Ember.TEMPLATES['key_list_item/html'] = Ember.Handlebars.compile(arguments[19]);
-        Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[20]);
-        Ember.TEMPLATES['log_list/html'] = Ember.Handlebars.compile(arguments[21]);
-        Ember.TEMPLATES['log_list_item/html'] = Ember.Handlebars.compile(arguments[22]);
-        Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[23]);
-        Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[24]);
-        Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[25]);
-        Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[26]);
-        Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[27]);
-        Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[28]);
-        Ember.TEMPLATES['machine_monitoring/html'] = Ember.Handlebars.compile(arguments[29]);
-        Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[30]);
-        Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[31]);
-        Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[32]);
-        Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[33]);
-        Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[34]);
-        Ember.TEMPLATES['metric_add_custom/html'] = Ember.Handlebars.compile(arguments[35]);
-        Ember.TEMPLATES['metric_add/html'] = Ember.Handlebars.compile(arguments[36]);
-        Ember.TEMPLATES['metric_node/html'] = Ember.Handlebars.compile(arguments[37]);
-        Ember.TEMPLATES['missing/html'] = Ember.Handlebars.compile(arguments[38]);
-        Ember.TEMPLATES['network_create/html'] = Ember.Handlebars.compile(arguments[39]);
-        Ember.TEMPLATES['network/html'] = Ember.Handlebars.compile(arguments[40]);
-        Ember.TEMPLATES['network_list/html'] = Ember.Handlebars.compile(arguments[41]);
-        Ember.TEMPLATES['network_list_item/html'] = Ember.Handlebars.compile(arguments[42]);
-        Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[43]);
-        Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[44]);
-        Ember.TEMPLATES['rule_list/html'] = Ember.Handlebars.compile(arguments[45]);
-        Ember.TEMPLATES['script_add/html'] = Ember.Handlebars.compile(arguments[46]);
-        Ember.TEMPLATES['script_edit/html'] = Ember.Handlebars.compile(arguments[47]);
-        Ember.TEMPLATES['script/html'] = Ember.Handlebars.compile(arguments[48]);
-        Ember.TEMPLATES['script_list/html'] = Ember.Handlebars.compile(arguments[49]);
-        Ember.TEMPLATES['script_list_item/html'] = Ember.Handlebars.compile(arguments[50]);
-        Ember.TEMPLATES['script_log_list/html'] = Ember.Handlebars.compile(arguments[51]);
-        Ember.TEMPLATES['script_run/html'] = Ember.Handlebars.compile(arguments[52]);
-        Ember.TEMPLATES['subnet_list_item/html'] = Ember.Handlebars.compile(arguments[53]);
-        Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[54]);
+        Ember.TEMPLATES['backend_add'] = Ember.Handlebars.compile(arguments[0]);
+        Ember.TEMPLATES['backend_button'] = Ember.Handlebars.compile(arguments[1]);
+        Ember.TEMPLATES['backend_edit'] = Ember.Handlebars.compile(arguments[2]);
+        Ember.TEMPLATES['confirmation_dialog'] = Ember.Handlebars.compile(arguments[3]);
+        Ember.TEMPLATES['dialog'] = Ember.Handlebars.compile(arguments[4]);
+        Ember.TEMPLATES['file_upload'] = Ember.Handlebars.compile(arguments[5]);
+        Ember.TEMPLATES['graph_button'] = Ember.Handlebars.compile(arguments[6]);
+        Ember.TEMPLATES['graph_list_bar'] = Ember.Handlebars.compile(arguments[7]);
+        Ember.TEMPLATES['graph_list_control'] = Ember.Handlebars.compile(arguments[8]);
+        Ember.TEMPLATES['graph_list'] = Ember.Handlebars.compile(arguments[9]);
+        Ember.TEMPLATES['graph_list_item'] = Ember.Handlebars.compile(arguments[10]);
+        Ember.TEMPLATES['home'] = Ember.Handlebars.compile(arguments[11]);
+        Ember.TEMPLATES['image_list'] = Ember.Handlebars.compile(arguments[12]);
+        Ember.TEMPLATES['image_list_item'] = Ember.Handlebars.compile(arguments[13]);
+        Ember.TEMPLATES['ip_address_list_item'] = Ember.Handlebars.compile(arguments[14]);
+        Ember.TEMPLATES['key_add'] = Ember.Handlebars.compile(arguments[15]);
+        Ember.TEMPLATES['key_edit'] = Ember.Handlebars.compile(arguments[16]);
+        Ember.TEMPLATES['key'] = Ember.Handlebars.compile(arguments[17]);
+        Ember.TEMPLATES['key_list'] = Ember.Handlebars.compile(arguments[18]);
+        Ember.TEMPLATES['key_list_item'] = Ember.Handlebars.compile(arguments[19]);
+        Ember.TEMPLATES['login'] = Ember.Handlebars.compile(arguments[20]);
+        Ember.TEMPLATES['log_list'] = Ember.Handlebars.compile(arguments[21]);
+        Ember.TEMPLATES['log_list_item'] = Ember.Handlebars.compile(arguments[22]);
+        Ember.TEMPLATES['machine_add'] = Ember.Handlebars.compile(arguments[23]);
+        Ember.TEMPLATES['machine'] = Ember.Handlebars.compile(arguments[24]);
+        Ember.TEMPLATES['machine_keys'] = Ember.Handlebars.compile(arguments[25]);
+        Ember.TEMPLATES['machine_keys_list_item'] = Ember.Handlebars.compile(arguments[26]);
+        Ember.TEMPLATES['machine_list'] = Ember.Handlebars.compile(arguments[27]);
+        Ember.TEMPLATES['machine_list_item'] = Ember.Handlebars.compile(arguments[28]);
+        Ember.TEMPLATES['machine_monitoring'] = Ember.Handlebars.compile(arguments[29]);
+        Ember.TEMPLATES['machine_power'] = Ember.Handlebars.compile(arguments[30]);
+        Ember.TEMPLATES['machine_shell'] = Ember.Handlebars.compile(arguments[31]);
+        Ember.TEMPLATES['machine_tags'] = Ember.Handlebars.compile(arguments[32]);
+        Ember.TEMPLATES['machine_tags_list_item'] = Ember.Handlebars.compile(arguments[33]);
+        Ember.TEMPLATES['messagebox'] = Ember.Handlebars.compile(arguments[34]);
+        Ember.TEMPLATES['metric_add_custom'] = Ember.Handlebars.compile(arguments[35]);
+        Ember.TEMPLATES['metric_add'] = Ember.Handlebars.compile(arguments[36]);
+        Ember.TEMPLATES['metric_node'] = Ember.Handlebars.compile(arguments[37]);
+        Ember.TEMPLATES['missing'] = Ember.Handlebars.compile(arguments[38]);
+        Ember.TEMPLATES['network_create'] = Ember.Handlebars.compile(arguments[39]);
+        Ember.TEMPLATES['network'] = Ember.Handlebars.compile(arguments[40]);
+        Ember.TEMPLATES['network_list'] = Ember.Handlebars.compile(arguments[41]);
+        Ember.TEMPLATES['network_list_item'] = Ember.Handlebars.compile(arguments[42]);
+        Ember.TEMPLATES['rule_edit'] = Ember.Handlebars.compile(arguments[43]);
+        Ember.TEMPLATES['rule'] = Ember.Handlebars.compile(arguments[44]);
+        Ember.TEMPLATES['rule_list'] = Ember.Handlebars.compile(arguments[45]);
+        Ember.TEMPLATES['script_add'] = Ember.Handlebars.compile(arguments[46]);
+        Ember.TEMPLATES['script_edit'] = Ember.Handlebars.compile(arguments[47]);
+        Ember.TEMPLATES['script'] = Ember.Handlebars.compile(arguments[48]);
+        Ember.TEMPLATES['script_list'] = Ember.Handlebars.compile(arguments[49]);
+        Ember.TEMPLATES['script_list_item'] = Ember.Handlebars.compile(arguments[50]);
+        Ember.TEMPLATES['script_log_list'] = Ember.Handlebars.compile(arguments[51]);
+        Ember.TEMPLATES['script_run'] = Ember.Handlebars.compile(arguments[52]);
+        Ember.TEMPLATES['subnet_list_item'] = Ember.Handlebars.compile(arguments[53]);
+        Ember.TEMPLATES['user_menu'] = Ember.Handlebars.compile(arguments[54]);
         callback();
       });
       return;
     }
-Ember.TEMPLATES["backend_add/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["backend_add"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -372,14 +372,14 @@ function program30(depth0,data) {
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push(">Add</a>\n        </div>\n    </div>\n</div>\n\n\n");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyAddView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "keyAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.fileUploadView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "fileUpload", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n");
   return buffer;
   
 });
-Ember.TEMPLATES["backend_button/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["backend_button"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression;
@@ -396,7 +396,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   return buffer;
   
 });
-Ember.TEMPLATES["backend_edit/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["backend_edit"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -443,7 +443,7 @@ function program1(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["confirmation_dialog/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["confirmation_dialog"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression;
@@ -467,7 +467,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   return buffer;
   
 });
-Ember.TEMPLATES["dialog/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["dialog"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -620,7 +620,7 @@ function program16(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["file_upload/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["file_upload"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression;
@@ -666,7 +666,7 @@ function program1(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["graph_button/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["graph_button"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', escapeExpression=this.escapeExpression;
@@ -686,7 +686,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   return buffer;
   
 });
-Ember.TEMPLATES["graph_list_bar/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["graph_list_bar"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -695,10 +695,10 @@ function program1(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.graphButtonView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "graphButton", {hash:{
     'graphBinding': ("this"),
     'actionProxyBinding': ("view.actionProxy")
-  },hashTypes:{'graphBinding': "STRING",'actionProxyBinding': "STRING"},hashContexts:{'graphBinding': depth0,'actionProxyBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'graphBinding': "STRING",'actionProxyBinding': "STRING"},hashContexts:{'graphBinding': depth0,'actionProxyBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n    ");
   return buffer;
   }
@@ -724,7 +724,7 @@ function program3(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["graph_list_control/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["graph_list_control"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -771,7 +771,7 @@ function program3(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["graph_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["graph_list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -798,9 +798,9 @@ function program2(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n        <div id=\"top-history\">\n            ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.graphListControlView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "graphListControl", {hash:{
     'actionProxyBinding': ("view.actionProxy")
-  },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n        </div>\n    ");
   return buffer;
   }
@@ -809,10 +809,10 @@ function program4(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n            ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.graphListItemView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "graphListItem", {hash:{
     'graphBinding': ("this"),
     'actionProxyBinding': ("view.actionProxy")
-  },hashTypes:{'graphBinding': "STRING",'actionProxyBinding': "STRING"},hashContexts:{'graphBinding': depth0,'actionProxyBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'graphBinding': "STRING",'actionProxyBinding': "STRING"},hashContexts:{'graphBinding': depth0,'actionProxyBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n        ");
   return buffer;
   }
@@ -821,9 +821,9 @@ function program6(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.graphListBarView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "graphListBar", {hash:{
     'actionProxyBinding': ("view.actionProxy")
-  },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n    ");
   return buffer;
   }
@@ -840,7 +840,7 @@ function program8(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["graph_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["graph_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -968,7 +968,7 @@ function program16(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["home/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["home"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -977,10 +977,10 @@ function program1(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.backendButtonView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "backendButton", {hash:{
     'backendBinding': ("this"),
     'class': ("ui-btn ui-input-btn ui-corner-all ui-shadow")
-  },hashTypes:{'backendBinding': "STRING",'class': "STRING"},hashContexts:{'backendBinding': depth0,'class': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'backendBinding': "STRING",'class': "STRING"},hashContexts:{'backendBinding': depth0,'class': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n            ");
   return buffer;
   }
@@ -1005,8 +1005,14 @@ function program5(depth0,data) {
   return buffer;
   }
 
+function program7(depth0,data) {
+  
+  
+  data.buffer.push("\n            <li class=\"ui-li-has-count ui-last-child\">\n\n                <a class=\"ui-btn ui-btn-icon-right ui-icon-carat-r\" href=\"#/logs\">\n\n                    Logs\n\n                </a>\n            </li>\n            ");
+  }
+
   data.buffer.push("<div id=\"home-page\" data-role=\"page\" class=\"ui-page-active ui-page\">\n\n    <!-- Page header -->\n\n    <div class=\"ui-header ui-bar-b\">\n\n        <h1 class=\"ui-title\">mist.io</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <!-- Page Body -->\n\n    <div role=\"main\" class=\"ui-content\" data-theme=\"c\">\n\n        <!-- Add backend button -->\n\n        <a id=\"add-backend-btn\" class=\"ui-link ui-btn ui-btn-d ui-icon-plus\n            ui-btn-icon-right ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "addBackend", {hash:{
     'target': ("view")
@@ -1029,21 +1035,24 @@ function program5(depth0,data) {
   data.buffer.push("\n                    </span>\n                    Keys\n\n                </a>\n            </li>\n\n            <!-- Scripts link -->\n\n            ");
   stack1 = helpers['if'].call(depth0, "Mist.betaFeatures", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            <!-- Logs link -->\n\n            <li class=\"ui-li-has-count ui-last-child\">\n\n                <a class=\"ui-btn ui-btn-icon-right ui-icon-carat-r\" href=\"#/logs\">\n\n                    Logs\n\n                </a>\n            </li>\n        </ul>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.graphListView", {hash:{
+  data.buffer.push("\n\n            <!-- Logs link -->\n            ");
+  stack1 = helpers['if'].call(depth0, "Mist.isCore", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n        </ul>\n\n        ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "graphList", {hash:{
     'actionProxyBinding': ("view")
-  },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.dialogView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "dialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.backendAddView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "backendAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.backendEditView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "backendEdit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n</div>\n");
   return buffer;
   
 });
-Ember.TEMPLATES["image_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["image_list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -1058,10 +1067,10 @@ function program3(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.imageListItemView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "imageListItem", {hash:{
     'imageBinding': ("this"),
     'class': ("checkbox-link")
-  },hashTypes:{'imageBinding': "STRING",'class': "STRING"},hashContexts:{'imageBinding': depth0,'class': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'imageBinding': "STRING",'class': "STRING"},hashContexts:{'imageBinding': depth0,'class': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n            ");
   return buffer;
   }
@@ -1079,7 +1088,7 @@ function program7(depth0,data) {
   }
 
   data.buffer.push("<div id=\"image-list-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#\" class=\"responsive-button\" data-icon=\"home\">Home</a>\n\n        <h1>Images</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.backendsController.loadingImages", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -1106,14 +1115,14 @@ function program7(depth0,data) {
   stack1 = helpers['if'].call(depth0, "view.searchingImages", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            </span>\n        </button>\n\n        <div class=\"small-padding\"></div>\n\n    </div>\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.dialogView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "dialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineAddView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n\n</div>");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push("\n\n</div>\n");
   return buffer;
   
 });
-Ember.TEMPLATES["image_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["image_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression;
@@ -1146,7 +1155,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   return buffer;
   
 });
-Ember.TEMPLATES["ip_address_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["ip_address_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -1212,7 +1221,7 @@ function program5(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["key_add/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["key_add"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression;
@@ -1280,7 +1289,7 @@ function program5(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["key_edit/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["key_edit"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -1311,7 +1320,7 @@ function program1(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["key/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["key"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -1344,10 +1353,10 @@ function program6(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineListItemView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineListItem", {hash:{
     'machineBinding': ("this"),
     'class': ("checkbox-link")
-  },hashTypes:{'machineBinding': "STRING",'class': "STRING"},hashContexts:{'machineBinding': depth0,'class': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'machineBinding': "STRING",'class': "STRING"},hashContexts:{'machineBinding': depth0,'class': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n                ");
   return buffer;
   }
@@ -1356,7 +1365,7 @@ function program6(depth0,data) {
   stack1 = helpers._triageMustache.call(depth0, "id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.keysController.loading", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -1374,11 +1383,11 @@ function program6(depth0,data) {
   stack1 = helpers['if'].call(depth0, "machines", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n        <div class=\"large-padding\"></div>\n\n    </div>\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.dialogView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "dialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyEditView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "keyEdit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    <div class=\"dual-action-footer\" data-role=\"footer\" data-theme=\"b\">\n        <table><tbody><tr><td>\n            <a data-role=\"button\" data-icon=\"edit\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "renameClicked", {hash:{
     'target': ("view")
@@ -1391,7 +1400,7 @@ function program6(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["key_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["key_list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -1400,16 +1409,16 @@ function program1(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyListItemView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "keyListItem", {hash:{
     'keyBinding': ("this"),
     'class': ("checkbox-link")
-  },hashTypes:{'keyBinding': "STRING",'class': "STRING"},hashContexts:{'keyBinding': depth0,'class': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'keyBinding': "STRING",'class': "STRING"},hashContexts:{'keyBinding': depth0,'class': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n            ");
   return buffer;
   }
 
   data.buffer.push("<div id=\"key-list-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#\" class=\"responsive-button\" data-icon=\"home\">Home</a>\n\n        <h1>Keys</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <a id=\"select-keys-btn\"\n           class=\"responsive-button\"\n           data-role=\"button\"\n           data-icon=\"arrow-d\"\n           ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "selectClicked", {hash:{
     'target': ("view")
@@ -1422,13 +1431,13 @@ function program1(depth0,data) {
   stack1 = helpers.each.call(depth0, "Mist.keysController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.dialogView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "dialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyAddView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "keyAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyEditView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "keyEdit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    <div id=\"select-keys-popup\" data-role=\"popup\" data-transition=\"flip\" data-position-to=\"#select-keys-btn\">\n        <ul data-role='listview'>\n            <li data-icon=\"false\">\n                <a ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "selectionModeClicked", true, {hash:{
     'target': ("view")
@@ -1453,7 +1462,7 @@ function program1(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["key_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["key_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, helper, options, self=this, escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
@@ -1487,7 +1496,7 @@ function program2(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["login/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["login"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -1528,7 +1537,7 @@ function program1(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["log_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["log_list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -1543,9 +1552,9 @@ function program3(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.logListItemView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "logListItem", {hash:{
     'logBinding': ("this")
-  },hashTypes:{'logBinding': "STRING"},hashContexts:{'logBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'logBinding': "STRING"},hashContexts:{'logBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n            ");
   return buffer;
   }
@@ -1556,7 +1565,9 @@ function program5(depth0,data) {
   data.buffer.push("\n            <div class=\"no-logs\"></div>\n        ");
   }
 
-  data.buffer.push("<div id=\"log-list-page\" data-role=\"page\" class=\"ui-page-active ui-page ui-page-theme-a log-list\">\n\n    <div class=\"ui-header ui-bar-b\">\n\n        <a class=\"ui-btn ui-btn-left ui-btn-icon-left ui-icon-home\n            ui-corner-all responsive-button\" href=\"#\">Home</a>\n\n        <h1 class=\"ui-title\">Logs</h1>\n\n    </div>\n\n    <div role=\"main\" class=\"ui-content\" data-theme=\"c\">\n\n        <div class=\"filter-wrapper\">\n            <fieldset data-role=\"controlgroup\" data-type=\"horizontal\">\n\n                <input name=\"event\"\n                    id=\"event-all\"\n                    data-mini=\"true\"\n                    value=\"on\"\n                    checked=\"checked\"\n                    type=\"radio\"\n                    ");
+  data.buffer.push("<div id=\"log-list-page\" data-role=\"page\" class=\"ui-page-active ui-page ui-page-theme-a log-list\">\n\n    <div class=\"ui-header ui-bar-b\">\n\n        <a class=\"ui-btn ui-btn-left ui-btn-icon-left ui-icon-home\n            ui-corner-all responsive-button\" href=\"#\">Home</a>\n\n        <h1 class=\"ui-title\">Logs</h1>\n\n        ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push("\n\n    </div>\n\n    <div role=\"main\" class=\"ui-content\" data-theme=\"c\">\n\n        <div class=\"filter-wrapper\">\n            <fieldset data-role=\"controlgroup\" data-type=\"horizontal\">\n\n                <input name=\"event\"\n                    id=\"event-all\"\n                    data-mini=\"true\"\n                    value=\"on\"\n                    checked=\"checked\"\n                    type=\"radio\"\n                    ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "updateFilterFlags", "all", {hash:{
     'on': ("change"),
     'target': ("view")
@@ -1613,7 +1624,7 @@ function program5(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["log_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["log_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
@@ -1709,7 +1720,7 @@ function program10(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["machine_add/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_add"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -1910,6 +1921,15 @@ function program22(depth0,data) {
 
 function program24(depth0,data) {
   
+  var buffer = '', stack1;
+  data.buffer.push("\n            ");
+  stack1 = helpers['if'].call(depth0, "Mist.scriptsController.length", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(25, program25, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            ");
+  return buffer;
+  }
+function program25(depth0,data) {
+  
   var buffer = '';
   data.buffer.push("\n                <select class=\"toggle-field ui-mini\" data-theme=\"a\" data-role=\"slider\"\n                ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "switchToggled", {hash:{
@@ -1920,7 +1940,7 @@ function program24(depth0,data) {
   return buffer;
   }
 
-function program26(depth0,data) {
+function program27(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                        ");
@@ -1930,13 +1950,13 @@ function program26(depth0,data) {
   return buffer;
   }
 
-function program28(depth0,data) {
+function program29(depth0,data) {
   
   
   data.buffer.push(" Select ");
   }
 
-function program30(depth0,data) {
+function program31(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                            <li data-icon=\"false\">\n                                <a ");
@@ -1950,7 +1970,7 @@ function program30(depth0,data) {
   return buffer;
   }
 
-function program32(depth0,data) {
+function program33(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n            Estimated price:\n            <span>");
@@ -2031,10 +2051,10 @@ function program32(depth0,data) {
     'valueBinding': ("Mist.machineAddController.newMachineScript")
   },hashTypes:{'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("\n            </div>\n            <div class=\"script-option advanced\">\n                <div id=\"create-machine-script-select\"\n                     data-role=\"collapsible\"\n                     data-iconpos=\"right\"\n                     data-collapsed-icon=\"arrow-d\"\n                     data-expanded-icon=\"arrow-u\"\n                     data-theme=\"a\"\n                     class=\"mist-select\">\n                    <h4>");
-  stack1 = helpers['if'].call(depth0, "Mist.machineAddController.newMachineScript.name", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(28, program28, data),fn:self.program(26, program26, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.machineAddController.newMachineScript.name", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(29, program29, data),fn:self.program(27, program27, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                    </h4>\n                    <ul data-role=\"listview\" data-theme=\"a\">\n                        ");
-  stack1 = helpers.each.call(depth0, "Mist.scriptsController", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(30, program30, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "Mist.scriptsController", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(31, program31, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                    </ul>\n                </div>\n                ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextArea", {hash:{
@@ -2049,7 +2069,7 @@ function program32(depth0,data) {
     'checkedBinding': ("Mist.machineAddController.newMachineMonitoring")
   },hashTypes:{'data-theme': "STRING",'checkedBinding': "STRING"},hashContexts:{'data-theme': depth0,'checkedBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("\n            Enable monitoring\n            </label>\n        </div>\n\n        <div id=\"create-machine-cost\">\n        ");
-  stack1 = helpers['if'].call(depth0, "view.price", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(32, program32, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.price", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(33, program33, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </div>\n\n        <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\" >\n                <a data-role=\"button\"\n                   data-theme=\"a\"\n                   ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
@@ -2060,12 +2080,12 @@ function program32(depth0,data) {
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push(">Launch!</a>\n        </div>\n    </div>\n</div>\n\n");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyAddView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "keyAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n");
   return buffer;
   
 });
-Ember.TEMPLATES["machine/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression;
@@ -2167,14 +2187,26 @@ function program15(depth0,data) {
   data.buffer.push(">\n                                </div>\n                            </div>\n                            ");
   stack1 = helpers._triageMustache.call(depth0, "loadavg", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" - ");
+  data.buffer.push(" ");
+  stack1 = helpers['if'].call(depth0, "cores", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(16, program16, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("- ");
   stack1 = helpers._triageMustache.call(depth0, "loadavg5", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n                        </td>\n                    </tr>\n                ");
+  data.buffer.push(" \n                        </td>\n                    </tr>\n                ");
+  return buffer;
+  }
+function program16(depth0,data) {
+  
+  var buffer = '', stack1;
+  data.buffer.push("- ");
+  stack1 = helpers._triageMustache.call(depth0, "cores", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push(" cores ");
   return buffer;
   }
 
-function program17(depth0,data) {
+function program18(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                    <tr>\n                        <td>Latency</td>\n                        <td>\n                            <div ");
@@ -2204,7 +2236,7 @@ function program17(depth0,data) {
   return buffer;
   }
 
-function program19(depth0,data) {
+function program20(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                    <tr>\n                        <td>Packet loss</td>\n                        <td>");
@@ -2214,16 +2246,16 @@ function program19(depth0,data) {
   return buffer;
   }
 
-function program21(depth0,data) {
+function program22(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                    <tr>\n                        <td>Tags</td>\n                        <td>\n                            ");
-  stack1 = helpers.each.call(depth0, "tags", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(22, program22, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "tags", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(23, program23, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                        </td>\n                    </tr>\n                ");
   return buffer;
   }
-function program22(depth0,data) {
+function program23(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                            <span class=\"tag\">");
@@ -2233,16 +2265,16 @@ function program22(depth0,data) {
   return buffer;
   }
 
-function program24(depth0,data) {
+function program25(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                    <tr>\n                        <td>Public IPs</td>\n                        <td>\n                            ");
-  stack1 = helpers.each.call(depth0, "view.public_ips", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(25, program25, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "view.public_ips", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(26, program26, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                        </td>\n                    </tr>\n                ");
   return buffer;
   }
-function program25(depth0,data) {
+function program26(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                                <div class=\"ip\">");
@@ -2252,17 +2284,27 @@ function program25(depth0,data) {
   return buffer;
   }
 
-function program27(depth0,data) {
+function program28(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                    <tr>\n                        <td>Private IPs</td>\n                        <td>\n                            ");
-  stack1 = helpers.each.call(depth0, "view.private_ips", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(25, program25, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "view.private_ips", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(26, program26, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                        </td>\n                    </tr>\n                ");
   return buffer;
   }
 
-function program29(depth0,data) {
+function program30(depth0,data) {
+  
+  var buffer = '', stack1;
+  data.buffer.push("\n                    <tr>\n                        <td colspan=\"2\"><div class=\"df\">");
+  stack1 = helpers._triageMustache.call(depth0, "view.machine.df", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</div></td>\n                ");
+  return buffer;
+  }
+
+function program32(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                    <tr>\n                        <td>");
@@ -2275,16 +2317,16 @@ function program29(depth0,data) {
   return buffer;
   }
 
-function program31(depth0,data) {
+function program34(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n            <div id=\"single-machine-metadata\" data-role=\"collapsible\">\n\n                <h4>Full metadata list</h4>\n\n                <table class=\"info-table\">\n                    <tbody>\n                    ");
-  stack1 = helpers.each.call(depth0, "view.metadata", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(32, program32, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "view.metadata", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(35, program35, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                    </tbody>\n                </table>\n\n            </div>\n        ");
   return buffer;
   }
-function program32(depth0,data) {
+function program35(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                        <tr>\n                            <td>");
@@ -2301,7 +2343,7 @@ function program32(depth0,data) {
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"header\" data-theme=\"a\" class=\"single-machine-header\">\n\n        <!-- Provider Icon -->\n        <span class=\"single-view-icon-wrapper\">\n            <span id=\"single-view-provider-icon\"\n                ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("view.providerIconClass")
@@ -2328,9 +2370,9 @@ function program32(depth0,data) {
   stack1 = helpers.unless.call(depth0, "pendingCreation", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </span>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n\n        <!--\n\n             Monitoring collapsible\n\n        -->\n\n\n        <div id=\"monitoring-collapsible\" data-role=\"collapsible\" data-collapsed=\"false\">\n\n            <h4>Monitoring</h4>\n\n            ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineMonitoringView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineMonitoring", {hash:{
     'machineBinding': ("view.machine")
-  },hashTypes:{'machineBinding': "STRING"},hashContexts:{'machineBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'machineBinding': "STRING"},hashContexts:{'machineBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n        </div>\n\n\n        <!--\n\n             Information collapsibles\n\n        -->\n\n\n        <div data-role=\"collapsible\" data-collapsed=\"false\">\n\n            <h4>Basic Info</h4>\n\n            <table class=\"info-table\">\n                <tbody>\n                <tr>\n                    <td>Last probed</td>\n                    <td> ");
   stack1 = helpers['if'].call(depth0, "probing", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(11, program11, data),fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -2341,42 +2383,45 @@ function program32(depth0,data) {
   stack1 = helpers['if'].call(depth0, "loadavg", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(15, program15, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                ");
-  stack1 = helpers['if'].call(depth0, "latency", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(17, program17, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "latency", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(18, program18, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                ");
-  stack1 = helpers['if'].call(depth0, "loss", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(19, program19, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "loss", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(20, program20, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                ");
-  stack1 = helpers['if'].call(depth0, "tags", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(21, program21, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "tags", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(22, program22, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                ");
-  stack1 = helpers['if'].call(depth0, "view.public_ips", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(24, program24, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.public_ips", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(25, program25, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                ");
-  stack1 = helpers['if'].call(depth0, "view.private_ips", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(27, program27, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.private_ips", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(28, program28, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                ");
-  stack1 = helpers.each.call(depth0, "view.basicInfo", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(29, program29, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.machine.df", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(30, program30, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                ");
+  stack1 = helpers.each.call(depth0, "view.basicInfo", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(32, program32, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            </tbody>\n            </table>\n        </div>\n\n        ");
-  stack1 = helpers['if'].call(depth0, "view.metadata", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(31, program31, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.metadata", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(34, program34, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.dialogView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "dialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.metricAddView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "metricAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineKeysView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineKeys", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineTagsView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineTags", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineShellView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineShell", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machinePowerView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machinePower", {hash:{
     'position': ("#single-machine-power-btn")
-  },hashTypes:{'position': "STRING"},hashContexts:{'position': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'position': "STRING"},hashContexts:{'position': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    <div class=\"tri-action-footer\" data-role=\"footer\" data-theme=\"b\">\n        <table><tbody><tr><td>\n            <a id=\"single-machine-tags-btn\"\n                ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("id::ui-state-disabled\n                    can_tag::ui-state-disabled\n                    :ui-btn\n                    :ui-btn-icon-left\n                    :ui-icon-grid")
@@ -2405,7 +2450,7 @@ function program32(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["machine_keys/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_keys"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -2423,9 +2468,9 @@ function program2(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineKeysListItemView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineKeysListItem", {hash:{
     'keyBinding': ("this")
-  },hashTypes:{'keyBinding': "STRING"},hashContexts:{'keyBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'keyBinding': "STRING"},hashContexts:{'keyBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n            ");
   return buffer;
   }
@@ -2475,7 +2520,7 @@ function program8(depth0,data) {
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push(">Back</a>\n\n    </div>\n\n</div>\n\n");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyAddView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "keyAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n<div id=\"key-actions-popup\"\n    class=\"tiny-popup\"\n    data-role=\"popup\"\n    data-overlay-theme=\"b\"\n    data-transition=\"flip\"\n    data-position-to=\"#machine-keys\"\n    data-theme=\"a\">\n    <ul data-role=\"listview\">\n        <li data-icon=\"false\"><a ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "removeClicked", {hash:{
     'target': ("view")
@@ -2521,7 +2566,7 @@ function program8(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["machine_keys_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_keys_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression;
@@ -2543,7 +2588,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   return buffer;
   
 });
-Ember.TEMPLATES["machine_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -2570,10 +2615,10 @@ function program3(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineListItemView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineListItem", {hash:{
     'machineBinding': ("this"),
     'class': ("checkbox-link")
-  },hashTypes:{'machineBinding': "STRING",'class': "STRING"},hashContexts:{'machineBinding': depth0,'class': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'machineBinding': "STRING",'class': "STRING"},hashContexts:{'machineBinding': depth0,'class': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n                    ");
   return buffer;
   }
@@ -2602,7 +2647,7 @@ function program6(depth0,data) {
   }
 
   data.buffer.push("<div id=\"machine-list-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#\" class=\"responsive-button\" data-icon=\"home\">Home</a>\n\n        <h1>Machines</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <a id=\"create-machine-btn\"\n           class=\"responsive-button\"\n           data-role=\"button\"\n           data-icon=\"plus\"\n           data-iconpos=\"right\"\n           data-theme=\"d\"\n           ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "createClicked", {hash:{
     'target': ("view")
@@ -2615,19 +2660,19 @@ function program6(depth0,data) {
   stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.dialogView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "dialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineAddView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineTagsView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineTags", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineShellView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineShell", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machinePowerView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machinePower", {hash:{
     'position': ("#machines-power-btn")
-  },hashTypes:{'position': "STRING"},hashContexts:{'position': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'position': "STRING"},hashContexts:{'position': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    <div id=\"select-machines-popup\" data-role=\"popup\" data-overlay-theme=\"b\" data-transition=\"flip\" data-position-to=\"#select-machines-btn\">\n        <ul data-role=\"listview\">\n            <li data-icon=\"false\">\n                <a ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "selectionModeClicked", "all", {hash:{
     'target': ("view")
@@ -2655,7 +2700,7 @@ function program6(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["machine_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
@@ -2808,7 +2853,7 @@ function program13(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["machine_monitoring/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_monitoring"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression;
@@ -2824,13 +2869,13 @@ function program1(depth0,data) {
     'class': ("view.pendingFirstStats:hidden")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push(">\n                ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.graphListView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "graphList", {hash:{
     'actionProxyBinding': ("view")
-  },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n        </div>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.ruleListView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "ruleList", {hash:{
     'rulesBinding': ("view.rules")
-  },hashTypes:{'rulesBinding': "STRING"},hashContexts:{'rulesBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'rulesBinding': "STRING"},hashContexts:{'rulesBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n        <div id=\"monitoring-bottom-btns\">\n            <div data-rule=\"ui-grid-a\">\n                <div class=\"ui-block-a\">\n                    <a id=\"add-rule-button\"\n                      ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("\n                            Mist.rulesController.creatingPending:ui-state-disabled\n                            :ui-btn\n                            :ui-corner-all\n                            :ui-btn-d\n                            :ui-btn-icon-left\n                            :ui-icon-plus")
@@ -2916,14 +2961,15 @@ function program11(depth0,data) {
   data.buffer.push("<div id=\"machine-monitoring\">\n\n    ");
   stack1 = helpers['if'].call(depth0, "view.machine.hasMonitoring", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(4, program4, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n</div>\n");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.ruleEditView", {hash:{
+  data.buffer.push("\n</div>\n\n");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "ruleEdit", {hash:{
     'metricsBinding': ("this.metrics")
-  },hashTypes:{'metricsBinding': "STRING"},hashContexts:{'metricsBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'metricsBinding': "STRING"},hashContexts:{'metricsBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push("\n");
   return buffer;
   
 });
-Ember.TEMPLATES["machine_power/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_power"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -2996,7 +3042,7 @@ function program7(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["machine_shell/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_shell"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', escapeExpression=this.escapeExpression;
@@ -3010,7 +3056,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   return buffer;
   
 });
-Ember.TEMPLATES["machine_tags/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_tags"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -3019,9 +3065,9 @@ function program1(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.machineTagsListItemView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineTagsListItem", {hash:{
     'tagBinding': ("this")
-  },hashTypes:{'tagBinding': "STRING"},hashContexts:{'tagBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'tagBinding': "STRING"},hashContexts:{'tagBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n            ");
   return buffer;
   }
@@ -3042,7 +3088,7 @@ function program5(depth0,data) {
   return buffer;
   }
 
-  data.buffer.push("<div id=\"machine-tags-popup\" \n     class=\"large-popup\" \n     data-role=\"popup\" \n     data-overlay-theme=\"b\" \n     data-transition=\"flip\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n        <h1>Manage Tags</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        ");
+  data.buffer.push("<div id=\"machine-tags-popup\"\n     class=\"large-popup\"\n     data-role=\"popup\"\n     data-overlay-theme=\"b\"\n     data-transition=\"flip\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n        <h1>Manage Tags</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
     'valueBinding': ("Mist.machineTagsController.newTag")
   },hashTypes:{'valueBinding': "STRING"},hashContexts:{'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
@@ -3064,7 +3110,7 @@ function program5(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["machine_tags_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_tags_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression;
@@ -3081,7 +3127,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   return buffer;
   
 });
-Ember.TEMPLATES["messagebox/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["messagebox"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression;
@@ -3136,7 +3182,7 @@ function program5(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["metric_add_custom/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["metric_add_custom"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -3189,7 +3235,7 @@ function program1(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["metric_add/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["metric_add"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -3198,9 +3244,9 @@ function program1(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.metricNodeView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "metricNode", {hash:{
     'nodeBinding': ("Mist.metricAddController.metricsTree")
-  },hashTypes:{'nodeBinding': "STRING"},hashContexts:{'nodeBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'nodeBinding': "STRING"},hashContexts:{'nodeBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n            ");
   return buffer;
   }
@@ -3232,12 +3278,12 @@ function program5(depth0,data) {
   stack1 = helpers['if'].call(depth0, "Mist.metricsController.addingMetric", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n        </div>\n    </div>\n</div>\n\n");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.metricAddCustomView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "metricAddCustom", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n");
   return buffer;
   
 });
-Ember.TEMPLATES["metric_node/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["metric_node"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -3286,9 +3332,9 @@ function program6(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n            ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.metricNodeView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "metricNode", {hash:{
     'nodeBinding': ("this")
-  },hashTypes:{'nodeBinding': "STRING"},hashContexts:{'nodeBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'nodeBinding': "STRING"},hashContexts:{'nodeBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n        ");
   return buffer;
   }
@@ -3299,7 +3345,7 @@ function program6(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["missing/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["missing"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   
@@ -3308,7 +3354,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   data.buffer.push("<div id=\"missing-page\" data-role=\"page\" class=\"ui-page-active ui-page ui-page-theme-a\">\n    <div id=\"splash\">\n        <div id=\"container\">\n            <a id=\"logo\" href=\"/#\"></a>\n            <div id=\"message\">\n                404. Got lost in the clouds\n            </div>\n        </div>\n    </div>\n</div>\n");
   
 });
-Ember.TEMPLATES["network_create/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["network_create"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression;
@@ -3467,7 +3513,7 @@ function program10(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["network/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["network"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -3534,7 +3580,7 @@ function program8(depth0,data) {
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <div id=\"single-network-info\" data-role=\"collapsible\" data-collapsed=\"false\">\n\n            <h4>Network Information</h4>\n\n            <table class=\"info-table\">\n                <tbody>\n                <tr>\n                    <td>Name</td>\n                    <td>");
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -3551,7 +3597,7 @@ function program8(depth0,data) {
   stack1 = helpers.each.call(depth0, "view.network.backend.machines.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n    </div>\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
   stack1 = helpers['if'].call(depth0, "backend.isOpenStack", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -3559,7 +3605,7 @@ function program8(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["network_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["network_list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -3586,16 +3632,16 @@ function program3(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.networkListItemView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "networkListItem", {hash:{
     'networkBinding': ("this"),
     'class': ("checkbox-link")
-  },hashTypes:{'networkBinding': "STRING",'class': "STRING"},hashContexts:{'networkBinding': depth0,'class': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'networkBinding': "STRING",'class': "STRING"},hashContexts:{'networkBinding': depth0,'class': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n                  ");
   return buffer;
   }
 
   data.buffer.push("<div id=\"network-list-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#\" class=\"responsive-button\" data-icon=\"home\">Home</a>\n\n        <h1>Networks</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n        <a id=\"network-create-btn\"\n            ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("Mist.backendsController.hasOpenStack::ui-disabled\n                :responsive-button")
@@ -3608,9 +3654,9 @@ function program3(depth0,data) {
   stack1 = helpers.each.call(depth0, "Mist.backendsController", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.networkCreateView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "networkCreate", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    <div class=\"single-action-footer\" data-role=\"footer\" data-theme=\"b\">\n        <a class=\"ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "deleteClicked", {hash:{
     'target': ("view")
@@ -3619,7 +3665,7 @@ function program3(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["network_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["network_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, helper, options, escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
@@ -3673,7 +3719,7 @@ function program5(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["rule_edit/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["rule_edit"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -3763,7 +3809,7 @@ function program7(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["rule/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["rule"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -3851,7 +3897,7 @@ function program5(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["rule_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["rule_list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -3860,9 +3906,9 @@ function program1(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.ruleView", {hash:{
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "rule", {hash:{
     'ruleBinding': ("this")
-  },hashTypes:{'ruleBinding': "STRING"},hashContexts:{'ruleBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  },hashTypes:{'ruleBinding': "STRING"},hashContexts:{'ruleBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n    ");
   return buffer;
   }
@@ -3883,7 +3929,7 @@ function program3(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["script_add/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["script_add"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression;
@@ -4021,7 +4067,12 @@ function program15(depth0,data) {
     'id': ("url-script-script"),
     'valueBinding': ("Mist.scriptAddController.newScript.script")
   },hashTypes:{'data-theme': "STRING",'id': "STRING",'valueBinding': "ID"},hashContexts:{'data-theme': depth0,'id': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n            </div>\n        </div>\n\n        ");
+  data.buffer.push("\n            </div>\n        </div>\n\n        <!--\n            Description\n        -->\n\n        <div id=\"script-add-description\" class=\"form-field\">\n          <label>Description (optional):</label>\n          ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextArea", {hash:{
+    'data-theme': ("a"),
+    'valueBinding': ("Mist.scriptAddController.newScript.description")
+  },hashTypes:{'data-theme': "STRING",'valueBinding': "ID"},hashContexts:{'data-theme': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n        </div>\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.scriptsController.addingScript", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(15, program15, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n        <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n            <a data-role=\"button\" ");
@@ -4036,13 +4087,11 @@ function program15(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "addClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Add</a>\n        </div>\n    </div>\n</div>\n\n");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.fileUploadView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n");
+  data.buffer.push(">Add</a>\n        </div>\n    </div>\n</div>\n");
   return buffer;
   
 });
-Ember.TEMPLATES["script_edit/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["script_edit"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -4073,7 +4122,7 @@ function program1(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["script/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["script"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -4087,6 +4136,16 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = '', stack1;
+  data.buffer.push("\n                 <tr>\n                     <td>Description</td>\n                     <td>");
+  stack1 = helpers._triageMustache.call(depth0, "description", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td>\n                 </tr>\n             ");
+  return buffer;
+  }
+
+function program5(depth0,data) {
+  
+  var buffer = '', stack1;
   data.buffer.push("\n                   <tr>\n                       <td>Entry Point</td>\n                       <td>");
   stack1 = helpers._triageMustache.call(depth0, "entrypoint", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -4094,7 +4153,7 @@ function program3(depth0,data) {
   return buffer;
   }
 
-function program5(depth0,data) {
+function program7(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n               <tr>\n                   <td>Script</td>\n                   <td><div class=\"command-container\">");
@@ -4104,7 +4163,7 @@ function program5(depth0,data) {
   return buffer;
   }
 
-function program7(depth0,data) {
+function program9(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n               <tr>\n                   <td>Url</td>\n                   <td>");
@@ -4118,7 +4177,7 @@ function program7(depth0,data) {
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.scriptsController.loading", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -4126,18 +4185,21 @@ function program7(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "runClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Run</a>\n\n       <div data-role=\"collapsible\" data-collapsed=\"false\">\n\n           <h4>Basic Info</h4>\n\n           <table class=\"info-table\">\n           <tbody>\n               <tr>\n                   <td>Type</td>\n                   <td>");
+  data.buffer.push(">Run</a>\n\n       <div data-role=\"collapsible\" data-collapsed=\"false\">\n\n           <h4>Basic Info</h4>\n\n           <table class=\"info-table\">\n           <tbody>\n             ");
+  stack1 = helpers['if'].call(depth0, "description", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n               <tr>\n                   <td>Type</td>\n                   <td>");
   stack1 = helpers._triageMustache.call(depth0, "type", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td>\n               </tr>\n               ");
-  stack1 = helpers['if'].call(depth0, "entrypoint", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "entrypoint", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n               ");
-  stack1 = helpers['if'].call(depth0, "view.isInline", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.isInline", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(9, program9, data),fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n           </tbody>\n           </table>\n       </div>\n\n       <div data-role=\"collapsible\" data-collapsed=\"false\">\n\n           <h4>Logs</h4>\n\n           ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "scriptLogList", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push("\n           \n       </div>\n\n        <div class=\"large-padding\"></div>\n\n    </div>\n\n    ");
+  data.buffer.push("\n\n       </div>\n\n        <div class=\"large-padding\"></div>\n\n    </div>\n\n    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "dialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "scriptRun", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
@@ -4155,7 +4217,7 @@ function program7(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["script_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["script_list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -4174,7 +4236,7 @@ function program1(depth0,data) {
   }
 
   data.buffer.push("<div id=\"script-list-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#\" class=\"responsive-button\" data-icon=\"home\">Home</a>\n\n        <h1>Scripts</h1>\n\n        ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.userMenuView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <div class=\"list-wrapper\">\n\n            <a id=\"select-scripts-btn\"\n               class=\"responsive-btn ui-btn ui-btn-icon-left ui-icon-arrow-d ui-corner-all ui-shadow\"\n               ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "selectClicked", {hash:{
     'target': ("view")
@@ -4220,7 +4282,7 @@ function program1(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["script_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["script_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, helper, options, escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
@@ -4231,10 +4293,10 @@ function program1(depth0,data) {
   data.buffer.push("\n    <div class=\"ui-grid-b\">\n        <div class=\"ui-block-a\">");
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>\n        <div class=\"ui-block-b\">");
+  data.buffer.push("</div>\n        <div class=\"ui-block-b\">\n          <span class=\"tag\">");
   stack1 = helpers._triageMustache.call(depth0, "type", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>\n        <div class=\"ui-block-c\"></div>\n    </div>\n");
+  data.buffer.push("</span>\n        </div>\n        <div class=\"ui-block-c\"></div>\n    </div>\n");
   return buffer;
   }
 
@@ -4249,7 +4311,7 @@ function program1(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["script_log_list/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["script_log_list"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -4293,7 +4355,7 @@ function program5(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["script_run/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["script_run"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression;
@@ -4345,7 +4407,7 @@ function program8(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                        ");
-  stack1 = helpers['if'].call(depth0, "probed", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "hasKeys", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                        ");
   return buffer;
@@ -4401,7 +4463,7 @@ function program11(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["subnet_list_item/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["subnet_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -4557,7 +4619,7 @@ function program20(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["user_menu/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["user_menu"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -4641,9 +4703,9 @@ function program9(depth0,data) {
   stack1 = helpers['if'].call(depth0, "Mist.authenticated", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(8, program8, data),fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n    </div>\n\n</div>\n\n");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.loginView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "login", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.messageboxView", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "messageBox", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n");
   return buffer;
   

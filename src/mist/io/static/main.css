@@ -33,6 +33,7 @@
 @import url("css/graph_list.css");
 @import url("css/metric_add_custom.css");
 @import url("css/script.css");
+@import url("css/script_list.css");
 
 
 /* Splash
@@ -450,6 +451,7 @@ ul.checkbox-list li label {
 
 .list-wrapper > a:nth-child(1) {
     float: left;
+    font-weight: normal;
 }
 .list-wrapper > a:nth-child(2) {
     float: right;

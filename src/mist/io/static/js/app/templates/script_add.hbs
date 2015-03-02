@@ -129,6 +129,17 @@
             </div>
         </div>
 
+        <!--
+            Description
+        -->
+
+        <div id="script-add-description" class="form-field">
+          <label>Description (optional):</label>
+          {{view Mist.TextArea
+              data-theme="a"
+              valueBinding=Mist.scriptAddController.newScript.description}}
+        </div>
+
         {{#if Mist.scriptsController.addingScript}}
             <div class="ajax-loader"></div>
         {{/if}}
@@ -141,5 +152,3 @@
         </div>
     </div>
 </div>
-
-{{view Mist.fileUploadView}}

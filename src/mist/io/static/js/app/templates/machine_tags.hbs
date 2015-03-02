@@ -1,7 +1,7 @@
-<div id="machine-tags-popup" 
-     class="large-popup" 
-     data-role="popup" 
-     data-overlay-theme="b" 
+<div id="machine-tags-popup"
+     class="large-popup"
+     data-role="popup"
+     data-overlay-theme="b"
      data-transition="flip">
 
     <div data-role="header" data-theme="b">
@@ -16,7 +16,7 @@
 
         <ul data-role="listview">
             {{#each Mist.machineTagsController.machine.tags}}
-                {{view Mist.machineTagsListItemView tagBinding="this"}}
+                {{view "machineTagsListItem" tagBinding="this"}}
             {{/each}}
         </ul>
 

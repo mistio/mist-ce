@@ -8,7 +8,7 @@ define('app/views/graph_button', ['app/views/templated'],
 
         'use strict';
 
-        return TemplatedView.extend({
+        return App.GraphButtonView = TemplatedView.extend({
 
 
             //

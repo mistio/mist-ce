@@ -4,11 +4,11 @@ define('app/views/network_list', ['app/views/mistscreen'],
     //
     //  @returns class
     //
-    function (Mistscreen) {
+    function (PageView) {
 
         'use strict';
 
-        return Mistscreen.extend({
+        return App.NetworkListView = PageView.extend({
 
 
             //

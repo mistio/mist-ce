@@ -8,7 +8,7 @@ define('app/views/key_add', ['app/views/popup'],
 
         'use strict';
 
-        return PopupView.extend({
+        return App.KeyAddView = PopupView.extend({
 
 
             //
