@@ -262,6 +262,16 @@
             </div>
         </div>
 
+        <div id="ports">
+            <!-- Expose Ports -->
+            <label>Ports:</label>
+            {{view Mist.TextArea
+                   id="create-machine-ports"
+                   data-theme="a"
+                   placeholder="e.g. 80:80"
+                   valueBinding="Mist.machineAddController.newMachineDockerPorts"}}
+        </div>
+
         <!-- Enable monitoring -->
         <div id="create-machine-monitoring" class="ui-state-disabled">
             <label>

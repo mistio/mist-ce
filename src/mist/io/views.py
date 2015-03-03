@@ -482,6 +482,9 @@ def create_machine(request):
         async = request.json_body.get('async', False)
         quantity = request.json_body.get('quantity', 1)
         persist = request.json_body.get('persist', False)
+        docker_port_bindings = request.json_body.get('docker_port_bindings', {})
+        docker_exposed_ports = request.json_body.get('docker_exposed_ports', {})
+
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -494,8 +497,9 @@ def create_machine(request):
             image_extra, disk, image_name, size_name,
             location_name, ips, monitoring, networks,
             docker_env, docker_command)
-    kwargs = {'script_id': script_id, 'script_params':script_params,
-              'job_id': job_id}
+    kwargs = {'script_id': script_id, 'script_params': script_params,
+              'job_id': job_id, 'docker_port_bindings': docker_port_bindings,
+              'docker_exposed_ports': docker_exposed_ports}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
