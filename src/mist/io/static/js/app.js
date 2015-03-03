@@ -559,7 +559,7 @@ var loadApp = function (
         },
     });
 
-    if (Mist.betaFeatures) {
+    if (Mist.isCore) {
     App.ScriptsRoute = Ember.Route.extend({
         activate: function () {
             Ember.run.next(function () {
@@ -807,7 +807,7 @@ var handleMobileInit = function () {
 
 var setupSocketEvents = function (socket, callback) {
 
-    if (Mist.betaFeatures) {
+    if (Mist.isCore) {
     //  This is a temporary ajax-request to get the scripts.
     //  It should be converted into a "list_scripts" socket handler
     //  as soon as the backend supports it

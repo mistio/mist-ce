@@ -218,7 +218,7 @@
         <!-- Select Script -->
 
         <div id="script">
-            {{#if Mist.betaFeatures}}
+            {{#if Mist.isCore}}
             {{#if Mist.scriptsController.length}}
                 <select class="toggle-field ui-mini" data-theme="a" data-role="slider"
                 {{action "switchToggled" on="change" target="view"}}>
