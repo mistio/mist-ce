@@ -1244,8 +1244,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
-                   script_id='', script_params='', docker_port_bindings={},
-                   docker_exposed_ports={}, job_id=None):
+                   script_id='', script_params='', job_id=None, docker_port_bindings={},
+                   docker_exposed_ports={}):
 
     """Creates a new virtual machine on the specified backend.
 

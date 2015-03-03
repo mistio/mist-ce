@@ -496,10 +496,10 @@ def create_machine(request):
             location_id, image_id, size_id, script,
             image_extra, disk, image_name, size_name,
             location_name, ips, monitoring, networks,
-            docker_env, docker_command, docker_port_bindings,
-            docker_exposed_ports)
-    kwargs = {'script_id': script_id, 'script_params':script_params,
-              'job_id': job_id}
+            docker_env, docker_command)
+    kwargs = {'script_id': script_id, 'script_params': script_params,
+              'job_id': job_id, 'docker_port_bindings': docker_port_bindings,
+              'docker_exposed_ports': docker_exposed_ports}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
