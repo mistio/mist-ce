@@ -1634,6 +1634,18 @@ var PROVIDER_MAP = {
         },
     ],
 
+    hostvirtual: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'HostVirtual',
+        },
+        {
+            name: 'token',
+            type: 'password',
+        },
+    ],
+
     docker: [
         {
             name: 'title',
