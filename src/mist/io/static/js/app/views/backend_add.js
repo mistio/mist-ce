@@ -8,7 +8,7 @@ define('app/views/backend_add', ['app/views/panel'],
 
         'use strict';
 
-        return PanelView.extend({
+        return App.BackendAddView = PanelView.extend({
 
 
             selectedRegion: null,

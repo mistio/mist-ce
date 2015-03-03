@@ -1,0 +1,19 @@
+#single-script-page #run-script-btn {
+    float: right;
+}
+#single-script-page .ui-collapsible {
+    clear: both;
+}
+#single-script-page .dual-action-footer {
+    display: block;
+}
+#single-script-page .log-list ul {
+    margin-top: 1em;
+}
+#single-script-page .log-list ul li {
+    padding: 0;
+}
+
+#single-script-page .log-list ul li a {
+    margin: 0;
+}

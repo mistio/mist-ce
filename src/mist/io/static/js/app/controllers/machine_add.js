@@ -97,13 +97,6 @@ define('app/controllers/machine_add', ['ember'],
                         }
                     }
                 }
-                if (providerName == 'DigitalOcean') {
-                    var re = /^[0-9a-zA-Z-.]*$/;
-                    if (!re.test(machineName)) {
-                        Mist.notificationController.timeNotify('Characters allowed are a-z, A-Z, 0-9, . and -', 7000);
-                        return;
-                    }
-                }
                 if (providerName == 'Azure') {
                     var re = /^[0-9a-zA-Z-]*$/;
                     if (!re.test(machineName)) {
@@ -115,15 +108,6 @@ define('app/controllers/machine_add', ['ember'],
                     var re = /^[0-9a-z-]*$/;
                     if (!re.test(machineName)) {
                         Mist.notificationController.timeNotify('Name must be lowercase letters, numbers, and hyphens', 7000);
-                        return;
-                    }
-                }
-                if (providerName == 'Linode') {
-                    var re = /^[0-9a-zA-Z-_]*$/;
-                    if (!re.test(machineName)) {
-                        Mist.notificationController.timeNotify(
-                            'A Linode label may only contain ASCII letters or numbers, dashes and underscores. Must ' +
-                            'begin and end with letters or numbers, and be at least 3 characters long', 7000);
                         return;
                     }
                 }
@@ -148,6 +132,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineMonitoring,
                         this.newMachineDockerEnvironment.trim(),
                         this.newMachineDockerCommand,
+                        this.newMachineScriptParams,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }
@@ -178,7 +163,9 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineLocation', {'name' : 'Select Location'})
                     .set('newMachineProvider', {'title' : 'Select Provider'})
                     .set('newMachineDockerEnvironment', '')
-                    .set('newMachineDockerCommand', '');
+                    .set('newMachineDockerCommand', '')
+                    .set('newMachineScriptParams', '');
+                this.view.clear();
              },
 
 

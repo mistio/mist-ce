@@ -1,7 +1,7 @@
 <div id="graphBar">
 
     {{#each Mist.graphsController.content}}
-        {{view Mist.graphButtonView
+        {{view "graphButton"
             graphBinding="this"
             actionProxyBinding="view.actionProxy"}}
     {{/each}}

@@ -1252,7 +1252,8 @@ def list_machines(user, backend_id):
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
-                   docker_env=[], docker_command=None, ssh_port=22):
+                   docker_env=[], docker_command=None, ssh_port=22,
+                   script_id='', script_params='', job_id = None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1302,6 +1303,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
+
+    machine_name = machine_name_validator(conn.type, machine_name)
     if conn.type is Provider.DOCKER:
         if key_id:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
@@ -1373,29 +1376,41 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
+
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
-        mist.io.tasks.azure_post_create_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id,
-                                      node.extra.get('username'), node.extra.get('password'), public_key)
+        mist.io.tasks.azure_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('username'), node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params, job_id = job_id
+        )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
-        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id, node.extra.get('password'), public_key)
+        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params, job_id = job_id
+        )
     elif key_id:
-        if script or monitoring:
-            mist.io.tasks.post_deploy_steps.delay(user.email, backend_id, node.id,
-                                      monitoring, script, key_id)
+        mist.io.tasks.post_deploy_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            script_id=script_id, script_params=script_params,
+            job_id = job_id
+        )
 
-    return {'id': node.id,
+
+    ret = {'id': node.id,
             'name': node.name,
             'extra': node.extra,
             'public_ips': node.public_ips,
             'private_ips': node.private_ips,
+            'job_id': job_id,
             }
+
+    return ret
 
 
 def _create_machine_rackspace(conn, public_key, machine_name,
@@ -2774,7 +2789,7 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False, dry=False):
+                      no_ssh=False, dry=False, **kwargs):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
@@ -2876,7 +2891,8 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     return ret
 
 
-def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
+def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='',
+                   shell=None):
     """Ping and SSH to machine and collect various metrics."""
 
     # run SSH commands
@@ -2897,6 +2913,8 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "fi;"
        "echo -------- && "
        "/sbin/ifconfig;"
+       "echo -------- &&"
+       "/bin/df -Pah;"
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
     )
@@ -2904,9 +2922,13 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     if key_id:
         log.warn('probing with key %s' % key_id)
 
-    cmd_output = ssh_command(user, backend_id, machine_id,
-                             host, command, key_id=key_id)
-    cmd_output = cmd_output.replace('\r\n','').split('--------')
+    if not shell:
+        cmd_output = ssh_command(user, backend_id, machine_id,
+                                 host, command, key_id=key_id)
+    else:
+        retval, cmd_output = shell.command(command)
+
+    cmd_output = cmd_output.replace('\r','').split('--------')
     log.warn(cmd_output)
     uptime_output = cmd_output[1]
     loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
@@ -2914,10 +2936,16 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     uptime = cmd_output[2]
     cores = cmd_output[3]
     ips = re.findall('inet addr:(\S+)', cmd_output[4])
+    m = re.findall('((?:[0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2})', cmd_output[4])
     if '127.0.0.1' in ips:
         ips.remove('127.0.0.1')
+    macs = {}
+    for i in range(0, len(ips)):
+        macs[ips[i]] = m[i]
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
+
+
     return {
         'uptime': uptime,
         'loadavg': loadavg,
@@ -2925,6 +2953,8 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         'users': users,
         'pub_ips': pub_ips,
         'priv_ips': priv_ips,
+        'macs': macs,
+        'df': cmd_output[5],
         'timestamp': time(),
     }
 
@@ -2969,7 +2999,7 @@ def notify_user(user, title, message="", **kwargs):
         if 'output' in kwargs:
             output += '%s\n' % kwargs['output']
         if 'retval' in kwargs:
-            output += 'returned with exit code %d.\n' % kwargs['retval']
+            output += 'returned with exit code %s.\n' % kwargs['retval']
         payload['output'] = output
     amqp_publish_user(user, routing_key='notify', data=payload)
 
@@ -3441,3 +3471,45 @@ def get_deploy_collectd_manual_command(uuid, password, monitor):
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
+
+
+def machine_name_validator(provider, name):
+    """
+    Validates machine names before creating a machine
+    Provider specific
+    """
+    if not name and provider not in config.EC2_PROVIDERS:
+        raise MachineNameValidationError("machine name cannot be empty")
+    if provider is Provider.DOCKER:
+        pass
+    elif provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
+        pass
+    elif provider in [Provider.OPENSTACK]:
+        pass
+    elif provider is Provider.HPCLOUD:
+        pass
+    elif provider in config.EC2_PROVIDERS:
+        if len(name) > 255:
+            raise MachineNameValidationError("machine name max chars allowed is 255")
+    elif provider is Provider.NEPHOSCALE:
+        pass
+    elif provider is Provider.GCE:
+        pass
+    elif provider is Provider.SOFTLAYER:
+        pass
+    elif provider is Provider.DIGITAL_OCEAN:
+        if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and dots")
+    elif provider == Provider.AZURE:
+        pass
+    elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+        pass
+    elif provider is Provider.LINODE:
+        if len(name) < 3:
+            raise MachineNameValidationError("machine name should be at least 3 chars")
+        if not re.search(r'^[0-9a-zA-Z][0-9a-zA-Z-_]+[0-9a-zA-Z]$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and underscores. Must begin and end with letters or numbers, " + \
+                "and be at least 3 characters long")
+    return name

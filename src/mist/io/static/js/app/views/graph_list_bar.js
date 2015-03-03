@@ -8,7 +8,7 @@ define('app/views/graph_list_bar', ['app/views/templated'],
 
         'use strict';
 
-        return TemplatedView.extend({
+        return App.GraphListBarView = TemplatedView.extend({
 
 
             //

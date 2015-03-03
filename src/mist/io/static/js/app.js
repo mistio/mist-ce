@@ -1,5 +1,7 @@
 startTimer();
 
+window.App = new Object();
+
 DEBUG_SOCKET = false;
 DEBUG_STATS = false;
 DEBUG_LOGS = false;
@@ -155,6 +157,7 @@ var appLoader = {
             before: [],
             exec: function () {
                 require(['ember'], function () {
+                    extendEmberView();
                     appLoader.complete('load ember');
                 });
             },
@@ -203,9 +206,9 @@ var appLoader = {
         'init app': {
             before: ['load templates', 'init connections'],
             exec: function () {
-                loadApp.apply(null, appLoader.buffer.files.concat([function () {
+                loadApp.apply(null, [function () {
                     appLoader.complete('init app');
-                }]));
+                }].concat(appLoader.buffer.files));
             }
         },
         'init connections': {
@@ -284,6 +287,10 @@ var loadFiles = function (callback) {
         'app/controllers/notification',
         'app/controllers/rule_edit',
         'app/controllers/rules',
+        'app/controllers/script_add',
+        'app/controllers/script_edit',
+        'app/controllers/script_run',
+        'app/controllers/scripts',
         'app/views/backend_add',
         'app/views/backend_button',
         'app/views/backend_edit',
@@ -330,12 +337,20 @@ var loadFiles = function (callback) {
         'app/views/rule',
         'app/views/rule_edit',
         'app/views/rule_list',
+        'app/views/script',
+        'app/views/script_add',
+        'app/views/script_edit',
+        'app/views/script_list',
+        'app/views/script_run',
+        'app/views/script_list_item',
+        'app/views/script_log_list',
         'app/views/subnet_list_item',
         'app/views/user_menu',
     ], callback);
 };
 
 var loadApp = function (
+    callback,
     TemplatesBuild,
     BackendAddController,
     BackendEditController,
@@ -365,55 +380,10 @@ var loadApp = function (
     NotificationController,
     RuleEditController,
     RulesController,
-    BackendAdd,
-    BackendButton,
-    BackendEdit,
-    ConfirmationDialog,
-    DialogView,
-    FileUploadView,
-    GraphButtonView,
-    GraphListView,
-    GraphListBarView,
-    GraphListControlView,
-    GraphListItemView,
-    Home,
-    ImageListItem,
-    ImageListView,
-    IPAddressListItemView,
-    SingleKeyView,
-    KeyAddView,
-    KeyEditDialog,
-    KeyListView,
-    KeyListItemView,
-    LogListView,
-    LogListItemView,
-    LoginView,
-    SingleMachineView,
-    MachineAddDialog,
-    MachineKeysView,
-    MachineKeysListItemView,
-    MachineListView,
-    MachineListItem,
-    MachineMonitoringView,
-    MachinePowerView,
-    MachineShellView,
-    MachineTagsView,
-    MachineTagsListItemView,
-    MessageBoxView,
-    MetricAddView,
-    MetricAddCustomView,
-    MissingView,
-    MetricNodeView,
-    NetworkView,
-    NetworkCreateView,
-    NetworkListView,
-    NetworkListItemView,
-    RuleView,
-    RuleEditView,
-    RuleListView,
-    SubnetListItemView,
-    UserMenuView,
-    callback) {
+    ScriptAddController,
+    ScriptEditController,
+    ScriptRunController,
+    ScriptsController) {
 
     // Hide error boxes on page unload
     window.onbeforeunload = function() {
@@ -421,11 +391,12 @@ var loadApp = function (
     };
 
     // Ember Application
-    App = Ember.Application.create({
-        ready: callback
-    });
+    App.ready = callback;
+    App = Ember.Application.create(App);
+    window.Mist  = App;
 
     // Globals
+    App.set('betaFeatures', !!window.BETA_FEATURES);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
@@ -436,8 +407,6 @@ var loadApp = function (
     );
 
     parseProviderMap();
-
-    window.Mist = App;
 
     // Ember routes and routers
 
@@ -454,6 +423,10 @@ var loadApp = function (
         this.route('keys');
         this.route('key', {
             path : '/keys/:key_id'
+        });
+        this.route('scripts');
+        this.route('script', {
+            path : '/scripts/:script_id'
         });
         this.route('logs');
         this.route('missing', { path: "/*path" });
@@ -511,7 +484,6 @@ var loadApp = function (
         }
     });
 
-
     App.MachinesRoute = Ember.Route.extend({
         activate: function() {
             Ember.run.next(function() {
@@ -555,9 +527,7 @@ var loadApp = function (
             });
         },
         exit: function () {
-            Mist.keysController.content.forEach(function (key) {
-                 key.set('selected', false);
-            });
+            Mist.keysController.content.setEach('selected', false);
         }
     });
 
@@ -587,12 +557,40 @@ var loadApp = function (
                 document.title = 'mist.io - logs';
             });
         },
-        exit: function () {
-            Mist.logsController.content.forEach(function (log) {
-                 log.set('selected', false);
+    });
+
+    if (Mist.betaFeatures) {
+    App.ScriptsRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(function () {
+                document.title = 'mist.io - scripts';
             });
+        },
+        exit: function () {
+            Mist.scriptsController.setEach('selected', false);
         }
     });
+
+    App.ScriptRoute = Ember.Route.extend({
+        activate: function () {
+            Ember.run.next(this, function () {
+                var model = this.modelFor('script');
+                var id = model._id || model.id;
+                var script = Mist.scriptsController.getObject(id);
+                document.title = 'mist.io - ' + (script ? script.id : id);
+            });
+        },
+        redirect: function (script) {
+            Mist.scriptsController.set('scriptRequest', script._id);
+        },
+        model: function (args) {
+            var id = args.script_id;
+            if (Mist.scriptsController.loading)
+                return {_id: id};
+            return Mist.scriptsController.getObject(id);
+        }
+    });
+    }
 
     App.MissingRoute = Ember.Route.extend({
         activate: function () {
@@ -601,58 +599,6 @@ var loadApp = function (
             });
         },
     });
-
-    // Ember views
-
-    App.SubnetListItemView = SubnetListItemView;
-    App.IpAddressListItemView = IPAddressListItemView;
-
-    App.set('homeView', Home);
-    App.set('ruleView', RuleView);
-    App.set('loginView', LoginView);
-    App.set('logListView', LogListView);
-    App.set('keyAddView', KeyAddView);
-    App.set('keyView', SingleKeyView);
-    App.set('missingView', MissingView);
-    App.set('metricNodeView', MetricNodeView);
-    App.set('keyListView', KeyListView);
-    App.set('networkView', NetworkView);
-    App.set('userMenuView', UserMenuView);
-    App.set('keyEditView', KeyEditDialog);
-    App.set('backendAddView', BackendAdd);
-    App.set('ruleEditView', RuleEditView);
-    App.set('metricAddView', MetricAddView);
-    App.set('backendEditView', BackendEdit);
-    App.set('imageListView', ImageListView);
-    App.set('fileUploadView', FileUploadView);
-    App.set('messageboxView', MessageBoxView);
-    App.set('machineMonitoringView', MachineMonitoringView);
-    App.set('machineView', SingleMachineView);
-    App.set('graphListView', GraphListView);
-    App.set('graphListBarView', GraphListBarView);
-    App.set('graphListControlView', GraphListControlView);
-    App.set('graphListItemView', GraphListItemView);
-    App.set('networkCreateView', NetworkCreateView);
-    App.set('networkListView', NetworkListView);
-    App.set('machineKeysView', MachineKeysView);
-    App.set('machineTagsView', MachineTagsView);
-    App.set('keyListItemView', KeyListItemView);
-    App.set('dialogView', DialogView);
-    App.set('ruleListView', RuleListView);
-    App.set('logListItemView', LogListItemView);
-    App.set('machineListView', MachineListView);
-    App.set('imageListItemView', ImageListItem);
-    App.set('machineAddView', MachineAddDialog);
-    App.set('backendButtonView', BackendButton);
-    App.set('graphButtonView', GraphButtonView);
-    App.set('networkListItemView', NetworkListItemView);
-    App.set('machinePowerView', MachinePowerView);
-    App.set('machineShellView', MachineShellView);
-    App.set('machineListItemView', MachineListItem);
-    App.set('confirmationDialog', ConfirmationDialog);
-    App.set('metricAddCustomView', MetricAddCustomView);
-    App.set('machineKeysListItemView', MachineKeysListItemView);
-    App.set('machineTagsListItemView', MachineTagsListItemView);
 
     // Ember controllers
 
@@ -684,7 +630,10 @@ var loadApp = function (
     App.set('machinePowerController', MachinePowerController.create());
     App.set('networkCreateController', NetworkCreateController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
-
+    App.set('scriptsController', ScriptsController.create());
+    App.set('scriptAddController', ScriptAddController.create());
+    App.set('scriptRunController', ScriptRunController.create());
+    App.set('scriptEditController', ScriptEditController.create());
 
     // Ember custom widgets
 
@@ -739,36 +688,8 @@ var loadApp = function (
 
     // Mist functions
 
-    App.getViewName = function (view) {
-        return view.constructor.toString().split('.')[1].split('View')[0];
-    };
-
     App.isScrolledToTop = function () {
         return window.pageYOffset <= 20;
-    };
-
-    App.capitalize = function (string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    };
-
-    App.decapitalize = function (string) {
-        return string.charAt(0).toLowerCase() + string.slice(1);
-    };
-
-    App.capitalizeArray = function (array) {
-        var newArray = [];
-        array.forEach(function(string) {
-            newArray.push(App.capitalize(string));
-        });
-        return newArray;
-    };
-
-    App.decapitalizeArray = function (array) {
-        var newArray = [];
-        array.forEach(function(string) {
-            newArray.push(App.decapitalize(string));
-        });
-        return newArray;
     };
 
     App.isScrolledToBottom = function(){
@@ -835,23 +756,6 @@ var loadApp = function (
         else
             element.slideUp();
     };
-
-    App.splitWords = function (string) {
-        if (string.indexOf('-') > -1)
-            return string.split('-');
-        else if (string.indexOf('_') > -1)
-            return string.split('_');
-        else if (string.indexOf(' ') > -1)
-            return string.split(' ');
-        else if (string.match(/([a-z])([A-Z])/g)) {
-            var wordJoints = string.match(/([a-z])([A-Z])/g);
-            wordJoints.forEach(function(joint) {
-                string = string.replace(joint, joint[0] + '_' + joint[1]);
-            });
-            return App.splitWords(string);
-        }
-        return [string];
-    };
 };
 
 
@@ -902,6 +806,15 @@ var handleMobileInit = function () {
 
 
 var setupSocketEvents = function (socket, callback) {
+
+    if (Mist.betaFeatures) {
+    //  This is a temporary ajax-request to get the scripts.
+    //  It should be converted into a "list_scripts" socket handler
+    //  as soon as the backend supports it
+    Mist.ajax.GET('/scripts').success(function (scripts) {
+        Mist.scriptsController.setContent(scripts);
+    });
+    }
 
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);
@@ -1074,7 +987,7 @@ function Ajax (csrfToken) {
                 };
 
                 if (data && Object.keys(data).length != 0)
-                    ajaxObject.data = JSON.stringify(data)
+                    ajaxObject.data = JSON.stringify(data);
 
                 $.ajax(ajaxObject);
 
@@ -1432,7 +1345,6 @@ function getTime () {
     return Date.now() - startTime;
 };
 
-
 // Console aliases
 function log() {
     if (LOGLEVEL > 3)
@@ -1541,6 +1453,24 @@ function parseProviderMap () {
 //
 //
 
+
+var extendEmberView = function () {
+
+    Ember.View.prototype.getName = function () {
+        return this.constructor.toString().split('.')[1].split('View')[0];
+    };
+    Ember.View.prototype.getWidgetID = function () {
+        return '#' + this.getName().dasherize();
+    }
+    Ember.View.prototype.getControllerName = function () {
+        return this.getName().decapitalize() + 'Controller';
+    }
+};
+
+
+String.prototype.decapitalize = function () {
+    return this.charAt(0).toLowerCase() + this.slice(1);
+}
 
 Date.prototype.getPrettyTime = function () {
 
@@ -1998,3 +1928,69 @@ var PROVIDER_MAP = {
         }
     ]
 };
+
+/*
+var SCRIPT_ADD_FIELDS = [
+    {
+        name: 'name',
+        type: 'text'
+    },
+    {
+        name: 'type',
+        type: 'select',
+        options: [
+            {
+                value: 'executable',
+                selected: true
+            },
+            {
+                value: 'ansible'
+            }
+        ]
+    },
+    {
+        name: 'source',
+        type: 'select',
+        options: [
+            {
+                value: 'github',
+                selected: true
+            },
+            {
+                value: 'url',
+            },
+            {
+                value: 'inline'
+            }
+        ]
+    },
+    {
+        conditional: {
+            source: 'url',
+            source: 'github'
+        },
+        fields: [
+            {
+                name: 'url',
+                type: 'text'
+            },
+            {
+                name: 'entry_point',
+                type: 'text',
+                optional: true
+            }
+        ]
+    },
+    {
+        conditional: {
+            source: 'inline'
+        },
+        fields: [
+            {
+                name: 'script',
+                type: 'text'
+            }
+        ]
+    }
+];
+*/

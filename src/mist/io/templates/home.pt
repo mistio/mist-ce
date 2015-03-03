@@ -12,7 +12,7 @@
     <link rel="stylesheet" type='text/css' href="resources/main.css"
           tal:condition="not:css_build"/>
 
-    <link rel="stylesheet" href="resources/mist-1424127992.css"
+    <link rel="stylesheet" href="resources/mist-1425311019.css"
           tal:condition="css_build" />
 
     <script tal:content="string: var IS_CORE=${is_core}" />
@@ -23,6 +23,7 @@
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script tal:content="string: var EMAIL=${email}" />
     <script tal:content="string: var CSRF_TOKEN=${csrf_token}" />
+    <script tal:content="string: var BETA_FEATURES=${beta_features}" />
 
     <script src="resources/js/lib/require/require.js"></script>
 
@@ -32,7 +33,7 @@
                 baseUrl: 'resources/js/',
                 paths: {
                     //the optimized mist.js source file.
-                    "app": "../build/mist-1424127992"
+                    "app": "../build/mist-1425311019"
                 }
             });
             require(["app"]);
@@ -85,36 +86,26 @@
         {{outlet}}
     </script>
     <script type="text/x-handlebars" data-template-name="index">
-        {{view Mist.homeView}}
+        {{view "home"}}
     </script>
     <script type="text/x-handlebars" data-template-name="machines">
-        {{view Mist.machineListView}}
+        {{view "machineList"}}
     </script>
     <script type="text/x-handlebars" data-template-name="images">
-        {{view Mist.imageListView}}
+        {{view "imageList"}}
     </script>
     <script type="text/x-handlebars" data-template-name="networks">
-        {{view Mist.networkListView}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="network">
-        {{view Mist.networkView}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="machine">
-        {{view Mist.machineView}}
+        {{view "networkList"}}
     </script>
     <script type="text/x-handlebars" data-template-name="keys">
-        {{view Mist.keyListView}}
+        {{view "keyList"}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="scripts">
+        {{view "scriptList"}}
     </script>
     <script type="text/x-handlebars" data-template-name="logs">
-        {{view Mist.logListView}}
+        {{view "logList"}}
     </script>
-    <script type="text/x-handlebars" data-template-name="key">
-        {{view Mist.keyView}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="missing">
-        {{view Mist.missingView}}
-    </script>
-
 </body>
 
 </html>

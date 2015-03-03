@@ -8,7 +8,7 @@ define('app/views/user_menu', ['app/views/templated', 'md5'],
 
         'user strict';
 
-        return TemplatedView.extend({
+        return App.UserMenuView = TemplatedView.extend({
 
             /**
              *  Properties

@@ -6,7 +6,7 @@ define('app/controllers/base_array', ['ember'],
     //
     function () {
 
-        'use scrict';
+        'use strict';
 
         return Ember.ArrayController.extend(Ember.Evented, {
 
@@ -31,8 +31,8 @@ define('app/controllers/base_array', ['ember'],
 
 
             selectedObjects: function () {
-                return this.get('content').filterBy('selected', true);
-            }.property('content.@each.selected'),
+                return this.filterBy('selected', true);
+            }.property('@each.selected'),
 
 
             //
