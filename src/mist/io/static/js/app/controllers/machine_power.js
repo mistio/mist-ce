@@ -52,6 +52,14 @@ define('app/controllers/machine_power', ['ember'],
 
                 // Show confirmation popup
                 var that = this;
+                if (action == 'rename'){
+                    var machine = this.machines[0];
+                    this.close();
+                    Ember.run.later(function(){
+                        Mist.machineEditController.open(machine);
+                    },350)
+                    return;
+                }
                 Ember.run.later(function () {
                     Mist.confirmationController.setUp('Machine ' + 'action',
                         'Are you sure you want to ' + action + ' these machines: '
@@ -109,10 +117,8 @@ define('app/controllers/machine_power', ['ember'],
                         machine.reboot();
                     } else if (action == 'start') {
                         machine.start();
-                    } else if (action == 'rename'){
-                        machine.rename();
                     }
-                });
+                },this);
             },
 
 
