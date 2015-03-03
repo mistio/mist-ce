@@ -17,6 +17,7 @@ define('app/controllers/machine_power', ['ember'],
             canReboot: null,
             canDestroy: null,
             canShutdown: null,
+            canRename: null,
 
 
             /**
@@ -76,6 +77,7 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canReboot', null);
                     this.set('canDestroy', null);
                     this.set('canShutdown', null);
+                    this.set('canRename', null);
                 });
             },
 
@@ -86,6 +88,7 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canReboot', !this.machines.findBy('can_reboot', false));
                     this.set('canDestroy', !this.machines.findBy('can_destroy', false));
                     this.set('canShutdown', !this.machines.findBy('can_stop', false));
+                    this.set('canRename', !this.machines.findBy('can_rename', false))
                     this.trigger('onActionsChange');
                 });
             },
@@ -106,6 +109,8 @@ define('app/controllers/machine_power', ['ember'],
                         machine.reboot();
                     } else if (action == 'start') {
                         machine.start();
+                    } else if (action == 'rename'){
+                        machine.rename();
                     }
                 });
             },

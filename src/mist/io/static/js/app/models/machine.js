@@ -133,6 +133,10 @@ define('app/models/machine', ['ember'],
                 this.backend.startMachine(this.id, callback);
             },
 
+            rename: function(callback) {
+                this.backend.renameMachine(this.id,callback);    
+            },
+
 
             waitFor: function(state) {
                 this.set('waitState', state);

@@ -10,6 +10,9 @@
     </div>
 
     <div data-role="content" data-theme="a">
+        {{#if Mist.machinePowerController.canRename}}
+        <a data-role="button" data-theme="d" {{action "actionClicked" "rename" target="view"}}>Rename</a>
+        {{/if}}
         {{#if Mist.machinePowerController.canStart}}
         <a data-role="button" data-theme="d" {{action "actionClicked" "start" target="view"}}>Start</a>
         {{/if}}
@@ -25,3 +28,6 @@
         <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
     </div>
 </div>
+
+
+{{view "machineEdit"}}

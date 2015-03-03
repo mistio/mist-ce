@@ -277,6 +277,7 @@ var loadFiles = function (callback) {
         'app/controllers/machine_add',
         'app/controllers/machine_keys',
         'app/controllers/machine_power',
+        'app/controllers/machine_edit',
         'app/controllers/machine_shell',
         'app/controllers/machine_tags',
         'app/controllers/metric_add',
@@ -322,6 +323,7 @@ var loadFiles = function (callback) {
         'app/views/machine_list_item',
         'app/views/machine_monitoring',
         'app/views/machine_power',
+        'app/views/machine_edit',
         'app/views/machine_shell',
         'app/views/machine_tags',
         'app/views/machine_tags_list_item',
@@ -370,6 +372,7 @@ var loadApp = function (
     MachineAddController,
     MachineKeysController,
     MachinePowerController,
+    MachineEditController,
     MachineShellController,
     MachineTagsController,
     MetricAddController,
@@ -628,6 +631,7 @@ var loadApp = function (
     App.set('notificationController', NotificationController.create());
     App.set('dialogController', DialogController.create());
     App.set('machinePowerController', MachinePowerController.create());
+    App.set('machineEditController', MachineEditController.create());
     App.set('networkCreateController', NetworkCreateController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
     App.set('scriptsController', ScriptsController.create());
