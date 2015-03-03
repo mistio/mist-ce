@@ -255,6 +255,12 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'KVM (via libvirt)',
         'provider' : Provider.LIBVIRT,
         'regions': []
+    },
+    # HostVirtual
+    {
+        'title': 'HostVirtual',
+        'provider' : Provider.HOSTVIRTUAL,
+        'regions': []
     }
 ]
 
