@@ -1922,7 +1922,7 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
     return node
 
 
-def _machine_action(user, backend_id, machine_id, action, plan_id=None):
+def _machine_action(user, backend_id, machine_id, action, plan_id=None, name=None):
     """Start, stop, reboot, resize and destroy have the same logic underneath, the only
     thing that changes is the action. This helper function saves us some code.
 
@@ -2095,7 +2095,7 @@ def reboot_machine(user, backend_id, machine_id):
 
 def rename_machine(user, backend_id, machine_id, name):
     """Renames a machine on a certain backend."""
-    _machine_action(user, backend_id, machine_id, 'rename')
+    _machine_action(user, backend_id, machine_id, 'rename', name=name)
 
 
 def resize_machine(user, backend_id, machine_id, plan_id):
