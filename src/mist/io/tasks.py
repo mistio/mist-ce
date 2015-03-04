@@ -208,15 +208,10 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 except Exception as e:
                     print repr(e)
                     error = True
-                    if node:
-                        notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
-                        notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
-                    else:
-                        notify_user(user, "Enable monitoring failed for machine %" % (machine_id), repr(e))
-                        notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, machine_id, e))
-
-                    log_event(action='enable_monitoring_failed',
-                              error=repr(e), **log_dict)
+                    notify_user(user, "Enable monitoring failed for machine %" % (machine_id), repr(e))
+                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, machine_id, e))
+                    log_event(action='enable_monitoring_failed', error=repr(e),
+                              **log_dict)
             log_event(action='post_deploy_finished', error=error, **log_dict)
 
         except (ServiceUnavailableError, SSHException) as exc:
