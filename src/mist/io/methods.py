@@ -2990,7 +2990,7 @@ def notify_admin(title, message=""):
         pass
 
 
-def notify_user(user, title, message="", **kwargs):
+def notify_user(user, title, message="", email_notify=True, **kwargs):
     # Notify connected user via amqp
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
@@ -3038,8 +3038,9 @@ def notify_user(user, title, message="", **kwargs):
         body += "Output: %s\n" % kwargs['output']
 
     try: # Send email in multi-user env
-        from mist.core.helpers import send_email
-        send_email("[mist.io] %s" % title, body, user.email)
+        if email_notify:
+            from mist.core.helpers import send_email
+            send_email("[mist.io] %s" % title, body, user.email)
     except ImportError:
         pass
 

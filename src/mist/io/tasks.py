@@ -563,12 +563,30 @@ class ListMachines(UserTask):
         return {'backend_id': backend_id, 'machines': machines}
 
     def error_rerun_handler(self, exc, errors, email, backend_id):
+        from mist.io.methods import notify_user
+
         if len(errors) < 6:
             return self.result_fresh  # Retry when the result is no longer fresh
+
         user = user_from_email(email)
-        with user.lock_n_load():
-            user.backends[backend_id].enabled = False
-            user.save()
+
+        if len(errors) == 6: # If does not respond for a minute
+            notify_user(user, 'Backend %s does not respond' % user.backends[backend_id]['title'],
+                        email_notify=False, backend_id=backend_id)
+
+        # Keep retrying for 30 minutes
+        times = [60, 60, 120, 300, 600, 600]
+        index = len(errors) - 6
+        if index < len(times):
+            return times[index]
+        else: # If backend still unresponsive disable it & notify user
+            with user.lock_n_load():
+                user.backends[backend_id].enabled = False
+                user.save()
+            notify_user(user, "Backend %s djsabled after not responding for 30mins" % user.backends[backend_id]['title'],
+                        email_notify=True, backend_id=backend_id)
+            log_event(user.email, 'incident', action='disable_backend',
+                      backend_id=backend_id, error="Backend unresponsive")
 
 
 class ProbeSSH(UserTask):
@@ -632,7 +650,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                           image_name, size_name, location_name, ips, monitoring,
                           networks, docker_env, docker_command,
                           script_id=None, script_params=None,
-                          quantity=1, persist=False, job_id=None):
+                          quantity=1, persist=False, job_id=None,
+                          docker_port_bindings={}, docker_exposed_ports={}):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
