@@ -2200,7 +2200,7 @@ function program15(depth0,data) {
   data.buffer.push("- ");
   stack1 = helpers._triageMustache.call(depth0, "loadavg5", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" \n                        </td>\n                    </tr>\n                ");
+  data.buffer.push("\n                        </td>\n                    </tr>\n                ");
   return buffer;
   }
 function program16(depth0,data) {
@@ -2307,7 +2307,7 @@ function program30(depth0,data) {
   data.buffer.push("\n                    <tr>\n                        <td colspan=\"2\"><div class=\"df\">");
   stack1 = helpers._triageMustache.call(depth0, "view.machine.df", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div></td>\n                ");
+  data.buffer.push("</div></td>\n                    </tr>\n                ");
   return buffer;
   }
 
