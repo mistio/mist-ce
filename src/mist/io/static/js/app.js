@@ -1641,7 +1641,7 @@ var PROVIDER_MAP = {
             defaultValue: 'HostVirtual',
         },
         {
-            name: 'token',
+            name: 'api_key',
             type: 'password',
         },
     ],
