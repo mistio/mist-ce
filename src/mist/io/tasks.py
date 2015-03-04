@@ -678,6 +678,6 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                       backend_id=backend_id, machine_name=name, error=error)
 
     pool.map(create_machine_wrapper, specs)
-    pool.join()
     pool.close()
+    pool.join()
 
