@@ -249,7 +249,7 @@ def add_backend_v_2(user, title, provider, params):
     elif provider == 'libvirt':
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     elif provider == 'hostvirtual':
-        backend_id, backend = _add_backend_hostvirtual(user, title, provider, params)
+        backend_id, backend = _add_backend_hostvirtual(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -1312,7 +1312,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
-
     machine_name = machine_name_validator(conn.type, machine_name)
     if conn.type is Provider.DOCKER:
         if key_id:
@@ -1834,17 +1833,16 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
 
     auth = NodeAuthSSHKey(pubkey=key)
 
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                auth=auth,
-                location=location
-            )
-        except Exception as e:
-            raise MachineCreationError("HostVirtual, got exception %s" % e, e)
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            auth=auth,
+            location=location
+        )
+    except Exception as e:
+        raise MachineCreationError("HostVirtual, got exception %s" % e, e)
 
         return node
 
