@@ -1844,7 +1844,7 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
     except Exception as e:
         raise MachineCreationError("HostVirtual, got exception %s" % e, e)
 
-        return node
+    return node
 
 
 def _create_machine_azure(conn, key_name, private_key, public_key,
