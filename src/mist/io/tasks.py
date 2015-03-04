@@ -112,14 +112,17 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             user.email, backend_id, machine_id)
     try:
         # find the node we're looking for and get its hostname
-        conn = connect_provider(user.backends[backend_id])
-        nodes = conn.list_nodes() # TODO: use cache
         node = None
-        for n in nodes:
-            if n.id == machine_id:
-                node = n
-                break
-        tmp_log('run list_machines')
+        try:
+            conn = connect_provider(user.backends[backend_id])
+            nodes = conn.list_nodes() # TODO: use cache
+            for n in nodes:
+                if n.id == machine_id:
+                    node = n
+                    break
+            tmp_log('run list_machines')
+        except:
+            raise self.retry(exc=Exception(), countdown=10, max_retries=10)
 
         if node and len(node.public_ips):
             # filter out IPv6 addresses
@@ -127,7 +130,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             host = ips[0]
         else:
             tmp_log('ip not found, retrying')
-            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
+            raise self.retry(exc=Exception(), countdown=60, max_retries=20)
 
         try:
             from mist.io.shell import Shell
@@ -205,21 +208,26 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 except Exception as e:
                     print repr(e)
                     error = True
-                    notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
-                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
+                    if node:
+                        notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
+                        notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
+                    else:
+                        notify_user(user, "Enable monitoring failed for machine %" % (machine_id), repr(e))
+                        notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, machine_id, e))
+
                     log_event(action='enable_monitoring_failed',
                               error=repr(e), **log_dict)
             log_event(action='post_deploy_finished', error=error, **log_dict)
 
         except (ServiceUnavailableError, SSHException) as exc:
             tmp_log(repr(exc))
-            raise self.retry(exc=exc, countdown=60, max_retries=5)
+            raise self.retry(exc=exc, countdown=60, max_retries=15)
     except Exception as exc:
         tmp_log(repr(exc))
         if str(exc).startswith('Retry'):
             raise
-        notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
-        notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
+        notify_user(user, "Deployment script failed for machine %s" % machine_id)
+        notify_admin("Deployment script failed for machine %s in backend %s by user %s" % (machine_id, backend_id, email), repr(exc))
         log_event(
             email=email,
             event_type='job',
@@ -228,7 +236,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             machine_id=machine_id,
             enable_monitoring=bool(monitoring),
             command=command,
-            error="Couldn't connect to run post deploy steps (5 attempts).",
+            error="Couldn't connect to run post deploy steps.",
             job_id=job_id
         )
 
