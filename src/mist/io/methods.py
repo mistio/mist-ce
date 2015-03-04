@@ -921,10 +921,10 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
                         user.save()
                 except:
                     if i == 2:
-                        log.error('zzzzzz: failed to recover from previous race conditions')
+                        log.error('RACE CONDITION: failed to recover from previous race conditions')
                         raise
                     else:
-                        log.error('zzzzzz: trying to recover from race condition')
+                        log.error('RACE CONDITION: trying to recover from race condition')
                 else:
                     break
             trigger_session_update(user.email, ['keys'])

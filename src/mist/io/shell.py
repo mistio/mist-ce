@@ -349,10 +349,10 @@ class Shell(object):
                             user.save()
                     except:
                         if i == 2:
-                            log.error('zzzzzz: shell failed to recover from previous race conditions')
+                            log.error('RACE CONDITION: shell failed to recover from previous race conditions')
                             raise
                         else:
-                            log.error('zzzzzz: shell trying to recover from race condition')
+                            log.error('RACE CONDITION: shell trying to recover from race condition')
                     else:
                         break
                 if trigger_session_update_flag:
