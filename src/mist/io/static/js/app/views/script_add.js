@@ -84,6 +84,7 @@ define('app/views/script_add', ['app/views/panel'],
 
             clear: function () {
                 this.$('.source').hide();
+                this.$('#script-add-description').hide();
                 this.closeTypeSelect();
                 this.closeSourceSelect();
             },
@@ -133,6 +134,7 @@ define('app/views/script_add', ['app/views/panel'],
             showSourceBundle: function (source) {
                 this.$('.source').hide();
                 this.$('.'+source.value).slideDown();
+                this.$('#script-add-description').slideDown();
             },
 
 

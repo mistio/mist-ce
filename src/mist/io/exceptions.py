@@ -160,6 +160,10 @@ class MachineCreationError(InternalServerError):
     msg = "Machine creation failed"
 
 
+class MachineNameValidationError(InternalServerError):
+    msg = "Error validating name"
+
+
 class NetworkCreationError(InternalServerError):
     msg = "Network creation failed"
 

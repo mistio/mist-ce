@@ -110,10 +110,12 @@
 
         {{view "graphList" actionProxyBinding="view"}}
 
-        <div data-role="collapsible" data-collapsed="false">
-           <h4>Activity log</h4>
-           {{view "logList"}}
-        </div>
+        {{#if Mist.isCore}}
+            <div data-role="collapsible" data-collapsed="false">
+               <h4>Activity log</h4>
+               {{view "logList"}}
+            </div>
+        {{/if}}
         {{/if}}
     </div>
 
