@@ -96,7 +96,11 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canReboot', !this.machines.findBy('can_reboot', false));
                     this.set('canDestroy', !this.machines.findBy('can_destroy', false));
                     this.set('canShutdown', !this.machines.findBy('can_stop', false));
-                    this.set('canRename', !this.machines.findBy('can_rename', false))
+                    if(this.machines.length == 1 && this.machines[0].get('can_rename')){
+                        this.set('canRename', true);
+                    }else{
+                        this.set('canRename', false);
+                    }
                     this.trigger('onActionsChange');
                 });
             },
