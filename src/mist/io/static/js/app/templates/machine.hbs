@@ -134,7 +134,7 @@
                                 <div {{bind-attr class="loadavg1 :led"}}>
                                 </div>
                             </div>
-                            {{loadavg}} {{#if cores}}- {{cores}} cores {{/if}}- {{loadavg5}} 
+                            {{loadavg}} {{#if cores}}- {{cores}} cores {{/if}}- {{loadavg5}}
                         </td>
                     </tr>
                 {{/if}}
@@ -263,8 +263,8 @@
                 {{bind-attr class="id::ui-state-disabled
                     :ui-btn
                     :ui-btn-icon-left
-                    :ui-icon-power"}}
-                {{action "powerClicked" target="view"}}>Power</a>
+                    :ui-icon-bars"}}
+                {{action "powerClicked" target="view"}}>Actions</a>
         </td></tr></tbody></table>
     </div>
 
