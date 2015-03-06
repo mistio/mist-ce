@@ -91,7 +91,12 @@
                 {{#if Mist.monitored_machines.length}}
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents">
                         <li class="ui-li-divider ui-bar-c ui-first-child">Incidents</li>
-                        <li class="ui-bar-b">
+                        {{#each Mist.incidents}}
+                            <li class="ui-mini>
+                               <a class="ui-btn ui-btn-cion-right">this</a>
+                            </li>
+                        {{/each}}
+                        <!--li class="ui-bar-b">
                             <a class="ui-btn ui-btn-icon-right ui-icon-alert" href="#/machines/didid"><span class="machine">testbox1</span>: load &gt; 2 <span class="time">3mins</span></a></li>
                         <li class="ui-mini">
                             <a class="ui-btn ui-btn-icon-right ui-icon-check" href="#/machines/didid"><span class="machine">testbox1</span>: monitoring data unavailable for 10 mins <span class="time">1h ago</span></a>
@@ -101,7 +106,7 @@
                         </li>
                         <li class="ui-mini ui-last-child">
                             <a class="ui-btn ui-btn-icon-right ui-icon-check" href="#/machines/didid"><span class="machine">testbox1</span>: net tx &gt; 5MBps for 17 mins <span class="time">2d ago</span></a>
-                        </li>
+                        </li-->
                     </ul>
                 {{/if}}
                 </div>

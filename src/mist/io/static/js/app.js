@@ -226,9 +226,8 @@ var appLoader = {
                     },
                 });
                 appLoader.buffer.logs = new Socket_({
-                    keepAlive: true,
                     namespace: '/logs',
-                    onInit: function (socket) {
+                    onConnect: function (socket) {
                         socket.emit('ready');
                     }
                 });
@@ -247,7 +246,9 @@ var appLoader = {
             before: ['init socket events'],
             exec: function () {
                 setupSocketEvents(Mist.socket, function () {
-                    appLoader.complete('fetch first data');
+                    setupLogsSocketEvents(Mist.logs, function () {
+                        appLoader.complete('fetch first data');
+                    });
                 });
             }
         },
@@ -804,6 +805,15 @@ var handleMobileInit = function () {
     });
 };
 
+
+var setupLogsSocketEvents = function (socket, callback) {
+
+    socket.on('open_incidents', function (openIncidents) {
+        Mist.set('incidents', openIncidents);
+    }); 
+    if (callback)
+        callback();
+};
 
 var setupSocketEvents = function (socket, callback) {
 
