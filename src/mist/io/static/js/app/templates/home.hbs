@@ -94,7 +94,7 @@
 
             <!-- Scripts link -->
 
-            {{#if Mist.betaFeatures}}
+            {{#if Mist.isCore}}
             <li class="ui-li-has-count">
 
                 <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/scripts">
@@ -108,7 +108,7 @@
             {{/if}}
 
             <!-- Logs link -->
-            {{#unless Mist.isCore}}
+            {{#if Mist.isCore}}
             <li class="ui-li-has-count ui-last-child">
 
                 <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="#/logs">
@@ -117,7 +117,7 @@
 
                 </a>
             </li>
-            {{/unless}}
+            {{/if}}
         </ul>
 
         {{view "graphList" actionProxyBinding="view"}}

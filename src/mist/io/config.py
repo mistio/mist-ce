@@ -33,6 +33,17 @@ PY_LOG_FORMAT_DATE = settings.get("PY_LOG_FORMAT_DATE", "%Y-%m-%d %H:%M:%S")
 GOOGLE_ANALYTICS_ID = settings.get("GOOGLE_ANALYTICS_ID", "")
 COMMAND_TIMEOUT = settings.get("COMMAND_TIMEOUT", 20)
 
+# celery settings
+CELERY_SETTINGS = {
+    'BROKER_URL': 'amqp://guest:guest@127.0.0.1/',
+    'CELERY_TASK_SERIALIZER': 'json',
+    'CELERYD_LOG_FORMAT': PY_LOG_FORMAT,
+    'CELERYD_TASK_LOG_FORMAT': PY_LOG_FORMAT,
+    'CELERYD_CONCURRENCY': 32,
+    'CELERYD_MAX_TASKS_PER_CHILD': 32,
+}
+CELERY_SETTINGS.update(settings.get('CELERY_SETTINGS', {}))
+
 # App constants
 
 STATES = {

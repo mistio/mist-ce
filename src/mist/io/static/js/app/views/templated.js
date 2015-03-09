@@ -21,14 +21,7 @@ define('app/views/templated', ['ember'],
             init: function () {
 
                 this._super();
-
-                var templateName = Mist.decapitalizeArray(
-                    Mist.splitWords(
-                        Mist.getViewName(this)
-                    )
-                ).join('_')
-
-                this.set('template', Ember.TEMPLATES[templateName]);
+                this.set('template', this.templateForName(this.getName()));
             }
         });
     }

@@ -908,15 +908,25 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
     # succesful connection
     if not host:
         if not associated:
-            with user.lock_n_load():
-                assoc = [backend_id,
-                         machine_id,
-                         0,
-                         username,
-                         False,
-                         port]
-                user.keypairs[key_id].machines.append(assoc)
-                user.save()
+            for i in range(3):
+                try:
+                    with user.lock_n_load():
+                        assoc = [backend_id,
+                                 machine_id,
+                                 0,
+                                 username,
+                                 False,
+                                 port]
+                        user.keypairs[key_id].machines.append(assoc)
+                        user.save()
+                except:
+                    if i == 2:
+                        log.error('RACE CONDITION: failed to recover from previous race conditions')
+                        raise
+                    else:
+                        log.error('RACE CONDITION: trying to recover from race condition')
+                else:
+                    break
             trigger_session_update(user.email, ['keys'])
         return
 
@@ -1244,7 +1254,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
-                   script_id='', script_params=''):
+                   script_id='', script_params='', job_id=None, docker_port_bindings={},
+                   docker_exposed_ports={}):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1299,10 +1310,13 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if conn.type is Provider.DOCKER:
         if key_id:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
-                                          docker_env=docker_env, docker_command=docker_command)
+                                          docker_env=docker_env, docker_command=docker_command,
+                                          docker_port_bindings=docker_port_bindings,
+                                          docker_exposed_ports=docker_exposed_ports)
         else:
             node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
-                                          docker_command=docker_command)
+                                          docker_command=docker_command, docker_port_bindings=docker_port_bindings,
+                                          docker_exposed_ports=docker_exposed_ports)
         if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
@@ -1367,13 +1381,14 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
+
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params,
+            script_id=script_id, script_params=script_params, job_id = job_id
         )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1382,21 +1397,25 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params,
+            script_id=script_id, script_params=script_params, job_id = job_id
         )
     elif key_id:
-        if script or script_id or monitoring:
-            mist.io.tasks.post_deploy_steps.delay(
-                user.email, backend_id, node.id, monitoring, script, key_id,
-                script_id=script_id, script_params=script_params,
-            )
+        mist.io.tasks.post_deploy_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            script_id=script_id, script_params=script_params,
+            job_id = job_id
+        )
 
-    return {'id': node.id,
+
+    ret = {'id': node.id,
             'name': node.name,
             'extra': node.extra,
             'public_ips': node.public_ips,
             'private_ips': node.private_ips,
+            'job_id': job_id,
             }
+
+    return ret
 
 
 def _create_machine_rackspace(conn, public_key, machine_name,
@@ -1703,7 +1722,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
     return node
 
 def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
-                           tty_attach=True):
+                           tty_attach=True, docker_port_bindings={}, docker_exposed_ports={}):
     """Create a machine in docker.
 
     """
@@ -1725,7 +1744,9 @@ def _create_machine_docker(conn, machine_name, image, script=None, public_key=No
             image=image,
             command=docker_command,
             environment=environment,
-            tty=tty_attach
+            tty=tty_attach,
+            ports=docker_exposed_ports,
+            port_bindings=docker_port_bindings,
         )
     except Exception as e:
         raise MachineCreationError("Docker, got exception %s" % e, e)
@@ -2768,7 +2789,7 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False, dry=False):
+                      no_ssh=False, dry=False, **kwargs):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
@@ -2870,7 +2891,8 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     return ret
 
 
-def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
+def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='',
+                   shell=None):
     """Ping and SSH to machine and collect various metrics."""
 
     # run SSH commands
@@ -2900,8 +2922,12 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     if key_id:
         log.warn('probing with key %s' % key_id)
 
-    cmd_output = ssh_command(user, backend_id, machine_id,
-                             host, command, key_id=key_id)
+    if not shell:
+        cmd_output = ssh_command(user, backend_id, machine_id,
+                                 host, command, key_id=key_id)
+    else:
+        retval, cmd_output = shell.command(command)
+
     cmd_output = cmd_output.replace('\r','').split('--------')
     log.warn(cmd_output)
     uptime_output = cmd_output[1]
@@ -2964,7 +2990,7 @@ def notify_admin(title, message=""):
         pass
 
 
-def notify_user(user, title, message="", **kwargs):
+def notify_user(user, title, message="", email_notify=True, **kwargs):
     # Notify connected user via amqp
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
@@ -2973,7 +2999,7 @@ def notify_user(user, title, message="", **kwargs):
         if 'output' in kwargs:
             output += '%s\n' % kwargs['output']
         if 'retval' in kwargs:
-            output += 'returned with exit code %d.\n' % kwargs['retval']
+            output += 'returned with exit code %s.\n' % kwargs['retval']
         payload['output'] = output
     amqp_publish_user(user, routing_key='notify', data=payload)
 
@@ -3012,8 +3038,9 @@ def notify_user(user, title, message="", **kwargs):
         body += "Output: %s\n" % kwargs['output']
 
     try: # Send email in multi-user env
-        from mist.core.helpers import send_email
-        send_email("[mist.io] %s" % title, body, user.email)
+        if email_notify:
+            from mist.core.helpers import send_email
+            send_email("[mist.io] %s" % title, body, user.email)
     except ImportError:
         pass
 
