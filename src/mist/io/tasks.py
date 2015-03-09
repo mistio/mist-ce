@@ -112,14 +112,17 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             user.email, backend_id, machine_id)
     try:
         # find the node we're looking for and get its hostname
-        conn = connect_provider(user.backends[backend_id])
-        nodes = conn.list_nodes() # TODO: use cache
         node = None
-        for n in nodes:
-            if n.id == machine_id:
-                node = n
-                break
-        tmp_log('run list_machines')
+        try:
+            conn = connect_provider(user.backends[backend_id])
+            nodes = conn.list_nodes() # TODO: use cache
+            for n in nodes:
+                if n.id == machine_id:
+                    node = n
+                    break
+            tmp_log('run list_machines')
+        except:
+            raise self.retry(exc=Exception(), countdown=10, max_retries=10)
 
         if node and len(node.public_ips):
             # filter out IPv6 addresses
@@ -127,7 +130,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             host = ips[0]
         else:
             tmp_log('ip not found, retrying')
-            raise self.retry(exc=Exception(), countdown=120, max_retries=5)
+            raise self.retry(exc=Exception(), countdown=60, max_retries=20)
 
         try:
             from mist.io.shell import Shell
@@ -205,21 +208,21 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 except Exception as e:
                     print repr(e)
                     error = True
-                    notify_user(user, "Enable monitoring failed for machine %s (%s)" % (node.name, node.id), repr(e))
-                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, node.name, e))
-                    log_event(action='enable_monitoring_failed',
-                              error=repr(e), **log_dict)
+                    notify_user(user, "Enable monitoring failed for machine %" % (machine_id), repr(e))
+                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, machine_id, e))
+                    log_event(action='enable_monitoring_failed', error=repr(e),
+                              **log_dict)
             log_event(action='post_deploy_finished', error=error, **log_dict)
 
         except (ServiceUnavailableError, SSHException) as exc:
             tmp_log(repr(exc))
-            raise self.retry(exc=exc, countdown=60, max_retries=5)
+            raise self.retry(exc=exc, countdown=60, max_retries=15)
     except Exception as exc:
         tmp_log(repr(exc))
         if str(exc).startswith('Retry'):
             raise
-        notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
-        notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
+        notify_user(user, "Deployment script failed for machine %s" % machine_id)
+        notify_admin("Deployment script failed for machine %s in backend %s by user %s" % (machine_id, backend_id, email), repr(exc))
         log_event(
             email=email,
             event_type='job',
@@ -228,7 +231,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             machine_id=machine_id,
             enable_monitoring=bool(monitoring),
             command=command,
-            error="Couldn't connect to run post deploy steps (5 attempts).",
+            error="Couldn't connect to run post deploy steps.",
             job_id=job_id
         )
 
@@ -563,12 +566,30 @@ class ListMachines(UserTask):
         return {'backend_id': backend_id, 'machines': machines}
 
     def error_rerun_handler(self, exc, errors, email, backend_id):
+        from mist.io.methods import notify_user
+
         if len(errors) < 6:
             return self.result_fresh  # Retry when the result is no longer fresh
+
         user = user_from_email(email)
-        with user.lock_n_load():
-            user.backends[backend_id].enabled = False
-            user.save()
+
+        if len(errors) == 6: # If does not respond for a minute
+            notify_user(user, 'Backend %s does not respond' % user.backends[backend_id]['title'],
+                        email_notify=False, backend_id=backend_id)
+
+        # Keep retrying for 30 minutes
+        times = [60, 60, 120, 300, 600, 600]
+        index = len(errors) - 6
+        if index < len(times):
+            return times[index]
+        else: # If backend still unresponsive disable it & notify user
+            with user.lock_n_load():
+                user.backends[backend_id].enabled = False
+                user.save()
+            notify_user(user, "Backend %s djsabled after not responding for 30mins" % user.backends[backend_id]['title'],
+                        email_notify=True, backend_id=backend_id)
+            log_event(user.email, 'incident', action='disable_backend',
+                      backend_id=backend_id, error="Backend unresponsive")
 
 
 class ProbeSSH(UserTask):
@@ -632,7 +653,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                           image_name, size_name, location_name, ips, monitoring,
                           networks, docker_env, docker_command,
                           script_id=None, script_params=None,
-                          quantity=1, persist=False, job_id=None):
+                          quantity=1, persist=False, job_id=None,
+                          docker_port_bindings={}, docker_exposed_ports={}):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -678,6 +700,6 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                       backend_id=backend_id, machine_name=name, error=error)
 
     pool.map(create_machine_wrapper, specs)
-    pool.join()
     pool.close()
+    pool.join()
 

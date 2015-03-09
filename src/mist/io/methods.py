@@ -926,15 +926,25 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
     # succesful connection
     if not host:
         if not associated:
-            with user.lock_n_load():
-                assoc = [backend_id,
-                         machine_id,
-                         0,
-                         username,
-                         False,
-                         port]
-                user.keypairs[key_id].machines.append(assoc)
-                user.save()
+            for i in range(3):
+                try:
+                    with user.lock_n_load():
+                        assoc = [backend_id,
+                                 machine_id,
+                                 0,
+                                 username,
+                                 False,
+                                 port]
+                        user.keypairs[key_id].machines.append(assoc)
+                        user.save()
+                except:
+                    if i == 2:
+                        log.error('RACE CONDITION: failed to recover from previous race conditions')
+                        raise
+                    else:
+                        log.error('RACE CONDITION: trying to recover from race condition')
+                else:
+                    break
             trigger_session_update(user.email, ['keys'])
         return
 
@@ -1262,7 +1272,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
-                   script_id='', script_params='', job_id = None):
+                   script_id='', script_params='', job_id=None, docker_port_bindings={},
+                   docker_exposed_ports={}):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1316,10 +1327,13 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if conn.type is Provider.DOCKER:
         if key_id:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
-                                          docker_env=docker_env, docker_command=docker_command)
+                                          docker_env=docker_env, docker_command=docker_command,
+                                          docker_port_bindings=docker_port_bindings,
+                                          docker_exposed_ports=docker_exposed_ports)
         else:
             node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
-                                          docker_command=docker_command)
+                                          docker_command=docker_command, docker_port_bindings=docker_port_bindings,
+                                          docker_exposed_ports=docker_exposed_ports)
         if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
@@ -1728,7 +1742,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
     return node
 
 def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
-                           tty_attach=True):
+                           tty_attach=True, docker_port_bindings={}, docker_exposed_ports={}):
     """Create a machine in docker.
 
     """
@@ -1750,7 +1764,9 @@ def _create_machine_docker(conn, machine_name, image, script=None, public_key=No
             image=image,
             command=docker_command,
             environment=environment,
-            tty=tty_attach
+            tty=tty_attach,
+            ports=docker_exposed_ports,
+            port_bindings=docker_port_bindings,
         )
     except Exception as e:
         raise MachineCreationError("Docker, got exception %s" % e, e)
@@ -3019,7 +3035,7 @@ def notify_admin(title, message=""):
         pass
 
 
-def notify_user(user, title, message="", **kwargs):
+def notify_user(user, title, message="", email_notify=True, **kwargs):
     # Notify connected user via amqp
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
@@ -3067,8 +3083,9 @@ def notify_user(user, title, message="", **kwargs):
         body += "Output: %s\n" % kwargs['output']
 
     try: # Send email in multi-user env
-        from mist.core.helpers import send_email
-        send_email("[mist.io] %s" % title, body, user.email)
+        if email_notify:
+            from mist.core.helpers import send_email
+            send_email("[mist.io] %s" % title, body, user.email)
     except ImportError:
         pass
 

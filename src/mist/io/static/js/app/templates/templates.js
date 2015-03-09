@@ -1033,7 +1033,7 @@ function program7(depth0,data) {
   stack1 = helpers._triageMustache.call(depth0, "Mist.keysController.content.length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                    </span>\n                    Keys\n\n                </a>\n            </li>\n\n            <!-- Scripts link -->\n\n            ");
-  stack1 = helpers['if'].call(depth0, "Mist.betaFeatures", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.isCore", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n            <!-- Logs link -->\n            ");
   stack1 = helpers['if'].call(depth0, "Mist.isCore", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
@@ -2042,7 +2042,7 @@ function program33(depth0,data) {
   stack1 = helpers.each.call(depth0, "Mist.machineAddController.newMachineProvider.networks.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(22, program22, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                </fieldset>\n            </div>\n        </div>\n\n        <!-- Select Script -->\n\n        <div id=\"script\">\n            ");
-  stack1 = helpers['if'].call(depth0, "Mist.betaFeatures", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(24, program24, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.isCore", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(24, program24, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            <label for=\"create-machine-script\">Script:</label>\n            <div class=\"script-option basic\">\n                ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextArea", {hash:{
@@ -2063,7 +2063,14 @@ function program33(depth0,data) {
     'placeholder': ("optional parameters"),
     'valueBinding': ("Mist.machineAddController.newMachineScriptParams")
   },hashTypes:{'id': "STRING",'data-theme': "STRING",'placeholder': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'placeholder': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n            </div>\n        </div>\n\n        <!-- Enable monitoring -->\n        <div id=\"create-machine-monitoring\" class=\"ui-state-disabled\">\n            <label>\n            ");
+  data.buffer.push("\n            </div>\n        </div>\n\n        <div id=\"ports\">\n            <!-- Expose Ports -->\n            <label>Ports:</label>\n            ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextArea", {hash:{
+    'id': ("create-machine-ports"),
+    'data-theme': ("a"),
+    'placeholder': ("e.g. 80:80"),
+    'valueBinding': ("Mist.machineAddController.newMachineDockerPorts")
+  },hashTypes:{'id': "STRING",'data-theme': "STRING",'placeholder': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'placeholder': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n        </div>\n\n        <!-- Enable monitoring -->\n        <div id=\"create-machine-monitoring\" class=\"ui-state-disabled\">\n            <label>\n            ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
     'data-theme': ("a"),
     'checkedBinding': ("Mist.machineAddController.newMachineMonitoring")
@@ -2193,7 +2200,7 @@ function program15(depth0,data) {
   data.buffer.push("- ");
   stack1 = helpers._triageMustache.call(depth0, "loadavg5", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push(" \n                        </td>\n                    </tr>\n                ");
+  data.buffer.push("\n                        </td>\n                    </tr>\n                ");
   return buffer;
   }
 function program16(depth0,data) {
@@ -2300,7 +2307,7 @@ function program30(depth0,data) {
   data.buffer.push("\n                    <tr>\n                        <td colspan=\"2\"><div class=\"df\">");
   stack1 = helpers._triageMustache.call(depth0, "view.machine.df", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div></td>\n                ");
+  data.buffer.push("</div></td>\n                    </tr>\n                ");
   return buffer;
   }
 
