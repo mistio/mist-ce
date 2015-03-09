@@ -374,12 +374,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                             measurementStep: newTimeWindow /
                                 DISPLAYED_DATAPOINTS,
                         });
-
-                        if (forceChange) {
-                            this.parent.stream.start();
-                            return;
-                        }
-
                         this.parent.stream.start();
                     }
                 }
@@ -413,32 +407,19 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 //
 
 
-                goBack: function () {
+                change: function (args) {
                     this.parent._clearPendingRequests();
                     this.parent.stream.stop();
-                    this.parent._fetchStats({
-                        from: this.parent.fetchStatsArgs.from -
-                            this.parent.config.timeWindow,
-                        until: this.parent.fetchStatsArgs.from
+                    var newTimeWindow = args.until - args.from;
+                    this.parent.config.setProperties({
+                        timeWindow: newTimeWindow,
+                        measurementStep: newTimeWindow /
+                            DISPLAYED_DATAPOINTS,
                     });
-                },
-
-
-                goForward: function () {
-                    this.parent._clearPendingRequests();
-                    if (this.isInFuture(this.parent.fetchStatsArgs.until))
-                        this.parent.stream.start();
-                    else
-                        this.parent._fetchStats({
-                            from: this.parent.fetchStatsArgs.until,
-                            until: this.parent.fetchStatsArgs.until +
-                                this.parent.config.timeWindow
-                        });
-                },
-
-
-                isInFuture: function (until) {
-                    return Date.now() <= until;
+                    this.parent._fetchStats({
+                        from: args.from,
+                        until: args.until,
+                    });
                 },
             }),
 

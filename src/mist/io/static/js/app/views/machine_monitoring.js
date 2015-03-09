@@ -205,55 +205,43 @@ define('app/views/machine_monitoring',
                 //
 
 
-                backClicked: function () {
-                    Mist.graphsController.history.goBack();
+                timeWindowChanged: function () {
+                    var newTimeWindow = $('#time-window-control select').val();
+                    if (newTimeWindow == 'range') {
+                        $('#pick-range').popup('open');
+                        var from = Mist.graphsController.fetchStatsArgs.from;
+                        var until = Mist.graphsController.fetchStatsArgs.until;
+                        $('#pick-range #range-start').val(new Date(from).toLocaleString());
+                        $('#pick-range #range-stop').val(new Date(until).toLocaleString());
+                    } else {
+                        Mist.graphsController.resolution.change(newTimeWindow);
+                    }
                 },
 
 
-                forwardClicked: function () {
-                    Mist.graphsController.history.goForward();
+                _openRangeSelectionPopup: function () {
+                    $('#pick-range').popup('open');
+                    var from = Mist.graphsController.fetchStatsArgs.from;
+                    var until = Mist.graphsController.fetchStatsArgs.until;
+                    $('#pick-range #range-start').val(new Date(from).toLocaleString());
+                    $('#pick-range #range-stop').val(new Date(until).toLocaleString());
                 },
 
-
-                resetClicked: function () {
-                    Mist.graphsController.stream.start();
-                },
-
-
-                pauseClicked: function () {
-                    Mist.graphsController.stream.stop();
-                },
-
-                rangeBackClicked: function () {
-                    this.$('#pick-range').popup('close');
+                _closeRangeSelectionPopup: function () {
+                    $('#pick-range').popup('close');
                 },
 
                 rangeOkClicked: function () {
-                    var rangeStart = this.$('#pick-range #range-start').val();
-                    var rangeStop = this.$('#pick-range #range-stop').val();
-                    info(rangeStart, rangeStop);
-                    this.$('#pick-range').popup('close');
+                    Mist.graphsController.history.change({
+                        timeWindow: 'range',
+                        from: new Date($('#pick-range #range-start').val()),
+                        until: new Date($('#pick-range #range-stop').val())
+                    });
+                    $('#pick-range').popup('close');
                 },
 
-                timeWindowChanged: function () {
-                    var newTimeWindow = $('#time-window-control select').val();
-                    if (newTimeWindow != 'range'){
-                        Mist.graphsController.resolution.change(newTimeWindow);
-                    } else {
-                        var justAGraph = Mist.graphsController.content[0];
-                        var startTime = justAGraph.getFirstDatapoint().time;
-                        var endTime = justAGraph.getLastDatapoint().time;
-                        $('#pick-range #range-start').val(startTime);
-                        $('#pick-range #range-stop').val(endTime);
-                        this.$('#pick-range').popup('open');
-                    }
-
-                    // Update cookie
-                    var entry = Mist.cookiesController.getSingleMachineEntry(
-                        this.machine);
-                    entry.timeWindow = newTimeWindow;
-                    Mist.cookiesController.setSingleMachineEntry(
-                        this.machine, entry);
+                rangeBackClicked: function () {
+                    $('#pick-range').popup('close');
                 },
 
 

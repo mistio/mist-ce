@@ -2,44 +2,6 @@
 
     <div id="history-control" class="ui-mini">
 
-        <!--
-            Stream Toggle
-        -->
-        {{#if Mist.graphsController.stream.isStreaming}}
-            <!--a id="history-control-stream"
-                class="ui-btn
-                    ui-mini
-                    ui-btn-b
-                    ui-corner-all
-                    ui-btn-inline"
-                {{action "pauseClicked" target="view.actionProxy"}}>
-                    Pause
-            </a-->
-        {{else}}
-            <a id="history-control-stream"
-                class="ui-btn
-                    ui-mini
-                    ui-btn-b
-                    ui-corner-all
-                    ui-btn-inline"
-                {{action "resetClicked" target="view.actionProxy"}}>
-                    Reset
-            </a>
-            <!--
-                Forward Button
-            -->
-            <a id="history-control-forward"
-                class="time
-                    ui-btn
-                    ui-mini
-                    ui-corner-all
-                    ui-btn-inline
-                    ui-btn-icon-notext
-                    ui-icon-arrow-r"
-                {{action "forwardClicked" target="view.actionProxy"}}>
-            </a>
-        {{/if}}
-
         <div id="time-window-control" class="ui-mini">
             <select data-inline="true" data-shadow="false" data-mini="true"
                 {{action "timeWindowChanged" on="change" target="view.actionProxy"}}>
@@ -51,20 +13,6 @@
                     <option value="range">Range</option>
             </select>
         </div>
-
-        <!--
-            Back Button
-        -->
-        <a id="history-control-back"
-            class="time
-                ui-btn
-                ui-mini
-                ui-corner-all
-                ui-btn-inline
-                ui-btn-icon-notext
-                ui-icon-arrow-l"
-            {{action "backClicked" target="view.actionProxy"}}>
-        </a>
     </div>
 
     <!--
@@ -72,7 +20,7 @@
     -->
 
     <div id="pick-range-screen"
-        class="ui-popup-screen ui-overlay-b ui-screen-hidden">
+        class="ui-popup-screen ui-screen-hidden">
     </div>
     <div id="pick-range-popup"
         class="flip

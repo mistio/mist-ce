@@ -1102,22 +1102,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         };
 
         function labelTicksFixed (axisInstance, format, timeDisplayed) {
-
             // Check Time Displayed
-            var labelStep;
-            if(timeDisplayed <= 10 * TIME_MAP.MINUTE)
-                axisInstance.ticks(d3.time.minutes,2);
-            else if(timeDisplayed <= TIME_MAP.HOUR)
-                axisInstance.ticks(d3.time.minutes,12);
-            else if(timeDisplayed <= TIME_MAP.DAY)
-                axisInstance.ticks(d3.time.hours,6);
-            else if(timeDisplayed <= TIME_MAP.WEEK)
-                axisInstance.ticks(d3.time.days,1);
-            else if(timeDisplayed <= TIME_MAP.MONTH)
-                axisInstance.ticks(d3.time.days,7);
-            if (format)
-                axisInstance.tickFormat(d3.time.format(format));
-
+            axisInstance.ticks(4);
             return axisInstance;
         };
 
