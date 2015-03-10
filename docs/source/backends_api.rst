@@ -200,7 +200,7 @@
    .. sourcecode:: http
 
         {
-            "title":"MyDocher",
+            "title":"MyDocker",
             "provider":"docker",
             "docker_host":"http://10.0.0.1",
             "docker_port":"4243"
