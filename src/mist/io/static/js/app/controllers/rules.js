@@ -136,6 +136,11 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
+            getRule: function (ruleId) {
+                return this.getRuleById(ruleId);
+            },
+
+
             getRuleById: function(ruleId) {
                 return this.content.findBy('id', ruleId);
             },

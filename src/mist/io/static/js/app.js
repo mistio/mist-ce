@@ -228,7 +228,8 @@ var appLoader = {
                 appLoader.buffer.logs = new Socket_({
                     namespace: '/logs',
                     onConnect: function (socket) {
-                        socket.emit('ready');
+                        if (!appLoader)
+                            socket.emit('ready');
                     }
                 });
             }
@@ -809,11 +810,25 @@ var handleMobileInit = function () {
 var setupLogsSocketEvents = function (socket, callback) {
 
     socket.on('open_incidents', function (openIncidents) {
-        Mist.set('incidents', openIncidents);
-    }); 
+        require(['app/models/story'], function (StoryModel) {
+            var models = openIncidents.map(function (incident) {
+                return StoryModel.create(incident);
+            });
+            Mist.set('openIncidents', models);
+        });
+    }).on('recent_incidents', function (closedIncidents) {
+        require(['app/models/story'], function (StoryModel) {
+            var models = closedIncidents.map(function (incident) {
+                return StoryModel.create(incident);
+            });
+            Mist.set('closedIncidents', models);
+        });
+    }).emit('ready');
+
     if (callback)
         callback();
 };
+
 
 var setupSocketEvents = function (socket, callback) {
 
@@ -1168,12 +1183,14 @@ function Socket_ (args) {
                     that._log('RECEIVE', response);
                     events.trigger.call(events, event, response);
                 });
+            return this;
         },
 
 
         off: function () {
             var events = this.get('events');
             events.off.apply(events, arguments);
+            return this;
         },
 
 
@@ -1181,6 +1198,7 @@ function Socket_ (args) {
             this._log('EMIT', slice(arguments));
             var socket = this.get('socket');
             socket.emit.apply(socket, arguments);
+            return this;
         },
 
 
@@ -1191,6 +1209,7 @@ function Socket_ (args) {
             if (socket.$events)
                 for (event in socket.$events)
                     delete socket.$events[event];
+            return this;
         },
 
 

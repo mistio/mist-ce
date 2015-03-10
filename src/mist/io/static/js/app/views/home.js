@@ -45,6 +45,10 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
                 addBackend: function () {
                     Mist.backendAddController.open();
+                },
+
+                incidentClicked: function (incident) {
+                    Mist.Router.router.transitionTo('machine', incident.get('machine'));
                 }
             },
 
