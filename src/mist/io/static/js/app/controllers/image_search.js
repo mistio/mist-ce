@@ -130,7 +130,7 @@ define('app/controllers/image_search', ['ember'],
 
                     if (!backend.enabled)
                         return;
-                    if (backend.isBareMetal)
+                    if (backend.get('isBareMetal'))
                         return;
 
                     searchingBackends.push(index);
