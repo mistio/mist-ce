@@ -5,7 +5,7 @@ define('app/views/key_list_item', ['app/views/list_item'],
      *  @returns Class
      */
     function (ListItemView) {
-        return ListItemView.extend({
+        return App.KeyListItemView = ListItemView.extend({
 
             /**
              *  Properties

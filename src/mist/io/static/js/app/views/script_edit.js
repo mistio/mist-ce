@@ -8,7 +8,7 @@ define('app/views/script_edit', ['app/views/popup'],
 
         'use strict';
 
-        return PopupView.extend({
+        return App.ScriptEditView = PopupView.extend({
 
 
             //

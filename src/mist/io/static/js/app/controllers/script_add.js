@@ -18,7 +18,8 @@ define('app/controllers/script_add', ['ember'],
                 type: {},
                 entryPoint: '',
                 text: '',
-                source: {}
+                source: {},
+                description: '',
             }),
 
 
@@ -55,7 +56,8 @@ define('app/controllers/script_add', ['ember'],
                     entryPoint: '',
                     text: '',
                     source: '',
-                    script: ''
+                    script: '',
+                    description: '',
                 });
             },
 

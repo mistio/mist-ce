@@ -218,12 +218,14 @@
         <!-- Select Script -->
 
         <div id="script">
-            {{#if Mist.betaFeatures}}
+            {{#if Mist.isCore}}
+            {{#if Mist.scriptsController.length}}
                 <select class="toggle-field ui-mini" data-theme="a" data-role="slider"
                 {{action "switchToggled" on="change" target="view"}}>
                     <option value="basic">basic</option>
                     <option value="advanced">advanced</option>
                 </select>
+            {{/if}}
             {{/if}}
             <label for="create-machine-script">Script:</label>
             <div class="script-option basic">
@@ -260,6 +262,16 @@
             </div>
         </div>
 
+        <div id="ports">
+            <!-- Expose Ports -->
+            <label>Ports:</label>
+            {{view Mist.TextArea
+                   id="create-machine-ports"
+                   data-theme="a"
+                   placeholder="e.g. 80:80"
+                   valueBinding="Mist.machineAddController.newMachineDockerPorts"}}
+        </div>
+
         <!-- Enable monitoring -->
         <div id="create-machine-monitoring" class="ui-state-disabled">
             <label>
@@ -289,4 +301,4 @@
     </div>
 </div>
 
-{{view Mist.keyAddView}}
+{{view "keyAdd"}}

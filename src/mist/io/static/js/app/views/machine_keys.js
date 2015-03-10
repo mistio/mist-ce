@@ -1,11 +1,11 @@
-define('app/views/machine_keys', ['app/views/controlled','ember'],
+define('app/views/machine_keys', ['app/views/controlled'],
     //
     //  Machine Keys View
     //
     //  @returns Class
     //
     function (ControlledView) {
-        return ControlledView.extend({
+        return App.MachineKeysView = ControlledView.extend({
 
 
             //

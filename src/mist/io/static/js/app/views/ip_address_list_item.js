@@ -8,7 +8,7 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
 
         'use strict'
 
-        return ListItemView.extend({
+        return App.IpAddressListItemView = ListItemView.extend({
 
             tagName: 'tr',
             pendingToggle: null,

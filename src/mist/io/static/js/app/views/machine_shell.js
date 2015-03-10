@@ -11,7 +11,7 @@ define('app/views/machine_shell', ['app/views/popup'],
         var MIN_TERM_ROWS = 24;
         var MIN_TERM_COLUMNS = 80;
 
-        return PopupView.extend({
+        return App.MachineShellView = PopupView.extend({
 
 
             //
@@ -239,4 +239,3 @@ define('app/views/machine_shell', ['app/views/popup'],
         }
     }
 );
-

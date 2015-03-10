@@ -8,7 +8,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
         'use strict';
 
-        return ControlledView.extend({
+        return App.RuleEditView = ControlledView.extend({
 
 
             //

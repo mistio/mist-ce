@@ -30,13 +30,7 @@ define('app/views/panel', ['app/views/controlled'],
 
             init: function () {
                 this._super();
-                this.set('panelId', '#' +
-                    Mist.decapitalizeArray(
-                        Mist.splitWords(
-                            Mist.getViewName(this)
-                        )
-                    ).join('-')
-                );
+                this.set('panelId', this.getWidgetID());
             },
 
 

@@ -5,7 +5,7 @@ define('app/views/machine_keys_list_item', ['app/views/list_item'],
      *  @returns Class
      */
     function(ListItemView) {
-        return ListItemView.extend({
+        return App.MachineKeysListItemView = ListItemView.extend({
 
             tagName: 'span',
             keyIcon: null,
@@ -18,9 +18,9 @@ define('app/views/machine_keys_list_item', ['app/views/list_item'],
                 var machineToFind = this.key.probing ?
                                     this.key.probing :
                                     Mist.machineKeysController.get('machine');
-                
+
                 if (!machineToFind) return;
-                
+
                 var that = this;
                 this.key.machines.some(function(machine) {
                     if (machine[1] == machineToFind.id &&

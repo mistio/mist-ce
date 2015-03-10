@@ -8,7 +8,7 @@ define('app/views/rule_list', ['app/views/templated'],
 
 		'use strict';
 
-		return TemplatedView.extend({
+		return App.RuleListView = TemplatedView.extend({
 
 
 			//

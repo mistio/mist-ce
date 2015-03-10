@@ -1,11 +1,12 @@
-define('app/views/key_edit', ['app/views/templated', 'ember'],
+define('app/views/key_edit', ['app/views/templated'],
     /**
      *  Key Edit View
      *
      *  @returns Class
      */
     function (TemplatedView) {
-        return TemplatedView.extend({
+
+        return App.KeyEditView = TemplatedView.extend({
 
             /**
              *
