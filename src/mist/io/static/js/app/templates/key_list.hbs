@@ -6,7 +6,7 @@
 
         <h1>Keys</h1>
 
-        {{view Mist.userMenuView}}
+        {{view "userMenu"}}
 
     </div>
 
@@ -32,7 +32,7 @@
             data-filter-placeholder="Filter..."
             class="checkbox-list">
             {{#each Mist.keysController.content}}
-                {{view Mist.keyListItemView keyBinding="this" class="checkbox-link"}}
+                {{view "keyListItem" keyBinding="this" class="checkbox-link"}}
             {{/each}}
         </ul>
 
@@ -40,13 +40,13 @@
 
     </div>
 
-    {{view Mist.dialogView}}
+    {{view "dialog"}}
 
-    {{view Mist.keyAddView}}
+    {{view "keyAdd"}}
 
-    {{view Mist.keyEditView}}
+    {{view "keyEdit"}}
 
-    {{view Mist.confirmationDialog}}
+    {{view "confirmationDialog"}}
 
     <div id="select-keys-popup" data-role="popup" data-transition="flip" data-position-to="#select-keys-btn">
         <ul data-role='listview'>

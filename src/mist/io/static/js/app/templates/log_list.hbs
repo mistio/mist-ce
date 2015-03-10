@@ -1,4 +1,4 @@
-<div id="log-list-page" data-role="page" class="ui-page-active ui-page ui-page-theme-a">
+<div id="log-list-page" data-role="page" class="ui-page-active ui-page ui-page-theme-a log-list">
 
     <div class="ui-header ui-bar-b">
 
@@ -6,6 +6,8 @@
             ui-corner-all responsive-button" href="#">Home</a>
 
         <h1 class="ui-title">Logs</h1>
+
+        {{view "userMenu"}}
 
     </div>
 
@@ -83,7 +85,7 @@
             data-enhanced="true"
             data-inset="true">
             {{#each Mist.logsController}}
-                {{view Mist.logListItemView logBinding="this"}}
+                {{view "logListItem" logBinding="this"}}
             {{/each}}
         </ul>
 

@@ -1,11 +1,11 @@
-define('app/views/machine_add', ['app/views/templated', 'ember'],
+define('app/views/machine_add', ['app/views/templated'],
     /**
      *  Machine Add View
      *
      *  @returns Class
      */
     function (TemplatedView) {
-        return TemplatedView.extend({
+        return App.MachineAddView = TemplatedView.extend({
 
             /**
              *  Properties
@@ -64,6 +64,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
              load: function () {
 
                 // Add event listeners
+                Mist.scriptsController.on('onChange', this, 'renderFields');
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
                 Mist.backendsController.on('onImageListChange', this, 'renderFields');
 
@@ -77,6 +78,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
              unload: function () {
 
                 // Remove event listeners
+                Mist.scriptsController.off('onChange', this, 'renderFields');
                 Mist.keysController.off('onKeyListChange', this, 'renderFields');
                 Mist.backendsController.off('onImageListChange', this, 'renderFields');
 
@@ -88,6 +90,14 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
              *  Methods
              *
              */
+
+
+             clear: function () {
+                 this.$('select').val('basic').slider('refresh');
+                 this.$('.script-option').hide();
+                 this.$('.basic').show();
+             },
+
 
              fieldIsReady: function (field) {
                 $('#create-machine-' + field).collapsible('option', 'collapsedIcon', 'check')
@@ -120,6 +130,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 $('#create-machine-panel #key').hide();
                 $('#create-machine-monitoring').hide();
                 $('#create-machine-panel .docker').show();
+                $('#create-machine-panel #ports').show();
             },
 
 
@@ -127,6 +138,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 this.hideDockerMenu();
                 $('#create-machine-panel #location').hide();
                 $('#create-machine-panel #size').hide();
+                $('#create-machine-panel #ports').show();
             },
 
 
@@ -137,6 +149,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 $('#create-machine-panel #key').show();
                 $('#create-machine-monitoring').show();
                 $('#create-machine-panel .docker').hide();
+                $('#create-machine-panel #ports').hide();
             },
 
 
@@ -156,6 +169,15 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
              */
 
             actions: {
+
+                switchToggled: function () {
+                    var value = this.$('#script select').val();
+                    this.$('.script-option').hide();
+                    this.$('.'+value).show();
+                    Mist.machineAddController.set('newMachineScript', '');
+                    Mist.machineAddController.set('newMachineScriptParams', '');
+                    Mist.machineAddController.set('hasScript', value == 'advanced');
+                },
 
 
                 selectProvider: function (backend) {
@@ -179,6 +201,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     $('#create-machine-panel .docker textarea').addClass('ui-state-disabled');
                     $('#create-machine-panel .docker .ui-checkbox').addClass('ui-state-disabled');
                     $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
+                    $('#create-machine-panel #ports').addClass('ui-state-disabled');
 
                     if (backend.get('requiresNetworkOnCreation')) {
                         if (backend.networks.content.length > 0) {
@@ -226,6 +249,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                            $('#create-machine-panel .docker textarea')
                                 .removeClass('ui-state-disabled');
                        }
+                       $('#create-machine-panel #ports').removeClass('ui-state-disabled');
                    }
                 },
 
@@ -264,6 +288,10 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                     this._selectKey(key)
                 },
 
+                selectScript: function (script) {
+                    Mist.machineAddController.set('newMachineScript', script);
+                    $('#create-machine-script-select').collapsible('collapse');
+                },
 
                 toggleNetworkSelection: function (network) {
                     network.set('selected', !network.selected);

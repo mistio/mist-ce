@@ -4,8 +4,8 @@ define('app/views/machine_list', ['app/views/mistscreen'],
      *
      * @returns Class
      */
-    function (MistScreen) {
-        return MistScreen.extend({
+    function (PageView) {
+        return App.MachineListView = PageView.extend({
 
             /**
              *

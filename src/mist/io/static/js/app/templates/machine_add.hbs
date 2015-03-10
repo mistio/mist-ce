@@ -218,11 +218,58 @@
         <!-- Select Script -->
 
         <div id="script">
+            {{#if Mist.isCore}}
+            {{#if Mist.scriptsController.length}}
+                <select class="toggle-field ui-mini" data-theme="a" data-role="slider"
+                {{action "switchToggled" on="change" target="view"}}>
+                    <option value="basic">basic</option>
+                    <option value="advanced">advanced</option>
+                </select>
+            {{/if}}
+            {{/if}}
             <label for="create-machine-script">Script:</label>
+            <div class="script-option basic">
+                {{view Mist.TextArea
+                       id="create-machine-script"
+                       data-theme="a"
+                       valueBinding="Mist.machineAddController.newMachineScript"}}
+            </div>
+            <div class="script-option advanced">
+                <div id="create-machine-script-select"
+                     data-role="collapsible"
+                     data-iconpos="right"
+                     data-collapsed-icon="arrow-d"
+                     data-expanded-icon="arrow-u"
+                     data-theme="a"
+                     class="mist-select">
+                    <h4>{{#if Mist.machineAddController.newMachineScript.name}}
+                        {{Mist.machineAddController.newMachineScript.name}}
+                        {{else}} Select {{/if}}
+                    </h4>
+                    <ul data-role="listview" data-theme="a">
+                        {{#each Mist.scriptsController}}
+                            <li data-icon="false">
+                                <a {{action "selectScript" this target="view"}}>{{this.name}}</a>
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{view Mist.TextArea
+                       id="create-machine-script-params"
+                       data-theme="a"
+                       placeholder="optional parameters"
+                       valueBinding="Mist.machineAddController.newMachineScriptParams"}}
+            </div>
+        </div>
+
+        <div id="ports">
+            <!-- Expose Ports -->
+            <label>Ports:</label>
             {{view Mist.TextArea
-                   id="create-machine-script"
+                   id="create-machine-ports"
                    data-theme="a"
-                   valueBinding="Mist.machineAddController.newMachineScript"}}
+                   placeholder="e.g. 80:80"
+                   valueBinding="Mist.machineAddController.newMachineDockerPorts"}}
         </div>
 
         <!-- Enable monitoring -->
@@ -254,4 +301,4 @@
     </div>
 </div>
 
-{{view Mist.keyAddView}}
+{{view "keyAdd"}}

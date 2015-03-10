@@ -32,6 +32,8 @@
 @import url("css/backend_button.css");
 @import url("css/graph_list.css");
 @import url("css/metric_add_custom.css");
+@import url("css/script.css");
+@import url("css/script_list.css");
 
 
 /* Splash
@@ -136,6 +138,11 @@ body {
     border-radius: 5px;
 }
 
+/* Form fields
+------------------------------------------------------------------------------------------------------------*/
+.form-field {
+    margin-bottom: 1.6em;
+}
 
 /* Text fields
 -----------------------------------------------------------------------------------------------------------*/
@@ -341,6 +348,9 @@ ul.checkbox-list li label {
     width: 33.3%;
 }
 
+.ui-footer .ui-grid-a a {
+    margin:0;
+}
 
 /* Small List Item
 -----------------------------------------------------------------------------------------------------------*/
@@ -428,6 +438,46 @@ ul.checkbox-list li label {
 #confirmation-popup p {
     text-align: center;
 }
+
+/* List Wrapper
+-----------------------------------------------------------------------------------------------------------*/
+.list-wrapper {
+    width: 100%;
+}
+
+.list-wrapper > a {
+    width: 5em;
+}
+
+.list-wrapper > a:nth-child(1) {
+    float: left;
+    font-weight: normal;
+}
+.list-wrapper > a:nth-child(2) {
+    float: right;
+}
+
+.list-wrapper .ui-filterable {
+    clear: both;
+    top: -3em;
+    position: relative;
+    margin-left: 9.5em;
+    margin-right: 9.5em;
+}
+
+.list-wrapper ul {
+    position: relative;
+    top: -2em;
+}
+
+@media only screen and (max-width: 550px) {
+
+    .list-wrapper .ui-filterable {
+        margin-left: 3em;
+        margin-right: 3em;
+    }
+}
+
 /* Other
 -----------------------------------------------------------------------------------------------------------*/
 #hidden-shell-iframe {
@@ -438,18 +488,14 @@ ul.checkbox-list li label {
     z-index: 1000;
 }
 
-@media only screen and (max-width: 420px) {
+@media only screen and (max-width: 550px) {
 
-    .responsive-button {
+    a.responsive-button,
+    a.responsive-btn {
         padding: 0px !important;
-        width: 40px;
-        height: 40px;
+        width: 2.5em;
+        height: 2.5em;
         text-indent: -5000px;
-    }
-
-    .ui-header .responsive-button {
-        width: 32px;
-        height: 30px;
     }
 
     #machine-list-page .ui-filterable, #key-list-page .ui-filterable  {
@@ -643,7 +689,7 @@ ul.checkbox-list li label {
     white-space: pre;
     text-align: left;
     max-height: 250px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 #dialog-popup .duration {

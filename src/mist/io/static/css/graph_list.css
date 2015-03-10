@@ -170,62 +170,76 @@
     fill: none;
 }
 
-.graph .green {
+.graph .aquamarine {
     stroke: #6CE0BA;
-    transition: 2s;
-    fill: none;
+}
+
+.graph .green {
+    stroke: #008000;
 }
 
 .graph .orange {
     stroke: #F2B752;
-    transition: 2s;
-    fill: none;
 }
 
 .graph .blue {
     stroke: #66A5D9;
-    transition: 2s;
-    fill: none;
 }
 
 .graph .pink {
     stroke: #D68BCD;
-    transition: 2s;
-    fill: none;
 }
 
 .graph .brown {
     stroke: #C47E52;
-    transition: 2s;
-    fill: none;
 }
 
 .graph .red {
     stroke: #F25757;
-    transition: 2s;
-    fill: none;
+}
+
+.graph .darkred {
+    stroke: #8B0000;
+}
+
+.graph .olive {
+    stroke: #808000;
+}
+
+.graph .wheat {
+    stroke: #F5DEB3;
 }
 
 .graph .purple {
     stroke: #8F66C4;
-    transition: 2s;
-    fill: none;
+}
+
+.graph .coral {
+    stroke: #FF7F50;
+}
+
+.graph .darkkhaki {
+    stroke: #BDB76B;
+}
+
+.graph .midnightblue {
+    stroke: #191970;
 }
 
 .graph .black {
     stroke: #5C5C5C;
-    transition: 2s;
-    fill: none;
 }
 
 .graph .gray {
     stroke: gray !important;
-    transition: 2s;
-    fill: none;
+}
+
+.graph .lineLegend.aquamarine {
+    background-color: #6CE0BA;
 }
 
 .graph .lineLegend.green {
-    background-color: #6CE0BA;
+    background-color: #008000;
 }
 
 .graph .lineLegend.orange {
@@ -248,12 +262,40 @@
     background-color: #F25757;
 }
 
+.graph .lineLegend.darkred {
+    background-color: #8B0000;
+}
+
+.graph .lineLegend.olive {
+    background-color: #808000;
+}
+
+.graph .lineLegend.wheat {
+    background-color: #F5DEB3;
+}
+
 .graph .lineLegend.purple {
     background-color: #8F66C4;
 }
 
+.graph .lineLegend.coral {
+    background-color: #FF7F50;
+}
+
+.graph .lineLegend.darkkhaki {
+    background-color: #BDB76B;
+}
+
+.graph .lineLegend.midnightblue {
+    background-color: #191970;
+}
+
 .graph .lineLegend.black {
     background-color: #5C5C5C;
+}
+
+.graph .lineLegend.gray {
+    background-color: gray;
 }
 
 .graph .lineLegend div {
