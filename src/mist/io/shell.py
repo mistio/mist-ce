@@ -373,7 +373,9 @@ class DockerShell(object):
     def __init__(self, host):
         self.host = host
         self.ws = websocket.WebSocket()
+        self.protocol = "ws"
         self.uri = ""
+        self.sslopts = {}
 
     def autoconfigure(self, user, backend_id, machine_id, **kwargs):
         log.info("autoconfiguring DockerShell for machine %s:%s",
@@ -384,8 +386,19 @@ class DockerShell(object):
         backend = user.backends[backend_id]
         docker_port = backend.docker_port
 
-        self.uri = "ws://%s:%s/containers/%s/attach/ws?logs=1&stream=1&stdin=1&stdout=1&stderr=1" % \
-                   (self.host, docker_port, machine_id)
+        # For basic auth
+        if backend.apikey and backend.apisecret:
+            self.uri = "://%s:%s@%s:%s/containers/%s/attach/ws?logs=1&stream=1&stdin=1&stdout=1&stderr=1" % \
+                       (backend.apikey, backend.apisecret, self.host, docker_port, machine_id)
+        else:
+            self.uri = "://%s:%s/containers/%s/attach/ws?logs=1&stream=1&stdin=1&stdout=1&stderr=1" % \
+                       (self.host, docker_port, machine_id)
+
+        # For tls
+        if backend.key_file and backend.cert_file:
+            self.protocol = "wss"
+
+        self.uri = self.protocol + self.uri
 
         log.info(self.uri)
 
