@@ -33,13 +33,11 @@
             data-filter-placeholder="Filter..."
             data-theme="c"
             class="checkbox-list">
-            {{#each Mist.backendsController.content}}
-                {{#if this.enabled}}
-                    {{#each this.machines.content}}
-                        {{view "machineListItem"
+            {{#each view.machines}}
+                {{#if this.backend.enabled}}
+                    {{view "machineListItem"
                             machineBinding="this"
                             class="checkbox-link"}}
-                    {{/each}}
                 {{/if}}
             {{/each}}
         </ul>
@@ -62,6 +60,9 @@
 
     <div id="select-machines-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
         <ul data-role="listview">
+            <li data-icon="false" data-role="list-divider" style="background-color: #D3D3D3; font-size: 16px; font-weight: bold">
+                Selection
+            </li>
             <li data-icon="false">
                 <a {{action "selectionModeClicked" "all" target="view"}}>All</a>
             </li>
@@ -77,6 +78,19 @@
                     </li>
                 {{/if}}
             {{/each}}
+
+            <li data-icon="false" data-role="list-divider" style="background-color: #D3D3D3; font-size: 16px; font-weight: bold">
+                Sort By
+            </li>
+            <li data-icon="false">
+                <a {{action "sortByModeClicked" "name" target="view"}}>Name</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "sortByModeClicked" "hasMonitoring" target="view"}}>Monitoring</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "sortByModeClicked" "state" target="view"}}>State</a>
+            </li>
         </ul>
     </div>
 

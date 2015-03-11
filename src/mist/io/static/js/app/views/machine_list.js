@@ -9,16 +9,25 @@ define('app/views/machine_list', ['app/views/mistscreen'],
 
             /**
              *
+             *  Properties
+             *
+             */
+
+             machines:[],
+
+            /**
+             *
              *  Initialization
              *
              */
 
             load: function () {
-
+                window.m = this;
                 // Add event listeners
                 Mist.backendsController.on('onMachineProbe', this, 'updateFooter');
                 Mist.backendsController.on('onSelectedMachinesChange', this, 'updateFooter');
-
+                Mist.backendsController.on('onMachineListChange', this,'machineInit');
+                this.machineInit();
             }.on('didInsertElement'),
 
 
@@ -27,6 +36,7 @@ define('app/views/machine_list', ['app/views/mistscreen'],
                 // Remove event listeners
                 Mist.backendsController.off('onMachineProbe', this, 'updateFooter');
                 Mist.backendsController.off('onSelectedMachinesChange', this, 'updateFooter');
+                Mist.backendsController.off('onMachineListChange', this,'machineInit');
 
             }.on('willDestroyElement'),
 
@@ -71,6 +81,15 @@ define('app/views/machine_list', ['app/views/mistscreen'],
                 }
             },
 
+            machineInit: function (){
+                var backends = Mist.backendsController.content;
+                var machineList = [];
+                backends.forEach(function (backend) {
+                    machineList.pushObjects(backend.machines.content);
+                    log(backend.machines.content.length);
+                });
+                this.set("machines",machineList);
+            },
 
             /**
              *
@@ -115,6 +134,16 @@ define('app/views/machine_list', ['app/views/mistscreen'],
                             machine.set('selected', mode == 'all' || mode == backend.title);
                         });
                     });
+                },
+
+
+                sortByModeClicked: function (mode) {
+
+                    $('#select-machines-popup').popup('close');
+                    if(mode=='hasMonitoring')
+                        this.set("machines",this.machines.sortBy(mode).reverse());
+                    else
+                        this.set("machines",this.machines.sortBy(mode));
                 }
             }
         });
