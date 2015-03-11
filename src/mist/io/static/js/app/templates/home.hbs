@@ -89,61 +89,51 @@
             <div class="ui-block-b">
                 <div class="ui-body">
                 {{#if Mist.monitored_machines.length}}
-                    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents">
+                    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents header">
                         <li class="ui-li-divider ui-bar-c ui-first-child">Incidents</li>
+                        <li class="ui-li-divider ui-bar-c ui-last-child" style="display:none;"></li>
+                    </ul>
+                    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents">
                         {{#each Mist.openIncidents}}
-                        <li class="ui-bar-b">
-                            <a class="ui-icon-alert ui-btn ui-btn-icon-left"
+                        <li class="ui-bar-b incident">
+                            <a class="ui-icon-alert ui-btn ui-btn-icon-right"
                                 {{action "incidentClicked" this target="view"}}>
                                 <span class="machine">
-                                    {{this.machine.name}}
+                                    {{this.machine.name}}:
                                 </span>
                                 <span class="rule-condition">
                                 {{#if this.ruleId}}
-                                    {{this.rule.metric.name}} {{this.rule.operator.symbol}} {{this.rule.value}}
+                                    {{this.rule.metric.name}} {{this.rule.operator.symbol}}
+                                    {{this.rule.value}} {{this.rule.metric.unit}} for {{this.rule.aggregate.title}}
+                                    value within {{this.rule.timeWindowToMins}} min(s)
                                 {{/if}}
                                 </span>
-                                <span class="duration">
-                                    for {{this.duration}}
+                                <span class="time">
+                                    {{this.duration}}
                                 </span>
-                                <span class="time"></span>
                             </a>
                         </li>
                         {{/each}}
                         {{#each Mist.closedIncidents}}
-                        <li class="ui-mini">
+                        <li class="ui-mini incident">
                             <a class="ui-icon-check ui-btn ui-btn-icon-right"
                                 {{action "incidentClicked" this target="view"}}>
                                 <span class="machine">
-                                    {{this.machine.name}}
+                                    {{this.machine.name}}:
                                 </span>
                                 <span class="rule-condition">
                                 {{#if this.ruleId}}
-                                    {{this.rule.metric.name}} {{this.rule.operator.symbol}} {{this.rule.value}}
+                                    {{this.rule.metric.name}} {{this.rule.operator.symbol}}
+                                    {{this.rule.value}} {{this.rule.metric.unit}} for {{this.rule.aggregate.title}}
+                                    value within {{this.rule.timeWindowToMins}} min(s)
                                 {{/if}}
+
                                 </span>
                                 for {{this.duration}}
-                                <span class="time"> --started at-- </span>
+                                <span class="time">{{this.closed}} ago </span>
                             </a>
                         </li>
                         {{/each}}
-                        <!--li class="ui-bar-b">
-                            <a class="ui-btn ui-btn-icon-right ui-icon-alert" href="#/machines/didid">
-                                <span class="machine">testbox1</span>: load &gt; 2
-                                <span class="time">3mins </span>
-                            </a>
-                        </li>
-                        <li class="ui-mini">
-                            <a class="ui-btn ui-btn-icon-right ui-icon-check" href="#/machines/didid">
-                            <span class="machine">testbox1</span>:
-                             monitoring data unavailable for 10 mins <span class="time">1h ago</span></a>
-                        </li>
-                        <li class="ui-mini ui-last-child">
-                            <a class="ui-btn ui-btn-icon-right ui-icon-check" href="#/machines/didid"><span class="machine">testbox1</span>: net rx &gt; 10MBps for 12 mins <span class="time">2d ago</span></a>
-                        </li>
-                        <li class="ui-mini ui-last-child">
-                            <a class="ui-btn ui-btn-icon-right ui-icon-check" href="#/machines/didid"><span class="machine">testbox1</span>: net tx &gt; 5MBps for 17 mins <span class="time">2d ago</span></a>
-                        </li-->
                     </ul>
                 {{/if}}
                 </div>

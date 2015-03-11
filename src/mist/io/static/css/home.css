@@ -25,10 +25,16 @@
    clear: both;
 }
 
-#home-page ul.incidents {
+#home-page ul.incidents.header {
     margin-top: 1em;
+    margin-bottom:0;
     margin-left: 1em;
+}
+
+#home-page ul.incidents {
     max-height: 174px;
+    margin-left: 1em;
+    margin-top: 0;
     overflow-y: auto;
 }
 
@@ -37,13 +43,6 @@
         margin-left: 0;
         margin-top: 0;
     }
-}
-
-ul.incidents span.time {
-    float: right;
-    font-weight: bold;
-    opacity: .75;
-    margin-bottom: -5px;
 }
 
 ul.incidents .ui-icon-alert:after, #machines .ui-icon-alert:after {
@@ -61,8 +60,6 @@ ul.incidents .ui-icon-check:after {
 ul.incidents li a.ui-btn{
     font-weight: normal;
     white-space: normal;
-    padding-left: 16px !important;
-    padding-right: 42px !important;
 }
 
 ul.incidents li a.ui-btn:after {
@@ -76,4 +73,29 @@ ul.incidents li a .machine {
 
 #home-page .ui-body {
     padding: 0;
+}
+
+#home-page ul.incidents li.incident a {
+    padding-top: 0.5em !important;
+    padding-bottom: 0.5em !important;
+}
+
+#home-page ul.incidents span.rule-condition {
+    font-size: 14px;
+}
+
+#home-page ul.incidents span.duration {
+    font-size: 12px;
+    opacity: .75;
+    margin-left: .4em;
+}
+
+#home-page ul.incidents span.machine {
+    display: inline-block;
+}
+
+#home-page ul.incidents span.time {
+    font-size: 12px;
+    opacity: .75;
+    float: right;
 }
