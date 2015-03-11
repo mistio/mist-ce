@@ -758,6 +758,23 @@ var loadApp = function (
         else
             element.slideUp();
     };
+
+    App.clock = Ember.Object.extend({
+        init: function () {
+            this._super();
+            var that = this;
+            setInterval(function () {
+                that.tick();
+            }, TIME_MAP.SECOND);
+        },
+        tick: function () {
+            this.setProperties({
+                second: new Date().getSeconds(),
+                minute: new Date().getMinutes(),
+                hour: new Date().getHours(),
+            });
+        }
+    }).create();
 };
 
 
@@ -1529,6 +1546,31 @@ Date.prototype.getMonthName = function (short) {
     return ['January','February','March','April','May','June','July',
         'August','September','October','November','December'][this.getMonth()];
 }
+
+Date.prototype.diffToString = function (date) {
+
+    var diff = this - date;
+    var ret = '';
+
+    if (diff < TIME_MAP.MINUTE)
+        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
+    else if (diff < TIME_MAP.HOUR)
+        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
+    else if (diff < TIME_MAP.DAY)
+        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
+    else if (diff < TIME_MAP.MONTH)
+        ret = parseInt(diff / TIME_MAP.MONTH) + ' day';
+    else if (diff < TIME_MAP.YEAR)
+        ret = parseInt(diff / TIME_MAP.YEAR) + ' month';
+    else
+        ret = 'TOO LONG!';
+
+    // Add 's' for plural
+    if (ret.split(' ')[0] != '1')
+        ret = ret + 's';
+
+    return ret;
+};
 
 Date.prototype.getTimeFromNow = function () {
 

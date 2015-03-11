@@ -18,9 +18,9 @@ define('app/models/story', ['app/models/base'],
             //
 
 
-
             convertProperties: {
                 'backend_id': 'backendId',
+                'started_at': 'startedAt',
                 'finished_at': 'finishedAt',
                 'incident_id': 'incidentId',
                 'machine_id': 'machineId',
@@ -28,6 +28,13 @@ define('app/models/story', ['app/models/base'],
                 'story_id': 'id',
             },
 
+
+
+            //
+            //
+            //  Computed properties
+            //
+            //
 
 
             backend: function () {
@@ -43,6 +50,15 @@ define('app/models/story', ['app/models/base'],
             rule: function () {
                 return Mist.rulesController.getRule(this.get('ruleId'));
             }.property('ruleId'),
+
+
+            duration: function () {
+                var start = parseInt(this.get('startedAt') * 1000);
+                var end = parseInt(this.get('finishedAt') * 1000);
+                if (!end)
+                    end = Date.now();
+                return new Date(end).diffToString(new Date(start));
+            }.property('startedAt', 'finishedAt', 'Mist.clock.minute'),
         });
     }
 );

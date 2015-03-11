@@ -93,7 +93,7 @@
                         <li class="ui-li-divider ui-bar-c ui-first-child">Incidents</li>
                         {{#each Mist.openIncidents}}
                         <li class="ui-bar-b">
-                            <a class="ui-icon-alert ui-btn ui-btn-icon-right"
+                            <a class="ui-icon-alert ui-btn ui-btn-icon-left"
                                 {{action "incidentClicked" this target="view"}}>
                                 <span class="machine">
                                     {{this.machine.name}}
@@ -103,7 +103,10 @@
                                     {{this.rule.metric.name}} {{this.rule.operator.symbol}} {{this.rule.value}}
                                 {{/if}}
                                 </span>
-                                <span class="time">--duration--</span>
+                                <span class="duration">
+                                    for {{this.duration}}
+                                </span>
+                                <span class="time"></span>
                             </a>
                         </li>
                         {{/each}}
@@ -119,7 +122,8 @@
                                     {{this.rule.metric.name}} {{this.rule.operator.symbol}} {{this.rule.value}}
                                 {{/if}}
                                 </span>
-                                <span class="time">for --duration-- --started at-- </span>
+                                for {{this.duration}}
+                                <span class="time"> --started at-- </span>
                             </a>
                         </li>
                         {{/each}}
