@@ -118,13 +118,14 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _clear: function () {
                 this.setProperties({
-                    'isOpen': null,
+                    'isOpen': false,
                     'content': [],
                 });
-                this.config.setProperties({
+                this.get('config').setProperties({
                     canModify: true,
                     canControl: true,
                     canMinimize: true,
+                    timeWindow: TIME_WINDOW_MAP.minutes,
                     showGraphLegend: false,
                     historyWidgetPosition: 'top',
                 });
@@ -134,7 +135,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _fetchStats: function (args) {
 
-                if (this.isClosed) return;
+                if (!this.get('isOpen')) return;
 
                 if (DEBUG_STATS) {
                     info('Requesting stats from: ' +
@@ -360,7 +361,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 //
 
 
-                change: function (newTimeWindow, forceChange) {
+                change: function (newTimeWindow, forceChange, rangeStart, rangeEnd) {
 
                     var newTimeWindow = TIME_WINDOW_MAP[newTimeWindow];
                     var oldTimeWindow = this.parent.config.timeWindow;
@@ -373,28 +374,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                             measurementStep: newTimeWindow /
                                 DISPLAYED_DATAPOINTS,
                         });
-
-                        if (forceChange) {
-                            this.parent.stream.start();
-                            return;
-                        }
-
-                        // Calculate new time boundaries
-                        var oldFrom = this.parent.fetchStatsArgs.from;
-                        var oldUntil = this.parent.fetchStatsArgs.until;
-
-                        var middle = oldFrom + ((oldUntil - oldFrom) / 2);
-
-                        var newFrom = middle - (newTimeWindow / 2);
-                        var newUntil = middle + (newTimeWindow / 2);
-
-                        if (this.parent.history.isInFuture(newUntil))
-                            this.parent.stream.start();
-                        else
-                            this.parent._fetchStats({
-                                from: newFrom,
-                                until: newUntil,
-                            });
+                        this.parent.stream.start();
                     }
                 }
             }),
@@ -427,32 +407,19 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 //
 
 
-                goBack: function () {
+                change: function (args) {
                     this.parent._clearPendingRequests();
                     this.parent.stream.stop();
-                    this.parent._fetchStats({
-                        from: this.parent.fetchStatsArgs.from -
-                            this.parent.config.timeWindow,
-                        until: this.parent.fetchStatsArgs.from
+                    var newTimeWindow = args.until - args.from;
+                    this.parent.config.setProperties({
+                        timeWindow: newTimeWindow,
+                        measurementStep: newTimeWindow /
+                            DISPLAYED_DATAPOINTS,
                     });
-                },
-
-
-                goForward: function () {
-                    this.parent._clearPendingRequests();
-                    if (this.isInFuture(this.parent.fetchStatsArgs.until))
-                        this.parent.stream.start();
-                    else
-                        this.parent._fetchStats({
-                            from: this.parent.fetchStatsArgs.until,
-                            until: this.parent.fetchStatsArgs.until +
-                                this.parent.config.timeWindow
-                        });
-                },
-
-
-                isInFuture: function (until) {
-                    return Date.now() <= until;
+                    this.parent._fetchStats({
+                        from: args.from,
+                        until: args.until,
+                    });
                 },
             }),
 

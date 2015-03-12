@@ -2,8 +2,8 @@ startTimer();
 
 window.App = new Object();
 
-DEBUG_SOCKET = false;
-DEBUG_STATS = false;
+DEBUG_SOCKET = true;
+DEBUG_STATS = true;
 DEBUG_LOGS = false;
 
 // Define libraries

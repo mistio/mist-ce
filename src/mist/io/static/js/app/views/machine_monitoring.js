@@ -205,36 +205,43 @@ define('app/views/machine_monitoring',
                 //
 
 
-                backClicked: function () {
-                    Mist.graphsController.history.goBack();
-                },
-
-
-                forwardClicked: function () {
-                    Mist.graphsController.history.goForward();
-                },
-
-
-                resetClicked: function () {
-                    Mist.graphsController.stream.start();
-                },
-
-
-                pauseClicked: function () {
-                    Mist.graphsController.stream.stop();
-                },
-
-
                 timeWindowChanged: function () {
                     var newTimeWindow = $('#time-window-control select').val();
-                    Mist.graphsController.resolution.change(newTimeWindow);
+                    if (newTimeWindow == 'range') {
+                        $('#pick-range').popup('open');
+                        var from = Mist.graphsController.fetchStatsArgs.from;
+                        var until = Mist.graphsController.fetchStatsArgs.until;
+                        $('#pick-range #range-start').val(new Date(from).toLocaleString());
+                        $('#pick-range #range-stop').val(new Date(until).toLocaleString());
+                    } else {
+                        Mist.graphsController.resolution.change(newTimeWindow);
+                    }
+                },
 
-                    // Update cookie
-                    var entry = Mist.cookiesController.getSingleMachineEntry(
-                        this.machine);
-                    entry.timeWindow = newTimeWindow;
-                    Mist.cookiesController.setSingleMachineEntry(
-                        this.machine, entry);
+
+                _openRangeSelectionPopup: function () {
+                    $('#pick-range').popup('open');
+                    var from = Mist.graphsController.fetchStatsArgs.from;
+                    var until = Mist.graphsController.fetchStatsArgs.until;
+                    $('#pick-range #range-start').val(new Date(from).toLocaleString());
+                    $('#pick-range #range-stop').val(new Date(until).toLocaleString());
+                },
+
+                _closeRangeSelectionPopup: function () {
+                    $('#pick-range').popup('close');
+                },
+
+                rangeOkClicked: function () {
+                    Mist.graphsController.history.change({
+                        timeWindow: 'range',
+                        from: new Date($('#pick-range #range-start').val()),
+                        until: new Date($('#pick-range #range-stop').val())
+                    });
+                    $('#pick-range').popup('close');
+                },
+
+                rangeBackClicked: function () {
+                    $('#pick-range').popup('close');
                 },
 
 
@@ -459,11 +466,11 @@ define('app/views/machine_monitoring',
                         canModify: true,
                         canControl: true,
                         canMinimize: true,
-                        timeWindow: cookie.timeWindow,
                     }
                 });
 
                 Ember.run.next(function () {
+                    return;
                     $('#time-window-control select')
                         .val(cookie.timeWindow)
                         .trigger('change');

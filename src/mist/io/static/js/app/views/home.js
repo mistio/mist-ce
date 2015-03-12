@@ -105,29 +105,39 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
             //
 
 
-            backClicked: function () {
-                Mist.graphsController.history.goBack();
-            },
-
-
-            forwardClicked: function () {
-                Mist.graphsController.history.goForward();
-            },
-
-
-            resetClicked: function () {
-                Mist.graphsController.stream.start();
-            },
-
-
-            pauseClicked: function () {
-                Mist.graphsController.stream.stop();
-            },
-
-
             timeWindowChanged: function () {
                 var newTimeWindow = $('#time-window-control select').val();
-                Mist.graphsController.resolution.change(newTimeWindow);
+                if (newTimeWindow == 'range') {
+                    this._openRangeSelectionPopup();
+                } else {
+                    Mist.graphsController.resolution.change(newTimeWindow);
+                }
+            },
+
+
+            _openRangeSelectionPopup: function () {
+                $('#pick-range').popup('open');
+                var from = Mist.graphsController.fetchStatsArgs.from;
+                var until = Mist.graphsController.fetchStatsArgs.until;
+                $('#pick-range #range-start').val(new Date(from).toLocaleString());
+                $('#pick-range #range-stop').val(new Date(until).toLocaleString());
+            },
+
+            _closeRangeSelectionPopup: function () {
+                $('#pick-range').popup('close');
+            },
+
+            rangeOkClicked: function () {
+                Mist.graphsController.history.change({
+                    timeWindow: 'range',
+                    from: new Date($('#pick-range #range-start').val()),
+                    until: new Date($('#pick-range #range-stop').val())
+                });
+                this._closeRangeSelectionPopup();
+            },
+
+            rangeBackClicked: function () {
+                this._closeRangeSelectionPopup();
             },
 
 
