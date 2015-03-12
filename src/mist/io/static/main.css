@@ -480,6 +480,12 @@ ul.checkbox-list li label {
 
 /* Other
 -----------------------------------------------------------------------------------------------------------*/
+#list-divider {
+    background-color: #D3D3D3;
+    font-size: 16px;
+    font-weight: bold;
+}
+
 #hidden-shell-iframe {
     display: none;
 }

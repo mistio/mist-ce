@@ -60,7 +60,7 @@
 
     <div id="select-machines-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
         <ul data-role="listview">
-            <li data-icon="false" data-role="list-divider" style="background-color: #D3D3D3; font-size: 16px; font-weight: bold">
+            <li id="list-divider" data-role="list-divider">
                 Selection
             </li>
             <li data-icon="false">
@@ -79,7 +79,7 @@
                 {{/if}}
             {{/each}}
 
-            <li data-icon="false" data-role="list-divider" style="background-color: #D3D3D3; font-size: 16px; font-weight: bold">
+            <li id="list-divider" data-role="list-divider">
                 Sort By
             </li>
             <li data-icon="false">
