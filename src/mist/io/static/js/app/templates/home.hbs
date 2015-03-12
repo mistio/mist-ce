@@ -83,7 +83,6 @@
                         </li>
                     </ul>
                 </div>
-
             </div>
 
             <div class="ui-block-b">
@@ -91,7 +90,7 @@
                 {{#if Mist.monitored_machines.length}}
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents header">
                         <li class="ui-li-divider ui-bar-c ui-first-child">Incidents</li>
-                        <li class="ui-li-divider ui-bar-c ui-last-child" style="display:none;"></li>
+                        <li class="ui-li-divider ui-bar-c ui--child" style="display:none;"></li>
                     </ul>
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents">
                         {{#each Mist.openIncidents}}
@@ -109,7 +108,7 @@
                                 {{/if}}
                                 </span>
                                 <span class="time">
-                                    {{this.duration}}
+                                    {{this.prettyTime}}
                                 </span>
                             </a>
                         </li>

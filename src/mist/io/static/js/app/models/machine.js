@@ -96,6 +96,11 @@ define('app/models/machine', ['ember'],
             }.property('Mist.keysController.content.@each.machines'),
 
 
+            hasOpenIncident: function () {
+                return !!Mist.openIncidents.findBy('machineId', this.get('id'));
+            }.property('Mist.openIncidents.@each.machine'),
+
+
             /**
              *
              *  Initialization

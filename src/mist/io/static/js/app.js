@@ -833,7 +833,7 @@ var setupLogsSocketEvents = function (socket, callback) {
             });
             Mist.set('openIncidents', models);
         });
-    }).on('recent_incidents', function (closedIncidents) {
+    }).on('closed_incidents', function (closedIncidents) {
         require(['app/models/story'], function (StoryModel) {
             var models = closedIncidents.map(function (incident) {
                 return StoryModel.create(incident);
@@ -841,7 +841,8 @@ var setupLogsSocketEvents = function (socket, callback) {
             Mist.set('closedIncidents', models);
         });
     }).emit('ready');
-
+    Mist.set('openIncidents', []);
+    Mist.set('closedIncidents', [])
     if (callback)
         callback();
 };

@@ -67,7 +67,12 @@ define('app/models/story', ['app/models/base'],
 
             closed: function () {
                 return new Date().diffToString(new Date(parseInt(this.get('finishedAt') * 1000)));
-            }.property('finishedAt', 'Mist.clock.minute')
+            }.property('finishedAt', 'Mist.clock.minute'),
+
+
+            prettyTime: function () {
+                return new Date(parseInt(this.get('startedAt') * 1000)).getTimeFromNow().replace(' ago', '');
+            }.property('startedAt', 'Mist.clock.second'),
         });
     }
 );
