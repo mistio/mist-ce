@@ -1176,6 +1176,10 @@ def get_machine_actions(machine_from_api, conn, extra):
         # in libvirt a terminated machine can be started
             can_start = True
 
+    if conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD] and machine_from_api.state is NodeState.PENDING:
+        can_start = True
+        can_stop = True
+
     if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
         # allow only reboot action for libvirt hypervisor
         can_stop = False
