@@ -11,6 +11,12 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
         return App.HomeView = PageView.extend({
 
 
+            hasIncidents: function () {
+                if (Mist.openIncidents)
+                    return !!Mist.openIncidents.length;
+            }.property('Mist.openIncidents'),
+
+
             //
             //
             //  Initialization
@@ -59,6 +65,7 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
             //
             //
 
+
             showGraphs: function () {
 
                 if (Mist.graphsController.isOpen)
@@ -97,47 +104,6 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
                         historyWidgetPosition: 'bottom',
                     }
                 });
-            },
-
-
-            //
-            // Proxy actions for graph list control view
-            //
-
-
-            timeWindowChanged: function () {
-                var newTimeWindow = $('#time-window-control select').val();
-                if (newTimeWindow == 'range') {
-                    this._openRangeSelectionPopup();
-                } else {
-                    Mist.graphsController.resolution.change(newTimeWindow);
-                }
-            },
-
-
-            _openRangeSelectionPopup: function () {
-                $('#pick-range').popup('open');
-                var from = Mist.graphsController.fetchStatsArgs.from;
-                var until = Mist.graphsController.fetchStatsArgs.until;
-                $('#pick-range #range-start').val(new Date(from).toLocaleString());
-                $('#pick-range #range-stop').val(new Date(until).toLocaleString());
-            },
-
-            _closeRangeSelectionPopup: function () {
-                $('#pick-range').popup('close');
-            },
-
-            rangeOkClicked: function () {
-                Mist.graphsController.history.change({
-                    timeWindow: 'range',
-                    from: new Date($('#pick-range #range-start').val()),
-                    until: new Date($('#pick-range #range-stop').val())
-                });
-                this._closeRangeSelectionPopup();
-            },
-
-            rangeBackClicked: function () {
-                this._closeRangeSelectionPopup();
             },
 
 

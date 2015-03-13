@@ -31,7 +31,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             resizeLock: null,
             pendingRequests: [],
             fetchingStats: null,
-            fetchingStatsArgs: null,
+            fetchStatsArgs: {},
             config: Ember.Object.create({
                 requestMethod: 'Socket',
                 timeWindow: TIME_WINDOW_MAP.minutes,
@@ -420,6 +420,34 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                         from: args.from,
                         until: args.until,
                     });
+                },
+
+                goBack: function () {
+                    this.parent._clearPendingRequests();
+                    this.parent.stream.stop();
+                    this.parent._fetchStats({
+                        from: this.parent.fetchStatsArgs.from -
+                            this.parent.config.timeWindow,
+                        until: this.parent.fetchStatsArgs.from
+                    });
+                },
+
+
+                goForward: function () {
+                    this.parent._clearPendingRequests();
+                    if (this.isInFuture(this.parent.fetchStatsArgs.until))
+                        this.parent.stream.start();
+                    else
+                        this.parent._fetchStats({
+                            from: this.parent.fetchStatsArgs.until,
+                            until: this.parent.fetchStatsArgs.until +
+                                this.parent.config.timeWindow
+                        });
+                },
+
+
+                isInFuture: function (until) {
+                    return Date.now() <= until;
                 },
             }),
 

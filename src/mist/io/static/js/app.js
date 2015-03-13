@@ -1519,25 +1519,25 @@ String.prototype.decapitalize = function () {
     return this.charAt(0).toLowerCase() + this.slice(1);
 }
 
-Date.prototype.getPrettyTime = function () {
+Date.prototype.getPrettyTime = function (noSeconds) {
 
     var hour = this.getHours();
     var min = this.getMinutes();
     var sec = this.getSeconds();
 
     var ret = (hour < 10 ? '0' : '') + hour + ':' +
-        (min < 10 ? '0' : '') + min + ':' +
-        (sec < 10 ? '0' : '') + sec;
+        (min < 10 ? '0' : '') + min +
+        (noSeconds ? '' : (':' + (sec < 10 ? '0' : '') + sec));
 
     return ret;
 }
 
-Date.prototype.getPrettyDate = function () {
-    return this.getMonthName() + ' ' + this.getDate() + ', ' + this.getFullYear();
+Date.prototype.getPrettyDate = function (shortMonth) {
+    return this.getMonthName(shortMonth) + ' ' + this.getDate() + ', ' + this.getFullYear();
 }
 
-Date.prototype.getPrettyDateTime = function () {
-    return this.getPrettyDate() + ', ' + this.getPrettyTime();
+Date.prototype.getPrettyDateTime = function (shortMonth, noSeconds) {
+    return this.getPrettyDate(shortMonth) + ', ' + this.getPrettyTime(noSeconds);
 }
 
 Date.prototype.getMonthName = function (short) {

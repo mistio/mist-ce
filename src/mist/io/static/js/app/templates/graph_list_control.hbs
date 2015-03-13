@@ -1,18 +1,71 @@
 <div id="graph-list-control">
 
     <div id="history-control" class="ui-mini">
+        <!--
+            Back Button
+        -->
+        <a id="history-control-back"
+            class="time
+                ui-btn
+                ui-mini
+                ui-corner-all
+                ui-btn-inline
+                ui-btn-icon-notext
+                ui-icon-arrow-l"
+            {{action "backClicked" target="view"}}>
+        </a>
+        <!--
+            Forward Button
+        -->
+        {{#unless Mist.graphsController.stream.isStreaming}}
+            <a id="history-control-forward"
+                class="time
+                    ui-btn
+                    ui-mini
+                    ui-corner-all
+                    ui-btn-inline
+                    ui-btn-icon-notext
+                    ui-icon-arrow-r"
+                {{action "forwardClicked" target="view"}}>
+            </a>
+        {{/unless}}
         <div id="time-window-control" class="ui-mini">
-            <select data-inline="true" data-shadow="false" data-mini="true"
-                {{action "timeWindowChanged" on="change" target="view.actionProxy"}}>
-                    <option value="minutes" selected='true'>last 10 mins</option>
-                    <option value="hour">last hour</option>
-                    <option value="day">last day</option>
-                    <option value="week">last week</option>
-                    <option value="month">last month</option>
-                    <option value="range">from / to</option>
-            </select>
+            <a class="ui-btn ui-btn-icon-right ui-icon-carat-d"
+                {{action "timeWindowClicked" target="view"}}>
+                    {{view.timeWindowText}}
+            </a>
         </div>
+
     </div>
+
+    <div id="change-time-window" data-role="popup" data-transition="flip" data-position-to="#time-window-control">
+        <ul data-role='listview'>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "minutes" "last 10 mins"target="view"}}>
+                    last 10 mins</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "hour" "last hour" target="view"}}>
+                    last hour</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "day" "last day" target="view"}}>
+                    last day</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "week" "last week" target="view"}}>
+                    last week</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "month" "last month" target="view"}}>
+                    last month</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "range" "range" target="view"}}>from / to</a>
+            </li>
+        </ul>
+    </div>
+
 
     <!--
         Pick Range Popup
@@ -59,11 +112,11 @@
                         data-type="horizontal">
 
                         <a class="ui-btn"
-                            {{action "rangeBackClicked" target="view.actionProxy"}}>
+                            {{action "rangeBackClicked" target="view"}}>
                                 Back
                         </a>
                         <a id="key-add-ok" class="ui-btn ui-btn-d"
-                            {{action "rangeOkClicked" target="view.actionProxy"}}>
+                            {{action "rangeOkClicked" target="view"}}>
                                 OK
                         </a>
                     </div>

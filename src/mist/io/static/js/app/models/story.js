@@ -73,6 +73,15 @@ define('app/models/story', ['app/models/base'],
             prettyTime: function () {
                 return new Date(parseInt(this.get('startedAt') * 1000)).getTimeFromNow().replace(' ago', '');
             }.property('startedAt', 'Mist.clock.second'),
+
+
+            ruleText: function () {
+                return this.get('logs')[0].condition;
+            }.property('logs.@each'),
+
+            isClosed: function () {
+                return !!this.get('finishedAt');
+            }.property('finishedAt')
         });
     }
 );

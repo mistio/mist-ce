@@ -26,7 +26,7 @@
 
         {{#if Mist.backendsController.length}}
         <div class="ui-grid-a ui-responsive">
-            <div class="ui-block-a">
+            <div {{bind-attr class="view.hasIncidents::full-width :ui-block-a"}}>
                 <div class="ui-body">
                     <!-- Navigation -->
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
@@ -85,56 +85,52 @@
                 </div>
             </div>
 
-            <div class="ui-block-b">
+            <div {{bind-attr class="view.hasIncidents::no-width :ui-block-b"}}>
                 <div class="ui-body">
-                {{#if Mist.monitored_machines.length}}
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents header">
                         <li class="ui-li-divider ui-bar-c ui-first-child">Incidents</li>
                         <li class="ui-li-divider ui-bar-c ui--child" style="display:none;"></li>
                     </ul>
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents">
                         {{#each Mist.openIncidents}}
-                        <li class="ui-bar-b incident">
-                            <a class="ui-icon-alert ui-btn ui-btn-icon-right"
-                                {{action "incidentClicked" this target="view"}}>
-                                <span class="machine">
-                                    {{this.machine.name}}:
-                                </span>
-                                <span class="rule-condition">
-                                {{#if this.ruleId}}
-                                    {{this.rule.metric.name}} {{this.rule.operator.symbol}}
-                                    {{this.rule.value}} {{this.rule.metric.unit}} for {{this.rule.aggregate.title}}
-                                    value within {{this.rule.timeWindowToMins}} min(s)
-                                {{/if}}
-                                </span>
-                                <span class="time">
-                                    {{this.prettyTime}}
-                                </span>
-                            </a>
-                        </li>
-                        {{/each}}
-                        {{#each Mist.closedIncidents}}
-                        <li class="ui-mini incident">
-                            <a class="ui-icon-check ui-btn ui-btn-icon-right"
-                                {{action "incidentClicked" this target="view"}}>
-                                <span class="machine">
-                                    {{this.machine.name}}:
-                                </span>
-                                <span class="rule-condition">
-                                {{#if this.ruleId}}
-                                    {{this.rule.metric.name}} {{this.rule.operator.symbol}}
-                                    {{this.rule.value}} {{this.rule.metric.unit}} for {{this.rule.aggregate.title}}
-                                    value within {{this.rule.timeWindowToMins}} min(s)
-                                {{/if}}
-
-                                </span>
-                                for {{this.duration}}
-                                <span class="time">{{this.closed}} ago </span>
-                            </a>
-                        </li>
+                            {{#if this.isClosed}}
+                                <li class="ui-mini incident">
+                                    <a class="ui-icon-check ui-btn ui-btn-icon-right"
+                                        {{action "incidentClicked" this target="view"}}>
+                                        <span class="machine">
+                                            {{this.machine.name}}:
+                                        </span>
+                                        <span class="rule-condition">
+                                        {{#if this.ruleId}}
+                                            {{this.ruleText}}
+                                        {{/if}}
+                                        </span>
+                                        <span class="duration">
+                                            for {{this.duration}}
+                                        </span>
+                                        <span class="time">{{this.closed}} ago </span>
+                                    </a>
+                                </li>
+                            {{else}}
+                                <li class="ui-bar-b incident">
+                                    <a class="ui-icon-alert ui-btn ui-btn-icon-right"
+                                        {{action "incidentClicked" this target="view"}}>
+                                        <span class="machine">
+                                            {{this.machine.name}}:
+                                        </span>
+                                        <span class="rule-condition">
+                                        {{#if this.ruleId}}
+                                            {{this.ruleText}}
+                                        {{/if}}
+                                        </span>
+                                        <span class="time">
+                                            {{this.prettyTime}}
+                                        </span>
+                                    </a>
+                                </li>
+                            {{/if}}
                         {{/each}}
                     </ul>
-                {{/if}}
                 </div>
             </div>
         </div><!-- /grid-a -->
@@ -142,7 +138,7 @@
         {{view "graphList" actionProxyBinding="view"}}
 
         {{#if Mist.isCore}}
-            <div data-role="collapsible" data-collapsed="false">
+            <div class="logs" data-role="collapsible" data-collapsed="false">
                <h4>Activity log</h4>
                {{view "logList"}}
             </div>

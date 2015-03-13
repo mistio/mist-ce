@@ -1,4 +1,3 @@
-
 /* Home Page CSS
 -----------------------------------------------------------------------------------------------------------*/
 #home-page #add-backend-btn {
@@ -20,29 +19,43 @@
     }
 }
 
+#home-page .ui-grid-a .ui-block-a,
+#home-page .ui-grid-a .ui-block-b {
+    transition: width .5s;
+    -webkit-transition: width .5s;
+}
+
 #home-page .ui-grid-a {
    margin-top: -20px;
    clear: both;
 }
 
+#home-page ul.incidents {
+    margin-top: 0;
+    margin-left: 1em;
+    max-height: 145px;
+    overflow-y: auto;
+}
+
 #home-page ul.incidents.header {
     margin-top: 1em;
-    margin-bottom:0;
+    margin-bottom: 0;
     margin-left: 1em;
 }
 
-#home-page ul.incidents {
-    max-height: 146px;
-    margin-left: 1em;
-    margin-top: 0;
-    overflow-y: auto;
-}
 
 @media (max-width: 35em) {
     #home-page ul.incidents {
         margin-left: 0;
         margin-top: 0;
     }
+}
+
+ul.incidents span.time {
+    float: right;
+    font-weight: bold;
+    opacity: .75;
+    margin-bottom: -5px;
 }
 
 ul.incidents .ui-icon-alert:after, #machines .ui-icon-alert:after {
@@ -60,6 +73,8 @@ ul.incidents .ui-icon-check:after {
 ul.incidents li a.ui-btn{
     font-weight: normal;
     white-space: normal;
+    padding-left: 16px !important;
+    padding-right: 42px !important;
 }
 
 ul.incidents li a.ui-btn:after {
@@ -75,27 +90,6 @@ ul.incidents li a .machine {
     padding: 0;
 }
 
-#home-page ul.incidents li.incident a {
-    padding-top: 0.5em !important;
-    padding-bottom: 0.5em !important;
-}
-
-#home-page ul.incidents span.rule-condition {
-    font-size: 14px;
-}
-
-#home-page ul.incidents span.duration {
-    font-size: 12px;
-    opacity: .75;
-    margin-left: .4em;
-}
-
-#home-page ul.incidents span.machine {
-    display: inline-block;
-}
-
-#home-page ul.incidents span.time {
-    font-size: 12px;
-    opacity: .75;
-    float: right;
+#home-page .logs {
+    clear: both;
 }

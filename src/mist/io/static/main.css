@@ -709,3 +709,11 @@ ul.checkbox-list li label {
 .ui-body-a {
     border-width: 0px;
 }
+
+.full-width {
+    width: 100% !important;
+}
+
+.no-width {
+    width: 0% !important;
+}
