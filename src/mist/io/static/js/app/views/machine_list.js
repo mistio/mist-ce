@@ -14,6 +14,7 @@ define('app/views/machine_list', ['app/views/mistscreen'],
              */
 
              machines:[],
+             hasSortMode: false,
 
             /**
              *
@@ -89,7 +90,18 @@ define('app/views/machine_list', ['app/views/mistscreen'],
                     log(backend.machines.content.length);
                 });
                 this.set("machines",machineList);
+                this.sortMachines(this.hasSortMode);
             },
+
+            sortMachines: function (mode){
+                if(mode){
+                    if(mode=='hasMonitoring')
+                        this.set("machines",this.machines.sortBy(mode).reverse());
+                    else
+                        this.set("machines",this.machines.sortBy(mode));
+                }
+            },
+
 
             /**
              *
@@ -140,10 +152,8 @@ define('app/views/machine_list', ['app/views/mistscreen'],
                 sortByModeClicked: function (mode) {
 
                     $('#select-machines-popup').popup('close');
-                    if(mode=='hasMonitoring')
-                        this.set("machines",this.machines.sortBy(mode).reverse());
-                    else
-                        this.set("machines",this.machines.sortBy(mode));
+                    this.set("hasSortMode",mode);
+                    this.sortMachines(mode);
                 }
             }
         });
