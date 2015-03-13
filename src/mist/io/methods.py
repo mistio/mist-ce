@@ -2172,7 +2172,13 @@ def ssh_command(user, backend_id, machine_id, host, command,
 
     """
 
-    shell = Shell(host)
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    else:
+        backend = user.backends[backend_id]
+        provider = backend.provider
+
+    shell = Shell(host, provider=provider)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
                                            key_id, username, password, port)
     retval, output = shell.command(command)
@@ -2950,7 +2956,6 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='',
         macs[ips[i]] = m[i]
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
-
 
     return {
         'uptime': uptime,

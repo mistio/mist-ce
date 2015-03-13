@@ -11,6 +11,7 @@ from StringIO import StringIO
 import paramiko
 import websocket
 import socket
+import uuid
 
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
@@ -415,9 +416,63 @@ class DockerShell(object):
 
     def disconnect(self, **kwargs):
         try:
+            self.ws.send_close()
             self.ws.close()
         except:
             pass
+
+    def _clean_and_clear(self):
+        buffer_breaker = uuid.uuid4().hex
+        self.ws.send("echo '%s'\n" % buffer_breaker)
+        while True:
+            buffer = ""
+            for line in self.ws.recv():
+                buffer = buffer + line
+            log.error("================================")
+            log.error(buffer)
+            if buffer_breaker in buffer:
+                log.error("================================")
+                log.error("Will return")
+                return
+
+    def _wrap_command(self, cmd):
+        if cmd[-1] is not "\n":
+            cmd = cmd + "\n"
+        return cmd
+
+    def command(self, cmd):
+        self.connect()
+        self._clean_and_clear()
+        log.error('??????????????????????????')
+        log.error('UNTIL EDO')
+
+        output = ''
+        retval = 0
+        cmd = self._wrap_command(cmd)
+        self.ws.send(cmd)
+
+        buffer_breaker = uuid.uuid4().hex
+        self.ws.send("echo '%s'\n" % buffer_breaker)
+        while True:
+            buffer = ""
+            for line in self.ws.recv():
+                buffer = buffer + line
+                output = output + line
+
+            log.error("???????????????????????????????????????")
+            log.error(output)
+            log.error(buffer)
+
+            if buffer_breaker + "\n" in buffer_breaker:
+                log.error("????????????????????????????")
+                log.error('Will break')
+                break
+
+        log.error("=================================")
+        log.error('Did BREAK')
+        log.error(output)
+
+        return retval, output
 
     def __del__(self):
         self.disconnect()
@@ -448,7 +503,6 @@ class Shell(object):
 
     def autoconfigure(self, user, backend_id, machine_id, key_id=None,
                       username=None, password=None, port=22):
-
         if isinstance(self._shell, ParamikoShell):
             return self._shell.autoconfigure(user, backend_id, machine_id, key_id=key_id,
                                              username=username, password=password, port=port)
@@ -480,6 +534,8 @@ class Shell(object):
     def command(self, cmd, pty=True):
         if isinstance(self._shell, ParamikoShell):
             return self._shell.command(cmd, pty=pty)
+        elif isinstance(self._shell, DockerShell):
+            return self._shell.command(cmd)
 
     def command_stream(self, cmd):
         if isinstance(self._shell, ParamikoShell):
