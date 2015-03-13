@@ -40,9 +40,7 @@
             </h4>
             <ul data-role="listview" data-theme="a">
                 {{#each Mist.backendsController.content}}
-                    {{#if this.enabled}}
-                        {{#unless this.isBareMetal}}
-                        {{#unless this.isLibvirt}}
+                        {{#if this.canCreateMachine}}
                             <li data-icon="false">
                                 <a {{action "selectProvider" this target="view"}}>
                                     <span class="provider-icon-small">
@@ -51,9 +49,7 @@
                                     {{this.title}}
                                 </a>
                             </li>
-                        {{/unless}}
-                        {{/unless}}
-                    {{/if}}
+                        {{/if}}
                 {{/each}}
             </ul>
         </div>

@@ -69,6 +69,15 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 return this.provider == 'docker';
             }.property('provider'),
 
+            isBareMetal: function () {
+                return this.provider == 'bare_metal';
+            }.property('provider'),
+
+            canCreateMachine: function () {
+                return this.enabled && 
+                    ['indonesian_vcloud', 'bare_metal', 'libvirt'].indexOf(this.provider) == -1;
+            }.property('provider', 'enabled'),
+
             className: function () {
                 return 'provider-' + this.getSimpleProvider();
             }.property('provider'),
@@ -83,8 +92,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             load: function () {
 
                 Ember.run(this, function () {
-
-                    this.set('isBareMetal', this.provider == 'bare_metal');
 
                     // Add controllers
                     this.sizes = SizesController.create({backend: this, content: []});
