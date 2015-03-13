@@ -248,6 +248,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_vcloud(title, provider, params)
     elif provider == 'libvirt':
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
+    elif provider == 'hostvirtual':
+        backend_id, backend = _add_backend_hostvirtual(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -713,6 +715,22 @@ def _add_backend_openstack(title, provider, params):
     return backend_id, backend
 
 
+def _add_backend_hostvirtual(title, provider, params):
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = api_key
+    backend.apisecret = api_key
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
 def rename_backend(user, backend_id, new_name):
     """Renames backend with given backend_id."""
 
@@ -1067,7 +1085,7 @@ def connect_provider(backend):
     elif backend.provider == Provider.HPCLOUD:
         conn = driver(backend.apikey, backend.apisecret, backend.tenant_name,
                       region=backend.region)
-    elif backend.provider == Provider.LINODE:
+    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL]:
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
@@ -1139,7 +1157,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT):
+                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL):
         can_tag = False
 
     # for other states
@@ -1309,7 +1327,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
-
     machine_name = machine_name_validator(conn.type, machine_name)
     if conn.type is Provider.DOCKER:
         if key_id:
@@ -1375,6 +1392,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                       machine_name, image, size,
                                       location)
+    elif conn.type == Provider.HOSTVIRTUAL:
+        node = _create_machine_hostvirtual(conn, public_key, machine_name, image,
+                                         size, location)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -1820,6 +1840,31 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
             raise MachineCreationError("Digital Ocean, got exception %s" % e, e)
 
         return node
+
+
+def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, location):
+    """Create a machine in HostVirtual.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+
+    auth = NodeAuthSSHKey(pubkey=key)
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            auth=auth,
+            location=location
+        )
+    except Exception as e:
+        raise MachineCreationError("HostVirtual, got exception %s" % e, e)
+
+    return node
 
 
 def _create_machine_azure(conn, key_name, private_key, public_key,
