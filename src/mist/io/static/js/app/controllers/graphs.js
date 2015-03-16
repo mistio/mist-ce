@@ -361,21 +361,18 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 //
 
 
-                change: function (newTimeWindow, forceChange, rangeStart, rangeEnd) {
+                change: function (newTimeWindow) {
 
                     var newTimeWindow = TIME_WINDOW_MAP[newTimeWindow];
                     var oldTimeWindow = this.parent.config.timeWindow;
 
-                    if ((oldTimeWindow != newTimeWindow)|| forceChange) {
-
-                        this.parent.stream.stop();
-                        this.parent.config.setProperties({
-                            timeWindow: newTimeWindow,
-                            measurementStep: newTimeWindow /
-                                DISPLAYED_DATAPOINTS,
-                        });
-                        this.parent.stream.start();
-                    }
+                    this.parent.stream.stop();
+                    this.parent.config.setProperties({
+                        timeWindow: newTimeWindow,
+                        measurementStep: newTimeWindow /
+                            DISPLAYED_DATAPOINTS,
+                    });
+                    this.parent.stream.start();
                 }
             }),
 
@@ -434,20 +431,23 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
                 goForward: function () {
+
                     this.parent._clearPendingRequests();
-                    if (this.isInFuture(this.parent.fetchStatsArgs.until))
-                        this.parent.stream.start();
+
+                    var timeWindow = this.parent.config.timeWindow;
+                    var from = this.parent.fetchStatsArgs.until;
+                    var until = from + timeWindow;
+
+                    if (new Date(until).isFuture())
+                        this.parent._fetchStats({
+                            from: Date.now() - timeWindow,
+                            until: Date.now(),
+                        });
                     else
                         this.parent._fetchStats({
-                            from: this.parent.fetchStatsArgs.until,
-                            until: this.parent.fetchStatsArgs.until +
-                                this.parent.config.timeWindow
+                            from: from,
+                            until: until
                         });
-                },
-
-
-                isInFuture: function (until) {
-                    return Date.now() <= until;
                 },
             }),
 

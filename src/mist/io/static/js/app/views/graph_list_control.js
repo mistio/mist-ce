@@ -128,8 +128,8 @@ define('app/views/graph_list_control', ['app/views/templated'],
                     }
                     Mist.graphsController.history.change({
                         timeWindow: 'range',
-                        from: from,
-                        until: until,
+                        from: from.getTime(),
+                        until: until.getTime(),
                     });
                     this._closeRangeSelectionPopup();
                 },

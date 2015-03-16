@@ -61,7 +61,7 @@
                     last month</a>
             </li>
             <li data-icon="false">
-                <a {{action "timeWindowChanged" "range" "range" target="view"}}>from / to</a>
+                <a {{action "timeWindowChanged" "range" "range" target="view"}}>Custom range</a>
             </li>
         </ul>
     </div>
@@ -95,11 +95,11 @@
                     <h1 class="ui-title">Select Range</h1>
                 </div>
                 <div class="ui-content ui-body-a" role="main">
-                    <label>From</label>
+                    <label>From:</label>
                     {{view Mist.TextField
                         id="range-start"
                         placeholder="range start"}}
-                    <label>To</label>
+                    <label>To:</label>
                     {{view Mist.TextField
                         id="range-stop"
                         placeholder="range stop"}}
