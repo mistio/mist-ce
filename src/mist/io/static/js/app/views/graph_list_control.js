@@ -115,8 +115,15 @@ define('app/views/graph_list_control', ['app/views/templated'],
                         Mist.notificationController.timeNotify('Invalid Range', 2000);
                         return;
                     }
-                    if (until - from < TIME_MAP.SECOND * 10 * DISPLAYED_DATAPOINTS) {
-                        Mist.notificationController.timeNotify('Range is too narrow', 2000);
+                    var minRange = TIME_MAP.SECOND * 10 * DISPLAYED_DATAPOINTS;
+                    if (until - from < minRange) {
+                        Mist.notificationController.timeNotify('Range is too narrow.' +
+                            ' Must be at least: ' + parseInt(minRange / TIME_MAP.MINUTE) +
+                            ' mins.' , 3000);
+                        return;
+                    }
+                    if (until.isFuture()) {
+                        Mist.notificationController.timeNotify('Invalid Date: "To"', 2000);
                         return;
                     }
                     Mist.graphsController.history.change({

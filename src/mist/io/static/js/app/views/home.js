@@ -54,7 +54,13 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
                 },
 
                 incidentClicked: function (incident) {
-                    Mist.Router.router.transitionTo('machine', incident.get('machine'));
+                    var machine = incident.get('machine');
+                    if (!machine)
+                        Mist.notificationController.timeNotify(
+                            'Machine not found', 2000);
+                    else
+                        Mist.Router.router.transitionTo('machine',
+                            incident.get('machine'));
                 }
             },
 

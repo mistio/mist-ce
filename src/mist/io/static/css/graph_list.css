@@ -33,7 +33,7 @@
     font-weight: normal;
 }
 
-#history-control div.ui-select {
+#history-control #time-window-control {
     text-align: center;
     margin: 0;
     border-width: 1px 0px;

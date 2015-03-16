@@ -45,7 +45,8 @@
 
 
 @media (max-width: 35em) {
-    #home-page ul.incidents {
+    #home-page ul.incidents,
+    #home-page ul.incidents.header {
         margin-left: 0;
         margin-top: 0;
     }

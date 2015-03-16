@@ -2,8 +2,8 @@ startTimer();
 
 window.App = new Object();
 
-DEBUG_SOCKET = true;
-DEBUG_STATS = true;
+DEBUG_SOCKET = false;
+DEBUG_STATS = false;
 DEBUG_LOGS = false;
 
 // Define libraries
@@ -1517,7 +1517,11 @@ var extendEmberView = function () {
 
 String.prototype.decapitalize = function () {
     return this.charAt(0).toLowerCase() + this.slice(1);
-}
+};
+
+Date.prototype.isFuture = function () {
+    return this > new Date();
+};
 
 Date.prototype.getPrettyTime = function (noSeconds) {
 
@@ -1560,9 +1564,9 @@ Date.prototype.diffToString = function (date) {
     else if (diff < TIME_MAP.DAY)
         ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
     else if (diff < TIME_MAP.MONTH)
-        ret = parseInt(diff / TIME_MAP.MONTH) + ' day';
+        ret = parseInt(diff / TIME_MAP.DAY) + ' day';
     else if (diff < TIME_MAP.YEAR)
-        ret = parseInt(diff / TIME_MAP.YEAR) + ' month';
+        ret = parseInt(diff / TIME_MAP.MONTH) + ' month';
     else
         ret = 'TOO LONG!';
 

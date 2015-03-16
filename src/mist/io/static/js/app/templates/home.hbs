@@ -98,12 +98,10 @@
                                     <a class="ui-icon-check ui-btn ui-btn-icon-right"
                                         {{action "incidentClicked" this target="view"}}>
                                         <span class="machine">
-                                            {{this.machine.name}}:
+                                            {{this.machineName}}:
                                         </span>
                                         <span class="rule-condition">
-                                        {{#if this.ruleId}}
                                             {{this.ruleText}}
-                                        {{/if}}
                                         </span>
                                         <span class="duration">
                                             for {{this.duration}}
@@ -116,12 +114,10 @@
                                     <a class="ui-icon-alert ui-btn ui-btn-icon-right"
                                         {{action "incidentClicked" this target="view"}}>
                                         <span class="machine">
-                                            {{this.machine.name}}:
+                                            {{this.machineName}}:
                                         </span>
                                         <span class="rule-condition">
-                                        {{#if this.ruleId}}
                                             {{this.ruleText}}
-                                        {{/if}}
                                         </span>
                                         <span class="time">
                                             {{this.prettyTime}}
