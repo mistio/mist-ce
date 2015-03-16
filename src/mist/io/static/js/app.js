@@ -1198,7 +1198,7 @@ function Socket_ (args) {
             events.on.apply(events, arguments);
             if (!socket.$events || !socket.$events[event])
                 socket.on(event, function (response) {
-                    that._log('RECEIVE', response);
+                    that._log('/'+ event, 'RECEIVE', response);
                     events.trigger.call(events, event, response);
                 });
             return this;
@@ -1213,7 +1213,8 @@ function Socket_ (args) {
 
 
         emit: function () {
-            this._log('EMIT', slice(arguments));
+            var args = slice(arguments)
+            this._log('/'+args[0], 'EMIT', args);
             var socket = this.get('socket');
             socket.emit.apply(socket, arguments);
             return this;
