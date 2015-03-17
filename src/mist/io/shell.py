@@ -423,16 +423,19 @@ class DockerShell(object):
 
     def _clean_and_clear(self):
         buffer_breaker = uuid.uuid4().hex
+        log.error("###################################")
+        log.error("UUID")
+        log.error(buffer_breaker)
         self.ws.send("echo '%s'\n" % buffer_breaker)
+        buffer = ""
         while True:
-            buffer = ""
-            for line in self.ws.recv():
-                buffer = buffer + line
-            log.error("================================")
+            buffer = buffer + self.ws.recv()
+            log.error("###################################")
             log.error(buffer)
-            if buffer_breaker in buffer:
-                log.error("================================")
-                log.error("Will return")
+            log.error("###################################")
+            if buffer[-len(buffer_breaker):] == buffer_breaker:
+                log.error("###################################")
+                log.error("MPIKA KI EDO")
                 return
 
     def _wrap_command(self, cmd):
@@ -443,8 +446,6 @@ class DockerShell(object):
     def command(self, cmd):
         self.connect()
         self._clean_and_clear()
-        log.error('??????????????????????????')
-        log.error('UNTIL EDO')
 
         output = ''
         retval = 0
@@ -453,25 +454,16 @@ class DockerShell(object):
 
         buffer_breaker = uuid.uuid4().hex
         self.ws.send("echo '%s'\n" % buffer_breaker)
+        buffer = ""
         while True:
-            buffer = ""
-            for line in self.ws.recv():
-                buffer = buffer + line
-                output = output + line
-
-            log.error("???????????????????????????????????????")
-            log.error(output)
-            log.error(buffer)
-
-            if buffer_breaker + "\n" in buffer_breaker:
-                log.error("????????????????????????????")
-                log.error('Will break')
+            buffer = buffer + self.ws.recv()
+            if buffer[-(len(buffer_breaker)+2):] == buffer_breaker + "\r\n":
+                output = buffer
                 break
 
-        log.error("=================================")
-        log.error('Did BREAK')
+        log.error("#########################################################")
+        log.error("THE COMMAND OUTPUT:")
         log.error(output)
-
         return retval, output
 
     def __del__(self):
@@ -535,6 +527,8 @@ class Shell(object):
         if isinstance(self._shell, ParamikoShell):
             return self._shell.command(cmd, pty=pty)
         elif isinstance(self._shell, DockerShell):
+            log.error("#####################################")
+            log.error("DOcker shell")
             return self._shell.command(cmd)
 
     def command_stream(self, cmd):
