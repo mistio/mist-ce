@@ -3333,6 +3333,8 @@ def get_stats(user, backend_id, machine_id, start='', stop='', step='', metrics=
         return ret
     else:
         log.error("Error getting stats %d:%s", resp.status_code, resp.text)
+        if resp.status_code == 400:
+            raise BadRequestError(resp.text.replace('Bad Request: ', ''))
         raise ServiceUnavailableError(resp.text)
 
 
