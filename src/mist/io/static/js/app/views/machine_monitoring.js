@@ -201,51 +201,6 @@ define('app/views/machine_monitoring',
 
 
                 //
-                // Proxy actions for graph list control view
-                //
-
-
-                timeWindowChanged: function () {
-                    var newTimeWindow = $('#time-window-control select').val();
-                    if (newTimeWindow == 'range') {
-                        $('#pick-range').popup('open');
-                        var from = Mist.graphsController.fetchStatsArgs.from;
-                        var until = Mist.graphsController.fetchStatsArgs.until;
-                        $('#pick-range #range-start').val(new Date(from).toLocaleString());
-                        $('#pick-range #range-stop').val(new Date(until).toLocaleString());
-                    } else {
-                        Mist.graphsController.resolution.change(newTimeWindow);
-                    }
-                },
-
-
-                _openRangeSelectionPopup: function () {
-                    $('#pick-range').popup('open');
-                    var from = Mist.graphsController.fetchStatsArgs.from;
-                    var until = Mist.graphsController.fetchStatsArgs.until;
-                    $('#pick-range #range-start').val(new Date(from).toLocaleString());
-                    $('#pick-range #range-stop').val(new Date(until).toLocaleString());
-                },
-
-                _closeRangeSelectionPopup: function () {
-                    $('#pick-range').popup('close');
-                },
-
-                rangeOkClicked: function () {
-                    Mist.graphsController.history.change({
-                        timeWindow: 'range',
-                        from: new Date($('#pick-range #range-start').val()),
-                        until: new Date($('#pick-range #range-stop').val())
-                    });
-                    $('#pick-range').popup('close');
-                },
-
-                rangeBackClicked: function () {
-                    $('#pick-range').popup('close');
-                },
-
-
-                //
                 //  Proxy actions for graph list bar
                 //
 

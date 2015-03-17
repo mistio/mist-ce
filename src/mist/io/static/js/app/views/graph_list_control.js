@@ -59,19 +59,50 @@ define('app/views/graph_list_control', ['app/views/templated'],
             //
             //
 
+
             _openRangeSelectionPopup: function () {
                 Ember.run.later(this, function () {
                     $('#pick-range').popup('open');
-                    var from = Mist.graphsController.fetchStatsArgs.from;
                     var until = Mist.graphsController.fetchStatsArgs.until;
-                    $('#pick-range #range-start').val(new Date(from).toLocaleString());
-                    $('#pick-range #range-stop').val(new Date(until).toLocaleString());
+                    var from = until - Mist.graphsController.config.timeWindow;
+                    $('#pick-range #range-start').val(new Date(from)
+                        .toLocaleString(undefined, {'hour12': false}));
+                    $('#pick-range #range-stop').val(new Date(until)
+                        .toLocaleString(undefined, {'hour12': false}));
                 }, 300);
             },
 
 
             _closeRangeSelectionPopup: function () {
                 $('#pick-range').popup('close');
+            },
+
+
+            _validateRange: function (from, until) {
+                if (from == 'Invalid Date') {
+                    Mist.notificationController.timeNotify('Invalid Date: "From"', 2000);
+                    return false;
+                }
+                if (until == 'Invalid Date') {
+                    Mist.notificationController.timeNotify('Invalid Date: "To"', 2000);
+                    return false;
+                }
+                if (until <= from) {
+                    Mist.notificationController.timeNotify('Invalid Range', 2000);
+                    return false;
+                }
+                var minRange = TIME_MAP.SECOND * 10 * DISPLAYED_DATAPOINTS;
+                if (until - from < minRange) {
+                    Mist.notificationController.timeNotify('Range is too narrow.' +
+                        ' Must be at least: ' + parseInt(minRange / TIME_MAP.MINUTE) +
+                        ' mins.' , 3000);
+                    return false;
+                }
+                if (until.isFuture()) {
+                    Mist.notificationController.timeNotify('Invalid Date: "To"', 2000);
+                    return false;
+                }
+                return true;
             },
 
 
@@ -101,29 +132,14 @@ define('app/views/graph_list_control', ['app/views/templated'],
 
 
                 rangeOkClicked: function () {
-                    var from = new Date($('#pick-range #range-start').val());
-                    var until = new Date($('#pick-range #range-stop').val());
-                    if (from == 'Invalid Date') {
-                        Mist.notificationController.timeNotify('Invalid Date: "From"', 2000);
-                        return;
+                    var from = $('#pick-range #range-start').val();
+                    var until = $('#pick-range #range-stop').val();
+                    if (until.toLowerCase().trim() === 'now') {
+                        until = Date.now();
                     }
-                    if (until == 'Invalid Date') {
-                        Mist.notificationController.timeNotify('Invalid Date: "To"', 2000);
-                        return;
-                    }
-                    if (until <= from) {
-                        Mist.notificationController.timeNotify('Invalid Range', 2000);
-                        return;
-                    }
-                    var minRange = TIME_MAP.SECOND * 10 * DISPLAYED_DATAPOINTS;
-                    if (until - from < minRange) {
-                        Mist.notificationController.timeNotify('Range is too narrow.' +
-                            ' Must be at least: ' + parseInt(minRange / TIME_MAP.MINUTE) +
-                            ' mins.' , 3000);
-                        return;
-                    }
-                    if (until.isFuture()) {
-                        Mist.notificationController.timeNotify('Invalid Date: "To"', 2000);
+                    from = new Date(from);
+                    until = new Date(until);
+                    if (!this._validateRange(from, until)) {
                         return;
                     }
                     Mist.graphsController.history.change({

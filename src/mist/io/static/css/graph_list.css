@@ -38,16 +38,17 @@
     margin: 0;
     border-width: 1px 0px;
     width: 100%;
-    margin-top: -56px;
+    margin-top: -47px;
     min-width: 190px;
 }
 
 #history-control a.time {
     width: 65px;
-    height: 39px;
+    height: 40px;
     border-radius: 0em;
-    margin: -5px -5px 0px 0px;
+    margin: -6px -5px 0px 0px;
     z-index: 10;
+    border-bottom-width: 0px;
 }
 
 #time-window-control {
@@ -57,7 +58,13 @@
 }
 
 #time-window-control .ui-btn {
-    height: 24px;
+    line-height: 25px;
+    padding-left: 85px !important;
+    padding-right: 80px !important;
+}
+
+#time-window-control.is-streaming .ui-btn {
+    padding-right: 3.1em !important;
 }
 
 #time-window-control span {
@@ -66,8 +73,14 @@
 
 #history-control-forward {
     float: right;
-    margin-top: -57px !important;
+    margin-bottom: -57px !important;
+    margin-right: 0px !important;
 }
+
+#monitoring-collapsible h4.ui-collapsible-heading a {
+    height: 21px;
+}
+
 .graph-button {
     display: inline-block;
     width: 150px;

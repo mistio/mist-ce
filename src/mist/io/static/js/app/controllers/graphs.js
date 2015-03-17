@@ -16,6 +16,24 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             month: TIME_MAP.MONTH,
         };
 
+        var STEP_MAP = [
+            TIME_MAP.SECOND * 10,
+            TIME_MAP.SECOND * 20,
+            TIME_MAP.SECOND * 30,
+            TIME_MAP.MINUTE,
+            TIME_MAP.MINTUE * 2,
+            TIME_MAP.MINTUE * 5,
+            TIME_MAP.MINUTE * 10,
+            TIME_MAP.MINTUE * 20,
+            TIME_MAP.MINUTE * 30,
+            TIME_MAP.HOUR,
+            TIME_MAP.HOUR * 2,
+            TIME_MAP.HOUR * 6,
+            TIME_MAP.HOUR * 8,
+            TIME_MAP.HOUR * 12,
+            TIME_MAP.HOUR * 24,
+        ];
+
         return Ember.ArrayController.extend(Ember.Evented, {
 
 
@@ -137,13 +155,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 if (!this.get('isOpen')) return;
 
-                if (DEBUG_STATS) {
-                    info('Requesting stats from: ' +
-                        new Date(args.from).getPrettyDateTime() +
-                        ' until: ' +
-                        new Date(args.until).getPrettyDateTime());
-                }
-
                 this._clearPendingRequests();
                 this.setProperties({
                     fetchingStats: true,
@@ -221,13 +232,22 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             _generatePayload: function (request) {
-                return {
+
+                var payload = {
                     request_id: request.id,
                     start: parseInt(request.from / 1000) - 50,
                     stop: parseInt(request.until / 1000) + 50,
                     step: parseInt(this.config.measurementStep / 1000),
                     metrics: request.metrics
                 };
+                if (DEBUG_STATS) {
+                    info('Requesting stats from: ' +
+                        new Date(payload.start).getPrettyDateTime() +
+                        ' until: ' +
+                        new Date(payload.stop).getPrettyDateTime(),
+                        payload);
+                }
+                return payload
             },
 
 
@@ -251,14 +271,22 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 var that = Mist.graphsController;
                 var request = that.pendingRequests.findBy(
                     'id', parseInt(data.request_id));
-                if (request)
-                    that._handleResponse(request, data.metrics);
+                if (request) {
+                    if (data.error) {
+                        Mist.notificationController.notify(data.error);
+                        this._clearPendingRequests();
+                    } else
+                        that._handleResponse(request, data.metrics, data);
+                }
                 that.trigger('onFetchStatsFromSocket', data);
             },
 
 
-            _handleResponse: function (request, response) {
+            _handleResponse: function (request, response,r) {
 
+                if (DEBUG_STATS) {
+                    info('Stats response: ', request, r);
+                }
                 request.datasources.forEach(function (datasource) {
 
                     if (!response[datasource.metric.id]) return;
@@ -408,10 +436,11 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     this.parent._clearPendingRequests();
                     this.parent.stream.stop();
                     var newTimeWindow = args.until - args.from;
+                    var step = newTimeWindow / DISPLAYED_DATAPOINTS;
+                    step = this._sanitizeStep(step);
                     this.parent.config.setProperties({
                         timeWindow: newTimeWindow,
-                        measurementStep: newTimeWindow /
-                            DISPLAYED_DATAPOINTS,
+                        measurementStep: step,
                     });
                     this.parent._fetchStats({
                         from: args.from,
@@ -448,6 +477,18 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                             from: from,
                             until: until
                         });
+                },
+
+
+                _sanitizeStep: function (step) {
+                    var newStep = 0;
+                    STEP_MAP.some(function (time, index) {
+                        if (step <= time)
+                            return newStep = time;
+                        if (index == STEP_MAP.length -1)
+                            return newStep = time;
+                    });
+                    return newStep;
                 },
             }),
 

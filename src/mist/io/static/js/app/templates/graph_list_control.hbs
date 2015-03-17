@@ -29,7 +29,7 @@
                 {{action "forwardClicked" target="view"}}>
             </a>
         {{/unless}}
-        <div id="time-window-control" class="ui-mini">
+        <div id="time-window-control" {{bind-attr class=":ui-mini Mist.graphsController.stream.isStreaming"}}>
             <a class="ui-btn ui-btn-icon-right ui-icon-carat-d"
                 {{action "timeWindowClicked" target="view"}}>
                     {{view.timeWindowText}}
@@ -61,7 +61,8 @@
                     last month</a>
             </li>
             <li data-icon="false">
-                <a {{action "timeWindowChanged" "range" "range" target="view"}}>Custom range</a>
+                <a {{action "timeWindowChanged" "range" "range" target="view"}}>
+                    custom range</a>
             </li>
         </ul>
     </div>
