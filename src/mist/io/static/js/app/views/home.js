@@ -11,6 +11,12 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
         return App.HomeView = PageView.extend({
 
 
+            hasIncidents: function () {
+                if (Mist.openIncidents)
+                    return !!Mist.openIncidents.length;
+            }.property('Mist.openIncidents'),
+
+
             //
             //
             //  Initialization
@@ -45,6 +51,16 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
                 addBackend: function () {
                     Mist.backendAddController.open();
+                },
+
+                incidentClicked: function (incident) {
+                    var machine = incident.get('machine');
+                    if (!machine)
+                        Mist.notificationController.timeNotify(
+                            'Machine not found', 2000);
+                    else
+                        Mist.Router.router.transitionTo('machine',
+                            incident.get('machine'));
                 }
             },
 
@@ -54,6 +70,7 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
             //  Methods
             //
             //
+
 
             showGraphs: function () {
 
@@ -83,7 +100,7 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
                 Mist.graphsController.open({
                     graphs: [Graph.create({
-                        title: 'Load for all monitored servers',
+                        title: 'Load on all monitored machines',
                         datasources: datasources,
                     })],
                     config: {
@@ -93,37 +110,6 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
                         historyWidgetPosition: 'bottom',
                     }
                 });
-            },
-
-
-            //
-            // Proxy actions for graph list control view
-            //
-
-
-            backClicked: function () {
-                Mist.graphsController.history.goBack();
-            },
-
-
-            forwardClicked: function () {
-                Mist.graphsController.history.goForward();
-            },
-
-
-            resetClicked: function () {
-                Mist.graphsController.stream.start();
-            },
-
-
-            pauseClicked: function () {
-                Mist.graphsController.stream.stop();
-            },
-
-
-            timeWindowChanged: function () {
-                var newTimeWindow = $('#time-window-control select').val();
-                Mist.graphsController.resolution.change(newTimeWindow);
             },
 
 

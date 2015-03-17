@@ -1,7 +1,7 @@
 {{#unless view.machine.isGhost}}
 
     <label>{{view Mist.Checkbox checkedBinding="view.machine.selected"}}</label>
-    {{#link-to "machine" view.machine classBinding="view.machine.hasMonitoring"}}
+    {{#link-to "machine" view.machine classBinding="view.monitoringIcon"}}
 
         <div class="ui-grid-b">
             <div class="ui-block-a machine-name">{{view.machine.name}}</div>

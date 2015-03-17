@@ -89,6 +89,15 @@ define('app/models/graph', ['ember'],
                     this.datasources.removeObject(datasource);
                     this.trigger('onDatasourceRemove');
                 });
+            },
+
+
+            getFirstDatapoint: function () {
+                return this.get('displayedData')[this.datasources[0].id][0];
+            },
+
+            getLastDatapoint: function () {
+                return this.get('displayedData')[this.datasources[0].id][DISPLAYED_DATAPOINTS - 1];
             }
         });
     }
