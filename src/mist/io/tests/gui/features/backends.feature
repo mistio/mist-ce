@@ -39,7 +39,7 @@ Feature: Add second-tier backends
       When I click the "Rackspace" button
       And I rename the backend to "Renamed"
       And I wait for 1 seconds
-      And I click the "Back" button inside the "Edit backend" popup
+      And I click the "Back" button inside the "Edit cloud" popup
       Then the "Renamed" backend should be added within 3 seconds
 
       When I click the "Renamed" button
