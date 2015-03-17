@@ -7,7 +7,7 @@ Feature: Add second-tier backends
 
   @all-backends
   Scenario Outline:
-    When I click the "Add backend" button
+    When I click the "Add cloud" button
     And I click the button that contains "Select provider"
     And I click the "<provider>" button
     And I wait for 1 seconds
