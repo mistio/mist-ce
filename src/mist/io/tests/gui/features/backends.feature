@@ -29,7 +29,7 @@ Feature: Add second-tier backends
     | VMware vCloud        | VMWARE       |
     | Indonesian Cloud     | INDONESIAN   |
 #    | EC2                  | EC2          |
-    | Docker               | DOCKER       |
+#    | Docker               | DOCKER       |
     | KVM (via libvirt)    | LIBVIRT      |
 
     @backend-actions
