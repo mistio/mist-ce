@@ -8,7 +8,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
 
         'use strict';
 
-        var MIN_LOGS_DISPLAYED = 30;
+        var MIN_LOGS_DISPLAYED = 20;
         var MAX_LOGS_REQUESTED = 300;
         var LOGS_REQUEST_INTERVAL = 500;
         var EVENT_TYPES = ['job', 'shell', 'request', 'session', 'incident'];
@@ -23,6 +23,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
             //
 
 
+            firstRequest: true,
             forceFlag: 'all',
             filterString: '',
             noMoreLogs: false,
@@ -51,6 +52,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
                 this._initializeScrolling();
                 this._initializeSocket();
                 this._updateLogTime();
+                this.set('firstRequest', true);
                 this.search();
                 Mist.l = this;
             }.on('didInsertElement'),
@@ -83,6 +85,7 @@ define('app/views/log_list', ['app/views/mistscreen'],
                 this.set('fetchingHistory', true);
                 this._processFilterString();
                 Mist.logs.emit('get_logs',  this._generatePayload());
+                this.set('firstRequest', false);
             },
 
 
@@ -270,7 +273,10 @@ define('app/views/log_list', ['app/views/mistscreen'],
 
             _generatePayload: function () {
 
-                var payload = {limit: MAX_LOGS_REQUESTED};
+                var limit = this.get('firstRequest') ? MIN_LOGS_DISPLAYED :
+                    MAX_LOGS_REQUESTED;
+
+                var payload = {limit: limit};
 
                 if (this.get('showErrors') != null)
                     payload.error = this.get('showErrors');

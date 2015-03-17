@@ -314,11 +314,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         var translate = 0;
                         if (that.animationEnabled) {
                             translate =  $('#' + graph.id).find('.valueLine > path').attr('transform');
-                            translate = + translate.slice(10,translate.indexOf(','));
+                            if (translate != undefined )
+                                translate = + translate.slice(10,translate.indexOf(','));
                         }
 
                         // hack previous code
-                        var displayedData = graph.displayedData[Object.keys(graph.displayedData)[0]];
+                        if (graph.displayedData != undefined)
+                            var displayedData = graph.displayedData[Object.keys(graph.displayedData)[0]];
                         var xCoordinates = that.xCoordinates[Object.keys(that.xCoordinates)[0]];
 
                         // Measurement That is less than curson x
@@ -1102,22 +1104,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
         };
 
         function labelTicksFixed (axisInstance, format, timeDisplayed) {
-
             // Check Time Displayed
-            var labelStep;
-            if(timeDisplayed <= 10 * TIME_MAP.MINUTE)
-                axisInstance.ticks(d3.time.minutes,2);
-            else if(timeDisplayed <= TIME_MAP.HOUR)
-                axisInstance.ticks(d3.time.minutes,12);
-            else if(timeDisplayed <= TIME_MAP.DAY)
-                axisInstance.ticks(d3.time.hours,6);
-            else if(timeDisplayed <= TIME_MAP.WEEK)
-                axisInstance.ticks(d3.time.days,1);
-            else if(timeDisplayed <= TIME_MAP.MONTH)
-                axisInstance.ticks(d3.time.days,7);
-            if (format)
-                axisInstance.tickFormat(d3.time.format(format));
-
+            axisInstance.ticks(4);
             return axisInstance;
         };
 

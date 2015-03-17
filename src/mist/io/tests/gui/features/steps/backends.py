@@ -58,7 +58,7 @@ def given_backend(context, backend):
         assert False, u'Could not find credentials for %s' % backend
 
     context.execute_steps('''
-    When I click the "Add backend" button
+    When I click the "Add cloud" button
     And I click the button that contains "Select provider"
     And I click the "%s" button
     And I use my "%s" credentials

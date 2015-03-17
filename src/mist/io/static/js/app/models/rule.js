@@ -51,7 +51,11 @@ define('app/models/rule', ['ember'],
                     machine: Mist.backendsController.getMachine(
                         data.machine, data.backend) || data.machine
                 });
-            }
+            },
+
+            timeWindowToMins: function () {
+                return (1 + parseInt(this.get('timeWindow') / 60)).toString();
+            }.property('timeWindow')
         });
     }
 );
