@@ -7,7 +7,7 @@ Feature: Add second-tier backends
 
   @all-backends
   Scenario Outline:
-    When I click the "Add backend" button
+    When I click the "Add cloud" button
     And I click the button that contains "Select provider"
     And I click the "<provider>" button
     And I wait for 1 seconds
@@ -23,13 +23,13 @@ Feature: Add second-tier backends
     | HP Helion Cloud       | HP           |
     | Linode               | LINODE       |
     | NephoScale           | NEPHOSCALE   |
-    | OpenStack            | OPENSTACK    |
+#    | OpenStack            | OPENSTACK    |
     | Rackspace            | RACKSPACE    |
     | SoftLayer            | SOFTLAYER    |
     | VMware vCloud        | VMWARE       |
     | Indonesian Cloud     | INDONESIAN   |
 #    | EC2                  | EC2          |
-    | Docker               | DOCKER       |
+#    | Docker               | DOCKER       |
     | KVM (via libvirt)    | LIBVIRT      |
 
     @backend-actions
@@ -39,7 +39,7 @@ Feature: Add second-tier backends
       When I click the "Rackspace" button
       And I rename the backend to "Renamed"
       And I wait for 1 seconds
-      And I click the "Back" button inside the "Edit backend" popup
+      And I click the "Back" button inside the "Edit cloud" popup
       Then the "Renamed" backend should be added within 3 seconds
 
       When I click the "Renamed" button
