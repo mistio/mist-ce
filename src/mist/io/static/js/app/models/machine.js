@@ -92,7 +92,7 @@ define('app/models/machine', ['ember'],
 
 
             hasKeys: function () {
-                return !!Mist.keysController.getMachineKeysCount(this)
+                return !!Mist.keysController.getMachineKeysCount(this) || this.backend.provider == 'docker';
             }.property('Mist.keysController.content.@each.machines'),
 
 
