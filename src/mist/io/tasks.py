@@ -26,6 +26,7 @@ from ansible import callbacks
 from ansible import utils
 
 from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
+from mist.io.exceptions import MistError
 from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
 
@@ -93,9 +94,11 @@ def ssh_command(email, backend_id, machine_id, host, command,
 @app.task(bind=True, default_retry_delay=3*60)
 def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                       key_id=None, username=None, password=None, port=22,
-                      script_id='', script_params='', job_id = None):
+                      script_id='', script_params='', job_id=None,
+                      hostname=''):
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
+    from mist.io.methods import create_dns_a_record
     if multi_user:
         from mist.core.methods import enable_monitoring
         from mist.core.tasks import run_script
@@ -161,6 +164,15 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                                                         backend_id)
             msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name,
                                                              node.id)
+
+            if hostname:
+                try:
+                    record = create_dns_a_record(user, hostname, host)
+                    log_event(action='create_dns_a_record', **log_dict)
+                except Exception as exc:
+                    log_event(action='create_dns_a_record', error=str(exc),
+                              **log_dict)
+
             error = False
             if script_id and multi_user:
                 tmp_log('will run script_id %s', script_id)
@@ -239,7 +251,8 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
 @app.task(bind=True, default_retry_delay=2*60)
 def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
                             command, key_id, username, password, public_key,
-                            script_id='', script_params='', job_id = None):
+                            script_id='', script_params='', job_id=None,
+                            hostname=''):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -293,7 +306,9 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
 
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
-                script_id=script_id, script_params=script_params, job_id=job_id)
+                script_id=script_id, script_params=script_params,
+                job_id=job_id, hostname=hostname,
+            )
 
         except Exception as exc:
             raise self.retry(exc=exc, countdown=10, max_retries=15)
@@ -307,7 +322,7 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
                                           monitoring, command, key_id,
                                           password, public_key, username='root',
                                           script_id='', script_params='',
-                                          job_id = None):
+                                          job_id=None, hostname=''):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -346,7 +361,8 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
 
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
-                script_id=script_id, script_params=script_params, job_id=job_id
+                script_id=script_id, script_params=script_params,
+                job_id=job_id, hostname=hostname,
             )
 
         except Exception as exc:
@@ -654,7 +670,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                           networks, docker_env, docker_command,
                           script_id=None, script_params=None,
                           quantity=1, persist=False, job_id=None,
-                          docker_port_bindings={}, docker_exposed_ports={}):
+                          docker_port_bindings={}, docker_exposed_ports={},
+                          hostname=''):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -684,12 +701,14 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
         specs.append((user, backend_id, key_id, name, location_id, image_id,
                       size_id, script, image_extra, disk, image_name, size_name,
                       location_name, ips, monitoring, networks, docker_env,
-                      docker_command, 22, script_id, script_params, job_id))
+                      docker_command, 22, script_id, script_params, job_id),
+                     {'hostname': hostname})
 
-    def create_machine_wrapper(args):
+    def create_machine_wrapper(args_kwargs):
+        args, kwargs = args_kwargs
         error = False
         try:
-            node = create_machine(*args)
+            node = create_machine(*args, **kwargs)
         except MachineCreationError as exc:
             error = str(exc)
         except Exception as exc:
