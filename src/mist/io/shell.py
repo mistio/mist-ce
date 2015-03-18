@@ -5,13 +5,14 @@ SSH.
 
 """
 
-from time import time
+from time import time, sleep
 from StringIO import StringIO
 
 import paramiko
 import websocket
 import socket
 import uuid
+import thread
 
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
@@ -43,7 +44,7 @@ class ParamikoShell(object):
 
     Use it like:
     shell = Shell('localhost', username='root', password='123')
-    print shell.command('uptime')
+    print shell.command('on0')
 
     Or:
     shell = Shell('localhost')
@@ -377,6 +378,7 @@ class DockerShell(object):
         self.protocol = "ws"
         self.uri = ""
         self.sslopts = {}
+        self.buffer = ""
 
     def autoconfigure(self, user, backend_id, machine_id, **kwargs):
         log.info("autoconfiguring DockerShell for machine %s:%s",
@@ -389,10 +391,10 @@ class DockerShell(object):
 
         # For basic auth
         if backend.apikey and backend.apisecret:
-            self.uri = "://%s:%s@%s:%s/containers/%s/attach/ws?logs=1&stream=1&stdin=1&stdout=1&stderr=1" % \
+            self.uri = "://%s:%s@%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
                        (backend.apikey, backend.apisecret, self.host, docker_port, machine_id)
         else:
-            self.uri = "://%s:%s/containers/%s/attach/ws?logs=1&stream=1&stdin=1&stdout=1&stderr=1" % \
+            self.uri = "://%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
                        (self.host, docker_port, machine_id)
 
         # For tls
@@ -421,50 +423,44 @@ class DockerShell(object):
         except:
             pass
 
-    def _clean_and_clear(self):
-        buffer_breaker = uuid.uuid4().hex
-        log.error("###################################")
-        log.error("UUID")
-        log.error(buffer_breaker)
-        self.ws.send("echo '%s'\n" % buffer_breaker)
-        buffer = ""
-        while True:
-            buffer = buffer + self.ws.recv()
-            log.error("###################################")
-            log.error(buffer)
-            log.error("###################################")
-            if buffer[-len(buffer_breaker):] == buffer_breaker:
-                log.error("###################################")
-                log.error("MPIKA KI EDO")
-                return
-
     def _wrap_command(self, cmd):
         if cmd[-1] is not "\n":
             cmd = cmd + "\n"
         return cmd
 
     def command(self, cmd):
-        self.connect()
-        self._clean_and_clear()
+        self.cmd = self._wrap_command(cmd)
+        log.error(self.cmd)
 
-        output = ''
+        self.ws = websocket.WebSocketApp(self.uri,
+                                         on_message=self._on_message,
+                                         on_error=self._on_error,
+                                         on_close=self._on_close)
+
+        log.error(self.ws)
+        self.ws.on_open = self._on_open
+        self.ws.run_forever(ping_interval=3, ping_timeout=10)
+        self.ws.close()
         retval = 0
-        cmd = self._wrap_command(cmd)
-        self.ws.send(cmd)
+        output = self.buffer.split("\n")[1:-1]
+        return retval, "".join(output)
 
-        buffer_breaker = uuid.uuid4().hex
-        self.ws.send("echo '%s'\n" % buffer_breaker)
-        buffer = ""
-        while True:
-            buffer = buffer + self.ws.recv()
-            if buffer[-(len(buffer_breaker)+2):] == buffer_breaker + "\r\n":
-                output = buffer
-                break
+    def _on_message(self, ws, message):
+        self.buffer = self.buffer + message
 
-        log.error("#########################################################")
-        log.error("THE COMMAND OUTPUT:")
-        log.error(output)
-        return retval, output
+    def _on_close(self, ws):
+        ws.close()
+        self.ws.close()
+
+    def _on_error(self, ws, error):
+        log.error("Got Websocker error: %s" % error)
+
+    def _on_open(self, ws):
+        def run(*args):
+            ws.send(self.cmd)
+            sleep(1)
+        thread.start_new_thread(run, ())
+
 
     def __del__(self):
         self.disconnect()
@@ -527,8 +523,6 @@ class Shell(object):
         if isinstance(self._shell, ParamikoShell):
             return self._shell.command(cmd, pty=pty)
         elif isinstance(self._shell, DockerShell):
-            log.error("#####################################")
-            log.error("DOcker shell")
             return self._shell.command(cmd)
 
     def command_stream(self, cmd):
