@@ -1537,6 +1537,10 @@ Date.prototype.getPrettyTime = function (noSeconds) {
     return ret;
 }
 
+Date.prototype._toString = function () {
+    var d = (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear();
+    return d + ', ' + this.getPrettyTime();
+}
 Date.prototype.getPrettyDate = function (shortMonth) {
     return this.getMonthName(shortMonth) + ' ' + this.getDate() + ', ' + this.getFullYear();
 }

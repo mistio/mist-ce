@@ -65,10 +65,8 @@ define('app/views/graph_list_control', ['app/views/templated'],
                     $('#pick-range').popup('open');
                     var until = Mist.graphsController.fetchStatsArgs.until;
                     var from = until - Mist.graphsController.config.timeWindow;
-                    $('#pick-range #range-start').val(new Date(from)
-                        .toLocaleString(undefined, {'hour12': false}));
-                    $('#pick-range #range-stop').val(new Date(until)
-                        .toLocaleString(undefined, {'hour12': false}));
+                    $('#pick-range #range-start').val(new Date(from)._toString());
+                    $('#pick-range #range-stop').val(new Date(until)._toString());
                 }, 300);
             },
 
@@ -139,15 +137,20 @@ define('app/views/graph_list_control', ['app/views/templated'],
                     }
                     from = new Date(from);
                     until = new Date(until);
-                    if (!this._validateRange(from, until)) {
-                        return;
+                    if (this._validateRange(from, until)) {
+                        Mist.graphsController.history.change({
+                            timeWindow: 'range',
+                            from: from.getTime(),
+                            until: until.getTime(),
+                        });
+                        Mist.graphsController.one('onFetchStats', this, callback);
+                        Mist.graphsController.one('onFetchStatsError', this, function () {
+                            Mist.graphsController.off('onFetchStats', this, callback);
+                        });
                     }
-                    Mist.graphsController.history.change({
-                        timeWindow: 'range',
-                        from: from.getTime(),
-                        until: until.getTime(),
-                    });
-                    this._closeRangeSelectionPopup();
+                    function callback () {
+                        this._closeRangeSelectionPopup();
+                    }
                 },
 
 
