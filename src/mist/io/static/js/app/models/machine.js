@@ -91,8 +91,13 @@ define('app/models/machine', ['ember'],
             }.property('imageId'),
 
 
+            hasShell: function () {
+                return this.get('hasKeys') || this.get('backend').get('isDocker');
+            }.property('hasKeys', 'backend.isDocker'),
+
+
             hasKeys: function () {
-                return !!Mist.keysController.getMachineKeysCount(this) || this.backend.provider == 'docker';
+                return !!Mist.keysController.getMachineKeysCount(this);
             }.property('Mist.keysController.content.@each.machines'),
 
 

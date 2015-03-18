@@ -57,7 +57,7 @@ define('app/views/machine_list', ['app/views/mistscreen'],
                         $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
                     }
 
-                    if (machine.get('hasKeys') && machine.state == 'running') {
+                    if (machine.get('hasShell') && machine.state == 'running') {
                         $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');

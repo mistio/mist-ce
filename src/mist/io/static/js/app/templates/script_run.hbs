@@ -34,7 +34,7 @@
                     {{#each Mist.backendsController.content}}
                     {{#if this.enabled}}
                         {{#each this.machines.content}}
-                        {{#if this.hasKeys}}
+                        {{#if this.hasShell}}
                             <li data-icon="false">
                                 <a {{action "machineClicked" this target="view"}}>
                                     {{this.name}}
