@@ -134,20 +134,23 @@ define('app/views/graph_list_control', ['app/views/templated'],
                 rangeOkClicked: function () {
                     var from = $('#pick-range #range-start').val();
                     var until = $('#pick-range #range-stop').val();
-                    if (until.toLowerCase().trim() === 'now') {
+                    if (until.toLowerCase().trim() === 'now')
                         until = Date.now();
-                    }
                     from = new Date(from);
                     until = new Date(until);
-                    if (!this._validateRange(from, until)) {
-                        return;
-                    }
-                    Mist.graphsController.history.change({
-                        timeWindow: 'range',
-                        from: from.getTime(),
-                        until: until.getTime(),
+                    if (this._validateRange(from, until))
+                        Mist.graphsController.history.change({
+                            timeWindow: 'range',
+                            from: from.getTime(),
+                            until: until.getTime(),
+                        });
+                    Mist.graphsController.one('onFetchStats', this, callback);
+                    Mist.graphsController.one('onFetchStatsError', this, function () {
+                        Mist.graphsController.off('onFetchStats', this, callback);
                     });
-                    this._closeRangeSelectionPopup();
+                    function callback () {
+                        this._closeRangeSelectionPopup();
+                    }
                 },
 
 

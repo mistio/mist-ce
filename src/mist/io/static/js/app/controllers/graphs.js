@@ -275,6 +275,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     if (data.error) {
                         Mist.notificationController.notify(data.error);
                         this._clearPendingRequests();
+                        this.trigger('onFetchStatsError', data);
                     } else
                         that._handleResponse(request, data.metrics, data);
                 }
@@ -447,6 +448,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                         until: args.until,
                     });
                 },
+
 
                 goBack: function () {
                     this.parent._clearPendingRequests();
