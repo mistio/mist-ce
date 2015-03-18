@@ -3,7 +3,12 @@
 #home-page #add-backend-btn {
     float: right;
     margin-right: 0px;
-    margin-bottom: 3px;
+    margin-bottom: 13px;
+    margin-top: 0;
+    top: .9em;
+    position: relative;
+    height: 18px;
+    line-height: 18px;
 }
 #home-page .ui-listview {
     clear: both;
