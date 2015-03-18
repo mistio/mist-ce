@@ -22,8 +22,9 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
-from libcloud.dns.types import Provider, RecordType
-from libcloud.dns.providers import get_driver
+from libcloud.dns.types import Provider as DnsProvider
+from libcloud.dns.types import RecordType
+from libcloud.dns.providers import get_driver as get_dns_driver
 
 import ansible.playbook
 import ansible.utils.template
@@ -3595,7 +3596,7 @@ def create_dns_a_record(user, domain_name, ip_addr):
     providers = {}
     for backend in user.backends.values():
         if backend.provider.startswith('ec2_'):
-            provider = Provider.ROUTE53
+            provider = DnsProvider.ROUTE53
             creds = backend.apikey, backend.apisecret
         #TODO: add support for more providers
         #elif backend.provider == Provider.LINODE:
@@ -3610,7 +3611,7 @@ def create_dns_a_record(user, domain_name, ip_addr):
             continue
 
         try:
-            conn = get_driver(provider)(*creds)
+            conn = get_dns_driver(provider)(*creds)
             zones = conn.list_zones()
         except InvalidCredsError:
             log.error("Invalid creds %s for DNS provider %s.", creds, provider)
