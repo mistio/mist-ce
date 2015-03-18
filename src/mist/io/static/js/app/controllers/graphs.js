@@ -242,9 +242,9 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 };
                 if (DEBUG_STATS) {
                     info('Requesting stats from: ' +
-                        new Date(payload.start).getPrettyDateTime() +
+                        new Date(payload.start * 1000).getPrettyDateTime() +
                         ' until: ' +
-                        new Date(payload.stop).getPrettyDateTime(),
+                        new Date(payload.stop * 1000).getPrettyDateTime(),
                         payload);
                 }
                 return payload
