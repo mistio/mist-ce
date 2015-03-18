@@ -126,10 +126,14 @@ define('app/views/log_list_item', ['app/views/list_item'],
                     this.propertyDidChange('machineLink');
                     if (this.get('isCollapsed')) {
                         this.set('isCollapsed', false);
-                        this.$().find('.details').slideDown();
+                        Ember.run.next(this, function () {
+                            this.$('.details').slideDown();
+                        });
                     } else {
-                        this.set('isCollapsed', true);
-                        this.$().find('.details').slideUp();
+                        var that = this;
+                        this.$('.details').slideUp(function () {
+                           that.set('isCollapsed', true);
+                        });
                     }
                 },
 
