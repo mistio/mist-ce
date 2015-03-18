@@ -1,4 +1,4 @@
-define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
+define('app/views/home', ['app/views/page', 'app/models/graph'],
     //
     //  Home View
     //
