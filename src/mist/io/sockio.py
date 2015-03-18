@@ -132,7 +132,7 @@ class ShellNamespace(CustomNamespace):
     def get_ssh_data(self):
         try:
             if self.provider == 'docker':
-                self.channel.send('echo\n')
+                self.channel.send('\n')
             while True:
                 wait_read(self.channel.fileno())
                 data = self.shell.recv(1024).decode('utf-8', 'ignore')
