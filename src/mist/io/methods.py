@@ -3614,7 +3614,7 @@ def create_dns_a_record(user, domain_name, ip_addr):
             conn = get_dns_driver(provider)(*creds)
             zones = conn.list_zones()
         except InvalidCredsError:
-            log.error("Invalid creds %s for DNS provider %s.", creds, provider)
+            log.error("Invalid creds for DNS provider %s.", provider)
             continue
         except Exception as exc:
             log.error("Error listing zones for DNS provider %s: %r",
@@ -3650,14 +3650,14 @@ def create_dns_a_record(user, domain_name, ip_addr):
 
     provider, creds, zone = best
     name = all_domains[zone.domain]
-    log.info("Will use name %s and zone %s in provider %s with creds %s.",
-             name, zone.domain, provider, creds)
+    log.info("Will use name %s and zone %s in provider %s.",
+             name, zone.domain, provider)
 
     # debug
-    log.debug("Will print all existing A records for zone '%s'.", zone.domain)
-    for record in zone.list_records():
-        if record.type == 'A':
-            log.info("%s -> %s", record.name, record.data)
+    #log.debug("Will print all existing A records for zone '%s'.", zone.domain)
+    #for record in zone.list_records():
+    #    if record.type == 'A':
+    #        log.info("%s -> %s", record.name, record.data)
 
     msg = ("Creating A record with name %s for %s in zone %s in %s"
            % (name, ip_addr, zone.domain, provider))
