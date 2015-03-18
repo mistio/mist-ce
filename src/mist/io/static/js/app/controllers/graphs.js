@@ -144,6 +144,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     canControl: true,
                     canMinimize: true,
                     timeWindow: TIME_WINDOW_MAP.minutes,
+                    measurementStep: 10 * TIME_MAP.SECOND,
                     showGraphLegend: false,
                     historyWidgetPosition: 'top',
                 });
