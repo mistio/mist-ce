@@ -33,7 +33,7 @@ define('app/views/network', ['app/views/mistscreen'],
             load: function() {
 
                 // Add Event listeners
-                Mist.backendsController.one('onNetworkListChange', this, 'load');
+                Mist.cloudsController.one('onNetworkListChange', this, 'load');
 
                 Ember.run(this, function() {
                     this.updateCurrentNetwork();
@@ -51,7 +51,7 @@ define('app/views/network', ['app/views/mistscreen'],
             unload: function() {
 
                 // Remove event listeners
-                Mist.backendsController.off('onNetworkListChange', this, 'load');
+                Mist.cloudsController.off('onNetworkListChange', this, 'load');
 
             }.on('willDestroyElement'),
 
@@ -65,7 +65,7 @@ define('app/views/network', ['app/views/mistscreen'],
 
             updateCurrentNetwork: function() {
                 Ember.run(this, function() {
-                    var network = Mist.backendsController.getRequestedNetwork();
+                    var network = Mist.cloudsController.getRequestedNetwork();
                     if (network)
                         this.get('controller').set('model', network);
 
@@ -92,7 +92,7 @@ define('app/views/network', ['app/views/mistscreen'],
                     var networkId = this.network.id;
                     Mist.confirmationController.setUp('Delete network',
                         'Are you sure you want to delete "' + this.network.name + '" ?', function () {
-                            that.network.backend.networks.deleteNetwork(networkId,
+                            that.network.cloud.networks.deleteNetwork(networkId,
                                 function (success) {
                                     if (success)
                                         Mist.Router.router.transitionTo('networks');
@@ -103,7 +103,7 @@ define('app/views/network', ['app/views/mistscreen'],
 
                 assignMachine: function (machine) {
                     var ip = this.get('selectedIp');
-                    this.get('network').get('backend').get('networks').associateIP({
+                    this.get('network').get('cloud').get('networks').associateIP({
                         network: this.get('network'),
                         machine: machine,
                         ip: ip,

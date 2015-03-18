@@ -4,8 +4,8 @@
 
 describe( 'views/*', function() {
 
-    it( 'should validate backend button template', function( done ) {
-        require( [ 'text!app/templates/backend_button.html' ], function( html ) {
+    it( 'should validate cloud button template', function( done ) {
+        require( [ 'text!app/templates/cloud_button.html' ], function( html ) {
             expect( html ).to.be.a( 'string' );
             expect(function(){ Em.Handlebars.compile( html ) }).to.not.throw( Error );
             done();
@@ -20,8 +20,8 @@ describe( 'views/*', function() {
         });
     });
 
-    it( 'should validate edit backend dialog template', function( done ) {
-        require( [ 'text!app/templates/edit_backend_dialog.html' ], function( html ) {
+    it( 'should validate edit cloud dialog template', function( done ) {
+        require( [ 'text!app/templates/edit_cloud_dialog.html' ], function( html ) {
             expect( html ).to.be.a( 'string' );
             expect(function(){ Em.Handlebars.compile( html ) }).to.not.throw( Error );
             done();

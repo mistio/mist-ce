@@ -82,7 +82,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 term.open(document.getElementById('shell-return'));
 
                 Mist.shell.emit('shell_open', {
-                    backend_id: this.machine.backend.id,
+                    cloud_id: this.machine.cloud.id,
                     machine_id: this.machine.id,
                     host: this.host,
                     cols: this.cols,

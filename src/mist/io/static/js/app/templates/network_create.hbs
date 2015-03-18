@@ -12,15 +12,15 @@
     <div data-role="content" data-theme="a">
 
         <!--
-            Select Backend
+            Select Cloud
 
-            Allow only openstack backends for now
+            Allow only openstack clouds for now
         -->
-        <div id="network-create-backend-wrapper">
+        <div id="network-create-cloud-wrapper">
 
-            <label for="network-create-backend">Backend:</label>
+            <label for="network-create-cloud">Cloud:</label>
 
-            <div id="network-create-backend"
+            <div id="network-create-cloud"
                 data-role="collapsible"
                 data-iconpos="right"
                 data-collapsed-icon="arrow-d"
@@ -30,21 +30,21 @@
 
                 <h4>
                     {{#with Mist.networkCreateController.network}}
-                        {{#if backend}}
-                            {{backend.title}}
+                        {{#if cloud}}
+                            {{cloud.title}}
                         {{else}}
-                            Select backend
+                            Select cloud
                         {{/if}}
                     {{/with}}
                 </h4>
 
                 <ul data-role="listview" data-theme="a">
 
-                    {{#each Mist.backendsController.content}}
+                    {{#each Mist.cloudsController.content}}
                         {{#if this.enabled}}
                             {{#if this.isOpenStack}}
                                 <li data-icon="false">
-                                    <a {{action "backendSelected" this target="view"}}>
+                                    <a {{action "cloudSelected" this target="view"}}>
                                         {{this.title}}
                                     </a>
                                 </li>

@@ -1,50 +1,50 @@
 
-/* Backend Button CSS
+/* Cloud Button CSS
 -----------------------------------------------------------------------------------------------------------*/
-#backend-buttons {
+#cloud-buttons {
     display: block;
     margin-top: -51px;
 }
-#backend-buttons .ui-controlgroup-controls a {
+#cloud-buttons .ui-controlgroup-controls a {
     padding: 13px 10px 10px 40px !important;
     color: black;
     position: relative;
 }
 @-moz-document url-prefix() {
-    #backend-buttons .ui-controlgroup-controls a  {
+    #cloud-buttons .ui-controlgroup-controls a  {
         top: 1px;
     }
 }
-#backend-buttons .ui-controlgroup-controls {
+#cloud-buttons .ui-controlgroup-controls {
     margin-bottom: 18px;
     display: block;
 }
-#backend-buttons .ui-controlgroup-controls .ui-btn {
+#cloud-buttons .ui-controlgroup-controls .ui-btn {
     border: 1px solid #fafafa;
     margin-top: 10px;
     padding: 10px 0 9px !important;
     background-color: transparent;
 }
-#backend-buttons .ui-controlgroup-controls .ui-btn:hover {
+#cloud-buttons .ui-controlgroup-controls .ui-btn:hover {
     background-color: #eee;
 }
-#backend-buttons .ui-controlgroup-controls .ui-btn:active {
+#cloud-buttons .ui-controlgroup-controls .ui-btn:active {
     background-color: #fff;
 }
 
-#backend-buttons .ui-icon-waiting {
+#cloud-buttons .ui-icon-waiting {
     background-image: url("../states/load-white-solid.gif") !important;
     background-position: 9px 9px !important;
     background-repeat: no-repeat !important;
     background-size: 22px 22px !important;
 }
 
-#backend-buttons .ui-icon-offline {
+#cloud-buttons .ui-icon-offline {
     background-image: url(../states/state-yellow-solid.png) !important;
     background-position: 9px 9px !important;
     background-repeat: no-repeat !important;
 }
 
-#backend-buttons .ui-icon-offline:after, .ui-icon-waiting:after {
+#cloud-buttons .ui-icon-offline:after, .ui-icon-waiting:after {
     background-color: rgba(0,0,0,0);
 }

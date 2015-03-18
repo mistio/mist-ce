@@ -1,6 +1,6 @@
-define('app/controllers/backend_edit', ['ember'],
+define('app/controllers/cloud_edit', ['ember'],
     //
-    //  Backend Edit Controller
+    //  Cloud Edit Controller
     //
     //  @returns Class
     //
@@ -18,7 +18,7 @@ define('app/controllers/backend_edit', ['ember'],
             //
 
 
-            backend: null,
+            cloud: null,
             newTitle: null,
             newState: null,
             renameLock: null,
@@ -31,12 +31,12 @@ define('app/controllers/backend_edit', ['ember'],
             //
 
 
-            open: function (backend) {
+            open: function (cloud) {
                 this._clear();
                 this.setProperties({
-                    backend: backend,
-                    newTitle: backend.title,
-                    newState: backend.enabled,
+                    cloud: cloud,
+                    newTitle: cloud.title,
+                    newState: cloud.enabled,
                 });
                 this.view.open();
             },
@@ -50,11 +50,11 @@ define('app/controllers/backend_edit', ['ember'],
 
             rename: function () {
 
-                if (this.newTitle == this.backend.title) return;
+                if (this.newTitle == this.cloud.title) return;
                 if (this.newTitle == '') return;
 
-                Mist.backendsController.renameBackend({
-                    backend: this.backend,
+                Mist.cloudsController.renameCloud({
+                    cloud: this.cloud,
                     newTitle: this.newTitle,
                     callback: this._rename
                 });
@@ -63,10 +63,10 @@ define('app/controllers/backend_edit', ['ember'],
 
             toggle: function () {
 
-                if (this.newState == this.backend.enabled) return;
+                if (this.newState == this.cloud.enabled) return;
 
-                Mist.backendsController.toggleBackend({
-                    backend: this.backend,
+                Mist.cloudsController.toggleCloud({
+                    cloud: this.cloud,
                     newState: this.newState,
                     callback: this._toggle
                 });
@@ -75,8 +75,8 @@ define('app/controllers/backend_edit', ['ember'],
 
             delete: function () {
 
-                Mist.backendsController.deleteBackend({
-                    backend: this.backend,
+                Mist.cloudsController.deleteCloud({
+                    cloud: this.cloud,
                     callback: this._delete
                 });
             },
@@ -91,7 +91,7 @@ define('app/controllers/backend_edit', ['ember'],
 
             _clear: function () {
                 this.setProperties({
-                    backend: {},
+                    cloud: {},
                     newTitle: null,
                     newState: null,
                 })
@@ -99,21 +99,21 @@ define('app/controllers/backend_edit', ['ember'],
 
 
             _rename: function () {
-                var that = Mist.backendEditController;
-                if (!that.backend) return;
-                that.set('newTitle', that.backend.title);
+                var that = Mist.cloudEditController;
+                if (!that.cloud) return;
+                that.set('newTitle', that.cloud.title);
             },
 
 
             _toggle: function () {
-                var that = Mist.backendEditController;
-                if (!that.backend) return;
-                that.set('newState', that.backend.enabled);
+                var that = Mist.cloudEditController;
+                if (!that.cloud) return;
+                that.set('newState', that.cloud.enabled);
             },
 
 
             _delete: function (success) {
-                var that = Mist.backendEditController;
+                var that = Mist.cloudEditController;
                 if (success) that.close();
             },
 
@@ -127,7 +127,7 @@ define('app/controllers/backend_edit', ['ember'],
 
             stateObserver: function () {
                 Ember.run.once(this, '_toggle');
-            }.observes('backend.enabled'),
+            }.observes('cloud.enabled'),
 
 
             newStateObserver: function () {
@@ -137,7 +137,7 @@ define('app/controllers/backend_edit', ['ember'],
 
             titleObserver: function () {
                 Ember.run.once(this, '_rename');
-            }.observes('backend.title'),
+            }.observes('cloud.title'),
 
 
             newTitleObserver: function () {

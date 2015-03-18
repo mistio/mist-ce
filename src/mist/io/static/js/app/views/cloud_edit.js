@@ -1,6 +1,6 @@
-define('app/views/backend_edit', ['app/views/popup'],
+define('app/views/cloud_edit', ['app/views/popup'],
     //
-    //  Backend Edit View
+    //  Cloud Edit View
     //
     //  @returns Class
     //
@@ -8,7 +8,7 @@ define('app/views/backend_edit', ['app/views/popup'],
 
         'use strict';
 
-        return App.BackendEditView = PopupView.extend({
+        return App.CloudEditView = PopupView.extend({
 
 
             //
@@ -21,13 +21,13 @@ define('app/views/backend_edit', ['app/views/popup'],
             open: function () {
                 this._super();
                 $('#monitoring-message').hide();
-                $('#backend-delete-confirm').hide();
+                $('#cloud-delete-confirm').hide();
             },
 
 
             updateStateSlider: function () {
-                var newState = Mist.backendEditController.newState ? '1' : '0';
-                $('#backend-toggle').val(newState).slider('refresh');
+                var newState = Mist.cloudEditController.newState ? '1' : '0';
+                $('#cloud-toggle').val(newState).slider('refresh');
             },
 
 
@@ -41,32 +41,32 @@ define('app/views/backend_edit', ['app/views/popup'],
             actions: {
 
                 stateToggleSwitched: function () {
-                    var newState = parseInt($('#backend-toggle').val());
-                    Mist.backendEditController.set('newState', newState);
+                    var newState = parseInt($('#cloud-toggle').val());
+                    Mist.cloudEditController.set('newState', newState);
                 },
 
 
                 deleteClicked: function () {
-                    if (Mist.backendEditController.backend.getMonitoredMachines.length)
+                    if (Mist.cloudEditController.cloud.getMonitoredMachines.length)
                         $('#monitoring-message').show();
                     else
                         $('#monitoring-message').hide();
-                    $('#backend-delete-confirm').slideDown();
+                    $('#cloud-delete-confirm').slideDown();
                 },
 
 
                 yesClicked: function () {
-                    Mist.backendEditController.delete();
+                    Mist.cloudEditController.delete();
                 },
 
 
                 noClicked: function () {
-                    $('#backend-delete-confirm').slideUp();
+                    $('#cloud-delete-confirm').slideUp();
                 },
 
 
                 backClicked: function() {
-                    Mist.backendEditController.close();
+                    Mist.cloudEditController.close();
                 },
             },
 
@@ -80,7 +80,7 @@ define('app/views/backend_edit', ['app/views/popup'],
 
             newStateObserver: function () {
                 Ember.run.once(this, 'updateStateSlider');
-            }.observes('Mist.backendEditController.newState')
+            }.observes('Mist.cloudEditController.newState')
         });
     }
 );

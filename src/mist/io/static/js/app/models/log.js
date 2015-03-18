@@ -22,7 +22,7 @@ define('app/models/log', ['ember'],
             email: null,
             time: null,
             action: null,
-            backendId: null,
+            cloudId: null,
             machineId: null,
             mode: null,
 

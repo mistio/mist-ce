@@ -66,7 +66,7 @@ define('app/views/machine_add', ['app/views/templated'],
                 // Add event listeners
                 Mist.scriptsController.on('onChange', this, 'renderFields');
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.on('onImageListChange', this, 'renderFields');
+                Mist.cloudsController.on('onImageListChange', this, 'renderFields');
 
                 // Connect view with machineAddController
                 var viewId = $('#create-machine-panel').parent().attr('id');
@@ -80,7 +80,7 @@ define('app/views/machine_add', ['app/views/templated'],
                 // Remove event listeners
                 Mist.scriptsController.off('onChange', this, 'renderFields');
                 Mist.keysController.off('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.off('onImageListChange', this, 'renderFields');
+                Mist.cloudsController.off('onImageListChange', this, 'renderFields');
 
              }.on('willDestroyElement'),
 
@@ -180,19 +180,19 @@ define('app/views/machine_add', ['app/views/templated'],
                 },
 
 
-                selectProvider: function (backend) {
+                selectProvider: function (cloud) {
 
                     if (this.fieldIsReady) {
                         this.fieldIsReady('provider');
                     }
 
-                    backend.networks.content.forEach(function (network, index) {
+                    cloud.networks.content.forEach(function (network, index) {
                         network.set('selected', false);
                     });
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineImage', {'name' : 'Select Image'})
                                              .set('newMachineSize', {'name' : 'Select Size'})
-                                             .set('newMachineProvider', backend);
+                                             .set('newMachineProvider', cloud);
 
                     $('#create-machine-image').removeClass('ui-state-disabled');
                     $('#create-machine-location').addClass('ui-state-disabled');
@@ -203,8 +203,8 @@ define('app/views/machine_add', ['app/views/templated'],
                     $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
                     $('#create-machine-panel #ports').addClass('ui-state-disabled');
 
-                    if (backend.get('requiresNetworkOnCreation')) {
-                        if (backend.networks.content.length > 0) {
+                    if (cloud.get('requiresNetworkOnCreation')) {
+                        if (cloud.networks.content.length > 0) {
                             $('#create-machine-network').show();
                             $('label[for=create-machine-script]').text('Script:');
                         }
@@ -214,7 +214,7 @@ define('app/views/machine_add', ['app/views/templated'],
                     }
 
                     var view = Mist.machineAddController.view;
-                    if (backend.get('isDocker')) {
+                    if (cloud.get('isDocker')) {
                         view.showDockerMenu();
                     } else {
                         view.hideDockerMenu();

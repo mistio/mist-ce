@@ -19,7 +19,7 @@ define('app/models/story', ['app/models/base'],
 
 
             convertProperties: {
-                backend_id: 'backendId',
+                cloud_id: 'cloudId',
                 started_at: 'startedAt',
                 finished_at: 'finishedAt',
                 incident_id: 'incidentId',
@@ -46,13 +46,13 @@ define('app/models/story', ['app/models/base'],
             //
 
 
-            backend: function () {
-                return Mist.backendsController.getBackend(this.get('backendId'));
-            }.property('backendId'),
+            cloud: function () {
+                return Mist.cloudsController.getCloud(this.get('cloudId'));
+            }.property('cloudId'),
 
 
             machine: function () {
-                return Mist.backendsController.getMachine(this.get('machineId'));
+                return Mist.cloudsController.getMachine(this.get('machineId'));
             }.property('machineId'),
 
 

@@ -72,7 +72,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 var that = this;
                 this.set('creationPending', true);
                 Mist.ajax.POST('/rules', {
-                    'backendId': machine.backend.id,
+                    'cloudId': machine.cloud.id,
                     'machineId': machine.id,
                     'metric': 'load.shortterm',
                     'operator': 'gt',

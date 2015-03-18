@@ -23,13 +23,13 @@ define('app/controllers/network_create', ['ember'],
 
             network: Ember.Object.create({
                 name: null,
-                backend: null,
+                cloud: null,
                 adminStateUp: true,
                 createSubnet: null,
                 clear: function () {
                     this.setProperties({
                         name: null,
-                        backend: null,
+                        cloud: null,
                         adminStateUp: true,
                         createSubnet: null,
                     });
@@ -79,8 +79,8 @@ define('app/controllers/network_create', ['ember'],
                 this.view.close();
             },
 
-            selectBackend: function (backend) {
-                this.network.set('backend', backend);
+            selectCloud: function (cloud) {
+                this.network.set('cloud', cloud);
             },
 
 
@@ -144,7 +144,7 @@ define('app/controllers/network_create', ['ember'],
                             });
                 }
 
-                var url = '/backends/' + this.network.backend.id +
+                var url = '/clouds/' + this.network.cloud.id +
                     '/networks';
                 var that = this;
                 that.set('creatingNetwork', true);

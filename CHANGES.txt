@@ -1,3 +1,14 @@
+0.9.9
+-----
+
+- rename backend to cloud
+- add scripts, logs & incidents in multi-user
+- add support for Docker, KVM, vCloud
+- major ux improvements
+- sanitize API
+- update dependencies
+
+
 0.9.8
 -----
 

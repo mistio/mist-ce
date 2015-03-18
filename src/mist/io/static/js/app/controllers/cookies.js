@@ -21,7 +21,7 @@ define('app/controllers/cookies', ['ember'],
         //
         //      smm: {
         //
-        //          machine_id_backend_id: {
+        //          machine_id_cloud_id: {
         //
         //               timeWindow: 1000,
         //               graphs: {
@@ -36,7 +36,7 @@ define('app/controllers/cookies', ['ember'],
         //               },
         //           },
         //
-        //           machined_id_backend_id: {
+        //           machined_id_cloud_id: {
         //              ...
         //           },
         //           ...
@@ -184,7 +184,7 @@ define('app/controllers/cookies', ['ember'],
 
 
         function uuidFromMachine(machine) {
-            return machine.id + '_' + machine.backend.id;
+            return machine.id + '_' + machine.cloud.id;
         }
 
         function deleteOldCookies () {

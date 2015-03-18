@@ -1,47 +1,47 @@
 
-/* Backend Add Panel CSS
+/* Cloud Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
-#backend-add label {
+#cloud-add label {
     margin-top: 20px;
 }
-#backend-add .mist-select ul {
+#cloud-add .mist-select ul {
     max-height: 165px;
     overflow-y: scroll;
 }
 
-#backend-add .ui-slider {
+#cloud-add .ui-slider {
     width: 100%;
     margin-top: .1em;
     margin-bottom: -0.4em;
 }
 
-#backend-add-advanced {
+#cloud-add-advanced {
 	display: none;
 }
 
-#backend-add #opentack-advanced-wrapper {
+#cloud-add #opentack-advanced-wrapper {
     text-align: center;
     margin-bottom: -20px;
 }
 
-#backend-add  .toggle-field {
+#cloud-add  .toggle-field {
     width: 100%;
 }
 
-#backend-add .on,
-#backend-add .off {
+#cloud-add .on,
+#cloud-add .off {
     display: block;
     width: 100%;
 }
 
-#backend-add .on {
+#cloud-add .on {
     display: none;
 }
 
-#backend-add .on {
+#cloud-add .on {
     margin-top: 20px;
 }
 
-#backend-add .on label {
+#cloud-add .on label {
     display: none;
 }

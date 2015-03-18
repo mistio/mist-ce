@@ -1,10 +1,10 @@
-define('app/controllers/backends', ['app/models/backend', 'ember'],
+define('app/controllers/clouds', ['app/models/cloud', 'ember'],
     //
-    //  Backends Controller
+    //  Clouds Controller
     //
     //  @returns Class
     //
-    function (Backend) {
+    function (Cloud) {
 
         'use strict';
 
@@ -27,9 +27,9 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             machineRequest: false,
             networkRequest: false,
 
-            addingBackend: false,
-            deletingBackend: false,
-            togglingBackend: false,
+            addingCloud: false,
+            deletingCloud: false,
+            togglingCloud: false,
             checkedMonitoring: false,
             checkingMonitoring: false,
 
@@ -53,8 +53,8 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             //
 
 
-            load: function (backends) {
-                this._updateContent(backends);
+            load: function (clouds) {
+                this._updateContent(clouds);
                 this.set('loading', false);
             },
 
@@ -66,70 +66,70 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             //
 
 
-            addBackend: function (args) {
+            addCloud: function (args) {
 
                 var key = Mist.keysController.keyExists(args.payload.key) ? args.payload.key : null;
 
                 var that = this;
-                this.set('addingBackend', true);
-                Mist.ajax.POST('/backends', args.payload)
-                .success(function (backend) {
-                    that._addBackend(backend, key);
+                this.set('addingCloud', true);
+                Mist.ajax.POST('/clouds', args.payload)
+                .success(function (cloud) {
+                    that._addCloud(cloud, key);
                 }).error(function (message) {
                     Mist.notificationController.notify(
-                        'Failed to add backend: ' + message);
-                }).complete(function (success, backend) {
-                    that.set('addingBackend', false);
-                    if (args.callback) args.callback(success, backend);
+                        'Failed to add cloud: ' + message);
+                }).complete(function (success, cloud) {
+                    that.set('addingCloud', false);
+                    if (args.callback) args.callback(success, cloud);
                 });
             },
 
 
-            renameBackend: function (args) {
+            renameCloud: function (args) {
                 var that = this;
-                this.set('renamingBackend', true);
-                Mist.ajax.PUT('/backends/' + args.backend.id, {
+                this.set('renamingCloud', true);
+                Mist.ajax.PUT('/clouds/' + args.cloud.id, {
                     'new_name': args.newTitle
                 }).success(function () {
-                    that._renameBackend(args.backend, args.newTitle);
+                    that._renameCloud(args.cloud, args.newTitle);
                 }).error(function () {
                     Mist.notificationController.notify(
-                        'Failed to rename backend');
+                        'Failed to rename cloud');
                 }).complete(function (success) {
-                    that.set('renamingBackend', false);
+                    that.set('renamingCloud', false);
                     if (args.callback) args.callback(success);
                 });
             },
 
 
-            deleteBackend: function(args) {
+            deleteCloud: function(args) {
                 var that = this;
-                this.set('deletingBackend', true);
-                Mist.ajax.DELETE('/backends/' + args.backend.id, {
+                this.set('deletingCloud', true);
+                Mist.ajax.DELETE('/clouds/' + args.cloud.id, {
                 }).success(function() {
-                    that._deleteBackend(args.backend);
+                    that._deleteCloud(args.cloud);
                 }).error(function() {
                     Mist.notificationController.notify(
-                        'Failed to delete backend');
+                        'Failed to delete cloud');
                 }).complete(function(success) {
-                    that.set('deletingBackend', false);
+                    that.set('deletingCloud', false);
                     if (args.callback) args.callback(success);
                 });
             },
 
 
-            toggleBackend: function(args) {
+            toggleCloud: function(args) {
                 var that = this;
-                this.set('togglingBackend', true);
-                Mist.ajax.POST('/backends/' + args.backend.id, {
+                this.set('togglingCloud', true);
+                Mist.ajax.POST('/clouds/' + args.cloud.id, {
                     'new_state': args.newState.toString()
                 }).success(function () {
-                    that._toggleBackend(args.backend, args.newState);
+                    that._toggleCloud(args.cloud, args.newState);
                 }).error(function () {
                     Mist.notificationController.notify(
-                        "Failed to change backend's state");
+                        "Failed to change cloud's state");
                 }).complete(function (success) {
-                    that.set('togglingBackend', false);
+                    that.set('togglingCloud', false);
                     if (args.callback) args.callback(success);
                 });
             },
@@ -153,16 +153,16 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 }
                 var that = this;
                 var uptime = null;
-                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/probe', {
+                Mist.ajax.POST('/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/probe', {
                     'host': host,
                     'key': keyId
                 }).success(function (data) {
                     machine.probeSuccess(data);
                 }).error(function(message) {
-                    if (!machine.backend || !machine.backend.enabled) return;
+                    if (!machine.cloud || !machine.cloud.enabled) return;
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success, data) {
-                    if (!machine.backend || !machine.backend.enabled) return;
+                    if (!machine.cloud || !machine.cloud.enabled) return;
                     if (key)
                         key.set('probing', false);
                     machine.set('probing', false);
@@ -186,8 +186,8 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             updateImageCount: function() {
                 var count = 0;
-                this.content.forEach(function(backend) {
-                    count += backend.images.content.length;
+                this.content.forEach(function(cloud) {
+                    count += cloud.images.content.length;
                 });
                 this.set('imageCount', count);
             }.observes('content.length'),
@@ -231,56 +231,56 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             },
 
 
-            getBackend: function(backendId) {
-                return this.content.findBy('id', backendId);
+            getCloud: function(cloudId) {
+                return this.content.findBy('id', cloudId);
             },
 
 
-            getMachine: function(machineId, backendId) {
+            getMachine: function(machineId, cloudId) {
 
-                if (backendId) {
-                    var backend = this.getBackend(backendId);
-                    if (backend)
-                        return backend.getMachine(machineId);
+                if (cloudId) {
+                    var cloud = this.getCloud(cloudId);
+                    if (cloud)
+                        return cloud.getMachine(machineId);
                     return null;
                 }
 
                 var machine = null;
-                this.content.some(function(backend) {
-                    return machine = backend.getMachine(machineId);
+                this.content.some(function(cloud) {
+                    return machine = cloud.getMachine(machineId);
                 });
                 return machine;
             },
 
 
-            getNetwork: function (networkId, backendId) {
-                if (backendId) {
-                    var backend = this.getBackend(backendId);
-                    if (backend)
-                        return backend.getNetwork(networkId);
+            getNetwork: function (networkId, cloudId) {
+                if (cloudId) {
+                    var cloud = this.getCloud(cloudId);
+                    if (cloud)
+                        return cloud.getNetwork(networkId);
                     return null;
                 }
 
                 var network = null;
-                this.content.some(function(backend) {
-                    return network = backend.getNetwork(networkId);
+                this.content.some(function(cloud) {
+                    return network = cloud.getNetwork(networkId);
                 });
                 return network;
             },
 
 
-            machineExists: function(machineId, backendId) {
-                return !!this.getMachine(machineId, backendId);
+            machineExists: function(machineId, cloudId) {
+                return !!this.getMachine(machineId, cloudId);
             },
 
 
-            backendExists: function(backendId) {
-                return !!this.getBackend(backendId);
+            cloudExists: function(cloudId) {
+                return !!this.getCloud(cloudId);
             },
 
 
-            networkExists: function (networkId, backendId) {
-                return !!this.getNetwork(networkId, backendId);
+            networkExists: function (networkId, cloudId) {
+                return !!this.getNetwork(networkId, cloudId);
             },
 
 
@@ -291,73 +291,73 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             //
 
 
-            _updateContent: function (backends) {
+            _updateContent: function (clouds) {
                 Ember.run(this, function() {
 
-                    // Remove deleted backends
-                    this.content.forEach(function (backend) {
-                        if (!backends.findBy('id', backend.id))
-                            this.content.removeObject(backend);
+                    // Remove deleted clouds
+                    this.content.forEach(function (cloud) {
+                        if (!clouds.findBy('id', cloud.id))
+                            this.content.removeObject(cloud);
                     }, this);
 
-                    backends.forEach(function (backend) {
+                    clouds.forEach(function (cloud) {
 
-                        var oldBackend = this.getBackend(backend.id);
+                        var oldCloud = this.getCloud(cloud.id);
 
-                        if (oldBackend)
-                            // Update existing backends
-                            forIn(backend, function (value, property) {
-                                oldBackend.set(property, value);
+                        if (oldCloud)
+                            // Update existing clouds
+                            forIn(cloud, function (value, property) {
+                                oldCloud.set(property, value);
                             });
                         else
-                            // Add new backends
-                            this._addBackend(backend);
+                            // Add new clouds
+                            this._addCloud(cloud);
                     }, this);
 
-                    this.trigger('onBackendListChange');
+                    this.trigger('onCloudListChange');
                 });
             },
 
 
-            _addBackend: function(backend, keyId) {
+            _addCloud: function(cloud, keyId) {
                 Ember.run(this, function() {
-                    if (this.backendExists(backend.id)) return;
-                    var backendModel = Backend.create(backend);
-                    this.content.addObject(backendModel);
-                    // <TODO (gtsop): move this code into backend model
+                    if (this.cloudExists(cloud.id)) return;
+                    var cloudModel = Cloud.create(cloud);
+                    this.content.addObject(cloudModel);
+                    // <TODO (gtsop): move this code into cloud model
                     if (keyId)
-                        backendModel.one('onMachineListChange', function() {
-                            if (backendModel.provider == 'bare_metal') {
+                        cloudModel.one('onMachineListChange', function() {
+                            if (cloudModel.provider == 'bare_metal') {
                                 Mist.keysController._associateKey(keyId,
-                                    backendModel.machines.content[0]);
+                                    cloudModel.machines.content[0]);
                             }
                         });
                     // />
-                    this.trigger('onBackendAdd');
+                    this.trigger('onCloudAdd');
                 });
             },
 
 
-            _deleteBackend: function(backend) {
+            _deleteCloud: function(cloud) {
                 Ember.run(this, function() {
-                    this.content.removeObject(backend);
-                    this.trigger('onBackendDelete');
+                    this.content.removeObject(cloud);
+                    this.trigger('onCloudDelete');
                 });
             },
 
 
-            _renameBackend: function(backend, newTitle) {
+            _renameCloud: function(cloud, newTitle) {
                 Ember.run(this, function() {
-                    backend.set('title', newTitle);
-                    this.trigger('onBackendRename');
+                    cloud.set('title', newTitle);
+                    this.trigger('onCloudRename');
                 });
             },
 
 
-            _toggleBackend: function(backend, newState) {
+            _toggleCloud: function(cloud, newState) {
                 Ember.run(this, function() {
-                    backend.set('enabled', newState);
-                    this.trigger('onBackendToggle');
+                    cloud.set('enabled', newState);
+                    this.trigger('onCloudToggle');
                 });
             },
 
@@ -365,8 +365,8 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             _updateImageCount: function() {
                 Ember.run(this, function() {
                     var counter = 0;
-                    this.content.forEach(function(backend) {
-                        if (backend.enabled) counter += backend.imageCount;
+                    this.content.forEach(function(cloud) {
+                        if (cloud.enabled) counter += cloud.imageCount;
                     });
                     this.set('imageCount', counter);
                     this.trigger('onImageListChange');
@@ -377,8 +377,8 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             _updateMachineCount: function() {
                 Ember.run(this, function() {
                     var counter = 0;
-                    this.content.forEach(function(backend) {
-                        if (backend.enabled) counter += backend.machineCount;
+                    this.content.forEach(function(cloud) {
+                        if (cloud.enabled) counter += cloud.machineCount;
                     });
                     this.set('machineCount', counter);
                     this.trigger('onMachineListChange');
@@ -389,9 +389,9 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             _updateNetworkCount: function() {
                 Ember.run(this, function() {
                     var counter = 0;
-                    this.content.forEach(function (backend) {
-                        if (backend.enabled)
-                            counter += backend.networkCount;
+                    this.content.forEach(function (cloud) {
+                        if (cloud.enabled)
+                            counter += cloud.networkCount;
                     });
                     this.set('networkCount', counter);
                     this.trigger('onNetworkListChange');
@@ -420,8 +420,8 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             _updateSelectedMachines: function() {
                 Ember.run(this, function() {
                     var newSelectedMachines = [];
-                    this.content.forEach(function(backend) {
-                        newSelectedMachines = newSelectedMachines.concat(backend.selectedMachines);
+                    this.content.forEach(function(cloud) {
+                        newSelectedMachines = newSelectedMachines.concat(cloud.selectedMachines);
                     });
                     this.set('selectedMachines', newSelectedMachines);
                     this.trigger('onSelectedMachinesChange');
@@ -432,8 +432,8 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             _updateSelectedNetworks: function () {
                 Ember.run(this, function () {
                     var newSelectedNetworks = [];
-                    this.content.forEach(function (backend) {
-                        newSelectedNetworks = newSelectedNetworks.concat(backend.selectedNetworks);
+                    this.content.forEach(function (cloud) {
+                        newSelectedNetworks = newSelectedNetworks.concat(cloud.selectedNetworks);
                     });
                     this.set('selectedNetworks', newSelectedNetworks);
                     this.trigger('onSelectedNetworksChange');

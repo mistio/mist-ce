@@ -58,7 +58,7 @@
         data-transition="flip">
 
         <ul data-role="listview">
-            {{#each view.network.backend.machines.content}}
+            {{#each view.network.cloud.machines.content}}
             <li data-icon="false">
                 <a {{action "assignMachine" this target="view"}}>
                     {{this.name}}
@@ -70,7 +70,7 @@
 
     {{view "confirmationDialog"}}
 
-    {{#if backend.isOpenStack}}
+    {{#if cloud.isOpenStack}}
     <div class="single-action-footer" data-role="footer" data-theme="b">
         <a class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete"
             {{action "deleteClicked" target="view"}}>

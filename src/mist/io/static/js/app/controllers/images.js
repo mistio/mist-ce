@@ -68,7 +68,7 @@ define('app/controllers/images', ['app/models/image'],
 
             content: null,
             loading: null,
-            backend: null,
+            cloud: null,
 
 
             //
@@ -112,18 +112,18 @@ define('app/controllers/images', ['app/models/image'],
 
             searchImages: function (filter, callback) {
                 var that = this;
-                Mist.ajax.POST('/backends/' + this.backend.id + '/images', {
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/images', {
                     'search_term': filter
                 }).success(function (images) {
 
                 }).error(function () {
                     Mist.notificationController.notify(
-                        'Failed to search images on ' + that.backend.title);
+                        'Failed to search images on ' + that.cloud.title);
                 }).complete(function (success, images) {
                     var imagesToReturn = [];
                     if (success) {
                         images.forEach(function (image) {
-                            image.backend = that.backend;
+                            image.cloud = that.cloud;
                             imagesToReturn.push(Image.create(image));
                         });
                     }
@@ -134,7 +134,7 @@ define('app/controllers/images', ['app/models/image'],
 
             toggleImageStar: function (image, callback) {
                 var that = this;
-                Mist.ajax.POST('/backends/' + this.backend.id + '/images/' + image.id, {
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/images/' + image.id, {
                 }).success(function (star) {
                     if (!that.imageExists(image.id))
                         that._addImage(image);
@@ -210,7 +210,7 @@ define('app/controllers/images', ['app/models/image'],
 
             _addImage: function (image) {
                 Ember.run(this, function () {
-                    image.backend = this.backend;
+                    image.cloud = this.cloud;
                     this.content.addObject(Image.create(image));
                     this.trigger('onImageAdd');
                 });

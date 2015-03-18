@@ -20,7 +20,7 @@ define('app/controllers/sizes', ['app/models/size'],
 
             content: null,
             loading: null,
-            backend: null,
+            cloud: null,
 
 
             //

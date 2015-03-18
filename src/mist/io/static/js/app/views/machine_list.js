@@ -16,8 +16,8 @@ define('app/views/machine_list', ['app/views/mistscreen'],
             load: function () {
 
                 // Add event listeners
-                Mist.backendsController.on('onMachineProbe', this, 'updateFooter');
-                Mist.backendsController.on('onSelectedMachinesChange', this, 'updateFooter');
+                Mist.cloudsController.on('onMachineProbe', this, 'updateFooter');
+                Mist.cloudsController.on('onSelectedMachinesChange', this, 'updateFooter');
 
             }.on('didInsertElement'),
 
@@ -25,8 +25,8 @@ define('app/views/machine_list', ['app/views/mistscreen'],
             unload: function () {
 
                 // Remove event listeners
-                Mist.backendsController.off('onMachineProbe', this, 'updateFooter');
-                Mist.backendsController.off('onSelectedMachinesChange', this, 'updateFooter');
+                Mist.cloudsController.off('onMachineProbe', this, 'updateFooter');
+                Mist.cloudsController.off('onSelectedMachinesChange', this, 'updateFooter');
 
             }.on('willDestroyElement'),
 
@@ -42,12 +42,12 @@ define('app/views/machine_list', ['app/views/mistscreen'],
                 if (Mist.machineShellController.isOpen)
                     return;
 
-                switch (Mist.backendsController.selectedMachines.length) {
+                switch (Mist.cloudsController.selectedMachines.length) {
                 case 0:
                     $('#machine-list-page .ui-footer').slideUp();
                     break;
                 case 1:
-                    var machine = Mist.backendsController.selectedMachines[0];
+                    var machine = Mist.cloudsController.selectedMachines[0];
 
                     $('#machine-list-page .ui-footer').slideDown();
 
@@ -87,17 +87,17 @@ define('app/views/machine_list', ['app/views/mistscreen'],
 
 
                 tagsClicked: function () {
-                    Mist.machineTagsController.open(Mist.backendsController.selectedMachines[0]);
+                    Mist.machineTagsController.open(Mist.cloudsController.selectedMachines[0]);
                 },
 
 
                 powerClicked: function () {
-                    Mist.machinePowerController.open(Mist.backendsController.selectedMachines);
+                    Mist.machinePowerController.open(Mist.cloudsController.selectedMachines);
                 },
 
 
                 shellClicked: function () {
-                    Mist.machineShellController.open(Mist.backendsController.selectedMachines[0]);
+                    Mist.machineShellController.open(Mist.cloudsController.selectedMachines[0]);
                 },
 
 
@@ -110,9 +110,9 @@ define('app/views/machine_list', ['app/views/mistscreen'],
 
                     $('#select-machines-popup').popup('close');
 
-                    Mist.backendsController.content.forEach(function (backend) {
-                        backend.machines.content.forEach(function (machine) {
-                            machine.set('selected', mode == 'all' || mode == backend.title);
+                    Mist.cloudsController.content.forEach(function (cloud) {
+                        cloud.machines.content.forEach(function (machine) {
+                            machine.set('selected', mode == 'all' || mode == cloud.title);
                         });
                     });
                 }

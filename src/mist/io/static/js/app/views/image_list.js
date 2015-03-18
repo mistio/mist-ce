@@ -35,7 +35,7 @@ define('app/views/image_list', ['app/views/mistscreen'],
 
                 // Add event listeners
                 Mist.imageSearchController.on('onSearchEnd', this, 'updateBaseImages');
-                Mist.backendsController.on('onImageListChange', this, 'updateDefaultImages');
+                Mist.cloudsController.on('onImageListChange', this, 'updateDefaultImages');
 
                 // Handle scrolling
                 var that = this;
@@ -54,8 +54,8 @@ define('app/views/image_list', ['app/views/mistscreen'],
 
                 // Remove event listeners
                 var that = this;
-                Mist.backendsController.content.forEach(function(backend) {
-                    backend.off('onImageListChange', that, 'updateBaseImages');
+                Mist.cloudsController.content.forEach(function(cloud) {
+                    cloud.off('onImageListChange', that, 'updateBaseImages');
                 });
                 Mist.imageSearchController.off('onSearchEnd', this, 'updateBaseImages');
                 $(window).off('scroll');
@@ -88,8 +88,8 @@ define('app/views/image_list', ['app/views/mistscreen'],
 
             updateDefaultImages: function () {
                 var newImages = [];
-                Mist.backendsController.content.forEach(function (backend) {
-                    backend.images.content.forEach(function (image) {
+                Mist.cloudsController.content.forEach(function (cloud) {
+                    cloud.images.content.forEach(function (image) {
                         if (image.star)
                             newImages.unshift(image);
                         else

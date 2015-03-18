@@ -20,7 +20,7 @@ define('app/controllers/locations', ['app/models/location'],
 
             content: null,
             loading: null,
-            backend: null,
+            cloud: null,
 
 
             //

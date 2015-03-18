@@ -10,11 +10,11 @@ define('app/views/script_run', ['app/views/panel'],
         return App.ScriptRunView = PanelView.extend({
 
             load: function () {
-                Mist.backendsController.on('onMachineListChange', this, 'refreshList');
+                Mist.cloudsController.on('onMachineListChange', this, 'refreshList');
             }.on('didInsertElement'),
 
             unload: function () {
-                Mist.backendsController.off('onMachineListChange', this, 'refreshList');
+                Mist.cloudsController.off('onMachineListChange', this, 'refreshList');
             }.on('willDestroyElement'),
 
             refreshList: function () {

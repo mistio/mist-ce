@@ -81,12 +81,12 @@ define('app/views/network_create', ['app/views/panel'],
 
             actions: {
 
-                backendSelected: function (backend) {
+                cloudSelected: function (cloud) {
                     Ember.run.later(function () {
                         $('#network-create-name-wrapper').slideDown();
                     }, SLIDE_DOWN_DELAY);
-                    Mist.networkCreateController.selectBackend(backend);
-                    this._fieldIsReady('backend');
+                    Mist.networkCreateController.selectCloud(cloud);
+                    this._fieldIsReady('cloud');
                 },
 
 

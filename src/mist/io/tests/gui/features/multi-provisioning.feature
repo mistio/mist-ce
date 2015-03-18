@@ -2,12 +2,12 @@
 Feature: Machines
 
   Background:
-    Given backends credentials
+    Given clouds credentials
     When I visit mist.io
 
   @machines-linode
   Scenario: Machine Actions Linode
-    Given "Linode" backend added
+    Given "Linode" cloud added
     Then Images counter should be greater than 0 within 80 seconds
     When I click the button that contains "Machines"
     And I click the "Create" button
@@ -48,7 +48,7 @@ Feature: Machines
 
   @machines-rackspace
   Scenario: Machine Actions Rackspace
-    Given "Rackspace ORD" backend added
+    Given "Rackspace ORD" cloud added
     Then Images counter should be greater than 0 within 80 seconds
     When I click the button that contains "Machines"
     And I click the "Create" button
@@ -90,7 +90,7 @@ Feature: Machines
 
   @machines-softlayer
   Scenario: Machine Actions SoftLayer
-    Given "SoftLayer" backend added
+    Given "SoftLayer" cloud added
     Then Images counter should be greater than 0 within 80 seconds
     When I click the button that contains "Machines"
     And I click the "Create" button

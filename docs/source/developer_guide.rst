@@ -107,7 +107,7 @@ The tests_config.yaml will seem like this at first::
     KEY_NAME: NinjaTestsKey
     COOKIE:
 
-You then add your credentials for every backend *(in case you don't have credentials for a backend it will not be added)*
+You then add your credentials for every cloud *(in case you don't have credentials for a cloud it will not be added)*
 
 To actually run the tests::
 
