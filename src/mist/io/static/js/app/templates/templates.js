@@ -524,7 +524,7 @@ function program4(depth0,data) {
 function program6(depth0,data) {
   
   var buffer = '', stack1;
-  data.buffer.push("\n                    <div class=\"command-container\"\n                        ");
+  data.buffer.push("\n                    <pre class=\"command-container\"\n                        ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "commandClicked", "", {hash:{
     'on': ("click"),
     'target': ("view")
@@ -532,7 +532,7 @@ function program6(depth0,data) {
   data.buffer.push(">");
   stack1 = helpers._triageMustache.call(depth0, "command", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>\n                ");
+  data.buffer.push("</pre>\n                ");
   return buffer;
   }
 
@@ -782,7 +782,7 @@ function program1(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "timeWindowChanged", "range", "range", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0,depth0],types:["STRING","STRING","STRING"],data:data})));
-  data.buffer.push(">\n                    custom range</a>\n            </li>\n        </ul>\n    </div>\n\n\n    <!--\n        Pick Range Popup\n    -->\n\n    <div id=\"pick-range-screen\"\n        class=\"ui-popup-screen ui-screen-hidden\">\n    </div>\n    <div>\n        <div id=\"pick-range-popup\"\n            class=\"flip\n                ui-popup-container\n                ui-popup-hidden\n                ui-popup-truncate\">\n            <div id=\"pick-range\"\n                class=\"small-popup\n                    ui-popup\n                    ui-body-inherit\n                    ui-overlay-shadow\n                    ui-corner-all\"\n                data-role=\"popup\"\n                data-enhanced=\"true\"\n                data-position-to=\"origin\"\n                data-transition=\"flip\">\n\n                <div class=\"ui-header ui-bar-b\" role=\"banner\">\n                    <h1 class=\"ui-title\">Select Range</h1>\n                </div>\n                <div class=\"ui-content ui-body-a\" role=\"main\">\n                    <label>From:</label>\n                    ");
+  data.buffer.push(">\n                    custom range</a>\n            </li>\n        </ul>\n    </div>\n\n\n    <!--\n        Pick Range Popup\n    -->\n\n    <div id=\"pick-range-screen\"\n        class=\"ui-popup-screen ui-screen-hidden\">\n    </div>\n    <div>\n        <div id=\"pick-range-popup\"\n            class=\"flip\n                ui-popup-container\n                ui-popup-hidden\n                ui-popup-truncate\">\n            <div id=\"pick-range\"\n                class=\"small-popup\n                    ui-popup\n                    ui-body-inherit\n                    ui-overlay-shadow\n                    ui-corner-all\"\n                data-role=\"popup\"\n                data-enhanced=\"true\"\n                data-position-to=\"#time-window-control\"\n                data-transition=\"flip\">\n\n                <div class=\"ui-header ui-bar-b\" role=\"banner\">\n                    <h1 class=\"ui-title\">Select Range</h1>\n                </div>\n                <div class=\"ui-content ui-body-a\" role=\"main\">\n                    <label>From:</label>\n                    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
     'id': ("range-start"),
     'placeholder': ("range start")
