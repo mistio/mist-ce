@@ -65,10 +65,8 @@ define('app/views/graph_list_control', ['app/views/templated'],
                     $('#pick-range').popup('open');
                     var until = Mist.graphsController.fetchStatsArgs.until;
                     var from = until - Mist.graphsController.config.timeWindow;
-                    $('#pick-range #range-start').val(new Date(from)
-                        .toLocaleString(undefined, {'hour12': false}));
-                    $('#pick-range #range-stop').val(new Date(until)
-                        .toLocaleString(undefined, {'hour12': false}));
+                    $('#pick-range #range-start').val(new Date(from)._toString());
+                    $('#pick-range #range-stop').val(new Date(until)._toString());
                 }, 300);
             },
 
