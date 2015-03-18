@@ -443,7 +443,7 @@ class DockerShell(object):
         self.ws.close()
         retval = 0
         output = self.buffer.split("\n")[1:-1]
-        return retval, "".join(output)
+        return retval, "\n".join(output)
 
     def _on_message(self, ws, message):
         self.buffer = self.buffer + message
@@ -468,7 +468,7 @@ class DockerShell(object):
 
 class Shell(object):
     """
-    Proxy Shell Class to distinguish weather we are talking about Docker or Pramiko Shell
+    Proxy Shell Class to distinguish weather we are talking about Docker or Paramiko Shell
     """
     def __init__(self, host, provider=None, username=None, key=None, password=None, port=22, enforce_paramiko=False):
         """
