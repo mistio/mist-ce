@@ -590,7 +590,7 @@ class ListMachines(UserTask):
         user = user_from_email(email)
 
         if len(errors) == 6: # If does not respond for a minute
-            notify_user(user, 'Backend %s does not respond' % user.backends[backend_id]['title'],
+            notify_user(user, 'Backend %s does not respond' % user.backends[backend_id].title,
                         email_notify=False, backend_id=backend_id)
 
         # Keep retrying for 30 minutes
@@ -602,7 +602,7 @@ class ListMachines(UserTask):
             with user.lock_n_load():
                 user.backends[backend_id].enabled = False
                 user.save()
-            notify_user(user, "Backend %s djsabled after not responding for 30mins" % user.backends[backend_id]['title'],
+            notify_user(user, "Backend %s disabled after not responding for 30mins" % user.backends[backend_id].title,
                         email_notify=True, backend_id=backend_id)
             log_event(user.email, 'incident', action='disable_backend',
                       backend_id=backend_id, error="Backend unresponsive")
