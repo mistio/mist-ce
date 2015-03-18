@@ -94,6 +94,11 @@ ul.incidents li a .machine {
 
 #home-page .ui-body {
     padding: 0;
+    overflow: visible;
+}
+
+#home-page .ui-grid-a.ui-responsive {
+    overflow: visible;
 }
 
 #home-page .logs {
