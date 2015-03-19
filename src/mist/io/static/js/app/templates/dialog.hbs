@@ -55,8 +55,8 @@
                 {{/if}}
 
                 {{#if this.command}}
-                    <div class="command-container"
-                        {{action "commandClicked" this on="click" target="view"}}>{{this.command}}</div>
+                    <pre class="command-container"
+                        {{action "commandClicked" this on="click" target="view"}}>{{this.command}}</pre>
                 {{/if}}
 
             {{/each}}

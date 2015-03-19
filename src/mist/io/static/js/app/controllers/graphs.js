@@ -144,6 +144,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     canControl: true,
                     canMinimize: true,
                     timeWindow: TIME_WINDOW_MAP.minutes,
+                    measurementStep: 10 * TIME_MAP.SECOND,
                     showGraphLegend: false,
                     historyWidgetPosition: 'top',
                 });
@@ -242,9 +243,9 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 };
                 if (DEBUG_STATS) {
                     info('Requesting stats from: ' +
-                        new Date(payload.start).getPrettyDateTime() +
+                        new Date(payload.start * 1000).getPrettyDateTime() +
                         ' until: ' +
-                        new Date(payload.stop).getPrettyDateTime(),
+                        new Date(payload.stop * 1000).getPrettyDateTime(),
                         payload);
                 }
                 return payload
@@ -275,6 +276,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     if (data.error) {
                         Mist.notificationController.notify(data.error);
                         this._clearPendingRequests();
+                        this.trigger('onFetchStatsError', data);
                     } else
                         that._handleResponse(request, data.metrics, data);
                 }
@@ -447,6 +449,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                         until: args.until,
                     });
                 },
+
 
                 goBack: function () {
                     this.parent._clearPendingRequests();
