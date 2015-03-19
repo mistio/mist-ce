@@ -135,10 +135,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
              *
              */
 
-            getSize: function (sizeId) {
-                return this.sizes.getSize(sizeId);
-            },
-
 
             getImage: function (imageId) {
                 return this.images.getImage(imageId);

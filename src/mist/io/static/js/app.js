@@ -874,7 +874,7 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_sizes', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.sizes.load(data.sizes);
+            backend.sizes.setContent(data.sizes);
     })
     .on('list_images', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
