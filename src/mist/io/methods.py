@@ -2225,9 +2225,8 @@ def ssh_command(user, backend_id, machine_id, host, command,
         raise BackendNotFoundError(backend_id)
     else:
         backend = user.backends[backend_id]
-        provider = backend.provider
 
-    shell = Shell(host, provider=provider)
+    shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
                                            key_id, username, password, port)
     retval, output = shell.command(command)
@@ -2984,23 +2983,6 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='',
         log.warn('probing with key %s' % key_id)
 
     if not shell:
-        backend = user.backends[backend_id]
-        if backend.provider == "docker":
-            command = "sudo -n uptime 2>&1 | grep load | wc -l && echo -------- " \
-                      "&& uptime && echo -------- " \
-                      "&& if [ -f /proc/uptime ]; " \
-                      "then cat /proc/uptime; " \
-                      "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`; " \
-                      "fi; echo -------- &&" \
-                      "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;" \
-                      "else sysctl hw.ncpu | awk '{print $2}';" \
-                      "fi;" \
-                      "echo -------- && " \
-                      "/sbin/ifconfig;" \
-                      "echo -------- &&" \
-                      "/bin/df -Pah;" \
-                      "echo --------\n"
-
         cmd_output = ssh_command(user, backend_id, machine_id,
                                  host, command, key_id=key_id)
     else:
