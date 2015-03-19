@@ -42,7 +42,7 @@ define('app/controllers/base_array', ['ember'],
 
 
             setContent: function (content) {
-                content |= [];
+                content = !!content ? content : [];
                 this._passOnProperties(content);
                 this._updateContent(content);
                 this.set('loading', false);

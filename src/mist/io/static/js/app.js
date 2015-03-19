@@ -889,7 +889,7 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_locations', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.locations.load(data.locations);
+            backend.locations.setContent(data.locations);
     })
     .on('list_networks', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
