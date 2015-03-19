@@ -44,7 +44,7 @@ class ParamikoShell(object):
 
     Use it like:
     shell = Shell('localhost', username='root', password='123')
-    print shell.command('on0')
+    print shell.command('uptime')
 
     Or:
     shell = Shell('localhost')
@@ -505,8 +505,7 @@ class Shell(object):
 
     def invoke_shell(self, term='xterm', cols=None, rows=None):
         if isinstance(self._shell, ParamikoShell):
-            self._shell.ssh.invoke_shell(term, cols, rows)
-            return self._shell.ssh
+            return self._shell.ssh.invoke_shell(term, cols, rows)
         elif isinstance(self._shell, DockerShell):
             return self._shell.ws
 
