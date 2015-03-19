@@ -14,15 +14,8 @@
 
 #single-machine-page #history-control {
     float: right;
-    margin-top: -56px;
-    margin-right: -7px;
-}
-
-#history-control-stream {
-    float: right;
-    margin: 0;
-    line-height: 21px;
-    border-radius: 0;
+    margin-top: -70px;
+    margin-right: -5px;
 }
 
 #home-page .graphValue {
@@ -36,31 +29,35 @@
 #history-control #time-window-control {
     text-align: center;
     margin: 0;
-    border-width: 1px 0px;
+    border-width: 0px;
     width: 100%;
-    margin-top: -47px;
+    margin-top: -40px;
+    clear: both;
     min-width: 190px;
 }
 
 #history-control a.time {
     width: 65px;
-    height: 40px;
+    height: 39px;
     border-radius: 0em;
-    margin: -6px -5px 0px 0px;
+    margin: 10px -5px -6px 0px;
     z-index: 10;
-    border-bottom-width: 0px;
+    border-width: 0px;
 }
 
 #time-window-control {
     margin: 0;
     border-radius: 0;
     border-left-width: 0;
+    height: 45px;
+    overflow: hidden;
 }
 
 #time-window-control .ui-btn {
-    line-height: 25px;
+    line-height: 24px;
     padding-left: 85px !important;
     padding-right: 80px !important;
+    border-width: 0px;
 }
 
 #time-window-control.is-streaming .ui-btn {
@@ -78,7 +75,7 @@
 }
 
 #monitoring-collapsible h4.ui-collapsible-heading a {
-    height: 21px;
+    height: 20px;
 }
 
 .graph-button {

@@ -23,4 +23,5 @@ src/deploy_collectd
 settings.py
 local/
 .settings
+.idea/
 share/
