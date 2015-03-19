@@ -1,4 +1,4 @@
-define('app/views/key_list', ['app/views/mistscreen'],
+define('app/views/key_list', ['app/views/page'],
     /**
      *  Key List View
      *

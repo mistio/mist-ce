@@ -1,4 +1,4 @@
-define('app/views/machine', ['app/views/mistscreen'],
+define('app/views/machine', ['app/views/page'],
     //
     //  Machine View
     //

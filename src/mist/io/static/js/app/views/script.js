@@ -1,4 +1,4 @@
-define('app/views/script', ['app/views/mistscreen'],
+define('app/views/script', ['app/views/page'],
     //
     //  Script View
     //
