@@ -1,9 +1,10 @@
-define('app/controllers/locations', [
+define('app/controllers/locations',
+    [
         'app/controllers/base_array',
         'app/models/location'
     ],
     //
-    //  Locations controller
+    //  Locations Controller
     //
     //  @returns Class
     //
