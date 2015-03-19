@@ -102,7 +102,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
                     // Add events
                     this.sizes.on('onSizeListChange', this, '_updateSizeCount');
-                    this.images.on('onImageListChange', this, '_updateImageCount');
+                    this.images.on('onChange', this, '_updateImageCount');
                     this.machines.on('onMachineListChange', this, '_updateMachineCount');
                     this.locations.on('onLocationListChange', this, '_updateLocationCount');
                     this.networks.on('onChange', this, '_updateNetworkCount');
@@ -134,11 +134,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
              *  Methods
              *
              */
-
-
-            getImage: function (imageId) {
-                return this.images.getImage(imageId);
-            },
 
 
             getMachine: function (machineId) {
@@ -196,29 +191,13 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 return this.provider;
             },
 
+
             /**
              *
              *  Pseudo-Private Methods
              *
              */
 
-            _toggle: function() {
-                if (this.enabled) {
-                    /*
-                    this.sizes.load();
-                    this.images.load();
-                    this.machines.load();
-                    this.locations.load();
-                    */
-                } else {
-                    /*
-                    this.sizes.clear();
-                    this.images.clear();
-                    this.machines.clear();
-                    this.locations.clear();
-                    */
-                }
-            },
 
             _updateSizeCount: function () {
                 Ember.run(this, function () {
@@ -230,8 +209,8 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             _updateImageCount: function () {
                 Ember.run(this, function () {
-                    this.set('imageCount', this.images.content.length);
-                    this.trigger('onImageListChange');
+                    this.set('imageCount', this.get('images').get('length'));
+                    this.trigger('onImagesChange');
                 });
             },
 
