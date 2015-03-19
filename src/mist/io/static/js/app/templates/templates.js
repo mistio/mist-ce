@@ -2,9 +2,9 @@ define('app/templates/templates', ['ember'], function() {
   return function (callback) {
     if (!JS_BUILD) {
       require([
-        'text!app/templates/backend_add.hbs',
-        'text!app/templates/backend_button.hbs',
-        'text!app/templates/backend_edit.hbs',
+        'text!app/templates/cloud_add.hbs',
+        'text!app/templates/cloud_button.hbs',
+        'text!app/templates/cloud_edit.hbs',
         'text!app/templates/confirmation_dialog.hbs',
         'text!app/templates/dialog.hbs',
         'text!app/templates/file_upload.hbs',
@@ -58,9 +58,9 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/subnet_list_item.hbs',
         'text!app/templates/user_menu.hbs',
       ], function () {
-        Ember.TEMPLATES['backend_add'] = Ember.Handlebars.compile(arguments[0]);
-        Ember.TEMPLATES['backend_button'] = Ember.Handlebars.compile(arguments[1]);
-        Ember.TEMPLATES['backend_edit'] = Ember.Handlebars.compile(arguments[2]);
+        Ember.TEMPLATES['cloud_add'] = Ember.Handlebars.compile(arguments[0]);
+        Ember.TEMPLATES['cloud_button'] = Ember.Handlebars.compile(arguments[1]);
+        Ember.TEMPLATES['cloud_edit'] = Ember.Handlebars.compile(arguments[2]);
         Ember.TEMPLATES['confirmation_dialog'] = Ember.Handlebars.compile(arguments[3]);
         Ember.TEMPLATES['dialog'] = Ember.Handlebars.compile(arguments[4]);
         Ember.TEMPLATES['file_upload'] = Ember.Handlebars.compile(arguments[5]);
@@ -117,7 +117,7 @@ define('app/templates/templates', ['ember'], function() {
       });
       return;
     }
-Ember.TEMPLATES["backend_add"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["cloud_add"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -127,10 +127,10 @@ function program1(depth0,data) {
   var buffer = '', stack1;
   data.buffer.push("\n                   <span class=\"provider-icon-small\">\n                        <span ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'class': ("Mist.backendAddController.provider.className")
+    'class': ("Mist.cloudAddController.provider.className")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push("></span>\n                    </span>\n                    ");
-  stack1 = helpers._triageMustache.call(depth0, "Mist.backendAddController.provider.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "Mist.cloudAddController.provider.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                ");
   return buffer;
@@ -347,23 +347,23 @@ function program30(depth0,data) {
   data.buffer.push("\n            <div class=\"ajax-loader\"></div>\n        ");
   }
 
-  data.buffer.push("<div id=\"backend-add\"\n    data-swipe-close=\"false\"\n    class=\"side-panel\"\n    data-role=\"panel\"\n    data-position=\"right\"\n    data-display=\"overlay\"\n    data-theme=\"c\">\n\n    <div data-role=\"header\">\n        <h1>Add cloud</h1>\n        <a class=\"ui-btn-right\" data-icon=\"info\" data-iconpos=\"notext\" data-theme=\"a\"\n            target=\"_blank\" href=\"https://mistio.zendesk.com/hc/en-us\"></a>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <label>Provider:</label>\n        <div id=\"new-backend-provider\"\n            class=\"mist-select\"\n            data-role=\"collapsible\"\n            data-collapsed-icon=\"carat-d\"\n            data-expanded-icon=\"carat-u\"\n            data-iconpos=\"right\"\n            data-theme=\"a\">\n            <h4>");
-  stack1 = helpers['if'].call(depth0, "Mist.backendAddController.provider.title", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("<div id=\"cloud-add\"\n    data-swipe-close=\"false\"\n    class=\"side-panel\"\n    data-role=\"panel\"\n    data-position=\"right\"\n    data-display=\"overlay\"\n    data-theme=\"c\">\n\n    <div data-role=\"header\">\n        <h1>Add cloud</h1>\n        <a class=\"ui-btn-right\" data-icon=\"info\" data-iconpos=\"notext\" data-theme=\"a\"\n            target=\"_blank\" href=\"https://mistio.zendesk.com/hc/en-us\"></a>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <label>Provider:</label>\n        <div id=\"new-cloud-provider\"\n            class=\"mist-select\"\n            data-role=\"collapsible\"\n            data-collapsed-icon=\"carat-d\"\n            data-expanded-icon=\"carat-u\"\n            data-iconpos=\"right\"\n            data-theme=\"a\">\n            <h4>");
+  stack1 = helpers['if'].call(depth0, "Mist.cloudAddController.provider.title", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            </h4>\n            <ul class=\"mist-select\" data-role=\"listview\" data-theme=\"a\">\n                ");
-  stack1 = helpers.each.call(depth0, "Mist.backendsController.providerList", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "Mist.cloudsController.providerList", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            </ul>\n        </div>\n\n        <div id=\"backend-add-fields\">\n        ");
+  data.buffer.push("\n            </ul>\n        </div>\n\n        <div id=\"cloud-add-fields\">\n        ");
   stack1 = helpers.each.call(depth0, "field", "in", "view.providerFields", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0,depth0,depth0],types:["ID","ID","ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </div>\n\n\n        ");
-  stack1 = helpers['if'].call(depth0, "Mist.backendsController.addingBackend", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(30, program30, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.cloudsController.addingBackend", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(30, program30, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n        <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n            <a data-role=\"button\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(" data-theme=\"a\">Back</a>\n            <a id=\"new-backend-ok\" data-theme=\"d\"\n                ");
+  data.buffer.push(" data-theme=\"a\">Back</a>\n            <a id=\"new-cloud-ok\" data-theme=\"d\"\n                ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("view.isReady::ui-state-disabled :ui-btn :ui-btn-d")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
@@ -379,7 +379,7 @@ function program30(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["backend_button"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["cloud_button"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression;
@@ -396,7 +396,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   return buffer;
   
 });
-Ember.TEMPLATES["backend_edit"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["cloud_edit"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
@@ -407,24 +407,24 @@ function program1(depth0,data) {
   data.buffer.push("\n                <div class=\"ajax-loader\"></div>\n            ");
   }
 
-  data.buffer.push("<!-- Popup Overlay -->\n\n<div id=\"backend-edit-screen\"\n    class=\"ui-popup-screen\n        ui-overlay-b\n        ui-screen-hidden\">\n</div>\n\n<!-- Popup Wrapper -->\n<div id=\"backend-edit-popup\"\n     class=\"pop\n        ui-popup-container\n        ui-popup-hidden\n        ui-popup-truncate\">\n\n    <!-- Popup -->\n\n    <div id=\"backend-edit\"\n         class=\"mid-popup\n            ui-popup\n            ui-body-a\n            ui-overlay-shadow\n            ui-corner-all\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\">\n\n         <!-- Header -->\n\n        <div class=\"ui-header ui-bar-b\">\n\n            <h1 class=\"ui-title\">Edit cloud</h1>\n\n        </div>\n\n        <!-- Body -->\n\n        <div role=\"main\" class=\"ui-content\" data-theme=\"a\">\n\n            <!-- New backend title text field -->\n\n            ");
+  data.buffer.push("<!-- Popup Overlay -->\n\n<div id=\"cloud-edit-screen\"\n    class=\"ui-popup-screen\n        ui-overlay-b\n        ui-screen-hidden\">\n</div>\n\n<!-- Popup Wrapper -->\n<div id=\"cloud-edit-popup\"\n     class=\"pop\n        ui-popup-container\n        ui-popup-hidden\n        ui-popup-truncate\">\n\n    <!-- Popup -->\n\n    <div id=\"cloud-edit\"\n         class=\"mid-popup\n            ui-popup\n            ui-body-a\n            ui-overlay-shadow\n            ui-corner-all\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\">\n\n         <!-- Header -->\n\n        <div class=\"ui-header ui-bar-b\">\n\n            <h1 class=\"ui-title\">Edit cloud</h1>\n\n        </div>\n\n        <!-- Body -->\n\n        <div role=\"main\" class=\"ui-content\" data-theme=\"a\">\n\n            <!-- New cloud title text field -->\n\n            ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
-    'valueBinding': ("Mist.backendEditController.newTitle")
+    'valueBinding': ("Mist.cloudEditController.newTitle")
   },hashTypes:{'valueBinding': "STRING"},hashContexts:{'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n\n            <!-- Backend state toggle switch -->\n\n            <div data-role=\"fieldcontain\">\n                <select id=\"backend-toggle\" data-role=\"slider\"\n                    ");
+  data.buffer.push("\n\n            <!-- Backend state toggle switch -->\n\n            <div data-role=\"fieldcontain\">\n                <select id=\"cloud-toggle\" data-role=\"slider\"\n                    ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "stateToggleSwitched", {hash:{
     'target': ("view"),
     'on': ("change")
   },hashTypes:{'target': "STRING",'on': "STRING"},hashContexts:{'target': depth0,'on': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push(">\n                        <option value=\"0\">Disabled</option>\n                        <option value=\"1\">Enabled</option>\n                </select>\n                <span class=\"state\">");
-  stack1 = helpers._triageMustache.call(depth0, "Mist.backendEditController.backend.state", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "Mist.cloudEditController.cloud.state", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</span>\n            </div>\n\n            <!-- Delete button -->\n\n            <a class=\"ui-btn ui-shadow ui-corner-all\"\n                ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "deleteClicked", {hash:{
     'target': ("view"),
     'on': ("click")
   },hashTypes:{'target': "STRING",'on': "STRING"},hashContexts:{'target': depth0,'on': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">\n                Delete\n            </a>\n\n            <!-- Delete confirmation -->\n\n            <div id=\"backend-delete-confirm\">\n                <label>Confirm backend removal?</label>\n                <label id=\"monitoring-message\">There are monitored machines.\n                    <br />Monitoring for these will be disabled\n                </label>\n                <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n                    <a class=\"ui-btn ui-shadow ui-corner-all\" id=\"button-confirm-disable\"\n                        ");
+  data.buffer.push(">\n                Delete\n            </a>\n\n            <!-- Delete confirmation -->\n\n            <div id=\"cloud-delete-confirm\">\n                <label>Confirm cloud removal?</label>\n                <label id=\"monitoring-message\">There are monitored machines.\n                    <br />Monitoring for these will be disabled\n                </label>\n                <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n                    <a class=\"ui-btn ui-shadow ui-corner-all\" id=\"button-confirm-disable\"\n                        ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "yesClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
@@ -433,7 +433,7 @@ function program1(depth0,data) {
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push(">No</a>\n                </div>\n            </div>\n\n            ");
-  stack1 = helpers['if'].call(depth0, "Mist.backendsController.deletingBackend", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.cloudsController.deletingBackend", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n            <!-- Back button -->\n\n            <a class=\"ui-btn ui-shadow ui-corner-all button-back\"\n                ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
@@ -1001,10 +1001,10 @@ function program1(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "backendButton", {hash:{
-    'backendBinding': ("this"),
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "cloudButton", {hash:{
+    'cloudBinding': ("this"),
     'class': ("ui-btn ui-input-btn ui-corner-all ui-shadow")
-  },hashTypes:{'backendBinding': "STRING",'class': "STRING"},hashContexts:{'backendBinding': depth0,'class': depth0},contexts:[depth0],types:["STRING"],data:data})));
+  },hashTypes:{'cloudBinding': "STRING",'class': "STRING"},hashContexts:{'cloudBinding': depth0,'class': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n            ");
   return buffer;
   }
@@ -1017,13 +1017,13 @@ function program3(depth0,data) {
     'class': ("view.hasIncidents::full-width :ui-block-a")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push(">\n                <div class=\"ui-body\">\n                    <!-- Navigation -->\n                    <ul class=\"ui-listview ui-listview-inset ui-corner-all ui-shadow\">\n                        <!-- Machines link -->\n                        <li class=\"ui-li-has-count ui-first-child\">\n                            <a class=\"ui-btn\" href=\"#/machines\">\n                                <span class=\"ui-li-count ui-body-inherit\">\n                                    ");
-  stack1 = helpers._triageMustache.call(depth0, "Mist.backendsController.machineCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "Mist.cloudsController.machineCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                                </span>\n                                Machines\n                            </a>\n                        </li>\n\n                        <!-- Images link -->\n                        <li class=\"ui-li-has-count\">\n                            <a class=\"ui-btn\" href=\"#/images\">\n                                <span class=\"ui-li-count ui-body-inherit\">\n                                    ");
-  stack1 = helpers._triageMustache.call(depth0, "Mist.backendsController.imageCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "Mist.cloudsController.imageCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                                </span>\n                                Images\n                            </a>\n                        </li>\n\n                        <!-- Networks link -->\n                        ");
-  stack1 = helpers['if'].call(depth0, "Mist.backendsController.hasNetworks", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.cloudsController.hasNetworks", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n                        <!-- Keys link -->\n                        <li class=\"ui-li-has-count\">\n                            <a class=\"ui-btn\" href=\"#/keys\">\n                                <span class=\"ui-li-count ui-body-inherit\">\n                                    ");
   stack1 = helpers._triageMustache.call(depth0, "Mist.keysController.content.length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
@@ -1052,7 +1052,7 @@ function program4(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                        <li class=\"ui-li-has-count\">\n                            <a class=\"ui-btn\" href=\"#/networks\">\n                                <span class=\"ui-li-count ui-body-inherit\">\n                                    ");
-  stack1 = helpers._triageMustache.call(depth0, "Mist.backendsController.networkCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "Mist.cloudsController.networkCount", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                                </span>\n                                Networks\n                            </a>\n                        </li>\n                        ");
   return buffer;
@@ -1121,22 +1121,22 @@ function program11(depth0,data) {
 
   data.buffer.push("<div id=\"home-page\" data-role=\"page\" class=\"ui-page-active ui-page\">\n    <!-- Page header -->\n    <div class=\"ui-header ui-bar-b\">\n        <h1 class=\"ui-title\">mist.io</h1>\n        ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push("\n    </div>\n\n    <!-- Page Body -->\n    <div role=\"main\" class=\"ui-content\" data-theme=\"c\">\n\n        <!-- Add backend button -->\n        <a id=\"add-backend-btn\" class=\"ui-link ui-btn ui-btn-d ui-icon-plus\n            ui-btn-icon-right ui-shadow ui-corner-all ui-mini\"\n            ");
+  data.buffer.push("\n    </div>\n\n    <!-- Page Body -->\n    <div role=\"main\" class=\"ui-content\" data-theme=\"c\">\n\n        <!-- Add cloud button -->\n        <a id=\"add-cloud-btn\" class=\"ui-link ui-btn ui-btn-d ui-icon-plus\n            ui-btn-icon-right ui-shadow ui-corner-all ui-mini\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "addBackend", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(" data-mini=\"true\">\n                Add cloud\n        </a>\n\n        <!-- Backends list -->\n        <div id=\"backend-buttons\" data-role=\"controlgroup\" data-type=\"horizontal\"\n            class=\"ui-controlgroup ui-controlgroup-horizontal ui-corner-all\">\n            ");
-  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push(" data-mini=\"true\">\n                Add cloud\n        </a>\n\n        <!-- Backends list -->\n        <div id=\"cloud-buttons\" data-role=\"controlgroup\" data-type=\"horizontal\"\n            class=\"ui-controlgroup ui-controlgroup-horizontal ui-corner-all\">\n            ");
+  stack1 = helpers.each.call(depth0, "Mist.cloudsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </div>\n\n        ");
-  stack1 = helpers['if'].call(depth0, "Mist.backendsController.length", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.cloudsController.length", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n    </div>\n\n    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "dialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "backendAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "cloudAdd", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "backendEdit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "cloudEdit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n</div>\n");
   return buffer;
   
@@ -1179,7 +1179,7 @@ function program7(depth0,data) {
   data.buffer.push("<div id=\"image-list-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#\" class=\"responsive-button\" data-icon=\"home\">Home</a>\n\n        <h1>Images</h1>\n\n        ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        ");
-  stack1 = helpers['if'].call(depth0, "Mist.backendsController.loadingImages", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.cloudsController.loadingImages", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n        ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -1238,7 +1238,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   data.buffer.push("</h3>\n    <p class=\"tag\">");
   data.buffer.push(escapeExpression(helpers.unbound.call(depth0, "view.image.id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("</p>\n    <p class=\"tag\">");
-  stack1 = helpers._triageMustache.call(depth0, "view.image.backend.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "view.image.cloud.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</p>\n</a>\n");
   return buffer;
@@ -1430,7 +1430,7 @@ function program5(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n        <div id=\"single-key-machines\" data-role=\"collapsible\">\n\n            <h4>Machines\n                ");
-  stack1 = helpers['if'].call(depth0, "Mist.backendsController.loadingMachines", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.cloudsController.loadingMachines", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            </h4>\n            <ul data-role=\"listview\" class=\"checkbox-list\" data-inset=\"true\">\n                ");
   stack1 = helpers.each.call(depth0, "view.machines", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
@@ -1737,7 +1737,7 @@ function program5(depth0,data) {
   data.buffer.push("\n    <div class=\"details info-table\">\n        <table>\n            <tbody>\n            <tr>\n                <td>Date</td>\n                <td>");
   data.buffer.push(escapeExpression(helpers.unbound.call(depth0, "view.fullPrettyTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
   data.buffer.push("</td>\n            </tr>\n            ");
-  stack1 = helpers['if'].call(depth0, "view.backendTitle", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.cloudTitle", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            ");
   stack1 = helpers['if'].call(depth0, "view.machineLink", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
@@ -1752,7 +1752,7 @@ function program6(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n            <tr>\n                <td>Backend Title</td>\n                <td>");
-  stack1 = helpers._triageMustache.call(depth0, "view.backendTitle", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "view.cloudTitle", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</td>\n            </tr>\n            ");
   return buffer;
@@ -2069,7 +2069,7 @@ function program31(depth0,data) {
   stack1 = helpers._triageMustache.call(depth0, "Mist.machineAddController.newMachineProvider.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            </h4>\n            <ul data-role=\"listview\" data-theme=\"a\">\n                ");
-  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "Mist.cloudsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n            </ul>\n        </div>\n\n        <!-- Select Image -->\n\n        <label>Image:</label>\n        <div id=\"create-machine-image\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\"\n             class=\"mist-select\">\n            <h4>\n                ");
   stack1 = helpers['if'].call(depth0, "Mist.machineAddController.newMachineImage.id", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
@@ -2177,7 +2177,7 @@ function program1(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n            ");
-  stack1 = helpers['if'].call(depth0, "Mist.backendsController.loadingMachines", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.cloudsController.loadingMachines", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        ");
   return buffer;
@@ -2740,7 +2740,7 @@ function program6(depth0,data) {
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push(">Select</a>\n\n        <ul id=\"machines\"\n            data-role=\"listview\"\n            data-inset=\"true\"\n            data-filter=\"true\"\n            data-filter-placeholder=\"Filter...\"\n            data-theme=\"c\"\n            class=\"checkbox-list\">\n            ");
-  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "Mist.cloudsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "dialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
@@ -2765,7 +2765,7 @@ function program6(depth0,data) {
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
   data.buffer.push(">None</a>\n            </li>\n            ");
-  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "Mist.cloudsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n    </div>\n\n    <div class=\"tri-action-footer\" data-role=\"footer\" data-theme=\"b\">\n        <table><tbody><tr><td>\n            <a id=\"machines-tags-btn\" data-role=\"button\" data-icon=\"grid\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "tagsClicked", {hash:{
@@ -2826,7 +2826,7 @@ function program2(depth0,data) {
   stack1 = helpers.unless.call(depth0, "pendingCreation", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n            </div>\n\n            <div class=\"ui-block-c machine-tags\">\n                <span class=\"tag\">");
-  stack1 = helpers._triageMustache.call(depth0, "view.machine.backend.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "view.machine.cloud.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</span>\n                ");
   stack1 = helpers.each.call(depth0, "view.machine.tags", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
@@ -3446,7 +3446,7 @@ function program1(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                        ");
-  stack1 = helpers['if'].call(depth0, "backend", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(4, program4, data),fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "cloud", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(4, program4, data),fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                    ");
   return buffer;
@@ -3455,7 +3455,7 @@ function program2(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                            ");
-  stack1 = helpers._triageMustache.call(depth0, "backend.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "cloud.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                        ");
   return buffer;
@@ -3464,7 +3464,7 @@ function program2(depth0,data) {
 function program4(depth0,data) {
   
   
-  data.buffer.push("\n                            Select backend\n                        ");
+  data.buffer.push("\n                            Select cloud\n                        ");
   }
 
 function program6(depth0,data) {
@@ -3489,7 +3489,7 @@ function program8(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                                <li data-icon=\"false\">\n                                    <a ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "backendSelected", "", {hash:{
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "cloudSelected", "", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
   data.buffer.push(">\n                                        ");
@@ -3505,11 +3505,11 @@ function program10(depth0,data) {
   data.buffer.push("\n            <div class=\"ajax-loader\"></div>\n        ");
   }
 
-  data.buffer.push("<div id=\"network-create\"\n    data-swipe-close=\"false\"\n    class=\"side-panel\"\n    data-role=\"panel\"\n    data-position=\"right\"\n    data-display=\"overlay\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n        <h1>Create Network</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <!--\n            Select Backend\n\n            Allow only openstack backends for now\n        -->\n        <div id=\"network-create-backend-wrapper\">\n\n            <label for=\"network-create-backend\">Backend:</label>\n\n            <div id=\"network-create-backend\"\n                data-role=\"collapsible\"\n                data-iconpos=\"right\"\n                data-collapsed-icon=\"arrow-d\"\n                data-expanded-icon=\"arrow-u\"\n                data-theme=\"a\"\n                class=\"mist-select\">\n\n                <h4>\n                    ");
+  data.buffer.push("<div id=\"network-create\"\n    data-swipe-close=\"false\"\n    class=\"side-panel\"\n    data-role=\"panel\"\n    data-position=\"right\"\n    data-display=\"overlay\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n        <h1>Create Network</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <!--\n            Select Backend\n\n            Allow only openstack clouds for now\n        -->\n        <div id=\"network-create-cloud-wrapper\">\n\n            <label for=\"network-create-cloud\">Backend:</label>\n\n            <div id=\"network-create-cloud\"\n                data-role=\"collapsible\"\n                data-iconpos=\"right\"\n                data-collapsed-icon=\"arrow-d\"\n                data-expanded-icon=\"arrow-u\"\n                data-theme=\"a\"\n                class=\"mist-select\">\n\n                <h4>\n                    ");
   stack1 = helpers['with'].call(depth0, "Mist.networkCreateController.network", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                </h4>\n\n                <ul data-role=\"listview\" data-theme=\"a\">\n\n                    ");
-  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "Mist.cloudsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n                </ul> <!-- list -->\n            </div> <!-- collapsible -->\n        </div><!-- wrapper -->\n\n\n        <!--\n            Select Network Name\n        -->\n        <div id=\"network-create-name-wrapper\">\n\n            <label for=\"network-create-name\">Network Name:</label>\n\n            ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -3677,12 +3677,12 @@ function program8(depth0,data) {
   stack1 = helpers['if'].call(depth0, "subnets", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    <div id=\"assign-machine\"\n        class=\"tiny-popup\"\n        data-role=\"popup\"\n        data-overlay-theme=\"b\"\n        data-transition=\"flip\">\n\n        <ul data-role=\"listview\">\n            ");
-  stack1 = helpers.each.call(depth0, "view.network.backend.machines.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "view.network.cloud.machines.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n    </div>\n\n    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "confirmationDialog", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    ");
-  stack1 = helpers['if'].call(depth0, "backend.isOpenStack", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "cloud.isOpenStack", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n</div>\n");
   return buffer;
@@ -3727,14 +3727,14 @@ function program3(depth0,data) {
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n        <a id=\"network-create-btn\"\n            ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'class': ("Mist.backendsController.hasOpenStack::ui-disabled\n                :responsive-button")
+    'class': ("Mist.cloudsController.hasOpenStack::ui-disabled\n                :responsive-button")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push("\n            data-role=\"button\"\n            data-icon=\"plus\"\n            data-iconpos=\"right\"\n            data-theme=\"d\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "createClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push(">Create</a>\n        <ul id=\"networks\"\n            data-role=\"listview\"\n            data-inset=\"true\"\n            data-filter=\"true\"\n            data-filter-placeholder=\"Filter...\"\n            data-theme=\"c\"\n            class=\"checkbox-list\">\n            ");
-  stack1 = helpers.each.call(depth0, "Mist.backendsController", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "Mist.cloudsController", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n\n        <div class=\"mid-padding\"></div>\n\n    </div>\n\n    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "networkCreate", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
@@ -3786,14 +3786,14 @@ function program5(depth0,data) {
   stack1 = helpers._triageMustache.call(depth0, "view.network.status", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</div>\n        <div class=\"ui-block-c key-tags\">\n            <span class=\"tag\">");
-  stack1 = helpers._triageMustache.call(depth0, "view.network.backend.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers._triageMustache.call(depth0, "view.network.cloud.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</span>\n        </div>\n    </div>\n\n");
   return buffer;
   }
 
   data.buffer.push("<label>\n    ");
-  stack1 = helpers['if'].call(depth0, "view.network.backend.isOpenStack", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.network.cloud.isOpenStack", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n</label>\n");
   stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "network", "view.network", options) : helperMissing.call(depth0, "link-to", "network", "view.network", options));
@@ -4185,7 +4185,7 @@ function program1(depth0,data) {
   data.buffer.push("\n                <div class=\"ajax-loader\"></div>\n            ");
   }
 
-  data.buffer.push("<!-- Popup Overlay -->\n\n<div id=\"script-edit-screen\"\n    class=\"ui-popup-screen\n        ui-overlay-b\n        ui-screen-hidden\">\n</div>\n\n<!-- Popup Wrapper -->\n<div id=\"script-edit-popup\"\n     class=\"pop\n        ui-popup-container\n        ui-popup-hidden\n        ui-popup-truncate\">\n\n    <!-- Popup -->\n\n    <div id=\"script-edit\"\n         class=\"mid-popup\n            ui-popup\n            ui-body-a\n            ui-overlay-shadow\n            ui-corner-all\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\">\n\n         <!-- Header -->\n\n        <div class=\"ui-header ui-bar-b\">\n\n            <h1 class=\"ui-title\">Rename script</h1>\n\n        </div>\n\n        <!-- Body -->\n\n        <div role=\"main\" class=\"ui-content\" data-theme=\"a\">\n\n            <!-- New backend name text field -->\n\n            ");
+  data.buffer.push("<!-- Popup Overlay -->\n\n<div id=\"script-edit-screen\"\n    class=\"ui-popup-screen\n        ui-overlay-b\n        ui-screen-hidden\">\n</div>\n\n<!-- Popup Wrapper -->\n<div id=\"script-edit-popup\"\n     class=\"pop\n        ui-popup-container\n        ui-popup-hidden\n        ui-popup-truncate\">\n\n    <!-- Popup -->\n\n    <div id=\"script-edit\"\n         class=\"mid-popup\n            ui-popup\n            ui-body-a\n            ui-overlay-shadow\n            ui-corner-all\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\">\n\n         <!-- Header -->\n\n        <div class=\"ui-header ui-bar-b\">\n\n            <h1 class=\"ui-title\">Rename script</h1>\n\n        </div>\n\n        <!-- Body -->\n\n        <div role=\"main\" class=\"ui-content\" data-theme=\"a\">\n\n            <!-- New cloud name text field -->\n\n            ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
     'id': ("script-edit-new-name"),
     'valueBinding': ("Mist.scriptEditController.newName")
@@ -4519,7 +4519,7 @@ function program11(depth0,data) {
   stack1 = helpers['with'].call(depth0, "Mist.scriptRunController.scriptToRun", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                </h4>\n                <ul data-role=\"listview\" data-theme=\"a\">\n                    ");
-  stack1 = helpers.each.call(depth0, "Mist.backendsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "Mist.cloudsController.content", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                </ul>\n            </div>\n        </div>\n\n        <div class=\"form-field\">\n            <label for=\"script-params\">Parameters (optional):</label>\n            ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextArea", {hash:{
