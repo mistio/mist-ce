@@ -144,7 +144,10 @@ class ShellNamespace(CustomNamespace):
                     pass
             while True:
                 wait_read(self.channel.fileno())
-                data = self.shell.recv(1024).decode('utf-8', 'ignore')
+                try:
+                    data = self.channel.recv(1024).decode('utf-8', 'ignore')
+                except TypeError:
+                    data = self.channel.recv().decode('utf-8', 'ignore')
 
                 if not len(data):
                     return
