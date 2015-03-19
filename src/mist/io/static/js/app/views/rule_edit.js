@@ -23,6 +23,14 @@ define('app/views/rule_edit', ['app/views/controlled'],
             newCommand: null,
 
 
+            sortedMetrics: function () {
+                var metrics = this.get('metrics');
+                if (metrics)
+                    return metrics.sortBy('lowerName');
+                return [];
+            }.property('metrics'),
+
+
             //
             //
             //  Methods

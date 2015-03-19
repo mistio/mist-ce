@@ -524,7 +524,7 @@ function program4(depth0,data) {
 function program6(depth0,data) {
   
   var buffer = '', stack1;
-  data.buffer.push("\n                    <div class=\"command-container\"\n                        ");
+  data.buffer.push("\n                    <pre class=\"command-container\"\n                        ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "commandClicked", "", {hash:{
     'on': ("click"),
     'target': ("view")
@@ -532,7 +532,7 @@ function program6(depth0,data) {
   data.buffer.push(">");
   stack1 = helpers._triageMustache.call(depth0, "command", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>\n                ");
+  data.buffer.push("</pre>\n                ");
   return buffer;
   }
 
@@ -782,7 +782,7 @@ function program1(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "timeWindowChanged", "range", "range", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0,depth0],types:["STRING","STRING","STRING"],data:data})));
-  data.buffer.push(">\n                    custom range</a>\n            </li>\n        </ul>\n    </div>\n\n\n    <!--\n        Pick Range Popup\n    -->\n\n    <div id=\"pick-range-screen\"\n        class=\"ui-popup-screen ui-screen-hidden\">\n    </div>\n    <div>\n        <div id=\"pick-range-popup\"\n            class=\"flip\n                ui-popup-container\n                ui-popup-hidden\n                ui-popup-truncate\">\n            <div id=\"pick-range\"\n                class=\"small-popup\n                    ui-popup\n                    ui-body-inherit\n                    ui-overlay-shadow\n                    ui-corner-all\"\n                data-role=\"popup\"\n                data-enhanced=\"true\"\n                data-position-to=\"origin\"\n                data-transition=\"flip\">\n\n                <div class=\"ui-header ui-bar-b\" role=\"banner\">\n                    <h1 class=\"ui-title\">Select Range</h1>\n                </div>\n                <div class=\"ui-content ui-body-a\" role=\"main\">\n                    <label>From:</label>\n                    ");
+  data.buffer.push(">\n                    custom range</a>\n            </li>\n        </ul>\n    </div>\n\n\n    <!--\n        Pick Range Popup\n    -->\n\n    <div id=\"pick-range-screen\"\n        class=\"ui-popup-screen ui-screen-hidden\">\n    </div>\n    <div>\n        <div id=\"pick-range-popup\"\n            class=\"flip\n                ui-popup-container\n                ui-popup-hidden\n                ui-popup-truncate\">\n            <div id=\"pick-range\"\n                class=\"small-popup\n                    ui-popup\n                    ui-body-inherit\n                    ui-overlay-shadow\n                    ui-corner-all\"\n                data-role=\"popup\"\n                data-enhanced=\"true\"\n                data-position-to=\"#time-window-control\"\n                data-transition=\"flip\">\n\n                <div class=\"ui-header ui-bar-b\" role=\"banner\">\n                    <h1 class=\"ui-title\">Select Range</h1>\n                </div>\n                <div class=\"ui-content ui-body-a\" role=\"main\">\n                    <label>From:</label>\n                    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
     'id': ("range-start"),
     'placeholder': ("range start")
@@ -1734,6 +1734,23 @@ function program3(depth0,data) {
 function program5(depth0,data) {
   
   var buffer = '', stack1;
+  data.buffer.push("\n    <div class=\"details info-table\">\n        <table>\n            <tbody>\n            <tr>\n                <td>Date</td>\n                <td>");
+  data.buffer.push(escapeExpression(helpers.unbound.call(depth0, "view.fullPrettyTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("</td>\n            </tr>\n            ");
+  stack1 = helpers['if'].call(depth0, "view.backendTitle", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            ");
+  stack1 = helpers['if'].call(depth0, "view.machineLink", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            ");
+  stack1 = helpers.each.call(depth0, "view.details", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            </tbody>\n        </table>\n    </div>\n");
+  return buffer;
+  }
+function program6(depth0,data) {
+  
+  var buffer = '', stack1;
   data.buffer.push("\n            <tr>\n                <td>Backend Title</td>\n                <td>");
   stack1 = helpers._triageMustache.call(depth0, "view.backendTitle", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -1741,16 +1758,16 @@ function program5(depth0,data) {
   return buffer;
   }
 
-function program7(depth0,data) {
+function program8(depth0,data) {
   
   var buffer = '', stack1, helper, options;
   data.buffer.push("\n            <tr>\n                <td>Machine</td>\n                <td>\n                    ");
-  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "machine", "view.machineLink", options) : helperMissing.call(depth0, "link-to", "machine", "view.machineLink", options));
+  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "machine", "view.machineLink", options) : helperMissing.call(depth0, "link-to", "machine", "view.machineLink", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                </td>\n            </td>\n            ");
   return buffer;
   }
-function program8(depth0,data) {
+function program9(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                        ");
@@ -1759,7 +1776,7 @@ function program8(depth0,data) {
   return buffer;
   }
 
-function program10(depth0,data) {
+function program11(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                <tr>\n                    <td>");
@@ -1790,18 +1807,10 @@ function program10(depth0,data) {
   data.buffer.push("</div>\n            </div>\n            <div class=\"ui-block-c\">\n                <div class=\"time\">");
   stack1 = helpers._triageMustache.call(depth0, "view.prettyTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>\n            </div>\n        </div>\n    </a>\n\n    <div class=\"details info-table\">\n        <table>\n            <tbody>\n            <tr>\n                <td>Date</td>\n                <td>");
-  data.buffer.push(escapeExpression(helpers.unbound.call(depth0, "view.fullPrettyTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("</td>\n            </tr>\n            ");
-  stack1 = helpers['if'].call(depth0, "view.backendTitle", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("</div>\n            </div>\n        </div>\n    </a>\n");
+  stack1 = helpers.unless.call(depth0, "view.isCollapsed", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            ");
-  stack1 = helpers['if'].call(depth0, "view.machineLink", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            ");
-  stack1 = helpers.each.call(depth0, "view.details", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            </tbody>\n        </table>\n    </div>\n</span>\n");
+  data.buffer.push("\n</span>\n");
   return buffer;
   
 });
@@ -3855,7 +3864,7 @@ function program7(depth0,data) {
   }
 
   data.buffer.push("<div id=\"rule-metric-screen\" class=\"ui-popup-screen ui-screen-hidden ui-overlay-b\"></div>\n<div id=\"rule-metric-popup\"\n     class=\"ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow\">\n\n    <div id=\"rule-metric\"\n         class=\"ui-popup\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\">\n\n        <ul data-role=\"listview\">\n            ");
-  stack1 = helpers.each.call(depth0, "view.metrics", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "view.sortedMetrics", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </ul>\n    </div>\n</div>\n\n\n<div id=\"rule-operator-screen\" class=\"ui-popup-screen ui-screen-hidden ui-overlay-b\"></div>\n<div id=\"rule-operator-popup\"\n     class=\"ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow\">\n\n    <div id=\"rule-operator\"\n         class=\"ui-popup\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\">\n\n        <ul data-role=\"listview\">\n            ");
   stack1 = helpers.each.call(depth0, "Mist.rulesController.operatorList", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});

@@ -22,6 +22,9 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
+from libcloud.dns.types import Provider as DnsProvider
+from libcloud.dns.types import RecordType
+from libcloud.dns.providers import get_driver as get_dns_driver
 
 import ansible.playbook
 import ansible.utils.template
@@ -1277,7 +1280,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
                    script_id='', script_params='', job_id=None, docker_port_bindings={},
-                   docker_exposed_ports={}):
+                   docker_exposed_ports={}, hostname=''):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1412,7 +1415,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         mist.io.tasks.azure_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id
+            script_id=script_id, script_params=script_params, job_id = job_id,
+            hostname=hostname,
         )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1421,13 +1425,14 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id
+            script_id=script_id, script_params=script_params, job_id = job_id,
+            hostname=hostname,
         )
     elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             script_id=script_id, script_params=script_params,
-            job_id = job_id
+            job_id=job_id, hostname=hostname,
         )
 
 
@@ -3565,3 +3570,100 @@ def machine_name_validator(provider, name):
                 "or numbers, dashes and underscores. Must begin and end with letters or numbers, " + \
                 "and be at least 3 characters long")
     return name
+
+
+def create_dns_a_record(user, domain_name, ip_addr):
+    """Will try to create DNS A record for specified domain name and IP addr.
+
+    All backends for which there is DNS support will be tried to see if the
+    relevant zone exists.
+
+    """
+
+    # split domain_name in dot separated parts
+    parts = [part for part in domain_name.split('.') if part]
+    # find all possible domains for this domain name, longest first
+    all_domains = {}
+    for i in range(1, len(parts) - 1):
+        host = '.'.join(parts[:i])
+        domain = '.'.join(parts[i:]) + '.'
+        all_domains[domain] = host
+    if not all_domains:
+        raise MistError("Couldn't extract a valid domain from '%s'."
+                        % domain_name)
+
+    # iterate over all backends that can also be used as DNS providers
+    providers = {}
+    for backend in user.backends.values():
+        if backend.provider.startswith('ec2_'):
+            provider = DnsProvider.ROUTE53
+            creds = backend.apikey, backend.apisecret
+        #TODO: add support for more providers
+        #elif backend.provider == Provider.LINODE:
+        #    pass
+        #elif backend.provider == Provider.RACKSPACE:
+        #    pass
+        else:
+            # no DNS support for this provider, skip
+            continue
+        if (provider, creds) in providers:
+            # we have already checked this provider with these creds, skip
+            continue
+
+        try:
+            conn = get_dns_driver(provider)(*creds)
+            zones = conn.list_zones()
+        except InvalidCredsError:
+            log.error("Invalid creds for DNS provider %s.", provider)
+            continue
+        except Exception as exc:
+            log.error("Error listing zones for DNS provider %s: %r",
+                      provider, exc)
+            continue
+
+        # for each possible domain, starting with the longest match
+        best_zone = None
+        for domain in all_domains:
+            for zone in zones:
+                if zone.domain == domain:
+                    log.info("Found zone '%s' in provider '%s'.",
+                             domain, provider)
+                    best_zone = zone
+                    break
+            if best_zone:
+                break
+
+        # add provider/creds combination to checked list, in case multiple
+        # backends for same provider with same creds exist
+        providers[(provider, creds)] = best_zone
+
+    best = None
+    for provider, creds in providers:
+        zone = providers[(provider, creds)]
+        if zone is None:
+            continue
+        if best is None or len(zone.domain) > len(best[2].domain):
+            best = provider, creds, zone
+
+    if not best:
+        raise MistError("No DNS zone matches specified domain name.")
+
+    provider, creds, zone = best
+    name = all_domains[zone.domain]
+    log.info("Will use name %s and zone %s in provider %s.",
+             name, zone.domain, provider)
+
+    # debug
+    #log.debug("Will print all existing A records for zone '%s'.", zone.domain)
+    #for record in zone.list_records():
+    #    if record.type == 'A':
+    #        log.info("%s -> %s", record.name, record.data)
+
+    msg = ("Creating A record with name %s for %s in zone %s in %s"
+           % (name, ip_addr, zone.domain, provider))
+    try:
+        record = zone.create_record(name, RecordType.A, ip_addr)
+    except Exception as exc:
+        raise MistError(msg + " failed: %r" % repr(exc))
+    log.info(msg + " succeeded.")
+    return record
