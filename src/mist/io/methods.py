@@ -1280,7 +1280,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
                    script_id='', script_params='', job_id=None, docker_port_bindings={},
-                   docker_exposed_ports={}, hostname=''):
+                   docker_exposed_ports={}, hostname='', plugins=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1416,7 +1416,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname,
+            hostname=hostname, plugins=plugins,
         )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1426,13 +1426,13 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname,
+            hostname=hostname, plugins=plugins
         )
     elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             script_id=script_id, script_params=script_params,
-            job_id=job_id, hostname=hostname,
+            job_id=job_id, hostname=hostname, plugins=plugins,
         )
 
 

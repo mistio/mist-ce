@@ -95,7 +95,7 @@ def ssh_command(email, backend_id, machine_id, host, command,
 def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                       key_id=None, username=None, password=None, port=22,
                       script_id='', script_params='', job_id=None,
-                      hostname=''):
+                      hostname='', plugins=None):
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
     from mist.io.methods import create_dns_a_record
@@ -226,6 +226,26 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, machine_id, e))
                     log_event(action='enable_monitoring_failed', error=repr(e),
                               **log_dict)
+                else:
+                    if plugins and multi_user:
+                        from mist.core.methods import deploy_and_assoc_python_plugin_from_script as deploy_script_plugin
+                        for script_id in plugins:
+                            try:
+                                deploy_script_plugin(
+                                    user, backend_id, machine_id, script_id,
+                                    host
+                                )
+                            except Exception as exc:
+                                log_event(
+                                    action='deploy_collectd_python_plugin',
+                                    plugin_script_id=script_id,
+                                    error=repr(exc), **log_dict
+                                )
+                            else:
+                                log_event(
+                                    action='deploy_collectd_python_plugin',
+                                    plugin_script_id=script_id, **log_dict
+                                )
             log_event(action='post_deploy_finished', error=error, **log_dict)
 
         except (ServiceUnavailableError, SSHException) as exc:
@@ -254,7 +274,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
 def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
                             command, key_id, username, password, public_key,
                             script_id='', script_params='', job_id=None,
-                            hostname=''):
+                            hostname='', plugins=None):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -309,7 +329,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
                 script_id=script_id, script_params=script_params,
-                job_id=job_id, hostname=hostname,
+                job_id=job_id, hostname=hostname, plugins=plugins,
             )
 
         except Exception as exc:
@@ -324,7 +344,8 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
                                           monitoring, command, key_id,
                                           password, public_key, username='root',
                                           script_id='', script_params='',
-                                          job_id=None, hostname=''):
+                                          job_id=None, hostname='',
+                                          plugins=None):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -364,7 +385,7 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
                 script_id=script_id, script_params=script_params,
-                job_id=job_id, hostname=hostname,
+                job_id=job_id, hostname=hostname, plugins=plugins,
             )
 
         except Exception as exc:
@@ -673,7 +694,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                           script_id=None, script_params=None,
                           quantity=1, persist=False, job_id=None,
                           docker_port_bindings={}, docker_exposed_ports={},
-                          hostname=''):
+                          hostname='', plugins=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -705,7 +726,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
              size_id, script, image_extra, disk, image_name, size_name,
              location_name, ips, monitoring, networks, docker_env,
              docker_command, 22, script_id, script_params, job_id),
-            {'hostname': hostname}
+            {'hostname': hostname, 'plugins': plugins}
         ))
 
     def create_machine_wrapper(args_kwargs):
