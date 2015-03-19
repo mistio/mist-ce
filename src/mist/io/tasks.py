@@ -168,7 +168,9 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             if hostname:
                 try:
                     record = create_dns_a_record(user, hostname, host)
-                    log_event(action='create_dns_a_record', **log_dict)
+                    hostname = '.'.join((record.name, record.zone.domain))
+                    log_event(action='create_dns_a_record', hostname=hostname,
+                              **log_dict)
                 except Exception as exc:
                     log_event(action='create_dns_a_record', error=str(exc),
                               **log_dict)
