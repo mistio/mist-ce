@@ -217,7 +217,8 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 try:
                     enable_monitoring(user, backend_id, node.id,
                         name=node.name, dns_name=node.extra.get('dns_name',''),
-                        public_ips=ips, no_ssh=False, dry=False, job_id=job_id
+                        public_ips=ips, no_ssh=False, dry=False, job_id=job_id,
+                        plugins=plugins,
                     )
                 except Exception as e:
                     print repr(e)
@@ -226,26 +227,6 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, machine_id, e))
                     log_event(action='enable_monitoring_failed', error=repr(e),
                               **log_dict)
-                else:
-                    if plugins and multi_user:
-                        from mist.core.methods import deploy_and_assoc_python_plugin_from_script as deploy_script_plugin
-                        for script_id in plugins:
-                            try:
-                                deploy_script_plugin(
-                                    user, backend_id, machine_id, script_id,
-                                    host
-                                )
-                            except Exception as exc:
-                                log_event(
-                                    action='deploy_collectd_python_plugin',
-                                    plugin_script_id=script_id,
-                                    error=repr(exc), **log_dict
-                                )
-                            else:
-                                log_event(
-                                    action='deploy_collectd_python_plugin',
-                                    plugin_script_id=script_id, **log_dict
-                                )
             log_event(action='post_deploy_finished', error=error, **log_dict)
 
         except (ServiceUnavailableError, SSHException) as exc:
