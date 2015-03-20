@@ -3412,6 +3412,7 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
         ret_dict['error_msg'] = "Expected 1 host, found %s" % inventory.hosts
         ret_dict['finished_at'] = time()
         return ret_dict
+    ret_dict['host'] = inventory.hosts.values()[0]['ansible_ssh_host']
     machine_name = inventory.hosts.keys()[0]
     log_prefix = "Running playbook '%s' on machine '%s'" % (playbook_path,
                                                             machine_name)
