@@ -95,7 +95,7 @@ def ssh_command(email, backend_id, machine_id, host, command,
 def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                       key_id=None, username=None, password=None, port=22,
                       script_id='', script_params='', job_id=None,
-                      hostname=''):
+                      hostname='', plugins=None):
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
     from mist.io.methods import create_dns_a_record
@@ -217,7 +217,8 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 try:
                     enable_monitoring(user, backend_id, node.id,
                         name=node.name, dns_name=node.extra.get('dns_name',''),
-                        public_ips=ips, no_ssh=False, dry=False, job_id=job_id
+                        public_ips=ips, no_ssh=False, dry=False, job_id=job_id,
+                        plugins=plugins,
                     )
                 except Exception as e:
                     print repr(e)
@@ -254,7 +255,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
 def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
                             command, key_id, username, password, public_key,
                             script_id='', script_params='', job_id=None,
-                            hostname=''):
+                            hostname='', plugins=None):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -309,7 +310,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
                 script_id=script_id, script_params=script_params,
-                job_id=job_id, hostname=hostname,
+                job_id=job_id, hostname=hostname, plugins=plugins,
             )
 
         except Exception as exc:
@@ -324,7 +325,8 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
                                           monitoring, command, key_id,
                                           password, public_key, username='root',
                                           script_id='', script_params='',
-                                          job_id=None, hostname=''):
+                                          job_id=None, hostname='',
+                                          plugins=None):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -364,7 +366,7 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
                 script_id=script_id, script_params=script_params,
-                job_id=job_id, hostname=hostname,
+                job_id=job_id, hostname=hostname, plugins=plugins,
             )
 
         except Exception as exc:
@@ -673,7 +675,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                           script_id=None, script_params=None,
                           quantity=1, persist=False, job_id=None,
                           docker_port_bindings={}, docker_exposed_ports={},
-                          hostname=''):
+                          hostname='', plugins=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -705,7 +707,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
              size_id, script, image_extra, disk, image_name, size_name,
              location_name, ips, monitoring, networks, docker_env,
              docker_command, 22, script_id, script_params, job_id),
-            {'hostname': hostname}
+            {'hostname': hostname, 'plugins': plugins}
         ))
 
     def create_machine_wrapper(args_kwargs):
