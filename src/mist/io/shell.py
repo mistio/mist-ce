@@ -13,6 +13,8 @@ import websocket
 import socket
 import uuid
 import thread
+import ssl
+import tempfile
 
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
@@ -377,7 +379,7 @@ class DockerShell(object):
         self.ws = websocket.WebSocket()
         self.protocol = "ws"
         self.uri = ""
-        self.sslopts = {}
+        self.sslopt = {}
         self.buffer = ""
 
     def autoconfigure(self, user, backend_id, machine_id, **kwargs):
@@ -400,6 +402,19 @@ class DockerShell(object):
         # For tls
         if backend.key_file and backend.cert_file:
             self.protocol = "wss"
+            tempkey = tempfile.NamedTemporaryFile(delete=False)
+            with open(tempkey.name, "w") as f:
+                f.write(backend.key_file)
+            tempcert = tempfile.NamedTemporaryFile(delete=False)
+            with open(tempcert.name, "w") as f:
+                f.write(backend.cert_file)
+
+            self.sslopt = {
+                'cert_reqs': ssl.CERT_NONE,
+                'keyfile': tempkey.name,
+                'certfile': tempcert.name
+            }
+            self.ws = websocket.WebSocket(sslopt=self.sslopt)
 
         self.uri = self.protocol + self.uri
 
