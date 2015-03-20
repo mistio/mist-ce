@@ -176,7 +176,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
     text-align: center;
 }
 .tiny-popup {
-    width: 150px !important;    
+    width: 150px !important;
 }
 .small-popup {
     width: 240px !important;
@@ -311,6 +311,7 @@ ul.checkbox-list li label {
     font-size: 12px;
     font-weight: normal;
     display: inline-block;
+    float: right;
 }
 
 #image-list .checkbox-link .tag {
