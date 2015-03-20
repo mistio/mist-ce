@@ -483,11 +483,13 @@ class Shell(object):
         self._shell = None
         self.host = host
         self.channel = None
+        self.ssh = None
 
         if provider == 'docker' and not enforce_paramiko:
             self._shell = DockerShell(host)
         else:
             self._shell = ParamikoShell(host, username=username, key=key, password=password, port=port)
+            self.ssh = self._shell.ssh
 
     def autoconfigure(self, user, backend_id, machine_id, key_id=None,
                       username=None, password=None, port=22):
