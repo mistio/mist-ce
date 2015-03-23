@@ -190,6 +190,12 @@ define('app/models/machine', ['ember'],
                                 ips_v4.push(ip);
                             }
                         });
+                        this.private_ips.forEach(function(ip) {
+                            // private ips as well
+                            if (ip.search(':') == -1) {
+                                ips_v4.push(ip);
+                            }
+                        });
                         return ips_v4[0];
                     } catch (error) {
                         //Mist.notificationController.notify('No host available for machine ' + this.name);
