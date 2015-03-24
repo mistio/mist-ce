@@ -1028,22 +1028,22 @@ function program3(depth0,data) {
   data.buffer.push("\n\n                        <!-- Keys link -->\n                        <li class=\"ui-li-has-count\">\n                            <a class=\"ui-btn\" href=\"#/keys\">\n                                <span class=\"ui-li-count ui-body-inherit\">\n                                    ");
   stack1 = helpers._triageMustache.call(depth0, "Mist.keysController.content.length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n                                </span>\n                                Keys\n                            </a>\n                        </li>\n\n                        <!-- Scripts link -->\n                        <li class=\"ui-li-has-count\">\n                            <a class=\"ui-btn\" href=\"#/scripts\">\n                                <span class=\"ui-li-count ui-body-inherit\">\n                                    ");
-  stack1 = helpers._triageMustache.call(depth0, "Mist.scriptsController.length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("\n                                </span>\n                                Keys\n                            </a>\n                        </li>\n\n                        ");
+  stack1 = helpers['if'].call(depth0, "Mist.isCore", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n                                </span>\n                                Scripts\n                            </a>\n                        </li>\n                    </ul>\n                </div>\n            </div>\n\n            <div ");
+  data.buffer.push("\n                    </ul>\n                </div>\n            </div>\n\n            <div ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("view.hasIncidents::no-width :ui-block-b")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push(">\n                <div class=\"ui-body\">\n                    <ul class=\"ui-listview ui-listview-inset ui-corner-all ui-shadow incidents header\">\n                        <li class=\"ui-li-divider ui-bar-c ui-first-child\">Incidents</li>\n                        <li class=\"ui-li-divider ui-bar-c ui--child\" style=\"display:none;\"></li>\n                    </ul>\n                    <ul class=\"ui-listview ui-listview-inset ui-corner-all ui-shadow incidents\">\n                        ");
-  stack1 = helpers.each.call(depth0, "Mist.openIncidents", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers.each.call(depth0, "Mist.openIncidents", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                    </ul>\n                </div>\n            </div>\n        </div><!-- /grid-a -->\n\n        ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "graphList", {hash:{
     'actionProxyBinding': ("view")
   },hashTypes:{'actionProxyBinding': "STRING"},hashContexts:{'actionProxyBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n        ");
-  stack1 = helpers['if'].call(depth0, "Mist.isCore", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.isCore", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(13, program13, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        ");
   return buffer;
@@ -1061,13 +1061,23 @@ function program4(depth0,data) {
 function program6(depth0,data) {
   
   var buffer = '', stack1;
+  data.buffer.push("\n                        <!-- Scripts link -->\n                        <li class=\"ui-li-has-count\">\n                            <a class=\"ui-btn\" href=\"#/scripts\">\n                                <span class=\"ui-li-count ui-body-inherit\">\n                                    ");
+  stack1 = helpers._triageMustache.call(depth0, "Mist.scriptsController.length", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                                </span>\n                                Scripts\n                            </a>\n                        </li>\n                        ");
+  return buffer;
+  }
+
+function program8(depth0,data) {
+  
+  var buffer = '', stack1;
   data.buffer.push("\n                            ");
-  stack1 = helpers['if'].call(depth0, "isClosed", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(9, program9, data),fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "isClosed", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(11, program11, data),fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                        ");
   return buffer;
   }
-function program7(depth0,data) {
+function program9(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                                <li class=\"ui-mini incident\">\n                                    <a class=\"ui-icon-check ui-btn ui-btn-icon-right\"\n                                        ");
@@ -1090,7 +1100,7 @@ function program7(depth0,data) {
   return buffer;
   }
 
-function program9(depth0,data) {
+function program11(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n                                <li class=\"ui-bar-b incident\">\n                                    <a class=\"ui-icon-alert ui-btn ui-btn-icon-right\"\n                                        ");
@@ -1110,7 +1120,7 @@ function program9(depth0,data) {
   return buffer;
   }
 
-function program11(depth0,data) {
+function program13(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n            <div class=\"logs\" data-role=\"collapsible\" data-collapsed=\"false\">\n               <h4>Activity log</h4>\n               ");
@@ -1734,6 +1744,23 @@ function program3(depth0,data) {
 function program5(depth0,data) {
   
   var buffer = '', stack1;
+  data.buffer.push("\n    <div class=\"details info-table\">\n        <table>\n            <tbody>\n            <tr>\n                <td>Date</td>\n                <td>");
+  data.buffer.push(escapeExpression(helpers.unbound.call(depth0, "view.fullPrettyTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("</td>\n            </tr>\n            ");
+  stack1 = helpers['if'].call(depth0, "view.backendTitle", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            ");
+  stack1 = helpers['if'].call(depth0, "view.machineLink", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            ");
+  stack1 = helpers.each.call(depth0, "view.details", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            </tbody>\n        </table>\n    </div>\n");
+  return buffer;
+  }
+function program6(depth0,data) {
+  
+  var buffer = '', stack1;
   data.buffer.push("\n            <tr>\n                <td>Backend Title</td>\n                <td>");
   stack1 = helpers._triageMustache.call(depth0, "view.backendTitle", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -1741,16 +1768,16 @@ function program5(depth0,data) {
   return buffer;
   }
 
-function program7(depth0,data) {
+function program8(depth0,data) {
   
   var buffer = '', stack1, helper, options;
   data.buffer.push("\n            <tr>\n                <td>Machine</td>\n                <td>\n                    ");
-  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "machine", "view.machineLink", options) : helperMissing.call(depth0, "link-to", "machine", "view.machineLink", options));
+  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "machine", "view.machineLink", options) : helperMissing.call(depth0, "link-to", "machine", "view.machineLink", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n                </td>\n            </td>\n            ");
   return buffer;
   }
-function program8(depth0,data) {
+function program9(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                        ");
@@ -1759,7 +1786,7 @@ function program8(depth0,data) {
   return buffer;
   }
 
-function program10(depth0,data) {
+function program11(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n                <tr>\n                    <td>");
@@ -1790,18 +1817,10 @@ function program10(depth0,data) {
   data.buffer.push("</div>\n            </div>\n            <div class=\"ui-block-c\">\n                <div class=\"time\">");
   stack1 = helpers._triageMustache.call(depth0, "view.prettyTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>\n            </div>\n        </div>\n    </a>\n\n    <div class=\"details info-table\">\n        <table>\n            <tbody>\n            <tr>\n                <td>Date</td>\n                <td>");
-  data.buffer.push(escapeExpression(helpers.unbound.call(depth0, "view.fullPrettyTime", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("</td>\n            </tr>\n            ");
-  stack1 = helpers['if'].call(depth0, "view.backendTitle", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("</div>\n            </div>\n        </div>\n    </a>\n");
+  stack1 = helpers.unless.call(depth0, "view.isCollapsed", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            ");
-  stack1 = helpers['if'].call(depth0, "view.machineLink", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            ");
-  stack1 = helpers.each.call(depth0, "view.details", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            </tbody>\n        </table>\n    </div>\n</span>\n");
+  data.buffer.push("\n</span>\n");
   return buffer;
   
 });

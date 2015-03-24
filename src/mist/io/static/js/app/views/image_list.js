@@ -1,4 +1,4 @@
-define('app/views/image_list', ['app/views/mistscreen'],
+define('app/views/image_list', ['app/views/page'],
     //
     //  Image List View
     //

@@ -311,6 +311,7 @@ ul.checkbox-list li label {
     font-size: 12px;
     font-weight: normal;
     display: inline-block;
+    float: right;
 }
 
 #image-list .checkbox-link .tag {

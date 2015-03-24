@@ -3,7 +3,12 @@
 #home-page #add-backend-btn {
     float: right;
     margin-right: 0px;
-    margin-bottom: 3px;
+    margin-bottom: 13px;
+    margin-top: 0;
+    top: .7em;
+    position: relative;
+    height: 18px;
+    line-height: 18px;
 }
 #home-page .ui-listview {
     clear: both;
@@ -26,7 +31,7 @@
 }
 
 #home-page .ui-grid-a {
-   margin-top: -20px;
+   margin-top: -10px;
    clear: both;
 }
 
@@ -89,6 +94,11 @@ ul.incidents li a .machine {
 
 #home-page .ui-body {
     padding: 0;
+    overflow: visible;
+}
+
+#home-page .ui-grid-a.ui-responsive {
+    overflow: visible;
 }
 
 #home-page .logs {
