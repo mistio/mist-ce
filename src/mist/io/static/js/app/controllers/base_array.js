@@ -99,9 +99,10 @@ define('app/controllers/base_array', ['ember'],
 
             _addObject: function (object) {
                 Ember.run(this, function () {
-                    this.addObject(this.get('model').create(object));
+                    var newObject = this.get('model').create(object)
+                    this.addObject(newObject);
                     this.trigger('onAdd', {
-                        object: object
+                        object: newObject
                     });
                 });
             },

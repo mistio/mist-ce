@@ -347,7 +347,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     });
 
                     // Pass machine reference to rules
-                    Mist.rulesController.content.forEach(function (rule) {
+                    Mist.rulesController.forEach(function (rule) {
                         if (rule.machine.id) return;
                         if (machine.equals([rule.backend, rule.machine]))
                             rule.set('machine', machine);
