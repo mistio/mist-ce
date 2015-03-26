@@ -32,6 +32,11 @@ In Red Hat based systems the following packages need to be installed:
    
     sudo yum install git python-virtualenv python-dev erlang pcre python-lxml  gcc libxml2 libxml2-python libxml2-devel
 
+For openSUSE distibution, you'll have to additionally install:
+
+    sudo zypper in python-gevent libevent-devel
+
+
 In MacOSX you have to install Xcode and its command line tools. For virtualenv
 you simply run::
 
