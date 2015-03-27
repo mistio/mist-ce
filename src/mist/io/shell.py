@@ -11,7 +11,7 @@ from StringIO import StringIO
 import paramiko
 import socket
 
-from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
+from mist.io.exceptions import CloudNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
@@ -45,7 +45,7 @@ class Shell(object):
 
     Or:
     shell = Shell('localhost')
-    shell.autoconfigure(user, backend_id, machine_id)
+    shell.autoconfigure(user, cloud_id, machine_id)
     for line in shell.command_stream('ps -fe'):
     print line
 
@@ -204,7 +204,7 @@ class Shell(object):
             yield line
             line = stdout.readline()
 
-    def autoconfigure(self, user, backend_id, machine_id,
+    def autoconfigure(self, user, cloud_id, machine_id,
                       key_id=None, username=None, password=None, port=22):
         """Autoconfigure SSH client.
 
@@ -218,9 +218,9 @@ class Shell(object):
         """
 
         log.info("autoconfiguring Shell for machine %s:%s",
-                 backend_id, machine_id)
-        if backend_id not in user.backends:
-            raise BackendNotFoundError(backend_id)
+                 cloud_id, machine_id)
+        if cloud_id not in user.clouds:
+            raise CloudNotFoundError(cloud_id)
         if key_id and key_id not in user.keypairs:
             raise KeypairNotFoundError(key_id)
 
@@ -237,7 +237,7 @@ class Shell(object):
             sudo_keys = []
             for key_id in keypairs:
                 for machine in keypairs[key_id].machines:
-                    if [backend_id, machine_id] == machine[:2]:
+                    if [cloud_id, machine_id] == machine[:2]:
                         assoc_keys.append(key_id)
                         if len(machine) > 2 and \
                                 int(time() - machine[2]) < 7*24*3600:
@@ -261,7 +261,7 @@ class Shell(object):
                 users = [username]
             else:
                 for machine in keypair.machines:
-                    if machine[:2] == [backend_id, machine_id]:
+                    if machine[:2] == [cloud_id, machine_id]:
                         if len(machine) >= 4 and machine[3]:
                             users.append(machine[3])
                             break
@@ -269,7 +269,7 @@ class Shell(object):
                 # check to see if some other key is associated with machine
                 for other_keypair in user.keypairs.values():
                     for machine in other_keypair.machines:
-                        if machine[:2] == [backend_id, machine_id]:
+                        if machine[:2] == [cloud_id, machine_id]:
                             if len(machine) >= 4 and machine[3]:
                                 ssh_user = machine[3]
                                 if ssh_user not in users:
@@ -317,7 +317,7 @@ class Shell(object):
                         continue
                 # we managed to connect succesfully, return
                 # but first update key
-                assoc = [backend_id,
+                assoc = [cloud_id,
                          machine_id,
                          time(),
                          ssh_user,
@@ -330,7 +330,7 @@ class Shell(object):
                             updated = False
                             for i in range(len(user.keypairs[key_id].machines)):
                                 machine = user.keypairs[key_id].machines[i]
-                                if [backend_id, machine_id] == machine[:2]:
+                                if [cloud_id, machine_id] == machine[:2]:
                                     old_assoc = user.keypairs[key_id].machines[i]
                                     user.keypairs[key_id].machines[i] = assoc
                                     updated = True
@@ -359,7 +359,7 @@ class Shell(object):
                     trigger_session_update(user.email, ['keys'])
                 return key_id, ssh_user
 
-        raise MachineUnauthorizedError("%s:%s" % (backend_id, machine_id))
+        raise MachineUnauthorizedError("%s:%s" % (cloud_id, machine_id))
 
     def __del__(self):
         self.disconnect()

@@ -39,7 +39,7 @@
                 {{Mist.machineAddController.newMachineProvider.title}}
             </h4>
             <ul data-role="listview" data-theme="a">
-                {{#each Mist.backendsController.content}}
+                {{#each Mist.cloudsController.content}}
                         {{#if this.canCreateMachine}}
                             <li data-icon="false">
                                 <a {{action "selectProvider" this target="view"}}>

@@ -16,11 +16,11 @@ define('app/models/image', ['ember'],
             extra: null,
 
             toggle: function (callback) {
-                this.backend.toggleImageStar(this, callback);
+                this.cloud.toggleImageStar(this, callback);
             },
 
             className: function () {
-                return 'image-' + this.backend.images.getImageOS(this.get('id'));
+                return 'image-' + this.cloud.images.getImageOS(this.get('id'));
             }.property('id'),
 
             isMist: function () {
@@ -29,8 +29,8 @@ define('app/models/image', ['ember'],
             }.property('name', 'id'),
 
             isDocker: function () {
-                return this.get('backend').get('isDocker');
-            }.property('backend')
+                return this.get('cloud').get('isDocker');
+            }.property('cloud')
         });
     }
 );

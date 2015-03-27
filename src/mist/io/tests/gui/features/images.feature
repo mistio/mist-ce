@@ -2,9 +2,9 @@
 Feature: Actions for Images
 
   Background:
-    Given backends credentials
+    Given clouds credentials
     When I visit mist.io
-    Given "EC2" backend added
+    Given "EC2" cloud added
 
   Scenario: Star image from Advanced search
     When I click the button that contains "Images"

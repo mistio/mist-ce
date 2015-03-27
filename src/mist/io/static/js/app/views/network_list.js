@@ -21,7 +21,7 @@ define('app/views/network_list', ['app/views/page'],
             load: function () {
 
                 // Add event listeners
-                Mist.backendsController.on('onSelectedNetworksChange', this, 'updateFooter');
+                Mist.cloudsController.on('onSelectedNetworksChange', this, 'updateFooter');
                 this.updateFooter();
 
             }.on('didInsertElement'),
@@ -43,7 +43,7 @@ define('app/views/network_list', ['app/views/page'],
 
 
             updateFooter: function () {
-                if (Mist.backendsController.selectedNetworks.length)
+                if (Mist.cloudsController.selectedNetworks.length)
                     $('#network-list-page .ui-footer').slideDown();
                 else
                     $('#network-list-page .ui-footer').slideUp();
@@ -66,14 +66,14 @@ define('app/views/network_list', ['app/views/page'],
 
                 deleteClicked: function () {
 
-                    var networkNames = Mist.backendsController
+                    var networkNames = Mist.cloudsController
                         .selectedNetworks.toStringByProperty('name');
 
                     Mist.confirmationController.setUp('Delete networks',
                         'Are you sure you want to delete these networks: '
                         + networkNames + ' ?', function () {
-                            Mist.backendsController.selectedNetworks.forEach(function (network) {
-                                network.backend.networks.deleteNetwork(network.id);
+                            Mist.cloudsController.selectedNetworks.forEach(function (network) {
+                                network.cloud.networks.deleteNetwork(network.id);
                             });
                         }
                     );

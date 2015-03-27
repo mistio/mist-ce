@@ -28,14 +28,14 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 Ember.run.next(this, function () {
                     this.checkedMonitoringObserver();
                 });
-                Mist.backendsController.on('onMachineListChange', this,
+                Mist.cloudsController.on('onMachineListChange', this,
                     'checkedMonitoringObserver');
             }.on('didInsertElement'),
 
 
             unload: function () {
                 Mist.graphsController.close();
-                Mist.backendsController.off('onMachineListChange', this,
+                Mist.cloudsController.off('onMachineListChange', this,
                     'checkedMonitoringObserver');
             }.on('willDestroyElement'),
 
@@ -49,8 +49,8 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
             actions: {
 
-                addBackend: function () {
-                    Mist.backendAddController.open();
+                addCloud: function () {
+                    Mist.cloudAddController.open();
                 },
 
                 incidentClicked: function (incident) {
@@ -82,9 +82,9 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 var datasources = [];
                 var loadMetric = Mist.metricsController.getMetric('load.shortterm');
                 Mist.monitored_machines.forEach(function (machineTuple) {
-                    var backend = Mist.backendsController.getBackend(machineTuple[0]);
-                    if (!backend) return;
-                    var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
+                    var cloud = Mist.cloudsController.getCloud(machineTuple[0]);
+                    if (!cloud) return;
+                    var machine = Mist.cloudsController.getMachine(machineTuple[1], machineTuple[0]);
                     if (!machine) return;
                     Mist.datasourcesController.addDatasource({
                         machine: machine,
@@ -122,10 +122,10 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
             checkedMonitoringObserver: function () {
                 Ember.run.later(this, function () {
-                    if (Mist.backendsController.checkedMonitoring)
+                    if (Mist.cloudsController.checkedMonitoring)
                         this.showGraphs();
                 }, 500); // to make sure datasources exist
-            }.observes('Mist.backendsController.checkedMonitoring')
+            }.observes('Mist.cloudsController.checkedMonitoring')
         });
     }
 );

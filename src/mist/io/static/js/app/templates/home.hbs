@@ -8,23 +8,23 @@
     <!-- Page Body -->
     <div role="main" class="ui-content" data-theme="c">
 
-        <!-- Add backend button -->
-        <a id="add-backend-btn" class="ui-link ui-btn ui-btn-d ui-icon-plus
+        <!-- Add cloud button -->
+        <a id="add-cloud-btn" class="ui-link ui-btn ui-btn-d ui-icon-plus
             ui-btn-icon-right ui-shadow ui-corner-all ui-mini"
-            {{action "addBackend" target="view"}} data-mini="true">
+            {{action "addCloud" target="view"}} data-mini="true">
                 Add cloud
         </a>
 
-        <!-- Backends list -->
-        <div id="backend-buttons" data-role="controlgroup" data-type="horizontal"
+        <!-- Clouds list -->
+        <div id="cloud-buttons" data-role="controlgroup" data-type="horizontal"
             class="ui-controlgroup ui-controlgroup-horizontal ui-corner-all">
-            {{#each Mist.backendsController.content}}
-                {{view "backendButton" backendBinding="this"
+            {{#each Mist.cloudsController.content}}
+                {{view "cloudButton" cloudBinding="this"
                        class="ui-btn ui-input-btn ui-corner-all ui-shadow"}}
             {{/each}}
         </div>
 
-        {{#if Mist.backendsController.length}}
+        {{#if Mist.cloudsController.length}}
         <div class="ui-grid-a ui-responsive">
             <div {{bind-attr class="view.hasIncidents::full-width :ui-block-a"}}>
                 <div class="ui-body">
@@ -34,7 +34,7 @@
                         <li class="ui-li-has-count ui-first-child">
                             <a class="ui-btn" href="#/machines">
                                 <span class="ui-li-count ui-body-inherit">
-                                    {{Mist.backendsController.machineCount}}
+                                    {{Mist.cloudsController.machineCount}}
                                 </span>
                                 Machines
                             </a>
@@ -44,18 +44,18 @@
                         <li class="ui-li-has-count">
                             <a class="ui-btn" href="#/images">
                                 <span class="ui-li-count ui-body-inherit">
-                                    {{Mist.backendsController.imageCount}}
+                                    {{Mist.cloudsController.imageCount}}
                                 </span>
                                 Images
                             </a>
                         </li>
 
                         <!-- Networks link -->
-                        {{#if Mist.backendsController.hasNetworks}}
+                        {{#if Mist.cloudsController.hasNetworks}}
                         <li class="ui-li-has-count">
                             <a class="ui-btn" href="#/networks">
                                 <span class="ui-li-count ui-body-inherit">
-                                    {{Mist.backendsController.networkCount}}
+                                    {{Mist.cloudsController.networkCount}}
                                 </span>
                                 Networks
                             </a>
@@ -146,8 +146,8 @@
 
     {{view "dialog"}}
 
-    {{view "backendAdd"}}
+    {{view "cloudAdd"}}
 
-    {{view "backendEdit"}}
+    {{view "cloudEdit"}}
 
 </div>

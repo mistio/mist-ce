@@ -33,7 +33,7 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
 
                 // An API call here
                 // PUT /monitoring/datasources/ {
-                //  backend_id: args.machine.backend.id
+                //  cloud_id: args.machine.cloud.id
                 //  machine_id: args.machine.id
                 //  metric_id: args.metric.id
                 // }

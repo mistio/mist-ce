@@ -17,7 +17,7 @@ define('app/models/machine', ['ember'],
             probed: null,
             keysCount: 0,
             probing: null,
-            backend: null,
+            cloud: null,
             selected: null,
             hasMonitoring: null,
             probeInterval: 30000,
@@ -87,7 +87,7 @@ define('app/models/machine', ['ember'],
             },
 
             image: function() {
-                return this.backend.images.getImage(this.imageId);
+                return this.cloud.images.getImage(this.imageId);
             }.property('imageId'),
 
 
@@ -123,22 +123,22 @@ define('app/models/machine', ['ember'],
              */
 
             shutdown: function(callback) {
-                this.backend.shutdownMachine(this.id, callback);
+                this.cloud.shutdownMachine(this.id, callback);
             },
 
 
             destroy: function(callback) {
-                this.backend.destroyMachine(this.id, callback);
+                this.cloud.destroyMachine(this.id, callback);
             },
 
 
             reboot: function(callback) {
-                this.backend.rebootMachine(this.id, callback);
+                this.cloud.rebootMachine(this.id, callback);
             },
 
 
             start: function(callback) {
-                this.backend.startMachine(this.id, callback);
+                this.cloud.startMachine(this.id, callback);
             },
 
 
@@ -165,11 +165,11 @@ define('app/models/machine', ['ember'],
                     return machine == this.id;
                 if (machine instanceof Array)
                     if (machine[1] == this.id &&
-                        machine[0] == this.backend.id)
+                        machine[0] == this.cloud.id)
                             return true;
                 if (machine instanceof Object)
                     if (machine.id == this.id &&
-                        machine.backend.id == this.backend.id)
+                        machine.cloud.id == this.cloud.id)
                             return true;
                 return false;
             },
@@ -200,10 +200,10 @@ define('app/models/machine', ['ember'],
             },
 
             probe: function(keyId, callback) {
-                if (!this.backend.enabled) return;
+                if (!this.cloud.enabled) return;
                 if (this.state != 'running') return;
                 var that = this;
-                Mist.backendsController.probeMachine(that, keyId, function(success) {
+                Mist.cloudsController.probeMachine(that, keyId, function(success) {
                     if (callback) {
                         callback(success);
                     }
@@ -226,7 +226,7 @@ define('app/models/machine', ['ember'],
                         return 'cold';
                     }
                 }
-                if (!this.backend || !this.backend.enabled) return;
+                if (!this.cloud || !this.cloud.enabled) return;
                 if (data.uptime) {
                     uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
                     this.set('uptimeChecked', new Date(data.timestamp * 1000));
@@ -258,7 +258,7 @@ define('app/models/machine', ['ember'],
                 this.set('loss', data.packets_loss || this.loss);
                 this.set('latency', data.rtt_avg ? Math.floor(data.rtt_avg) : this.latency);
                 this.set('df', data.df || this.df);
-                Mist.backendsController.trigger('onMachineProbe', this);
+                Mist.cloudsController.trigger('onMachineProbe', this);
             },
             /**
              *

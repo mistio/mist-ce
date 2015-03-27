@@ -1,6 +1,6 @@
-define('app/views/backend_button', ['app/views/templated'],
+define('app/views/cloud_button', ['app/views/templated'],
     //
-    //  Backend Button View
+    //  Cloud Button View
     //
     //  @returns Class
     //
@@ -8,7 +8,7 @@ define('app/views/backend_button', ['app/views/templated'],
 
         'use strict';
 
-        return App.BackendButtonView = TemplatedView.extend({
+        return App.CloudButtonView = TemplatedView.extend({
 
 
             //
@@ -18,7 +18,7 @@ define('app/views/backend_button', ['app/views/templated'],
             //
 
 
-            backend: null,
+            cloud: null,
 
 
             //
@@ -29,13 +29,13 @@ define('app/views/backend_button', ['app/views/templated'],
 
 
             load: function () {
-                this.renderBackends();
+                this.renderClouds();
                 this.stateObserver();
             }.on('didInsertElement'),
 
 
             unload: function () {
-                this.renderBackends();
+                this.renderClouds();
             }.on('willDestroyElement'),
 
 
@@ -46,10 +46,10 @@ define('app/views/backend_button', ['app/views/templated'],
             //
 
 
-            renderBackends: function () {
+            renderClouds: function () {
                 Ember.run.next(function () {
-                    if ($('#backend-buttons').controlgroup)
-                        $('#backend-buttons').controlgroup('refresh');
+                    if ($('#cloud-buttons').controlgroup)
+                        $('#cloud-buttons').controlgroup('refresh');
                 });
             },
 
@@ -64,9 +64,9 @@ define('app/views/backend_button', ['app/views/templated'],
             actions: {
 
                 buttonClicked: function () {
-                    $('#backend-edit').popup('option',
+                    $('#cloud-edit').popup('option',
                         'positionTo', '#' + this.elementId);
-                    Mist.backendEditController.open(this.backend);
+                    Mist.cloudEditController.open(this.cloud);
                 }
             },
 
@@ -86,15 +86,15 @@ define('app/views/backend_button', ['app/views/templated'],
                     .removeClass('ui-icon-offline')
                     .removeClass('ui-icon-waiting');
 
-                if (this.backend.state == 'online')
+                if (this.cloud.state == 'online')
                     btn.addClass('ui-icon-check')
-                else if (this.backend.state == 'offline')
+                else if (this.cloud.state == 'offline')
                     btn.addClass('ui-icon-offline')
-                else if (this.backend.state == 'waiting')
+                else if (this.cloud.state == 'waiting')
                     btn.addClass('ui-icon-waiting')
                         .removeClass('ui-btn-icon-left');
 
-            }.observes('backend.state')
+            }.observes('cloud.state')
         });
     }
 );

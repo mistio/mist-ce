@@ -10,11 +10,11 @@ module("MistIoLocal", {
 test("Home page loaded", function(){
   ok( S("#home-menu li").size() == 2, "loaded home page");
 
-  var num = S("#backend-buttons a").size();
+  var num = S("#cloud-buttons a").size();
 
   for(var i =0; i < num; i++){
-    S("#backend-buttons a:eq("+i+")").visible().click();
-    S('#edit-backend-ok').visible().click(); 
+    S("#cloud-buttons a:eq("+i+")").visible().click();
+    S('#edit-cloud-ok').visible().click(); 
   }
 
   S('#machines-count').visible().click(); 

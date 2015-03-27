@@ -261,9 +261,9 @@ var appLoader = {
 var loadFiles = function (callback) {
     require([
         'app/templates/templates',
-        'app/controllers/backend_add',
-        'app/controllers/backend_edit',
-        'app/controllers/backends',
+        'app/controllers/cloud_add',
+        'app/controllers/cloud_edit',
+        'app/controllers/clouds',
         'app/controllers/confirmation',
         'app/controllers/cookies',
         'app/controllers/datasources',
@@ -293,9 +293,9 @@ var loadFiles = function (callback) {
         'app/controllers/script_edit',
         'app/controllers/script_run',
         'app/controllers/scripts',
-        'app/views/backend_add',
-        'app/views/backend_button',
-        'app/views/backend_edit',
+        'app/views/cloud_add',
+        'app/views/cloud_button',
+        'app/views/cloud_edit',
         'app/views/confirmation_dialog',
         'app/views/dialog',
         'app/views/file_upload',
@@ -354,9 +354,9 @@ var loadFiles = function (callback) {
 var loadApp = function (
     callback,
     TemplatesBuild,
-    BackendAddController,
-    BackendEditController,
-    BackendsController,
+    CloudAddController,
+    CloudEditController,
+    CloudsController,
     ConfirmationController,
     CookiesController,
     DatasourcesController,
@@ -457,8 +457,8 @@ var loadApp = function (
             });
         },
         exit: function() {
-            Mist.backendsController.forEach(function (backend) {
-                backend.networks.forEach(function (network) {
+            Mist.cloudsController.forEach(function (cloud) {
+                cloud.networks.forEach(function (network) {
                     network.set('selected', false);
                 });
             });
@@ -470,19 +470,19 @@ var loadApp = function (
             Ember.run.next(this, function () {
                 var model = this.modelFor('network');
                 var id = model._id || model.id;
-                var network = Mist.backendsController.getNetwork(id);
+                var network = Mist.cloudsController.getNetwork(id);
                 document.title = 'mist.io - ' + (network ? network.name : id);
             });
         },
         redirect: function (network) {
-            Mist.backendsController.set('networkRequest', network._id);
+            Mist.cloudsController.set('networkRequest', network._id);
         },
         model: function (args) {
             var id = args.network_id;
-            if (Mist.backendsController.loading ||
-                Mist.backendsController.loadingNetworks)
-                    return {_id: id, backend: {}};
-            return Mist.backendsController.getNetwork(id);
+            if (Mist.cloudsController.loading ||
+                Mist.cloudsController.loadingNetworks)
+                    return {_id: id, cloud: {}};
+            return Mist.cloudsController.getNetwork(id);
         }
     });
 
@@ -493,8 +493,8 @@ var loadApp = function (
             });
         },
         exit: function() {
-            Mist.backendsController.forEach(function(backend) {
-                backend.machines.forEach(function(machine) {
+            Mist.cloudsController.forEach(function(cloud) {
+                cloud.machines.forEach(function(machine) {
                     machine.set('selected', false);
                 });
             });
@@ -506,19 +506,19 @@ var loadApp = function (
             Ember.run.next(this, function () {
                 var model = this.modelFor('machine');
                 var id = model._id || model.id;
-                var machine = Mist.backendsController.getMachine(id);
+                var machine = Mist.cloudsController.getMachine(id);
                 document.title = 'mist.io - ' + (machine ? machine.name : id);
             });
         },
         redirect: function (machine) {
-            Mist.backendsController.set('machineRequest', machine._id);
+            Mist.cloudsController.set('machineRequest', machine._id);
         },
         model: function (args) {
             var id = args.machine_id;
-            if (Mist.backendsController.loading ||
-                Mist.backendsController.loadingMachines)
-                    return {_id: id, backend: {}};
-            return Mist.backendsController.getMachine(id);
+            if (Mist.cloudsController.loading ||
+                Mist.cloudsController.loadingMachines)
+                    return {_id: id, cloud: {}};
+            return Mist.cloudsController.getMachine(id);
         }
     });
 
@@ -614,13 +614,13 @@ var loadApp = function (
     App.set('keyEditController', KeyEditController.create());
     App.set('cookiesController', CookiesController.create());
     App.set('ruleEditController', RuleEditController.create());
-    App.set('backendsController', BackendsController.create());
+    App.set('cloudsController', CloudsController.create());
     App.set('metricAddController', MetricAddController.create());
     App.set('fileUploadController', FileUploadController.create());
     App.set('machineAddController', MachineAddController.create());
-    App.set('backendAddController', BackendAddController.create());
+    App.set('cloudAddController', CloudAddController.create());
     App.set('monitoringController', MonitoringController.create());
-    App.set('backendEditController', BackendEditController.create());
+    App.set('cloudEditController', CloudEditController.create());
     App.set('machineTagsController', MachineTagsController.create());
     App.set('machineKeysController', MachineKeysController.create());
     App.set('imageSearchController', ImageSearchController.create());
@@ -853,7 +853,7 @@ var setupSocketEvents = function (socket, callback) {
     if (Mist.isCore) {
     //  This is a temporary ajax-request to get the scripts.
     //  It should be converted into a "list_scripts" socket handler
-    //  as soon as the backend supports it
+    //  as soon as the cloud supports it
     Mist.ajax.GET('/scripts').success(function (scripts) {
         Mist.scriptsController.setContent(scripts);
     });
@@ -865,41 +865,41 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_logs', function (logs) {
         Mist.logsController.load(logs);
     })
-    .on('list_backends', function (backends) {
-        Mist.backendsController.load(backends);
+    .on('list_clouds', function (clouds) {
+        Mist.cloudsController.load(clouds);
         if (callback)
             callback();
         callback = null;
     })
     .on('list_sizes', function (data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.sizes.load(data.sizes);
+        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+        if (cloud)
+            cloud.sizes.load(data.sizes);
     })
     .on('list_images', function (data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.images.load(data.images);
+        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+        if (cloud)
+            cloud.images.load(data.images);
     })
     .on('list_machines', function (data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.machines.load(data.machines);
+        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+        if (cloud)
+            cloud.machines.load(data.machines);
     })
     .on('list_locations', function (data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.locations.load(data.locations);
+        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+        if (cloud)
+            cloud.locations.load(data.locations);
     })
     .on('list_networks', function (data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.networks.setContent(data.networks);
+        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+        if (cloud)
+            cloud.networks.setContent(data.networks);
     })
     .on('monitoring',function (data){
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
-        Mist.backendsController.set('checkedMonitoring', true);
+        Mist.cloudsController.set('checkedMonitoring', true);
     })
     .on('stats', function (data) {
         Mist.graphsController._handleSocketResponse(data);
@@ -910,8 +910,8 @@ var setupSocketEvents = function (socket, callback) {
 
         // Extract machine information
         var machineId = data.machine_id;
-        var backendId = data.backend_id;
-        var machine = Mist.backendsController.getMachine(machineId, backendId);
+        var cloudId = data.cloud_id;
+        var machine = Mist.cloudsController.getMachine(machineId, cloudId);
         if (machine.id) {
             dialogBody.push({
                 link: machine.name,
@@ -949,7 +949,7 @@ var setupSocketEvents = function (socket, callback) {
     .emit('ready');
 
     function onProbe(data) {
-        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        var machine = Mist.cloudsController.getMachine(data.machine_id, data.cloud_id);
         if (machine)
             machine.probeSuccess(data.result);
     }

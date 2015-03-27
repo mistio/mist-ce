@@ -29,8 +29,8 @@ define('app/views/machine', ['app/views/page'],
 
             load: function() {
 
-                Mist.backendsController.off('onMachineListChange', this, 'load');
-                Mist.backendsController.on('onMachineListChange', this, 'load');
+                Mist.cloudsController.off('onMachineListChange', this, 'load');
+                Mist.cloudsController.on('onMachineListChange', this, 'load');
 
                 Ember.run(this, function() {
                     this.updateCurrentMachine();
@@ -44,7 +44,7 @@ define('app/views/machine', ['app/views/page'],
             unload: function() {
 
                 // Remove event listeners
-                Mist.backendsController.off('onMachineListChange', this, 'load');
+                Mist.cloudsController.off('onMachineListChange', this, 'load');
 
             }.on('willDestroyElement'),
 
@@ -58,7 +58,7 @@ define('app/views/machine', ['app/views/page'],
 
             updateCurrentMachine: function() {
                 Ember.run(this, function() {
-                    var machine = Mist.backendsController.getRequestedMachine();
+                    var machine = Mist.cloudsController.getRequestedMachine();
                     if (machine)
                         this.get('controller').set('model', machine);
 
@@ -73,7 +73,7 @@ define('app/views/machine', ['app/views/page'],
 
             updateMonitoringCollapsible: function() {
                 Ember.run.next(this, function() {
-                    if (Mist.backendsController.checkedMonitoring && this.machine.id) {
+                    if (Mist.cloudsController.checkedMonitoring && this.machine.id) {
                         $('#monitoring-collapsible').show();
                     } else {
                         $('#monitoring-collapsible').hide();
@@ -169,23 +169,23 @@ define('app/views/machine', ['app/views/page'],
 
 
             providerIconClass: function() {
-                if (!this.machine || !this.machine.backend || !this.machine.backend.provider)
+                if (!this.machine || !this.machine.cloud || !this.machine.cloud.provider)
                     return '';
-                return 'provider-' + this.machine.backend.getSimpleProvider();
-            }.property('machine.backend.provider'),
+                return 'provider-' + this.machine.cloud.getSimpleProvider();
+            }.property('machine.cloud.provider'),
 
 
             imageIconClass: function () {
 
                 if (!this.machine || !this.machine.extra ||
-                    !this.machine.backend || !this.machine.backend.provider)
+                    !this.machine.cloud || !this.machine.cloud.provider)
                     return 'image-generic';
 
                 var imageId = this.machine.extra.image_id || this.machine.extra.imageId || '';
 
                 // Use .toString() because digital ocean returns
                 // an number instead of a string which breaks the search
-                return 'image-' + this.machine.backend.images.getImageOS(imageId.toString());
+                return 'image-' + this.machine.cloud.images.getImageOS(imageId.toString());
 
             }.property('machine.extra.@each'),
 
@@ -242,7 +242,7 @@ define('app/views/machine', ['app/views/page'],
                     this.set('public_ips', [this.machine.public_ips]);
                 }
 
-                if (this.machine.backend.provider != 'docker') {
+                if (this.machine.cloud.provider != 'docker') {
                     if (this.machine.private_ips instanceof Array) {
                         this.set('private_ips', this.machine.private_ips);
                     } else if (typeof this.machine.public_ips == 'string') {
@@ -250,7 +250,7 @@ define('app/views/machine', ['app/views/page'],
                     }
                 }
                 if (this.machine.extra) {
-                    if (this.machine.backend.provider == 'docker') {
+                    if (this.machine.cloud.provider == 'docker') {
                         basicInfo['Image'] = this.machine.extra.image;
                         basicInfo['Status'] = this.machine.extra.status;
                         basicInfo['Command'] = this.machine.extra.command;
@@ -309,7 +309,7 @@ define('app/views/machine', ['app/views/page'],
 
             checkedMonitoringObserver: function() {
                 Ember.run.once(this, 'updateMonitoringCollapsible');
-            }.observes('machine', 'Mist.backendsController.checkedMonitoring'),
+            }.observes('machine', 'Mist.cloudsController.checkedMonitoring'),
         });
 
 

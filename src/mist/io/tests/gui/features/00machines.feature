@@ -2,12 +2,12 @@
 Feature: Machines
 
   Background:
-    Given backends credentials
+    Given clouds credentials
     When I visit mist.io
 
   @machines-ec2
   Scenario: Machine Actions EC2
-    Given "EC2" backend added
+    Given "EC2" cloud added
     Then Images counter should be greater than 0 within 80 seconds
     When I click the button that contains "Machines"
     And I click the "Create" button

@@ -1,11 +1,11 @@
-@backends
-Feature: Add second-tier backends
+@clouds
+Feature: Add second-tier clouds
 
   Background:
-    Given backends credentials
+    Given clouds credentials
     When I visit mist.io
 
-  @all-backends
+  @all-clouds
   Scenario Outline:
     When I click the "Add cloud" button
     And I click the button that contains "Select provider"
@@ -13,7 +13,7 @@ Feature: Add second-tier backends
     And I wait for 1 seconds
     And I use my "<credentials>" credentials
     And I click the "Add" button
-    Then the "<provider>" backend should be added within 30 seconds
+    Then the "<provider>" cloud should be added within 30 seconds
 
     Examples: Providers
     | provider              | credentials  |
@@ -32,17 +32,17 @@ Feature: Add second-tier backends
 #    | Docker               | DOCKER       |
     | KVM (via libvirt)    | LIBVIRT      |
 
-    @backend-actions
-    Scenario: Backend Actions
-      Given "Rackspace" backend added
+    @cloud-actions
+    Scenario: Cloud Actions
+      Given "Rackspace" cloud added
 
       When I click the "Rackspace" button
-      And I rename the backend to "Renamed"
+      And I rename the cloud to "Renamed"
       And I wait for 1 seconds
       And I click the "Back" button inside the "Edit cloud" popup
-      Then the "Renamed" backend should be added within 3 seconds
+      Then the "Renamed" cloud should be added within 3 seconds
 
       When I click the "Renamed" button
       And I click the "Delete" button
       And I click the "Yes" button
-      Then the "Renamed" backend should be deleted
+      Then the "Renamed" cloud should be deleted

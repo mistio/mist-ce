@@ -1,4 +1,4 @@
-<div id="backend-add"
+<div id="cloud-add"
     data-swipe-close="false"
     class="side-panel"
     data-role="panel"
@@ -15,24 +15,24 @@
     <div data-role="content" data-theme="a">
 
         <label>Provider:</label>
-        <div id="new-backend-provider"
+        <div id="new-cloud-provider"
             class="mist-select"
             data-role="collapsible"
             data-collapsed-icon="carat-d"
             data-expanded-icon="carat-u"
             data-iconpos="right"
             data-theme="a">
-            <h4>{{#if Mist.backendAddController.provider.title}}
+            <h4>{{#if Mist.cloudAddController.provider.title}}
                    <span class="provider-icon-small">
-                        <span {{bind-attr class="Mist.backendAddController.provider.className"}}></span>
+                        <span {{bind-attr class="Mist.cloudAddController.provider.className"}}></span>
                     </span>
-                    {{Mist.backendAddController.provider.title}}
+                    {{Mist.cloudAddController.provider.title}}
                 {{else}}
                     Select provider
                 {{/if}}
             </h4>
             <ul class="mist-select" data-role="listview" data-theme="a">
-                {{#each Mist.backendsController.providerList}}
+                {{#each Mist.cloudsController.providerList}}
                     <li data-icon="false">
                         <a {{action "selectProvider" this target="view"}}>
                             <span class="provider-icon-small">
@@ -45,7 +45,7 @@
             </ul>
         </div>
 
-        <div id="backend-add-fields">
+        <div id="cloud-add-fields">
         {{#each field in view.providerFields}}
                 <div {{bind-attr class="field.className :field"}}>
                 {{#if field.label}}
@@ -121,13 +121,13 @@
         </div>
 
 
-        {{#if Mist.backendsController.addingBackend}}
+        {{#if Mist.cloudsController.addingCloud}}
             <div class="ajax-loader"></div>
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" {{action "backClicked" target="view"}} data-theme="a">Back</a>
-            <a id="new-backend-ok" data-theme="d"
+            <a id="new-cloud-ok" data-theme="d"
                 {{bind-attr class="view.isReady::ui-state-disabled :ui-btn :ui-btn-d"}}
                 {{action "addClicked" target="view"}}>Add</a>
         </div>

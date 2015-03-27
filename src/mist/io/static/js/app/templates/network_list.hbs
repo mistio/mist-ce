@@ -13,7 +13,7 @@
     <div data-role="content" data-theme="a">
         <a id="network-create-btn"
             {{bind-attr
-                class="Mist.backendsController.hasOpenStack::ui-disabled
+                class="Mist.cloudsController.hasOpenStack::ui-disabled
                 :responsive-button"}}
             data-role="button"
             data-icon="plus"
@@ -27,7 +27,7 @@
             data-filter-placeholder="Filter..."
             data-theme="c"
             class="checkbox-list">
-            {{#each Mist.backendsController}}
+            {{#each Mist.cloudsController}}
                 {{#if this.enabled}}
                   {{#each this.networks}}
                         {{view "networkListItem"

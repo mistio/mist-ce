@@ -91,7 +91,7 @@ class ShellNamespace(CustomNamespace):
         if self.ssh_info:
             self.disconnect()
         self.ssh_info = {
-            'backend_id': data['backend_id'],
+            'cloud_id': data['cloud_id'],
             'machine_id': data['machine_id'],
             'host': data['host'],
             'columns': data['cols'],
@@ -101,7 +101,7 @@ class ShellNamespace(CustomNamespace):
         self.shell = Shell(data['host'])
         try:
             key_id, ssh_user = self.shell.autoconfigure(
-                self.user, data['backend_id'], data['machine_id']
+                self.user, data['cloud_id'], data['machine_id']
             )
         except Exception as exc:
             if isinstance(exc, MachineUnauthorizedError):
@@ -179,14 +179,14 @@ class MistNamespace(CustomNamespace):
         self.update_greenlet = self.spawn(update_subscriber, self)
 
         self.monitoring_greenlet = self.spawn_later(2, check_monitoring_from_socket, self)
-        self.backends_greenlet = self.spawn_later(2, list_backends_from_socket, self)
+        self.clouds_greenlet = self.spawn_later(2, list_clouds_from_socket, self)
         self.keys_greenlet = self.spawn_later(2, list_keys_from_socket, self)
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
 
-    def on_stats(self, backend_id, machine_id, start, stop, step, request_id, metrics):
+    def on_stats(self, cloud_id, machine_id, start, stop, step, request_id, metrics):
         error = False
         try:
-            data = get_stats(self.user, backend_id, machine_id,
+            data = get_stats(self.user, cloud_id, machine_id,
                              start, stop, step)
         except BadRequestError as exc:
             error = str(exc)
@@ -196,7 +196,7 @@ class MistNamespace(CustomNamespace):
             return
 
         ret = {
-            'backend_id': backend_id,
+            'cloud_id': cloud_id,
             'machine_id': machine_id,
             'start': start,
             'stop': stop,
@@ -217,21 +217,21 @@ class MistNamespace(CustomNamespace):
                 log.warn('send probe')
 
             if routing_key == 'list_networks':
-                backend_id = msg.body['backend_id']                
-                log.warn('Got networks from %s' % self.user.backends[backend_id].title)
+                cloud_id = msg.body['cloud_id']                
+                log.warn('Got networks from %s' % self.user.clouds[cloud_id].title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = msg.body['machines']
-                backend_id = msg.body['backend_id']
-                # update backend machine count in multi-user setups
+                cloud_id = msg.body['cloud_id']
+                # update cloud machine count in multi-user setups
                 try:
-                    if multi_user and len(machines) != self.user.backends[backend_id].machine_count:
-                        tasks.update_machine_count.delay(self.user.email, backend_id, len(machines))
+                    if multi_user and len(machines) != self.user.clouds[cloud_id].machine_count:
+                        tasks.update_machine_count.delay(self.user.email, cloud_id, len(machines))
                         log.info('Updated machine count for user %s' % self.user.email)
                 except Exception as e:
                     log.error('Cannot update machine count for user %s: %r' % (self.user.email, e))
                 for machine in machines:
-                    bmid = (backend_id, machine['id'])
+                    bmid = (cloud_id, machine['id'])
                     if bmid in self.running_machines:
                         # machine was running
                         if machine['state'] != 'running':
@@ -248,21 +248,21 @@ class MistNamespace(CustomNamespace):
                     if not ips:
                         continue
                     cached = tasks.ProbeSSH().smart_delay(
-                        self.user.email, backend_id, machine['id'], ips[0]
+                        self.user.email, cloud_id, machine['id'], ips[0]
                     )
                     if cached is not None:
                         self.emit('probe', cached)
                     cached = tasks.Ping().smart_delay(
-                        self.user.email, backend_id, machine['id'], ips[0]
+                        self.user.email, cloud_id, machine['id'], ips[0]
                     )
                     if cached is not None:
                         self.emit('ping', cached)
         elif routing_key == 'update':
             self.user.refresh()
             sections = msg.body
-            if 'backends' in sections:
-                self.backends_greenlet.kill()
-                self.backends_greenlet = self.spawn(list_backends_from_socket,
+            if 'clouds' in sections:
+                self.clouds_greenlet.kill()
+                self.clouds_greenlet = self.spawn(list_clouds_from_socket,
                                                     self)
             if 'keys' in sections:
                 self.keys_greenlet.kill()
@@ -299,18 +299,18 @@ def check_monitoring_from_socket(namespace):
         pass
 
 
-def list_backends_from_socket(namespace):
+def list_clouds_from_socket(namespace):
     user = namespace.user
-    backends = methods.list_backends(user)
-    namespace.emit('list_backends', backends)
+    clouds = methods.list_clouds(user)
+    namespace.emit('list_clouds', clouds)
     for key, task in (('list_machines', tasks.ListMachines()),
                       ('list_images', tasks.ListImages()),
                       ('list_sizes', tasks.ListSizes()),
                       ('list_networks', tasks.ListNetworks()),
                       ('list_locations', tasks.ListLocations()),):
-        for backend_id in user.backends:
-            if user.backends[backend_id].enabled:
-                cached = task.smart_delay(user.email, backend_id)
+        for cloud_id in user.clouds:
+            if user.clouds[cloud_id].enabled:
+                cached = task.smart_delay(user.email, cloud_id)
                 if cached is not None:
                     namespace.emit(key, cached)
 

@@ -1,10 +1,10 @@
-define('app/controllers/backend_add', ['app/models/backend'],
+define('app/controllers/cloud_add', ['app/models/cloud'],
     //
-    //  Backend Add Controller
+    //  Cloud Add Controller
     //
     //  @returns Class
     //
-    function (Backend) {
+    function (Cloud) {
 
         'use strict';
 
@@ -58,10 +58,10 @@ define('app/controllers/backend_add', ['app/models/backend'],
                 });
 
                 var that = this;
-                Mist.backendsController.addBackend({
+                Mist.cloudsController.addCloud({
                     payload: payload,
-                    callback: function (success, backend) {
-                        that._giveCallback(success, backend);
+                    callback: function (success, cloud) {
+                        that._giveCallback(success, cloud);
                         if (success) that.close();
                     }
                 });
@@ -83,8 +83,8 @@ define('app/controllers/backend_add', ['app/models/backend'],
             },
 
 
-            _giveCallback: function (success, backend) {
-                if (this.callback) this.callback(success, backend);
+            _giveCallback: function (success, cloud) {
+                if (this.callback) this.callback(success, cloud);
             },
         });
     }

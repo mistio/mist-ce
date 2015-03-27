@@ -1,26 +1,26 @@
 
-/* Backend Edit Popup CSS
+/* Cloud Edit Popup CSS
 -----------------------------------------------------------------------------------------------------------*/
-#backend-edit .ui-slider {
+#cloud-edit .ui-slider {
     width: 120px;
 }
-#backend-edit .state {
+#cloud-edit .state {
     position: relative;
     bottom: 11px;
     left: 24px;
 }
-#backend-edit label {
+#cloud-edit label {
     text-align: center;
 }
 
-#backend-edit .ui-field-contain {
+#cloud-edit .ui-field-contain {
     overflow: visible;
     height: 50px;
     border-bottom: 1px solid #ddd !important;
     margin: 6px 0;
 }
 
-#backend-edit .button-back {
+#cloud-edit .button-back {
     width: 25%;
     margin: 0 auto;
 }

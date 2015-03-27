@@ -1,7 +1,7 @@
-define('app/models/backend', ['app/controllers/machines', 'app/controllers/images', 'app/controllers/sizes',
+define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images', 'app/controllers/sizes',
                               'app/controllers/locations','app/controllers/networks', 'ember'],
     /**
-     *  Backend Model
+     *  Cloud Model
      *
      *  @returns Class
      */
@@ -94,11 +94,11 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 Ember.run(this, function () {
 
                     // Add controllers
-                    this.sizes = SizesController.create({backend: this, content: []});
-                    this.images = ImagesController.create({backend: this, content: []});
-                    this.machines = MachinesController.create({backend: this, content: []});
-                    this.locations = LocationsController.create({backend: this, content: []});
-                    this.networks = NetworksController.create({backend: this, content: []});
+                    this.sizes = SizesController.create({cloud: this, content: []});
+                    this.images = ImagesController.create({cloud: this, content: []});
+                    this.machines = MachinesController.create({cloud: this, content: []});
+                    this.locations = LocationsController.create({cloud: this, content: []});
+                    this.networks = NetworksController.create({cloud: this, content: []});
 
                     // Add events
                     this.sizes.on('onSizeListChange', this, '_updateSizeCount');

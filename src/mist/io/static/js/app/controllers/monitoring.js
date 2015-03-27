@@ -30,7 +30,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
             load: function(callback) {
                 if (!Mist.authenticated) {
-                    Mist.backendsController.set('checkedMonitoring', true);
+                    Mist.cloudsController.set('checkedMonitoring', true);
                     return;
                 }
             }.on('init'),
@@ -48,7 +48,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 var that = this;
                 machine.set('enablingMonitoring', true);
 
-                var url = '/backends/' + machine.backend.id +
+                var url = '/clouds/' + machine.cloud.id +
                     '/machines/' + machine.id + '/monitoring';
 
                 Mist.ajax.POST(url, {
@@ -81,7 +81,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 machine.set('disablingMonitoring', true);
                 machine.set('hasMonitoring', false);
 
-                var url = '/backends/' + machine.backend.id +
+                var url = '/clouds/' + machine.cloud.id +
                     '/machines/' + machine.id + '/monitoring';
 
                 Mist.ajax.POST(url, {
@@ -147,15 +147,15 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 Mist.metricsController.setBuiltInMetrics(data.builtin_metrics);
                 Mist.rulesController.load(data.rules);
 
-                Mist.backendsController.content.forEach(function (backend) {
-                   backend.machines._updateMonitoredMachines();
+                Mist.cloudsController.content.forEach(function (cloud) {
+                   cloud.machines._updateMonitoredMachines();
                 });
             },
 
 
             getMonitoringCommand: function (machine, callback) {
 
-                var url = '/backends/' + machine.backend.id +
+                var url = '/clouds/' + machine.cloud.id +
                     '/machines/' + machine.id + '/monitoring';
 
                 var that = this;

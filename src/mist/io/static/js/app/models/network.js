@@ -24,7 +24,7 @@ define('app/models/network', [
 
             status: null,
             subnets: null,
-            backend: null,
+            cloud: null,
             ipAddresses: null,
 
 

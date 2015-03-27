@@ -1,6 +1,6 @@
-define('app/views/backend_add', ['app/views/panel'],
+define('app/views/cloud_add', ['app/views/panel'],
     //
-    //  Backend Add View
+    //  Cloud Add View
     //
     //  @returns Class
     //
@@ -8,7 +8,7 @@ define('app/views/backend_add', ['app/views/panel'],
 
         'use strict';
 
-        return App.BackendAddView = PanelView.extend({
+        return App.CloudAddView = PanelView.extend({
 
 
             selectedRegion: null,
@@ -22,8 +22,8 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
             providerFields: function () {
-                return getProviderFields(Mist.backendAddController.provider);
-            }.property('Mist.backendAddController.provider'),
+                return getProviderFields(Mist.cloudAddController.provider);
+            }.property('Mist.cloudAddController.provider'),
 
 
             hasAdvanced: function () {
@@ -32,9 +32,9 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
             providerRegions: function () {
-                if (Mist.backendAddController.provider)
-                    return Mist.backendAddController.provider.regions;
-            }.property('Mist.backendAddController.provider'),
+                if (Mist.cloudAddController.provider)
+                    return Mist.cloudAddController.provider.regions;
+            }.property('Mist.cloudAddController.provider'),
 
 
             isReady: function () {
@@ -59,13 +59,13 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
             clear: function () {
-                $('#new-backend-provider').collapsible('collapse');
-                $('#backend-add-fields').hide();
+                $('#new-cloud-provider').collapsible('collapse');
+                $('#cloud-add-fields').hide();
                 Ember.run.next(this, function () {
                     $(this.panelId).trigger('create');
                     Ember.run.later(this, function () {
-                        if (Mist.backendAddController.provider)
-                            $('#backend-add-fields').fadeIn();
+                        if (Mist.cloudAddController.provider)
+                            $('#cloud-add-fields').fadeIn();
                     }, 100);
                 });
             },
@@ -79,25 +79,25 @@ define('app/views/backend_add', ['app/views/panel'],
                 if (!fields.findBy('type', 'region'))
                     return;
 
-                Mist.backendsController.content.some(function (backend) {
+                Mist.cloudsController.content.some(function (cloud) {
 
-                    // backend.provider == provider.provider won't work
-                    // because we still save backends in the database using
+                    // cloud.provider == provider.provider won't work
+                    // because we still save clouds in the database using
                     // the old format for compatibility reasons
-                    if (backend.getSimpleProvider() == provider.provider) {
+                    if (cloud.getSimpleProvider() == provider.provider) {
 
                         if (provider.provider == 'ec2') {
-                            fields.findBy('name', 'api_key').set('value', backend.apikey);
+                            fields.findBy('name', 'api_key').set('value', cloud.apikey);
                             fields.findBy('name', 'api_secret').set('value', 'getsecretfromdb');
                         }
                         if (provider.provider == 'rackspace') {
-                            fields.findBy('name', 'username').set('value', backend.apikey);
+                            fields.findBy('name', 'username').set('value', cloud.apikey);
                             fields.findBy('name', 'api_key').set('value', 'getsecretfromdb');
                         }
                         if (provider.provider == 'hpcloud') {
-                            fields.findBy('name', 'username').set('value', backend.apikey);
+                            fields.findBy('name', 'username').set('value', cloud.apikey);
                             fields.findBy('name', 'password').set('value', 'getsecretfromdb');
-                            fields.findBy('name', 'tenant_name').set('value', backend.tenant_name);
+                            fields.findBy('name', 'tenant_name').set('value', cloud.tenant_name);
                         }
                     }
                 });
@@ -116,8 +116,8 @@ define('app/views/backend_add', ['app/views/panel'],
                 selectProvider: function (provider, field) {
                     this.clear();
                     clearProviderFields(provider);
-                    Mist.backendAddController.set('provider', provider);
-                    $('#new-backend-provider').collapsible('collapse');
+                    Mist.cloudAddController.set('provider', provider);
+                    $('#new-cloud-provider').collapsible('collapse');
                     this.autocompleteCredentials(provider);
                 },
 
@@ -167,12 +167,12 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
                 backClicked: function() {
-                    Mist.backendAddController.close();
+                    Mist.cloudAddController.close();
                 },
 
 
                 addClicked: function() {
-                    Mist.backendAddController.add();
+                    Mist.cloudAddController.add();
                 },
 
 

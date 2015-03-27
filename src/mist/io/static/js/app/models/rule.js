@@ -48,8 +48,8 @@ define('app/models/rule', ['ember'],
                     operator: Mist.rulesController.getOperatorByTitle(data.operator),
                     metric: Mist.metricsController.getMetric(data.metric),
                     aggregate: Mist.rulesController.getAggregateByValue(data.aggregate),
-                    machine: Mist.backendsController.getMachine(
-                        data.machine, data.backend) || data.machine
+                    machine: Mist.cloudsController.getMachine(
+                        data.machine, data.cloud) || data.machine
                 });
             },
 
