@@ -327,11 +327,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3'],
                         var minValueIndex = 0;
                         var currentValue = 0;
 
-                        for (var i = 0; i < xCoordinates.length; i++) {
-                            if (xCoordinates[i]+translate > virtualMouseX)
-                                break;
-                            else
-                                minValueIndex = i;
+                        if (xCoordinates) {
+                            for (var i = 0; i < xCoordinates.length; i++) {
+                                if (xCoordinates[i]+translate > virtualMouseX)
+                                    break;
+                                else
+                                    minValueIndex = i;
+                            }
                         }
 
                         // Fix for the area that has not defined data

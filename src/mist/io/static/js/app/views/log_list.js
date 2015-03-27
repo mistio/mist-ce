@@ -1,4 +1,4 @@
-define('app/views/log_list', ['app/views/mistscreen'],
+define('app/views/log_list', ['app/views/page'],
     //
     //  Log List View
     //

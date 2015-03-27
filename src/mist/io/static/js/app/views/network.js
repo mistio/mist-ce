@@ -1,4 +1,4 @@
-define('app/views/network', ['app/views/mistscreen'],
+define('app/views/network', ['app/views/page'],
     //
     //  Network View
     //

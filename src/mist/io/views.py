@@ -484,6 +484,9 @@ def create_machine(request):
         persist = request.json_body.get('persist', False)
         docker_port_bindings = request.json_body.get('docker_port_bindings', {})
         docker_exposed_ports = request.json_body.get('docker_exposed_ports', {})
+        # hostname: if provided it will be attempted to assign a DNS name
+        hostname = request.json_body.get('hostname', '')
+        plugins = request.json_body.get('plugins')
 
     except Exception as e:
         raise RequiredParameterMissingError(e)
@@ -499,7 +502,8 @@ def create_machine(request):
             docker_env, docker_command)
     kwargs = {'script_id': script_id, 'script_params': script_params,
               'job_id': job_id, 'docker_port_bindings': docker_port_bindings,
-              'docker_exposed_ports': docker_exposed_ports}
+              'docker_exposed_ports': docker_exposed_ports,
+              'hostname': hostname, 'plugins': plugins}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
