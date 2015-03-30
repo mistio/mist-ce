@@ -74,7 +74,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             }.property('provider'),
 
             canCreateMachine: function () {
-                return this.enabled && 
+                return this.enabled &&
                     ['indonesian_vcloud', 'bare_metal', 'libvirt'].indexOf(this.provider) == -1;
             }.property('provider', 'enabled'),
 
@@ -249,6 +249,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 Ember.run(this, function () {
                     this.set('machineCount', this.machines.content.length);
                     this.trigger('onMachineListChange');
+                    Mist.backendsController.trigger('onMachineListChange');
                 });
             },
 

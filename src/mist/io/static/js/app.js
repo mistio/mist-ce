@@ -401,6 +401,7 @@ var loadApp = function (
     App.set('betaFeatures', !!window.BETA_FEATURES);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
+    App.set('machineListSortMode', false);
     App.set('email', EMAIL);
     App.set('password', '');
     App.set('isClientMobile',

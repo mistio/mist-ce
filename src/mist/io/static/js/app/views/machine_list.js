@@ -14,7 +14,6 @@ define('app/views/machine_list', ['app/views/page'],
              */
 
              machines:[],
-             hasSortMode: false,
 
             /**
              *
@@ -90,7 +89,8 @@ define('app/views/machine_list', ['app/views/page'],
                     log(backend.machines.content.length);
                 });
                 this.set("machines",machineList);
-                this.sortMachines(this.hasSortMode);
+                this.sortMachines(Mist.machineSortListMode);
+                console.log("event");
             },
 
             sortMachines: function (mode){
@@ -152,7 +152,7 @@ define('app/views/machine_list', ['app/views/page'],
                 sortByModeClicked: function (mode) {
 
                     $('#select-machines-popup').popup('close');
-                    this.set("hasSortMode",mode);
+                    Mist.set("machineSortListMode",mode);
                     this.sortMachines(mode);
                 }
             }
