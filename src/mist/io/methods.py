@@ -253,6 +253,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     elif provider == 'hostvirtual':
         backend_id, backend = _add_backend_hostvirtual(title, provider, params)
+    elif provider == 'vsphere':
+        backend_id, backend = _add_backend_vsphere(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -734,6 +736,34 @@ def _add_backend_hostvirtual(title, provider, params):
     return backend_id, backend
 
 
+def _add_backend_vsphere(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    host = params.get('host', '')
+    if not host:
+        raise RequiredParameterMissingError('host')
+    for prefix in ['https://', 'http://']:
+        host = host.strip(prefix)
+    host = host.split('/')[0]
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.apiurl = host
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
 def rename_backend(user, backend_id, new_name):
     """Renames backend with given backend_id."""
 
@@ -1114,6 +1144,9 @@ def connect_provider(backend):
     elif backend.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         libcloud.security.VERIFY_SSL_CERT = False;
         conn = driver(backend.apikey, backend.apisecret, host=backend.apiurl)
+    elif backend.provider == Provider.VSPHERE:
+        libcloud.security.VERIFY_SSL_CERT = False;
+        conn = driver(host=backend.apiurl, username=backend.apikey, password=backend.apisecret)
     elif backend.provider == Provider.DIGITAL_OCEAN:
         if backend.apikey == backend.apisecret:  # API v2
             conn = driver(backend.apisecret)
@@ -1160,7 +1193,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL):
+                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE):
         can_tag = False
 
     # for other states
