@@ -132,3 +132,7 @@
 .info-table .loadleds {
     margin-right: 10px;
 }
+
+div.df {
+    font-family: monospace;
+}

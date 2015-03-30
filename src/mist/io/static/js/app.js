@@ -1,5 +1,7 @@
 startTimer();
 
+window.App = new Object();
+
 DEBUG_SOCKET = false;
 DEBUG_STATS = false;
 DEBUG_LOGS = false;
@@ -155,6 +157,7 @@ var appLoader = {
             before: [],
             exec: function () {
                 require(['ember'], function () {
+                    extendEmberView();
                     appLoader.complete('load ember');
                 });
             },
@@ -203,9 +206,9 @@ var appLoader = {
         'init app': {
             before: ['load templates', 'init connections'],
             exec: function () {
-                loadApp.apply(null, appLoader.buffer.files.concat([function () {
+                loadApp.apply(null, [function () {
                     appLoader.complete('init app');
-                }]));
+                }].concat(appLoader.buffer.files));
             }
         },
         'init connections': {
@@ -223,10 +226,10 @@ var appLoader = {
                     },
                 });
                 appLoader.buffer.logs = new Socket_({
-                    keepAlive: true,
                     namespace: '/logs',
-                    onInit: function (socket) {
-                        socket.emit('ready');
+                    onConnect: function (socket) {
+                        if (!appLoader)
+                            socket.emit('ready');
                     }
                 });
             }
@@ -244,7 +247,9 @@ var appLoader = {
             before: ['init socket events'],
             exec: function () {
                 setupSocketEvents(Mist.socket, function () {
-                    appLoader.complete('fetch first data');
+                    setupLogsSocketEvents(Mist.logs, function () {
+                        appLoader.complete('fetch first data');
+                    });
                 });
             }
         },
@@ -347,6 +352,7 @@ var loadFiles = function (callback) {
 };
 
 var loadApp = function (
+    callback,
     TemplatesBuild,
     BackendAddController,
     BackendEditController,
@@ -379,63 +385,7 @@ var loadApp = function (
     ScriptAddController,
     ScriptEditController,
     ScriptRunController,
-    ScriptsController,
-    BackendAdd,
-    BackendButton,
-    BackendEdit,
-    ConfirmationDialog,
-    DialogView,
-    FileUploadView,
-    GraphButtonView,
-    GraphListView,
-    GraphListBarView,
-    GraphListControlView,
-    GraphListItemView,
-    Home,
-    ImageListItem,
-    ImageListView,
-    IPAddressListItemView,
-    SingleKeyView,
-    KeyAddView,
-    KeyEditDialog,
-    KeyListView,
-    KeyListItemView,
-    LogListView,
-    LogListItemView,
-    LoginView,
-    SingleMachineView,
-    MachineAddDialog,
-    MachineKeysView,
-    MachineKeysListItemView,
-    MachineListView,
-    MachineListItem,
-    MachineMonitoringView,
-    MachinePowerView,
-    MachineShellView,
-    MachineTagsView,
-    MachineTagsListItemView,
-    MessageBoxView,
-    MetricAddView,
-    MetricAddCustomView,
-    MissingView,
-    MetricNodeView,
-    NetworkView,
-    NetworkCreateView,
-    NetworkListView,
-    NetworkListItemView,
-    RuleView,
-    RuleEditView,
-    RuleListView,
-    ScriptView,
-    ScriptAddView,
-    ScriptEditView,
-    ScriptListView,
-    ScriptRunView,
-    ScriptListItemView,
-    ScriptLogListView,
-    SubnetListItemView,
-    UserMenuView,
-    callback) {
+    ScriptsController) {
 
     // Hide error boxes on page unload
     window.onbeforeunload = function() {
@@ -443,12 +393,12 @@ var loadApp = function (
     };
 
     // Ember Application
-    App = Ember.Application.create({
-        ready: callback
-    });
+    App.ready = callback;
+    App = Ember.Application.create(App);
+    window.Mist  = App;
 
     // Globals
-    App.set('betaFeatures', window.BETA_FEATURES || false);
+    App.set('betaFeatures', !!window.BETA_FEATURES);
     App.set('isCore', !!IS_CORE);
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
@@ -459,8 +409,6 @@ var loadApp = function (
     );
 
     parseProviderMap();
-
-    window.Mist = App;
 
     // Ember routes and routers
 
@@ -538,7 +486,6 @@ var loadApp = function (
         }
     });
 
-
     App.MachinesRoute = Ember.Route.extend({
         activate: function() {
             Ember.run.next(function() {
@@ -614,7 +561,7 @@ var loadApp = function (
         },
     });
 
-    if (Mist.betaFeatures) {
+    if (Mist.isCore) {
     App.ScriptsRoute = Ember.Route.extend({
         activate: function () {
             Ember.run.next(function () {
@@ -654,67 +601,6 @@ var loadApp = function (
             });
         },
     });
-
-    // Ember views
-
-    App.DialogView = DialogView;
-    App.LogListItemView = LogListItemView;
-    App.ScriptAddView = ScriptAddView;
-    App.ScriptView = ScriptView;
-    App.ScriptEditView = ScriptEditView;
-    App.ScriptRunView = ScriptRunView;
-    App.ScriptListView = ScriptListView;
-    App.ScriptListItemView = ScriptListItemView;
-    App.ScriptLogListView = ScriptLogListView;
-    App.SubnetListItemView = SubnetListItemView;
-    App.IpAddressListItemView = IPAddressListItemView;
-
-    App.set('homeView', Home);
-    App.set('ruleView', RuleView);
-    App.set('loginView', LoginView);
-    App.set('logListView', LogListView);
-    App.set('keyAddView', KeyAddView);
-    App.set('keyView', SingleKeyView);
-    App.set('missingView', MissingView);
-    App.set('metricNodeView', MetricNodeView);
-    App.set('keyListView', KeyListView);
-    App.set('networkView', NetworkView);
-    App.set('userMenuView', UserMenuView);
-    App.set('keyEditView', KeyEditDialog);
-    App.set('backendAddView', BackendAdd);
-    App.set('ruleEditView', RuleEditView);
-    App.set('metricAddView', MetricAddView);
-    App.set('backendEditView', BackendEdit);
-    App.set('imageListView', ImageListView);
-    App.set('fileUploadView', FileUploadView);
-    App.set('messageboxView', MessageBoxView);
-    App.set('machineMonitoringView', MachineMonitoringView);
-    App.set('machineView', SingleMachineView);
-    App.set('graphListView', GraphListView);
-    App.set('graphListBarView', GraphListBarView);
-    App.set('graphListControlView', GraphListControlView);
-    App.set('graphListItemView', GraphListItemView);
-    App.set('networkCreateView', NetworkCreateView);
-    App.set('networkListView', NetworkListView);
-    App.set('machineKeysView', MachineKeysView);
-    App.set('machineTagsView', MachineTagsView);
-    App.set('keyListItemView', KeyListItemView);
-    App.set('dialogView', DialogView);
-    App.set('ruleListView', RuleListView);
-    App.set('logListItemView', LogListItemView);
-    App.set('machineListView', MachineListView);
-    App.set('imageListItemView', ImageListItem);
-    App.set('machineAddView', MachineAddDialog);
-    App.set('backendButtonView', BackendButton);
-    App.set('graphButtonView', GraphButtonView);
-    App.set('networkListItemView', NetworkListItemView);
-    App.set('machinePowerView', MachinePowerView);
-    App.set('machineShellView', MachineShellView);
-    App.set('machineListItemView', MachineListItem);
-    App.set('confirmationDialog', ConfirmationDialog);
-    App.set('metricAddCustomView', MetricAddCustomView);
-    App.set('machineKeysListItemView', MachineKeysListItemView);
-    App.set('machineTagsListItemView', MachineTagsListItemView);
 
     // Ember controllers
 
@@ -804,38 +690,8 @@ var loadApp = function (
 
     // Mist functions
 
-    App.getViewName = function (view) {
-        var name = view.constructor.toString().split('.')[1].split('View')[0];
-        // Ensure compatibility with new view name convention
-        return name.charAt(0).toLowerCase() + name.slice(1)
-    };
-
     App.isScrolledToTop = function () {
         return window.pageYOffset <= 20;
-    };
-
-    App.capitalize = function (string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    };
-
-    App.decapitalize = function (string) {
-        return string.charAt(0).toLowerCase() + string.slice(1);
-    };
-
-    App.capitalizeArray = function (array) {
-        var newArray = [];
-        array.forEach(function(string) {
-            newArray.push(App.capitalize(string));
-        });
-        return newArray;
-    };
-
-    App.decapitalizeArray = function (array) {
-        var newArray = [];
-        array.forEach(function(string) {
-            newArray.push(App.decapitalize(string));
-        });
-        return newArray;
     };
 
     App.isScrolledToBottom = function(){
@@ -903,22 +759,22 @@ var loadApp = function (
             element.slideUp();
     };
 
-    App.splitWords = function (string) {
-        if (string.indexOf('-') > -1)
-            return string.split('-');
-        else if (string.indexOf('_') > -1)
-            return string.split('_');
-        else if (string.indexOf(' ') > -1)
-            return string.split(' ');
-        else if (string.match(/([a-z])([A-Z])/g)) {
-            var wordJoints = string.match(/([a-z])([A-Z])/g);
-            wordJoints.forEach(function(joint) {
-                string = string.replace(joint, joint[0] + '_' + joint[1]);
+    App.clock = Ember.Object.extend({
+        init: function () {
+            this._super();
+            var that = this;
+            setInterval(function () {
+                that.tick();
+            }, TIME_MAP.SECOND);
+        },
+        tick: function () {
+            this.setProperties({
+                second: new Date().getSeconds(),
+                minute: new Date().getMinutes(),
+                hour: new Date().getHours(),
             });
-            return App.splitWords(string);
         }
-        return [string];
-    };
+    }).create();
 };
 
 
@@ -968,14 +824,40 @@ var handleMobileInit = function () {
 };
 
 
+var setupLogsSocketEvents = function (socket, callback) {
+
+    socket.on('open_incidents', function (openIncidents) {
+        require(['app/models/story'], function (StoryModel) {
+            var models = openIncidents.map(function (incident) {
+                return StoryModel.create(incident);
+            });
+            Mist.set('openIncidents', models);
+        });
+    }).on('closed_incidents', function (closedIncidents) {
+        require(['app/models/story'], function (StoryModel) {
+            var models = closedIncidents.map(function (incident) {
+                return StoryModel.create(incident);
+            });
+            Mist.set('closedIncidents', models);
+        });
+    }).emit('ready');
+    Mist.set('openIncidents', []);
+    Mist.set('closedIncidents', [])
+    if (callback)
+        callback();
+};
+
+
 var setupSocketEvents = function (socket, callback) {
 
+    if (Mist.isCore) {
     //  This is a temporary ajax-request to get the scripts.
     //  It should be converted into a "list_scripts" socket handler
     //  as soon as the backend supports it
     Mist.ajax.GET('/scripts').success(function (scripts) {
         Mist.scriptsController.setContent(scripts);
     });
+    }
 
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);
@@ -1033,7 +915,7 @@ var setupSocketEvents = function (socket, callback) {
         if (machine.id) {
             dialogBody.push({
                 link: machine.name,
-                class: 'ui-btn ui-btn-icon-right ui-icon-carat-r ui-mini ui-corner-all',
+                class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 href: '#/machines/' + machineId,
                 closeDialog: true,
             });
@@ -1316,22 +1198,26 @@ function Socket_ (args) {
             events.on.apply(events, arguments);
             if (!socket.$events || !socket.$events[event])
                 socket.on(event, function (response) {
-                    that._log('RECEIVE', response);
+                    that._log('/'+ event, 'RECEIVE', response);
                     events.trigger.call(events, event, response);
                 });
+            return this;
         },
 
 
         off: function () {
             var events = this.get('events');
             events.off.apply(events, arguments);
+            return this;
         },
 
 
         emit: function () {
-            this._log('EMIT', slice(arguments));
+            var args = slice(arguments)
+            this._log('/'+args[0], 'EMIT', args);
             var socket = this.get('socket');
             socket.emit.apply(socket, arguments);
+            return this;
         },
 
 
@@ -1342,6 +1228,7 @@ function Socket_ (args) {
             if (socket.$events)
                 for (event in socket.$events)
                     delete socket.$events[event];
+            return this;
         },
 
 
@@ -1506,7 +1393,6 @@ function getTime () {
     return Date.now() - startTime;
 };
 
-
 // Console aliases
 function log() {
     if (LOGLEVEL > 3)
@@ -1616,25 +1502,51 @@ function parseProviderMap () {
 //
 
 
-Date.prototype.getPrettyTime = function () {
+var extendEmberView = function () {
+
+    Ember.View.prototype.getName = function () {
+        return this.constructor.toString().split('.')[1].split('View')[0];
+    };
+    Ember.View.prototype.getWidgetID = function () {
+        return '#' + this.getName().dasherize();
+    }
+    Ember.View.prototype.getControllerName = function () {
+        return this.getName().decapitalize() + 'Controller';
+    }
+};
+
+
+String.prototype.decapitalize = function () {
+    return this.charAt(0).toLowerCase() + this.slice(1);
+};
+
+Date.prototype.isFuture = function () {
+    return this > new Date();
+};
+
+Date.prototype.getPrettyTime = function (noSeconds) {
 
     var hour = this.getHours();
     var min = this.getMinutes();
     var sec = this.getSeconds();
 
     var ret = (hour < 10 ? '0' : '') + hour + ':' +
-        (min < 10 ? '0' : '') + min + ':' +
-        (sec < 10 ? '0' : '') + sec;
+        (min < 10 ? '0' : '') + min +
+        (noSeconds ? '' : (':' + (sec < 10 ? '0' : '') + sec));
 
     return ret;
 }
 
-Date.prototype.getPrettyDate = function () {
-    return this.getMonthName() + ' ' + this.getDate() + ', ' + this.getFullYear();
+Date.prototype._toString = function () {
+    var d = (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear();
+    return d + ', ' + this.getPrettyTime();
+}
+Date.prototype.getPrettyDate = function (shortMonth) {
+    return this.getMonthName(shortMonth) + ' ' + this.getDate() + ', ' + this.getFullYear();
 }
 
-Date.prototype.getPrettyDateTime = function () {
-    return this.getPrettyDate() + ', ' + this.getPrettyTime();
+Date.prototype.getPrettyDateTime = function (shortMonth, noSeconds) {
+    return this.getPrettyDate(shortMonth) + ', ' + this.getPrettyTime(noSeconds);
 }
 
 Date.prototype.getMonthName = function (short) {
@@ -1644,6 +1556,31 @@ Date.prototype.getMonthName = function (short) {
     return ['January','February','March','April','May','June','July',
         'August','September','October','November','December'][this.getMonth()];
 }
+
+Date.prototype.diffToString = function (date) {
+
+    var diff = this - date;
+    var ret = '';
+
+    if (diff < TIME_MAP.MINUTE)
+        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
+    else if (diff < TIME_MAP.HOUR)
+        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
+    else if (diff < TIME_MAP.DAY)
+        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
+    else if (diff < TIME_MAP.MONTH)
+        ret = parseInt(diff / TIME_MAP.DAY) + ' day';
+    else if (diff < TIME_MAP.YEAR)
+        ret = parseInt(diff / TIME_MAP.MONTH) + ' month';
+    else
+        ret = 'TOO LONG!';
+
+    // Add 's' for plural
+    if (ret.split(' ')[0] != '1')
+        ret = ret + 's';
+
+    return ret;
+};
 
 Date.prototype.getTimeFromNow = function () {
 
@@ -1739,7 +1676,7 @@ var PROVIDER_MAP = {
         {
             name: 'title',
             type: 'text',
-            defaultValue: 'Other Server',
+            defaultValue: 'SSH',
         },
         {
             name: 'machine_ip',
@@ -1774,6 +1711,18 @@ var PROVIDER_MAP = {
         },
         {
             name: 'token',
+            type: 'password',
+        },
+    ],
+
+    hostvirtual: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'HostVirtual',
+        },
+        {
+            name: 'api_key',
             type: 'password',
         },
     ],

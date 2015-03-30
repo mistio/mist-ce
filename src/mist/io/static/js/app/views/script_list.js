@@ -1,4 +1,4 @@
-define('app/views/script_list', ['app/views/mistscreen'],
+define('app/views/script_list', ['app/views/page'],
     //
     //  Script List View
     //
@@ -8,7 +8,7 @@ define('app/views/script_list', ['app/views/mistscreen'],
 
         'use strict';
 
-        return PageView.extend({
+        return App.ScriptListView = PageView.extend({
 
 
             load: function () {

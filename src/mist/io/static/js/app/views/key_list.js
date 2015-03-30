@@ -1,11 +1,11 @@
-define('app/views/key_list', ['app/views/mistscreen'],
+define('app/views/key_list', ['app/views/page'],
     /**
      *  Key List View
      *
      *  @returns Class
      */
-    function (MistScreen) {
-        return MistScreen.extend({
+    function (PageView) {
+        return App.KeyListView = PageView.extend({
 
             /**
              *

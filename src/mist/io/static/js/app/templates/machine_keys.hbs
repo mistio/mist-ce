@@ -1,0 +1,114 @@
+<div id="machine-keys-panel"
+    data-swipe-close="false"
+    class="side-panel"
+    data-role="panel"
+    data-position="right"
+    data-display="overlay"
+    data-theme="c">
+
+    <div data-role="header">
+        <h1>Manage Keys</h1>
+    </div>
+
+    <div data-role="content" data-theme="c">
+
+        <a id="associate-btn" data-role="button"
+            class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
+           {{action "associateClicked" target="view"}}>Add Key</a>
+
+        {{#if Mist.machineKeysController.associatedKeys}}
+        <ul id="machine-keys">
+            {{#each Mist.machineKeysController.associatedKeys}}
+                {{view "machineKeysListItem" keyBinding="this"}}
+            {{/each}}
+        </ul>
+        {{/if}}
+
+        {{#if Mist.keysController.associatingKey}}
+            <div class="ajax-loader"></div>
+        {{else}} {{#if Mist.keysController.disassociatingKey}}
+            <div class="ajax-loader"></div>
+        {{/if}} {{/if}}
+
+        <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
+
+    </div>
+
+</div>
+
+{{view "keyAdd"}}
+
+<div id="key-actions-popup"
+    class="tiny-popup"
+    data-role="popup"
+    data-overlay-theme="b"
+    data-transition="flip"
+    data-position-to="#machine-keys"
+    data-theme="a">
+    <ul data-role="listview">
+        <li data-icon="false"><a {{action "removeClicked" target="view"}}>Remove</a></li>
+        <li data-icon="false"><a {{action "probeClicked" target="view"}}>Probe</a></li>
+        <li data-icon="false"><a {{action "viewClicked" target="view"}}>View</a></li>
+    </ul>
+</div>
+
+<div id="non-associated-keys-popup"
+    class="tiny-popup"
+    data-role="popup"
+    data-overlay-theme="b"
+    data-transition="flip"
+    data-position-to="#associate-btn">
+
+    <ul data-role="listview">
+        {{#each Mist.machineKeysController.nonAssociatedKeys}}
+        <li data-icon="false">
+            <a {{action "nonAssociatedKeyClicked" this target="view"}}>{{this.id}}</a>
+        </li>
+        {{/each}}
+        <li data-icon="false" data-theme="d">
+            <a {{action "newKeyClicked" target="view"}}>New key</a>
+        </li>
+    </ul>
+</div>
+
+<div id="machine-userPort-popup"
+    class="large-popup"
+    data-role="popup"
+    data-theme="c"
+    data-overlay-theme="b"
+    data-position-to="#machine-keys-panel"
+    data-transition="flip">
+
+    <div data-role="header">
+        <h2>SSH user &amp; port</h2>
+    </div>
+
+    <div data-role="content">
+        <div class="message">
+            Cannot connect as root on port 22
+        </div>
+        <label for="user">User:</label>
+        {{view Mist.TextField
+               id="user"
+               data-theme="a"
+               placeholder="root"
+               valueBinding="Mist.machineKeysController.user"}}
+
+        <label for="port">Port:</label>
+        {{view Mist.TextField
+               id="port"
+               data-theme="a"
+               placeholder="22"
+               valueBinding="Mist.machineKeysController.port"}}
+
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a class="ui-btn ui-btn-a"
+                {{action "closeSSH_Details" target="Mist.machineKeysController"}}>
+                Cancel
+            </a>
+            <a id="tryAssociate" class="ui-btn ui-btn-d"
+                {{action "customAssociateClicked" target="view"}}>Retry</a>
+        </div>
+
+    </div>
+</div>

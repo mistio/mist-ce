@@ -30,7 +30,7 @@ define('app/views/controlled', ['app/views/templated'],
 
             init: function () {
                 this._super();
-                this.set('controllerName', Mist.getViewName(this) + 'Controller');
+                this.set('controllerName', this.getControllerName());
             },
 
 

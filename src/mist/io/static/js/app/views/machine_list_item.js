@@ -5,7 +5,7 @@ define('app/views/machine_list_item', ['app/views/list_item'],
      *  @returns Class
      */
     function (ListItemView) {
-        return ListItemView.extend({
+        return App.MachineListItemView = ListItemView.extend({
 
             /**
              *  Properties
@@ -28,6 +28,15 @@ define('app/views/machine_list_item', ['app/views/list_item'],
                     }
                 });
             },
+
+            monitoringIcon: function() {
+                if (this.machine.hasMonitoring){
+                    if (this.machine.get('hasOpenIncident'))
+                        return 'ui-icon-alert';
+                    return 'ui-icon-check';
+                }
+                return 'ui-icon-none';
+            }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
 
 
             /**

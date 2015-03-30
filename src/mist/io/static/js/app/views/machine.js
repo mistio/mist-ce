@@ -1,14 +1,14 @@
-define('app/views/machine', ['app/views/mistscreen'],
+define('app/views/machine', ['app/views/page'],
     //
     //  Machine View
     //
     //  @returns Class
     //
-    function(MistScreen) {
+    function(PageView) {
 
         'use strict';
 
-        return MistScreen.extend({
+        return App.MachineView = PageView.extend({
 
 
             //

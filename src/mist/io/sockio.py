@@ -34,6 +34,7 @@ from mist.io.helpers import amqp_subscribe_user
 from mist.io.helpers import amqp_log
 from mist.io.methods import notify_user
 from mist.io.exceptions import MachineUnauthorizedError
+from mist.io.exceptions import BadRequestError
 
 from mist.io import methods
 from mist.io import tasks
@@ -183,9 +184,13 @@ class MistNamespace(CustomNamespace):
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
 
     def on_stats(self, backend_id, machine_id, start, stop, step, request_id, metrics):
+        error = False
         try:
             data = get_stats(self.user, backend_id, machine_id,
                              start, stop, step)
+        except BadRequestError as exc:
+            error = str(exc)
+            data = []
         except Exception as exc:
             amqp_log("Error getting stats: %r" % exc)
             return
@@ -198,6 +203,8 @@ class MistNamespace(CustomNamespace):
             'request_id': request_id,
             'metrics': data,
         }
+        if error:
+            ret['error'] = error
         self.emit('stats', ret)
 
     def process_update(self, msg):

@@ -1,0 +1,80 @@
+{{#unless view.machine.isGhost}}
+
+    <label>{{view Mist.Checkbox checkedBinding="view.machine.selected"}}</label>
+    {{#link-to "machine" view.machine classBinding="view.monitoringIcon"}}
+
+        <div class="ui-grid-b">
+            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
+
+            <span class="ui-block-b machine-state">
+                <span {{bind-attr class="view.machine.state"}}>
+                {{view.machine.state}}
+
+                {{#if pendingCreation}}
+                    <div class='ajax-loader'></div>
+                {{else}} {{#if waitState}}
+                    <div class='ajax-loader'></div>
+                {{/if}} {{/if}}
+                </span>
+            </span>
+
+            <div class="ui-block-c machine-leds">
+                <span>
+                    {{#if view.machine.hasMonitoring}}
+                        <span></span>
+                    {{/if}}
+                </span>
+                {{#unless pendingCreation}}
+                    <div {{bind-attr class="probing probed"}}>
+                        <div class="loadleds">
+                            <div {{bind-attr class="loadavg15 :led"}}>
+                            </div>
+                            <div {{bind-attr class="loadavg5 :led"}}>
+                            </div>
+                            <div {{bind-attr class="loadavg1 :led"}}>
+                            </div>
+                        </div>
+                        <div {{bind-attr class=":netleds"}}>
+                            <div {{bind-attr class="netled4 :netled1"}}>
+                            </div>
+                            <div {{bind-attr class="netled3 :netled2"}}>
+                            </div>
+                            <div {{bind-attr class="netled2 :netled3"}}>
+                            </div>
+                            <div {{bind-attr class="netled1 :netled4"}}>
+                            </div>
+                        </div>
+
+                    </div>
+                {{/unless}}
+
+            </div>
+
+            <div class="ui-block-c machine-tags">
+                <span class="tag">{{view.machine.backend.title}}</span>
+                {{#each view.machine.tags}}
+                <span class="tag">{{this}}</span>
+                {{/each}}
+            </div>
+
+        </div>
+    {{/link-to}}
+
+{{else}}
+
+    <a class="ui-icon-delete" {{action disassociateGhostMachine target="view"}}>
+
+        <div class="ui-grid-b">
+            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
+
+            <span class="ui-block-b machine-state">
+                <span {{bind-attr class="view.machine.state"}}>
+                    {{view.machine.state}}
+                </span>
+            </span>
+
+        </div>
+
+    </a>
+
+{{/unless}}

@@ -1,14 +1,14 @@
-define('app/views/image_list', ['app/views/mistscreen'],
+define('app/views/image_list', ['app/views/page'],
     //
     //  Image List View
     //
     //  @returns Class
     //
-    function (MistScreen, image_list_html) {
+    function (PageView) {
 
         'use strict';
 
-        return MistScreen.extend({
+        return App.ImageListView = PageView.extend({
 
 
             //

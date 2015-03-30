@@ -479,17 +479,39 @@ def create_machine(request):
         docker_command = request.json_body.get('docker_command', None)
         script_id = request.json_body.get('script_id', '')
         script_params = request.json_body.get('script_params', '')
+        async = request.json_body.get('async', False)
+        quantity = request.json_body.get('quantity', 1)
+        persist = request.json_body.get('persist', False)
+        docker_port_bindings = request.json_body.get('docker_port_bindings', {})
+        docker_exposed_ports = request.json_body.get('docker_exposed_ports', {})
+        # hostname: if provided it will be attempted to assign a DNS name
+        hostname = request.json_body.get('hostname', '')
+        plugins = request.json_body.get('plugins')
+
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
     user = user_from_request(request)
-    ret = methods.create_machine(user, backend_id, key_id, machine_name,
-                                 location_id, image_id, size_id, script,
-                                 image_extra, disk, image_name, size_name,
-                                 location_name, ips, monitoring, networks,
-                                 docker_env, docker_command,
-                                 script_id=script_id,
-                                 script_params=script_params)
+    import uuid
+    job_id = uuid.uuid4().hex
+    from mist.io import tasks
+    args = (backend_id, key_id, machine_name,
+            location_id, image_id, size_id, script,
+            image_extra, disk, image_name, size_name,
+            location_name, ips, monitoring, networks,
+            docker_env, docker_command)
+    kwargs = {'script_id': script_id, 'script_params': script_params,
+              'job_id': job_id, 'docker_port_bindings': docker_port_bindings,
+              'docker_exposed_ports': docker_exposed_ports,
+              'hostname': hostname, 'plugins': plugins}
+    if not async:
+        ret = methods.create_machine(user, *args, **kwargs)
+    else:
+        args = (user.email, ) + args
+        kwargs.update({'quantity': quantity, 'persist': persist})
+        tasks.create_machine_async.apply_async(args, kwargs, countdown=2)
+        ret = {'job_id': job_id}
+
     return ret
 
 

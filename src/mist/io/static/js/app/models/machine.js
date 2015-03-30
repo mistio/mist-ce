@@ -41,6 +41,8 @@ define('app/models/machine', ['ember'],
             loadavg5: null,
             loadavg15: null,
 
+            df: null,
+
             installationStatus: Ember.Object.create({
                 activated_at: null,
                 error_msg: null,
@@ -92,6 +94,14 @@ define('app/models/machine', ['ember'],
             hasKeys: function () {
                 return !!Mist.keysController.getMachineKeysCount(this)
             }.property('Mist.keysController.content.@each.machines'),
+
+
+            hasOpenIncident: function () {
+                var incident = Mist.openIncidents.findBy('machineId', this.get('id'));
+                if (!incident)
+                    return false;
+                return !incident.get('isClosed');
+            }.property('Mist.openIncidents.@each.machine'),
 
 
             /**
@@ -247,6 +257,7 @@ define('app/models/machine', ['ember'],
                 }
                 this.set('loss', data.packets_loss || this.loss);
                 this.set('latency', data.rtt_avg ? Math.floor(data.rtt_avg) : this.latency);
+                this.set('df', data.df || this.df);
                 Mist.backendsController.trigger('onMachineProbe', this);
             },
             /**

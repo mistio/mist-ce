@@ -22,6 +22,9 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
+from libcloud.dns.types import Provider as DnsProvider
+from libcloud.dns.types import RecordType
+from libcloud.dns.providers import get_driver as get_dns_driver
 
 import ansible.playbook
 import ansible.utils.template
@@ -248,6 +251,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_vcloud(title, provider, params)
     elif provider == 'libvirt':
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
+    elif provider == 'hostvirtual':
+        backend_id, backend = _add_backend_hostvirtual(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -713,6 +718,22 @@ def _add_backend_openstack(title, provider, params):
     return backend_id, backend
 
 
+def _add_backend_hostvirtual(title, provider, params):
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = api_key
+    backend.apisecret = api_key
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
 def rename_backend(user, backend_id, new_name):
     """Renames backend with given backend_id."""
 
@@ -908,15 +929,25 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
     # succesful connection
     if not host:
         if not associated:
-            with user.lock_n_load():
-                assoc = [backend_id,
-                         machine_id,
-                         0,
-                         username,
-                         False,
-                         port]
-                user.keypairs[key_id].machines.append(assoc)
-                user.save()
+            for i in range(3):
+                try:
+                    with user.lock_n_load():
+                        assoc = [backend_id,
+                                 machine_id,
+                                 0,
+                                 username,
+                                 False,
+                                 port]
+                        user.keypairs[key_id].machines.append(assoc)
+                        user.save()
+                except:
+                    if i == 2:
+                        log.error('RACE CONDITION: failed to recover from previous race conditions')
+                        raise
+                    else:
+                        log.error('RACE CONDITION: trying to recover from race condition')
+                else:
+                    break
             trigger_session_update(user.email, ['keys'])
         return
 
@@ -1057,7 +1088,7 @@ def connect_provider(backend):
     elif backend.provider == Provider.HPCLOUD:
         conn = driver(backend.apikey, backend.apisecret, backend.tenant_name,
                       region=backend.region)
-    elif backend.provider == Provider.LINODE:
+    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL]:
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
@@ -1129,7 +1160,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT):
+                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL):
         can_tag = False
 
     # for other states
@@ -1165,6 +1196,10 @@ def get_machine_actions(machine_from_api, conn, extra):
         if machine_from_api.state is NodeState.TERMINATED:
         # in libvirt a terminated machine can be started
             can_start = True
+
+    if conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD] and machine_from_api.state is NodeState.PENDING:
+        can_start = True
+        can_stop = True
 
     if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
         # allow only reboot action for libvirt hypervisor
@@ -1244,7 +1279,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
-                   script_id='', script_params=''):
+                   script_id='', script_params='', job_id=None, docker_port_bindings={},
+                   docker_exposed_ports={}, hostname='', plugins=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1294,13 +1330,17 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
+    machine_name = machine_name_validator(conn.type, machine_name)
     if conn.type is Provider.DOCKER:
         if key_id:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
-                                          docker_env=docker_env, docker_command=docker_command)
+                                          docker_env=docker_env, docker_command=docker_command,
+                                          docker_port_bindings=docker_port_bindings,
+                                          docker_exposed_ports=docker_exposed_ports)
         else:
             node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
-                                          docker_command=docker_command)
+                                          docker_command=docker_command, docker_port_bindings=docker_port_bindings,
+                                          docker_exposed_ports=docker_exposed_ports)
         if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
@@ -1355,6 +1395,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                       machine_name, image, size,
                                       location)
+    elif conn.type == Provider.HOSTVIRTUAL:
+        node = _create_machine_hostvirtual(conn, public_key, machine_name, image,
+                                         size, location)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -1365,13 +1408,15 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
+
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params,
+            script_id=script_id, script_params=script_params, job_id = job_id,
+            hostname=hostname, plugins=plugins,
         )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1380,21 +1425,26 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params,
+            script_id=script_id, script_params=script_params, job_id = job_id,
+            hostname=hostname, plugins=plugins
         )
     elif key_id:
-        if script or script_id or monitoring:
-            mist.io.tasks.post_deploy_steps.delay(
-                user.email, backend_id, node.id, monitoring, script, key_id,
-                script_id=script_id, script_params=script_params,
-            )
+        mist.io.tasks.post_deploy_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            script_id=script_id, script_params=script_params,
+            job_id=job_id, hostname=hostname, plugins=plugins,
+        )
 
-    return {'id': node.id,
+
+    ret = {'id': node.id,
             'name': node.name,
             'extra': node.extra,
             'public_ips': node.public_ips,
             'private_ips': node.private_ips,
+            'job_id': job_id,
             }
+
+    return ret
 
 
 def _create_machine_rackspace(conn, public_key, machine_name,
@@ -1701,7 +1751,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
     return node
 
 def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
-                           tty_attach=True):
+                           tty_attach=True, docker_port_bindings={}, docker_exposed_ports={}):
     """Create a machine in docker.
 
     """
@@ -1723,7 +1773,9 @@ def _create_machine_docker(conn, machine_name, image, script=None, public_key=No
             image=image,
             command=docker_command,
             environment=environment,
-            tty=tty_attach
+            tty=tty_attach,
+            ports=docker_exposed_ports,
+            port_bindings=docker_port_bindings,
         )
     except Exception as e:
         raise MachineCreationError("Docker, got exception %s" % e, e)
@@ -1793,6 +1845,31 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
             raise MachineCreationError("Digital Ocean, got exception %s" % e, e)
 
         return node
+
+
+def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, location):
+    """Create a machine in HostVirtual.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+
+    auth = NodeAuthSSHKey(pubkey=key)
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            auth=auth,
+            location=location
+        )
+    except Exception as e:
+        raise MachineCreationError("HostVirtual, got exception %s" % e, e)
+
+    return node
 
 
 def _create_machine_azure(conn, key_name, private_key, public_key,
@@ -2766,7 +2843,7 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False, dry=False):
+                      no_ssh=False, dry=False, **kwargs):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
@@ -2868,7 +2945,8 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     return ret
 
 
-def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
+def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='',
+                   shell=None):
     """Ping and SSH to machine and collect various metrics."""
 
     # run SSH commands
@@ -2889,6 +2967,8 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "fi;"
        "echo -------- && "
        "/sbin/ifconfig;"
+       "echo -------- &&"
+       "/bin/df -Pah;"
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
     )
@@ -2896,9 +2976,13 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     if key_id:
         log.warn('probing with key %s' % key_id)
 
-    cmd_output = ssh_command(user, backend_id, machine_id,
-                             host, command, key_id=key_id)
-    cmd_output = cmd_output.replace('\r\n','').split('--------')
+    if not shell:
+        cmd_output = ssh_command(user, backend_id, machine_id,
+                                 host, command, key_id=key_id)
+    else:
+        retval, cmd_output = shell.command(command)
+
+    cmd_output = cmd_output.replace('\r','').split('--------')
     log.warn(cmd_output)
     uptime_output = cmd_output[1]
     loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
@@ -2906,10 +2990,16 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     uptime = cmd_output[2]
     cores = cmd_output[3]
     ips = re.findall('inet addr:(\S+)', cmd_output[4])
+    m = re.findall('((?:[0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2})', cmd_output[4])
     if '127.0.0.1' in ips:
         ips.remove('127.0.0.1')
+    macs = {}
+    for i in range(0, len(ips)):
+        macs[ips[i]] = m[i]
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
+
+
     return {
         'uptime': uptime,
         'loadavg': loadavg,
@@ -2917,6 +3007,8 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         'users': users,
         'pub_ips': pub_ips,
         'priv_ips': priv_ips,
+        'macs': macs,
+        'df': cmd_output[5],
         'timestamp': time(),
     }
 
@@ -2952,7 +3044,7 @@ def notify_admin(title, message=""):
         pass
 
 
-def notify_user(user, title, message="", **kwargs):
+def notify_user(user, title, message="", email_notify=True, **kwargs):
     # Notify connected user via amqp
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
@@ -2961,7 +3053,7 @@ def notify_user(user, title, message="", **kwargs):
         if 'output' in kwargs:
             output += '%s\n' % kwargs['output']
         if 'retval' in kwargs:
-            output += 'returned with exit code %d.\n' % kwargs['retval']
+            output += 'returned with exit code %s.\n' % kwargs['retval']
         payload['output'] = output
     amqp_publish_user(user, routing_key='notify', data=payload)
 
@@ -3000,8 +3092,9 @@ def notify_user(user, title, message="", **kwargs):
         body += "Output: %s\n" % kwargs['output']
 
     try: # Send email in multi-user env
-        from mist.core.helpers import send_email
-        send_email("[mist.io] %s" % title, body, user.email)
+        if email_notify:
+            from mist.core.helpers import send_email
+            send_email("[mist.io] %s" % title, body, user.email)
     except ImportError:
         pass
 
@@ -3133,8 +3226,8 @@ from %s_read import *
 
 for i in range(3):
     val = read()
-    if val is not None and not isinstance(val, (int, float)):
-        raise Exception("read() must return a single int or float "
+    if val is not None and not isinstance(val, (int, float, long)):
+        raise Exception("read() must return a single int, float or long "
                         "(or None to not submit any sample to collectd)")
     time.sleep(1)
 print("READ FUNCTION TEST PASSED")
@@ -3294,6 +3387,8 @@ def get_stats(user, backend_id, machine_id, start='', stop='', step='', metrics=
         return ret
     else:
         log.error("Error getting stats %d:%s", resp.status_code, resp.text)
+        if resp.status_code == 400:
+            raise BadRequestError(resp.text.replace('Bad Request: ', ''))
         raise ServiceUnavailableError(resp.text)
 
 
@@ -3317,6 +3412,7 @@ def run_playbook(user, backend_id, machine_id, playbook_path, extra_vars=None,
         ret_dict['error_msg'] = "Expected 1 host, found %s" % inventory.hosts
         ret_dict['finished_at'] = time()
         return ret_dict
+    ret_dict['host'] = inventory.hosts.values()[0]['ansible_ssh_host']
     machine_name = inventory.hosts.keys()[0]
     log_prefix = "Running playbook '%s' on machine '%s'" % (playbook_path,
                                                             machine_name)
@@ -3433,3 +3529,142 @@ def get_deploy_collectd_manual_command(uuid, password, monitor):
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
+
+
+def machine_name_validator(provider, name):
+    """
+    Validates machine names before creating a machine
+    Provider specific
+    """
+    if not name and provider not in config.EC2_PROVIDERS:
+        raise MachineNameValidationError("machine name cannot be empty")
+    if provider is Provider.DOCKER:
+        pass
+    elif provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
+        pass
+    elif provider in [Provider.OPENSTACK]:
+        pass
+    elif provider is Provider.HPCLOUD:
+        pass
+    elif provider in config.EC2_PROVIDERS:
+        if len(name) > 255:
+            raise MachineNameValidationError("machine name max chars allowed is 255")
+    elif provider is Provider.NEPHOSCALE:
+        pass
+    elif provider is Provider.GCE:
+        pass
+    elif provider is Provider.SOFTLAYER:
+        pass
+    elif provider is Provider.DIGITAL_OCEAN:
+        if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and dots")
+    elif provider == Provider.AZURE:
+        pass
+    elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+        pass
+    elif provider is Provider.LINODE:
+        if len(name) < 3:
+            raise MachineNameValidationError("machine name should be at least 3 chars")
+        if not re.search(r'^[0-9a-zA-Z][0-9a-zA-Z-_]+[0-9a-zA-Z]$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and underscores. Must begin and end with letters or numbers, " + \
+                "and be at least 3 characters long")
+    return name
+
+
+def create_dns_a_record(user, domain_name, ip_addr):
+    """Will try to create DNS A record for specified domain name and IP addr.
+
+    All backends for which there is DNS support will be tried to see if the
+    relevant zone exists.
+
+    """
+
+    # split domain_name in dot separated parts
+    parts = [part for part in domain_name.split('.') if part]
+    # find all possible domains for this domain name, longest first
+    all_domains = {}
+    for i in range(1, len(parts) - 1):
+        host = '.'.join(parts[:i])
+        domain = '.'.join(parts[i:]) + '.'
+        all_domains[domain] = host
+    if not all_domains:
+        raise MistError("Couldn't extract a valid domain from '%s'."
+                        % domain_name)
+
+    # iterate over all backends that can also be used as DNS providers
+    providers = {}
+    for backend in user.backends.values():
+        if backend.provider.startswith('ec2_'):
+            provider = DnsProvider.ROUTE53
+            creds = backend.apikey, backend.apisecret
+        #TODO: add support for more providers
+        #elif backend.provider == Provider.LINODE:
+        #    pass
+        #elif backend.provider == Provider.RACKSPACE:
+        #    pass
+        else:
+            # no DNS support for this provider, skip
+            continue
+        if (provider, creds) in providers:
+            # we have already checked this provider with these creds, skip
+            continue
+
+        try:
+            conn = get_dns_driver(provider)(*creds)
+            zones = conn.list_zones()
+        except InvalidCredsError:
+            log.error("Invalid creds for DNS provider %s.", provider)
+            continue
+        except Exception as exc:
+            log.error("Error listing zones for DNS provider %s: %r",
+                      provider, exc)
+            continue
+
+        # for each possible domain, starting with the longest match
+        best_zone = None
+        for domain in all_domains:
+            for zone in zones:
+                if zone.domain == domain:
+                    log.info("Found zone '%s' in provider '%s'.",
+                             domain, provider)
+                    best_zone = zone
+                    break
+            if best_zone:
+                break
+
+        # add provider/creds combination to checked list, in case multiple
+        # backends for same provider with same creds exist
+        providers[(provider, creds)] = best_zone
+
+    best = None
+    for provider, creds in providers:
+        zone = providers[(provider, creds)]
+        if zone is None:
+            continue
+        if best is None or len(zone.domain) > len(best[2].domain):
+            best = provider, creds, zone
+
+    if not best:
+        raise MistError("No DNS zone matches specified domain name.")
+
+    provider, creds, zone = best
+    name = all_domains[zone.domain]
+    log.info("Will use name %s and zone %s in provider %s.",
+             name, zone.domain, provider)
+
+    # debug
+    #log.debug("Will print all existing A records for zone '%s'.", zone.domain)
+    #for record in zone.list_records():
+    #    if record.type == 'A':
+    #        log.info("%s -> %s", record.name, record.data)
+
+    msg = ("Creating A record with name %s for %s in zone %s in %s"
+           % (name, ip_addr, zone.domain, provider))
+    try:
+        record = zone.create_record(name, RecordType.A, ip_addr)
+    except Exception as exc:
+        raise MistError(msg + " failed: %r" % repr(exc))
+    log.info(msg + " succeeded.")
+    return record

@@ -8,7 +8,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
         'use strict';
 
-        return ControlledView.extend({
+        return App.RuleEditView = ControlledView.extend({
 
 
             //
@@ -21,6 +21,14 @@ define('app/views/rule_edit', ['app/views/controlled'],
             rule: null,
             metrics: [],
             newCommand: null,
+
+
+            sortedMetrics: function () {
+                var metrics = this.get('metrics');
+                if (metrics)
+                    return metrics.sortBy('lowerName');
+                return [];
+            }.property('metrics'),
 
 
             //

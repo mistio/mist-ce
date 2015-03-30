@@ -1,11 +1,11 @@
-define('app/views/machine_list', ['app/views/mistscreen'],
+define('app/views/machine_list', ['app/views/page'],
     /**
      * Machine List View
      *
      * @returns Class
      */
-    function (MistScreen) {
-        return MistScreen.extend({
+    function (PageView) {
+        return App.MachineListView = PageView.extend({
 
             /**
              *

@@ -8,7 +8,7 @@ define('app/views/file_upload', ['app/views/templated', 'ember'],
 
         'use strict';
 
-        return TemplatedView.extend({
+        return App.FileUploadView = TemplatedView.extend({
 
 
             //

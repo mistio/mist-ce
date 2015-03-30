@@ -1,0 +1,72 @@
+<div id="key-list-page" data-role="page" class="ui-page-active">
+
+    <div data-role="header" data-theme="b">
+
+        <a href="#" class="responsive-button" data-icon="home">Home</a>
+
+        <h1>Keys</h1>
+
+        {{view "userMenu"}}
+
+    </div>
+
+    <div data-role="content" data-theme="a">
+
+        <a id="select-keys-btn"
+           class="responsive-button"
+           data-role="button"
+           data-icon="arrow-d"
+           {{action "selectClicked" target="view"}}>Select</a>
+
+        <a id="add-key-btn"
+           class="responsive-button"
+           data-role="button"
+           data-icon="plus"
+           data-iconpos="right"
+           data-theme="d"
+           {{action "addClicked" target="view"}}>Add</a>
+
+        <ul data-role="listview"
+            data-filter="true"
+            data-inset="true"
+            data-filter-placeholder="Filter..."
+            class="checkbox-list">
+            {{#each Mist.keysController.content}}
+                {{view "keyListItem" keyBinding="this" class="checkbox-link"}}
+            {{/each}}
+        </ul>
+
+        <div class="mid-padding"></div>
+
+    </div>
+
+    {{view "dialog"}}
+
+    {{view "keyAdd"}}
+
+    {{view "keyEdit"}}
+
+    {{view "confirmationDialog"}}
+
+    <div id="select-keys-popup" data-role="popup" data-transition="flip" data-position-to="#select-keys-btn">
+        <ul data-role='listview'>
+            <li data-icon="false">
+                <a {{action "selectionModeClicked" true target="view"}}>All</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "selectionModeClicked" false target="view"}}>None</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tri-action-footer" data-role="footer" data-theme="b">
+        <table><tbody><tr><td>
+            <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
+        </td><td>
+            <a data-role="button" data-icon="delete" {{action "deleteClicked" target="view"}}>Delete</a>
+        </td><td>
+            <a data-role="button" data-icon="gear" {{action "setDefaultClicked" target="view"}}>Set default</a>
+        </td></tr></tbody></table>
+    </div>
+
+</div>

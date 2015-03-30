@@ -14,7 +14,7 @@ define('app/views/machine_monitoring',
 
         'use strict';
 
-        return TemplatedView.extend({
+        return App.MachineMonitoringView = TemplatedView.extend({
 
 
             //
@@ -197,44 +197,6 @@ define('app/views/machine_monitoring',
 
                 addRuleClicked: function() {
                     Mist.rulesController.newRule(this.machine);
-                },
-
-
-                //
-                // Proxy actions for graph list control view
-                //
-
-
-                backClicked: function () {
-                    Mist.graphsController.history.goBack();
-                },
-
-
-                forwardClicked: function () {
-                    Mist.graphsController.history.goForward();
-                },
-
-
-                resetClicked: function () {
-                    Mist.graphsController.stream.start();
-                },
-
-
-                pauseClicked: function () {
-                    Mist.graphsController.stream.stop();
-                },
-
-
-                timeWindowChanged: function () {
-                    var newTimeWindow = $('#time-window-control select').val();
-                    Mist.graphsController.resolution.change(newTimeWindow);
-
-                    // Update cookie
-                    var entry = Mist.cookiesController.getSingleMachineEntry(
-                        this.machine);
-                    entry.timeWindow = newTimeWindow;
-                    Mist.cookiesController.setSingleMachineEntry(
-                        this.machine, entry);
                 },
 
 
@@ -459,11 +421,11 @@ define('app/views/machine_monitoring',
                         canModify: true,
                         canControl: true,
                         canMinimize: true,
-                        timeWindow: cookie.timeWindow,
                     }
                 });
 
                 Ember.run.next(function () {
+                    return;
                     $('#time-window-control select')
                         .val(cookie.timeWindow)
                         .trigger('change');
@@ -615,7 +577,7 @@ define('app/views/machine_monitoring',
                     this.showMonitoring();
                 else
                     this.hideMonitoring();
-            }.observes('machine.hasMonitoring'),
+            }.observes('machine.hasMonitoring').on('didInsertElement'),
 
 
             metricsObsever: function () {

@@ -1,0 +1,81 @@
+<div id="single-network-page" data-role="page" class="ui-page-active">
+
+    <div data-role="header" data-theme="b">
+
+        <a href="#/networks" class="responsive-button" data-icon="arrow-l">Networks</a>
+
+        <h1>{{name}}</h1>
+
+        {{view "userMenu"}}
+
+    </div>
+
+    <div data-role="content" data-theme="a">
+
+        <div id="single-network-info" data-role="collapsible" data-collapsed="false">
+
+            <h4>Network Information</h4>
+
+            <table class="info-table">
+                <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td>{{name}}</td>
+                </tr>
+                <tr>
+                    <td>Id</td>
+                    <td>{{id}}</td>
+                </tr>
+                {{#if status}}
+                <tr>
+                    <td>Status</td>
+                    <td>{{status}}</td>
+                </tr>
+                {{/if}}
+                </tbody>
+            </table>
+
+        </div>
+
+        {{#if subnets}}
+        <div id="single-network-subnets" data-role="collapsible" data-collapsed="false">
+            <h4>Subnets ({{subnets.length}})</h4>
+
+            {{#each subnets}}
+                {{view "subnetListItem" model=this}}
+            {{/each}}
+        </div>
+        {{/if}}
+
+        <div class="mid-padding"></div>
+
+    </div>
+
+    <div id="assign-machine"
+        class="tiny-popup"
+        data-role="popup"
+        data-overlay-theme="b"
+        data-transition="flip">
+
+        <ul data-role="listview">
+            {{#each view.network.backend.machines.content}}
+            <li data-icon="false">
+                <a {{action "assignMachine" this target="view"}}>
+                    {{this.name}}
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+
+    {{view "confirmationDialog"}}
+
+    {{#if backend.isOpenStack}}
+    <div class="single-action-footer" data-role="footer" data-theme="b">
+        <a class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete"
+            {{action "deleteClicked" target="view"}}>
+                Delete
+        </a>
+    </div>
+    {{/if}}
+</div>
