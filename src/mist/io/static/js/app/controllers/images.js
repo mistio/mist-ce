@@ -156,17 +156,19 @@ define('app/controllers/images', ['app/models/image'],
 
                 var os = 'generic';
                 var image = this.getImage(imageId);
-                var imageAttribute;
+                var imageTitle;
 
-                if(!!image)
-                    imageAttribute = image.name;
+                if(!image)
+                    imageTitle = imageId;
                 else
-                    imageAttribute = imageId;
+                    imageTitle = image.name;
 
                 OS_MAP.some(function (pair) {
                     return pair[0].some(function (key) {
-                        if (imageAttribute.toLowerCase().indexOf(key) > -1)
-                            return os = pair[1];
+                        if (imageTitle.toLowerCase().indexOf(key) > -1){
+                            os = pair[1];
+                            return true;
+                        }
                     });
                 });
 
