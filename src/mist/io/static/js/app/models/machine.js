@@ -96,6 +96,14 @@ define('app/models/machine', ['ember'],
             }.property('Mist.keysController.content.@each.machines'),
 
 
+            hasOpenIncident: function () {
+                var incident = Mist.openIncidents.findBy('machineId', this.get('id'));
+                if (!incident)
+                    return false;
+                return !incident.get('isClosed');
+            }.property('Mist.openIncidents.@each.machine'),
+
+
             /**
              *
              *  Initialization

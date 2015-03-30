@@ -15,11 +15,11 @@
                 <div class="tag">{{unbound view.log.type}}</div>
             </div>
             <div class="ui-block-c">
-                <div>{{view.prettyTime}}</div>
+                <div class="time">{{view.prettyTime}}</div>
             </div>
         </div>
     </a>
-
+{{#unless view.isCollapsed}}
     <div class="details info-table">
         <table>
             <tbody>
@@ -37,7 +37,7 @@
             <tr>
                 <td>Machine</td>
                 <td>
-                    {{#link-to "machine" view.machineLink class="ui-btn ui-btn-icon-right ui-icon-carat-r"}}
+                    {{#link-to "machine" view.machineLink}}
                         {{unbound view.machineLink.name}}
                     {{/link-to}}
                 </td>
@@ -52,4 +52,5 @@
             </tbody>
         </table>
     </div>
+{{/unless}}
 </span>

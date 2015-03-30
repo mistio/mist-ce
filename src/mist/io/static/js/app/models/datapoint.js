@@ -32,13 +32,9 @@ define('app/models/datapoint', ['ember'],
             init: function () {
                 this._super();
 
-
-                if (this.time != null && this.value != null)
-                    this.setProperties({
-                        time: new Date(this.time),
-                        value: this.value
-                    });
-                else
+                if (this.time != null)
+                    this.set('time', new Date(this.time));
+                if (this.time == null && this.value == null)
                     this.setProperties({
                         time: new Date(this[1] * 1000),
                         value: this[0]

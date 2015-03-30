@@ -1,4 +1,4 @@
-define('app/views/mistscreen', ['app/views/templated'],
+define('app/views/page', ['app/views/templated'],
     //
     //  Page View
     //

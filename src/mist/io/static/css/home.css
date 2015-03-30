@@ -1,10 +1,14 @@
-
 /* Home Page CSS
 -----------------------------------------------------------------------------------------------------------*/
 #home-page #add-backend-btn {
     float: right;
-    margin-top: 10px;
-    margin-bottom: 0;
+    margin-right: 0px;
+    margin-bottom: 13px;
+    margin-top: 0;
+    top: .7em;
+    position: relative;
+    height: 18px;
+    line-height: 18px;
 }
 #home-page .ui-listview {
     clear: both;
@@ -18,4 +22,85 @@
     #home-page .ui-listview .ajax-loader {
         margin-top: -19px;
     }
+}
+
+#home-page .ui-grid-a .ui-block-a,
+#home-page .ui-grid-a .ui-block-b {
+    transition: width .5s;
+    -webkit-transition: width .5s;
+}
+
+#home-page .ui-grid-a {
+   margin-top: -10px;
+   clear: both;
+}
+
+#home-page ul.incidents {
+    margin-top: 0;
+    margin-left: 1em;
+    max-height: 145px;
+    overflow-y: auto;
+}
+
+#home-page ul.incidents.header {
+    margin-top: 1em;
+    margin-bottom: 0;
+    margin-left: 1em;
+}
+
+
+@media (max-width: 35em) {
+    #home-page ul.incidents,
+    #home-page ul.incidents.header {
+        margin-left: 0;
+        margin-top: 0;
+    }
+}
+
+ul.incidents span.time {
+    float: right;
+    font-weight: bold;
+    opacity: .75;
+    margin-bottom: -5px;
+}
+
+ul.incidents .ui-icon-alert:after, #machines .ui-icon-alert:after {
+    background-color: indianred;
+}
+
+ul.incidents .ui-icon-check:after {
+    background-color: rgba(33, 133, 89, 0.4);
+}
+
+#machines .ui-icon-check:after {
+    background-color: rgba(33, 133, 89, .6);
+}
+
+ul.incidents li a.ui-btn{
+    font-weight: normal;
+    white-space: normal;
+    padding-left: 16px !important;
+    padding-right: 42px !important;
+}
+
+ul.incidents li a.ui-btn:after {
+    right: 8px !important;
+}
+
+
+ul.incidents li a .machine {
+    font-weight: bold;
+}
+
+#home-page .ui-body {
+    padding: 0;
+    overflow: visible;
+}
+
+#home-page .ui-grid-a.ui-responsive {
+    overflow: visible;
+}
+
+#home-page .logs {
+    clear: both;
 }

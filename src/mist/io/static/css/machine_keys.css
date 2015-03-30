@@ -29,3 +29,9 @@
 #machine-keys-panel #machine-keys {
 	padding: 0;
 }
+
+#non-associated-keys-popup.tiny-popup{
+	/* only for machine keys*/
+    overflow: auto;
+    max-height: 16.6em;
+}

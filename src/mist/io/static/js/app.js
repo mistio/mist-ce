@@ -226,10 +226,10 @@ var appLoader = {
                     },
                 });
                 appLoader.buffer.logs = new Socket_({
-                    keepAlive: true,
                     namespace: '/logs',
-                    onInit: function (socket) {
-                        socket.emit('ready');
+                    onConnect: function (socket) {
+                        if (!appLoader)
+                            socket.emit('ready');
                     }
                 });
             }
@@ -247,7 +247,9 @@ var appLoader = {
             before: ['init socket events'],
             exec: function () {
                 setupSocketEvents(Mist.socket, function () {
-                    appLoader.complete('fetch first data');
+                    setupLogsSocketEvents(Mist.logs, function () {
+                        appLoader.complete('fetch first data');
+                    });
                 });
             }
         },
@@ -756,6 +758,23 @@ var loadApp = function (
         else
             element.slideUp();
     };
+
+    App.clock = Ember.Object.extend({
+        init: function () {
+            this._super();
+            var that = this;
+            setInterval(function () {
+                that.tick();
+            }, TIME_MAP.SECOND);
+        },
+        tick: function () {
+            this.setProperties({
+                second: new Date().getSeconds(),
+                minute: new Date().getMinutes(),
+                hour: new Date().getHours(),
+            });
+        }
+    }).create();
 };
 
 
@@ -802,6 +821,30 @@ var handleMobileInit = function () {
         $.mobile.ignoreContentEnabled = true;
         $.mobile.panel.prototype._bindUpdateLayout = function(){};
     });
+};
+
+
+var setupLogsSocketEvents = function (socket, callback) {
+
+    socket.on('open_incidents', function (openIncidents) {
+        require(['app/models/story'], function (StoryModel) {
+            var models = openIncidents.map(function (incident) {
+                return StoryModel.create(incident);
+            });
+            Mist.set('openIncidents', models);
+        });
+    }).on('closed_incidents', function (closedIncidents) {
+        require(['app/models/story'], function (StoryModel) {
+            var models = closedIncidents.map(function (incident) {
+                return StoryModel.create(incident);
+            });
+            Mist.set('closedIncidents', models);
+        });
+    }).emit('ready');
+    Mist.set('openIncidents', []);
+    Mist.set('closedIncidents', [])
+    if (callback)
+        callback();
 };
 
 
@@ -872,7 +915,7 @@ var setupSocketEvents = function (socket, callback) {
         if (machine.id) {
             dialogBody.push({
                 link: machine.name,
-                class: 'ui-btn ui-btn-icon-right ui-icon-carat-r ui-mini ui-corner-all',
+                class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 href: '#/machines/' + machineId,
                 closeDialog: true,
             });
@@ -1155,22 +1198,26 @@ function Socket_ (args) {
             events.on.apply(events, arguments);
             if (!socket.$events || !socket.$events[event])
                 socket.on(event, function (response) {
-                    that._log('RECEIVE', response);
+                    that._log('/'+ event, 'RECEIVE', response);
                     events.trigger.call(events, event, response);
                 });
+            return this;
         },
 
 
         off: function () {
             var events = this.get('events');
             events.off.apply(events, arguments);
+            return this;
         },
 
 
         emit: function () {
-            this._log('EMIT', slice(arguments));
+            var args = slice(arguments)
+            this._log('/'+args[0], 'EMIT', args);
             var socket = this.get('socket');
             socket.emit.apply(socket, arguments);
+            return this;
         },
 
 
@@ -1181,6 +1228,7 @@ function Socket_ (args) {
             if (socket.$events)
                 for (event in socket.$events)
                     delete socket.$events[event];
+            return this;
         },
 
 
@@ -1470,27 +1518,35 @@ var extendEmberView = function () {
 
 String.prototype.decapitalize = function () {
     return this.charAt(0).toLowerCase() + this.slice(1);
-}
+};
 
-Date.prototype.getPrettyTime = function () {
+Date.prototype.isFuture = function () {
+    return this > new Date();
+};
+
+Date.prototype.getPrettyTime = function (noSeconds) {
 
     var hour = this.getHours();
     var min = this.getMinutes();
     var sec = this.getSeconds();
 
     var ret = (hour < 10 ? '0' : '') + hour + ':' +
-        (min < 10 ? '0' : '') + min + ':' +
-        (sec < 10 ? '0' : '') + sec;
+        (min < 10 ? '0' : '') + min +
+        (noSeconds ? '' : (':' + (sec < 10 ? '0' : '') + sec));
 
     return ret;
 }
 
-Date.prototype.getPrettyDate = function () {
-    return this.getMonthName() + ' ' + this.getDate() + ', ' + this.getFullYear();
+Date.prototype._toString = function () {
+    var d = (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear();
+    return d + ', ' + this.getPrettyTime();
+}
+Date.prototype.getPrettyDate = function (shortMonth) {
+    return this.getMonthName(shortMonth) + ' ' + this.getDate() + ', ' + this.getFullYear();
 }
 
-Date.prototype.getPrettyDateTime = function () {
-    return this.getPrettyDate() + ', ' + this.getPrettyTime();
+Date.prototype.getPrettyDateTime = function (shortMonth, noSeconds) {
+    return this.getPrettyDate(shortMonth) + ', ' + this.getPrettyTime(noSeconds);
 }
 
 Date.prototype.getMonthName = function (short) {
@@ -1500,6 +1556,31 @@ Date.prototype.getMonthName = function (short) {
     return ['January','February','March','April','May','June','July',
         'August','September','October','November','December'][this.getMonth()];
 }
+
+Date.prototype.diffToString = function (date) {
+
+    var diff = this - date;
+    var ret = '';
+
+    if (diff < TIME_MAP.MINUTE)
+        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
+    else if (diff < TIME_MAP.HOUR)
+        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
+    else if (diff < TIME_MAP.DAY)
+        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
+    else if (diff < TIME_MAP.MONTH)
+        ret = parseInt(diff / TIME_MAP.DAY) + ' day';
+    else if (diff < TIME_MAP.YEAR)
+        ret = parseInt(diff / TIME_MAP.MONTH) + ' month';
+    else
+        ret = 'TOO LONG!';
+
+    // Add 's' for plural
+    if (ret.split(' ')[0] != '1')
+        ret = ret + 's';
+
+    return ret;
+};
 
 Date.prototype.getTimeFromNow = function () {
 
@@ -1595,7 +1676,7 @@ var PROVIDER_MAP = {
         {
             name: 'title',
             type: 'text',
-            defaultValue: 'Other Server',
+            defaultValue: 'SSH',
         },
         {
             name: 'machine_ip',
@@ -1630,6 +1711,18 @@ var PROVIDER_MAP = {
         },
         {
             name: 'token',
+            type: 'password',
+        },
+    ],
+
+    hostvirtual: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'HostVirtual',
+        },
+        {
+            name: 'api_key',
             type: 'password',
         },
     ],

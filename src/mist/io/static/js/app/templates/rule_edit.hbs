@@ -9,7 +9,7 @@
          data-transition="flip">
 
         <ul data-role="listview">
-            {{#each view.metrics}}
+            {{#each view.sortedMetrics}}
             <li data-icon="false">
                 <a class="ui-btn" {{action "metricClicked" this.id target="view"}}>
                     {{this.name}}

@@ -58,6 +58,8 @@ define('app/controllers/base_array', ['ember'],
 
 
             setContent: function (content) {
+                if (!content)
+                    content = [];
                 this.get('passOnProperties').forEach(function (property) {
                     content.setEach(property, this.get(property));
                 }, this);

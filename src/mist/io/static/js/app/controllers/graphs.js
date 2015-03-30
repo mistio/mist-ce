@@ -16,6 +16,24 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             month: TIME_MAP.MONTH,
         };
 
+        var STEP_MAP = [
+            TIME_MAP.SECOND * 10,
+            TIME_MAP.SECOND * 20,
+            TIME_MAP.SECOND * 30,
+            TIME_MAP.MINUTE,
+            TIME_MAP.MINTUE * 2,
+            TIME_MAP.MINTUE * 5,
+            TIME_MAP.MINUTE * 10,
+            TIME_MAP.MINTUE * 20,
+            TIME_MAP.MINUTE * 30,
+            TIME_MAP.HOUR,
+            TIME_MAP.HOUR * 2,
+            TIME_MAP.HOUR * 6,
+            TIME_MAP.HOUR * 8,
+            TIME_MAP.HOUR * 12,
+            TIME_MAP.HOUR * 24,
+        ];
+
         return Ember.ArrayController.extend(Ember.Evented, {
 
 
@@ -31,7 +49,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             resizeLock: null,
             pendingRequests: [],
             fetchingStats: null,
-            fetchingStatsArgs: null,
+            fetchStatsArgs: {},
             config: Ember.Object.create({
                 requestMethod: 'Socket',
                 timeWindow: TIME_WINDOW_MAP.minutes,
@@ -118,13 +136,15 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _clear: function () {
                 this.setProperties({
-                    'isOpen': null,
+                    'isOpen': false,
                     'content': [],
                 });
-                this.config.setProperties({
+                this.get('config').setProperties({
                     canModify: true,
                     canControl: true,
                     canMinimize: true,
+                    timeWindow: TIME_WINDOW_MAP.minutes,
+                    measurementStep: 10 * TIME_MAP.SECOND,
                     showGraphLegend: false,
                     historyWidgetPosition: 'top',
                 });
@@ -134,14 +154,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _fetchStats: function (args) {
 
-                if (this.isClosed) return;
-
-                if (DEBUG_STATS) {
-                    info('Requesting stats from: ' +
-                        new Date(args.from).getPrettyDateTime() +
-                        ' until: ' +
-                        new Date(args.until).getPrettyDateTime());
-                }
+                if (!this.get('isOpen')) return;
 
                 this._clearPendingRequests();
                 this.setProperties({
@@ -220,13 +233,22 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             _generatePayload: function (request) {
-                return {
+
+                var payload = {
                     request_id: request.id,
                     start: parseInt(request.from / 1000) - 50,
                     stop: parseInt(request.until / 1000) + 50,
                     step: parseInt(this.config.measurementStep / 1000),
                     metrics: request.metrics
                 };
+                if (DEBUG_STATS) {
+                    info('Requesting stats from: ' +
+                        new Date(payload.start * 1000).getPrettyDateTime() +
+                        ' until: ' +
+                        new Date(payload.stop * 1000).getPrettyDateTime(),
+                        payload);
+                }
+                return payload
             },
 
 
@@ -250,14 +272,23 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 var that = Mist.graphsController;
                 var request = that.pendingRequests.findBy(
                     'id', parseInt(data.request_id));
-                if (request)
-                    that._handleResponse(request, data.metrics);
+                if (request) {
+                    if (data.error) {
+                        Mist.notificationController.notify(data.error);
+                        this._clearPendingRequests();
+                        this.trigger('onFetchStatsError', data);
+                    } else
+                        that._handleResponse(request, data.metrics, data);
+                }
                 that.trigger('onFetchStatsFromSocket', data);
             },
 
 
-            _handleResponse: function (request, response) {
+            _handleResponse: function (request, response,r) {
 
+                if (DEBUG_STATS) {
+                    info('Stats response: ', request, r);
+                }
                 request.datasources.forEach(function (datasource) {
 
                     if (!response[datasource.metric.id]) return;
@@ -360,42 +391,18 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 //
 
 
-                change: function (newTimeWindow, forceChange) {
+                change: function (newTimeWindow) {
 
                     var newTimeWindow = TIME_WINDOW_MAP[newTimeWindow];
                     var oldTimeWindow = this.parent.config.timeWindow;
 
-                    if ((oldTimeWindow != newTimeWindow)|| forceChange) {
-
-                        this.parent.stream.stop();
-                        this.parent.config.setProperties({
-                            timeWindow: newTimeWindow,
-                            measurementStep: newTimeWindow /
-                                DISPLAYED_DATAPOINTS,
-                        });
-
-                        if (forceChange) {
-                            this.parent.stream.start();
-                            return;
-                        }
-
-                        // Calculate new time boundaries
-                        var oldFrom = this.parent.fetchStatsArgs.from;
-                        var oldUntil = this.parent.fetchStatsArgs.until;
-
-                        var middle = oldFrom + ((oldUntil - oldFrom) / 2);
-
-                        var newFrom = middle - (newTimeWindow / 2);
-                        var newUntil = middle + (newTimeWindow / 2);
-
-                        if (this.parent.history.isInFuture(newUntil))
-                            this.parent.stream.start();
-                        else
-                            this.parent._fetchStats({
-                                from: newFrom,
-                                until: newUntil,
-                            });
-                    }
+                    this.parent.stream.stop();
+                    this.parent.config.setProperties({
+                        timeWindow: newTimeWindow,
+                        measurementStep: newTimeWindow /
+                            DISPLAYED_DATAPOINTS,
+                    });
+                    this.parent.stream.start();
                 }
             }),
 
@@ -427,6 +434,23 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 //
 
 
+                change: function (args) {
+                    this.parent._clearPendingRequests();
+                    this.parent.stream.stop();
+                    var newTimeWindow = args.until - args.from;
+                    var step = newTimeWindow / DISPLAYED_DATAPOINTS;
+                    step = this._sanitizeStep(step);
+                    this.parent.config.setProperties({
+                        timeWindow: newTimeWindow,
+                        measurementStep: step,
+                    });
+                    this.parent._fetchStats({
+                        from: args.from,
+                        until: args.until,
+                    });
+                },
+
+
                 goBack: function () {
                     this.parent._clearPendingRequests();
                     this.parent.stream.stop();
@@ -439,20 +463,35 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
                 goForward: function () {
+
                     this.parent._clearPendingRequests();
-                    if (this.isInFuture(this.parent.fetchStatsArgs.until))
-                        this.parent.stream.start();
+
+                    var timeWindow = this.parent.config.timeWindow;
+                    var from = this.parent.fetchStatsArgs.until;
+                    var until = from + timeWindow;
+
+                    if (new Date(until).isFuture())
+                        this.parent._fetchStats({
+                            from: Date.now() - timeWindow,
+                            until: Date.now(),
+                        });
                     else
                         this.parent._fetchStats({
-                            from: this.parent.fetchStatsArgs.until,
-                            until: this.parent.fetchStatsArgs.until +
-                                this.parent.config.timeWindow
+                            from: from,
+                            until: until
                         });
                 },
 
 
-                isInFuture: function (until) {
-                    return Date.now() <= until;
+                _sanitizeStep: function (step) {
+                    var newStep = 0;
+                    STEP_MAP.some(function (time, index) {
+                        if (step <= time)
+                            return newStep = time;
+                        if (index == STEP_MAP.length -1)
+                            return newStep = time;
+                    });
+                    return newStep;
                 },
             }),
 

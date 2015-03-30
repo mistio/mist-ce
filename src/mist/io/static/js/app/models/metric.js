@@ -31,6 +31,12 @@ define('app/models/metric', ['ember'],
             datapoints: null,
 
 
+
+            lowerName: function () {
+                return this.get('name').toLowerCase();
+            }.property('name'),
+
+
             //
             //
             //  Initialization
