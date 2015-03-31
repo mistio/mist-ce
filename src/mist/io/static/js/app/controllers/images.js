@@ -86,13 +86,20 @@ define('app/controllers/images',
                 var os = 'generic';
                 var image = this.getObject(imageId);
 
-                if (!image) return os;
+                if(!image)
+                    var imageTitle = imageId;
+                else
+                    var imageTitle = image.name;
+
                 OS_MAP.some(function (pair) {
                     return pair[0].some(function (key) {
-                        if (image.name.toLowerCase().indexOf(key) > -1)
-                            return os = pair[1];
+                        if (imageTitle.toLowerCase().indexOf(key) > -1){
+                            os = pair[1];
+                            return true;
+                        }
                     });
                 });
+
                 return os;
             },
 

@@ -3226,8 +3226,8 @@ from %s_read import *
 
 for i in range(3):
     val = read()
-    if val is not None and not isinstance(val, (int, float)):
-        raise Exception("read() must return a single int or float "
+    if val is not None and not isinstance(val, (int, float, long)):
+        raise Exception("read() must return a single int, float or long "
                         "(or None to not submit any sample to collectd)")
     time.sleep(1)
 print("READ FUNCTION TEST PASSED")
