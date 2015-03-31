@@ -90,16 +90,13 @@ define('app/views/machine_list', ['app/views/page'],
                 });
                 this.set("machines",machineList);
                 this.sortMachines(Mist.machineSortListMode);
-                console.log("event");
             },
 
             sortMachines: function (mode){
-                if(mode){
-                    if(mode=='hasMonitoring')
-                        this.set("machines",this.machines.sortBy(mode).reverse());
-                    else
-                        this.set("machines",this.machines.sortBy(mode));
-                }
+                if(mode == 'state')
+                    this.set("machines",this.machines.sortBy(mode)).reverse();
+                else
+                    this.set("machines",this.machines.sortBy(mode));    
             },
 
 

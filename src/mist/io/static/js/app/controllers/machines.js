@@ -303,7 +303,6 @@ define('app/controllers/machines', ['app/models/machine'],
                     that._updateMonitoredMachines();
 
                     that.trigger('onMachineListChange');
-                    console.log("updates2");
                 });
             },
 

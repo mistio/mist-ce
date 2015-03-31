@@ -15,6 +15,7 @@ define('app/models/machine', ['ember'],
             id: null,
             name: null,
             probed: null,
+            cores: null,
             keysCount: 0,
             probing: null,
             backend: null,
@@ -52,6 +53,17 @@ define('app/models/machine', ['ember'],
                 state: null,
                 stdout: null,
             }),
+
+            weight: 0,
+            states: {
+                error: 5,
+                pending: 4,
+                running: 3,
+                rebooting: 3,
+                terminated: 2,
+                stopped: 2,
+                unknown: 1,
+            },
 
 
             /**
@@ -103,6 +115,23 @@ define('app/models/machine', ['ember'],
                 return !incident.get('isClosed');
             }.property('Mist.openIncidents.@each.machine'),
 
+            incidents: function () {
+                return incidents = Mist.openIncidents.filterBy('machineId', this.get('id'));
+            }.property('Mist.openIncidents.@each.machine'),
+
+            sortingWeight: function () {
+                this.set('weight', 100000 * this.states[this.state]);
+                if(this.get('hasMonitoring'))
+                    this.set('weight', 10000 * (1 + this.get('incidents').length/100) + this.get('weight'));
+                if(this.get('probed'))
+                    this.set('weight', 1000 * (1 + (this.get('cores')/this.get('loadavg1')/100)) +  100 * (1 + this.get('loss')/100) + 10 * (1 + this.get('latency')/10000) + this.get('weight'));
+                return this.get('weight');
+            }.property('state','incidents','cores','loadavg1','loss','hasMonitoring','probed','latency'),
+
+            sortingName: function () {
+                console.log(this.get('sortingWeight') + '-' + this.get('name'), this.get('hasMonitoring'), this.get('probed'));
+                return this.get('sortingWeight') + '-' + this.get('name');
+            }.property('name','sortingWeight'),
 
             /**
              *
