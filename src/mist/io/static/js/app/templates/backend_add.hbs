@@ -125,7 +125,7 @@
                 {{/if}}
                 {{#if field.isSlider}}
                     <select class="toggle-field" data-theme="a" data-role="slider"
-                    {{action "switchToggled" on="change" target="view"}}>
+                    {{action "switchToggled" field on="change" target="view"}}>
                         <option value="0">{{unbound field.offLabel}}</option>
                         <option value="1">{{unbound field.onLabel}}</option>
                     </select>

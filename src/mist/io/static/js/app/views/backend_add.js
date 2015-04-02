@@ -41,7 +41,7 @@ define('app/views/backend_add', ['app/views/panel'],
                 var isReady = true
                 this.get('providerFields').some(function (field) {
                     if (field.optional) return;
-                    if (field.isSlider) return;
+                    if (field.isSlider && !field.name) return;
                     if (field.value === undefined ||
                         field.value === null ||
                         field.value === '')
@@ -179,7 +179,7 @@ define('app/views/backend_add', ['app/views/panel'],
                 },
 
 
-                switchToggled: function () {
+                switchToggled: function (field) {
                     var interval = 250;
                     var on = this.$().find('select').val() == 1;
                     if (on) {
@@ -192,6 +192,9 @@ define('app/views/backend_add', ['app/views/panel'],
                         Ember.run.later(this, function () {
                             $('.off').fadeIn(interval);
                         }, interval - 50);
+                    }
+                    if (field.name) {
+                        field.set('value', field.get((on ? 'on' : 'off') + 'Value'))
                     }
                 }
             },

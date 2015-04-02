@@ -47,7 +47,7 @@ define('app/controllers/backend_add', ['app/models/backend'],
             add: function () {
 
                 var provider = this.get('provider');
-                var fields = getProviderFields(provider).filterBy('isSlider', undefined);
+                var fields = getProviderFields(provider).rejectBy('name', undefined);
 
                 var payload = {
                     title: provider.title,

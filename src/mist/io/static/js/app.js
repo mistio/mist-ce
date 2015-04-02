@@ -1696,14 +1696,18 @@ var PROVIDER_MAP = {
             name: 'machine_ip',
             type: 'text',
             label: 'Hostname',
+            optional: true,
+            placeholder: 'DNS or IP '
         },
         {
             name: 'windows',
-            value: 'windows',
             type: 'slider',
             label: 'Operating System',
             onLabel: 'Windows',
             offLabel: 'Unix',
+            onValue: true,
+            offValue: false,
+            optional: true,
             on: [
             ],
             off: [
