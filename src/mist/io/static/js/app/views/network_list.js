@@ -69,14 +69,23 @@ define('app/views/network_list', ['app/views/page'],
                     var networkNames = Mist.backendsController
                         .selectedNetworks.toStringByProperty('name');
 
-                    Mist.confirmationController.setUp('Delete networks',
-                        'Are you sure you want to delete these networks: '
-                        + networkNames + ' ?', function () {
-                            Mist.backendsController.selectedNetworks.forEach(function (network) {
-                                network.backend.networks.deleteNetwork(network.id);
-                            });
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Delete networks',
+                        body: [
+                            {
+                                paragraph: 'Are you sure you want to delete these networks: ' +
+                                    networkNames + ' ?'
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm) {
+                                Mist.backendsController.selectedNetworks.forEach(function (network) {
+                                    network.backend.networks.deleteNetwork(network.id);
+                                });
+                            }
                         }
-                    );
+                    });
                 }
             }
         });
