@@ -1,6 +1,7 @@
 import os
 import shutil
 import random
+import socket
 import tempfile
 import json
 import requests
@@ -298,35 +299,43 @@ def _add_backend_bare_metal(user, title, provider, params):
     """
     Add a bare metal backend
     """
-    machine_hostname = params.get('machine_ip', '')
-    if not machine_hostname:
-        raise RequiredParameterMissingError('machine_hostname')
-
     remove_on_error = params.get('remove_on_error', True)
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
-
-    if remove_on_error:
-        if not machine_key:
-            raise RequiredParameterMissingError('machine_key')
-        if machine_key not in user.keypairs:
-            raise KeypairNotFoundError(machine_key)
-        if not machine_user:
-            machine_user = 'root'
-
+    os_type = params.get('os_type')
+    if os_type != 'windows':
+        os_type = 'unix'
     try:
         port = int(params.get('machine_port', 22))
     except:
         port = 22
-    machine = model.Machine()
-    machine.dns_name = machine_hostname
-    machine.ssh_port = port
+    machine_hostname = params.get('machine_ip', '')
+    if machine_hostname:
+        try:
+            socket.gethostbyname(machine_hostname)
+        except socket.gaierror:
+            raise BadRequestError("Hostname '%s' isn't resolvable/accessible."
+                                  % machine_hostname)
+    use_ssh = remove_on_error and os_type == 'unix' and machine_key
+    if use_ssh:
+        if machine_key not in user.keypairs:
+            raise KeypairNotFoundError(machine_key)
+        if not machine_hostname:
+            raise BadRequestError("Hostname '%s' isn't a valid DNS name "
+                                  "or IP address." % machine_name)
+        if not machine_user:
+            machine_user = 'root'
 
-    machine.public_ips = [machine_hostname]
-    machine_id = machine_hostname.replace('.', '').replace(' ', '')
-    machine.name = machine_hostname
+    machine = model.Machine()
+    machine.ssh_port = port
+    if machine_hostname:
+        machine.dns_name = machine_hostname
+        machine.public_ips = [machine_hostname]
+    machine_id = title.replace('.', '').replace(' ', '')
+    machine.name = title
+    machine.os_type = os_type
     backend = model.Backend()
-    backend.title = title or machine_hostname
+    backend.title = title
     backend.provider = provider
     backend.enabled = True
     backend.machines[machine_id] = machine
@@ -338,7 +347,7 @@ def _add_backend_bare_metal(user, title, provider, params):
         user.backends[backend_id] = backend
         # try to connect. this will either fail and we'll delete the
         # backend, or it will work and it will create the association
-        if remove_on_error:
+        if use_ssh:
             try:
                 ssh_command(
                     user, backend_id, machine_id, machine_hostname, 'uptime',
@@ -346,10 +355,10 @@ def _add_backend_bare_metal(user, title, provider, params):
                     port=port
                 )
             except MachineUnauthorizedError as exc:
-                # remove backend
-                del user.backends[backend_id]
-                user.save()
                 raise BackendUnauthorizedError(exc)
+            except ServiceUnavailableError as exc:
+                raise MistError("Couldn't connect to host '%s'."
+                                % machine_hostname)
         user.save()
     return backend_id
 
