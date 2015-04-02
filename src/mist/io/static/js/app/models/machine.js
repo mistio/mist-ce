@@ -123,8 +123,13 @@ define('app/models/machine', ['ember'],
                 this.set('weight', 100000 * this.states[this.state]);
                 if(this.get('hasMonitoring'))
                     this.set('weight', 10000 * (1 + this.get('incidents').length/100) + this.get('weight'));
-                if(this.get('probed'))
-                    this.set('weight', 1000 * (1 + (this.get('cores')/this.get('loadavg1')/100)) +  100 * (1 + this.get('loss')/100) + 10 * (1 + this.get('latency')/10000) + this.get('weight'));
+                if(this.get('probed')){
+                    if(this.get('loadavg1')>0){
+                        console.log(this.get('cores')/(this.get('loadavg1')),"cores/load");
+                        this.set('weight', 1000 * (1 + (this.get('cores')/this.get('loadavg1')/100)));
+                    }
+                    this.set('weight', 100 * (1 + this.get('loss')/100) + 10 * (1 + this.get('latency')/10000) + this.get('weight'));
+                }
                 return this.get('weight');
             }.property('state','incidents','cores','loadavg1','loss','hasMonitoring','probed','latency'),
 
