@@ -264,7 +264,6 @@ var loadFiles = function (callback) {
         'app/controllers/backend_add',
         'app/controllers/backend_edit',
         'app/controllers/backends',
-        'app/controllers/confirmation',
         'app/controllers/cookies',
         'app/controllers/datasources',
         'app/controllers/dialog',
@@ -296,7 +295,6 @@ var loadFiles = function (callback) {
         'app/views/backend_add',
         'app/views/backend_button',
         'app/views/backend_edit',
-        'app/views/confirmation_dialog',
         'app/views/dialog',
         'app/views/file_upload',
         'app/views/graph_button',
@@ -357,7 +355,6 @@ var loadApp = function (
     BackendAddController,
     BackendEditController,
     BackendsController,
-    ConfirmationController,
     CookiesController,
     DatasourcesController,
     DialogController,
@@ -626,7 +623,6 @@ var loadApp = function (
     App.set('imageSearchController', ImageSearchController.create());
     App.set('datasourcesController', DatasourcesController.create());
     App.set('machineShellController', MachineShellController.create());
-    App.set('confirmationController', ConfirmationController.create());
     App.set('notificationController', NotificationController.create());
     App.set('dialogController', DialogController.create());
     App.set('machinePowerController', MachinePowerController.create());
