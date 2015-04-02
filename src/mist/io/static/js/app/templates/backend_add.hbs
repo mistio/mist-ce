@@ -47,11 +47,14 @@
 
         <div id="backend-add-fields">
         {{#each field in view.providerFields}}
-                <div {{bind-attr class="field.className :field"}}>
+            {{#if field.show}}
+            <div {{bind-attr class="field.className :field"}}>
                 {{#if field.label}}
-                    <label {{bind-attr for="field.name"}}>
-                        {{unbound field.label}}:
-                    </label>
+                    {{#unless field.isCheckbox}}
+                        <label {{bind-attr for="field.name"}}>
+                            {{unbound field.label}}:
+                        </label>
+                    {{/unless}}
                 {{/if}}
                 {{#if field.isText}}
                     {{view Mist.TextField
@@ -68,6 +71,14 @@
                             {{unbound field.buttonText}}
                     </a>
                 {{/if}}
+                {{#if field.isCheckbox}}
+                    <label>
+                        {{view Mist.Checkbox
+                            data-theme="a"
+                           checkedBinding=field.value}}
+                        {{field.label}}
+                    </label>
+                {{/if}}
                 {{#if field.isKey}}
                     <div {{bind-attr id="field.name"}}
                         class="mist-select"
@@ -78,6 +89,9 @@
                         data-theme="a">
                         <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
                         <ul data-role="listview">
+                            <li data-icon="false" data-theme="a">
+                                <a {{action "selectKey" "" field target="view"}}>-- None --</a>
+                            </li>
                             {{#each Mist.keysController.content}}
                                 <li data-icon="false" data-theme="a">
                                     <a {{action "selectKey" this field target="view"}}>{{this.id}}</a>
@@ -117,6 +131,7 @@
                     </select>
                 {{/if}}
             </div>
+            {{/if}}
         {{/each}}
         </div>
 

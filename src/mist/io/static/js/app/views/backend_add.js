@@ -151,7 +151,10 @@ define('app/views/backend_add', ['app/views/panel'],
 
                 selectKey: function (key, field) {
                     $('#' + field.name).collapsible('collapse');
-                    field.set('value', key.id);
+                    field.set('value', key.id || key);
+                    Ember.run.next(this, function () {
+                        this.$().trigger('create');
+                    });
                 },
 
 
@@ -181,12 +184,12 @@ define('app/views/backend_add', ['app/views/panel'],
                     var on = this.$().find('select').val() == 1;
                     if (on) {
                         $('.off').fadeOut(interval);
-                        Ember.run.later(function () {
+                        Ember.run.later(this, function () {
                             $('.on').fadeIn(interval);
                         }, interval - 50);
                     } else {
                         $('.on').fadeOut(interval);
-                        Ember.run.later(function () {
+                        Ember.run.later(this, function () {
                             $('.off').fadeIn(interval);
                         }, interval - 50);
                     }
