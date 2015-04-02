@@ -93,19 +93,26 @@ define('app/controllers/machine_keys', ['ember'],
                 // Check if this is the last key of the machine
                 if (Mist.keysController.getMachineKeysCount(this.machine) == 1) {
                     var machine = this.machine;
-                    Mist.confirmationController.set('title', 'Disassociate key');
-                    Mist.confirmationController.set('text', 'You are about to remove the last key associated with "' +
-                        machine.name + '" machine and you won\'t be able to access it anymore. Are you sure ' +
-                        'you want to proceed?');
-                    Mist.confirmationController.set('callback', function () {
-                        key.disassociate(machine, callback);
-                    });
-
                     // Open confirmation just a bit later
                     // so that key actions popup has enough
                     // time to close
                     Ember.run.later(function() {
-                        Mist.confirmationController.show();
+                        Mist.dialogController.open({
+                            type: DIALOG_TYPES.YES_NO,
+                            head: 'Disassociate key',
+                            body: [
+                                {
+                                    paragraph: 'You are about to remove the last key associated with "' +
+                                    machine.name + '" machine and you won\'t be able to access it anymore. ' +
+                                    'Are you sure you want to proceed?'
+                                }
+                            ],
+                            callback: function (didConfirm) {
+                                if (didConfirm) {
+                                    key.disassociate(machine, callback);
+                                }
+                            }
+                        });
                     }, 300);
                 } else {
                     key.disassociate(this.machine, callback);
