@@ -21,6 +21,8 @@ define('app/models/base', ['ember'],
             id: null,
             name: null,
             selected: false,
+            convertProperties: {},
+            processProperties: {},
 
 
             //
@@ -31,7 +33,7 @@ define('app/models/base', ['ember'],
 
 
             load: function () {
-                this._convertProperties();
+                this.update(this);
             }.on('init'),
 
 
@@ -43,11 +45,13 @@ define('app/models/base', ['ember'],
 
 
             update: function (data) {
-                forIn(this, data, function (value, key) {
-                    this.set(key, value);
+                Ember.run(this, function () {
+                    forIn(this, data, function (value, key) {
+                        this.set(key, value);
+                    });
+                    this._convertProperties();
+                    this._processProperties();
                 });
-                this._convertProperties();
-                this._processProperties();
             },
 
 
@@ -60,13 +64,11 @@ define('app/models/base', ['ember'],
 
             _convertProperties: function () {
                 var properties = this.get('convertProperties');
-                if (!properties)
-                    return;
-                var processors = this.get('processProperties') || {};
+                var processors = this.get('processProperties');
                 forIn(this, properties, function (after, before) {
                     var newValue = this.get(before);
                     if (after in processors)
-                        newValue = processors[after](newValue);
+                        newValue = processors[after].call(this, newValue);
                     this.set(after, newValue);
                     this.set(before, undefined);
                     delete this[before];
@@ -76,10 +78,8 @@ define('app/models/base', ['ember'],
 
             _processProperties: function () {
                 var processors = this.get('processProperties');
-                if (!processors)
-                    return;
                 forIn(this, processors, function (fnc, property) {
-                    this.set(property, fnc(this.get(property)));
+                    this.set(property, fnc.call(this, this.get(property)));
                 });
             },
         });
