@@ -409,12 +409,16 @@ define('app/views/machine_monitoring',
 
             _showGraphs: function () {
 
+                if (!this.$())
+                    return;
+
                 var cookie = Mist.cookiesController
                     .getSingleMachineEntry(this.machine);
 
                 if (Mist.graphsController.isOpen)
                     return;
                 this.set('graphs', this.graphs.sortBy('index'));
+
                 Mist.graphsController.open({
                     graphs: this.graphs,
                     config: {
