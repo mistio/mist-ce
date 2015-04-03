@@ -3966,8 +3966,8 @@ function program1(depth0,data) {
   var buffer = '';
   data.buffer.push("\n        ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "rule", {hash:{
-    'ruleBinding': ("this")
-  },hashTypes:{'ruleBinding': "STRING"},hashContexts:{'ruleBinding': depth0},contexts:[depth0],types:["STRING"],data:data})));
+    'model': ("")
+  },hashTypes:{'model': "ID"},hashContexts:{'model': depth0},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n    ");
   return buffer;
   }
