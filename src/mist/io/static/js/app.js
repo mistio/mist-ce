@@ -442,14 +442,6 @@ var loadApp = function (
         this.route('missing', { path: "/*path" });
     });
 
-    App.LogsRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - logs';
-            });
-        },
-    });
-
     if (Mist.isCore) {
     App.ScriptsRoute = Ember.Route.extend({
         activate: function () {
