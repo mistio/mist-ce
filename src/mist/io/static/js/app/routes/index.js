@@ -1,19 +1,17 @@
-define('app/routes/index', ['ember'],
+define('app/routes/index', ['app/routes/base'],
     //
     //  Index Route
     //
     //  @returns Class
     //
-    function () {
+    function (BaseRoute) {
 
         'use strict';
 
-        return App.IndexRoute = Ember.Route.extend({
-            activate: function () {
-                Ember.run.next(function () {
-                    document.title = 'mist.io - home';
-                });
-            }
+        return App.IndexRoute = BaseRoute.extend({
+
+            documentTitle: 'mist.io - home'
+
         });
     }
 );

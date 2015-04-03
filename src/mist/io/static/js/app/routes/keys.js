@@ -1,19 +1,17 @@
-define('app/routes/keys', ['ember'],
+define('app/routes/keys', ['app/routes/base'],
     //
     //  Keys Route
     //
     //  @returns Class
     //
-    function () {
+    function (BaseRoute) {
 
         'use strict';
 
-        return App.KeysRoute = Ember.Route.extend({
-            activate: function () {
-                Ember.run.next(function () {
-                    document.title = 'mist.io - keys';
-                });
-            },
+        return App.KeysRoute = BaseRoute.extend({
+
+            documentTitle: 'mist.io - keys',
+
             exit: function () {
                 Mist.keysController.content.setEach('selected', false);
             }

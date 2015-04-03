@@ -1,25 +1,28 @@
-define('app/routes/key', ['ember'],
+define('app/routes/key', ['app/routes/base'],
     //
     //  Key Route
     //
     //  @returns Class
     //
-    function () {
+    function (BaseRoute) {
 
         'use strict';
 
-        return App.KeyRoute = Ember.Route.extend({
+        return App.KeyRoute = BaseRoute.extend({
+
             activate: function () {
                 Ember.run.next(this, function () {
                     var model = this.modelFor('key');
                     var id = model._id || model.id;
                     var key = Mist.keysController.getKey(id);
-                    document.title = 'mist.io - ' + (key ? key.id : id);
+                    this.set('documentTitle', 'mist.io - ' + (key ? key.id : id));
                 });
             },
+
             redirect: function (key) {
                 Mist.keysController.set('keyRequest', key._id);
             },
+
             model: function (args) {
                 var id = args.key_id;
                 if (Mist.keysController.loading)

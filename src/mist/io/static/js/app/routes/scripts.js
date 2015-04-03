@@ -1,19 +1,17 @@
-define('app/routes/scripts', ['ember'],
+define('app/routes/scripts', ['app/routes/base'],
     //
     //  Scripts Route
     //
     //  @returns Class
     //
-    function () {
+    function (BaseRoute) {
 
         'use strict';
 
-        return App.ScriptsRoute = Ember.Route.extend({
-            activate: function () {
-                Ember.run.next(function () {
-                    document.title = 'mist.io - scripts';
-                });
-            },
+        return App.ScriptsRoute = BaseRoute.extend({
+
+            documentTitle: 'mist.io - scripts',
+
             exit: function () {
                 Mist.scriptsController.setEach('selected', false);
             }

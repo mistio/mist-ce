@@ -1,19 +1,17 @@
-define('app/routes/machines', ['ember'],
+define('app/routes/machines', ['app/routes/base'],
     //
     //  Machines Route
     //
     //  @returns Class
     //
-    function () {
+    function (BaseRoute) {
 
         'use strict';
 
-        return App.MachinesRoute = Ember.Route.extend({
-            activate: function() {
-                Ember.run.next(function() {
-                    document.title = 'mist.io - machines';
-                });
-            },
+        return App.MachinesRoute = BaseRoute.extend({
+
+            documentTitle: 'mist.io - machines',
+
             exit: function() {
                 Mist.backendsController.forEach(function(backend) {
                     backend.machines.content.setEach('selected', false);

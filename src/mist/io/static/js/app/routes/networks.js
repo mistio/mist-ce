@@ -1,19 +1,17 @@
-define('app/routes/networks', ['ember'],
+define('app/routes/networks', ['app/routes/base'],
     //
     //  Networks Route
     //
     //  @returns Class
     //
-    function () {
+    function (BaseRoute) {
 
         'use strict';
 
-        return App.NetworksRoute = Ember.Route.extend({
-            activate: function () {
-                Ember.run.next(function () {
-                    document.title = 'mist.io - networks';
-                });
-            },
+        return App.NetworksRoute = BaseRoute.extend({
+
+            documentTitle: 'mist.io - networks',
+
             exit: function() {
                 Mist.backendsController.forEach(function (backend) {
                     backend.networks.content.setEach('selected', false);

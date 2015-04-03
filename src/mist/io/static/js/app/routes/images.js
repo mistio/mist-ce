@@ -1,19 +1,17 @@
-define('app/routes/images', ['ember'],
+define('app/routes/images', ['app/routes/base'],
     //
     //  Images Route
     //
     //  @returns Class
     //
-    function () {
+    function (BaseRoute) {
 
         'use strict';
 
-        return App.ImagesRoute = Ember.Route.extend({
-            activate: function() {
-                Ember.run.next(function() {
-                    document.title = 'mist.io - images';
-                });
-            }
+        return App.ImagesRoute = BaseRoute.extend({
+
+            documentTitle: 'mist.io - images'
+
         });
     }
 );

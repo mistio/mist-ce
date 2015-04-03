@@ -9,11 +9,9 @@ define('app/routes/missing', ['ember'],
         'use strict';
 
         return App.MissingRoute = Ember.Route.extend({
-            activate: function () {
-                Ember.run.next(function () {
-                    document.title = 'mist.io - 404';
-                });
-            },
+
+            documentTitle: 'mist.io - 404'
+
         });
     }
 );
