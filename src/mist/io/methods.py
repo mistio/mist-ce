@@ -272,13 +272,17 @@ def add_backend_v_2(user, title, provider, params):
         except Exception as exc:
             log.error("Error while adding backend%r" % exc)
             raise BackendUnavailableError(exc)
-        try:
-            machines = conn.list_nodes()
-        except InvalidCredsError:
-            raise BackendUnauthorizedError()
-        except Exception as exc:
-            log.error("Error while trying list_nodes: %r", exc)
-            raise BackendUnavailableError(exc=exc)
+        if provider not in ['vshere']:
+            # in some providers -eg vSphere- this is not needed
+            # as we are sure we got a succesfull connection with
+            # the provider if connect_provider doesn't fail
+            try:
+                machines = conn.list_nodes()
+            except InvalidCredsError:
+                raise BackendUnauthorizedError()
+            except Exception as exc:
+                log.error("Error while trying list_nodes: %r", exc)
+                raise BackendUnavailableError(exc=exc)
 
     with user.lock_n_load():
         user.backends[backend_id] = backend
