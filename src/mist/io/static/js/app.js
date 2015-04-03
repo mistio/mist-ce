@@ -2083,5 +2083,8 @@ var OS_MAP = [
     ],
     [
         ['amazon'], 'amazon'
+    ],
+    [
+        ['windows'], 'windows'
     ]
 ];
