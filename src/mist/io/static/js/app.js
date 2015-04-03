@@ -296,6 +296,7 @@ var loadFiles = function (callback) {
 
         'app/routes/images',
         'app/routes/index',
+        'app/routes/networks',
 
         'app/views/backend_add',
         'app/views/backend_button',
@@ -434,21 +435,6 @@ var loadApp = function (
         });
         this.route('logs');
         this.route('missing', { path: "/*path" });
-    });
-
-    App.NetworksRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - networks';
-            });
-        },
-        exit: function() {
-            Mist.backendsController.forEach(function (backend) {
-                backend.networks.forEach(function (network) {
-                    network.set('selected', false);
-                });
-            });
-        }
     });
 
     App.NetworkRoute = Ember.Route.extend({
