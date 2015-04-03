@@ -42,6 +42,7 @@
 
 
         <!-- If machine is not running created, disable keys UI -->
+        {{#unless isWindows}}
         <span id="mist-manage-keys"
             {{bind-attr
                 class="view.isRunning::ui-state-disabled
@@ -68,6 +69,7 @@
                 {{/if}}
             {{/unless}}
         </span>
+        {{/unless}}
     </div>
 
     <div data-role="content" data-theme="a">
