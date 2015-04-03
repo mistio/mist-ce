@@ -1207,11 +1207,20 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_destroy = False
         can_start = False
 
+    if conn.type in (config.EC2_PROVIDERS, Provider.LINODE,
+                     Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
+                     Provider.DOCKER, Provider.OPENSTACK, Provider.RACKSPACE):
+        can_rename = True
+    else:
+        can_rename = False
+
+
     return {'can_stop': can_stop,
             'can_start': can_start,
             'can_destroy': can_destroy,
             'can_reboot': can_reboot,
-            'can_tag': can_tag}
+            'can_tag': can_tag,
+            'can_rename': can_rename}
 
 
 def list_machines(user, backend_id):
@@ -1998,12 +2007,12 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
     return node
 
 
-def _machine_action(user, backend_id, machine_id, action, plan_id=None):
+def _machine_action(user, backend_id, machine_id, action, plan_id=None, name=None):
     """Start, stop, reboot, resize and destroy have the same logic underneath, the only
     thing that changes is the action. This helper function saves us some code.
 
     """
-    actions = ('start', 'stop', 'reboot', 'destroy', 'resize')
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename')
 
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
@@ -2076,6 +2085,8 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
                 conn.ex_stop_node(machine)
         elif action is 'resize':
             conn.ex_resize_node(node, plan_id)
+        elif action is 'rename':
+            conn.ex_rename_node(node, name)
         elif action is 'reboot':
             if bare_metal:
                 try:
@@ -2165,6 +2176,11 @@ def stop_machine(user, backend_id, machine_id):
 def reboot_machine(user, backend_id, machine_id):
     """Reboots a machine on a certain backend."""
     _machine_action(user, backend_id, machine_id, 'reboot')
+
+
+def rename_machine(user, backend_id, machine_id, name):
+    """Renames a machine on a certain backend."""
+    _machine_action(user, backend_id, machine_id, 'rename', name=name)
 
 
 def resize_machine(user, backend_id, machine_id, plan_id):
