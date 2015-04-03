@@ -87,7 +87,7 @@ define('app/models/machine', ['ember'],
             },
 
             image: function() {
-                return this.backend.images.getImage(this.imageId);
+                return this.get('backend').get('images').getObject(this.imageId);
             }.property('imageId'),
 
 
