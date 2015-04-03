@@ -302,6 +302,7 @@ var loadFiles = function (callback) {
         'app/routes/machines',
         'app/routes/network',
         'app/routes/networks',
+        'app/routes/scripts',
 
         'app/views/backend_add',
         'app/views/backend_button',
@@ -443,16 +444,7 @@ var loadApp = function (
     });
 
     if (Mist.isCore) {
-    App.ScriptsRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - scripts';
-            });
-        },
-        exit: function () {
-            Mist.scriptsController.setEach('selected', false);
-        }
-    });
+
 
     App.ScriptRoute = Ember.Route.extend({
         activate: function () {
