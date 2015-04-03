@@ -261,6 +261,7 @@ var appLoader = {
 var loadFiles = function (callback) {
     require([
         'app/templates/templates',
+
         'app/controllers/backend_add',
         'app/controllers/backend_edit',
         'app/controllers/backends',
@@ -292,6 +293,9 @@ var loadFiles = function (callback) {
         'app/controllers/script_edit',
         'app/controllers/script_run',
         'app/controllers/scripts',
+
+        'app/routes/index',
+
         'app/views/backend_add',
         'app/views/backend_button',
         'app/views/backend_edit',
@@ -429,14 +433,6 @@ var loadApp = function (
         });
         this.route('logs');
         this.route('missing', { path: "/*path" });
-    });
-
-    App.IndexRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - home';
-            });
-        }
     });
 
     App.ImagesRoute = Ember.Route.extend({
