@@ -90,15 +90,24 @@ define('app/views/network', ['app/views/page'],
                 deleteClicked: function () {
                     var that = this;
                     var networkId = this.network.id;
-                    Mist.confirmationController.setUp('Delete network',
-                        'Are you sure you want to delete "' + this.network.name + '" ?', function () {
-                            that.network.backend.networks.deleteNetwork(networkId,
-                                function (success) {
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Delete network',
+                        body: [
+                            {
+                                paragraph: 'Are you sure you want to delete "' +
+                                    this.network.name + '" ?'
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm) {
+                                that.network.backend.networks.deleteNetwork(networkId, function (success) {
                                     if (success)
                                         Mist.Router.router.transitionTo('networks');
-                            });
+                                });
+                            }
                         }
-                    );
+                    });
                 },
 
                 assignMachine: function (machine) {

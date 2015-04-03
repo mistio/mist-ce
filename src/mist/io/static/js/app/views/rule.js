@@ -18,7 +18,6 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             //
 
 
-            rule: null,
             isUpdating: null,
             newRuleValue: null,
             newRuleTimeWindow: null,
@@ -31,13 +30,17 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             //
 
 
+            rule: function () {
+                return this.get('model');
+            }.property('controller.model'),
+
             aggregateIsAny: function () {
-                if (this.rule.aggregate) {
-                    var isAny = this.rule.aggregate.value == 'any';
+                if (this.get('rule').aggregate) {
+                    var isAny = this.get('rule').aggregate.value == 'any';
                     // Bad, but whatever for now...
                     if (!isAny)
                         Ember.run.next(this, function () {
-                            $('#' + this.rule.id + ' .rule-time-window')
+                            $('#' + this.get('rule').id + ' .rule-time-window')
                                 .parent().trigger('create');
                         });
                     return isAny;
@@ -53,9 +56,9 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             load: function () {
-                this.showAdvancedCondition();
-                this.updateTextValues();
                 Ember.run.next(this, function () {
+                    this.showAdvancedCondition();
+                    this.updateTextValues();
                     $('#'+this.elementId).trigger('create');
                 })
             }.on('didInsertElement'),
@@ -75,17 +78,16 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                     return;
 
                 // Check if values actually changed
-                if (this.rule.value == this.newRuleValue &&
-                    1 + this.rule.timeWindow / 60 == this.newRuleTimeWindow)
+                if (this.get('rule').value == this.newRuleValue &&
+                    1 + this.get('rule').timeWindow / 60 == this.newRuleTimeWindow)
                     return;
 
                 this.set('isUpdating', true);
                 Ember.run.later(this, function () {
                     this.set('isUpdating', false);
-
                     var that = this;
                     Mist.rulesController.editRule({
-                        rule: this.rule,
+                        rule: this.get('rule'),
                         properties: {
                             value: this.newRuleValue,
                             reminder_offset: (this.newRuleTimeWindow - 1) * 60
@@ -101,8 +103,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
             updateTextValues: function () {
                 this.setProperties({
-                   newRuleTimeWindow: 1 + this.rule.timeWindow / 60,
-                   newRuleValue: this.rule.value
+                   newRuleTimeWindow: 1 + this.get('rule').timeWindow / 60,
+                   newRuleValue: this.get('rule').value
                 });
             },
 
@@ -125,8 +127,11 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                 // "aggregate": "all"
                 // "timeWindow": "0"
 
-                var isDefault = this.rule.aggregate.value == 'all' &&
-                                this.rule.timeWindow == 0;
+                if (!this.get('rule.aggregate'))
+                    return;
+
+                var isDefault = this.get('rule').aggregate.value == 'all' &&
+                                this.get('rule').timeWindow == 0;
 
                 if (!isDefault) {
                     $(el + ' .rule-more').hide(0);
@@ -145,27 +150,27 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             actions: {
 
                 openMetricPopup: function () {
-                    Mist.ruleEditController.open(this.rule, 'metric');
+                    Mist.ruleEditController.open(this.get('rule'), 'metric');
                 },
 
 
                 openOperatorPopup: function () {
-                    Mist.ruleEditController.open(this.rule, 'operator');
+                    Mist.ruleEditController.open(this.get('rule'), 'operator');
                 },
 
 
                 openActionPopup: function () {
-                    Mist.ruleEditController.open(this.rule, 'action');
+                    Mist.ruleEditController.open(this.get('rule'), 'action');
                 },
 
 
                 openAggregatePopup: function () {
-                    Mist.ruleEditController.open(this.rule, 'aggregate');
+                    Mist.ruleEditController.open(this.get('rule'), 'aggregate');
                 },
 
 
                 deleteRuleClicked: function () {
-                    Mist.rulesController.deleteRule(this.rule);
+                    Mist.rulesController.deleteRule(this.get('rule'));
                 },
 
 

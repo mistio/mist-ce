@@ -35,7 +35,7 @@ define('app/views/image_list', ['app/views/page'],
 
                 // Add event listeners
                 Mist.imageSearchController.on('onSearchEnd', this, 'updateBaseImages');
-                Mist.backendsController.on('onImageListChange', this, 'updateDefaultImages');
+                Mist.backendsController.on('onImagesChange', this, 'updateDefaultImages');
 
                 // Handle scrolling
                 var that = this;
@@ -55,7 +55,7 @@ define('app/views/image_list', ['app/views/page'],
                 // Remove event listeners
                 var that = this;
                 Mist.backendsController.content.forEach(function(backend) {
-                    backend.off('onImageListChange', that, 'updateBaseImages');
+                    backend.off('onImagesChange', that, 'updateBaseImages');
                 });
                 Mist.imageSearchController.off('onSearchEnd', this, 'updateBaseImages');
                 $(window).off('scroll');

@@ -181,7 +181,7 @@ define('app/views/machine', ['app/views/page'],
                     !this.machine.backend || !this.machine.backend.provider)
                     return 'image-generic';
 
-                var imageId = this.machine.extra.image_id || this.machine.extra.imageId || '';
+                var imageId = this.machine.extra.image_id || this.machine.extra.imageId || this.machine.extra.image || '';
 
                 // Use .toString() because digital ocean returns
                 // an number instead of a string which breaks the search
