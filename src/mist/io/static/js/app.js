@@ -300,6 +300,7 @@ var loadFiles = function (callback) {
         'app/routes/keys',
         'app/routes/machine',
         'app/routes/machines',
+        'app/routes/missing',
         'app/routes/network',
         'app/routes/networks',
         'app/routes/script',
@@ -442,14 +443,6 @@ var loadApp = function (
         });
         this.route('logs');
         this.route('missing', { path: "/*path" });
-    });
-
-    App.MissingRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - 404';
-            });
-        },
     });
 
     // Ember controllers
