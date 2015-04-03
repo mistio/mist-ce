@@ -16,9 +16,7 @@ define('app/routes/networks', ['ember'],
             },
             exit: function() {
                 Mist.backendsController.forEach(function (backend) {
-                    backend.networks.forEach(function (network) {
-                        network.set('selected', false);
-                    });
+                    backend.networks.content.setEach('selected', false);
                 });
             }
         });

@@ -16,9 +16,7 @@ define('app/routes/machines', ['ember'],
             },
             exit: function() {
                 Mist.backendsController.forEach(function(backend) {
-                    backend.machines.forEach(function(machine) {
-                        machine.set('selected', false);
-                    });
+                    backend.machines.content.setEach('selected', false);
                 });
             }
         });
