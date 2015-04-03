@@ -104,16 +104,19 @@ define('app/models/machine', ['ember'],
             }.property('Mist.openIncidents.@each.machine'),
 
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            isWindows: function () {
+                return this.get('extra') && this.get('extra').os_type == 'windows';
+            }.property('extra'),
 
-            load: function() {
-                this.set('commandHistory', []);
-                //this.probe();
-            }.on('init'),
+
+            canConnect: function () {
+                return this.get('isWindows') || this.get('hasKeys');
+            }.property('isWindows', 'hasKeys'),
+
+
+            connectText: function () {
+                return this.get('isWindows') ? 'Connect' : 'Shell';
+            }.property('isWindows'),
 
 
             /**
