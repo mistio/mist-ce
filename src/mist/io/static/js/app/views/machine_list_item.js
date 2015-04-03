@@ -56,12 +56,21 @@ define('app/views/machine_list_item', ['app/views/list_item'],
                     var keyId = this.get('parentView').get('key').get('id');
                     var machine = this.machine;
 
-                    Mist.confirmationController.set('title', 'Disassociate machine');
-                    Mist.confirmationController.set('text', 'Are you sure you want to disassociate ' + machine.name + ' ?');
-                    Mist.confirmationController.set('callback', function () {
-                        Mist.keysController.disassociateKey(keyId, machine);
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Disassociate machine',
+                        body: [
+                            {
+                                paragraph: 'Are you sure you want to disassociate ' +
+                                    machine.name + ' ?'
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm) {
+                                Mist.keysController.disassociateKey(keyId, machine);
+                            }
+                        }
                     });
-                    Mist.confirmationController.show();
                 }
             },
 
