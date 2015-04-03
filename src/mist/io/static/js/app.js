@@ -294,6 +294,7 @@ var loadFiles = function (callback) {
         'app/controllers/script_run',
         'app/controllers/scripts',
 
+        'app/routes/images',
         'app/routes/index',
 
         'app/views/backend_add',
@@ -433,14 +434,6 @@ var loadApp = function (
         });
         this.route('logs');
         this.route('missing', { path: "/*path" });
-    });
-
-    App.ImagesRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
-                document.title = 'mist.io - images';
-            });
-        }
     });
 
     App.NetworksRoute = Ember.Route.extend({
