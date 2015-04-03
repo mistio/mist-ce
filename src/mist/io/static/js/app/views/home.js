@@ -111,6 +111,9 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                     Mist.graphsController.close();
                 }
 
+                if (!datasources.length)
+                    return;
+
                 Mist.graphsController.open({
                     graphs: [Graph.create({
                         title: 'Load on all monitored machines',

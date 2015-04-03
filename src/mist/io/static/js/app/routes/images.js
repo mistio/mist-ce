@@ -11,7 +11,7 @@ define('app/routes/images', ['ember'],
         return App.ImagesRoute = Ember.Route.extend({
             activate: function() {
                 Ember.run.next(function() {
-                    document.title = 'mist.io  images';
+                    document.title = 'mist.io - images';
                 });
             }
         });
