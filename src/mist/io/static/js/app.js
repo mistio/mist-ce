@@ -296,6 +296,7 @@ var loadFiles = function (callback) {
 
         'app/routes/images',
         'app/routes/index',
+        'app/routes/keys',
         'app/routes/machine',
         'app/routes/machines',
         'app/routes/network',
@@ -438,17 +439,6 @@ var loadApp = function (
         });
         this.route('logs');
         this.route('missing', { path: "/*path" });
-    });
-
-    App.KeysRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - keys';
-            });
-        },
-        exit: function () {
-            Mist.keysController.content.setEach('selected', false);
-        }
     });
 
     App.KeyRoute = Ember.Route.extend({
