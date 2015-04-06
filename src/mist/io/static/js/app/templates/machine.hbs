@@ -1,7 +1,7 @@
 <div id="single-machine-page" data-role="page" class="ui-page-active" data-theme="a">
 
     <div data-role="header" data-theme="b">
-
+        <a id="yolo" class="ui-btn ui-btn-icon-left">Yolo</a>
         <a class="ui-btn
                 ui-btn-icon-left
                 ui-icon-arrow-l
@@ -253,13 +253,22 @@
                     :ui-icon-grid"}}
                 {{action "tagsClicked" target="view"}}>Tags</a>
         </td><td>
-            <a id="single-machine-shell-btn"
-                {{bind-attr class="canConnect::ui-state-disabled
-                    isWindows:ui-state-disabled
-                    :ui-btn
-                    :ui-btn-icon-left
-                    :ui-icon-gear"}}
-                {{action "shellClicked" target="view"}}>{{connectText}}</a>
+            {{#if isWindows}}
+                <a id="single-machine-shell-btn"
+                    target="_blank"
+                    {{bind-attr href="rdpURL" class="canConnect::ui-state-disabled
+                        :ui-btn
+                        :ui-btn-icon-left
+                        :ui-icon-gear"}}>Connect</a>
+            {{else}}
+                <a id="single-machine-shell-btn"
+                    {{bind-attr class="canConnect::ui-state-disabled
+                        :ui-btn
+                        :ui-btn-icon-left
+                        :ui-icon-gear"}}
+                    {{action "shellClicked" target="view"}}>Shell</a>
+            {{/if}}
+
         </td><td>
             <a id="single-machine-power-btn"
                 {{bind-attr class="id::ui-state-disabled

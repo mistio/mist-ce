@@ -46,10 +46,21 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                         this.set('host', ip);
                 }, this);
 
+                if (machine.get('isWindows')) {
+                    this.openRDP();
+                    this.set('isOpen', false);
+                    return;
+                }
+
                 if (this.host)
                     this.view.open();
                 else
                     this.close();
+
+            },
+
+
+            openRDP: function () {
 
             },
 
