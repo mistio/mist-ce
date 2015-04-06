@@ -13,11 +13,8 @@
     <div data-role="content" data-theme="a">
 
         <a id="create-machine-btn"
-           class="responsive-button"
-           data-role="button"
-           data-icon="plus"
-           data-iconpos="right"
-           data-theme="d"
+           class="responsive-button ui-btn ui-btn-d ui-icon-plus
+                ui-btn-icon-right ui-shadow ui-corner-all"
            {{action "createClicked" target="view"}}>Create</a>
 
         <a id="select-machines-btn"
@@ -92,11 +89,14 @@
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
-            <a id="machines-tags-btn" data-role="button" data-icon="grid" {{action "tagsClicked" target="view"}}>Tags</a>
+            <a id="machines-tags-btn" class="ui-btn ui-icon-grid ui-btn-icon-left ui-shadow ui-corner-all"
+                {{action "tagsClicked" target="view"}}>Tags</a>
         </td><td>
-            <a id="machines-shell-btn" data-role="button" data-icon="gear" {{action "shellClicked" target="view"}}>Shell</a>
+            <a id="machines-shell-btn" class="ui-btn ui-icon-gear ui-btn-icon-left ui-shadow ui-corner-all"
+                {{action "shellClicked" target="view"}}>Shell</a>
         </td><td>
-            <a id="machines-power-btn" data-role="button" data-icon="power" {{action "powerClicked" target="view"}}>Power</a>
+            <a id="machines-power-btn" class="ui-btn ui-icon-power ui-btn-icon-left ui-shadow ui-corner-all"
+                {{action "powerClicked" target="view"}}>Power</a>
         </td></tr></tbody></table>
     </div>
 

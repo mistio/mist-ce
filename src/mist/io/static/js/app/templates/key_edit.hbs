@@ -20,8 +20,10 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
-            <button id="rename-key-ok" data-theme="d" {{action "saveClicked" target="view"}}>Save</button>
+            <a class="ui-btn ui-btn-a ui-shadow ui-corner-all"
+                {{action "backClicked" target="view"}}>Back</a>
+            <a id="rename-key-ok" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+                {{action "saveClicked" target="view"}}>Save</a>
         </div>
 
     </div>

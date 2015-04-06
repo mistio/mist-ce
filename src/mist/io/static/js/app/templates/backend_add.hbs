@@ -126,8 +126,10 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" {{action "backClicked" target="view"}} data-theme="a">Back</a>
-            <a id="new-backend-ok" data-theme="d"
+            <a class="ui-btn ui-btn-a ui-shadow ui-corner-all" {{action "backClicked" target="view"}}>
+                Back
+            </a>
+            <a id="new-backend-ok"
                 {{bind-attr class="view.isReady::ui-state-disabled :ui-btn :ui-btn-d"}}
                 {{action "addClicked" target="view"}}>Add</a>
         </div>
