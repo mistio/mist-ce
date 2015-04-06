@@ -93,10 +93,7 @@ define('app/views/machine_list', ['app/views/page'],
             },
 
             sortMachines: function (mode){
-                if(mode == 'state')
-                    this.set("machines",this.machines.sortBy(mode).reverse());
-                else
-                    this.set("machines",this.machines.sortBy(mode));
+                this.set("machines",this.machines.sortBy(mode));
             },
 
 

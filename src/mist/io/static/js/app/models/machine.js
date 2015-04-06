@@ -130,6 +130,10 @@ define('app/models/machine', ['ember'],
                     }
                     this.set('weight', 100 * (1 + this.get('loss')/100) + 10 * (1 + this.get('latency')/10000) + this.get('weight'));
                 }
+                this.set('weight', 1 / this.get('weight'));
+                //because standar sort returns the list from min to max and if we use reverse
+                //it also sorts the names in reverse.
+                //So the one with the smallest weight has the max priority
                 return this.get('weight');
             }.property('state','incidents','cores','loadavg1','loss','hasMonitoring','probed','latency'),
 
