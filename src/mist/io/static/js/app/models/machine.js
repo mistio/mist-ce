@@ -138,7 +138,7 @@ define('app/models/machine', ['ember'],
                         ips_v4.push(ip);
                     }
                 });
-                return ips_v4.length ? ips_v4[0]: null;
+                return ips_v4.length ? ips_v4[0]: '';
             }.property('public_ips', 'private_ips'),
 
 

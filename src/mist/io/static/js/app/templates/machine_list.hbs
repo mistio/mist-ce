@@ -82,7 +82,21 @@
         <table><tbody><tr><td>
             <a id="machines-tags-btn" data-role="button" data-icon="grid" {{action "tagsClicked" target="view"}}>Tags</a>
         </td><td>
-            <a id="machines-shell-btn" data-role="button" data-icon="gear" {{action "shellClicked" target="view"}}>{{view.connectText}}</a>
+            {{#if view.selectedMachine.isWindows}}
+                <a id="single-machine-shell-btn"
+                    target="_blank"
+                    {{bind-attr href="view.selectedMachine.rdpURL" class="view.selectedMachine.canConnect::ui-state-disabled
+                        :ui-btn
+                        :ui-btn-icon-left
+                        :ui-icon-gear"}}>Connect</a>
+            {{else}}
+                <a id="machines-shell-btn" {{bind-attr class="view.selectedMachine.canConnect::ui-state-disabled
+                    :ui-btn
+                    :ui-btn-icon-left
+                    :ui-icon-gear"}}
+                    {{action "shellClicked" target="view"}}>Shell</a>
+            {{/if}}
+
         </td><td>
             <a id="machines-power-btn" data-role="button" data-icon="power" {{action "powerClicked" target="view"}}>Power</a>
         </td></tr></tbody></table>

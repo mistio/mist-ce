@@ -554,6 +554,8 @@ def machine_rdp(request):
     rdp_port = request.params.get('rdp_port',3389)
     host = request.params.get('host')
 
+    if not host:
+        raise BadRequestError('no hostname specified')
     try:
         1 < int(rdp_port) < 65535
     except:
