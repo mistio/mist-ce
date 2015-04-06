@@ -866,7 +866,7 @@ function Ajax (csrfToken) {
                         if (!success && ret.error)
                             ret.error(jqXHR.responseText, jqXHR.status);
                         if (ret.complete)
-                            ret.complete(success, jqXHR.responseJSON);
+                            ret.complete(success, jqXHR.responseJSON, jqXHR);
                     }
                 };
 

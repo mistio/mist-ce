@@ -8,6 +8,8 @@ define('app/views/machine_list', ['app/views/page'],
         return App.MachineListView = PageView.extend({
 
 
+            selectedMachine: null,
+
             /**
              *
              *  Initialization
@@ -42,6 +44,7 @@ define('app/views/machine_list', ['app/views/page'],
                 if (Mist.machineShellController.isOpen)
                     return;
                 var connectText = 'Shell';
+                this.set('selectedMachine', null)
                 switch (Mist.backendsController.selectedMachines.length) {
                 case 0:
                     $('#machine-list-page .ui-footer').slideUp();
@@ -51,13 +54,14 @@ define('app/views/machine_list', ['app/views/page'],
                     connectText = machine.get('connectText');
                     $('#machine-list-page .ui-footer').slideDown();
 
+                    this.set('selectedMachine', machine)
                     if (machine.can_tag) {
                         $('#machine-list-page #machines-tags-btn').removeClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
                     }
 
-                    if (machine.get('canConnect') && machine.state == 'running' && !machine.get('isWindows')) {
+                    if (machine.get('canConnect') && machine.state == 'running') {
                         $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');

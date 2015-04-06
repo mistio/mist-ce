@@ -124,6 +124,36 @@ define('app/models/machine', ['ember'],
             }.property('isWindows'),
 
 
+            host: function () {
+                var ips_v4 = [];
+                this.public_ips.forEach(function(ip) {
+                    if (ip.search(':') == -1) {
+                        // this is not an IPv6, so it is supported
+                        ips_v4.push(ip);
+                    }
+                });
+                this.private_ips.forEach(function(ip) {
+                    if (ip.search(':') == -1) {
+                        // this is not an IPv6, so it is supported
+                        ips_v4.push(ip);
+                    }
+                });
+                return ips_v4.length ? ips_v4[0]: '';
+            }.property('public_ips', 'private_ips'),
+
+
+            rdpURL: function () {
+                if (!this.get('isWindows'))
+                    return '';
+                var port = this.get('extra').remote_desktop_port || 3389;
+                var url = '/backends/' + this.get('backend.id') +
+                    '/machines/' + this.get('id') + '/rdp?' +
+                    'host=' + this.get('host') + '&' +
+                    'rdp_port=' + port;
+                return url;
+            }.property('isWindows', 'host', 'extra'),
+
+
             /**
              *
              *  Methods
