@@ -13,10 +13,9 @@
     <div data-role="content" data-theme="a">
 
         <a id="select-keys-btn"
-           class="responsive-button"
-           data-role="button"
-           data-icon="arrow-d"
-           {{action "selectClicked" target="view"}}>Select</a>
+           class="responsive-button ui-link ui-btn ui-icon-arrow-d
+               ui-btn-icon-notext ui-shadow ui-corner-all"
+           {{action "selectClicked" target="view"}}></a>
 
         <a id="add-key-btn"
            class="responsive-button"
@@ -48,6 +47,9 @@
 
     <div id="select-keys-popup" data-role="popup" data-transition="flip" data-position-to="#select-keys-btn">
         <ul data-role='listview'>
+            <li id="list-divider" data-role="list-divider">
+                Select
+            </li>
             <li data-icon="false">
                 <a {{action "selectionModeClicked" true target="view"}}>All</a>
             </li>

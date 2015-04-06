@@ -228,7 +228,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
 -----------------------------------------------------------------------------------------------------------*/
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable {
-    margin: 3em 8em -3em 118px !important;
+    margin: 3em 8em -3em 3em !important;
     position: relative;
     top: -3.1em;
 }
@@ -483,6 +483,12 @@ ul.checkbox-list li label {
 
 /* Other
 -----------------------------------------------------------------------------------------------------------*/
+#list-divider {
+    background-color: #D3D3D3;
+    font-size: 16px;
+    font-weight: bold;
+}
+
 #hidden-shell-iframe {
     display: none;
 }
