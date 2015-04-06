@@ -57,7 +57,7 @@ define('app/views/machine_list', ['app/views/page'],
                         $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
                     }
 
-                    if (machine.get('canConnect') && machine.state == 'running') {
+                    if (machine.get('canConnect') && machine.state == 'running' && !machine.get('isWindows')) {
                         $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');
