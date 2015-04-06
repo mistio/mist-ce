@@ -149,7 +149,7 @@ define('app/models/machine', ['ember'],
                 var url = '/backends/' + this.get('backend.id') +
                     '/machines/' + this.get('id') + '/rdp?' +
                     'host=' + this.get('host') + '&' +
-                    'rpd_port=' + port;
+                    'rdp_port=' + port;
                 return url;
             }.property('isWindows', 'host', 'extra'),
 
