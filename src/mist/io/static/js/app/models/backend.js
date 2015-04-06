@@ -74,8 +74,8 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             }.property('provider'),
 
             canCreateMachine: function () {
-                return this.enabled &&
-                    ['indonesian_vcloud', 'bare_metal', 'libvirt'].indexOf(this.provider) == -1;
+                return this.enabled && 
+                    ['indonesian_vcloud', 'bare_metal', 'libvirt', 'vsphere'].indexOf(this.provider) == -1;
             }.property('provider', 'enabled'),
 
             className: function () {

@@ -1860,6 +1860,26 @@ var PROVIDER_MAP = {
             name: 'organization',
             type: 'text'
         }
+    ],
+    vsphere: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'VMware vSphere'
+        },
+        {
+            name: 'username',
+            type: 'text'
+        },
+        {
+            name: 'password',
+            type: 'password'
+        },
+        {
+            name: 'host',
+            type: 'text',
+            label: 'Hostname',
+        }
     ]
 };
 
@@ -1908,5 +1928,8 @@ var OS_MAP = [
     ],
     [
         ['amazon'], 'amazon'
+    ],
+    [
+        ['windows'], 'windows'
     ]
 ];

@@ -42,6 +42,7 @@
 
 
         <!-- If machine is not running created, disable keys UI -->
+        {{#unless isWindows}}
         <span id="mist-manage-keys"
             {{bind-attr
                 class="view.isRunning::ui-state-disabled
@@ -68,6 +69,7 @@
                 {{/if}}
             {{/unless}}
         </span>
+        {{/unless}}
     </div>
 
     <div data-role="content" data-theme="a">
@@ -252,11 +254,12 @@
                 {{action "tagsClicked" target="view"}}>Tags</a>
         </td><td>
             <a id="single-machine-shell-btn"
-                {{bind-attr class="hasShell::ui-state-disabled
+                {{bind-attr class="canConnect::ui-state-disabled
+                    isWindows:ui-state-disabled
                     :ui-btn
                     :ui-btn-icon-left
                     :ui-icon-gear"}}
-                {{action "shellClicked" target="view"}}>Shell</a>
+                {{action "shellClicked" target="view"}}>{{connectText}}</a>
         </td><td>
             <a id="single-machine-power-btn"
                 {{bind-attr class="id::ui-state-disabled
