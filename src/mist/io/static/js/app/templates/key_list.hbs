@@ -19,11 +19,8 @@
            {{action "selectClicked" target="view"}}>Select</a>
 
         <a id="add-key-btn"
-           class="responsive-button"
-           data-role="button"
-           data-icon="plus"
-           data-iconpos="right"
-           data-theme="d"
+           class="responsive-button  ui-btn ui-btn-d ui-icon-plus
+                ui-btn-icon-right ui-shadow ui-corner-all"
            {{action "addClicked" target="view"}}>Add</a>
 
         <ul data-role="listview"
@@ -59,11 +56,14 @@
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
-            <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
+            <a class="ui-btn ui-icon-edit ui-btn-icon-left ui-shadow ui-corner-all"
+                {{action "renameClicked" target="view"}}>Rename</a>
         </td><td>
-            <a data-role="button" data-icon="delete" {{action "deleteClicked" target="view"}}>Delete</a>
+            <a class="ui-btn ui-icon-delete ui-btn-icon-left ui-shadow ui-corner-all"
+                {{action "deleteClicked" target="view"}}>Delete</a>
         </td><td>
-            <a data-role="button" data-icon="gear" {{action "setDefaultClicked" target="view"}}>Set default</a>
+            <a class="ui-btn ui-icon-gear ui-btn-icon-left ui-shadow ui-corner-all"
+                {{action "setDefaultClicked" target="view"}}>Set default</a>
         </td></tr></tbody></table>
     </div>
 
