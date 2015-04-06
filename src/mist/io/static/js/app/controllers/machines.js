@@ -314,7 +314,8 @@ define('app/controllers/machines', ['app/models/machine'],
                         machine.set('state', 'pending');
                     this.content.addObject(machine);
                     this.content.removeObject(dummyMachine);
-                    Mist.keysController._associateKey(key.id, machine);
+                    if (key && key.id)
+                        Mist.keysController._associateKey(key.id, machine);
                     this.trigger('onMachineListChange');
                 });
             },

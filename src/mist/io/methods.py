@@ -2242,6 +2242,11 @@ def ssh_command(user, backend_id, machine_id, host, command,
 
     """
 
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    else:
+        backend = user.backends[backend_id]
+
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
                                            key_id, username, password, port)
@@ -2380,7 +2385,7 @@ def list_backends(user):
     ret = []
     for backend_id in user.backends:
         backend = user.backends[backend_id]
-        ret.append({'id': backend_id,
+        info = {'id': backend_id,
                     'apikey': backend.apikey,
                     'title': backend.title or backend.provider,
                     'provider': backend.provider,
@@ -2391,7 +2396,13 @@ def list_backends(user):
                     # for Provider.RACKSPACE (the new Nova provider)
                     ## 'datacenter': backend.datacenter,
                     'enabled': backend.enabled,
-                    'tenant_name': backend.tenant_name})
+                    'tenant_name': backend.tenant_name}
+
+        if backend.provider == 'docker':
+            info['docker_port'] = backend.docker_port
+
+        ret.append(info)
+
     return ret
 
 
@@ -3014,7 +3025,6 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='',
         macs[ips[i]] = m[i]
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
-
 
     return {
         'uptime': uptime,

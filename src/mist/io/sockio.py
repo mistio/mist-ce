@@ -86,6 +86,7 @@ class ShellNamespace(CustomNamespace):
         super(ShellNamespace, self).init()
         self.channel = None
         self.ssh_info = {}
+        self.provider = ''
 
     def on_shell_open(self, data):
         if self.ssh_info:
@@ -98,22 +99,30 @@ class ShellNamespace(CustomNamespace):
             'rows': data['rows'],
         }
         log.info("opened shell")
+        self.provider = data.get('provider', '')
         self.shell = Shell(data['host'])
         try:
             key_id, ssh_user = self.shell.autoconfigure(
                 self.user, data['backend_id'], data['machine_id']
             )
         except Exception as exc:
-            if isinstance(exc, MachineUnauthorizedError):
-                err = 'Permission denied (publickey).'
+            if self.provider == 'docker':
+                self.shell = Shell(data['host'], provider=data.get('provider', ''))
+                key_id, ssh_user = self.shell.autoconfigure(
+                    self.user, data['backend_id'], data['machine_id']
+                )
             else:
-                err = str(exc)
-            self.ssh_info['error'] = err
-            self.emit_shell_data(err)
-            self.disconnect()
-            return
+                log.info(str(exc))
+                if isinstance(exc, MachineUnauthorizedError):
+                    err = 'Permission denied (publickey).'
+                else:
+                    err = str(exc)
+                self.ssh_info['error'] = err
+                self.emit_shell_data(err)
+                self.disconnect()
+                return
         self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
-        self.channel = self.shell.ssh.invoke_shell('xterm', data['cols'], data['rows'])
+        self.channel = self.shell.invoke_shell('xterm', data['cols'], data['rows'])
         self.spawn(self.get_ssh_data)
 
     def on_shell_data(self, data):
@@ -128,9 +137,18 @@ class ShellNamespace(CustomNamespace):
 
     def get_ssh_data(self):
         try:
+            if self.provider == 'docker':
+                try:
+                    self.channel.send('\n')
+                except:
+                    pass
             while True:
                 wait_read(self.channel.fileno())
-                data = self.channel.recv(1024).decode('utf-8','ignore')
+                try:
+                    data = self.channel.recv(1024).decode('utf-8', 'ignore')
+                except TypeError:
+                    data = self.channel.recv().decode('utf-8', 'ignore')
+
                 if not len(data):
                     return
                 self.emit_shell_data(data)
