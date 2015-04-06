@@ -74,8 +74,6 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
             showGraphs: function () {
 
-                if (Mist.graphsController.isOpen)
-                    return;
                 if (!Mist.monitored_machines)
                    return;
 
@@ -83,7 +81,8 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 var loadMetric = Mist.metricsController.getMetric('load.shortterm');
                 Mist.monitored_machines.forEach(function (machineTuple) {
                     var backend = Mist.backendsController.getBackend(machineTuple[0]);
-                    if (!backend) return;
+                    if (!backend || !backend.get('enabled'))
+                        return
                     var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
                     if (!machine) return;
                     Mist.datasourcesController.addDatasource({
@@ -94,6 +93,23 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                         }
                     });
                 });
+
+                if (Mist.graphsController.isOpen) {
+                    var listChanged = false;
+                    var existingDatasources = Mist.graphsController.content[0].datasources;
+                    datasources.some(function (datasource) {
+                        var exists = existingDatasources.findBy('id', datasource.id);
+                        if (!exists) {
+                            listChanged = true;
+                            return true;
+                        }
+                    });
+                    if (existingDatasources.length != datasources.length)
+                        listChanged = true;
+                    if (!listChanged)
+                        return;
+                    Mist.graphsController.close();
+                }
 
                 if (!datasources.length)
                     return;
@@ -122,7 +138,7 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
             checkedMonitoringObserver: function () {
                 Ember.run.later(this, function () {
-                    if (Mist.backendsController.checkedMonitoring)
+                    if (this.$() && Mist.backendsController.checkedMonitoring)
                         this.showGraphs();
                 }, 500); // to make sure datasources exist
             }.observes('Mist.backendsController.checkedMonitoring')

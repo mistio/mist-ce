@@ -1,14 +1,18 @@
-define('app/controllers/rules', ['app/models/rule', 'ember'],
+define('app/controllers/rules',
+    [
+        'app/controllers/base_array',
+        'app/models/rule',
+    ],
     //
     //  Rules Controller
     //
     //  @returns Class
     //
-    function (Rule) {
+    function (BaseArrayController, RuleModel) {
 
         'use strict';
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return BaseArrayController.extend({
 
 
             //
@@ -17,8 +21,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             //
             //
 
-
-            content: [],
+            model: RuleModel,
             creationPending: false,
 
             aggregateList: [{
@@ -50,21 +53,18 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
             //
             //
-            //  Initialization
-            //
-            //
-
-
-            load: function(rules) {
-                this._updateContent(rules);
-            },
-
-
-            //
-            //
             //  Methods
             //
             //
+
+
+            setContent: function (content) {
+                var contentToArray = [];
+                forIn(content, function (rule) {
+                    contentToArray.push(rule);
+                });
+                this._super(contentToArray);
+            },
 
 
             newRule: function (machine, callback) {
@@ -79,7 +79,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     'value': 5,
                     'action': 'alert'
                 }).success(function (rule) {
-                    that._addRule(rule);
+                    that._addObject(rule);
                 }).error(function (message) {
                     Mist.notificationController.notify(
                         'Error while creating rule: ' + message);
@@ -95,7 +95,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 rule.set('pendingAction', true);
                 Mist.ajax.DELETE('/rules/' + rule.id, {
                 }).success(function(){
-                    that._deleteRule(rule);
+                    that._deleteObject(rule);
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Error while deleting rule: ' + message);
@@ -120,7 +120,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 Mist.ajax.POST('/rules',
                     payload
                 ).success(function (data) {
-                    that._updateRule(args.rule, data);
+                    that._updateObject(data);
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Error while updating rule: ' + message);
@@ -131,21 +131,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
-            ruleExists: function (ruleId) {
-                return !!this.getRuleById(ruleId);
-            },
-
-
-            getRule: function (ruleId) {
-                return this.getRuleById(ruleId);
-            },
-
-
-            getRuleById: function(ruleId) {
-                return this.content.findBy('id', ruleId);
-            },
-
-
             getOperatorByTitle: function(ruleTitle) {
                 return this.operatorList.findBy('title', ruleTitle);
             },
@@ -153,72 +138,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
             getAggregateByValue: function (aggregateValue) {
                 return this.aggregateList.findBy('value', aggregateValue);
-            },
-
-
-            //
-            //
-            //  Pseudo-Private Methods
-            //
-            //
-
-
-            _updateContent: function (rules) {
-                Ember.run(this, function() {
-
-                    // Remove deleted rules
-                    this.content.forEach(function (rule) {
-                        if (!rules[rule.id])
-                            this._deleteRule(rule);
-                    }, this);
-
-                    forIn(this, rules, function (rule, ruleId) {
-
-                        rule.id = ruleId;
-
-                        var oldRule = this.getRuleById(ruleId);
-
-                        if (oldRule)
-                            this._updateRule(oldRule, rule);
-                        else
-                            // Add new rules
-                            this._addRule(rule);
-                    });
-
-                    this.trigger('onRuleListChange');
-                });
-            },
-
-
-            _addRule: function (rule) {
-                Ember.run(this, function () {
-                    var newRule = Rule.create(rule);
-                    if (this.ruleExists(rule.id)) return;
-                    this.content.addObject(newRule);
-                    this.trigger('onRuleAdd', {
-                        rule: newRule
-                    });
-                });
-            },
-
-
-            _updateRule: function (rule, data) {
-                Ember.run(this, function () {
-                    rule.updateFromRawData(data);
-                    this.trigger('onRuleUpdate', {
-                        rule: rule,
-                    });
-                });
-            },
-
-
-            _deleteRule: function (rule) {
-                Ember.run(this, function () {
-                    this.content.removeObject(rule);
-                    this.trigger('onRuleDelete', {
-                        rule: rule
-                    });
-                });
             },
 
 

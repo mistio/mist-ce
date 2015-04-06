@@ -124,7 +124,7 @@ class Backend(OODict):
             concat = "%s%s%s%s%s" % (self.provider, self.region, self.apikey, self.apiurl, self.tenant_name)
         elif self.provider == 'libvirt':
             concat = "%s%s" % (self.provider, self.apiurl)
-        elif self.provider in ['vcloud', 'indonesian_vcloud']:
+        elif self.provider in ['vcloud', 'indonesian_vcloud', 'vsphere']:
             concat = "%s%s%s%s" % (self.provider, self.apikey, self.apisecret, self.apiurl)
         else:
             concat = '%s%s%s' % (self.provider, self.region, self.apikey)

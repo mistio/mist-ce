@@ -58,8 +58,6 @@
 
     {{view "machinePower" position="#machines-power-btn"}}
 
-    {{view "confirmationDialog"}}
-
     <div id="select-machines-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
         <ul data-role="listview">
             <li data-icon="false">
@@ -84,7 +82,7 @@
         <table><tbody><tr><td>
             <a id="machines-tags-btn" data-role="button" data-icon="grid" {{action "tagsClicked" target="view"}}>Tags</a>
         </td><td>
-            <a id="machines-shell-btn" data-role="button" data-icon="gear" {{action "shellClicked" target="view"}}>Shell</a>
+            <a id="machines-shell-btn" data-role="button" data-icon="gear" {{action "shellClicked" target="view"}}>{{view.connectText}}</a>
         </td><td>
             <a id="machines-power-btn" data-role="button" data-icon="power" {{action "powerClicked" target="view"}}>Power</a>
         </td></tr></tbody></table>
