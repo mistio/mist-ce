@@ -103,9 +103,6 @@
     <script type="text/x-handlebars" data-template-name="scripts">
         {{view "scriptList"}}
     </script>
-    <script type="text/x-handlebars" data-template-name="logs">
-        {{view "logList"}}
-    </script>
 </body>
 
 </html>

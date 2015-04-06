@@ -260,6 +260,7 @@ var appLoader = {
 var loadFiles = function (callback) {
     require([
         'app/templates/templates',
+
         'app/controllers/backend_add',
         'app/controllers/backend_edit',
         'app/controllers/backends',
@@ -291,6 +292,19 @@ var loadFiles = function (callback) {
         'app/controllers/script_edit',
         'app/controllers/script_run',
         'app/controllers/scripts',
+
+        'app/routes/images',
+        'app/routes/index',
+        'app/routes/key',
+        'app/routes/keys',
+        'app/routes/machine',
+        'app/routes/machines',
+        'app/routes/missing',
+        'app/routes/network',
+        'app/routes/networks',
+        'app/routes/script',
+        'app/routes/scripts',
+
         'app/views/backend_add',
         'app/views/backend_button',
         'app/views/backend_edit',
@@ -428,174 +442,6 @@ var loadApp = function (
         });
         this.route('logs');
         this.route('missing', { path: "/*path" });
-    });
-
-    App.IndexRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - home';
-            });
-        }
-    });
-
-    App.ImagesRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
-                document.title = 'mist.io - images';
-            });
-        }
-    });
-
-    App.NetworksRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - networks';
-            });
-        },
-        exit: function() {
-            Mist.backendsController.forEach(function (backend) {
-                backend.networks.forEach(function (network) {
-                    network.set('selected', false);
-                });
-            });
-        }
-    });
-
-    App.NetworkRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('network');
-                var id = model._id || model.id;
-                var network = Mist.backendsController.getNetwork(id);
-                document.title = 'mist.io - ' + (network ? network.name : id);
-            });
-        },
-        redirect: function (network) {
-            Mist.backendsController.set('networkRequest', network._id);
-        },
-        model: function (args) {
-            var id = args.network_id;
-            if (Mist.backendsController.loading ||
-                Mist.backendsController.loadingNetworks)
-                    return {_id: id, backend: {}};
-            return Mist.backendsController.getNetwork(id);
-        }
-    });
-
-    App.MachinesRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
-                document.title = 'mist.io - machines';
-            });
-        },
-        exit: function() {
-            Mist.backendsController.forEach(function(backend) {
-                backend.machines.forEach(function(machine) {
-                    machine.set('selected', false);
-                });
-            });
-        }
-    });
-
-    App.MachineRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('machine');
-                var id = model._id || model.id;
-                var machine = Mist.backendsController.getMachine(id);
-                document.title = 'mist.io - ' + (machine ? machine.name : id);
-            });
-        },
-        redirect: function (machine) {
-            Mist.backendsController.set('machineRequest', machine._id);
-        },
-        model: function (args) {
-            var id = args.machine_id;
-            if (Mist.backendsController.loading ||
-                Mist.backendsController.loadingMachines)
-                    return {_id: id, backend: {}};
-            return Mist.backendsController.getMachine(id);
-        }
-    });
-
-    App.KeysRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - keys';
-            });
-        },
-        exit: function () {
-            Mist.keysController.content.setEach('selected', false);
-        }
-    });
-
-    App.KeyRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('key');
-                var id = model._id || model.id;
-                var key = Mist.keysController.getKey(id);
-                document.title = 'mist.io - ' + (key ? key.id : id);
-            });
-        },
-        redirect: function (key) {
-            Mist.keysController.set('keyRequest', key._id);
-        },
-        model: function (args) {
-            var id = args.key_id;
-            if (Mist.keysController.loading)
-                return {_id: id, machines: []};
-            return Mist.keysController.getKey(id);
-        }
-    });
-
-    App.LogsRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - logs';
-            });
-        },
-    });
-
-    if (Mist.isCore) {
-    App.ScriptsRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - scripts';
-            });
-        },
-        exit: function () {
-            Mist.scriptsController.setEach('selected', false);
-        }
-    });
-
-    App.ScriptRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('script');
-                var id = model._id || model.id;
-                var script = Mist.scriptsController.getObject(id);
-                document.title = 'mist.io - ' + (script ? script.id : id);
-            });
-        },
-        redirect: function (script) {
-            Mist.scriptsController.set('scriptRequest', script._id);
-        },
-        model: function (args) {
-            var id = args.script_id;
-            if (Mist.scriptsController.loading)
-                return {_id: id};
-            return Mist.scriptsController.getObject(id);
-        }
-    });
-    }
-
-    App.MissingRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - 404';
-            });
-        },
     });
 
     // Ember controllers
