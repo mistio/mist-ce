@@ -10,7 +10,7 @@ except ImportError:
 @when(u'I visit mist.io')
 def visit(context):
     if not LOCAL:
-        end_time = time() + 120
+        end_time = time() + 160
 
         while time() < end_time:
             try:
@@ -20,7 +20,7 @@ def visit(context):
             except:
                 sleep(5)
     else:
-        end_time = time() + 60
+        end_time = time() + 120
         while time() < end_time:
             try:
                 context.browser.get(context.mist_url)

@@ -1,19 +1,16 @@
-define('app/models/size', ['ember'],
-    /**
-     *  Size Model
-     *
-     *  @returns Class
-     */
-    function () {
-        return Ember.Object.extend({
+define('app/models/size', ['app/models/base'],
+    //
+    //  Size Model
+    //
+    //  @returns Class
+    //
+    function (BaseModel) {
 
-            /**
-             *  Properties
-             */
+        'use strict';
 
-            id: null,
+        return BaseModel.extend({
+
             ram: null,
-            name: null,
             disk: null,
             price: null,
             driver: null,

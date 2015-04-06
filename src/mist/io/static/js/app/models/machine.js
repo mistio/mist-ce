@@ -91,8 +91,13 @@ define('app/models/machine', ['ember'],
             }.property('imageId'),
 
 
+            hasShell: function () {
+                return this.get('hasKeys') || this.get('backend').get('isDocker');
+            }.property('hasKeys', 'backend.isDocker'),
+
+
             hasKeys: function () {
-                return !!Mist.keysController.getMachineKeysCount(this)
+                return !!Mist.keysController.getMachineKeysCount(this);
             }.property('Mist.keysController.content.@each.machines'),
 
 
@@ -110,8 +115,8 @@ define('app/models/machine', ['ember'],
 
 
             canConnect: function () {
-                return this.get('isWindows') || this.get('hasKeys');
-            }.property('isWindows', 'hasKeys'),
+                return this.get('isWindows') || this.get('hasShell');
+            }.property('isWindows', 'hasShell'),
 
 
             connectText: function () {

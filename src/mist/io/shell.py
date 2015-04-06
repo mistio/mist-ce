@@ -5,11 +5,16 @@ SSH.
 
 """
 
-from time import time
+from time import time, sleep
 from StringIO import StringIO
 
 import paramiko
+import websocket
 import socket
+import uuid
+import thread
+import ssl
+import tempfile
 
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
@@ -30,7 +35,7 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 
-class Shell(object):
+class ParamikoShell(object):
     """sHell
 
     This class takes care of all SSH related issues. It initiates a connection
@@ -363,3 +368,179 @@ class Shell(object):
 
     def __del__(self):
         self.disconnect()
+
+
+class DockerShell(object):
+    """
+    Docker Shell achieved through the docker hosts API, by opening a websocket
+    """
+    def __init__(self, host):
+        self.host = host
+        self.ws = websocket.WebSocket()
+        self.protocol = "ws"
+        self.uri = ""
+        self.sslopt = {}
+        self.buffer = ""
+
+    def autoconfigure(self, user, backend_id, machine_id, **kwargs):
+        log.info("autoconfiguring DockerShell for machine %s:%s",
+                 backend_id, machine_id)
+        if backend_id not in user.backends:
+            raise BackendNotFoundError(backend_id)
+
+        backend = user.backends[backend_id]
+        docker_port = backend.docker_port
+
+        # For basic auth
+        if backend.apikey and backend.apisecret:
+            self.uri = "://%s:%s@%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
+                       (backend.apikey, backend.apisecret, self.host, docker_port, machine_id)
+        else:
+            self.uri = "://%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
+                       (self.host, docker_port, machine_id)
+
+        # For tls
+        if backend.key_file and backend.cert_file:
+            self.protocol = "wss"
+            tempkey = tempfile.NamedTemporaryFile(delete=False)
+            with open(tempkey.name, "w") as f:
+                f.write(backend.key_file)
+            tempcert = tempfile.NamedTemporaryFile(delete=False)
+            with open(tempcert.name, "w") as f:
+                f.write(backend.cert_file)
+
+            self.sslopt = {
+                'cert_reqs': ssl.CERT_NONE,
+                'keyfile': tempkey.name,
+                'certfile': tempcert.name
+            }
+            self.ws = websocket.WebSocket(sslopt=self.sslopt)
+
+        self.uri = self.protocol + self.uri
+
+        log.info(self.uri)
+
+        self.connect()
+
+        # This need in order to be consistent with the ParamikoShell
+        return None, None
+
+    def connect(self):
+        try:
+            self.ws.connect(self.uri)
+        except websocket.WebSocketException:
+            raise MachineUnauthorizedError()
+
+    def disconnect(self, **kwargs):
+        try:
+            self.ws.send_close()
+            self.ws.close()
+        except:
+            pass
+
+    def _wrap_command(self, cmd):
+        if cmd[-1] is not "\n":
+            cmd = cmd + "\n"
+        return cmd
+
+    def command(self, cmd):
+        self.cmd = self._wrap_command(cmd)
+        log.error(self.cmd)
+
+        self.ws = websocket.WebSocketApp(self.uri,
+                                         on_message=self._on_message,
+                                         on_error=self._on_error,
+                                         on_close=self._on_close)
+
+        log.error(self.ws)
+        self.ws.on_open = self._on_open
+        self.ws.run_forever(ping_interval=3, ping_timeout=10)
+        self.ws.close()
+        retval = 0
+        output = self.buffer.split("\n")[1:-1]
+        return retval, "\n".join(output)
+
+    def _on_message(self, ws, message):
+        self.buffer = self.buffer + message
+
+    def _on_close(self, ws):
+        ws.close()
+        self.ws.close()
+
+    def _on_error(self, ws, error):
+        log.error("Got Websocker error: %s" % error)
+
+    def _on_open(self, ws):
+        def run(*args):
+            ws.send(self.cmd)
+            sleep(1)
+        thread.start_new_thread(run, ())
+
+
+    def __del__(self):
+        self.disconnect()
+
+
+class Shell(object):
+    """
+    Proxy Shell Class to distinguish weather we are talking about Docker or Paramiko Shell
+    """
+    def __init__(self, host, provider=None, username=None, key=None, password=None, port=22, enforce_paramiko=False):
+        """
+
+        :param provider: If docker, then DockerShell
+        :param host: Host of machine/docker
+        :param enforce_paramiko: If True, then Paramiko even for Docker containers. This is useful
+        if we want SSH Connection to Docker containers
+        :return:
+        """
+
+        self._shell = None
+        self.host = host
+        self.channel = None
+        self.ssh = None
+
+        if provider == 'docker' and not enforce_paramiko:
+            self._shell = DockerShell(host)
+        else:
+            self._shell = ParamikoShell(host, username=username, key=key, password=password, port=port)
+            self.ssh = self._shell.ssh
+
+    def autoconfigure(self, user, backend_id, machine_id, key_id=None,
+                      username=None, password=None, port=22):
+        if isinstance(self._shell, ParamikoShell):
+            return self._shell.autoconfigure(user, backend_id, machine_id, key_id=key_id,
+                                             username=username, password=password, port=port)
+        elif isinstance(self._shell, DockerShell):
+            return self._shell.autoconfigure(user, backend_id, machine_id)
+
+    def connect(self, username, key=None, password=None, port=22):
+        if isinstance(self._shell, ParamikoShell):
+            self._shell.connect(username, key=key, password=password, port=port)
+        elif isinstance(self._shell, DockerShell):
+            self._shell.connect()
+
+    def invoke_shell(self, term='xterm', cols=None, rows=None):
+        if isinstance(self._shell, ParamikoShell):
+            return self._shell.ssh.invoke_shell(term, cols, rows)
+        elif isinstance(self._shell, DockerShell):
+            return self._shell.ws
+
+    def recv(self, default=1024):
+        if isinstance(self._shell, ParamikoShell):
+            return self._shell.ssh.recv(default)
+        elif isinstance(self._shell, DockerShell):
+            return self._shell.ws.recv()
+
+    def disconnect(self):
+            self._shell.disconnect()
+
+    def command(self, cmd, pty=True):
+        if isinstance(self._shell, ParamikoShell):
+            return self._shell.command(cmd, pty=pty)
+        elif isinstance(self._shell, DockerShell):
+            return self._shell.command(cmd)
+
+    def command_stream(self, cmd):
+        if isinstance(self._shell, ParamikoShell):
+            yield self._shell.command_stream(cmd)

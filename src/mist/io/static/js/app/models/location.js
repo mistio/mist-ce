@@ -1,21 +1,21 @@
-define('app/models/location', ['ember'],
-    /**
-     * Location model
-     *
-     * @returns Class
-     */
-    function() {
-        return Ember.Object.extend({
-            id: null,
-            name: null,
+define('app/models/location', ['app/models/base'],
+    //
+    //  Location model
+    //
+    //  @returns Class
+    //
+    function (BaseModel) {
+
+        'use strict';
+
+        return BaseModel.extend({
+
             country: null,
-            init: function () {
-                this._super();
-                this.nameObserver();
-            },
-            nameObserver: function () {
-                this.set('name', this.name || 'Default');
-            }.observes('name')
+            processProperties: {
+                name: function (name) {
+                    return name || 'Default';
+                }
+            }
         });
     }
 );

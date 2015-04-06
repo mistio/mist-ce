@@ -219,6 +219,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 Ember.run(this, function () {
                     this.set('machineCount', this.machines.content.length);
                     this.trigger('onMachineListChange');
+                    Mist.backendsController.trigger('onMachineListChange');
                 });
             },
 
