@@ -2415,6 +2415,33 @@ function program36(depth0,data) {
   return buffer;
   }
 
+function program38(depth0,data) {
+  
+  var buffer = '';
+  data.buffer.push("\n                <a id=\"single-machine-shell-btn\"\n                    target=\"_blank\"\n                    ");
+  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
+    'href': ("rdpURL"),
+    'class': ("canConnect::ui-state-disabled\n                        :ui-btn\n                        :ui-btn-icon-left\n                        :ui-icon-gear")
+  },hashTypes:{'href': "STRING",'class': "STRING"},hashContexts:{'href': depth0,'class': depth0},contexts:[],types:[],data:data})));
+  data.buffer.push(">Connect</a>\n            ");
+  return buffer;
+  }
+
+function program40(depth0,data) {
+  
+  var buffer = '';
+  data.buffer.push("\n                <a id=\"single-machine-shell-btn\"\n                    ");
+  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
+    'class': ("canConnect::ui-state-disabled\n                        :ui-btn\n                        :ui-btn-icon-left\n                        :ui-icon-gear")
+  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
+  data.buffer.push("\n                    ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "shellClicked", {hash:{
+    'target': ("view")
+  },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(">Shell</a>\n            ");
+  return buffer;
+  }
+
   data.buffer.push("<div id=\"single-machine-page\" data-role=\"page\" class=\"ui-page-active\" data-theme=\"a\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a class=\"ui-btn\n                ui-btn-icon-left\n                ui-icon-arrow-l\n                responsive-button\"\n            href=\"#/machines\">Machines</a>\n\n        <h1>");
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -2500,18 +2527,10 @@ function program36(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "tagsClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Tags</a>\n        </td><td>\n            <a id=\"single-machine-shell-btn\"\n                ");
-  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'class': ("canConnect::ui-state-disabled\n                    isWindows:ui-state-disabled\n                    :ui-btn\n                    :ui-btn-icon-left\n                    :ui-icon-gear")
-  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push("\n                ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "shellClicked", {hash:{
-    'target': ("view")
-  },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">");
-  stack1 = helpers._triageMustache.call(depth0, "connectText", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push(">Tags</a>\n        </td><td>\n            ");
+  stack1 = helpers['if'].call(depth0, "isWindows", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(40, program40, data),fn:self.program(38, program38, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</a>\n        </td><td>\n            <a id=\"single-machine-power-btn\"\n                ");
+  data.buffer.push("\n        </td><td>\n            <a id=\"single-machine-power-btn\"\n                ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'class': ("id::ui-state-disabled\n                    :ui-btn\n                    :ui-btn-icon-left\n                    :ui-icon-power")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
@@ -2719,6 +2738,33 @@ function program6(depth0,data) {
   return buffer;
   }
 
+function program8(depth0,data) {
+  
+  var buffer = '';
+  data.buffer.push("\n                <a id=\"single-machine-shell-btn\"\n                    target=\"_blank\"\n                    ");
+  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
+    'href': ("view.selectedMachine.rdpURL"),
+    'class': ("view.selectedMachine.canConnect::ui-state-disabled\n                        :ui-btn\n                        :ui-btn-icon-left\n                        :ui-icon-gear")
+  },hashTypes:{'href': "STRING",'class': "STRING"},hashContexts:{'href': depth0,'class': depth0},contexts:[],types:[],data:data})));
+  data.buffer.push(">Connect</a>\n            ");
+  return buffer;
+  }
+
+function program10(depth0,data) {
+  
+  var buffer = '';
+  data.buffer.push("\n                <a id=\"machines-shell-btn\" ");
+  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
+    'class': ("view.selectedMachine.canConnect::ui-state-disabled\n                    :ui-btn\n                    :ui-btn-icon-left\n                    :ui-icon-gear")
+  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
+  data.buffer.push("\n                    ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "shellClicked", {hash:{
+    'target': ("view")
+  },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(">Shell</a>\n            ");
+  return buffer;
+  }
+
   data.buffer.push("<div id=\"machine-list-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#\" class=\"responsive-button\" data-icon=\"home\">Home</a>\n\n        <h1>Machines</h1>\n\n        ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "userMenu", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
   data.buffer.push("\n\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <a id=\"create-machine-btn\"\n           class=\"responsive-button\"\n           data-role=\"button\"\n           data-icon=\"plus\"\n           data-iconpos=\"right\"\n           data-theme=\"d\"\n           ");
@@ -2759,14 +2805,10 @@ function program6(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "tagsClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Tags</a>\n        </td><td>\n            <a id=\"machines-shell-btn\" data-role=\"button\" data-icon=\"gear\" ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "shellClicked", {hash:{
-    'target': ("view")
-  },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">");
-  stack1 = helpers._triageMustache.call(depth0, "view.connectText", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push(">Tags</a>\n        </td><td>\n            ");
+  stack1 = helpers['if'].call(depth0, "view.selectedMachine.isWindows", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(10, program10, data),fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</a>\n        </td><td>\n            <a id=\"machines-power-btn\" data-role=\"button\" data-icon=\"power\" ");
+  data.buffer.push("\n\n        </td><td>\n            <a id=\"machines-power-btn\" data-role=\"button\" data-icon=\"power\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "powerClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));

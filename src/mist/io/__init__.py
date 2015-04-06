@@ -101,6 +101,7 @@ def add_routes(configurator):
 
     configurator.add_route('machines', '/backends/{backend}/machines')
     configurator.add_route('machine', '/backends/{backend}/machines/{machine}')
+    configurator.add_route('machine_rdp', '/backends/{backend}/machines/{machine}/rdp')
     configurator.add_route('machine_metadata',
                      '/backends/{backend}/machines/{machine}/metadata')
     configurator.add_route('probe', '/backends/{backend}/machines/{machine}/probe')
