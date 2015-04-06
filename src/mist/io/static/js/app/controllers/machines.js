@@ -314,7 +314,8 @@ define('app/controllers/machines', ['app/models/machine'],
                         machine.set('state', 'pending');
                     this.content.addObject(machine);
                     this.content.removeObject(dummyMachine);
-                    Mist.keysController._associateKey(key.id, machine);
+                    if (key && key.id)
+                        Mist.keysController._associateKey(key.id, machine);
                     this.trigger('onMachineListChange');
                 });
             },
@@ -347,7 +348,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     });
 
                     // Pass machine reference to rules
-                    Mist.rulesController.content.forEach(function (rule) {
+                    Mist.rulesController.forEach(function (rule) {
                         if (rule.machine.id) return;
                         if (machine.equals([rule.backend, rule.machine]))
                             rule.set('machine', machine);

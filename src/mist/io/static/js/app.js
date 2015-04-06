@@ -18,7 +18,6 @@ require.config({
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
-        sha256: 'lib/sha256',
         socket: 'lib/socket.io',
         term: 'lib/term'
     },
@@ -261,10 +260,10 @@ var appLoader = {
 var loadFiles = function (callback) {
     require([
         'app/templates/templates',
+
         'app/controllers/backend_add',
         'app/controllers/backend_edit',
         'app/controllers/backends',
-        'app/controllers/confirmation',
         'app/controllers/cookies',
         'app/controllers/datasources',
         'app/controllers/dialog',
@@ -293,10 +292,22 @@ var loadFiles = function (callback) {
         'app/controllers/script_edit',
         'app/controllers/script_run',
         'app/controllers/scripts',
+
+        'app/routes/images',
+        'app/routes/index',
+        'app/routes/key',
+        'app/routes/keys',
+        'app/routes/machine',
+        'app/routes/machines',
+        'app/routes/missing',
+        'app/routes/network',
+        'app/routes/networks',
+        'app/routes/script',
+        'app/routes/scripts',
+
         'app/views/backend_add',
         'app/views/backend_button',
         'app/views/backend_edit',
-        'app/views/confirmation_dialog',
         'app/views/dialog',
         'app/views/file_upload',
         'app/views/graph_button',
@@ -357,7 +368,6 @@ var loadApp = function (
     BackendAddController,
     BackendEditController,
     BackendsController,
-    ConfirmationController,
     CookiesController,
     DatasourcesController,
     DialogController,
@@ -434,174 +444,6 @@ var loadApp = function (
         this.route('missing', { path: "/*path" });
     });
 
-    App.IndexRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - home';
-            });
-        }
-    });
-
-    App.ImagesRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
-                document.title = 'mist.io - images';
-            });
-        }
-    });
-
-    App.NetworksRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - networks';
-            });
-        },
-        exit: function() {
-            Mist.backendsController.forEach(function (backend) {
-                backend.networks.forEach(function (network) {
-                    network.set('selected', false);
-                });
-            });
-        }
-    });
-
-    App.NetworkRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('network');
-                var id = model._id || model.id;
-                var network = Mist.backendsController.getNetwork(id);
-                document.title = 'mist.io - ' + (network ? network.name : id);
-            });
-        },
-        redirect: function (network) {
-            Mist.backendsController.set('networkRequest', network._id);
-        },
-        model: function (args) {
-            var id = args.network_id;
-            if (Mist.backendsController.loading ||
-                Mist.backendsController.loadingNetworks)
-                    return {_id: id, backend: {}};
-            return Mist.backendsController.getNetwork(id);
-        }
-    });
-
-    App.MachinesRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
-                document.title = 'mist.io - machines';
-            });
-        },
-        exit: function() {
-            Mist.backendsController.forEach(function(backend) {
-                backend.machines.forEach(function(machine) {
-                    machine.set('selected', false);
-                });
-            });
-        }
-    });
-
-    App.MachineRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('machine');
-                var id = model._id || model.id;
-                var machine = Mist.backendsController.getMachine(id);
-                document.title = 'mist.io - ' + (machine ? machine.name : id);
-            });
-        },
-        redirect: function (machine) {
-            Mist.backendsController.set('machineRequest', machine._id);
-        },
-        model: function (args) {
-            var id = args.machine_id;
-            if (Mist.backendsController.loading ||
-                Mist.backendsController.loadingMachines)
-                    return {_id: id, backend: {}};
-            return Mist.backendsController.getMachine(id);
-        }
-    });
-
-    App.KeysRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - keys';
-            });
-        },
-        exit: function () {
-            Mist.keysController.content.setEach('selected', false);
-        }
-    });
-
-    App.KeyRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('key');
-                var id = model._id || model.id;
-                var key = Mist.keysController.getKey(id);
-                document.title = 'mist.io - ' + (key ? key.id : id);
-            });
-        },
-        redirect: function (key) {
-            Mist.keysController.set('keyRequest', key._id);
-        },
-        model: function (args) {
-            var id = args.key_id;
-            if (Mist.keysController.loading)
-                return {_id: id, machines: []};
-            return Mist.keysController.getKey(id);
-        }
-    });
-
-    App.LogsRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - logs';
-            });
-        },
-    });
-
-    if (Mist.isCore) {
-    App.ScriptsRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - scripts';
-            });
-        },
-        exit: function () {
-            Mist.scriptsController.setEach('selected', false);
-        }
-    });
-
-    App.ScriptRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('script');
-                var id = model._id || model.id;
-                var script = Mist.scriptsController.getObject(id);
-                document.title = 'mist.io - ' + (script ? script.id : id);
-            });
-        },
-        redirect: function (script) {
-            Mist.scriptsController.set('scriptRequest', script._id);
-        },
-        model: function (args) {
-            var id = args.script_id;
-            if (Mist.scriptsController.loading)
-                return {_id: id};
-            return Mist.scriptsController.getObject(id);
-        }
-    });
-    }
-
-    App.MissingRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - 404';
-            });
-        },
-    });
-
     // Ember controllers
 
     App.set('keysController', KeysController.create());
@@ -626,7 +468,6 @@ var loadApp = function (
     App.set('imageSearchController', ImageSearchController.create());
     App.set('datasourcesController', DatasourcesController.create());
     App.set('machineShellController', MachineShellController.create());
-    App.set('confirmationController', ConfirmationController.create());
     App.set('notificationController', NotificationController.create());
     App.set('dialogController', DialogController.create());
     App.set('machinePowerController', MachinePowerController.create());
@@ -874,12 +715,12 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_sizes', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.sizes.load(data.sizes);
+            backend.sizes.setContent(data.sizes);
     })
     .on('list_images', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.images.load(data.images);
+            backend.images.setContent(data.images);
     })
     .on('list_machines', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -889,7 +730,7 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_locations', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.locations.load(data.locations);
+            backend.locations.setContent(data.locations);
     })
     .on('list_networks', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -2059,71 +1900,76 @@ var PROVIDER_MAP = {
             name: 'organization',
             type: 'text'
         }
+    ],
+    vsphere: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'VMware vSphere'
+        },
+        {
+            name: 'username',
+            type: 'text'
+        },
+        {
+            name: 'password',
+            type: 'password'
+        },
+        {
+            name: 'host',
+            type: 'text',
+            label: 'Hostname',
+        }
     ]
 };
 
-/*
-var SCRIPT_ADD_FIELDS = [
-    {
-        name: 'name',
-        type: 'text'
-    },
-    {
-        name: 'type',
-        type: 'select',
-        options: [
-            {
-                value: 'executable',
-                selected: true
-            },
-            {
-                value: 'ansible'
-            }
-        ]
-    },
-    {
-        name: 'source',
-        type: 'select',
-        options: [
-            {
-                value: 'github',
-                selected: true
-            },
-            {
-                value: 'url',
-            },
-            {
-                value: 'inline'
-            }
-        ]
-    },
-    {
-        conditional: {
-            source: 'url',
-            source: 'github'
-        },
-        fields: [
-            {
-                name: 'url',
-                type: 'text'
-            },
-            {
-                name: 'entry_point',
-                type: 'text',
-                optional: true
-            }
-        ]
-    },
-    {
-        conditional: {
-            source: 'inline'
-        },
-        fields: [
-            {
-                name: 'script',
-                type: 'text'
-            }
-        ]
-    }
+var OS_MAP = [
+    [
+        ['rhel', 'redhat', 'red hat'], 'redhat'
+    ],
+    [
+        ['ubuntu'], 'ubuntu'
+    ],
+    [
+        ['ibm'], 'ibm'
+    ],
+    [
+        ['canonical'], 'canonical'
+    ],
+    [
+        ['sles', 'suse'], 'suse'
+    ],
+    [
+        ['oracle'], 'oracle'
+    ],
+    [
+        ['karmic'], 'karmic'
+    ],
+    [
+        ['opensolaris'], 'opensolaris'
+    ],
+    [
+        ['gentoo'], 'gentoo'
+    ],
+    [
+        ['opensuse'], 'opensuse'
+    ],
+    [
+        ['fedora'], 'fedora'
+    ],
+    [
+        ['centos'], 'centos'
+    ],
+    [
+        ['fedora'], 'fedora'
+    ],
+    [
+        ['debian'], 'debian'
+    ],
+    [
+        ['amazon'], 'amazon'
+    ],
+    [
+        ['windows'], 'windows'
+    ]
 ];
-*/

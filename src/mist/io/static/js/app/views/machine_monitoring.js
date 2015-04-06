@@ -72,8 +72,8 @@ define('app/views/machine_monitoring',
 
                 Mist.set('ma', this);
                 // Add event handlers
-                Mist.rulesController.on('onRuleAdd', this, '_ruleAdded');
-                Mist.rulesController.on('onRuleDelete', this, '_ruleDeleted');
+                Mist.rulesController.on('onAdd', this, '_ruleAdded');
+                Mist.rulesController.on('onDelete', this, '_ruleDeleted');
                 Mist.metricsController.on('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.on('onMetricDelte', this, '_metricDeleted');
                 Mist.metricsController.on('onMetricDisassociate', this, '_metricDeleted');
@@ -85,8 +85,8 @@ define('app/views/machine_monitoring',
             unload: function () {
 
                 // Remove event handlers
-                Mist.rulesController.off('onRuleAdd', this, '_ruleAdded');
-                Mist.rulesController.off('onRuleDelete', this, '_ruleDeleted');
+                Mist.rulesController.off('onAdd', this, '_ruleAdded');
+                Mist.rulesController.off('onDelete', this, '_ruleDeleted');
                 Mist.metricsController.off('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.off('onMetricDelte', this, '_metricDeleted');
                 Mist.metricsController.off('onMetricDisassociate', this, '_metricDeleted');
@@ -409,12 +409,16 @@ define('app/views/machine_monitoring',
 
             _showGraphs: function () {
 
+                if (!this.$())
+                    return;
+
                 var cookie = Mist.cookiesController
                     .getSingleMachineEntry(this.machine);
 
                 if (Mist.graphsController.isOpen)
                     return;
                 this.set('graphs', this.graphs.sortBy('index'));
+
                 Mist.graphsController.open({
                     graphs: this.graphs,
                     config: {
@@ -441,7 +445,7 @@ define('app/views/machine_monitoring',
 
 
             _updateRules: function () {
-                Mist.rulesController.content.forEach(function (rule) {
+                Mist.rulesController.forEach(function (rule) {
                     if (this.machine.equals(rule.machine))
                         if (!this.rules.findBy('id', rule.id))
                             this.rules.pushObject(rule);
@@ -540,15 +544,15 @@ define('app/views/machine_monitoring',
 
             _ruleAdded: function (event) {
                 if (this.machine.equals)
-                    if (this.machine.equals(event.rule.machine))
-                        this.rules.pushObject(event.rule);
+                    if (this.machine.equals(event.object.machine))
+                        this.rules.pushObject(event.object);
             },
 
 
             _ruleDeleted: function (event) {
                 if (this.machine.equals)
-                    if (this.machine.equals(event.rule.machine))
-                        this.rules.removeObject(event.rule);
+                    if (this.machine.equals(event.object.machine))
+                        this.rules.removeObject(event.object);
             },
 
 

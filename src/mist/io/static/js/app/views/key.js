@@ -159,22 +159,24 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
 
                     var keyId = this.key.id;
 
-                    Mist.confirmationController.set('title', 'Delete key');
-                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyId + '" ?');
-                    Mist.confirmationController.set('callback', function () {
-                        Mist.keysController.deleteKey(keyId, function (success) {
-
-                            // Wait for the confirmation popup to close
-                            // before navigating to #/keys. Else, the
-                            // rest of the popups will never open
-                            Ember.run.later(function () {
-                                if (success)
-                                    Mist.Router.router.transitionTo('keys');
-                            }, 300);
-
-                        });
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Delete key',
+                        body: [
+                            {
+                                paragraph: 'Are you sure you want to delete "' +
+                                    keyId + '" ?'
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm) {
+                                Mist.keysController.deleteKey(keyId, function (success) {
+                                    if (success)
+                                        Mist.Router.router.transitionTo('keys');
+                                });
+                            }
+                        }
                     });
-                    Mist.confirmationController.show();
                 }
             },
 

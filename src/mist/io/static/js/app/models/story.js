@@ -57,7 +57,7 @@ define('app/models/story', ['app/models/base'],
 
 
             rule: function () {
-                return Mist.rulesController.getRule(this.get('ruleId'));
+                return Mist.rulesController.getObject(this.get('ruleId'));
             }.property('ruleId'),
 
 

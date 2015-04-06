@@ -254,6 +254,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     elif provider == 'hostvirtual':
         backend_id, backend = _add_backend_hostvirtual(title, provider, params)
+    elif provider == 'vsphere':
+        backend_id, backend = _add_backend_vsphere(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -271,13 +273,17 @@ def add_backend_v_2(user, title, provider, params):
         except Exception as exc:
             log.error("Error while adding backend%r" % exc)
             raise BackendUnavailableError(exc)
-        try:
-            machines = conn.list_nodes()
-        except InvalidCredsError:
-            raise BackendUnauthorizedError()
-        except Exception as exc:
-            log.error("Error while trying list_nodes: %r", exc)
-            raise BackendUnavailableError(exc=exc)
+        if provider not in ['vshere']:
+            # in some providers -eg vSphere- this is not needed
+            # as we are sure we got a succesfull connection with
+            # the provider if connect_provider doesn't fail
+            try:
+                machines = conn.list_nodes()
+            except InvalidCredsError:
+                raise BackendUnauthorizedError()
+            except Exception as exc:
+                log.error("Error while trying list_nodes: %r", exc)
+                raise BackendUnavailableError(exc=exc)
 
     with user.lock_n_load():
         user.backends[backend_id] = backend
@@ -743,6 +749,34 @@ def _add_backend_hostvirtual(title, provider, params):
     return backend_id, backend
 
 
+def _add_backend_vsphere(title, provider, params):
+    username = params.get('username', '')
+    if not username:
+        raise RequiredParameterMissingError('username')
+
+    password = params.get('password', '')
+    if not password:
+        raise RequiredParameterMissingError('password')
+
+    host = params.get('host', '')
+    if not host:
+        raise RequiredParameterMissingError('host')
+    for prefix in ['https://', 'http://']:
+        host = host.strip(prefix)
+    host = host.split('/')[0]
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = username
+    backend.apisecret = password
+    backend.apiurl = host
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
 def rename_backend(user, backend_id, new_name):
     """Renames backend with given backend_id."""
 
@@ -1123,6 +1157,9 @@ def connect_provider(backend):
     elif backend.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         libcloud.security.VERIFY_SSL_CERT = False;
         conn = driver(backend.apikey, backend.apisecret, host=backend.apiurl)
+    elif backend.provider == Provider.VSPHERE:
+        libcloud.security.VERIFY_SSL_CERT = False;
+        conn = driver(host=backend.apiurl, username=backend.apikey, password=backend.apisecret)
     elif backend.provider == Provider.DIGITAL_OCEAN:
         if backend.apikey == backend.apisecret:  # API v2
             conn = driver(backend.apisecret)
@@ -1169,7 +1206,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL):
+                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE):
         can_tag = False
 
     # for other states
@@ -1216,11 +1253,20 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_destroy = False
         can_start = False
 
+    if conn.type in (config.EC2_PROVIDERS, Provider.LINODE,
+                     Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
+                     Provider.DOCKER, Provider.OPENSTACK, Provider.RACKSPACE):
+        can_rename = True
+    else:
+        can_rename = False
+
+
     return {'can_stop': can_stop,
             'can_start': can_start,
             'can_destroy': can_destroy,
             'can_reboot': can_reboot,
-            'can_tag': can_tag}
+            'can_tag': can_tag,
+            'can_rename': can_rename}
 
 
 def list_machines(user, backend_id):
@@ -2007,12 +2053,12 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
     return node
 
 
-def _machine_action(user, backend_id, machine_id, action, plan_id=None):
+def _machine_action(user, backend_id, machine_id, action, plan_id=None, name=None):
     """Start, stop, reboot, resize and destroy have the same logic underneath, the only
     thing that changes is the action. This helper function saves us some code.
 
     """
-    actions = ('start', 'stop', 'reboot', 'destroy', 'resize')
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename')
 
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
@@ -2085,6 +2131,8 @@ def _machine_action(user, backend_id, machine_id, action, plan_id=None):
                 conn.ex_stop_node(machine)
         elif action is 'resize':
             conn.ex_resize_node(node, plan_id)
+        elif action is 'rename':
+            conn.ex_rename_node(node, name)
         elif action is 'reboot':
             if bare_metal:
                 try:
@@ -2176,6 +2224,11 @@ def reboot_machine(user, backend_id, machine_id):
     _machine_action(user, backend_id, machine_id, 'reboot')
 
 
+def rename_machine(user, backend_id, machine_id, name):
+    """Renames a machine on a certain backend."""
+    _machine_action(user, backend_id, machine_id, 'rename', name=name)
+
+
 def resize_machine(user, backend_id, machine_id, plan_id):
     """Resize a machine on an other plan."""
     _machine_action(user, backend_id, machine_id, 'resize', plan_id=plan_id)
@@ -2234,6 +2287,11 @@ def ssh_command(user, backend_id, machine_id, host, command,
     Raises MachineUnauthorizedError if it doesn't manage to connect.
 
     """
+
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    else:
+        backend = user.backends[backend_id]
 
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
@@ -2373,7 +2431,7 @@ def list_backends(user):
     ret = []
     for backend_id in user.backends:
         backend = user.backends[backend_id]
-        ret.append({'id': backend_id,
+        info = {'id': backend_id,
                     'apikey': backend.apikey,
                     'title': backend.title or backend.provider,
                     'provider': backend.provider,
@@ -2384,7 +2442,13 @@ def list_backends(user):
                     # for Provider.RACKSPACE (the new Nova provider)
                     ## 'datacenter': backend.datacenter,
                     'enabled': backend.enabled,
-                    'tenant_name': backend.tenant_name})
+                    'tenant_name': backend.tenant_name}
+
+        if backend.provider == 'docker':
+            info['docker_port'] = backend.docker_port
+
+        ret.append(info)
+
     return ret
 
 
@@ -3007,7 +3071,6 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user='',
         macs[ips[i]] = m[i]
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
-
 
     return {
         'uptime': uptime,

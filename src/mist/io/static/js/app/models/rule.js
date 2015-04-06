@@ -1,14 +1,14 @@
-define('app/models/rule', ['ember'],
+define('app/models/rule', ['app/models/base'],
     //
     //  Rule Model
     //
     //  @returns Class
-    ///
-    function () {
+    //
+    function (BaseModel) {
 
         'use strict';
 
-        return Ember.Object.extend({
+        return BaseModel.extend({
 
 
             //
@@ -18,7 +18,6 @@ define('app/models/rule', ['ember'],
             //
 
 
-            id: null,
             unit: null,
             value: null,
             metric: null,
@@ -31,27 +30,34 @@ define('app/models/rule', ['ember'],
             actionToTake: null,
             pendingAction: false,
 
-
-            init: function () {
-                this._super();
-                this.updateFromRawData(this);
+            convertProperties: {
+                action: 'actionToTake',
+                reminder_offset: 'timeWindow'
             },
 
-            updateFromRawData: function (data) {
-
-                this.setProperties({
-                    // Rename action attribute because it conflicts with
-                    // handlebar's templating "action" keyword
-                    value: data.value,
-                    actionToTake: data.action,
-                    timeWindow: data.reminder_offset,
-                    operator: Mist.rulesController.getOperatorByTitle(data.operator),
-                    metric: Mist.metricsController.getMetric(data.metric),
-                    aggregate: Mist.rulesController.getAggregateByValue(data.aggregate),
-                    machine: Mist.backendsController.getMachine(
-                        data.machine, data.backend) || data.machine
-                });
+            processProperties: {
+                operator: function (operator) {
+                    return Mist.rulesController.getOperatorByTitle(operator);
+                },
+                metric: function (metricId) {
+                    return Mist.metricsController.getMetric(metricId);
+                },
+                aggregate: function (aggregate) {
+                    return Mist.rulesController.getAggregateByValue(aggregate);
+                },
+                machine: function (machine) {
+                    return Mist.backendsController.getMachine(
+                        machine, this.get('backend')) || machine;
+                },
             },
+
+
+            //
+            //
+            //  Computed Properties
+            //
+            //
+
 
             timeWindowToMins: function () {
                 return (1 + parseInt(this.get('timeWindow') / 60)).toString();

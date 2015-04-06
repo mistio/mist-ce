@@ -87,12 +87,17 @@ define('app/models/machine', ['ember'],
             },
 
             image: function() {
-                return this.backend.images.getImage(this.imageId);
+                return this.get('backend').get('images').getObject(this.imageId);
             }.property('imageId'),
 
 
+            hasShell: function () {
+                return this.get('hasKeys') || this.get('backend').get('isDocker');
+            }.property('hasKeys', 'backend.isDocker'),
+
+
             hasKeys: function () {
-                return !!Mist.keysController.getMachineKeysCount(this)
+                return !!Mist.keysController.getMachineKeysCount(this);
             }.property('Mist.keysController.content.@each.machines'),
 
 
@@ -104,16 +109,19 @@ define('app/models/machine', ['ember'],
             }.property('Mist.openIncidents.@each.machine'),
 
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            isWindows: function () {
+                return this.get('extra') && this.get('extra').os_type == 'windows';
+            }.property('extra'),
 
-            load: function() {
-                this.set('commandHistory', []);
-                //this.probe();
-            }.on('init'),
+
+            canConnect: function () {
+                return this.get('isWindows') || this.get('hasShell');
+            }.property('isWindows', 'hasShell'),
+
+
+            connectText: function () {
+                return this.get('isWindows') ? 'Connect' : 'Shell';
+            }.property('isWindows'),
 
 
             /**
