@@ -365,7 +365,8 @@ ul.checkbox-list li label {
     display: inline-block;
     border: 1px solid #c4c4c4;
 }
-.small-list-item button {
+.small-list-item button,
+.small-list-item a {
     display: inline;
 }
 .small-list-item p {
