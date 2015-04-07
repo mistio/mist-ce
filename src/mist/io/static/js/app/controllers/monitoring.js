@@ -145,7 +145,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
                 Mist.metricsController.setCustomMetrics(data.custom_metrics);
                 Mist.metricsController.setBuiltInMetrics(data.builtin_metrics);
-                Mist.rulesController.load(data.rules);
+                Mist.rulesController.setContent(data.rules);
 
                 Mist.backendsController.content.forEach(function (backend) {
                    backend.machines._updateMonitoredMachines();

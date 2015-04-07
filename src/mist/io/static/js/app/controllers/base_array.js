@@ -18,8 +18,7 @@ define('app/controllers/base_array', ['ember'],
             //
 
 
-            model: null,
-            content: null,
+            loading: true,
             passOnProperties: [],
 
 
@@ -37,39 +36,21 @@ define('app/controllers/base_array', ['ember'],
 
             //
             //
-            //  Initialization
-            //
-            //
-
-
-            load: function () {
-                this.setProperties({
-                    loading: true,
-                    content: new Array(),
-                });
-            }.on('init'),
-
-
-            //
-            //
             //  Public Methods
             //
             //
 
 
             setContent: function (content) {
-                if (!content)
-                    content = [];
-                this.get('passOnProperties').forEach(function (property) {
-                    content.setEach(property, this.get(property));
-                }, this);
+                content = !!content ? content : [];
+                this._passOnProperties(content);
                 this._updateContent(content);
                 this.set('loading', false);
             },
 
 
             getObject: function (id) {
-                return this.get('content').findBy('id', id);
+                return this.findBy('id', id);
             },
 
 
@@ -85,11 +66,17 @@ define('app/controllers/base_array', ['ember'],
             //
 
 
-            _updateContent: function (content) {
+            _passOnProperties: function (content) {
+                this.get('passOnProperties').forEach(function (property) {
+                    content.setEach(property, this.get(property));
+                }, this);
+            },
 
+
+            _updateContent: function (content) {
                 Ember.run(this, function () {
                     // Remove deleted objects
-                    this.get('content').forEach(function (object) {
+                    this.forEach(function (object) {
                         if (!content.findBy('id', object.id))
                             this._deleteObject(object);
                     }, this);
@@ -103,17 +90,22 @@ define('app/controllers/base_array', ['ember'],
                         }
                     }, this);
 
-                    this.trigger('onChange');
+                    this.trigger('onChange', {
+                        objects: this
+                    });
                 });
             },
 
 
             _addObject: function (object) {
                 Ember.run(this, function () {
-                    this.addObject(this.get('model').create(object));
-                    this.trigger('onAdd', {
-                        object: object
-                    });
+                    if (!this.objectExists(object.id)) {
+                        var newObject = this.get('model').create(object);
+                        this.pushObject(newObject);
+                        this.trigger('onAdd', {
+                            object: newObject
+                        });
+                    }
                 });
             },
 
@@ -147,9 +139,11 @@ define('app/controllers/base_array', ['ember'],
 
             selectedObserver: function () {
                 Ember.run.once(this, function () {
-                    this.trigger('onSelectedChange');
+                    this.trigger('onSelectedChange', {
+                        objects: this.get('selectedObjects')
+                    });
                 });
-            }.observes('content.@each.selected')
+            }.observes('@each.selected')
         })
     }
 );

@@ -367,14 +367,15 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 Ember.run(this, function() {
                     var counter = 0;
                     this.content.forEach(function(backend) {
-                        if (backend.enabled) counter += backend.imageCount;
+                        if (backend.enabled)
+                            counter += backend.get('imageCount');
                     });
                     this.set('imageCount', counter);
-                    this.trigger('onImageListChange');
+                    this.trigger('onImagesChange');
                 });
             },
 
-
+ 
             _updateMachineCount: function() {
                 Ember.run(this, function() {
                     var counter = 0;

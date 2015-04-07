@@ -99,12 +99,17 @@ define('app/models/machine', ['ember'],
             },
 
             image: function() {
-                return this.backend.images.getImage(this.imageId);
+                return this.get('backend').get('images').getObject(this.imageId);
             }.property('imageId'),
 
 
+            hasShell: function () {
+                return this.get('hasKeys') || this.get('backend').get('isDocker');
+            }.property('hasKeys', 'backend.isDocker'),
+
+
             hasKeys: function () {
-                return !!Mist.keysController.getMachineKeysCount(this)
+                return !!Mist.keysController.getMachineKeysCount(this);
             }.property('Mist.keysController.content.@each.machines'),
 
 
@@ -142,16 +147,49 @@ define('app/models/machine', ['ember'],
                 return this.get('sortingWeight') + '-' + this.get('name');
             }.property('name','sortingWeight'),
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            isWindows: function () {
+                return this.get('extra') && this.get('extra').os_type == 'windows';
+            }.property('extra'),
 
-            load: function() {
-                this.set('commandHistory', []);
-                //this.probe();
-            }.on('init'),
+
+            canConnect: function () {
+                return this.get('isWindows') || this.get('hasShell');
+            }.property('isWindows', 'hasShell'),
+
+
+            connectText: function () {
+                return this.get('isWindows') ? 'Connect' : 'Shell';
+            }.property('isWindows'),
+
+
+            host: function () {
+                var ips_v4 = [];
+                this.public_ips.forEach(function(ip) {
+                    if (ip.search(':') == -1) {
+                        // this is not an IPv6, so it is supported
+                        ips_v4.push(ip);
+                    }
+                });
+                this.private_ips.forEach(function(ip) {
+                    if (ip.search(':') == -1) {
+                        // this is not an IPv6, so it is supported
+                        ips_v4.push(ip);
+                    }
+                });
+                return ips_v4.length ? ips_v4[0]: '';
+            }.property('public_ips', 'private_ips'),
+
+
+            rdpURL: function () {
+                if (!this.get('isWindows'))
+                    return '';
+                var port = this.get('extra').remote_desktop_port || 3389;
+                var url = '/backends/' + this.get('backend.id') +
+                    '/machines/' + this.get('id') + '/rdp?' +
+                    'host=' + this.get('host') + '&' +
+                    'rdp_port=' + port;
+                return url;
+            }.property('isWindows', 'host', 'extra'),
 
 
             /**

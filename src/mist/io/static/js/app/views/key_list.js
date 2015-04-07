@@ -97,12 +97,20 @@ define('app/views/key_list', ['app/views/page'],
 
                     var keyId = Mist.keysController.selectedKeys[0].id;
 
-                    Mist.confirmationController.set('title', 'Delete key');
-                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyId + '" ?');
-                    Mist.confirmationController.set('callback', function () {
-                        Mist.keysController.deleteKey(keyId);
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Delete key',
+                        body: [
+                            {
+                                paragraph: 'Are you sure you want to delete "' +
+                                    keyId + '" ?'
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm)
+                                Mist.keysController.deleteKey(keyId);
+                        }
                     });
-                    Mist.confirmationController.show();
                 }
             }
         });

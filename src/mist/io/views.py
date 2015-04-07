@@ -525,7 +525,9 @@ def machine_actions(request):
     action = params.get('action', '')
     plan_id = params.get('plan_id', '')
     #plan_id is the id of the plan to resize
-    if action in ('start', 'stop', 'reboot', 'destroy', 'resize'):
+    name = params.get('name', '')
+
+    if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename'):
         if action == 'start':
             methods.start_machine(user, backend_id, machine_id)
         elif action == 'stop':
@@ -536,10 +538,36 @@ def machine_actions(request):
             methods.destroy_machine(user, backend_id, machine_id)
         elif action == 'resize':
             methods.resize_machine(user, backend_id, machine_id, plan_id)
+        elif action == 'rename':
+            methods.rename_machine(user, backend_id, machine_id, name)
         ## return OK
         return methods.list_machines(user, backend_id)
     raise BadRequestError()
 
+
+@view_config(route_name='machine_rdp', request_method='GET', renderer="json")
+def machine_rdp(request):
+    "Generate and return an rdp file for windows machines"
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    user = user_from_request(request)
+    rdp_port = request.params.get('rdp_port',3389)
+    host = request.params.get('host')
+
+    if not host:
+        raise BadRequestError('no hostname specified')
+    try:
+        1 < int(rdp_port) < 65535
+    except:
+        rdp_port = 3389
+
+    rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % (host, rdp_port)
+    return Response(content_type='application/octet-stream',
+                    content_disposition='attachment; filename="%s.rdp"' % host,
+                    charset='utf8',
+                    pragma='no-cache',
+                    body=rdp_content)
+    
 
 @view_config(route_name='machine_metadata', request_method='POST',
              renderer='json')

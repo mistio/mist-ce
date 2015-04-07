@@ -66,7 +66,7 @@ define('app/views/machine_add', ['app/views/templated'],
                 // Add event listeners
                 Mist.scriptsController.on('onChange', this, 'renderFields');
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.on('onImageListChange', this, 'renderFields');
+                Mist.backendsController.on('onImagesChange', this, 'renderFields');
 
                 // Connect view with machineAddController
                 var viewId = $('#create-machine-panel').parent().attr('id');
@@ -80,7 +80,7 @@ define('app/views/machine_add', ['app/views/templated'],
                 // Remove event listeners
                 Mist.scriptsController.off('onChange', this, 'renderFields');
                 Mist.keysController.off('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.off('onImageListChange', this, 'renderFields');
+                Mist.backendsController.off('onImagesChange', this, 'renderFields');
 
              }.on('willDestroyElement'),
 
