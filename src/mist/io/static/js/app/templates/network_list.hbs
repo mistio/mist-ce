@@ -14,11 +14,12 @@
         <a id="network-create-btn"
             {{bind-attr
                 class="Mist.backendsController.hasOpenStack::ui-disabled
-                :responsive-button"}}
-            data-role="button"
-            data-icon="plus"
-            data-iconpos="right"
-            data-theme="d"
+                :responsive-button
+                :ui-btn :ui-btn-d
+                :ui-icon-plus
+                :ui-btn-icon-right
+                :ui-corner-all 
+                :ui-shadow"}}
             {{action "createClicked" target="view"}}>Create</a>
         <ul id="networks"
             data-role="listview"
