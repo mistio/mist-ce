@@ -222,10 +222,10 @@ def add_backend_v_2(user, title, provider, params):
     baremetal = provider == 'bare_metal'
 
     if provider == 'bare_metal':
-        backend_id = _add_backend_bare_metal(user, title, provider, params)
+        backend_id, mon_dict = _add_backend_bare_metal(user, title, provider, params)
         log.info("Backend with id '%s' added succesfully.", backend_id)
         trigger_session_update(user.email, ['backends'])
-        return backend_id
+        return {'backend_id': backend_id, 'monitoring': mon_dict}
     elif provider == 'ec2':
         backend_id, backend = _add_backend_ec2(user, title, params)
     elif provider == 'rackspace':
@@ -298,7 +298,7 @@ def add_backend_v_2(user, title, provider, params):
         username = backend.apikey
         associate_key(user, key_id, backend_id, node_id, username=username)
 
-    return backend_id
+    return {'backend_id': backend_id}
 
 
 def _add_backend_bare_metal(user, title, provider, params):
@@ -366,7 +366,17 @@ def _add_backend_bare_metal(user, title, provider, params):
                 raise MistError("Couldn't connect to host '%s'."
                                 % machine_hostname)
         user.save()
-    return backend_id
+    if params.get('monitoring'):
+        try:
+            from mist.core.methods import enable_monitoring
+        except ImportError:
+            pass
+        mon_dict = enable_monitoring(user, backend_id, machine_id,
+                                     no_ssh=not use_ssh)
+    else:
+        mon_dict = {}
+
+    return backend_id, mon_dict
 
 
 def _add_backend_vcloud(title, provider, params):
@@ -2924,7 +2934,7 @@ def enable_monitoring(user, backend_id, machine_id,
         'no_ssh': True,
         'dry': dry,
         'name': name,
-        'public_ips': ",".join(public_ips),
+        'public_ips': ",".join(public_ips or []),
         'dns_name': dns_name,
         'backend_title': backend.title,
         'backend_provider': backend.provider,
@@ -3595,12 +3605,16 @@ def undeploy_collectd(user, backend_id, machine_id):
     return ret_dict
 
 
-def get_deploy_collectd_manual_command(uuid, password, monitor):
+def get_deploy_collectd_command_unix(uuid, password, monitor):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
     cmd = "wget -O - %s | sudo python - %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
+
+
+def get_deploy_collectd_command_windows(uuid, password, monitor):
+    return "windows sucks (%s, %s, %s)" % (uuid, password, monitor)
 
 
 def machine_name_validator(provider, name):
