@@ -42,7 +42,7 @@ from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
-from mist.io.bare_metal import BareMetalDriver
+from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
 from mist.io.exceptions import *
 
 
@@ -226,6 +226,11 @@ def add_backend_v_2(user, title, provider, params):
         log.info("Backend with id '%s' added succesfully.", backend_id)
         trigger_session_update(user.email, ['backends'])
         return {'backend_id': backend_id, 'monitoring': mon_dict}
+    elif provider == 'coreos':
+        backend_id = _add_backend_coreos(user, title, provider, params)
+        log.info("Backend with id '%s' added succesfully.", backend_id)
+        trigger_session_update(user.email, ['backends'])
+        return {'backend_id': backend_id}
     elif provider == 'ec2':
         backend_id, backend = _add_backend_ec2(user, title, params)
     elif provider == 'rackspace':
@@ -377,6 +382,73 @@ def _add_backend_bare_metal(user, title, provider, params):
         mon_dict = {}
 
     return backend_id, mon_dict
+
+
+def _add_backend_coreos(user, title, provider, params):
+    remove_on_error = params.get('remove_on_error', True)
+    machine_key = params.get('machine_key', '')
+    machine_user = params.get('machine_user', '')
+    os_type = 'coreos'
+
+    try:
+        port = int(params.get('machine_port', 22))
+    except:
+        port = 22
+    machine_hostname = str(params.get('machine_ip', ''))
+
+    if not machine_hostname:
+        raise RequiredParameterMissingError('machine_ip')
+
+    try:
+        socket.gethostbyname(machine_hostname)
+    except socket.gaierror:
+        raise BadRequestError("Hostname '%s' isn't resolvable/accessible."
+                              % machine_hostname)
+
+    use_ssh = remove_on_error and machine_key
+    if use_ssh:
+        if machine_key not in user.keypairs:
+            raise KeypairNotFoundError(machine_key)
+        if not machine_user:
+            machine_user = 'root'
+
+    machine = model.Machine()
+    machine.ssh_port = port
+    if machine_hostname:
+        machine.dns_name = machine_hostname
+        machine.public_ips = [machine_hostname]
+    machine_id = machine_hostname.replace('.', '').replace(' ', '')
+    log.error("########################")
+    log.error("MACHINE_ID %s" % machine_id)
+    machine.name = title
+    machine.os_type = os_type
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.enabled = True
+    backend.machines[machine_id] = machine
+    backend_id = backend.get_id()
+
+    with user.lock_n_load():
+        if backend_id in user.backends:
+            raise BackendExistsError(backend_id)
+        user.backends[backend_id] = backend
+        # try to connect. this will either fail and we'll delete the
+        # backend, or it will work and it will create the association
+        if use_ssh:
+            try:
+                ssh_command(
+                    user, backend_id, machine_id, machine_hostname, 'uptime',
+                    key_id=machine_key, username=machine_user, password=None,
+                    port=port
+                )
+            except MachineUnauthorizedError as exc:
+                raise BackendUnauthorizedError(exc)
+            except ServiceUnavailableError as exc:
+                raise MistError("Couldn't connect to host '%s'."
+                                % machine_hostname)
+        user.save()
+    return backend_id
 
 
 def _add_backend_vcloud(title, provider, params):
@@ -1105,7 +1177,7 @@ def connect_provider(backend):
     Backend is expected to be a mist.io.model.Backend
 
     """
-    if backend.provider != 'bare_metal':
+    if backend.provider not in ['bare_metal', 'coreos']:
         driver = get_driver(backend.provider)
     if backend.provider == Provider.AZURE:
         #create a temp file and output the cert there, so that
@@ -1178,6 +1250,8 @@ def connect_provider(backend):
             conn = driver(backend.apikey, backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
+    elif backend.provider == 'coreos':
+        conn = CoreOSDriver(backend.machines)
     elif backend.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if backend.apisecret:
@@ -1236,7 +1310,7 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_reboot = False
         can_tag = False
 
-    if conn.type == 'bare_metal':
+    if conn.type in ['bare_metal', 'coreos']:
         can_start = False
         can_destroy = False
         can_stop = False

@@ -1584,6 +1584,45 @@ var PROVIDER_MAP = {
         }
     ],
 
+    coreos: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'CoreOS',
+        },
+        {
+            name: 'machine_ip',
+            type: 'text',
+            label: 'Hostname',
+            placeholder: 'DNS or IP '
+        },
+        {
+            name: 'machine_key',
+            type: 'ssh_key',
+            label: 'SSH Key',
+            optional: true,
+        },
+        {
+            showIf: 'machine_key',
+            name: 'machine_user',
+            type: 'text',
+            label: 'User',
+            optional: true,
+            defaultValue: 'root',
+        },
+        {
+            showIf: 'machine_key',
+            name: 'machine_port',
+            type: 'text',
+            label: 'Port',
+            defaultValue: '22',
+            optional: true,
+        },
+
+
+
+    ],
+
     digitalocean: [
         {
             name: 'title',
