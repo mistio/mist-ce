@@ -132,8 +132,8 @@ define('app/views/machine', ['app/views/page'],
                 },
 
 
-                powerClicked: function () {
-                    Mist.machinePowerController.open(this.machine);
+                actionsClicked: function () {
+                    Mist.machineActionsController.open(this.machine);
                 },
 
 

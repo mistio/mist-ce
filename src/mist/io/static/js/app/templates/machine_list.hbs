@@ -56,7 +56,7 @@
 
     {{view "machineShell"}}
 
-    {{view "machinePower" position="#machines-power-btn"}}
+    {{view "machineActions" position="#machines-actions-btn"}}
 
     <div id="select-machines-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
         <ul data-role="listview">
@@ -98,7 +98,7 @@
             {{/if}}
 
         </td><td>
-            <a id="machines-power-btn" data-role="button" data-icon="power" {{action "powerClicked" target="view"}}>Power</a>
+            <a id="machines-actions-btn" data-role="button" data-icon="power" {{action "actionsClicked" target="view"}}>Actions</a>
         </td></tr></tbody></table>
     </div>
 
