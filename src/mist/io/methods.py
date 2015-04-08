@@ -418,8 +418,6 @@ def _add_backend_coreos(user, title, provider, params):
         machine.dns_name = machine_hostname
         machine.public_ips = [machine_hostname]
     machine_id = machine_hostname.replace('.', '').replace(' ', '')
-    log.error("########################")
-    log.error("MACHINE_ID %s" % machine_id)
     machine.name = title
     machine.os_type = os_type
     backend = model.Backend()
