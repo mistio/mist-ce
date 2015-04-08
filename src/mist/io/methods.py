@@ -227,7 +227,7 @@ def add_backend_v_2(user, title, provider, params):
         trigger_session_update(user.email, ['backends'])
         return {'backend_id': backend_id, 'monitoring': mon_dict}
     elif provider == 'coreos':
-        backend_id = _add_backend_coreos(user, title, provider, params)
+        backend_id, mon_dict = _add_backend_coreos(user, title, provider, params)
         log.info("Backend with id '%s' added succesfully.", backend_id)
         trigger_session_update(user.email, ['backends'])
         return {'backend_id': backend_id}
@@ -448,7 +448,18 @@ def _add_backend_coreos(user, title, provider, params):
                 raise MistError("Couldn't connect to host '%s'."
                                 % machine_hostname)
         user.save()
-    return backend_id
+
+    if params.get('monitoring'):
+        try:
+            from mist.core.methods import enable_monitoring
+        except ImportError:
+            pass
+        mon_dict = enable_monitoring(user, backend_id, machine_id,
+                                     no_ssh=not use_ssh)
+    else:
+        mon_dict = {}
+
+    return backend_id, mon_dict
 
 
 def _add_backend_vcloud(title, provider, params):

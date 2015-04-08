@@ -1618,9 +1618,12 @@ var PROVIDER_MAP = {
             defaultValue: '22',
             optional: true,
         },
-
-
-
+        {
+            name: 'monitoring',
+            type: 'checkbox',
+            label: 'Enable monitoring',
+            defaultValue: true,
+        }
     ],
 
     digitalocean: [
