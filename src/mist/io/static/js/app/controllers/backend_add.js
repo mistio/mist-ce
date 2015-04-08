@@ -82,15 +82,15 @@ define('app/controllers/backend_add', ['app/models/backend'],
             _showMonitoringPopup: function (backend, payload) {
                 Mist.dialogController.open({
                     type: DIALOG_TYPES.OK,
-                    head: 'Install monitoring agent',
+                    head: 'Enable monitoring',
                     body: [
                         {
                             paragraph: 'Run this command on your server to install' +
                                 ' the monitoring agent'
                         },
                         {
-                            command: payload.windows ? backend.windows_command :
-                                backend.unix_command
+                            command: payload.windows ? backend.monitoring.windows_command :
+                                backend.monitoring.unix_command
                         },
                     ],
                 });
