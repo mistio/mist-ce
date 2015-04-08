@@ -371,10 +371,12 @@ def _add_backend_bare_metal(user, title, provider, params):
             from mist.core.methods import enable_monitoring
         except ImportError:
             pass
-        ret = enable_monitoring(user, backend_id, machine_id,
-                                no_ssh=not use_ssh)
+        mon_dict = enable_monitoring(user, backend_id, machine_id,
+                                     no_ssh=not use_ssh)
+    else:
+        mon_dict = {}
 
-    return backend_id
+    return backend_id, mon_dict
 
 
 def _add_backend_vcloud(title, provider, params):
