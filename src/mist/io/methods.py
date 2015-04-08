@@ -367,6 +367,10 @@ def _add_backend_bare_metal(user, title, provider, params):
                                 % machine_hostname)
         user.save()
     if params.get('monitoring'):
+        try:
+            from mist.core.methods import enable_monitoring
+        except ImportError:
+            pass
         ret = enable_monitoring(user, backend_id, machine_id,
                                 no_ssh=not use_ssh)
 
