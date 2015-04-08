@@ -1,0 +1,7 @@
+
+/* Machine Actions View CSS
+-----------------------------------------------------------------------------------------------------------*/
+#machine-actions-popup-popup.ui-popup-hidden {
+    top: auto !important;
+    bottom: 50px !important;
+}

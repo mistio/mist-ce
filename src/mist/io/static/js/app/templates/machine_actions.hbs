@@ -1,0 +1,27 @@
+<div id="machine-actions-popup"
+     class="tiny-popup"
+     data-role="popup"
+     data-overlay-theme="c"
+     data-transition="slideup"
+     {{bind-attr data-position-to="view.position"}}>
+
+    <div data-role="header" data-theme="b">
+        <h1>Actions</h1>
+    </div>
+
+    <div data-role="content" data-theme="a">
+        {{#if Mist.machineActionsController.canStart}}
+        <a data-role="button" data-theme="d" {{action "actionClicked" "start" target="view"}}>Start</a>
+        {{/if}}
+        {{#if Mist.machineActionsController.canShutdown}}
+        <a data-role="button" data-theme="d" {{action "actionClicked" "shutdown" target="view"}}>Shutdown</a>
+        {{/if}}
+        {{#if Mist.machineActionsController.canReboot}}
+        <a data-role="button" data-theme="d" {{action "actionClicked" "reboot" target="view"}}>Reboot</a>
+        {{/if}}
+        {{#if Mist.machineActionsController.canDestroy}}
+        <a data-role="button" data-theme="d" {{action "actionClicked" "destroy" target="view"}}>Destroy</a>
+        {{/if}}
+        <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
+    </div>
+</div>
