@@ -308,8 +308,10 @@ def _add_backend_bare_metal(user, title, provider, params):
     remove_on_error = params.get('remove_on_error', True)
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
-    os_type = params.get('os_type')
-    if os_type != 'windows':
+    is_windows = params.get('windows', False)
+    if is_windows:
+        os_type = 'windows'
+    else:
         os_type = 'unix'
     try:
         port = int(params.get('machine_port', 22))
