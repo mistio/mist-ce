@@ -329,8 +329,8 @@ def _add_backend_bare_metal(user, title, provider, params):
         if machine_key not in user.keypairs:
             raise KeypairNotFoundError(machine_key)
         if not machine_hostname:
-            raise BadRequestError("Hostname '%s' isn't a valid DNS name "
-                                  "or IP address." % machine_name)
+            raise BadRequestError("You have specified an SSH key but machine "
+                                  "hostname is empty.")
         if not machine_user:
             machine_user = 'root'
 
