@@ -3616,7 +3616,7 @@ def get_deploy_collectd_command_unix(uuid, password, monitor):
 
 
 def get_deploy_collectd_command_windows(uuid, password, monitor):
-     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s"""""") -interval 10'"''' % (uuid, password, monitor)
+     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:25826"""""") -interval 10'"''' % (uuid, password, monitor)
 
 
 def machine_name_validator(provider, name):
