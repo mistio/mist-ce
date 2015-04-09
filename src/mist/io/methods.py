@@ -367,9 +367,6 @@ def _add_backend_bare_metal(user, title, provider, params):
                                 % machine_hostname)
         user.save()
     if params.get('monitoring'):
-        if not machine_hostname:
-            raise BadRequestError("Can't enable monitoring when no hostname "
-                                  "has been provided.")
         try:
             from mist.core.methods import enable_monitoring as _en_monitoring
         except ImportError:
