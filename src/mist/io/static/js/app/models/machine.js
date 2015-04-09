@@ -53,7 +53,10 @@ define('app/models/machine', ['ember'],
                 stdout: null,
             }),
 
-
+            isUnknown: function () {
+                return this.get('state') == 'unknown';    
+            }.property('state'),
+            
             /**
              *  Computed Properties
              */
