@@ -128,3 +128,6 @@ class BareMetalDriver(object):
 class CoreOSDriver(BareMetalDriver):
     type = 'coreos'
     name = 'CoreOS'
+
+    def __repr__(self):
+        return ('<CoreOSDriver>')
