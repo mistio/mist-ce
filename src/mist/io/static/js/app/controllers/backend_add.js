@@ -96,7 +96,15 @@ define('app/controllers/backend_add', ['app/models/backend'],
                 });
             },
 
-
+            _chooseMonitoringCommand: function(backend, payload) {
+                if (payload.windows) {
+                    console.log("WINDOWS");
+                    //return backend.monitoring.windows_command;
+                } else if (payload.unix) {
+                    console.log("UNIX");
+                    //return backend.monitoring.unix_command;
+                }
+            },
             _clear: function () {
                 this.setProperties({
                     callback: null,
