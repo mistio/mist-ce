@@ -1,5 +1,4 @@
 {{#unless view.machine.isGhost}}
-
     <label>{{view Mist.Checkbox checkedBinding="view.machine.selected"}}</label>
     {{#link-to "machine" view.machine classBinding="view.monitoringIcon"}}
 
@@ -7,6 +6,7 @@
             <div class="ui-block-a machine-name">{{view.machine.name}}</div>
 
             <span class="ui-block-b machine-state">
+                {{#unless view.machine.isUnknown}}
                 <span {{bind-attr class="view.machine.state"}}>
                 {{view.machine.state}}
 
@@ -16,6 +16,7 @@
                     <div class='ajax-loader'></div>
                 {{/if}} {{/if}}
                 </span>
+                {{/unless}}
             </span>
 
             <div class="ui-block-c machine-leds">
@@ -59,7 +60,6 @@
 
         </div>
     {{/link-to}}
-
 {{else}}
 
     <a class="ui-icon-delete" {{action disassociateGhostMachine target="view"}}>

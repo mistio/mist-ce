@@ -1287,15 +1287,15 @@ function parseProviderMap () {
 
     // Append nested fields into main array
     forIn(PROVIDER_MAP, function (fields, title) {
-        fields.forEach(function (field) {
+        fields.forEach(function (field, i1) {
             if (field.type == 'slider') {
-                field.on.forEach(function (f) {
+                field.on.forEach(function (f, i2) {
                     f.className = 'on';
-                    fields.push(f);
+                    fields.splice(i1 + i2 + 1, 0, f);
                 });
-                field.off.forEach(function (f) {
+                field.off.forEach(function (f, i2) {
                     f.className = 'off';
-                    fields.push(f);
+                    fields.splice(i1 + i2 + 1, 0, f);
                 });
             }
         });
@@ -1308,6 +1308,8 @@ function parseProviderMap () {
         fields.forEach(function (field, index) {
             field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
             field.value = field.defaultValue || '';
+            if (!field.showIf)
+                field.show = true;
             if (field.type == 'slider')
                 field.isSlider = true;
             if (field.type == 'text' ||
@@ -1319,6 +1321,8 @@ function parseProviderMap () {
                 field.isKey = true;
             if (field.type == 'region')
                 field.isRegion = true;
+            if (field.type == 'checkbox')
+                field.isCheckbox = true;
             if (!field.placeholder)
                 field.placeholder = "";
             if (field.optional)
@@ -1331,6 +1335,17 @@ function parseProviderMap () {
                             return word.toUpperCase();
                     return word.capitalize()
                 }).join(' ');
+        });
+    });
+
+    // Build dependencies
+    forIn(PROVIDER_MAP, function (fields, title) {
+        fields.forEach(function (field, index) {
+            if (field.showIf) {
+                field.set('showDependency', fields.findBy('name', field.showIf));
+                var binding = Ember.Binding.from("showDependency.value").to("show");
+                binding.connect(field);
+            }
         });
     });
 }
@@ -1517,30 +1532,55 @@ var PROVIDER_MAP = {
         {
             name: 'title',
             type: 'text',
-            defaultValue: 'SSH',
         },
         {
             name: 'machine_ip',
             type: 'text',
             label: 'Hostname',
-        },
-        {
-            name: 'machine_user',
-            type: 'text',
-            label: 'User',
-            defaultValue: 'root',
-        },
-        {
-            name: 'machine_port',
-            type: 'text',
-            label: 'Port',
-            defaultValue: '22',
             optional: true,
+            placeholder: 'DNS or IP '
         },
         {
-            name: 'machine_key',
-            type: 'ssh_key',
-            label: 'SSH Key',
+            name: 'windows',
+            type: 'slider',
+            label: 'Operating System',
+            onLabel: 'Windows',
+            offLabel: 'Unix',
+            onValue: true,
+            offValue: false,
+            optional: true,
+            on: [
+            ],
+            off: [
+                {
+                    name: 'machine_key',
+                    type: 'ssh_key',
+                    label: 'SSH Key',
+                    optional: true,
+                },
+                {
+                    showIf: 'machine_key',
+                    name: 'machine_user',
+                    type: 'text',
+                    label: 'User',
+                    optional: true,
+                    defaultValue: 'root',
+                },
+                {
+                    showIf: 'machine_key',
+                    name: 'machine_port',
+                    type: 'text',
+                    label: 'Port',
+                    defaultValue: '22',
+                    optional: true,
+                },
+            ]
+        },
+        {
+            name: 'monitoring',
+            type: 'checkbox',
+            label: 'Enable monitoring',
+            defaultValue: true,
         }
     ],
 

@@ -355,12 +355,38 @@ define('app/views/machine_monitoring',
                 this.set('gettingCommand', true);
                 Mist.monitoringController.getMonitoringCommand(
                     this.machine, function (success, data) {
-                        if (success)
-                            showPopup(data.command);
+                        if (success) {
+                            if (that.machine.get('isWindows'))
+                                showWindowsPopup(data.windows_command);
+                            else
+                                showUnixPopup(data.unix_command);
+                        }
                         that.set('gettingCommand', false)
                 });
 
-                function showPopup (command) {
+                function showWindowsPopup(command) {
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.OK_CANCEL,
+                        head: 'Enable monitoring',
+                        body: [
+                            {
+                                paragraph: 'Run this command on your server\'s console' +
+                                    ' to install the monitoring agent:'
+                            },
+                            {
+                                command: command
+                            },
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm)
+                                Mist.monitoringController.enableMonitoring(
+                                    that.machine, null, true
+                                );
+                        },
+                    });
+                }
+                
+                function showUnixPopup (command) {
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.OK_CANCEL,
                         head: 'Enable monitoring',
