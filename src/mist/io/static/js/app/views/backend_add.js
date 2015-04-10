@@ -41,7 +41,7 @@ define('app/views/backend_add', ['app/views/panel'],
                 var isReady = true
                 this.get('providerFields').some(function (field) {
                     if (field.optional) return;
-                    if (field.isSlider) return;
+                    if (field.isSlider && !field.name) return;
                     if (field.value === undefined ||
                         field.value === null ||
                         field.value === '')
@@ -151,7 +151,10 @@ define('app/views/backend_add', ['app/views/panel'],
 
                 selectKey: function (key, field) {
                     $('#' + field.name).collapsible('collapse');
-                    field.set('value', key.id);
+                    field.set('value', key.id || key);
+                    Ember.run.next(this, function () {
+                        this.$().trigger('create');
+                    });
                 },
 
 
@@ -176,19 +179,22 @@ define('app/views/backend_add', ['app/views/panel'],
                 },
 
 
-                switchToggled: function () {
+                switchToggled: function (field) {
                     var interval = 250;
                     var on = this.$().find('select').val() == 1;
                     if (on) {
                         $('.off').fadeOut(interval);
-                        Ember.run.later(function () {
+                        Ember.run.later(this, function () {
                             $('.on').fadeIn(interval);
                         }, interval - 50);
                     } else {
                         $('.on').fadeOut(interval);
-                        Ember.run.later(function () {
+                        Ember.run.later(this, function () {
                             $('.off').fadeIn(interval);
                         }, interval - 50);
+                    }
+                    if (field.name) {
+                        field.set('value', field.get((on ? 'on' : 'off') + 'Value'))
                     }
                 }
             },
