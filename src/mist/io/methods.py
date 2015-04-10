@@ -313,8 +313,10 @@ def _add_backend_bare_metal(user, title, provider, params):
     remove_on_error = params.get('remove_on_error', True)
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
-    os_type = params.get('os_type')
-    if os_type != 'windows':
+    is_windows = params.get('windows', False)
+    if is_windows:
+        os_type = 'windows'
+    else:
         os_type = 'unix'
     try:
         port = int(params.get('machine_port', 22))
@@ -332,8 +334,8 @@ def _add_backend_bare_metal(user, title, provider, params):
         if machine_key not in user.keypairs:
             raise KeypairNotFoundError(machine_key)
         if not machine_hostname:
-            raise BadRequestError("Hostname '%s' isn't a valid DNS name "
-                                  "or IP address." % machine_name)
+            raise BadRequestError("You have specified an SSH key but machine "
+                                  "hostname is empty.")
         if not machine_user:
             machine_user = 'root'
 
@@ -373,11 +375,11 @@ def _add_backend_bare_metal(user, title, provider, params):
         user.save()
     if params.get('monitoring'):
         try:
-            from mist.core.methods import enable_monitoring
+            from mist.core.methods import enable_monitoring as _en_monitoring
         except ImportError:
-            pass
-        mon_dict = enable_monitoring(user, backend_id, machine_id,
-                                     no_ssh=not use_ssh)
+            _en_monitoring = enable_monitoring
+        mon_dict = _en_monitoring(user, backend_id, machine_id,
+                                  no_ssh=not use_ssh)
     else:
         mon_dict = {}
 
@@ -3697,7 +3699,7 @@ def get_deploy_collectd_command_unix(uuid, password, monitor):
 
 
 def get_deploy_collectd_command_windows(uuid, password, monitor):
-     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s"""""") -interval 10'"''' % (uuid, password, monitor)
+     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:25826"""""") -interval 10'"''' % (uuid, password, monitor)
 
 
 def get_deploy_collectd_command_docker(uuid, password, monitor):
