@@ -88,26 +88,15 @@ define('app/controllers/backend_add', ['app/models/backend'],
                             paragraph: 'Run this command on your server to install' +
                                 ' the monitoring agent'
                         },
-                        //{
-                        //    command: payload.windows ? backend.monitoring.windows_command :
-                        //        backend.monitoring.unix_command
-                        //},
                         {
-                            command: this._chooseMonitoringCommand(backend, payload)
+                            command: payload.windows ? backend.monitoring.windows_command :
+                                backend.monitoring.unix_command
                         },
                     ],
                 });
             },
 
-            _chooseMonitoringCommand: function(backend, payload) {
-                if (payload.windows) {
-                    return backend.monitoring.windows_command;
-                } else if (payload.unix) {
-                    return backend.monitoring.unix_command;
-                } else if (payload.coreos) {
-                    return backend.monitoring.coreos_command;
-                }
-            },
+
             _clear: function () {
                 this.setProperties({
                     callback: null,
