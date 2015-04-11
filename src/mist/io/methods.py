@@ -254,8 +254,6 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     elif provider == 'hostvirtual':
         backend_id, backend = _add_backend_hostvirtual(title, provider, params)
-    elif provider == 'vsphere':
-        backend_id, backend = _add_backend_vsphere(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -1169,9 +1167,6 @@ def connect_provider(backend):
     elif backend.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         libcloud.security.VERIFY_SSL_CERT = False;
         conn = driver(backend.apikey, backend.apisecret, host=backend.apiurl)
-    elif backend.provider == Provider.VSPHERE:
-        libcloud.security.VERIFY_SSL_CERT = False;
-        conn = driver(host=backend.apiurl, username=backend.apikey, password=backend.apisecret)
     elif backend.provider == Provider.DIGITAL_OCEAN:
         if backend.apikey == backend.apisecret:  # API v2
             conn = driver(backend.apisecret)
