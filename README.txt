@@ -28,9 +28,9 @@ If you plan to support KVM via libvirt, you should install libvirt library::
     sudo aptitude install libvirt-bin libvirt-dev
     ./bin/pip install libvirt-python
 
-For vSphere support, you should install pysphere library::
+For vSphere support, you should install pyvmomi library::
 
-    ./bin/pip install pysphere
+    ./bin/pip install pyvmomi
 
 In Red Hat based systems the following packages need to be installed:
    
