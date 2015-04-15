@@ -146,8 +146,7 @@ define('app/views/machine_monitoring',
                     else if (!Mist.current_plan)
                         this._showMissingPlanMessage();
 
-                    // Make sure machine has a key
-                    else if (!this.machine.probed)
+                    else if (!this.machine.probed || this.machine.get('isCoreos'))
                         this._showManualMonitoringCommand();
 
                     // Confrim to enable monitoring
