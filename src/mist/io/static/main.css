@@ -498,6 +498,15 @@ ul.checkbox-list li label {
     z-index: 1000;
 }
 
+#select-keys-btn {
+    float: left;
+    font-weight: normal;
+    padding: 0px !important;
+    width: 2.5em;
+    height: 2.5em;
+    text-indent: -5000px;
+}
+
 @media only screen and (max-width: 550px) {
 
     a.responsive-button,
