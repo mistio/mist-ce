@@ -7,7 +7,9 @@
 #key-list-page #add-key-btn {
     float: right;
 }
+#key-list-page #select-keys-btn{
 
+}
 #key-list-page .tag {
     position: relative;
     top: 5px !important;

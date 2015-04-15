@@ -4,6 +4,9 @@
 #machine-list-page .ui-filterable {
     clear: both;
 }
+#machine-list-page #select-machines-btn{
+    
+}
 #machine-list-page #create-machine-btn {
     float: right;
 }
