@@ -230,7 +230,7 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, mon_dict = _add_backend_coreos(user, title, provider, params)
         log.info("Backend with id '%s' added succesfully.", backend_id)
         trigger_session_update(user.email, ['backends'])
-        return {'backend_id': backend_id}
+        return {'backend_id': backend_id, 'monitoring': mon_dict}
     elif provider == 'ec2':
         backend_id, backend = _add_backend_ec2(user, title, params)
     elif provider == 'rackspace':
