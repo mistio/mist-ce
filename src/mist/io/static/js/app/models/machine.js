@@ -117,6 +117,11 @@ define('app/models/machine', ['ember'],
             }.property('extra'),
 
 
+            isCoreos: function () {
+                return this.get('extra') && this.get('extra').os_type == 'coreos';
+            }.property('extra'),
+
+
             canConnect: function () {
                 return this.get('isWindows') || this.get('hasShell');
             }.property('isWindows', 'hasShell'),
