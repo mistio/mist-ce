@@ -315,6 +315,10 @@ def _add_backend_bare_metal(user, title, provider, params):
         port = int(params.get('machine_port', 22))
     except:
         port = 22
+    try:
+        rdp_port = int(params.get('remote_desktop_port', 3389))
+    except:
+        rdp_port = 3389
     machine_hostname = params.get('machine_ip', '')
     if machine_hostname:
         try:
@@ -334,6 +338,7 @@ def _add_backend_bare_metal(user, title, provider, params):
 
     machine = model.Machine()
     machine.ssh_port = port
+    machine.remote_desktop_port = rdp_port
     if machine_hostname:
         machine.dns_name = machine_hostname
         machine.public_ips = [machine_hostname]
