@@ -15,9 +15,9 @@
 
         <div class="list-wrapper">
 
-            <a id="select-btn"
+            <a id="select-scripts-btn"
                class="responsive-btn ui-btn ui-btn-icon-left ui-icon-arrow-d ui-corner-all ui-shadow"
-               {{action "selectClicked" target="view"}}></a>
+               {{action "selectClicked" target="view"}}>Select</a>
 
             <a id="run-script-btn"
                class="responsive-btn ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all ui-shadow"
@@ -44,9 +44,6 @@
 
     <div id="select-scripts-popup" data-role="popup" data-transition="flip" data-position-to="#select-scripts-btn">
         <ul data-role='listview'>
-            <li id="list-divider" data-role="list-divider">
-                Select
-            </li>
             <li data-icon="false">
                 <a {{action "selectionModeClicked" true target="view"}}>All</a>
             </li>
