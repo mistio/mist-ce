@@ -42,6 +42,6 @@
     margin-top: 20px;
 }
 
-#backend-add .on label {
+#backend-add .docker.on label {
     display: none;
 }

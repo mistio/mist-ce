@@ -48,7 +48,7 @@
         <div id="backend-add-fields">
         {{#each field in view.providerFields}}
             {{#if field.show}}
-            <div {{bind-attr class="field.className :field"}}>
+            <div {{bind-attr class="field.className :field Mist.backendAddController.provider.provider"}}>
                 {{#if field.label}}
                     {{#unless field.isCheckbox}}
                         <label {{bind-attr for="field.name"}}>
