@@ -31,7 +31,11 @@
         </span>
 
         <!-- State label -->
-        <h1 {{bind-attr class="state"}}>{{state}}</h1>
+        <h1 {{bind-attr class="state"}}>
+            {{#unless isUnknown}}
+                {{state}}
+            {{/unless}}
+        </h1>
 
         <!-- Show spinner if machines are being loaded -->
         {{#unless id}}

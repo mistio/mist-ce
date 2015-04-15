@@ -52,7 +52,7 @@ STATES = {
     NodeState.TERMINATED: 'terminated',
     NodeState.PENDING: 'pending',
     # we assume unknown means stopped, especially for the EC2 case
-    NodeState.UNKNOWN: 'stopped',
+    NodeState.UNKNOWN: 'unknown',
     NodeState.STOPPED: 'stopped',
     NodeState.ERROR: 'error',
     NodeState.PAUSED: 'paused',
@@ -261,14 +261,7 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'HostVirtual',
         'provider' : Provider.HOSTVIRTUAL,
         'regions': []
-    },
-    # vSphere
-    {
-        'title': 'VMWare vSphere',
-        'provider' : Provider.VSPHERE,
-        'regions': []
     }
-
 ]
 
 SUPPORTED_PROVIDERS = [

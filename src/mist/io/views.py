@@ -198,8 +198,11 @@ def add_backend(request):
 
     user = user_from_request(request)
 
+    monitoring = None
     if int(api_version) == 2:
-        backend_id = methods.add_backend_v_2(user, title, provider, params)
+        ret = methods.add_backend_v_2(user, title, provider, params)
+        backend_id = ret['backend_id']
+        monitoring = ret.get('monitoring')
     else:
         apikey = params.get('apikey', '')
         apisecret = params.get('apisecret', '')
@@ -233,7 +236,7 @@ def add_backend(request):
         )
 
     backend = user.backends[backend_id]
-    return {
+    ret = {
         'index': len(user.backends) - 1,
         'id': backend_id,
         'apikey': backend.apikey,
@@ -246,6 +249,9 @@ def add_backend(request):
         'status': 'off',
         'enabled': backend.enabled,
     }
+    if monitoring:
+        ret['monitoring'] = monitoring
+    return ret
 
 
 @view_config(route_name='backend_action', request_method='DELETE')
@@ -567,7 +573,7 @@ def machine_rdp(request):
                     charset='utf8',
                     pragma='no-cache',
                     body=rdp_content)
-    
+
 
 @view_config(route_name='machine_metadata', request_method='POST',
              renderer='json')

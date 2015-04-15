@@ -84,7 +84,7 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                     if (!backend || !backend.get('enabled'))
                         return
                     var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
-                    if (!machine) return;
+                    if (!machine || machine.get('isWindows')) return;
                     Mist.datasourcesController.addDatasource({
                         machine: machine,
                         metric: loadMetric,

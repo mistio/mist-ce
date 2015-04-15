@@ -1,6 +1,7 @@
 import os
 import shutil
 import random
+import socket
 import tempfile
 import json
 import requests
@@ -221,10 +222,10 @@ def add_backend_v_2(user, title, provider, params):
     baremetal = provider == 'bare_metal'
 
     if provider == 'bare_metal':
-        backend_id = _add_backend_bare_metal(user, title, provider, params)
+        backend_id, mon_dict = _add_backend_bare_metal(user, title, provider, params)
         log.info("Backend with id '%s' added succesfully.", backend_id)
         trigger_session_update(user.email, ['backends'])
-        return backend_id
+        return {'backend_id': backend_id, 'monitoring': mon_dict}
     elif provider == 'ec2':
         backend_id, backend = _add_backend_ec2(user, title, params)
     elif provider == 'rackspace':
@@ -253,8 +254,6 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     elif provider == 'hostvirtual':
         backend_id, backend = _add_backend_hostvirtual(title, provider, params)
-    elif provider == 'vsphere':
-        backend_id, backend = _add_backend_vsphere(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -297,42 +296,52 @@ def add_backend_v_2(user, title, provider, params):
         username = backend.apikey
         associate_key(user, key_id, backend_id, node_id, username=username)
 
-    return backend_id
+    return {'backend_id': backend_id}
 
 
 def _add_backend_bare_metal(user, title, provider, params):
     """
     Add a bare metal backend
     """
-    machine_hostname = params.get('machine_ip', '')
-    if not machine_hostname:
-        raise RequiredParameterMissingError('machine_hostname')
-
     remove_on_error = params.get('remove_on_error', True)
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
-
-    if remove_on_error:
-        if not machine_key:
-            raise RequiredParameterMissingError('machine_key')
-        if machine_key not in user.keypairs:
-            raise KeypairNotFoundError(machine_key)
-        if not machine_user:
-            machine_user = 'root'
-
+    is_windows = params.get('windows', False)
+    if is_windows:
+        os_type = 'windows'
+    else:
+        os_type = 'unix'
     try:
         port = int(params.get('machine_port', 22))
     except:
         port = 22
-    machine = model.Machine()
-    machine.dns_name = machine_hostname
-    machine.ssh_port = port
+    machine_hostname = params.get('machine_ip', '')
+    if machine_hostname:
+        try:
+            socket.gethostbyname(machine_hostname)
+        except socket.gaierror:
+            raise BadRequestError("Hostname '%s' isn't resolvable/accessible."
+                                  % machine_hostname)
+    use_ssh = remove_on_error and os_type == 'unix' and machine_key
+    if use_ssh:
+        if machine_key not in user.keypairs:
+            raise KeypairNotFoundError(machine_key)
+        if not machine_hostname:
+            raise BadRequestError("You have specified an SSH key but machine "
+                                  "hostname is empty.")
+        if not machine_user:
+            machine_user = 'root'
 
-    machine.public_ips = [machine_hostname]
-    machine_id = machine_hostname.replace('.', '').replace(' ', '')
-    machine.name = machine_hostname
+    machine = model.Machine()
+    machine.ssh_port = port
+    if machine_hostname:
+        machine.dns_name = machine_hostname
+        machine.public_ips = [machine_hostname]
+    machine_id = title.replace('.', '').replace(' ', '')
+    machine.name = title
+    machine.os_type = os_type
     backend = model.Backend()
-    backend.title = title or machine_hostname
+    backend.title = title
     backend.provider = provider
     backend.enabled = True
     backend.machines[machine_id] = machine
@@ -344,7 +353,7 @@ def _add_backend_bare_metal(user, title, provider, params):
         user.backends[backend_id] = backend
         # try to connect. this will either fail and we'll delete the
         # backend, or it will work and it will create the association
-        if remove_on_error:
+        if use_ssh:
             try:
                 ssh_command(
                     user, backend_id, machine_id, machine_hostname, 'uptime',
@@ -352,12 +361,22 @@ def _add_backend_bare_metal(user, title, provider, params):
                     port=port
                 )
             except MachineUnauthorizedError as exc:
-                # remove backend
-                del user.backends[backend_id]
-                user.save()
                 raise BackendUnauthorizedError(exc)
+            except ServiceUnavailableError as exc:
+                raise MistError("Couldn't connect to host '%s'."
+                                % machine_hostname)
         user.save()
-    return backend_id
+    if params.get('monitoring'):
+        try:
+            from mist.core.methods import enable_monitoring as _en_monitoring
+        except ImportError:
+            _en_monitoring = enable_monitoring
+        mon_dict = _en_monitoring(user, backend_id, machine_id,
+                                  no_ssh=not use_ssh)
+    else:
+        mon_dict = {}
+
+    return backend_id, mon_dict
 
 
 def _add_backend_vcloud(title, provider, params):
@@ -1148,9 +1167,6 @@ def connect_provider(backend):
     elif backend.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         libcloud.security.VERIFY_SSL_CERT = False;
         conn = driver(backend.apikey, backend.apisecret, host=backend.apiurl)
-    elif backend.provider == Provider.VSPHERE:
-        libcloud.security.VERIFY_SSL_CERT = False;
-        conn = driver(host=backend.apiurl, username=backend.apikey, password=backend.apisecret)
     elif backend.provider == Provider.DIGITAL_OCEAN:
         if backend.apikey == backend.apisecret:  # API v2
             conn = driver(backend.apisecret)
@@ -2915,7 +2931,7 @@ def enable_monitoring(user, backend_id, machine_id,
         'no_ssh': True,
         'dry': dry,
         'name': name,
-        'public_ips': ",".join(public_ips),
+        'public_ips': ",".join(public_ips or []),
         'dns_name': dns_name,
         'backend_title': backend.title,
         'backend_provider': backend.provider,
@@ -3586,12 +3602,16 @@ def undeploy_collectd(user, backend_id, machine_id):
     return ret_dict
 
 
-def get_deploy_collectd_manual_command(uuid, password, monitor):
+def get_deploy_collectd_command_unix(uuid, password, monitor):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
     cmd = "wget -O - %s | sudo python - %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
+
+
+def get_deploy_collectd_command_windows(uuid, password, monitor):
+     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:25826"""""") -interval 10'"''' % (uuid, password, monitor)
 
 
 def machine_name_validator(provider, name):

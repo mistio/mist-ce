@@ -71,6 +71,7 @@ class Machine(OODict):
     ## collectd_password = StrField()
     name = HtmlSafeStrField()
     ssh_port = IntField(22)
+    os_type = StrField('unix')
 
 
 class Machines(FieldsDict):
