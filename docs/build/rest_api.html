@@ -40,7 +40,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-default ">
     <div class="container">
@@ -105,7 +105,7 @@
               
                 
   <li>
-    <a href="modules.html" title="Previous Chapter: Modules"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm">&laquo; Modules</span>
+    <a href="modules.html" title="Previous Chapter: Modules"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Modules</span>
     </a>
   </li>
               
@@ -148,7 +148,7 @@ service at <a class="reference external" href="https://mist.io">https://mist.io<
 <h2>Authenticate through <a class="reference external" href="https://mist.io">https://mist.io</a><a class="headerlink" href="#authenticate-through-https-mist-io" title="Permalink to this headline">¶</a></h2>
 <dl class="post">
 <dt id="post-mist.io-auth">
-<tt class="descname">POST </tt><tt class="descname">mist.io/auth</tt><a class="headerlink" href="#post-mist.io-auth" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">mist.io/auth</code><a class="headerlink" href="#post-mist.io-auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Authenticate to mist.io service</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /auth
@@ -197,8 +197,8 @@ use the premioum services of mist such as monitoring, adding rules and alerts to
 <h2>Supported Providers<a class="headerlink" href="#supported-providers" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--providers">
-<tt class="descname">GET </tt><tt class="descname">/providers</tt><a class="headerlink" href="#get--providers" title="Permalink to this definition">¶</a></dt>
-<dd><p>In each GET API request, you have to include the <tt class="docutils literal"><span class="pre">`Api-Version`</span></tt> header</p>
+<code class="descname">GET </code><code class="descname">/providers</code><a class="headerlink" href="#get--providers" title="Permalink to this definition">¶</a></dt>
+<dd><p>In each GET API request, you have to include the <code class="docutils literal"><span class="pre">`Api-Version`</span></code> header</p>
 <div class="highlight-http"><div class="highlight"><pre>{&#39;Api-Version&#39;:2}
 </pre></div>
 </div>
@@ -259,7 +259,7 @@ Accept: application/json; charset=UTF-8
 <h2>Backends Actions<a class="headerlink" href="#backends-actions" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--backends">
-<tt class="descname">GET </tt><tt class="descname">/backends</tt><a class="headerlink" href="#get--backends" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends</code><a class="headerlink" href="#get--backends" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all added backends</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends
@@ -296,8 +296,8 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends">
-<tt class="descname">POST </tt><tt class="descname">/backends</tt><a class="headerlink" href="#post--backends" title="Permalink to this definition">¶</a></dt>
-<dd><p>In each POST API request, you have to include the <tt class="docutils literal"><span class="pre">`Api-Version`</span></tt> header</p>
+<code class="descname">POST </code><code class="descname">/backends</code><a class="headerlink" href="#post--backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>In each POST API request, you have to include the <code class="docutils literal"><span class="pre">`Api-Version`</span></code> header</p>
 <div class="highlight-http"><div class="highlight"><pre>{&#39;Api-Version&#39;:2}
 </pre></div>
 </div>
@@ -539,7 +539,7 @@ Accept: application/json; charset=UTF-8
 <li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>docker_host</strong> (<em>string</em>) &#8211; <em>(required)</em> The host of your Docker</li>
-<li><strong>docker_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> The port on which your Docker API is exposed to. By default will be <tt class="docutils literal"><span class="pre">`4243`</span></tt></li>
+<li><strong>docker_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> The port on which your Docker API is exposed to. By default will be <code class="docutils literal"><span class="pre">`4243`</span></code></li>
 <li><strong>auth_user</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth User</li>
 <li><strong>auth_password</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth Password</li>
 </ul>
@@ -595,7 +595,7 @@ Accept: application/json; charset=UTF-8
 <li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
 <li><strong>machine_user</strong> (<em>string</em>) &#8211; <em>(required)</em> User to connect with your server</li>
 <li><strong>machine_key</strong> (<em>string</em>) &#8211; <em>(required)</em> The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.</li>
-<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <tt class="docutils literal"><span class="pre">`22`</span></tt>, but you can alter this if your ssh-server listen to another port</li>
+<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <code class="docutils literal"><span class="pre">`22`</span></code>, but you can alter this if your ssh-server listen to another port</li>
 </ul>
 </td>
 </tr>
@@ -621,7 +621,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="delete">
 <dt id="delete--backends-backend_id">
-<tt class="descname">DELETE </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#delete--backends-backend_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DELETE </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#delete--backends-backend_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>DELETE /backends/2tK74h4mXbjjLlkjjO4SHn3
@@ -633,7 +633,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="put">
 <dt id="put--backends-backend_id">
-<tt class="descname">PUT </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#put--backends-backend_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PUT </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#put--backends-backend_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>PUT /backends
@@ -661,7 +661,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#post--backends-backend_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#post--backends-backend_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggle state of backend between enabled and disabled</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3
@@ -689,7 +689,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--backends-backend_id-sizes">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/sizes</tt><a class="headerlink" href="#get--backends-backend_id-sizes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/sizes</code><a class="headerlink" href="#get--backends-backend_id-sizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all sizes provided by backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/sizes
@@ -824,7 +824,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--backends-backend_id-locations">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/locations</tt><a class="headerlink" href="#get--backends-backend_id-locations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/locations</code><a class="headerlink" href="#get--backends-backend_id-locations" title="Permalink to this definition">¶</a></dt>
 <dd><p>List locations provided by backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/locations
@@ -859,7 +859,7 @@ Accept: application/json; charset=UTF-8
 <h2>Keys Actions<a class="headerlink" href="#keys-actions" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--keys">
-<tt class="descname">GET </tt><tt class="descname">/keys</tt><a class="headerlink" href="#get--keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/keys</code><a class="headerlink" href="#get--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>List added keys</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys
@@ -900,7 +900,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="put">
 <dt id="put--keys">
-<tt class="descname">PUT </tt><tt class="descname">/keys</tt><a class="headerlink" href="#put--keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PUT </code><code class="descname">/keys</code><a class="headerlink" href="#put--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add Key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>PUT /keys
@@ -930,7 +930,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--keys">
-<tt class="descname">POST </tt><tt class="descname">/keys</tt><a class="headerlink" href="#post--keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/keys</code><a class="headerlink" href="#post--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ask mist to generate a new private key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys
@@ -948,7 +948,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="delete">
 <dt id="delete--keys-key_id">
-<tt class="descname">DELETE </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#delete--keys-key_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DELETE </code><code class="descname">/keys/{key_id}</code><a class="headerlink" href="#delete--keys-key_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>DELETE /keys/{key_id}
@@ -960,7 +960,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="put">
 <dt id="put--keys-key_id">
-<tt class="descname">PUT </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#put--keys-key_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PUT </code><code class="descname">/keys/{key_id}</code><a class="headerlink" href="#put--keys-key_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>PUT /keys/{key_id}
@@ -988,7 +988,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--keys-key_id">
-<tt class="descname">POST </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#post--keys-key_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/keys/{key_id}</code><a class="headerlink" href="#post--keys-key_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set default key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /keys/{key_id}
@@ -1000,7 +1000,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--keys-key_id-private">
-<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}/private</tt><a class="headerlink" href="#get--keys-key_id-private" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/keys/{key_id}/private</code><a class="headerlink" href="#get--keys-key_id-private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get private key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys/{key_id}/private
@@ -1016,7 +1016,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--keys-key_id-public">
-<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}/public</tt><a class="headerlink" href="#get--keys-key_id-public" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/keys/{key_id}/public</code><a class="headerlink" href="#get--keys-key_id-public" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get public key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys/{key_id}/public
@@ -1035,7 +1035,7 @@ Accept: application/json; charset=UTF-8
 <h2>Images Actions<a class="headerlink" href="#images-actions" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--backends-backend_id-images">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/images</tt><a class="headerlink" href="#get--backends-backend_id-images" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/images</code><a class="headerlink" href="#get--backends-backend_id-images" title="Permalink to this definition">¶</a></dt>
 <dd><p>List available images for this backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/images
@@ -1112,7 +1112,7 @@ search through all EC2 images including community and custom images.</p>
 <h2>Machines Actions<a class="headerlink" href="#machines-actions" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--backends-backend_id-machines">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#get--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/machines</code><a class="headerlink" href="#get--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all added machines for this backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
@@ -1181,7 +1181,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id-machines">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#post--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines</code><a class="headerlink" href="#post--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create machine</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
@@ -1266,7 +1266,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id-machines-machine_id">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}</tt><a class="headerlink" href="#post--backends-backend_id-machines-machine_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines/{machine_id}</code><a class="headerlink" href="#post--backends-backend_id-machines-machine_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Machine actions like reboot, destroy, shutdown and start</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>  POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
@@ -1294,7 +1294,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id-machines-machine_id-metadata">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</tt><a class="headerlink" href="#post--backends-backend_id-machines-machine_id-metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</code><a class="headerlink" href="#post--backends-backend_id-machines-machine_id-metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add tags/metadata for machine</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
@@ -1325,7 +1325,7 @@ Accept: application/json; charset=UTF-8
 <h2>Shell<a class="headerlink" href="#shell" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--backends-backend_id-machines-machine_id-shell?host=host_ip&amp;command=shell_command">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</tt><a class="headerlink" href="#get--backends-backend_id-machines-machine_id-shell?host=host_ip&command=shell_command" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</code><a class="headerlink" href="#get--backends-backend_id-machines-machine_id-shell?host=host_ip&command=shell_command" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run shell command in machine. Mist will yield an html body with the command&#8217;s output.</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&amp;command=uptime
@@ -1390,7 +1390,7 @@ Accept: application/json; charset=UTF-8
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>

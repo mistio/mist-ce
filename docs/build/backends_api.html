@@ -39,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-default ">
     <div class="container">
@@ -125,7 +125,7 @@
       
   <dl class="get">
 <dt id="get--backends">
-<tt class="descname">GET </tt><tt class="descname">/backends</tt><a class="headerlink" href="#get--backends" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends</code><a class="headerlink" href="#get--backends" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all added backends</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends
@@ -162,8 +162,8 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends">
-<tt class="descname">POST </tt><tt class="descname">/backends</tt><a class="headerlink" href="#post--backends" title="Permalink to this definition">¶</a></dt>
-<dd><p>In each POST API request, you have to include the <tt class="docutils literal"><span class="pre">`Api-Version`</span></tt> header</p>
+<code class="descname">POST </code><code class="descname">/backends</code><a class="headerlink" href="#post--backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>In each POST API request, you have to include the <code class="docutils literal"><span class="pre">`Api-Version`</span></code> header</p>
 <div class="highlight-http"><div class="highlight"><pre>{&#39;Api-Version&#39;:2}
 </pre></div>
 </div>
@@ -405,7 +405,7 @@ Accept: application/json; charset=UTF-8
 <li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>docker_host</strong> (<em>string</em>) &#8211; <em>(required)</em> The host of your Docker</li>
-<li><strong>docker_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> The port on which your Docker API is exposed to. By default will be <tt class="docutils literal"><span class="pre">`4243`</span></tt></li>
+<li><strong>docker_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> The port on which your Docker API is exposed to. By default will be <code class="docutils literal"><span class="pre">`4243`</span></code></li>
 <li><strong>auth_user</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth User</li>
 <li><strong>auth_password</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth Password</li>
 </ul>
@@ -461,7 +461,7 @@ Accept: application/json; charset=UTF-8
 <li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
 <li><strong>machine_user</strong> (<em>string</em>) &#8211; <em>(required)</em> User to connect with your server</li>
 <li><strong>machine_key</strong> (<em>string</em>) &#8211; <em>(required)</em> The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.</li>
-<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <tt class="docutils literal"><span class="pre">`22`</span></tt>, but you can alter this if your ssh-server listen to another port</li>
+<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <code class="docutils literal"><span class="pre">`22`</span></code>, but you can alter this if your ssh-server listen to another port</li>
 </ul>
 </td>
 </tr>
@@ -487,7 +487,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="delete">
 <dt id="delete--backends-backend_id">
-<tt class="descname">DELETE </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#delete--backends-backend_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DELETE </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#delete--backends-backend_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>DELETE /backends/2tK74h4mXbjjLlkjjO4SHn3
@@ -499,7 +499,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="put">
 <dt id="put--backends-backend_id">
-<tt class="descname">PUT </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#put--backends-backend_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PUT </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#put--backends-backend_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>PUT /backends
@@ -527,7 +527,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#post--backends-backend_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#post--backends-backend_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggle state of backend between enabled and disabled</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3
@@ -555,7 +555,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--backends-backend_id-sizes">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/sizes</tt><a class="headerlink" href="#get--backends-backend_id-sizes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/sizes</code><a class="headerlink" href="#get--backends-backend_id-sizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all sizes provided by backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/sizes
@@ -690,7 +690,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--backends-backend_id-locations">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/locations</tt><a class="headerlink" href="#get--backends-backend_id-locations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/locations</code><a class="headerlink" href="#get--backends-backend_id-locations" title="Permalink to this definition">¶</a></dt>
 <dd><p>List locations provided by backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/locations
@@ -735,7 +735,7 @@ Accept: application/json; charset=UTF-8
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>
