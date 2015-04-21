@@ -21,8 +21,10 @@
         {{/if}}
         <a {{action "forgot" target="view"}} target="_new">Forgot your password?</a>
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
-            <button id="login-ok" data-theme="d" {{action "loginClicked" target="view"}}>Log in</button>
+            <a class="ui-btn ui-btn-a ui-shadow ui-corner-all"
+                {{action "backClicked" target="view"}}>Back</a>
+            <a id="login-ok" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+                {{action "loginClicked" target="view"}}>Log in</a>
         </div>
 
     </div>

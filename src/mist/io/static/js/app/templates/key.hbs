@@ -2,7 +2,10 @@
 
     <div data-role="header" data-theme="b">
 
-        <a href="#/keys" class="responsive-button" data-icon="arrow-l">Keys</a>
+        <a href="#/keys" class="responsive-button ui-btn-left ui-btn ui-icon-arrow-l
+            ui-btn-icon-left ui-shadow ui-corner-all">
+            Keys
+        </a>
 
         <h1>{{id}}</h1>
 
@@ -31,7 +34,9 @@
                 <div class="ajax-loader"></div>
                 {{/if}}
             </h4>
-            <a data-role="button" {{action "displayClicked" target="view"}}>Display</a>
+            <a class="ui-btn ui-shadow ui-corner-all" {{action "displayClicked" target="view"}}>
+                Display
+            </a>
         </div>
 
         {{#if machines}}
