@@ -47,10 +47,8 @@ define('app/controllers/machine_power', ['ember'],
                 // Close current popup
                 $('#machine-power-popup').popup('close');
 
-
                 var machineNames = this.machines.toStringByProperty('name');
 
-                // Show confirmation popup
                 var that = this;
                 if (action == 'rename'){
                     var machine = this.machines[0];
@@ -61,12 +59,21 @@ define('app/controllers/machine_power', ['ember'],
                     return;
                 }
                 Ember.run.later(function () {
-                    Mist.confirmationController.setUp('Machine ' + 'action',
-                        'Are you sure you want to ' + action + ' these machines: '
-                        + machineNames + ' ?', function () {
-                            that._act(action);
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Machine action',
+                        body: [
+                            {
+                                paragraph: 'Are you sure you want to ' + action + ' these machines: ' +
+                                    machineNames + ' ?'
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm) {
+                                that._act(action);
+                            }
                         }
-                    );
+                    });
                 }, 500);
             },
 

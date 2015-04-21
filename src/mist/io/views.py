@@ -198,8 +198,11 @@ def add_backend(request):
 
     user = user_from_request(request)
 
+    monitoring = None
     if int(api_version) == 2:
-        backend_id = methods.add_backend_v_2(user, title, provider, params)
+        ret = methods.add_backend_v_2(user, title, provider, params)
+        backend_id = ret['backend_id']
+        monitoring = ret.get('monitoring')
     else:
         apikey = params.get('apikey', '')
         apisecret = params.get('apisecret', '')
@@ -233,7 +236,7 @@ def add_backend(request):
         )
 
     backend = user.backends[backend_id]
-    return {
+    ret = {
         'index': len(user.backends) - 1,
         'id': backend_id,
         'apikey': backend.apikey,
@@ -246,6 +249,9 @@ def add_backend(request):
         'status': 'off',
         'enabled': backend.enabled,
     }
+    if monitoring:
+        ret['monitoring'] = monitoring
+    return ret
 
 
 @view_config(route_name='backend_action', request_method='DELETE')
@@ -482,6 +488,12 @@ def create_machine(request):
         async = request.json_body.get('async', False)
         quantity = request.json_body.get('quantity', 1)
         persist = request.json_body.get('persist', False)
+        docker_port_bindings = request.json_body.get('docker_port_bindings', {})
+        docker_exposed_ports = request.json_body.get('docker_exposed_ports', {})
+        # hostname: if provided it will be attempted to assign a DNS name
+        hostname = request.json_body.get('hostname', '')
+        plugins = request.json_body.get('plugins')
+
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -494,8 +506,10 @@ def create_machine(request):
             image_extra, disk, image_name, size_name,
             location_name, ips, monitoring, networks,
             docker_env, docker_command)
-    kwargs = {'script_id': script_id, 'script_params':script_params,
-              'job_id': job_id}
+    kwargs = {'script_id': script_id, 'script_params': script_params,
+              'job_id': job_id, 'docker_port_bindings': docker_port_bindings,
+              'docker_exposed_ports': docker_exposed_ports,
+              'hostname': hostname, 'plugins': plugins}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
@@ -535,6 +549,30 @@ def machine_actions(request):
         ## return OK
         return methods.list_machines(user, backend_id)
     raise BadRequestError()
+
+
+@view_config(route_name='machine_rdp', request_method='GET', renderer="json")
+def machine_rdp(request):
+    "Generate and return an rdp file for windows machines"
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    user = user_from_request(request)
+    rdp_port = request.params.get('rdp_port',3389)
+    host = request.params.get('host')
+
+    if not host:
+        raise BadRequestError('no hostname specified')
+    try:
+        1 < int(rdp_port) < 65535
+    except:
+        rdp_port = 3389
+
+    rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % (host, rdp_port)
+    return Response(content_type='application/octet-stream',
+                    content_disposition='attachment; filename="%s.rdp"' % host,
+                    charset='utf8',
+                    pragma='no-cache',
+                    body=rdp_content)
 
 
 @view_config(route_name='machine_metadata', request_method='POST',

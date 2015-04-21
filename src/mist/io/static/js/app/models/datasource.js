@@ -43,7 +43,11 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
                 id = id.replace(/[^\w]/g, '_');
 
                 this.set('id', id);
-                this.clear();
+                if (this.datapoints)
+                    this.preFill();
+                else
+                    this.clear();
+
             },
 
 
@@ -58,6 +62,17 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
                 this.set('datapoints', []);
             },
 
+            preFill: function () {
+                var datapoints = [];
+                var step = Mist.graphsController.config.measurementStep
+                var lastInitTimestamp = this.datapoints[0].time;
+                for (var i = 0; i < DISPLAYED_DATAPOINTS - this.datapoints.length; i++) {
+                    this.datapoints.unshift(Datapoint.create({
+                        time: lastInitTimestamp - (i * step),
+                        value: null,
+                    }))
+                }
+            },
 
             update: function (datapoints) {
 

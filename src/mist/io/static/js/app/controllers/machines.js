@@ -53,7 +53,7 @@ define('app/controllers/machines', ['app/models/machine'],
              */
 
             newMachine: function(name, image, size, location, key, script, monitoring,
-                dockerEnv, dockerCommand, scriptParams) {
+                dockerEnv, dockerCommand, scriptParams, dockerPorts) {
 
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -90,6 +90,19 @@ define('app/controllers/machines', ['app/models/machine'],
                     });
                 }
 
+                // Construct docker port bindings
+                if (dockerPorts.length) {
+                    var portBindings = {};
+                    var exposedPorts = {};
+                    dockerPorts.split('\n').forEach(function (line) {
+                        var vars = line.split(':');
+                        var key = vars[1] + '/tcp';
+                        portBindings[key] = [{'HostPort': vars[0]}];
+                        exposedPorts[key] = {};
+                    });
+                }
+
+
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
                         'name': name,
@@ -113,6 +126,8 @@ define('app/controllers/machines', ['app/models/machine'],
                         // Docker
                         'docker_env': environment,
                         'docker_command': dockerCommand,
+                        'docker_exposed_ports': exposedPorts,
+                        'docker_port_bindings': portBindings
                 }).success(function (machine) {
                     machine.backend = that.backend;
                     // Nephoscale returns machine id on request success,
@@ -302,7 +317,8 @@ define('app/controllers/machines', ['app/models/machine'],
                         machine.set('state', 'pending');
                     this.content.addObject(machine);
                     this.content.removeObject(dummyMachine);
-                    Mist.keysController._associateKey(key.id, machine);
+                    if (key && key.id)
+                        Mist.keysController._associateKey(key.id, machine);
                     this.trigger('onMachineListChange');
                 });
             },
@@ -335,7 +351,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     });
 
                     // Pass machine reference to rules
-                    Mist.rulesController.content.forEach(function (rule) {
+                    Mist.rulesController.forEach(function (rule) {
                         if (rule.machine.id) return;
                         if (machine.equals([rule.backend, rule.machine]))
                             rule.set('machine', machine);

@@ -66,7 +66,7 @@ define('app/views/machine_add', ['app/views/templated'],
                 // Add event listeners
                 Mist.scriptsController.on('onChange', this, 'renderFields');
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.on('onImageListChange', this, 'renderFields');
+                Mist.backendsController.on('onImagesChange', this, 'renderFields');
 
                 // Connect view with machineAddController
                 var viewId = $('#create-machine-panel').parent().attr('id');
@@ -80,7 +80,7 @@ define('app/views/machine_add', ['app/views/templated'],
                 // Remove event listeners
                 Mist.scriptsController.off('onChange', this, 'renderFields');
                 Mist.keysController.off('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.off('onImageListChange', this, 'renderFields');
+                Mist.backendsController.off('onImagesChange', this, 'renderFields');
 
              }.on('willDestroyElement'),
 
@@ -130,6 +130,7 @@ define('app/views/machine_add', ['app/views/templated'],
                 $('#create-machine-panel #key').hide();
                 $('#create-machine-monitoring').hide();
                 $('#create-machine-panel .docker').show();
+                $('#create-machine-panel #ports').show();
             },
 
 
@@ -137,6 +138,7 @@ define('app/views/machine_add', ['app/views/templated'],
                 this.hideDockerMenu();
                 $('#create-machine-panel #location').hide();
                 $('#create-machine-panel #size').hide();
+                $('#create-machine-panel #ports').show();
             },
 
 
@@ -147,6 +149,7 @@ define('app/views/machine_add', ['app/views/templated'],
                 $('#create-machine-panel #key').show();
                 $('#create-machine-monitoring').show();
                 $('#create-machine-panel .docker').hide();
+                $('#create-machine-panel #ports').hide();
             },
 
 
@@ -198,6 +201,7 @@ define('app/views/machine_add', ['app/views/templated'],
                     $('#create-machine-panel .docker textarea').addClass('ui-state-disabled');
                     $('#create-machine-panel .docker .ui-checkbox').addClass('ui-state-disabled');
                     $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
+                    $('#create-machine-panel #ports').addClass('ui-state-disabled');
 
                     if (backend.get('requiresNetworkOnCreation')) {
                         if (backend.networks.content.length > 0) {
@@ -245,6 +249,7 @@ define('app/views/machine_add', ['app/views/templated'],
                            $('#create-machine-panel .docker textarea')
                                 .removeClass('ui-state-disabled');
                        }
+                       $('#create-machine-panel #ports').removeClass('ui-state-disabled');
                    }
                 },
 

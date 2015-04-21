@@ -84,6 +84,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 Mist.shell.emit('shell_open', {
                     backend_id: this.machine.backend.id,
                     machine_id: this.machine.id,
+                    provider: this.machine.backend.provider,
                     host: this.host,
                     cols: this.cols,
                     rows: this.rows,

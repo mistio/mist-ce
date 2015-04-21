@@ -1,56 +1,6 @@
 <div id="graph-list-control">
 
     <div id="history-control" class="ui-mini">
-
-        <!--
-            Stream Toggle
-        -->
-        {{#if Mist.graphsController.stream.isStreaming}}
-            <!--a id="history-control-stream"
-                class="ui-btn
-                    ui-mini
-                    ui-btn-b
-                    ui-corner-all
-                    ui-btn-inline"
-                {{action "pauseClicked" target="view.actionProxy"}}>
-                    Pause
-            </a-->
-        {{else}}
-            <a id="history-control-stream"
-                class="ui-btn
-                    ui-mini
-                    ui-btn-b
-                    ui-corner-all
-                    ui-btn-inline"
-                {{action "resetClicked" target="view.actionProxy"}}>
-                    Reset
-            </a>
-            <!--
-                Forward Button
-            -->
-            <a id="history-control-forward"
-                class="time
-                    ui-btn
-                    ui-mini
-                    ui-corner-all
-                    ui-btn-inline
-                    ui-btn-icon-notext
-                    ui-icon-arrow-r"
-                {{action "forwardClicked" target="view.actionProxy"}}>
-            </a>
-        {{/if}}
-
-        <div id="time-window-control" class="ui-mini">
-            <select data-inline="true" data-shadow="false" data-mini="true"
-                {{action "timeWindowChanged" on="change" target="view.actionProxy"}}>
-                    <option value="minutes" selected='true'>10 minutes</option>
-                    <option value="hour">1 hour</option>
-                    <option value="day">1 day</option>
-                    <option value="week">1 week</option>
-                    <option value="month">1 month</option>
-            </select>
-        </div>
-
         <!--
             Back Button
         -->
@@ -62,7 +12,117 @@
                 ui-btn-inline
                 ui-btn-icon-notext
                 ui-icon-arrow-l"
-            {{action "backClicked" target="view.actionProxy"}}>
+            {{action "backClicked" target="view"}}>
         </a>
+        <!--
+            Forward Button
+        -->
+        {{#unless Mist.graphsController.stream.isStreaming}}
+            <a id="history-control-forward"
+                class="time
+                    ui-btn
+                    ui-mini
+                    ui-corner-all
+                    ui-btn-inline
+                    ui-btn-icon-notext
+                    ui-icon-arrow-r"
+                {{action "forwardClicked" target="view"}}>
+            </a>
+        {{/unless}}
+        <div id="time-window-control" {{bind-attr class=":ui-mini Mist.graphsController.stream.isStreaming"}}>
+            <a class="ui-btn ui-btn-icon-right ui-icon-carat-d"
+                {{action "timeWindowClicked" target="view"}}>
+                    {{view.timeWindowText}}
+            </a>
+        </div>
+
+    </div>
+
+    <div id="change-time-window" data-role="popup" data-transition="flip" data-position-to="#time-window-control">
+        <ul data-role='listview'>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "minutes" "last 10 mins"target="view"}}>
+                    last 10 mins</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "hour" "last hour" target="view"}}>
+                    last hour</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "day" "last day" target="view"}}>
+                    last day</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "week" "last week" target="view"}}>
+                    last week</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "month" "last month" target="view"}}>
+                    last month</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "timeWindowChanged" "range" "range" target="view"}}>
+                    custom range</a>
+            </li>
+        </ul>
+    </div>
+
+
+    <!--
+        Pick Range Popup
+    -->
+
+    <div id="pick-range-screen"
+        class="ui-popup-screen ui-screen-hidden">
+    </div>
+    <div>
+        <div id="pick-range-popup"
+            class="flip
+                ui-popup-container
+                ui-popup-hidden
+                ui-popup-truncate">
+            <div id="pick-range"
+                class="small-popup
+                    ui-popup
+                    ui-body-inherit
+                    ui-overlay-shadow
+                    ui-corner-all"
+                data-role="popup"
+                data-enhanced="true"
+                data-position-to="#time-window-control"
+                data-transition="flip">
+
+                <div class="ui-header ui-bar-b" role="banner">
+                    <h1 class="ui-title">Select Range</h1>
+                </div>
+                <div class="ui-content ui-body-a" role="main">
+                    <label>From:</label>
+                    {{view Mist.TextField
+                        id="range-start"
+                        placeholder="range start"}}
+                    <label>To:</label>
+                    {{view Mist.TextField
+                        id="range-stop"
+                        placeholder="range stop"}}
+                    <div class="ok-cancel
+                            ui-controlgroup
+                            ui-controlgroup-horizontal
+                            ui-group-theme-a
+                            ui-corner-all"
+                        data-role="controlgroup"
+                        data-type="horizontal">
+
+                        <a class="ui-btn"
+                            {{action "rangeBackClicked" target="view"}}>
+                                Back
+                        </a>
+                        <a id="key-add-ok" class="ui-btn ui-btn-d"
+                            {{action "rangeOkClicked" target="view"}}>
+                                OK
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

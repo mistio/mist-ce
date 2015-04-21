@@ -1,18 +1,16 @@
-define('app/models/image', ['ember'],
+define('app/models/image', ['app/models/base'],
     //
     // Image Model
     //
     // @returns Class
     //
-    function() {
+    function (BaseModel) {
 
         'use strict';
 
-        return Ember.Object.extend({
+        return BaseModel.extend({
 
-            id: null,
             star: null,
-            name: null,
             extra: null,
 
             toggle: function (callback) {
