@@ -328,6 +328,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                     if (keyId)
                         backendModel.one('onMachineListChange', function() {
                             if (backendModel.provider == 'bare_metal') {
+                                backendModel.set('isBareMetal', true);
                                 Mist.keysController._associateKey(keyId,
                                     backendModel.machines.content[0]);
                             }

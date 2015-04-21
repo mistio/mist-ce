@@ -228,7 +228,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
 -----------------------------------------------------------------------------------------------------------*/
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable {
-    margin: 3em 8em -3em 118px !important;
+    margin: 3em 8em -3em 3em !important;
     position: relative;
     top: -3.1em;
 }
@@ -365,7 +365,8 @@ ul.checkbox-list li label {
     display: inline-block;
     border: 1px solid #c4c4c4;
 }
-.small-list-item button {
+.small-list-item button,
+.small-list-item a {
     display: inline;
 }
 .small-list-item p {
@@ -483,12 +484,27 @@ ul.checkbox-list li label {
 
 /* Other
 -----------------------------------------------------------------------------------------------------------*/
+#list-divider {
+    background-color: #D3D3D3;
+    font-size: 16px;
+    font-weight: bold;
+}
+
 #hidden-shell-iframe {
     display: none;
 }
 
 .single-machine-loader {
     z-index: 1000;
+}
+
+.select-btn {
+    float: left;
+    font-weight: normal;
+    padding: 0px !important;
+    width: 2.5em;
+    height: 2.5em;
+    text-indent: -5000px;
 }
 
 @media only screen and (max-width: 550px) {

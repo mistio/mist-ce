@@ -2,7 +2,8 @@
 
     <div data-role="header" data-theme="b">
 
-        <a href="#" class="responsive-button" data-icon="home">Home</a>
+        <a href="#" class="responsive-button ui-btn-left ui-btn ui-icon-home
+            ui-btn-icon-left ui-shadow ui-corner-all">Home</a>
 
         <h1>Images</h1>
 
@@ -38,7 +39,8 @@
             <div class="ajax-loader"></div>
         {{/if}}
 
-        <button id="images-advanced-search" data-theme="b" {{action "searchClicked" target="view"}}>
+        <a id="images-advanced-search" class="ui-btn ui-btn-b ui-shadow ui-corner-all"
+            {{action "searchClicked" target="view"}}>
             <span>
                 {{#if view.searchingImages}}
                     Please wait...
@@ -46,7 +48,7 @@
                     Continue search on server...
                 {{/if}}
             </span>
-        </button>
+        </a>
 
         <div class="small-padding"></div>
 

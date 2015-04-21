@@ -4,12 +4,11 @@
 #machine-list-page .ui-filterable {
     clear: both;
 }
+#machine-list-page #select-machines-btn{
+    
+}
 #machine-list-page #create-machine-btn {
     float: right;
-}
-#machine-list-page #select-machines-btn {
-    float: left;
-    font-weight: normal;
 }
 .running {
     color: #13B754;
