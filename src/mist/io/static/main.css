@@ -327,15 +327,10 @@ ul.checkbox-list li label {
     width: 100%;
     bottom: 0;
 }
-.ui-footer table {
-    margin-left: -1px;
-    width: 100%;
-}
 .ui-footer a {
+    margin: 0 !important;
     padding-left: 0 !important;
-    padding-right: 0 !important;
     width: 100%;
-    margin: 0;
 }
 
 @media only screen and  (max-width: 340px) {
@@ -343,16 +338,6 @@ ul.checkbox-list li label {
         font-size: 10px;
         text-indent: 10px;
     }
-}
-.ui-footer.dual-action-footer td {
-    width: 50%;
-}
-.ui-footer.tri-action-footer td {
-    width: 33.3%;
-}
-
-.ui-footer .ui-grid-a a {
-    margin:0;
 }
 
 /* Small List Item
