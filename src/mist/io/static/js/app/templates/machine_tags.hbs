@@ -12,7 +12,8 @@
 
         {{view Mist.TextField valueBinding="Mist.machineTagsController.newTag"}}
 
-        <a id="add-tag-ok" data-role="button" data-theme="d" {{action "addClicked" target="view"}}>Add</a>
+        <a id="add-tag-ok" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+            {{action "addClicked" target="view"}}>Add</a>
 
         <ul data-role="listview">
             {{#each Mist.machineTagsController.machine.tags}}
@@ -26,7 +27,8 @@
             <div class="ajax-loader"></div>
         {{/if}} {{/if}}
 
-        <a id="add-tag-back" data-role="button" {{action "backClicked" target="view"}}>Back</a>
+        <a id="add-tag-back" class="ui-btn ui-shadow ui-corner-all"
+            {{action "backClicked" target="view"}}>Back</a>
 
     </div>
 
