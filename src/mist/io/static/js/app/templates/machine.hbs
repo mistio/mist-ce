@@ -31,7 +31,11 @@
         </span>
 
         <!-- State label -->
-        <h1 {{bind-attr class="state"}}>{{state}}</h1>
+        <h1 {{bind-attr class="state"}}>
+            {{#unless isUnknown}}
+                {{state}}
+            {{/unless}}
+        </h1>
 
         <!-- Show spinner if machines are being loaded -->
         {{#unless id}}
@@ -42,6 +46,7 @@
 
 
         <!-- If machine is not running created, disable keys UI -->
+        {{#unless isWindows}}
         <span id="mist-manage-keys"
             {{bind-attr
                 class="view.isRunning::ui-state-disabled
@@ -68,6 +73,7 @@
                 {{/if}}
             {{/unless}}
         </span>
+        {{/unless}}
     </div>
 
     <div data-role="content" data-theme="a">
@@ -241,8 +247,6 @@
 
     {{view "machinePower" position="#single-machine-power-btn"}}
 
-    {{view "confirmationDialog"}}
-
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
             <a id="single-machine-tags-btn"
@@ -253,19 +257,28 @@
                     :ui-icon-grid"}}
                 {{action "tagsClicked" target="view"}}>Tags</a>
         </td><td>
-            <a id="single-machine-shell-btn"
-                {{bind-attr class="hasKeys::ui-state-disabled
-                    :ui-btn
-                    :ui-btn-icon-left
-                    :ui-icon-gear"}}
-                {{action "shellClicked" target="view"}}>Shell</a>
+            {{#if isWindows}}
+                <a id="single-machine-shell-btn"
+                    target="_blank"
+                    {{bind-attr href="rdpURL" class="canConnect::ui-state-disabled
+                        :ui-btn
+                        :ui-btn-icon-left
+                        :ui-icon-gear"}}>Connect</a>
+            {{else}}
+                <a id="single-machine-shell-btn"
+                    {{bind-attr class="canConnect::ui-state-disabled
+                        :ui-btn
+                        :ui-btn-icon-left
+                        :ui-icon-gear"}}
+                    {{action "shellClicked" target="view"}}>Shell</a>
+            {{/if}}
         </td><td>
             <a id="single-machine-power-btn"
                 {{bind-attr class="id::ui-state-disabled
                     :ui-btn
                     :ui-btn-icon-left
-                    :ui-icon-power"}}
-                {{action "powerClicked" target="view"}}>Power</a>
+                    :ui-icon-bars"}}
+                {{action "powerClicked" target="view"}}>Actions</a>
         </td></tr></tbody></table>
     </div>
 

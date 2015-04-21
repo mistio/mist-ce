@@ -1,4 +1,4 @@
-define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
+define('app/views/home', ['app/views/page', 'app/models/graph'],
     //
     //  Home View
     //
@@ -9,6 +9,12 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
         'use strict';
 
         return App.HomeView = PageView.extend({
+
+
+            hasIncidents: function () {
+                if (Mist.openIncidents)
+                    return !!Mist.openIncidents.length;
+            }.property('Mist.openIncidents'),
 
 
             //
@@ -45,6 +51,16 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
                 addBackend: function () {
                     Mist.backendAddController.open();
+                },
+
+                incidentClicked: function (incident) {
+                    var machine = incident.get('machine');
+                    if (!machine)
+                        Mist.notificationController.timeNotify(
+                            'Machine not found', 2000);
+                    else
+                        Mist.Router.router.transitionTo('machine',
+                            incident.get('machine'));
                 }
             },
 
@@ -55,10 +71,9 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
             //
             //
 
+
             showGraphs: function () {
 
-                if (Mist.graphsController.isOpen)
-                    return;
                 if (!Mist.monitored_machines)
                    return;
 
@@ -66,9 +81,10 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
                 var loadMetric = Mist.metricsController.getMetric('load.shortterm');
                 Mist.monitored_machines.forEach(function (machineTuple) {
                     var backend = Mist.backendsController.getBackend(machineTuple[0]);
-                    if (!backend) return;
+                    if (!backend || !backend.get('enabled'))
+                        return
                     var machine = Mist.backendsController.getMachine(machineTuple[1], machineTuple[0]);
-                    if (!machine) return;
+                    if (!machine || machine.get('isWindows')) return;
                     Mist.datasourcesController.addDatasource({
                         machine: machine,
                         metric: loadMetric,
@@ -78,12 +94,29 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
                     });
                 });
 
+                if (Mist.graphsController.isOpen) {
+                    var listChanged = false;
+                    var existingDatasources = Mist.graphsController.content[0].datasources;
+                    datasources.some(function (datasource) {
+                        var exists = existingDatasources.findBy('id', datasource.id);
+                        if (!exists) {
+                            listChanged = true;
+                            return true;
+                        }
+                    });
+                    if (existingDatasources.length != datasources.length)
+                        listChanged = true;
+                    if (!listChanged)
+                        return;
+                    Mist.graphsController.close();
+                }
+
                 if (!datasources.length)
                     return;
 
                 Mist.graphsController.open({
                     graphs: [Graph.create({
-                        title: 'Load for all monitored servers',
+                        title: 'Load on all monitored machines',
                         datasources: datasources,
                     })],
                     config: {
@@ -97,37 +130,6 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
 
             //
-            // Proxy actions for graph list control view
-            //
-
-
-            backClicked: function () {
-                Mist.graphsController.history.goBack();
-            },
-
-
-            forwardClicked: function () {
-                Mist.graphsController.history.goForward();
-            },
-
-
-            resetClicked: function () {
-                Mist.graphsController.stream.start();
-            },
-
-
-            pauseClicked: function () {
-                Mist.graphsController.stream.stop();
-            },
-
-
-            timeWindowChanged: function () {
-                var newTimeWindow = $('#time-window-control select').val();
-                Mist.graphsController.resolution.change(newTimeWindow);
-            },
-
-
-            //
             //
             //  Observers
             //
@@ -136,7 +138,7 @@ define('app/views/home', ['app/views/mistscreen', 'app/models/graph'],
 
             checkedMonitoringObserver: function () {
                 Ember.run.later(this, function () {
-                    if (Mist.backendsController.checkedMonitoring)
+                    if (this.$() && Mist.backendsController.checkedMonitoring)
                         this.showGraphs();
                 }, 500); // to make sure datasources exist
             }.observes('Mist.backendsController.checkedMonitoring')

@@ -72,8 +72,8 @@ define('app/views/machine_monitoring',
 
                 Mist.set('ma', this);
                 // Add event handlers
-                Mist.rulesController.on('onRuleAdd', this, '_ruleAdded');
-                Mist.rulesController.on('onRuleDelete', this, '_ruleDeleted');
+                Mist.rulesController.on('onAdd', this, '_ruleAdded');
+                Mist.rulesController.on('onDelete', this, '_ruleDeleted');
                 Mist.metricsController.on('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.on('onMetricDelte', this, '_metricDeleted');
                 Mist.metricsController.on('onMetricDisassociate', this, '_metricDeleted');
@@ -85,8 +85,8 @@ define('app/views/machine_monitoring',
             unload: function () {
 
                 // Remove event handlers
-                Mist.rulesController.off('onRuleAdd', this, '_ruleAdded');
-                Mist.rulesController.off('onRuleDelete', this, '_ruleDeleted');
+                Mist.rulesController.off('onAdd', this, '_ruleAdded');
+                Mist.rulesController.off('onDelete', this, '_ruleDeleted');
                 Mist.metricsController.off('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.off('onMetricDelte', this, '_metricDeleted');
                 Mist.metricsController.off('onMetricDisassociate', this, '_metricDeleted');
@@ -197,44 +197,6 @@ define('app/views/machine_monitoring',
 
                 addRuleClicked: function() {
                     Mist.rulesController.newRule(this.machine);
-                },
-
-
-                //
-                // Proxy actions for graph list control view
-                //
-
-
-                backClicked: function () {
-                    Mist.graphsController.history.goBack();
-                },
-
-
-                forwardClicked: function () {
-                    Mist.graphsController.history.goForward();
-                },
-
-
-                resetClicked: function () {
-                    Mist.graphsController.stream.start();
-                },
-
-
-                pauseClicked: function () {
-                    Mist.graphsController.stream.stop();
-                },
-
-
-                timeWindowChanged: function () {
-                    var newTimeWindow = $('#time-window-control select').val();
-                    Mist.graphsController.resolution.change(newTimeWindow);
-
-                    // Update cookie
-                    var entry = Mist.cookiesController.getSingleMachineEntry(
-                        this.machine);
-                    entry.timeWindow = newTimeWindow;
-                    Mist.cookiesController.setSingleMachineEntry(
-                        this.machine, entry);
                 },
 
 
@@ -393,12 +355,38 @@ define('app/views/machine_monitoring',
                 this.set('gettingCommand', true);
                 Mist.monitoringController.getMonitoringCommand(
                     this.machine, function (success, data) {
-                        if (success)
-                            showPopup(data.command);
+                        if (success) {
+                            if (that.machine.get('isWindows'))
+                                showWindowsPopup(data.windows_command);
+                            else
+                                showUnixPopup(data.unix_command);
+                        }
                         that.set('gettingCommand', false)
                 });
 
-                function showPopup (command) {
+                function showWindowsPopup(command) {
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.OK_CANCEL,
+                        head: 'Enable monitoring',
+                        body: [
+                            {
+                                paragraph: 'Run this command on your server\'s console' +
+                                    ' to install the monitoring agent:'
+                            },
+                            {
+                                command: command
+                            },
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm)
+                                Mist.monitoringController.enableMonitoring(
+                                    that.machine, null, true
+                                );
+                        },
+                    });
+                }
+                
+                function showUnixPopup (command) {
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.OK_CANCEL,
                         head: 'Enable monitoring',
@@ -447,23 +435,27 @@ define('app/views/machine_monitoring',
 
             _showGraphs: function () {
 
+                if (!this.$())
+                    return;
+
                 var cookie = Mist.cookiesController
                     .getSingleMachineEntry(this.machine);
 
                 if (Mist.graphsController.isOpen)
                     return;
                 this.set('graphs', this.graphs.sortBy('index'));
+
                 Mist.graphsController.open({
                     graphs: this.graphs,
                     config: {
                         canModify: true,
                         canControl: true,
                         canMinimize: true,
-                        timeWindow: cookie.timeWindow,
                     }
                 });
 
                 Ember.run.next(function () {
+                    return;
                     $('#time-window-control select')
                         .val(cookie.timeWindow)
                         .trigger('change');
@@ -479,7 +471,7 @@ define('app/views/machine_monitoring',
 
 
             _updateRules: function () {
-                Mist.rulesController.content.forEach(function (rule) {
+                Mist.rulesController.forEach(function (rule) {
                     if (this.machine.equals(rule.machine))
                         if (!this.rules.findBy('id', rule.id))
                             this.rules.pushObject(rule);
@@ -578,15 +570,15 @@ define('app/views/machine_monitoring',
 
             _ruleAdded: function (event) {
                 if (this.machine.equals)
-                    if (this.machine.equals(event.rule.machine))
-                        this.rules.pushObject(event.rule);
+                    if (this.machine.equals(event.object.machine))
+                        this.rules.pushObject(event.object);
             },
 
 
             _ruleDeleted: function (event) {
                 if (this.machine.equals)
-                    if (this.machine.equals(event.rule.machine))
-                        this.rules.removeObject(event.rule);
+                    if (this.machine.equals(event.object.machine))
+                        this.rules.removeObject(event.object);
             },
 
 

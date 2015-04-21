@@ -18,7 +18,6 @@ require.config({
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
-        sha256: 'lib/sha256',
         socket: 'lib/socket.io',
         term: 'lib/term'
     },
@@ -226,10 +225,10 @@ var appLoader = {
                     },
                 });
                 appLoader.buffer.logs = new Socket_({
-                    keepAlive: true,
                     namespace: '/logs',
-                    onInit: function (socket) {
-                        socket.emit('ready');
+                    onConnect: function (socket) {
+                        if (!appLoader)
+                            socket.emit('ready');
                     }
                 });
             }
@@ -247,7 +246,9 @@ var appLoader = {
             before: ['init socket events'],
             exec: function () {
                 setupSocketEvents(Mist.socket, function () {
-                    appLoader.complete('fetch first data');
+                    setupLogsSocketEvents(Mist.logs, function () {
+                        appLoader.complete('fetch first data');
+                    });
                 });
             }
         },
@@ -259,10 +260,10 @@ var appLoader = {
 var loadFiles = function (callback) {
     require([
         'app/templates/templates',
+
         'app/controllers/backend_add',
         'app/controllers/backend_edit',
         'app/controllers/backends',
-        'app/controllers/confirmation',
         'app/controllers/cookies',
         'app/controllers/datasources',
         'app/controllers/dialog',
@@ -277,6 +278,7 @@ var loadFiles = function (callback) {
         'app/controllers/machine_add',
         'app/controllers/machine_keys',
         'app/controllers/machine_power',
+        'app/controllers/machine_edit',
         'app/controllers/machine_shell',
         'app/controllers/machine_tags',
         'app/controllers/metric_add',
@@ -291,10 +293,22 @@ var loadFiles = function (callback) {
         'app/controllers/script_edit',
         'app/controllers/script_run',
         'app/controllers/scripts',
+
+        'app/routes/images',
+        'app/routes/index',
+        'app/routes/key',
+        'app/routes/keys',
+        'app/routes/machine',
+        'app/routes/machines',
+        'app/routes/missing',
+        'app/routes/network',
+        'app/routes/networks',
+        'app/routes/script',
+        'app/routes/scripts',
+
         'app/views/backend_add',
         'app/views/backend_button',
         'app/views/backend_edit',
-        'app/views/confirmation_dialog',
         'app/views/dialog',
         'app/views/file_upload',
         'app/views/graph_button',
@@ -322,6 +336,7 @@ var loadFiles = function (callback) {
         'app/views/machine_list_item',
         'app/views/machine_monitoring',
         'app/views/machine_power',
+        'app/views/machine_edit',
         'app/views/machine_shell',
         'app/views/machine_tags',
         'app/views/machine_tags_list_item',
@@ -355,7 +370,6 @@ var loadApp = function (
     BackendAddController,
     BackendEditController,
     BackendsController,
-    ConfirmationController,
     CookiesController,
     DatasourcesController,
     DialogController,
@@ -370,6 +384,7 @@ var loadApp = function (
     MachineAddController,
     MachineKeysController,
     MachinePowerController,
+    MachineEditController,
     MachineShellController,
     MachineTagsController,
     MetricAddController,
@@ -432,174 +447,6 @@ var loadApp = function (
         this.route('missing', { path: "/*path" });
     });
 
-    App.IndexRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - home';
-            });
-        }
-    });
-
-    App.ImagesRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
-                document.title = 'mist.io - images';
-            });
-        }
-    });
-
-    App.NetworksRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - networks';
-            });
-        },
-        exit: function() {
-            Mist.backendsController.forEach(function (backend) {
-                backend.networks.forEach(function (network) {
-                    network.set('selected', false);
-                });
-            });
-        }
-    });
-
-    App.NetworkRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('network');
-                var id = model._id || model.id;
-                var network = Mist.backendsController.getNetwork(id);
-                document.title = 'mist.io - ' + (network ? network.name : id);
-            });
-        },
-        redirect: function (network) {
-            Mist.backendsController.set('networkRequest', network._id);
-        },
-        model: function (args) {
-            var id = args.network_id;
-            if (Mist.backendsController.loading ||
-                Mist.backendsController.loadingNetworks)
-                    return {_id: id, backend: {}};
-            return Mist.backendsController.getNetwork(id);
-        }
-    });
-
-    App.MachinesRoute = Ember.Route.extend({
-        activate: function() {
-            Ember.run.next(function() {
-                document.title = 'mist.io - machines';
-            });
-        },
-        exit: function() {
-            Mist.backendsController.forEach(function(backend) {
-                backend.machines.forEach(function(machine) {
-                    machine.set('selected', false);
-                });
-            });
-        }
-    });
-
-    App.MachineRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('machine');
-                var id = model._id || model.id;
-                var machine = Mist.backendsController.getMachine(id);
-                document.title = 'mist.io - ' + (machine ? machine.name : id);
-            });
-        },
-        redirect: function (machine) {
-            Mist.backendsController.set('machineRequest', machine._id);
-        },
-        model: function (args) {
-            var id = args.machine_id;
-            if (Mist.backendsController.loading ||
-                Mist.backendsController.loadingMachines)
-                    return {_id: id, backend: {}};
-            return Mist.backendsController.getMachine(id);
-        }
-    });
-
-    App.KeysRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - keys';
-            });
-        },
-        exit: function () {
-            Mist.keysController.content.setEach('selected', false);
-        }
-    });
-
-    App.KeyRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('key');
-                var id = model._id || model.id;
-                var key = Mist.keysController.getKey(id);
-                document.title = 'mist.io - ' + (key ? key.id : id);
-            });
-        },
-        redirect: function (key) {
-            Mist.keysController.set('keyRequest', key._id);
-        },
-        model: function (args) {
-            var id = args.key_id;
-            if (Mist.keysController.loading)
-                return {_id: id, machines: []};
-            return Mist.keysController.getKey(id);
-        }
-    });
-
-    App.LogsRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - logs';
-            });
-        },
-    });
-
-    if (Mist.isCore) {
-    App.ScriptsRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - scripts';
-            });
-        },
-        exit: function () {
-            Mist.scriptsController.setEach('selected', false);
-        }
-    });
-
-    App.ScriptRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(this, function () {
-                var model = this.modelFor('script');
-                var id = model._id || model.id;
-                var script = Mist.scriptsController.getObject(id);
-                document.title = 'mist.io - ' + (script ? script.id : id);
-            });
-        },
-        redirect: function (script) {
-            Mist.scriptsController.set('scriptRequest', script._id);
-        },
-        model: function (args) {
-            var id = args.script_id;
-            if (Mist.scriptsController.loading)
-                return {_id: id};
-            return Mist.scriptsController.getObject(id);
-        }
-    });
-    }
-
-    App.MissingRoute = Ember.Route.extend({
-        activate: function () {
-            Ember.run.next(function () {
-                document.title = 'mist.io - 404';
-            });
-        },
-    });
-
     // Ember controllers
 
     App.set('keysController', KeysController.create());
@@ -624,10 +471,10 @@ var loadApp = function (
     App.set('imageSearchController', ImageSearchController.create());
     App.set('datasourcesController', DatasourcesController.create());
     App.set('machineShellController', MachineShellController.create());
-    App.set('confirmationController', ConfirmationController.create());
     App.set('notificationController', NotificationController.create());
     App.set('dialogController', DialogController.create());
     App.set('machinePowerController', MachinePowerController.create());
+    App.set('machineEditController', MachineEditController.create());
     App.set('networkCreateController', NetworkCreateController.create());
     App.set('metricAddCustomController', MetricAddCustomController.create());
     App.set('scriptsController', ScriptsController.create());
@@ -756,6 +603,23 @@ var loadApp = function (
         else
             element.slideUp();
     };
+
+    App.clock = Ember.Object.extend({
+        init: function () {
+            this._super();
+            var that = this;
+            setInterval(function () {
+                that.tick();
+            }, TIME_MAP.SECOND);
+        },
+        tick: function () {
+            this.setProperties({
+                second: new Date().getSeconds(),
+                minute: new Date().getMinutes(),
+                hour: new Date().getHours(),
+            });
+        }
+    }).create();
 };
 
 
@@ -805,6 +669,30 @@ var handleMobileInit = function () {
 };
 
 
+var setupLogsSocketEvents = function (socket, callback) {
+
+    socket.on('open_incidents', function (openIncidents) {
+        require(['app/models/story'], function (StoryModel) {
+            var models = openIncidents.map(function (incident) {
+                return StoryModel.create(incident);
+            });
+            Mist.set('openIncidents', models);
+        });
+    }).on('closed_incidents', function (closedIncidents) {
+        require(['app/models/story'], function (StoryModel) {
+            var models = closedIncidents.map(function (incident) {
+                return StoryModel.create(incident);
+            });
+            Mist.set('closedIncidents', models);
+        });
+    }).emit('ready');
+    Mist.set('openIncidents', []);
+    Mist.set('closedIncidents', [])
+    if (callback)
+        callback();
+};
+
+
 var setupSocketEvents = function (socket, callback) {
 
     if (Mist.isCore) {
@@ -831,12 +719,12 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_sizes', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.sizes.load(data.sizes);
+            backend.sizes.setContent(data.sizes);
     })
     .on('list_images', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.images.load(data.images);
+            backend.images.setContent(data.images);
     })
     .on('list_machines', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -846,7 +734,7 @@ var setupSocketEvents = function (socket, callback) {
     .on('list_locations', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.locations.load(data.locations);
+            backend.locations.setContent(data.locations);
     })
     .on('list_networks', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -872,7 +760,7 @@ var setupSocketEvents = function (socket, callback) {
         if (machine.id) {
             dialogBody.push({
                 link: machine.name,
-                class: 'ui-btn ui-btn-icon-right ui-icon-carat-r ui-mini ui-corner-all',
+                class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 href: '#/machines/' + machineId,
                 closeDialog: true,
             });
@@ -982,7 +870,7 @@ function Ajax (csrfToken) {
                         if (!success && ret.error)
                             ret.error(jqXHR.responseText, jqXHR.status);
                         if (ret.complete)
-                            ret.complete(success, jqXHR.responseJSON);
+                            ret.complete(success, jqXHR.responseJSON, jqXHR);
                     }
                 };
 
@@ -1155,22 +1043,26 @@ function Socket_ (args) {
             events.on.apply(events, arguments);
             if (!socket.$events || !socket.$events[event])
                 socket.on(event, function (response) {
-                    that._log('RECEIVE', response);
+                    that._log('/'+ event, 'RECEIVE', response);
                     events.trigger.call(events, event, response);
                 });
+            return this;
         },
 
 
         off: function () {
             var events = this.get('events');
             events.off.apply(events, arguments);
+            return this;
         },
 
 
         emit: function () {
-            this._log('EMIT', slice(arguments));
+            var args = slice(arguments)
+            this._log('/'+args[0], 'EMIT', args);
             var socket = this.get('socket');
             socket.emit.apply(socket, arguments);
+            return this;
         },
 
 
@@ -1181,6 +1073,7 @@ function Socket_ (args) {
             if (socket.$events)
                 for (event in socket.$events)
                     delete socket.$events[event];
+            return this;
         },
 
 
@@ -1398,15 +1291,15 @@ function parseProviderMap () {
 
     // Append nested fields into main array
     forIn(PROVIDER_MAP, function (fields, title) {
-        fields.forEach(function (field) {
+        fields.forEach(function (field, i1) {
             if (field.type == 'slider') {
-                field.on.forEach(function (f) {
+                field.on.forEach(function (f, i2) {
                     f.className = 'on';
-                    fields.push(f);
+                    fields.splice(i1 + i2 + 1, 0, f);
                 });
-                field.off.forEach(function (f) {
+                field.off.forEach(function (f, i2) {
                     f.className = 'off';
-                    fields.push(f);
+                    fields.splice(i1 + i2 + 1, 0, f);
                 });
             }
         });
@@ -1419,6 +1312,8 @@ function parseProviderMap () {
         fields.forEach(function (field, index) {
             field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
             field.value = field.defaultValue || '';
+            if (!field.showIf)
+                field.show = true;
             if (field.type == 'slider')
                 field.isSlider = true;
             if (field.type == 'text' ||
@@ -1430,6 +1325,8 @@ function parseProviderMap () {
                 field.isKey = true;
             if (field.type == 'region')
                 field.isRegion = true;
+            if (field.type == 'checkbox')
+                field.isCheckbox = true;
             if (!field.placeholder)
                 field.placeholder = "";
             if (field.optional)
@@ -1442,6 +1339,17 @@ function parseProviderMap () {
                             return word.toUpperCase();
                     return word.capitalize()
                 }).join(' ');
+        });
+    });
+
+    // Build dependencies
+    forIn(PROVIDER_MAP, function (fields, title) {
+        fields.forEach(function (field, index) {
+            if (field.showIf) {
+                field.set('showDependency', fields.findBy('name', field.showIf));
+                var binding = Ember.Binding.from("showDependency.value").to("show");
+                binding.connect(field);
+            }
         });
     });
 }
@@ -1470,27 +1378,35 @@ var extendEmberView = function () {
 
 String.prototype.decapitalize = function () {
     return this.charAt(0).toLowerCase() + this.slice(1);
-}
+};
 
-Date.prototype.getPrettyTime = function () {
+Date.prototype.isFuture = function () {
+    return this > new Date();
+};
+
+Date.prototype.getPrettyTime = function (noSeconds) {
 
     var hour = this.getHours();
     var min = this.getMinutes();
     var sec = this.getSeconds();
 
     var ret = (hour < 10 ? '0' : '') + hour + ':' +
-        (min < 10 ? '0' : '') + min + ':' +
-        (sec < 10 ? '0' : '') + sec;
+        (min < 10 ? '0' : '') + min +
+        (noSeconds ? '' : (':' + (sec < 10 ? '0' : '') + sec));
 
     return ret;
 }
 
-Date.prototype.getPrettyDate = function () {
-    return this.getMonthName() + ' ' + this.getDate() + ', ' + this.getFullYear();
+Date.prototype._toString = function () {
+    var d = (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear();
+    return d + ', ' + this.getPrettyTime();
+}
+Date.prototype.getPrettyDate = function (shortMonth) {
+    return this.getMonthName(shortMonth) + ' ' + this.getDate() + ', ' + this.getFullYear();
 }
 
-Date.prototype.getPrettyDateTime = function () {
-    return this.getPrettyDate() + ', ' + this.getPrettyTime();
+Date.prototype.getPrettyDateTime = function (shortMonth, noSeconds) {
+    return this.getPrettyDate(shortMonth) + ', ' + this.getPrettyTime(noSeconds);
 }
 
 Date.prototype.getMonthName = function (short) {
@@ -1500,6 +1416,31 @@ Date.prototype.getMonthName = function (short) {
     return ['January','February','March','April','May','June','July',
         'August','September','October','November','December'][this.getMonth()];
 }
+
+Date.prototype.diffToString = function (date) {
+
+    var diff = this - date;
+    var ret = '';
+
+    if (diff < TIME_MAP.MINUTE)
+        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
+    else if (diff < TIME_MAP.HOUR)
+        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
+    else if (diff < TIME_MAP.DAY)
+        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
+    else if (diff < TIME_MAP.MONTH)
+        ret = parseInt(diff / TIME_MAP.DAY) + ' day';
+    else if (diff < TIME_MAP.YEAR)
+        ret = parseInt(diff / TIME_MAP.MONTH) + ' month';
+    else
+        ret = 'TOO LONG!';
+
+    // Add 's' for plural
+    if (ret.split(' ')[0] != '1')
+        ret = ret + 's';
+
+    return ret;
+};
 
 Date.prototype.getTimeFromNow = function () {
 
@@ -1595,30 +1536,62 @@ var PROVIDER_MAP = {
         {
             name: 'title',
             type: 'text',
-            defaultValue: 'Other Server',
         },
         {
             name: 'machine_ip',
             type: 'text',
             label: 'Hostname',
-        },
-        {
-            name: 'machine_user',
-            type: 'text',
-            label: 'User',
-            defaultValue: 'root',
-        },
-        {
-            name: 'machine_port',
-            type: 'text',
-            label: 'Port',
-            defaultValue: '22',
             optional: true,
+            placeholder: 'DNS or IP '
         },
         {
-            name: 'machine_key',
-            type: 'ssh_key',
-            label: 'SSH Key',
+            name: 'windows',
+            type: 'slider',
+            label: 'Operating System',
+            onLabel: 'Windows',
+            offLabel: 'Unix',
+            onValue: true,
+            offValue: false,
+            optional: true,
+            on: [
+                {
+                    name: 'remote_desktop_port',
+                    type: 'text',
+                    label: 'Remote Desktop Port',
+                    defaultValue: '3389',
+                    optional: true,
+                }
+            ],
+            off: [
+                {
+                    name: 'machine_key',
+                    type: 'ssh_key',
+                    label: 'SSH Key',
+                    optional: true,
+                },
+                {
+                    showIf: 'machine_key',
+                    name: 'machine_user',
+                    type: 'text',
+                    label: 'User',
+                    optional: true,
+                    defaultValue: 'root',
+                },
+                {
+                    showIf: 'machine_key',
+                    name: 'machine_port',
+                    type: 'text',
+                    label: 'Port',
+                    defaultValue: '22',
+                    optional: true,
+                },
+            ]
+        },
+        {
+            name: 'monitoring',
+            type: 'checkbox',
+            label: 'Enable monitoring',
+            defaultValue: true,
         }
     ],
 
@@ -1630,6 +1603,18 @@ var PROVIDER_MAP = {
         },
         {
             name: 'token',
+            type: 'password',
+        },
+    ],
+
+    hostvirtual: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'HostVirtual',
+        },
+        {
+            name: 'api_key',
             type: 'password',
         },
     ],
@@ -1926,71 +1911,76 @@ var PROVIDER_MAP = {
             name: 'organization',
             type: 'text'
         }
+    ],
+    vsphere: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'VMware vSphere'
+        },
+        {
+            name: 'username',
+            type: 'text'
+        },
+        {
+            name: 'password',
+            type: 'password'
+        },
+        {
+            name: 'host',
+            type: 'text',
+            label: 'Hostname',
+        }
     ]
 };
 
-/*
-var SCRIPT_ADD_FIELDS = [
-    {
-        name: 'name',
-        type: 'text'
-    },
-    {
-        name: 'type',
-        type: 'select',
-        options: [
-            {
-                value: 'executable',
-                selected: true
-            },
-            {
-                value: 'ansible'
-            }
-        ]
-    },
-    {
-        name: 'source',
-        type: 'select',
-        options: [
-            {
-                value: 'github',
-                selected: true
-            },
-            {
-                value: 'url',
-            },
-            {
-                value: 'inline'
-            }
-        ]
-    },
-    {
-        conditional: {
-            source: 'url',
-            source: 'github'
-        },
-        fields: [
-            {
-                name: 'url',
-                type: 'text'
-            },
-            {
-                name: 'entry_point',
-                type: 'text',
-                optional: true
-            }
-        ]
-    },
-    {
-        conditional: {
-            source: 'inline'
-        },
-        fields: [
-            {
-                name: 'script',
-                type: 'text'
-            }
-        ]
-    }
+var OS_MAP = [
+    [
+        ['rhel', 'redhat', 'red hat'], 'redhat'
+    ],
+    [
+        ['ubuntu'], 'ubuntu'
+    ],
+    [
+        ['ibm'], 'ibm'
+    ],
+    [
+        ['canonical'], 'canonical'
+    ],
+    [
+        ['sles', 'suse'], 'suse'
+    ],
+    [
+        ['oracle'], 'oracle'
+    ],
+    [
+        ['karmic'], 'karmic'
+    ],
+    [
+        ['opensolaris'], 'opensolaris'
+    ],
+    [
+        ['gentoo'], 'gentoo'
+    ],
+    [
+        ['opensuse'], 'opensuse'
+    ],
+    [
+        ['fedora'], 'fedora'
+    ],
+    [
+        ['centos'], 'centos'
+    ],
+    [
+        ['fedora'], 'fedora'
+    ],
+    [
+        ['debian'], 'debian'
+    ],
+    [
+        ['amazon'], 'amazon'
+    ],
+    [
+        ['windows'], 'windows'
+    ]
 ];
-*/

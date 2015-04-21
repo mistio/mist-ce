@@ -328,7 +328,6 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                     if (keyId)
                         backendModel.one('onMachineListChange', function() {
                             if (backendModel.provider == 'bare_metal') {
-                                backendModel.set('isBareMetal', true);
                                 Mist.keysController._associateKey(keyId,
                                     backendModel.machines.content[0]);
                             }
@@ -367,14 +366,15 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 Ember.run(this, function() {
                     var counter = 0;
                     this.content.forEach(function(backend) {
-                        if (backend.enabled) counter += backend.imageCount;
+                        if (backend.enabled)
+                            counter += backend.get('imageCount');
                     });
                     this.set('imageCount', counter);
-                    this.trigger('onImageListChange');
+                    this.trigger('onImagesChange');
                 });
             },
 
-
+ 
             _updateMachineCount: function() {
                 Ember.run(this, function() {
                     var counter = 0;

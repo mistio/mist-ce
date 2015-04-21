@@ -17,6 +17,7 @@ define('app/controllers/machine_power', ['ember'],
             canReboot: null,
             canDestroy: null,
             canShutdown: null,
+            canRename: null,
 
 
             /**
@@ -46,18 +47,33 @@ define('app/controllers/machine_power', ['ember'],
                 // Close current popup
                 $('#machine-power-popup').popup('close');
 
-
                 var machineNames = this.machines.toStringByProperty('name');
 
-                // Show confirmation popup
                 var that = this;
+                if (action == 'rename'){
+                    var machine = this.machines[0];
+                    this.close();
+                    Ember.run.later(function(){
+                        Mist.machineEditController.open(machine);
+                    },350)
+                    return;
+                }
                 Ember.run.later(function () {
-                    Mist.confirmationController.setUp('Machine ' + 'action',
-                        'Are you sure you want to ' + action + ' these machines: '
-                        + machineNames + ' ?', function () {
-                            that._act(action);
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Machine action',
+                        body: [
+                            {
+                                paragraph: 'Are you sure you want to ' + action + ' these machines: ' +
+                                    machineNames + ' ?'
+                            }
+                        ],
+                        callback: function (didConfirm) {
+                            if (didConfirm) {
+                                that._act(action);
+                            }
                         }
-                    );
+                    });
                 }, 500);
             },
 
@@ -76,6 +92,7 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canReboot', null);
                     this.set('canDestroy', null);
                     this.set('canShutdown', null);
+                    this.set('canRename', null);
                 });
             },
 
@@ -86,6 +103,11 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canReboot', !this.machines.findBy('can_reboot', false));
                     this.set('canDestroy', !this.machines.findBy('can_destroy', false));
                     this.set('canShutdown', !this.machines.findBy('can_stop', false));
+                    if(this.machines.length == 1 && this.machines[0].get('can_rename')){
+                        this.set('canRename', true);
+                    }else{
+                        this.set('canRename', false);
+                    }
                     this.trigger('onActionsChange');
                 });
             },
@@ -107,7 +129,7 @@ define('app/controllers/machine_power', ['ember'],
                     } else if (action == 'start') {
                         machine.start();
                     }
-                });
+                },this);
             },
 
 

@@ -47,7 +47,7 @@ define('app/controllers/backend_add', ['app/models/backend'],
             add: function () {
 
                 var provider = this.get('provider');
-                var fields = getProviderFields(provider).filterBy('isSlider', undefined);
+                var fields = getProviderFields(provider).rejectBy('name', undefined);
 
                 var payload = {
                     title: provider.title,
@@ -61,6 +61,10 @@ define('app/controllers/backend_add', ['app/models/backend'],
                 Mist.backendsController.addBackend({
                     payload: payload,
                     callback: function (success, backend) {
+                        Ember.run.later(function () {
+                            if (payload.monitoring === true)
+                                that._showMonitoringPopup(backend, payload);
+                            }, 200);
                         that._giveCallback(success, backend);
                         if (success) that.close();
                     }
@@ -73,6 +77,24 @@ define('app/controllers/backend_add', ['app/models/backend'],
             //  Pseudo-Private Methods
             //
             //
+
+
+            _showMonitoringPopup: function (backend, payload) {
+                Mist.dialogController.open({
+                    type: DIALOG_TYPES.OK,
+                    head: 'Enable monitoring',
+                    body: [
+                        {
+                            paragraph: 'Run this command on your server to install' +
+                                ' the monitoring agent'
+                        },
+                        {
+                            command: payload.windows ? backend.monitoring.windows_command :
+                                backend.monitoring.unix_command
+                        },
+                    ],
+                });
+            },
 
 
             _clear: function () {

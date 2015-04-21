@@ -26,6 +26,7 @@ from ansible import callbacks
 from ansible import utils
 
 from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
+from mist.io.exceptions import MistError
 from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
 
@@ -93,9 +94,11 @@ def ssh_command(email, backend_id, machine_id, host, command,
 @app.task(bind=True, default_retry_delay=3*60)
 def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                       key_id=None, username=None, password=None, port=22,
-                      script_id='', script_params='', job_id = None):
+                      script_id='', script_params='', job_id=None,
+                      hostname='', plugins=None):
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
+    from mist.io.methods import create_dns_a_record
     if multi_user:
         from mist.core.methods import enable_monitoring
         from mist.core.tasks import run_script
@@ -161,6 +164,17 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                                                         backend_id)
             msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name,
                                                              node.id)
+
+            if hostname:
+                try:
+                    record = create_dns_a_record(user, hostname, host)
+                    hostname = '.'.join((record.name, record.zone.domain))
+                    log_event(action='create_dns_a_record', hostname=hostname,
+                              **log_dict)
+                except Exception as exc:
+                    log_event(action='create_dns_a_record', error=str(exc),
+                              **log_dict)
+
             error = False
             if script_id and multi_user:
                 tmp_log('will run script_id %s', script_id)
@@ -203,12 +217,13 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 try:
                     enable_monitoring(user, backend_id, node.id,
                         name=node.name, dns_name=node.extra.get('dns_name',''),
-                        public_ips=ips, no_ssh=False, dry=False, job_id=job_id
+                        public_ips=ips, no_ssh=False, dry=False, job_id=job_id,
+                        plugins=plugins,
                     )
                 except Exception as e:
                     print repr(e)
                     error = True
-                    notify_user(user, "Enable monitoring failed for machine %" % (machine_id), repr(e))
+                    notify_user(user, "Enable monitoring failed for machine %s" % machine_id, repr(e))
                     notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, machine_id, e))
                     log_event(action='enable_monitoring_failed', error=repr(e),
                               **log_dict)
@@ -239,7 +254,8 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
 @app.task(bind=True, default_retry_delay=2*60)
 def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
                             command, key_id, username, password, public_key,
-                            script_id='', script_params='', job_id = None):
+                            script_id='', script_params='', job_id=None,
+                            hostname='', plugins=None):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -293,7 +309,9 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
 
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
-                script_id=script_id, script_params=script_params, job_id=job_id)
+                script_id=script_id, script_params=script_params,
+                job_id=job_id, hostname=hostname, plugins=plugins,
+            )
 
         except Exception as exc:
             raise self.retry(exc=exc, countdown=10, max_retries=15)
@@ -307,7 +325,8 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
                                           monitoring, command, key_id,
                                           password, public_key, username='root',
                                           script_id='', script_params='',
-                                          job_id = None):
+                                          job_id=None, hostname='',
+                                          plugins=None):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -346,7 +365,8 @@ def rackspace_first_gen_post_create_steps(self, email, backend_id, machine_id,
 
             post_deploy_steps.delay(
                 email, backend_id, machine_id, monitoring, command, key_id,
-                script_id=script_id, script_params=script_params, job_id=job_id
+                script_id=script_id, script_params=script_params,
+                job_id=job_id, hostname=hostname, plugins=plugins,
             )
 
         except Exception as exc:
@@ -574,7 +594,7 @@ class ListMachines(UserTask):
         user = user_from_email(email)
 
         if len(errors) == 6: # If does not respond for a minute
-            notify_user(user, 'Backend %s does not respond' % user.backends[backend_id]['title'],
+            notify_user(user, 'Backend %s does not respond' % user.backends[backend_id].title,
                         email_notify=False, backend_id=backend_id)
 
         # Keep retrying for 30 minutes
@@ -586,7 +606,7 @@ class ListMachines(UserTask):
             with user.lock_n_load():
                 user.backends[backend_id].enabled = False
                 user.save()
-            notify_user(user, "Backend %s djsabled after not responding for 30mins" % user.backends[backend_id]['title'],
+            notify_user(user, "Backend %s disabled after not responding for 30mins" % user.backends[backend_id].title,
                         email_notify=True, backend_id=backend_id)
             log_event(user.email, 'incident', action='disable_backend',
                       backend_id=backend_id, error="Backend unresponsive")
@@ -654,7 +674,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                           networks, docker_env, docker_command,
                           script_id=None, script_params=None,
                           quantity=1, persist=False, job_id=None,
-                          docker_port_bindings={}, docker_exposed_ports={}):
+                          docker_port_bindings={}, docker_exposed_ports={},
+                          hostname='', plugins=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -681,15 +702,19 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
     user = user_from_email(email)
     specs = []
     for name in names:
-        specs.append((user, backend_id, key_id, name, location_id, image_id,
-                      size_id, script, image_extra, disk, image_name, size_name,
-                      location_name, ips, monitoring, networks, docker_env,
-                      docker_command, 22, script_id, script_params, job_id))
+        specs.append((
+            (user, backend_id, key_id, name, location_id, image_id,
+             size_id, script, image_extra, disk, image_name, size_name,
+             location_name, ips, monitoring, networks, docker_env,
+             docker_command, 22, script_id, script_params, job_id),
+            {'hostname': hostname, 'plugins': plugins}
+        ))
 
-    def create_machine_wrapper(args):
+    def create_machine_wrapper(args_kwargs):
+        args, kwargs = args_kwargs
         error = False
         try:
-            node = create_machine(*args)
+            node = create_machine(*args, **kwargs)
         except MachineCreationError as exc:
             error = str(exc)
         except Exception as exc:

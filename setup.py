@@ -25,7 +25,8 @@ requires = [
     'gevent-subprocess',
     'amqp',
     'netaddr',
-    'amqp'
+    'amqp',
+    'websocket-client'
 ]
 
 setup(name='mist.io',
