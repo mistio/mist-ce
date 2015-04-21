@@ -172,7 +172,7 @@ function program8(depth0,data) {
   var buffer = '', stack1;
   data.buffer.push("\n            <div ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'class': ("field.className :field")
+    'class': ("field.className :field Mist.backendAddController.provider.provider")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push(">\n                ");
   stack1 = helpers['if'].call(depth0, "field.label", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
