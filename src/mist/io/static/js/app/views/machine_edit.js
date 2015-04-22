@@ -19,9 +19,11 @@ define('app/views/machine_edit', ['app/views/popup'],
 
             updateRenameButton: function () {
                 if (Mist.machineEditController.renamingMachine) {
-                    $('#rename-machine-ok').addClass('ui-state-disabled');
+                    $('#rename-machine-option').addClass('ui-state-disabled');
+                    $('#machine-edit-ok').addClass('ui-state-disabled');
                 } else {
-                    $('#rename-machine-ok').removeClass('ui-state-disabled');
+                    $('#rename-machine-option').removeClass('ui-state-disabled');
+                    $('#machine-edit-ok').removeClass('ui-state-disabled');
                 }
             },
 
@@ -48,7 +50,7 @@ define('app/views/machine_edit', ['app/views/popup'],
              *  Observers
              *
              */
-             
+
             updateRenameButtonObserver: function () {
                 Ember.run.once(this, 'updateRenameButton');
             }.observes('Mist.machineEditController.renamingMachine')
