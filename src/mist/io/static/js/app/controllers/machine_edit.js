@@ -56,7 +56,7 @@ define('app/controllers/machine_edit', ['ember'],
                 }).error(function() {
                     Mist.notificationController.notify('Failed to rename machine');
                 }).complete(function(success) {
-
+                    that.set('renamingMachine', false);
                 });
             }
         });

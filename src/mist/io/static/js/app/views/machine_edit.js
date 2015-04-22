@@ -48,6 +48,7 @@ define('app/views/machine_edit', ['app/views/popup'],
              *  Observers
              *
              */
+             
             updateRenameButtonObserver: function () {
                 Ember.run.once(this, 'updateRenameButton');
             }.observes('Mist.machineEditController.renamingMachine')
