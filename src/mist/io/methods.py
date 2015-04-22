@@ -1333,7 +1333,9 @@ def list_machines(user, backend_id):
                    'extra': m.extra}
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
-
+    if conn.type == 'libvirt':
+        # close ssh connections for libvirt
+        conn.disconnect()
     return ret
 
 
