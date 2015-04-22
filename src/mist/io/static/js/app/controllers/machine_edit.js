@@ -20,6 +20,7 @@ define('app/controllers/machine_edit', ['ember'],
 
             machine: null,
             newName: '',
+            renamingMachine: false,
 
 
             //
@@ -45,11 +46,11 @@ define('app/controllers/machine_edit', ['ember'],
 
             save: function () {
                 var that = this;
+                this.set('renamingMachine', true);
                 Mist.ajax.POST('/backends/' + this.machine.backend.id + '/machines/' + this.machine.id, {
                     'action' : 'rename',
                     'name': this.newName
                 }).success(function() {
-                    alert('Yupie');
                     that.close();
                     //that._destroyMachine(machineId);
                 }).error(function() {

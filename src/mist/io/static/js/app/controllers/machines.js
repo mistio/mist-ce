@@ -232,9 +232,6 @@ define('app/controllers/machines', ['app/models/machine'],
                 });
             },
 
-            renameMachine: function(machineId, callback) {
-
-            },
 
             getMachine: function(machineId) {
                 return this.content.findBy('id', machineId);

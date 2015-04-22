@@ -11,6 +11,20 @@ define('app/views/machine_edit', ['app/views/popup'],
         return App.MachineEditView = PopupView.extend({
 
 
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            updateRenameButton: function () {
+                if (Mist.machineEditController.renamingMachine) {
+                    $('#rename-machine-ok').addClass('ui-state-disabled');
+                } else {
+                    $('#rename-machine-ok').removeClass('ui-state-disabled');
+                }
+            },
+
             //
             //
             //  Actions
@@ -27,7 +41,16 @@ define('app/views/machine_edit', ['app/views/popup'],
                 saveClicked: function () {
                     Mist.machineEditController.save();
                 }
-            }
+            },
+
+            /**
+             *
+             *  Observers
+             *
+             */
+            updateRenameButtonObserver: function () {
+                Ember.run.once(this, 'updateRenameButton');
+            }.observes('Mist.machineEditController.renamingMachine')
         });
     }
 );
