@@ -12,7 +12,6 @@ from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
-
 from netaddr import IPSet, IPNetwork
 
 from libcloud.compute.providers import get_driver
@@ -1183,10 +1182,8 @@ def connect_provider(backend):
     elif backend.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if backend.apisecret:
-            temp_key_file = NamedTemporaryFile(delete=False)
-            temp_key_file.write(backend.apisecret)
-            temp_key_file.close()
-            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=temp_key_file.name, ssh_port=backend.ssh_port)
+            with get_temp_file(backend.apisecret) as tmp_key_path:
+                conn = driver(backend.apiurl, user=backend.apikey, ssh_key=tmp_key_path, ssh_port=backend.ssh_port)
         else:
             conn = driver(backend.apiurl, user=backend.apikey)
     else:
