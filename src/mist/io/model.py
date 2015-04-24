@@ -72,6 +72,7 @@ class Machine(OODict):
     name = HtmlSafeStrField()
     ssh_port = IntField(22)
     os_type = StrField('unix')
+    remote_desktop_port = IntField(3389)
 
 
 class Machines(FieldsDict):
