@@ -303,7 +303,8 @@ class StdStreamCapture(object):
         return self.get_mux()
 
 
-def check_host(host, allow_localhost=True, allow_private=True):
+def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
+               allow_private=config.ALLOW_CONNECT_PRIVATE):
     """Check if a given host is a valid DNS name or IPv4 address"""
 
     try:
