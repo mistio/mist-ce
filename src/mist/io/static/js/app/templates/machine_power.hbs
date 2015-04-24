@@ -6,10 +6,14 @@
      {{bind-attr data-position-to="view.position"}}>
 
     <div data-role="header" data-theme="b">
-        <h1>Power</h1>
+        <h1>Actions</h1>
     </div>
 
     <div data-role="content" data-theme="a">
+        {{#if Mist.machinePowerController.canRename}}
+        <a id="rename-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+            {{action "actionClicked" "rename" target="view"}}>Rename</a>
+        {{/if}}
         {{#if Mist.machinePowerController.canStart}}
         <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
             {{action "actionClicked" "start" target="view"}}>Start</a>
@@ -29,3 +33,6 @@
         <a class="ui-btn ui-shadow ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
     </div>
 </div>
+
+
+{{view "machineEdit"}}
