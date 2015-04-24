@@ -1336,7 +1336,7 @@ def list_machines(user, backend_id):
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
     if conn.type == 'libvirt':
-        # close ssh connections for libvirt
+        # close connection with libvirt
         conn.disconnect()
     return ret
 
@@ -2504,6 +2504,9 @@ def list_sizes(user, backend_id):
                     'price': size.price,
                     'ram': size.ram})
 
+    if conn.type == 'libvirt':
+        # close connection with libvirt
+        conn.disconnect()
     return ret
 
 
@@ -2544,6 +2547,9 @@ def list_locations(user, backend_id):
                     'name': name,
                     'country': location.country})
 
+    if conn.type == 'libvirt':
+        # close connection with libvirt
+        conn.disconnect()
     return ret
 
 
@@ -2609,6 +2615,10 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret.append(ec2_network_to_dict(network))
+
+    if conn.type == 'libvirt':
+        # close connection with libvirt
+        conn.disconnect()
     return ret
 
 
