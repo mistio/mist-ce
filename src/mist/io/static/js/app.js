@@ -1550,6 +1550,13 @@ var PROVIDER_MAP = {
             offValue: false,
             optional: true,
             on: [
+                {
+                    name: 'remote_desktop_port',
+                    type: 'text',
+                    label: 'Remote Desktop Port',
+                    defaultValue: '3389',
+                    optional: true,
+                }
             ],
             off: [
                 {
