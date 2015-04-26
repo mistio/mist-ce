@@ -92,6 +92,18 @@ Finally, you can start, stop or restart a specific process::
 
 Point your browser to http://127.0.0.1:8000 and you are ready to roll!
 
+Contributing to mist.io
+=======================
+
+The first step is to fork the mist.io repository on `github`__ . Then install it locally by following the instructions above.
+Make sure you use the fork’s url where required. After a few minutes Mist.io should be up and running on port 8000
+
+__ https://github.com/mistio/mist.io
+
+The most common case is that you'll want to add support for a provider. In that casem you can have a look at the `Mist.io Blog`__
+
+__ http://blog.mist.io/post/117233356986/adding-a-new-provider-in-mist-io-the-host-virtual
+
 Documentation
 =============
 

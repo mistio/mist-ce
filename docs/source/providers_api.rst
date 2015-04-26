@@ -60,6 +60,7 @@
       {'provider': 'vcloud', 'regions': [], 'title': 'VMware vCloud'}
       {'provider': 'indonesian_vcloud', 'regions': [],'title': 'Indonesian Cloud'},
       {'provider': 'libvirt', 'regions': [], 'title': 'KVM (via libvirt)'},
-      {'provider': 'hostvirtual', 'regions': [], 'title': 'HostVirtual'}]}
+      {'provider': 'hostvirtual', 'regions': [], 'title': 'HostVirtual'}]},
+      {u'provider': u'coreos', u'regions': [], u'title': u'CoreOS'},
       ]
       }
