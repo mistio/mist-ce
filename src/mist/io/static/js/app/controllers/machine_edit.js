@@ -8,7 +8,7 @@ define('app/controllers/machine_edit', ['ember'],
 
         'use strict';
 
-        return Ember.Object.extend({
+        return Ember.Object.extend(Ember.Evented, {
 
 
             //
@@ -51,12 +51,21 @@ define('app/controllers/machine_edit', ['ember'],
                     'action' : 'rename',
                     'name': this.newName
                 }).success(function() {
+                    that._renameMachine();
                     that.close();
-                    //that._destroyMachine(machineId);
                 }).error(function() {
                     Mist.notificationController.notify('Failed to rename machine');
                 }).complete(function(success) {
                     that.set('renamingMachine', false);
+                });
+            },
+
+            _renameMachine: function (machine, name) {
+                Ember.run(this, function () {
+                    this.get('machine', this.get('newName'));
+                    this.trigger('onMachineRename', {
+                        object: this.get('machine')
+                    });
                 });
             }
         });
