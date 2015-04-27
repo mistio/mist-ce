@@ -41,6 +41,7 @@ from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
+from mist.io.helpers import check_host
 from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
 
@@ -217,6 +218,24 @@ def add_backend_v_2(user, title, provider, params):
     if not provider:
         raise RequiredParameterMissingError("provider")
     log.info("Adding new backend in provider '%s' with Api-Version: 2", provider)
+
+    # perform hostname validation if hostname is supplied
+    if provider in ['vcloud', 'bare_metal', 'docker', 'libvirt', 'openstack', 'vsphere']:
+        if provider == 'vcloud':
+            hostname = params.get('host', '')
+        elif provider == 'bare_metal':
+            hostname = params.get('machine_ip', '')
+        elif provider == 'docker':
+            hostname = params.get('docker_host', '')
+        elif provider == 'libvirt':
+            hostname = params.get('machine_hostname', '')
+        elif provider == 'openstack':
+            hostname = params.get('auth_url', '')
+        elif provider == 'vsphere':
+            hostname = params.get('host', '')
+
+        if hostname:
+            check_host(hostname)
 
     baremetal = provider == 'bare_metal'
 
