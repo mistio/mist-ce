@@ -169,8 +169,9 @@ Accept: application/json; charset=UTF-8
 </div>
 <p><strong>Add EC2 Backend</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
-    &quot;title&quot;:&quot;EC2 AP Sydney&quot;,
-    &quot;provider&quot;:&quot;ec2_ap_southeast_2&quot;,
+    &quot;title&quot;:&quot;EC2 Ireland&quot;,
+    &quot;provider&quot;:&quot;ec2&quot;,
+    &quot;region&quot;:&quot;ec2_eu_west&quot;
     &quot;api_key&quot;:&quot;POIHJOINPOIMIQCIHA&quot;,
     &quot;api_secret&quot;:&quot;09jLlilkjIU087JKHgjhguy90ur&quot;
 }
@@ -184,6 +185,7 @@ Accept: application/json; charset=UTF-8
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>region</strong> (<em>string</em>) &#8211; <em>(required)</em> Region Id, as found in the supported providers list</li>
 <li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> EC2 API Key</li>
 <li><strong>api_secret</strong> (<em>string</em>) &#8211; <em>(required)</em> EC2 API Secret</li>
 </ul>
@@ -223,8 +225,9 @@ Accept: application/json; charset=UTF-8
 </table>
 <p><strong>Add Rackspace backend</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
-    &quot;title&quot;:&quot;MyRackspace&quot;,
-    &quot;provider&quot;:&quot;rackspace:ord&quot;,
+    &quot;title&quot;:&quot;Rackspace Chicago&quot;,
+    &quot;provider&quot;:&quot;rackspace&quot;,
+    &quot;region&quot;:&quot;ord&quot;,
     &quot;username&quot;:&quot;myuser&quot;,
     &quot;api_key&quot;:&quot;oinoh*jhbJHVJHV77t8&quot;
 }
@@ -238,6 +241,7 @@ Accept: application/json; charset=UTF-8
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>region</strong> (<em>string</em>) &#8211; <em>(required)</em> Region Id as found in supported providers list</li>
 <li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Rackspace username</li>
 <li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> Rackspace API Key</li>
 </ul>
@@ -392,7 +396,9 @@ Accept: application/json; charset=UTF-8
     &quot;title&quot;:&quot;MyDocher&quot;,
     &quot;provider&quot;:&quot;docker&quot;,
     &quot;docker_host&quot;:&quot;http://10.0.0.1&quot;,
-    &quot;docker_port&quot;:&quot;4243&quot;
+    &quot;docker_port&quot;:&quot;2375&quot;,
+    &quot;key_file&quot;:&quot;-----BEGIN RSA PRIVATE KEY-----...&quot;,
+    &quot;cert_file&quot;:&quot;-----BEGIN CERTIFICATE-----....&quot;
 }
 </pre></div>
 </div>
@@ -406,8 +412,38 @@ Accept: application/json; charset=UTF-8
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>docker_host</strong> (<em>string</em>) &#8211; <em>(required)</em> The host of your Docker</li>
 <li><strong>docker_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> The port on which your Docker API is exposed to. By default will be <code class="docutils literal"><span class="pre">`4243`</span></code></li>
+<li><strong>key_file</strong> (<em>string</em>) &#8211; <em>(optional)</em> For TLS connections, this is the content of your corresponding key.pem file</li>
+<li><strong>cert_file</strong> (<em>string</em>) &#8211; <em>(optional)</em> For TLS connections, this is the content of your corresponding cert.pem file</li>
 <li><strong>auth_user</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth User</li>
 <li><strong>auth_password</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth Password</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add CoreOS backend</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;Core OS&quot;,
+    &quot;provider&quot;:&quot;coreos&quot;,
+    &quot;machine_ip&quot;:&quot;10.0.0.1&quot;,
+    &quot;machine_user&quot;:&quot;root&quot;,
+    &quot;machine_key&quot;:&quot;mySSHKey&quot;,
+    &quot;machine_port&quot;:&quot;22&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
+<li><strong>machine_user</strong> (<em>string</em>) &#8211; <em>(optional)</em> User to connect with your server</li>
+<li><strong>machine_key</strong> (<em>string</em>) &#8211; <em>(optional)</em> The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.</li>
+<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <code class="docutils literal"><span class="pre">`22`</span></code>, but you can alter this if your ssh-server listen to another port</li>
 </ul>
 </td>
 </tr>
@@ -439,7 +475,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Single Server/Bare Metal backend</strong>:</p>
+<p><strong>Add Single Server/Bare Metal Unix backend</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;MyServer&quot;,
     &quot;provider&quot;:&quot;bare_metal&quot;,
@@ -467,22 +503,32 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Example response</strong>:</p>
+<p><strong>Add Windows Server backend</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
-   &quot;status&quot;: &quot;off&quot;,
-   &quot;tenant_name&quot;: &quot;&quot;,
-   &quot;id&quot;: &quot;48emAUzL9teVYhkyJc9koRaPXEDp&quot;,
-   &quot;index&quot;: 2,
-   &quot;apikey&quot;: &quot;POIHJOINPOIMIQCIHA&quot;,
-   &quot;title&quot;: &quot;EC2 AP Sydney&quot;,
-   &quot;region&quot;: &quot;&quot;,
-   &quot;poll_interval&quot;: 10000,
-   &quot;apiurl&quot;: &quot;&quot;,
-   &quot;provider&quot;: &quot;ec2_ap_southeast_2&quot;,
-   &quot;enabled&quot;: true
+    &quot;title&quot;:&quot;MyWindows&quot;,
+    &quot;provider&quot;:&quot;bare_metal&quot;,
+    &quot;machine_ip&quot;:&quot;10.0.0.1&quot;,
+    &quot;windows&quot;:true,
+    &quot;remote_desktop_port&quot;:&quot;3389&quot;
 }
 </pre></div>
 </div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
+<li><strong>windows</strong> (<em>boolean</em>) &#8211; <em>(required)</em>  This boolean informs mist.io that this Bare Metal server is a Windows Server</li>
+<li><strong>remote_desktop_port</strong> (<em>string</em>) &#8211; <em>(required)</em> The Remote Desktop Port of your Windows Server</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="delete">
