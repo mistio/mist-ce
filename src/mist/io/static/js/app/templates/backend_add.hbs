@@ -44,18 +44,28 @@
                 {{/each}}
             </ul>
         </div>
+        <style>
 
+        </style>
         <div id="backend-add-fields">
         {{#each field in view.providerFields}}
             {{#if field.show}}
             <div {{bind-attr class="field.className :field Mist.backendAddController.provider.provider"}}>
-                {{#if field.label}}
-                    {{#unless field.isCheckbox}}
-                        <label {{bind-attr for="field.name"}}>
-                            {{unbound field.label}}:
-                        </label>
-                    {{/unless}}
-                {{/if}}
+                <div class="label-wrapper">
+                    {{#if field.label}}
+                        {{#unless field.isCheckbox}}
+                            <label {{bind-attr for="field.name"}}>
+                                {{unbound field.label}}:
+                            </label>
+                        {{/unless}}
+                    {{/if}}
+                    {{#if field.helpText}}
+                        <a class="ui-btn ui-btn-a ui-icon-info ui-btn-icon-notext ui-shadow ui-corner-all"
+                            {{bind-attr id="field.helpId"}}
+                            {{action "helpClicked" field target="view"}}>
+                        </a>
+                    {{/if}}
+                </div>
                 {{#if field.isText}}
                     {{view Mist.TextField
                         data-theme="a"
@@ -135,7 +145,6 @@
         {{/each}}
         </div>
 
-
         {{#if Mist.backendsController.addingBackend}}
             <div class="ajax-loader"></div>
         {{/if}}
@@ -151,6 +160,32 @@
     </div>
 </div>
 
+<div id="help-tooltip-screen"
+    class="ui-popup-screen
+        ui-overlay-b
+        ui-screen-hidden">
+</div>
+<div id="help-tooltip-popup"
+     class="pop
+        ui-popup-container
+        ui-popup-hidden
+        ui-popup-truncate">
+    <div id="help-tooltip"
+         class="ui-popup
+            ui-body-a
+            ui-overlay-shadow
+            ui-corner-all"
+         data-role="popup"
+         data-arrow="true"
+         data-enhanced="true"
+         data-transition="flip">
+        <p>{{view.helpText}}
+            <a target="_blank" {{bind-attr href="view.helpHref"}}>
+                Read more...
+            </a>
+        </p>
+    </div>
+</div>
 
 {{view "keyAdd"}}
 

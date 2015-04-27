@@ -1331,6 +1331,8 @@ function parseProviderMap () {
                 field.placeholder = "";
             if (field.optional)
                 field.placeholder += '(optional)';
+            if (field.helpText)
+                field.helpId = field.name + '_' + 'help';
             if (!field.label &&  field.name)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||
@@ -1523,6 +1525,8 @@ var PROVIDER_MAP = {
         {
             name: 'subscription_id',
             type: 'text',
+            helpText: 'Lorem ipsum yolo',
+            helpHref: 'http://youtube.com'
         },
         {
             name: 'certificate',

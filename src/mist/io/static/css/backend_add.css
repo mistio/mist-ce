@@ -24,7 +24,7 @@
     margin-bottom: -20px;
 }
 
-#backend-add  .toggle-field {
+#backend-add .toggle-field {
     width: 100%;
 }
 
@@ -44,4 +44,30 @@
 
 #backend-add .docker.on label {
     display: none;
+}
+
+#backend-add .label-wrapper {
+    display: table;
+    width: 100%;
+}
+
+#backend-add .label-wrapper label,
+#backend-add .label-wrapper a {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#backend-add .label-wrapper a {
+    text-align: right;
+    line-height: 0;
+    white-space: nowrap;
+}
+
+#help-tooltip {
+    font-size: 14px;
+    padding: .5em;
+}
+
+#help-tooltip a {
+    font-weight: normal;
 }
