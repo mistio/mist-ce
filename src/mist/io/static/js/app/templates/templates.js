@@ -4397,7 +4397,7 @@ function program9(depth0,data) {
   return buffer;
   }
 
-  data.buffer.push("<div id=\"single-script-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#/scripts\" class=\"responsive-button ui-btn-left ui-btn\n            ui-icon-arrow-l ui-btn-icon-left\">Scripts</a>\n\n        <h1>");
+  data.buffer.push("<div id=\"single-script-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#/scripts\" class=\"responsive-button ui-btn-left ui-btn ui-icon-arrow-l\n            ui-btn-icon-left ui-shadow ui-corner-all\">Scripts</a>\n\n        <h1>");
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</h1>\n\n        ");
