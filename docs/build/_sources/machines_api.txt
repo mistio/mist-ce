@@ -92,15 +92,6 @@
         "disk":""
     }
 
-   :jsonparam string name:  *required* Name of the machine
-   :jsonparam string key:  *required* The id of the key to be associated with the machine
-   :jsonparam string image:  *required* Id of image to be used
-   :jsonparam string location:  *required* Id of the location to be used
-   :jsonparam string size:  *required* Id of size to be used
-   :jsonparam string name:  *required* Bash command to be run when machine is initiated, given as a string
-   :jsonparam string image_extra:  *required* Needed only by Linode backend, otherwise empty string
-   :jsonparam string disk:  *required* Needed only by Linode backend, otherwise empty string
-
    **Example response**:
 
    .. sourcecode:: http
@@ -145,6 +136,32 @@
        ],
        "name": "WebServer 3"
     }
+
+
+   **Create Machine on EC2**:
+
+   .. sourcecode:: http
+
+        {
+            "name":"devserver",
+            "key":"mysshkey",
+            "size":"t1.micro",
+            "script":"echo 1 > /root/config",
+            "image":"ami-7c356d2e",
+            "location":"0",
+            "monitoring": true,
+        }
+
+   :jsonparam string name:  *required* Name of the machine
+   :jsonparam string key:  *required* The id of the key to be associated with the machine
+   :jsonparam string image:  *required* Id of image to be used
+   :jsonparam string location:  *required* Id of the location to be used
+   :jsonparam string size:  *required* Id of size to be used
+   :jsonparam string script: *optional* Script to run after the machine is provisioned
+   :jsonparam boolean monitoring: *optional* If true, Mist will enable monitoring for this machine
+
+
+
 
 .. http:post:: /backends/{backend_id}/machines/{machine_id}
 

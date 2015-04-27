@@ -1255,25 +1255,6 @@ Accept: application/json; charset=UTF-8
 }
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
-<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
-<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
-<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
-<li><strong>name</strong> &#8211; <em>required</em> Bash command to be run when machine is initiated, given as a string</li>
-<li><strong>image_extra</strong> (<em>string</em>) &#8211; <em>required</em> Needed only by Linode backend, otherwise empty string</li>
-<li><strong>disk</strong> (<em>string</em>) &#8211; <em>required</em> Needed only by Linode backend, otherwise empty string</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 <p><strong>Example response</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
    &quot;public_ips&quot;:
@@ -1317,6 +1298,36 @@ Accept: application/json; charset=UTF-8
 }
 </pre></div>
 </div>
+<p><strong>Create Machine on EC2</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;devserver&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;t1.micro&quot;,
+    &quot;script&quot;:&quot;echo 1 &gt; /root/config&quot;,
+    &quot;image&quot;:&quot;ami-7c356d2e&quot;,
+    &quot;location&quot;:&quot;0&quot;,
+    &quot;monitoring&quot;: true,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>script</strong> (<em>string</em>) &#8211; <em>optional</em> Script to run after the machine is provisioned</li>
+<li><strong>monitoring</strong> (<em>boolean</em>) &#8211; <em>optional</em> If true, Mist will enable monitoring for this machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="post">
