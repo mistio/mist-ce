@@ -62,7 +62,7 @@ define('app/controllers/machine_edit', ['ember'],
 
             _renameMachine: function (machine, name) {
                 Ember.run(this, function () {
-                    this.get('machine', this.get('newName'));
+                    this.get('machine').set('name', this.get('newName'));
                     this.trigger('onMachineRename', {
                         object: this.get('machine')
                     });
