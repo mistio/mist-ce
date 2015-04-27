@@ -34,13 +34,13 @@ Feature: Machines
 #    And "randomly_created" machine should be probed within 400 seconds
 
     When I choose the "randomly_created" machine
-    And I click the "Power" button
+    And I click the "Actions" button
     And I click the "Reboot" button
     And I wait for 1 seconds
     And I click the "Yes" button
     Then "randomly_created" machine state should be "running" within 200 seconds
 
-    When I click the "Power" button
+    When I click the "Actions" button
     And I click the "Destroy" button
     And I wait for 1 seconds
     And I click the "Yes" button
@@ -75,13 +75,13 @@ Feature: Machines
 #    And "randomly_created" machine should be probed within 500 seconds
 
     When I choose the "randomly_created" machine
-    And I click the "Power" button
+    And I click the "Actions" button
     And I click the "Reboot" button
     And I wait for 1 seconds
     And I click the "Yes" button
     Then "randomly_created" machine state should be "running" within 200 seconds
 
-    When I click the "Power" button
+    When I click the "Actions" button
     And I click the "Destroy" button
     And I wait for 1 seconds
     And I click the "Yes" button
@@ -117,13 +117,13 @@ Feature: Machines
 #    And "randomly_created" machine should be probed within 500 seconds
 
     When I choose the "randomly_created" machine
-    And I click the "Power" button
+    And I click the "Actions" button
     And I click the "Reboot" button
     And I wait for 1 seconds
     And I click the "Yes" button
     Then "randomly_created" machine state should be "running" within 200 seconds
 
-    When I click the "Power" button
+    When I click the "Actions" button
     And I click the "Destroy" button
     And I wait for 1 seconds
     And I click the "Yes" button
