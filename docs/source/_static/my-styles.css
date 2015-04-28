@@ -31,3 +31,7 @@ a.headerlink {
 .navbar-default {
     background-image: linear-gradient( #3c3c3c /*{a-bar-background-start}*/, #111 /*{a-bar-background-end}*/);
 }
+
+code {
+    color: #2780e3;
+}

@@ -12,7 +12,6 @@ from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
-
 from netaddr import IPSet, IPNetwork
 
 from libcloud.compute.providers import get_driver
@@ -317,6 +316,10 @@ def _add_backend_bare_metal(user, title, provider, params):
         port = int(params.get('machine_port', 22))
     except:
         port = 22
+    try:
+        rdp_port = int(params.get('remote_desktop_port', 3389))
+    except:
+        rdp_port = 3389
     machine_hostname = params.get('machine_ip', '')
     if machine_hostname:
         try:
@@ -336,6 +339,7 @@ def _add_backend_bare_metal(user, title, provider, params):
 
     machine = model.Machine()
     machine.ssh_port = port
+    machine.remote_desktop_port = rdp_port
     if machine_hostname:
         machine.dns_name = machine_hostname
         machine.public_ips = [machine_hostname]
@@ -1182,10 +1186,8 @@ def connect_provider(backend):
     elif backend.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if backend.apisecret:
-            temp_key_file = NamedTemporaryFile(delete=False)
-            temp_key_file.write(backend.apisecret)
-            temp_key_file.close()
-            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=temp_key_file.name, ssh_port=backend.ssh_port)
+            with get_temp_file(backend.apisecret) as tmp_key_path:
+                conn = driver(backend.apiurl, user=backend.apikey, ssh_key=tmp_key_path, ssh_port=backend.ssh_port)
         else:
             conn = driver(backend.apiurl, user=backend.apikey)
     else:
@@ -1264,9 +1266,8 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_destroy = False
         can_start = False
 
-    if conn.type in (config.EC2_PROVIDERS, Provider.LINODE,
-                     Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
-                     Provider.DOCKER, Provider.OPENSTACK, Provider.RACKSPACE):
+    if conn.type in (Provider.LINODE, Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
+                     Provider.DOCKER, Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in config.EC2_PROVIDERS:
         can_rename = True
     else:
         can_rename = False
@@ -1337,7 +1338,9 @@ def list_machines(user, backend_id):
                    'extra': m.extra}
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
-
+    if conn.type == 'libvirt':
+        # close connection with libvirt
+        conn.disconnect()
     return ret
 
 
@@ -2504,6 +2507,9 @@ def list_sizes(user, backend_id):
                     'price': size.price,
                     'ram': size.ram})
 
+    if conn.type == 'libvirt':
+        # close connection with libvirt
+        conn.disconnect()
     return ret
 
 
@@ -2544,6 +2550,9 @@ def list_locations(user, backend_id):
                     'name': name,
                     'country': location.country})
 
+    if conn.type == 'libvirt':
+        # close connection with libvirt
+        conn.disconnect()
     return ret
 
 
@@ -2609,6 +2618,10 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret.append(ec2_network_to_dict(network))
+
+    if conn.type == 'libvirt':
+        # close connection with libvirt
+        conn.disconnect()
     return ret
 
 
@@ -2934,7 +2947,7 @@ def enable_monitoring(user, backend_id, machine_id,
         'action': 'enable',
         'no_ssh': True,
         'dry': dry,
-        'name': name,
+        'name': name or backend.title,
         'public_ips': ",".join(public_ips or []),
         'dns_name': dns_name,
         'backend_title': backend.title,

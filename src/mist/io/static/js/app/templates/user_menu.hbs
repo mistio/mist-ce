@@ -1,6 +1,5 @@
 <a id="me-btn"
-   class="ui-btn-right"
-   data-role="button"
+   class="ui-btn-right ui-btn ui-shadow ui-corner-all"
    {{action "meClicked" target="view"}}>
     {{#if view.gravatarURL}}
         <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
@@ -17,23 +16,29 @@
 
         <a href="https://mistio.zendesk.com/access/login"
            target="_blank"
-           data-role="button"
-           data-theme="b"
-           data-mini="true">Support</a>
+           class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini">
+           Support</a>
+
+        <a href="docs/index.html"
+           target="_blank"
+           class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini">
+           Docs</a>
 
         {{#if Mist.authenticated}}
 
-            <a data-role="button" data-mini="true" data-theme="b"
+            <a class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini"
                {{bind-attr href="view.accountUrl"}}
                {{bind-attr target="view.isNotCore"}}>Account</a>
 
 
             {{#if Mist.isCore}}
-                <a data-role="button" data-theme="b" data-mini="true" {{action "logoutClicked" target="view"}}>Logout</a>
+                <a class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini"
+                    {{action "logoutClicked" target="view"}}>Logout</a>
             {{/if}}
         {{else}}
             {{#unless Mist.isCore}}
-                <a data-role="button" data-theme="b" data-mini="true" {{action "loginClicked" target="view"}}>Login</a>
+                <a class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini"
+                    {{action "loginClicked" target="view"}}>Login</a>
             {{/unless}}
         {{/if}}
 

@@ -39,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-default ">
     <div class="container">
@@ -69,8 +69,8 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
 </ul>
 </li>
@@ -125,8 +125,8 @@
       
   <dl class="get">
 <dt id="get--providers">
-<tt class="descname">GET </tt><tt class="descname">/providers</tt><a class="headerlink" href="#get--providers" title="Permalink to this definition">¶</a></dt>
-<dd><p>In each GET API request, you have to include the <tt class="docutils literal"><span class="pre">`Api-Version`</span></tt> header</p>
+<code class="descname">GET </code><code class="descname">/providers</code><a class="headerlink" href="#get--providers" title="Permalink to this definition">¶</a></dt>
+<dd><p>In each GET API request, you have to include the <code class="docutils literal"><span class="pre">`Api-Version`</span></code> header</p>
 <div class="highlight-http"><div class="highlight"><pre>{&#39;Api-Version&#39;:2}
 </pre></div>
 </div>
@@ -138,44 +138,48 @@ Accept: application/json; charset=UTF-8
 </pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>{u&#39;supported_providers&#39;:
+<div class="highlight-http"><div class="highlight"><pre>{&#39;supported_providers&#39;:
 [
-  {u&#39;provider&#39;: u&#39;bare_metal&#39;,
-   u&#39;regions&#39;: [],
-   u&#39;title&#39;: u&#39;Other Server&#39;},
-  {u&#39;provider&#39;: u&#39;azure&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;Azure&#39;},
-  {u&#39;provider&#39;: u&#39;ec2&#39;,
-   u&#39;regions&#39;: [{u&#39;id&#39;: u&#39;ec2_ap_northeast&#39;, u&#39;location&#39;: u&#39;Tokyo&#39;},
-    {u&#39;id&#39;: u&#39;ec2_ap_southeast&#39;, u&#39;location&#39;: u&#39;Singapore&#39;},
-    {u&#39;id&#39;: u&#39;ec2_ap_southeast_2&#39;, u&#39;location&#39;: u&#39;Sydney&#39;},
-    {u&#39;id&#39;: u&#39;ec2_eu_west&#39;, u&#39;location&#39;: u&#39;Ireland&#39;},
-    {u&#39;id&#39;: u&#39;ec2_sa_east&#39;, u&#39;location&#39;: u&#39;Sao Paulo&#39;},
-    {u&#39;id&#39;: u&#39;ec2_us_east&#39;, u&#39;location&#39;: u&#39;N. Virginia&#39;},
-    {u&#39;id&#39;: u&#39;ec2_us_west&#39;, u&#39;location&#39;: u&#39;N. California&#39;},
-    {u&#39;id&#39;: u&#39;ec2_us_west_oregon&#39;, u&#39;location&#39;: u&#39;Oregon&#39;}],
-   u&#39;title&#39;: u&#39;EC2&#39;},
-  {u&#39;provider&#39;: u&#39;gce&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;Google Compute Engine&#39;},
-  {u&#39;provider&#39;: u&#39;nephoscale&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;NephoScale&#39;},
-  {u&#39;provider&#39;: u&#39;digitalocean&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;DigitalOcean&#39;},
-  {u&#39;provider&#39;: u&#39;linode&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;Linode&#39;},
-  {u&#39;provider&#39;: u&#39;openstack&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;OpenStack&#39;},
-  {u&#39;provider&#39;: u&#39;rackspace&#39;,
-   u&#39;regions&#39;: [{u&#39;id&#39;: u&#39;dfw&#39;, u&#39;location&#39;: u&#39;Dallas&#39;},
-    {u&#39;id&#39;: u&#39;ord&#39;, u&#39;location&#39;: u&#39;Chicago&#39;},
-    {u&#39;id&#39;: u&#39;iad&#39;, u&#39;location&#39;: u&#39;N. Virginia&#39;},
-    {u&#39;id&#39;: u&#39;lon&#39;, u&#39;location&#39;: u&#39;London&#39;},
-    {u&#39;id&#39;: u&#39;syd&#39;, u&#39;location&#39;: u&#39;Sydney&#39;},
-    {u&#39;id&#39;: u&#39;hkg&#39;, u&#39;location&#39;: u&#39;Hong Kong&#39;},
-    {u&#39;id&#39;: u&#39;rackspace_first_gen:us&#39;, u&#39;location&#39;: u&#39;US-First Gen&#39;},
-    {u&#39;id&#39;: u&#39;rackspace_first_gen:uk&#39;, u&#39;location&#39;: u&#39;UK-First Gen&#39;}],
-   u&#39;title&#39;: u&#39;Rackspace&#39;},
-  {u&#39;provider&#39;: u&#39;softlayer&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;SoftLayer&#39;},
-  {u&#39;provider&#39;: u&#39;hpcloud&#39;,
-   u&#39;regions&#39;: [{u&#39;id&#39;: u&#39;region-a.geo-1&#39;, u&#39;location&#39;: u&#39;US West&#39;},
-    {u&#39;id&#39;: u&#39;region-b.geo-1&#39;, u&#39;location&#39;: u&#39;US East&#39;}],
-   u&#39;title&#39;: u&#39;HP Helion Cloud&#39;},
-  {u&#39;provider&#39;: u&#39;docker&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;Docker&#39;},
-  {u&#39;provider&#39;: u&#39;vcloud&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;VMware vCloud&#39;}
+  {&#39;provider&#39;: &#39;bare_metal&#39;,
+   &#39;regions&#39;: [],
+   &#39;title&#39;: &#39;Other Server&#39;},
+  {&#39;provider&#39;: &#39;azure&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;Azure&#39;},
+  {&#39;provider&#39;: &#39;ec2&#39;,
+   &#39;regions&#39;: [{&#39;id&#39;: &#39;ec2_ap_northeast&#39;, &#39;location&#39;: &#39;Tokyo&#39;},
+    {&#39;id&#39;: &#39;ec2_ap_southeast&#39;, &#39;location&#39;: &#39;Singapore&#39;},
+    {&#39;id&#39;: &#39;ec2_ap_southeast_2&#39;, &#39;location&#39;: &#39;Sydney&#39;},
+    {&#39;id&#39;: &#39;ec2_eu_west&#39;, &#39;location&#39;: &#39;Ireland&#39;},
+    {&#39;id&#39;: &#39;ec2_sa_east&#39;, &#39;location&#39;: &#39;Sao Paulo&#39;},
+    {&#39;id&#39;: &#39;ec2_us_east&#39;, &#39;location&#39;: &#39;N. Virginia&#39;},
+    {&#39;id&#39;: &#39;ec2_us_west&#39;, &#39;location&#39;: &#39;N. California&#39;},
+    {&#39;id&#39;: &#39;ec2_us_west_oregon&#39;, &#39;location&#39;: &#39;Oregon&#39;}],
+   &#39;title&#39;: &#39;EC2&#39;},
+  {&#39;provider&#39;: &#39;gce&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;Google Compute Engine&#39;},
+  {&#39;provider&#39;: &#39;nephoscale&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;NephoScale&#39;},
+  {&#39;provider&#39;: &#39;digitalocean&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;DigitalOcean&#39;},
+  {&#39;provider&#39;: &#39;linode&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;Linode&#39;},
+  {&#39;provider&#39;: &#39;openstack&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;OpenStack&#39;},
+  {&#39;provider&#39;: &#39;rackspace&#39;,
+   &#39;regions&#39;: [{&#39;id&#39;: &#39;dfw&#39;, &#39;location&#39;: &#39;Dallas&#39;},
+    {&#39;id&#39;: &#39;ord&#39;, &#39;location&#39;: &#39;Chicago&#39;},
+    {&#39;id&#39;: &#39;iad&#39;, &#39;location&#39;: &#39;N. Virginia&#39;},
+    {&#39;id&#39;: &#39;lon&#39;, &#39;location&#39;: &#39;London&#39;},
+    {&#39;id&#39;: &#39;syd&#39;, &#39;location&#39;: &#39;Sydney&#39;},
+    {&#39;id&#39;: &#39;hkg&#39;, &#39;location&#39;: &#39;Hong Kong&#39;},
+    {&#39;id&#39;: &#39;rackspace_first_gen:us&#39;, &#39;location&#39;: &#39;US-First Gen&#39;},
+    {&#39;id&#39;: &#39;rackspace_first_gen:uk&#39;, &#39;location&#39;: &#39;UK-First Gen&#39;}],
+   &#39;title&#39;: &#39;Rackspace&#39;},
+  {&#39;provider&#39;: &#39;softlayer&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;SoftLayer&#39;},
+  {&#39;provider&#39;: &#39;hpcloud&#39;,
+   &#39;regions&#39;: [{&#39;id&#39;: &#39;region-a.geo-1&#39;, &#39;location&#39;: &#39;US West&#39;},
+    {&#39;id&#39;: &#39;region-b.geo-1&#39;, &#39;location&#39;: &#39;US East&#39;}],
+   &#39;title&#39;: &#39;HP Helion Cloud&#39;},
+  {&#39;provider&#39;: &#39;docker&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;Docker&#39;},
+  {&#39;provider&#39;: &#39;vcloud&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;VMware vCloud&#39;}
+  {&#39;provider&#39;: &#39;indonesian_vcloud&#39;, &#39;regions&#39;: [],&#39;title&#39;: &#39;Indonesian Cloud&#39;},
+  {&#39;provider&#39;: &#39;libvirt&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;KVM (via libvirt)&#39;},
+  {&#39;provider&#39;: &#39;hostvirtual&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;HostVirtual&#39;}]},
+  {u&#39;provider&#39;: u&#39;coreos&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;CoreOS&#39;},
   ]
   }
 </pre></div>
@@ -197,7 +201,7 @@ Accept: application/json; charset=UTF-8
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>

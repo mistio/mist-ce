@@ -15,7 +15,7 @@ define('app/routes/script', ['app/routes/base'],
                     var model = this.modelFor('script');
                     var id = model._id || model.id;
                     var script = Mist.scriptsController.getObject(id);
-                    this.set('documentTitle', 'mist.io - ' + (script ? script.id : id));
+                    this.set('documentTitle', 'mist.io - ' + (script ? script.name : id));
                 });
             },
 
