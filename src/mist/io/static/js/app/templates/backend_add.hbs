@@ -8,8 +8,6 @@
 
     <div data-role="header">
         <h1>Add cloud</h1>
-        <a class="ui-btn-right" data-icon="info" data-iconpos="notext" data-theme="a"
-            target="_blank" href="https://mistio.zendesk.com/hc/en-us"></a>
     </div>
 
     <div data-role="content" data-theme="a">
@@ -180,9 +178,11 @@
          data-enhanced="true"
          data-transition="flip">
         <p>{{view.helpText}}
+            {{#if view.helpHref}}
             <a target="_blank" {{bind-attr href="view.helpHref"}}>
                 Read more...
             </a>
+            {{/if}}
         </p>
     </div>
 </div>
