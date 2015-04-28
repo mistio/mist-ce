@@ -220,7 +220,7 @@ def add_backend_v_2(user, title, provider, params):
     log.info("Adding new backend in provider '%s' with Api-Version: 2", provider)
 
     # perform hostname validation if hostname is supplied
-    if provider in ['vcloud', 'bare_metal', 'docker', 'libvirt', 'openstack', 'vsphere']:
+    if provider in ['vcloud', 'bare_metal', 'docker', 'libvirt', 'openstack', 'vsphere', 'coreos']:
         if provider == 'vcloud':
             hostname = params.get('host', '')
         elif provider == 'bare_metal':
@@ -233,6 +233,8 @@ def add_backend_v_2(user, title, provider, params):
             hostname = params.get('auth_url', '')
         elif provider == 'vsphere':
             hostname = params.get('host', '')
+        elif provider == 'coreos':
+            hostname = params.get('machine_ip', '')
 
         if hostname:
             check_host(hostname)
