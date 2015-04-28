@@ -86,3 +86,8 @@ Finally, you can start, stop or restart a specific process::
     ./bin/supervisorctl restart uwsgi
 
 Point your browser to http://127.0.0.1:8000 and you are ready to roll!
+use logins 'mist'/ '@wesom3' 
+
+Edit the file haproxy.conf and then restart the haproxy if you need to change this password
+
+    ./bin/supervisorctl restart haproxy
