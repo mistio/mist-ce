@@ -51,14 +51,16 @@
    .. sourcecode:: http
 
         {
-            "title":"EC2 AP Sydney",
-            "provider":"ec2_ap_southeast_2",
+            "title":"EC2 Ireland",
+            "provider":"ec2",
+            "region":"ec2_eu_west"
             "api_key":"POIHJOINPOIMIQCIHA",
             "api_secret":"09jLlilkjIU087JKHgjhguy90ur"
         }
 
    :jsonparam string title:  *(required)* Title of the backend
    :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string region: *(required)* Region Id, as found in the supported providers list
    :jsonparam string api_key: *(required)* EC2 API Key
    :jsonparam string api_secret: *(required)* EC2 API Secret
 
@@ -89,14 +91,16 @@
    .. sourcecode:: http
 
         {
-            "title":"MyRackspace",
-            "provider":"rackspace:ord",
+            "title":"Rackspace Chicago",
+            "provider":"rackspace",
+            "region":"ord",
             "username":"myuser",
             "api_key":"oinoh*jhbJHVJHV77t8"
         }
 
    :jsonparam string title:  *(required)* Title of the backend
    :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string region: *(required)* Region Id as found in supported providers list
    :jsonparam string username: *(required)* Rackspace username
    :jsonparam string api_key: *(required)* Rackspace API Key
 
@@ -203,15 +207,39 @@
             "title":"MyDocher",
             "provider":"docker",
             "docker_host":"http://10.0.0.1",
-            "docker_port":"4243"
+            "docker_port":"2375",
+            "key_file":"-----BEGIN RSA PRIVATE KEY-----...",
+            "cert_file":"-----BEGIN CERTIFICATE-----...."
         }
 
    :jsonparam string title:  *(required)* Title of the backend
    :jsonparam string provider: *(required)* Provider as found in supported providers list
    :jsonparam string docker_host: *(required)* The host of your Docker
    :jsonparam string docker_port: *(optional)* The port on which your Docker API is exposed to. By default will be ```4243```
+   :jsonparam string key_file: *(optional)* For TLS connections, this is the content of your corresponding key.pem file
+   :jsonparam string cert_file: *(optional)* For TLS connections, this is the content of your corresponding cert.pem file
    :jsonparam string auth_user: *(optional)* In case you have set up a basic auth in front of Docker, this will be the Auth User
    :jsonparam string auth_password: *(optional)* In case you have set up a basic auth in front of Docker, this will be the Auth Password
+
+   **Add CoreOS backend**:
+
+   .. sourcecode:: http
+
+        {
+            "title":"Core OS",
+            "provider":"coreos",
+            "machine_ip":"10.0.0.1",
+            "machine_user":"root",
+            "machine_key":"mySSHKey",
+            "machine_port":"22"
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string machine_ip: *(required)* IP of your server
+   :jsonparam string machine_user: *(optional)* User to connect with your server
+   :jsonparam string machine_key: *(optional)* The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.
+   :jsonparam string machine_port: *(optional)* By default it will be ```22```, but you can alter this if your ssh-server listen to another port
 
    **Add HP Cloud backend**:
 
@@ -231,7 +259,7 @@
    :jsonparam string password: *(required)* Password for your HP Cloud Account
    :jsonparam string tenant_name: *(required)* Tenant name for your HP Cloud Account
 
-   **Add Single Server/Bare Metal backend**:
+   **Add Single Server/Bare Metal Unix backend**:
 
    .. sourcecode:: http
 
@@ -251,23 +279,23 @@
    :jsonparam string machine_key: *(required)* The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.
    :jsonparam string machine_port: *(optional)* By default it will be ```22```, but you can alter this if your ssh-server listen to another port
 
-   **Example response**:
+   **Add Windows Server backend**:
 
    .. sourcecode:: http
 
-    {
-       "status": "off",
-       "tenant_name": "",
-       "id": "48emAUzL9teVYhkyJc9koRaPXEDp",
-       "index": 2,
-       "apikey": "POIHJOINPOIMIQCIHA",
-       "title": "EC2 AP Sydney",
-       "region": "",
-       "poll_interval": 10000,
-       "apiurl": "",
-       "provider": "ec2_ap_southeast_2",
-       "enabled": true
-    }
+        {
+            "title":"MyWindows",
+            "provider":"bare_metal",
+            "machine_ip":"10.0.0.1",
+            "windows":true,
+            "remote_desktop_port":"3389"
+        }
+
+   :jsonparam string title:  *(required)* Title of the backend
+   :jsonparam string provider: *(required)* Provider as found in supported providers list
+   :jsonparam string machine_ip: *(required)* IP of your server
+   :jsonparam boolean windows: *(required)*  This boolean informs mist.io that this Bare Metal server is a Windows Server
+   :jsonparam string remote_desktop_port: *(required)* The Remote Desktop Port of your Windows Server
 
 .. http:delete:: /backends/{backend_id}
 

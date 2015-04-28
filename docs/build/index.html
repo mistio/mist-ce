@@ -40,7 +40,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-default ">
     <div class="container">
@@ -70,8 +70,8 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
 </ul>
 </li>
@@ -96,7 +96,7 @@
               
                 
   <li>
-    <a href="developer_guide.html" title="Next Chapter: Developer Guide"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm">Developer Guide &raquo;</span>
+    <a href="developer_guide.html" title="Next Chapter: Developer Guide"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Developer Guide &raquo;</span>
     </a>
   </li>
               
@@ -154,19 +154,11 @@ at <a class="reference external" href="https://mist.io">mist.io</a>.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide.html#mist-io">mist.io</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer_guide.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer_guide.html#deployment">Deployment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="developer_guide.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide.html#contributing-to-mist-io">Contributing to mist.io</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer_guide.html#documentation">Documentation</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io"><tt class="docutils literal"><span class="pre">mist.io</span></tt></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.views"><tt class="docutils literal"><span class="pre">mist.io.views</span></tt></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.methods"><tt class="docutils literal"><span class="pre">mist.io.methods</span></tt></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.dal"><tt class="docutils literal"><span class="pre">mist.io.dal</span></tt></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.model"><tt class="docutils literal"><span class="pre">mist.io.model</span></tt></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.shell"><tt class="docutils literal"><span class="pre">mist.io.shell</span></tt></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a><ul>
@@ -180,15 +172,24 @@ at <a class="reference external" href="https://mist.io">mist.io</a>.</p>
 <li class="toctree-l2"><a class="reference internal" href="rest_api.html#error-codes">Error Codes</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io"><code class="docutils literal"><span class="pre">mist.io</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.views"><code class="docutils literal"><span class="pre">mist.io.views</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.methods"><code class="docutils literal"><span class="pre">mist.io.methods</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.dal"><code class="docutils literal"><span class="pre">mist.io.dal</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.model"><code class="docutils literal"><span class="pre">mist.io.model</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-mist.io.shell"><code class="docutils literal"><span class="pre">mist.io.shell</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
-<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
 </ul>
 </div>
 
@@ -206,7 +207,7 @@ at <a class="reference external" href="https://mist.io">mist.io</a>.</p>
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>

@@ -25,6 +25,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/log_list.hbs',
         'text!app/templates/log_list_item.hbs',
         'text!app/templates/machine_add.hbs',
+        'text!app/templates/machine_edit.hbs',
         'text!app/templates/machine.hbs',
         'text!app/templates/machine_keys.hbs',
         'text!app/templates/machine_keys_list_item.hbs',
@@ -80,37 +81,38 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['log_list'] = Ember.Handlebars.compile(arguments[20]);
         Ember.TEMPLATES['log_list_item'] = Ember.Handlebars.compile(arguments[21]);
         Ember.TEMPLATES['machine_add'] = Ember.Handlebars.compile(arguments[22]);
-        Ember.TEMPLATES['machine'] = Ember.Handlebars.compile(arguments[23]);
-        Ember.TEMPLATES['machine_keys'] = Ember.Handlebars.compile(arguments[24]);
-        Ember.TEMPLATES['machine_keys_list_item'] = Ember.Handlebars.compile(arguments[25]);
-        Ember.TEMPLATES['machine_list'] = Ember.Handlebars.compile(arguments[26]);
-        Ember.TEMPLATES['machine_list_item'] = Ember.Handlebars.compile(arguments[27]);
-        Ember.TEMPLATES['machine_monitoring'] = Ember.Handlebars.compile(arguments[28]);
-        Ember.TEMPLATES['machine_power'] = Ember.Handlebars.compile(arguments[29]);
-        Ember.TEMPLATES['machine_shell'] = Ember.Handlebars.compile(arguments[30]);
-        Ember.TEMPLATES['machine_tags'] = Ember.Handlebars.compile(arguments[31]);
-        Ember.TEMPLATES['machine_tags_list_item'] = Ember.Handlebars.compile(arguments[32]);
-        Ember.TEMPLATES['messagebox'] = Ember.Handlebars.compile(arguments[33]);
-        Ember.TEMPLATES['metric_add_custom'] = Ember.Handlebars.compile(arguments[34]);
-        Ember.TEMPLATES['metric_add'] = Ember.Handlebars.compile(arguments[35]);
-        Ember.TEMPLATES['metric_node'] = Ember.Handlebars.compile(arguments[36]);
-        Ember.TEMPLATES['missing'] = Ember.Handlebars.compile(arguments[37]);
-        Ember.TEMPLATES['network_create'] = Ember.Handlebars.compile(arguments[38]);
-        Ember.TEMPLATES['network'] = Ember.Handlebars.compile(arguments[39]);
-        Ember.TEMPLATES['network_list'] = Ember.Handlebars.compile(arguments[40]);
-        Ember.TEMPLATES['network_list_item'] = Ember.Handlebars.compile(arguments[41]);
-        Ember.TEMPLATES['rule_edit'] = Ember.Handlebars.compile(arguments[42]);
-        Ember.TEMPLATES['rule'] = Ember.Handlebars.compile(arguments[43]);
-        Ember.TEMPLATES['rule_list'] = Ember.Handlebars.compile(arguments[44]);
-        Ember.TEMPLATES['script_add'] = Ember.Handlebars.compile(arguments[45]);
-        Ember.TEMPLATES['script_edit'] = Ember.Handlebars.compile(arguments[46]);
-        Ember.TEMPLATES['script'] = Ember.Handlebars.compile(arguments[47]);
-        Ember.TEMPLATES['script_list'] = Ember.Handlebars.compile(arguments[48]);
-        Ember.TEMPLATES['script_list_item'] = Ember.Handlebars.compile(arguments[49]);
-        Ember.TEMPLATES['script_log_list'] = Ember.Handlebars.compile(arguments[50]);
-        Ember.TEMPLATES['script_run'] = Ember.Handlebars.compile(arguments[51]);
-        Ember.TEMPLATES['subnet_list_item'] = Ember.Handlebars.compile(arguments[52]);
-        Ember.TEMPLATES['user_menu'] = Ember.Handlebars.compile(arguments[53]);
+        Ember.TEMPLATES['machine_edit'] = Ember.Handlebars.compile(arguments[23]);
+        Ember.TEMPLATES['machine'] = Ember.Handlebars.compile(arguments[24]);
+        Ember.TEMPLATES['machine_keys'] = Ember.Handlebars.compile(arguments[25]);
+        Ember.TEMPLATES['machine_keys_list_item'] = Ember.Handlebars.compile(arguments[26]);
+        Ember.TEMPLATES['machine_list'] = Ember.Handlebars.compile(arguments[27]);
+        Ember.TEMPLATES['machine_list_item'] = Ember.Handlebars.compile(arguments[28]);
+        Ember.TEMPLATES['machine_monitoring'] = Ember.Handlebars.compile(arguments[29]);
+        Ember.TEMPLATES['machine_power'] = Ember.Handlebars.compile(arguments[30]);
+        Ember.TEMPLATES['machine_shell'] = Ember.Handlebars.compile(arguments[31]);
+        Ember.TEMPLATES['machine_tags'] = Ember.Handlebars.compile(arguments[32]);
+        Ember.TEMPLATES['machine_tags_list_item'] = Ember.Handlebars.compile(arguments[33]);
+        Ember.TEMPLATES['messagebox'] = Ember.Handlebars.compile(arguments[34]);
+        Ember.TEMPLATES['metric_add_custom'] = Ember.Handlebars.compile(arguments[35]);
+        Ember.TEMPLATES['metric_add'] = Ember.Handlebars.compile(arguments[36]);
+        Ember.TEMPLATES['metric_node'] = Ember.Handlebars.compile(arguments[37]);
+        Ember.TEMPLATES['missing'] = Ember.Handlebars.compile(arguments[38]);
+        Ember.TEMPLATES['network_create'] = Ember.Handlebars.compile(arguments[39]);
+        Ember.TEMPLATES['network'] = Ember.Handlebars.compile(arguments[40]);
+        Ember.TEMPLATES['network_list'] = Ember.Handlebars.compile(arguments[41]);
+        Ember.TEMPLATES['network_list_item'] = Ember.Handlebars.compile(arguments[42]);
+        Ember.TEMPLATES['rule_edit'] = Ember.Handlebars.compile(arguments[43]);
+        Ember.TEMPLATES['rule'] = Ember.Handlebars.compile(arguments[44]);
+        Ember.TEMPLATES['rule_list'] = Ember.Handlebars.compile(arguments[45]);
+        Ember.TEMPLATES['script_add'] = Ember.Handlebars.compile(arguments[46]);
+        Ember.TEMPLATES['script_edit'] = Ember.Handlebars.compile(arguments[47]);
+        Ember.TEMPLATES['script'] = Ember.Handlebars.compile(arguments[48]);
+        Ember.TEMPLATES['script_list'] = Ember.Handlebars.compile(arguments[49]);
+        Ember.TEMPLATES['script_list_item'] = Ember.Handlebars.compile(arguments[50]);
+        Ember.TEMPLATES['script_log_list'] = Ember.Handlebars.compile(arguments[51]);
+        Ember.TEMPLATES['script_run'] = Ember.Handlebars.compile(arguments[52]);
+        Ember.TEMPLATES['subnet_list_item'] = Ember.Handlebars.compile(arguments[53]);
+        Ember.TEMPLATES['user_menu'] = Ember.Handlebars.compile(arguments[54]);
         callback();
       });
       return;
@@ -2188,6 +2190,37 @@ function program31(depth0,data) {
   return buffer;
   
 });
+Ember.TEMPLATES["machine_edit"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  
+  data.buffer.push("\n                <div class=\"ajax-loader\"></div>\n            ");
+  }
+
+  data.buffer.push("<!-- Popup Overlay -->\n\n<div id=\"machine-edit-screen\"\n    class=\"ui-popup-screen\n        ui-overlay-b\n        ui-screen-hidden\">\n</div>\n\n<!-- Popup Wrapper -->\n<div id=\"machine-edit-popup\"\n     class=\"pop\n        ui-popup-container\n        ui-popup-hidden\n        ui-popup-truncate\">\n\n    <!-- Popup -->\n\n    <div id=\"machine-edit\"\n         class=\"mid-popup\n            ui-popup\n            ui-body-a\n            ui-overlay-shadow\n            ui-corner-all\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\">\n\n         <!-- Header -->\n\n        <div class=\"ui-header ui-bar-b\">\n\n            <h1 class=\"ui-title\">Rename machine</h1>\n\n        </div>\n\n        <!-- Body -->\n\n        <div role=\"main\" class=\"ui-content\" data-theme=\"a\">\n\n            <!-- New backend name text field -->\n\n            ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'id': ("machine-edit-new-name"),
+    'valueBinding': ("Mist.machineEditController.newName")
+  },hashTypes:{'id': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n\n            ");
+  stack1 = helpers['if'].call(depth0, "Mist.machineEditController.renamingMachine", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n\n            <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\" >\n                    <a class=\"ui-btn ui-btn-a ui-corner-all ui-shadow\"\n                       ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
+    'target': ("view")
+  },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(">Back</a>\n                    <a id=\"machine-edit-ok\"\n                        class=\"ui-btn ui-btn-d ui-corner-all ui-shadow\"\n                        ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "saveClicked", {hash:{
+    'target': ("view")
+  },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(">Save</a>\n            </div>\n        </div>\n    </div>\n</div>\n");
+  return buffer;
+  
+});
 Ember.TEMPLATES["machine"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
@@ -2582,13 +2615,13 @@ function program42(depth0,data) {
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </td><td>\n            <a id=\"single-machine-power-btn\"\n                ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'class': ("id::ui-state-disabled\n                    :ui-btn\n                    :ui-btn-icon-left\n                    :ui-icon-power")
+    'class': ("id::ui-state-disabled\n                    :ui-btn\n                    :ui-btn-icon-left\n                    :ui-icon-bars")
   },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
   data.buffer.push("\n                ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "powerClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Power</a>\n        </td></tr></tbody></table>\n    </div>\n\n</div>\n");
+  data.buffer.push(">Actions</a>\n        </td></tr></tbody></table>\n    </div>\n\n</div>\n");
   return buffer;
   
 });
@@ -2858,11 +2891,11 @@ function program10(depth0,data) {
   data.buffer.push(">Tags</a>\n        </td><td>\n            ");
   stack1 = helpers['if'].call(depth0, "view.selectedMachine.isWindows", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(10, program10, data),fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n        </td><td>\n            <a id=\"machines-power-btn\" class=\"ui-btn ui-icon-power ui-btn-icon-left ui-shadow ui-corner-all\"\n                ");
+  data.buffer.push("\n\n        </td><td>\n            <a id=\"machines-power-btn\" data-role=\"button\" data-icon=\"bars\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "powerClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Power</a>\n        </td></tr></tbody></table>\n    </div>\n\n</div>\n");
+  data.buffer.push(">Actions</a>\n        </td></tr></tbody></table>\n    </div>\n\n</div>\n");
   return buffer;
   
 });
@@ -3152,6 +3185,17 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = '';
+  data.buffer.push("\n        <a id=\"rename-machine-option\" class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "rename", {hash:{
+    'target': ("view")
+  },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
+  data.buffer.push(">Rename</a>\n        ");
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = '';
   data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "start", {hash:{
     'target': ("view")
@@ -3160,7 +3204,7 @@ function program1(depth0,data) {
   return buffer;
   }
 
-function program3(depth0,data) {
+function program5(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
@@ -3171,7 +3215,7 @@ function program3(depth0,data) {
   return buffer;
   }
 
-function program5(depth0,data) {
+function program7(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
@@ -3182,7 +3226,7 @@ function program5(depth0,data) {
   return buffer;
   }
 
-function program7(depth0,data) {
+function program9(depth0,data) {
   
   var buffer = '';
   data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
@@ -3197,23 +3241,28 @@ function program7(depth0,data) {
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'data-position-to': ("view.position")
   },hashTypes:{'data-position-to': "STRING"},hashContexts:{'data-position-to': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push(">\n\n    <div data-role=\"header\" data-theme=\"b\">\n        <h1>Power</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n        ");
-  stack1 = helpers['if'].call(depth0, "Mist.machinePowerController.canStart", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push(">\n\n    <div data-role=\"header\" data-theme=\"b\">\n        <h1>Actions</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n        ");
+  stack1 = helpers['if'].call(depth0, "Mist.machinePowerController.canRename", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        ");
-  stack1 = helpers['if'].call(depth0, "Mist.machinePowerController.canShutdown", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.machinePowerController.canStart", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        ");
-  stack1 = helpers['if'].call(depth0, "Mist.machinePowerController.canReboot", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.machinePowerController.canShutdown", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        ");
-  stack1 = helpers['if'].call(depth0, "Mist.machinePowerController.canDestroy", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "Mist.machinePowerController.canReboot", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(7, program7, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n        ");
+  stack1 = helpers['if'].call(depth0, "Mist.machinePowerController.canDestroy", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        <a class=\"ui-btn ui-shadow ui-corner-all\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0],types:["STRING"],data:data})));
-  data.buffer.push(">Back</a>\n    </div>\n</div>\n");
+  data.buffer.push(">Back</a>\n    </div>\n</div>\n\n\n");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "machineEdit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push("\n");
   return buffer;
   
 });
@@ -4348,7 +4397,7 @@ function program9(depth0,data) {
   return buffer;
   }
 
-  data.buffer.push("<div id=\"single-script-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#/scripts\" class=\"responsive-button ui-btn-left ui-btn\n            ui-icon-arrow-l ui-btn-icon-left\">Scripts</a>\n\n        <h1>");
+  data.buffer.push("<div id=\"single-script-page\" data-role=\"page\" class=\"ui-page-active\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n\n        <a href=\"#/scripts\" class=\"responsive-button ui-btn-left ui-btn ui-icon-arrow-l\n            ui-btn-icon-left ui-shadow ui-corner-all\">Scripts</a>\n\n        <h1>");
   stack1 = helpers._triageMustache.call(depth0, "name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("</h1>\n\n        ");
@@ -4874,7 +4923,7 @@ function program9(depth0,data) {
   data.buffer.push("\n    &nbsp;</a>\n\n<div id=\"user-menu-popup\" class=\"ui-mini\" data-role=\"popup\" data-position-to=\"#me-btn\" data-theme=\"c\" data-overlay-theme=\"b\" data-transition=\"flip\">\n\n    <div data-role=\"content\">\n\n        <div id=\"user-email\">");
   stack1 = helpers._triageMustache.call(depth0, "EMAIL", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>\n\n        <a href=\"https://mistio.zendesk.com/access/login\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Support</a>\n\n        ");
+  data.buffer.push("</div>\n\n        <a href=\"https://mistio.zendesk.com/access/login\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Support</a>\n\n        <a href=\"docs/index.html\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Docs</a>\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.authenticated", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(8, program8, data),fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n    </div>\n\n</div>\n\n");

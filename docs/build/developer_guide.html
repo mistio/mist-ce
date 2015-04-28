@@ -33,7 +33,7 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
-    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="next" title="RESTful API" href="rest_api.html" />
     <link rel="prev" title="Welcome to mist.io’s documentation!" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -41,7 +41,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-default ">
     <div class="container">
@@ -71,8 +71,8 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
 </ul>
 </li>
@@ -87,9 +87,10 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">Developer Guide</a><ul>
+<li><a class="reference internal" href="#mist-io">mist.io</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#deployment">Deployment</a></li>
-<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#contributing-to-mist-io">Contributing to mist.io</a></li>
 <li><a class="reference internal" href="#documentation">Documentation</a></li>
 </ul>
 </li>
@@ -102,11 +103,11 @@
               
                 
   <li>
-    <a href="index.html" title="Previous Chapter: Welcome to mist.io’s documentation!"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm">&laquo; Welcome to mist....</span>
+    <a href="index.html" title="Previous Chapter: Welcome to mist.io’s documentation!"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Welcome to mist....</span>
     </a>
   </li>
   <li>
-    <a href="modules.html" title="Next Chapter: Modules"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm">Modules &raquo;</span>
+    <a href="rest_api.html" title="Next Chapter: RESTful API"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">RESTful API &raquo;</span>
     </a>
   </li>
               
@@ -142,11 +143,14 @@
       
   <div class="section" id="developer-guide">
 <h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="mist-io">
+<h2>mist.io<a class="headerlink" href="#mist-io" title="Permalink to this headline">¶</a></h2>
+<p>Mist.io helps you manage and monitor your virtual machines, across different
+clouds, using any device that can access the web. It is provided under the
+GNU AGPL v3.0 License. Check out the freemium service at <a class="reference external" href="https://mist.io">https://mist.io</a></p>
+</div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Clone the project from <a class="reference external" href="https://github.com/mistio/mist.io">https://github.com/mistio/mist.io</a></li>
-</ul>
 <p>Mist.io is written in Python. Currently it is tested and developed using
 Python 2.7. The only system wide requirements are Python, Python header
 files and some basic build tools. Git is used for revision control. Every other
@@ -154,96 +158,79 @@ dependency is build automatically via zc.buildout. Although we use zc.buildout
 it is recommended to install mist.io in a virtualenv to avoid conflicts with
 eggs in the system&#8217;s Python.</p>
 <p>To install the basic requirements in a Debian based distro do:</p>
-<div class="highlight-python"><div class="highlight"><pre>sudo aptitude install python-dev build-essential git
+<div class="highlight-python"><div class="highlight"><pre>sudo aptitude install python-dev build-essential git erlang libpcre3-dev
 </pre></div>
 </div>
 <p>If you wish to install it in a virtual environment you&#8217;ll also need:</p>
 <div class="highlight-python"><div class="highlight"><pre>sudo aptitude install python-virtualenv
 </pre></div>
 </div>
+<p>If you plan to support KVM via libvirt, you should install libvirt library:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo aptitude install libvirt-bin libvirt-dev
+./bin/pip install libvirt-python
+</pre></div>
+</div>
+<p>For vSphere support, you should install pysphere library:</p>
+<div class="highlight-python"><div class="highlight"><pre>./bin/pip install pysphere
+</pre></div>
+</div>
+<p>In Red Hat based systems the following packages need to be installed:</p>
+<blockquote>
+<div>sudo yum install git python-virtualenv python-dev erlang pcre python-lxml  gcc libxml2 libxml2-python libxml2-devel</div></blockquote>
+<p>For openSUSE distibution, you&#8217;ll have to additionally install:</p>
+<blockquote>
+<div>sudo zypper in python-gevent libevent-devel</div></blockquote>
 <p>In MacOSX you have to install Xcode and its command line tools. For virtualenv
 you simply run:</p>
 <div class="highlight-python"><div class="highlight"><pre>sudo easy_install virtualenv
 </pre></div>
 </div>
-<p>In MacOSX there might be some problems with certificates. To solve the issue
-donwload a pem from <a class="reference external" href="http://curl.haxx.se/docs/caextract.html">http://curl.haxx.se/docs/caextract.html</a> rename it to
-curl-ca-bundle.crt and save it to /opt/local/share/curl/ or to /usr/share/curl/ca-bundle.crt.
-Check out this gist <a class="reference external" href="https://gist.github.com/1stvamp/2158128">https://gist.github.com/1stvamp/2158128</a></p>
 <p>Supposing you have all the above, the steps are simple. Clone the repository,
 create a virtualenv and run buildout:</p>
 <div class="highlight-python"><div class="highlight"><pre>git clone https://github.com/mistio/mist.io.git
 cd mist.io
 virtualenv --no-site-packages .
-mist.io$ ./bin/python bootstrap.py
-mist.io$ ./bin/buildout -v
+./bin/pip install ansible
+./bin/python bootstrap.py
+./bin/buildout -v
 </pre></div>
 </div>
-<p>In case you are using an older version of setuptools, bootstrap will fail. To solve this you need to:</p>
-<div class="highlight-python"><div class="highlight"><pre>mist.io$ ./bin/pip install setuptools --upgrade
+<p>In case you are using an older version of setuptools, bootstrap will fail. To
+solve this you need to:</p>
+<div class="highlight-python"><div class="highlight"><pre>./bin/pip install setuptools --upgrade
+</pre></div>
+</div>
+<p>If you are using Python 2.6 you&#8217;ll have to install ipython version 1, otherwise buildout will fail:</p>
+<div class="highlight-python"><div class="highlight"><pre>./bin/pip install ipython==1
 </pre></div>
 </div>
 </div>
 <div class="section" id="deployment">
 <h2>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h2>
-<p>Mist.io comes with two sets of deployment options, one suited for production
-environments and one for develompent.</p>
-<p>To get it up and running for production:</p>
-<div class="highlight-python"><div class="highlight"><pre>mist.io$ ./bin/uwsgi-start production.ini
+<p>Mist.io comes with supervisor in order to handle all the processes.</p>
+<p>To get it up and running:</p>
+<div class="highlight-python"><div class="highlight"><pre>./bin/supervisord
 </pre></div>
 </div>
-<p>For development mode:</p>
-<div class="highlight-python"><div class="highlight"><pre>mist.io$ ./bin/uwsgi-start development.ini
+<p>For development you can tail the logs:</p>
+<div class="highlight-python"><div class="highlight"><pre>tail -f var/log/*.log
 </pre></div>
 </div>
-<p>Or if you prefer to use paster:</p>
-<div class="highlight-python"><div class="highlight"><pre>mist.io$ ./bin/paster serve development.ini --reload
+<p>You can also monitor that all the processes are up and running:</p>
+<div class="highlight-python"><div class="highlight"><pre>./bin/supervisorctl status
 </pre></div>
 </div>
-<p>With the &#8211;reload flag, whenever there are changes in Python code and templates
-the server will automatically restart to load the new version. Changes in css
-and javascript don&#8217;t need a restart to show up. To stop it, simply press CTRL+C.</p>
-<p>Point your browser to <a class="reference external" href="http://127.0.0.1:6543">http://127.0.0.1:6543</a> and you are ready to roll!</p>
-</div>
-<div class="section" id="testing">
-<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
-<p>We have only a basic set of API tests &#8211; <em>will soon add more</em> &#8211; based on nose package.</p>
-<p>In order to run the tests you have to have paster or uwsgi started.</p>
-<p>You also need to:</p>
-<div class="highlight-python"><div class="highlight"><pre>mist.io$ cp src/mist/tests/tests_config.yaml.dist src/mist/tests/tests_config.yaml
+<p>Finally, you can start, stop or restart a specific process:</p>
+<div class="highlight-python"><div class="highlight"><pre>./bin/supervisorctl restart uwsgi
 </pre></div>
 </div>
-<p>The tests_config.yaml will seem like this at first:</p>
-<div class="highlight-python"><div class="highlight"><pre>BACKENDS: {}
-BACKEND_KEYS:
-  DigitalOcean:
-    api_key:
-    client_id:
-  EC2:
-    api_key:
-    api_secret:
-  Nephoscale:
-    password:
-    username:
-  Rackspace:
-    api_key:
-    username:
-  SoftLayer:
-    api_key:
-    username:
-KEYPAIRS: {}
-MIST_URI: http://127.0.0.1:6543
-SUPPORTED_PROVIDERS: []
-MACHINE_NAME: NinjaTests
-KEY_NAME: NinjaTestsKey
-COOKIE:
-</pre></div>
+<p>Point your browser to <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> and you are ready to roll!</p>
 </div>
-<p>You then add your credentials for every backend <em>(in case you don&#8217;t have credentials for a backend it will not be added)</em></p>
-<p>To actually run the tests:</p>
-<div class="highlight-python"><div class="highlight"><pre>mist.io$ ./bin/nosetests -w src/mist/io/tests
-</pre></div>
-</div>
+<div class="section" id="contributing-to-mist-io">
+<h2>Contributing to mist.io<a class="headerlink" href="#contributing-to-mist-io" title="Permalink to this headline">¶</a></h2>
+<p>The first step is to fork the mist.io repository on <a class="reference external" href="https://github.com/mistio/mist.io">github</a> . Then install it locally by following the instructions above.
+Make sure you use the fork’s url where required. After a few minutes Mist.io should be up and running on port 8000</p>
+<p>The most common case is that you&#8217;ll want to add support for a provider. In that case you can have a look at the <a class="reference external" href="http://blog.mist.io/post/117233356986/adding-a-new-provider-in-mist-io-the-host-virtual">Mist.io Blog</a></p>
 </div>
 <div class="section" id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
@@ -280,7 +267,7 @@ latex <em>(and later use pdflatex to convert all of our Documentation to pdf)</e
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>

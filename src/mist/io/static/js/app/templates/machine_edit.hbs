@@ -1,0 +1,59 @@
+<!-- Popup Overlay -->
+
+<div id="machine-edit-screen"
+    class="ui-popup-screen
+        ui-overlay-b
+        ui-screen-hidden">
+</div>
+
+<!-- Popup Wrapper -->
+<div id="machine-edit-popup"
+     class="pop
+        ui-popup-container
+        ui-popup-hidden
+        ui-popup-truncate">
+
+    <!-- Popup -->
+
+    <div id="machine-edit"
+         class="mid-popup
+            ui-popup
+            ui-body-a
+            ui-overlay-shadow
+            ui-corner-all"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip">
+
+         <!-- Header -->
+
+        <div class="ui-header ui-bar-b">
+
+            <h1 class="ui-title">Rename machine</h1>
+
+        </div>
+
+        <!-- Body -->
+
+        <div role="main" class="ui-content" data-theme="a">
+
+            <!-- New backend name text field -->
+
+            {{view Mist.TextField
+                id="machine-edit-new-name"
+                valueBinding="Mist.machineEditController.newName"}}
+
+            {{#if Mist.machineEditController.renamingMachine}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
+                    <a class="ui-btn ui-btn-a ui-corner-all ui-shadow"
+                       {{action "backClicked" target="view"}}>Back</a>
+                    <a id="machine-edit-ok"
+                        class="ui-btn ui-btn-d ui-corner-all ui-shadow"
+                        {{action "saveClicked" target="view"}}>Save</a>
+            </div>
+        </div>
+    </div>
+</div>
