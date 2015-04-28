@@ -338,12 +338,7 @@ def _add_backend_bare_metal(user, title, provider, params):
     except:
         rdp_port = 3389
     machine_hostname = params.get('machine_ip', '')
-    if machine_hostname:
-        try:
-            socket.gethostbyname(machine_hostname)
-        except socket.gaierror:
-            raise BadRequestError("Hostname '%s' isn't resolvable/accessible."
-                                  % machine_hostname)
+
     use_ssh = remove_on_error and os_type == 'unix' and machine_key
     if use_ssh:
         if machine_key not in user.keypairs:
