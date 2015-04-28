@@ -2,7 +2,7 @@
 /* Backend Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
 #backend-add label {
-    margin-top: 20px;
+    margin-top: 1em;
 }
 #backend-add .mist-select ul {
     max-height: 165px;
@@ -51,17 +51,6 @@
     width: 100%;
 }
 
-#backend-add .label-wrapper label,
-#backend-add .label-wrapper a {
-    display: table-cell;
-    vertical-align: middle;
-}
-
-#backend-add .label-wrapper a {
-    text-align: right;
-    line-height: 0;
-    white-space: nowrap;
-}
 
 #help-tooltip {
     font-size: 14px;
