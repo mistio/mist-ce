@@ -92,15 +92,6 @@
         "disk":""
     }
 
-   :jsonparam string name:  *required* Name of the machine
-   :jsonparam string key:  *required* The id of the key to be associated with the machine
-   :jsonparam string image:  *required* Id of image to be used
-   :jsonparam string location:  *required* Id of the location to be used
-   :jsonparam string size:  *required* Id of size to be used
-   :jsonparam string name:  *required* Bash command to be run when machine is initiated, given as a string
-   :jsonparam string image_extra:  *required* Needed only by Linode backend, otherwise empty string
-   :jsonparam string disk:  *required* Needed only by Linode backend, otherwise empty string
-
    **Example response**:
 
    .. sourcecode:: http
@@ -145,6 +136,143 @@
        ],
        "name": "WebServer 3"
     }
+
+
+   **Create Machine on EC2**:
+
+   .. sourcecode:: http
+
+        {
+            "name":"devserver",
+            "key":"mysshkey",
+            "size":"t1.micro",
+            "script":"echo 1 > /root/config",
+            "image":"ami-7c356d2e",
+            "location":"0",
+            "monitoring": true,
+        }
+
+   :jsonparam string name:  *required* Name of the machine
+   :jsonparam string key:  *required* The id of the key to be associated with the machine
+   :jsonparam string image:  *required* Id of image to be used
+   :jsonparam string location:  *required* Id of the location to be used
+   :jsonparam string size:  *required* Id of size to be used
+   :jsonparam string script: *optional* Script to run after the machine is provisioned
+   :jsonparam boolean monitoring: *optional* If true, Mist will enable monitoring for this machine
+
+   **Create Machine on Azure**:
+
+   .. sourcecode:: http
+
+        {
+            "name":"devserver",
+            "key":"mysshkey",
+            "size":"ExtraSmall",
+            "script":"echo 1 > /root/config",
+            "image":"2b171e93f07c4903bcad35bda10acf22__CoreOS-Stable-633.1.0",
+            "location":"West US",
+            "monitoring": true,
+        }
+
+   :jsonparam string name:  *required* Name of the machine
+   :jsonparam string key:  *required* The id of the key to be associated with the machine
+   :jsonparam string image:  *required* Id of image to be used
+   :jsonparam string location:  *required* Id of the location to be used
+   :jsonparam string size:  *required* Id of size to be used
+   :jsonparam string script: *optional* Script to run after the machine is provisioned
+   :jsonparam boolean monitoring: *optional* If true, Mist will enable monitoring for this machine
+
+   **Create Machine on DigitalOcean**:
+
+   .. sourcecode:: http
+
+        {
+            "name":"devserver",
+            "key":"mysshkey",
+            "size":"512mb",
+            "script":"echo 1 > /root/config",
+            "image":"7572830",
+            "location":"sfo1",
+            "monitoring": true,
+        }
+
+   :jsonparam string name:  *required* Name of the machine
+   :jsonparam string key:  *required* The id of the key to be associated with the machine
+   :jsonparam string image:  *required* Id of image to be used
+   :jsonparam string location:  *required* Id of the location to be used
+   :jsonparam string size:  *required* Id of size to be used
+   :jsonparam string script: *optional* Script to run after the machine is provisioned
+   :jsonparam boolean monitoring: *optional* If true, Mist will enable monitoring for this machine
+
+   **Create Container on Docker**:
+
+   .. sourcecode:: http
+
+        {
+            "name":"UbuntuContainer",
+            "key":"mysshkey",
+            "size":"default",
+            "image":"d0955f21bf24f5bfffd32d2d0bb669d0564701c271bc3dfc64cfc5adfdec2d07",
+            "docker_env":
+            {
+                "SOMEVAR": "True",
+                "SOMEOTHERVAR": "False"
+            },
+            "docker_command": "/bin/bash",
+            "docker_exposed_ports":
+            {
+                "8888/tcp": {},
+                "4977/tcp": {}
+            },
+              "docker_port_bindings":
+              {
+                    "8888/tcp":
+                    [
+                      {
+                        "HostPort": "88888"
+                      }
+                    ],
+                    "4977/tcp":
+                    [
+                      {
+                        "HostPort": "4977"
+                      }
+                    ]
+              }
+        }
+
+   :jsonparam string name:  *required* Name of the machine
+   :jsonparam string key:  *optional* The id of the key to be associated with the machine
+   :jsonparam string image:  *required* Id of image to be used
+   :jsonparam string location:  *required* Id of the location to be used
+   :jsonparam string size:  *required* Id of size to be used
+   :jsonparam dict docker_env: *optional* Here you specify Environmental Variables for your docker container
+   :jsonparam dict docker_exposed_ports: *optional* If you want to expose some ports, specify them here, with this format
+   :jsonparam dict docker_port_bindings: *optional* Specify the port bindings for your exposed ports
+   :jsonparam string docker_command: *required* Here you specify the command to run
+
+   **Create Machine on GCE (Google Compute Engine)**:
+
+   .. sourcecode:: http
+
+        {
+            "name":"devserver",
+            "key":"mysshkey",
+            "size":"1000",
+            "script":"echo 1 > /root/config",
+            "image":"5298942163210525420",
+            "location":"2221",
+            "monitoring": true,
+        }
+
+   :jsonparam string name:  *required* Name of the machine
+   :jsonparam string key:  *required* The id of the key to be associated with the machine
+   :jsonparam string image:  *required* Id of image to be used
+   :jsonparam string location:  *required* Id of the location to be used
+   :jsonparam string size:  *required* Id of size to be used
+   :jsonparam string script: *optional* Script to run after the machine is provisioned
+   :jsonparam boolean monitoring: *optional* If true, Mist will enable monitoring for this machine
+
 
 .. http:post:: /backends/{backend_id}/machines/{machine_id}
 
