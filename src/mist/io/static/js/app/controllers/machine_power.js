@@ -17,6 +17,7 @@ define('app/controllers/machine_power', ['ember'],
             canReboot: null,
             canDestroy: null,
             canShutdown: null,
+            canRename: null,
 
 
             /**
@@ -49,6 +50,14 @@ define('app/controllers/machine_power', ['ember'],
                 var machineNames = this.machines.toStringByProperty('name');
 
                 var that = this;
+                if (action == 'rename'){
+                    var machine = this.machines[0];
+                    this.close();
+                    Ember.run.later(function(){
+                        Mist.machineEditController.open(machine);
+                    },350)
+                    return;
+                }
                 Ember.run.later(function () {
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.YES_NO,
@@ -83,6 +92,7 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canReboot', null);
                     this.set('canDestroy', null);
                     this.set('canShutdown', null);
+                    this.set('canRename', null);
                 });
             },
 
@@ -93,6 +103,11 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canReboot', !this.machines.findBy('can_reboot', false));
                     this.set('canDestroy', !this.machines.findBy('can_destroy', false));
                     this.set('canShutdown', !this.machines.findBy('can_stop', false));
+                    if(this.machines.length == 1 && this.machines[0].get('can_rename')){
+                        this.set('canRename', true);
+                    }else{
+                        this.set('canRename', false);
+                    }
                     this.trigger('onActionsChange');
                 });
             },
@@ -114,7 +129,7 @@ define('app/controllers/machine_power', ['ember'],
                     } else if (action == 'start') {
                         machine.start();
                     }
-                });
+                },this);
             },
 
 

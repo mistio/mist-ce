@@ -14,6 +14,7 @@ from base64 import b64encode
 from memcache import Client as MemcacheClient
 
 from celery import Celery, Task
+from celery.exceptions import SoftTimeLimitExceeded
 
 from amqp import Message
 from amqp.connection import Connection
@@ -465,6 +466,8 @@ class UserTask(Task):
             data = self.execute(*args, **kwargs)
         except Exception as exc:
             # error handling
+            if isinstance(exc, SoftTimeLimitExceeded):
+                log.error("SoftTimeLimitExceeded: %s", id_str)
             now = time()
             if not cached_err:
                 cached_err = {'seq_id': seq_id, 'timestamps': []}
@@ -516,6 +519,7 @@ class ListSizes(UserTask):
     result_expires = 60 * 60 * 24 * 7
     result_fresh = 60 * 60
     polling = False
+    soft_time_limit = 30
 
     def execute(self, email, backend_id):
         from mist.io import methods
@@ -530,6 +534,7 @@ class ListLocations(UserTask):
     result_expires = 60 * 60 * 24 * 7
     result_fresh = 60 * 60
     polling = False
+    soft_time_limit = 30
 
     def execute(self, email, backend_id):
         from mist.io import methods
@@ -544,6 +549,7 @@ class ListNetworks(UserTask):
     result_expires = 60 * 60 * 24
     result_fresh = 0
     polling = False
+    soft_time_limit = 30
 
     def execute(self, email, backend_id):
         log.warn('Running list networks for user %s backend %s' % (email, backend_id))
@@ -560,6 +566,7 @@ class ListImages(UserTask):
     result_expires = 60 * 60 * 24 * 7
     result_fresh = 60 * 60
     polling = False
+    soft_time_limit = 30
 
     def execute(self, email, backend_id):
         log.warn('Running list images for user %s backend %s' % (email, backend_id))
@@ -576,6 +583,7 @@ class ListMachines(UserTask):
     result_expires = 60 * 60 * 24
     result_fresh = 10
     polling = True
+    soft_time_limit = 30
 
     def execute(self, email, backend_id):
         log.warn('Running list machines for user %s backend %s' % (email, backend_id))
@@ -618,6 +626,7 @@ class ProbeSSH(UserTask):
     result_expires = 60 * 60 * 2
     result_fresh = 60 * 2
     polling = True
+    soft_time_limit = 30
 
     def execute(self, email, backend_id, machine_id, host):
         user = user_from_email(email)
@@ -640,6 +649,7 @@ class Ping(UserTask):
     result_expires = 60 * 60 * 2
     result_fresh = 60 * 15
     polling = True
+    soft_time_limit = 30
 
     def execute(self, email, backend_id, machine_id, host):
         from mist.io import methods

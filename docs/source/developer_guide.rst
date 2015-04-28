@@ -2,10 +2,15 @@ Developer Guide
 ***************
 
 
+mist.io
+=======
+
+Mist.io helps you manage and monitor your virtual machines, across different
+clouds, using any device that can access the web. It is provided under the
+GNU AGPL v3.0 License. Check out the freemium service at https://mist.io
+
 Installation
 ============
-
-* Clone the project from https://github.com/mistio/mist.io
 
 Mist.io is written in Python. Currently it is tested and developed using
 Python 2.7. The only system wide requirements are Python, Python header
@@ -16,21 +21,34 @@ eggs in the system's Python.
 
 To install the basic requirements in a Debian based distro do::
 
-    sudo aptitude install python-dev build-essential git
+    sudo aptitude install python-dev build-essential git erlang libpcre3-dev
 
 If you wish to install it in a virtual environment you'll also need::
 
     sudo aptitude install python-virtualenv
 
+If you plan to support KVM via libvirt, you should install libvirt library::
+
+    sudo aptitude install libvirt-bin libvirt-dev
+    ./bin/pip install libvirt-python
+
+For vSphere support, you should install pysphere library::
+
+    ./bin/pip install pysphere
+
+In Red Hat based systems the following packages need to be installed:
+
+    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml  gcc libxml2 libxml2-python libxml2-devel
+
+For openSUSE distibution, you'll have to additionally install:
+
+    sudo zypper in python-gevent libevent-devel
+
+
 In MacOSX you have to install Xcode and its command line tools. For virtualenv
 you simply run::
 
     sudo easy_install virtualenv
-
-In MacOSX there might be some problems with certificates. To solve the issue
-donwload a pem from http://curl.haxx.se/docs/caextract.html rename it to
-curl-ca-bundle.crt and save it to /opt/local/share/curl/ or to /usr/share/curl/ca-bundle.crt.
-Check out this gist https://gist.github.com/1stvamp/2158128
 
 Supposing you have all the above, the steps are simple. Clone the repository,
 create a virtualenv and run buildout::
@@ -38,80 +56,53 @@ create a virtualenv and run buildout::
     git clone https://github.com/mistio/mist.io.git
     cd mist.io
     virtualenv --no-site-packages .
-    mist.io$ ./bin/python bootstrap.py
-    mist.io$ ./bin/buildout -v
+    ./bin/pip install ansible
+    ./bin/python bootstrap.py
+    ./bin/buildout -v
 
-In case you are using an older version of setuptools, bootstrap will fail. To solve this you need to::
+In case you are using an older version of setuptools, bootstrap will fail. To
+solve this you need to::
 
-   mist.io$ ./bin/pip install setuptools --upgrade
+   ./bin/pip install setuptools --upgrade
 
+If you are using Python 2.6 you'll have to install ipython version 1, otherwise buildout will fail::
+
+   ./bin/pip install ipython==1
 
 Deployment
 ==========
 
-Mist.io comes with two sets of deployment options, one suited for production
-environments and one for develompent.
+Mist.io comes with supervisor in order to handle all the processes.
 
-To get it up and running for production::
+To get it up and running::
 
-    mist.io$ ./bin/uwsgi-start production.ini
+    ./bin/supervisord
 
-For development mode::
+For development you can tail the logs::
 
-    mist.io$ ./bin/uwsgi-start development.ini
+    tail -f var/log/*.log
 
-Or if you prefer to use paster::
+You can also monitor that all the processes are up and running::
 
-    mist.io$ ./bin/paster serve development.ini --reload
+    ./bin/supervisorctl status
 
-With the --reload flag, whenever there are changes in Python code and templates
-the server will automatically restart to load the new version. Changes in css
-and javascript don't need a restart to show up. To stop it, simply press CTRL+C.
+Finally, you can start, stop or restart a specific process::
 
-Point your browser to http://127.0.0.1:6543 and you are ready to roll!
+    ./bin/supervisorctl restart uwsgi
 
-Testing
-=======
+Point your browser to http://127.0.0.1:8000 and you are ready to roll!
 
-We have only a basic set of API tests -- *will soon add more* -- based on nose package.
+Contributing to mist.io
+=======================
 
-In order to run the tests you have to have paster or uwsgi started.
+The first step is to fork the mist.io repository on `github`__ . Then install it locally by following the instructions above.
+Make sure you use the fork’s url where required. After a few minutes Mist.io should be up and running on port 8000
 
-You also need to::
+__ https://github.com/mistio/mist.io
 
-    mist.io$ cp src/mist/tests/tests_config.yaml.dist src/mist/tests/tests_config.yaml
+The most common case is that you'll want to add support for a provider. In that case you can have a look at the `Mist.io Blog`__
 
-The tests_config.yaml will seem like this at first::
-
-    BACKENDS: {}
-    BACKEND_KEYS:
-      DigitalOcean:
-        api_key:
-        client_id:
-      EC2:
-        api_key:
-        api_secret:
-      Nephoscale:
-        password:
-        username:
-      Rackspace:
-        api_key:
-        username:
-      SoftLayer:
-        api_key:
-        username:
-    KEYPAIRS: {}
-    MIST_URI: http://127.0.0.1:6543
-    SUPPORTED_PROVIDERS: []
-    MACHINE_NAME: NinjaTests
-    KEY_NAME: NinjaTestsKey
-    COOKIE:
-
-You then add your credentials for every backend *(in case you don't have credentials for a backend it will not be added)*
-
-To actually run the tests::
-
-    mist.io$ ./bin/nosetests -w src/mist/io/tests
+__ http://blog.mist.io/post/117233356986/adding-a-new-provider-in-mist-io-the-host-virtual
 
 Documentation
 =============

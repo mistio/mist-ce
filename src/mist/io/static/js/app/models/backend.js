@@ -170,6 +170,9 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 this.machines.startMachine(machineId, callback);
             },
 
+            renameMachine: function (machineId, callback) {
+                this.machines.renameMachine(machineId, callback);
+            },
 
             searchImages: function (filter, callback) {
                 this.images.searchImages(filter, callback);
