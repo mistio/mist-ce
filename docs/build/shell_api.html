@@ -39,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-default ">
     <div class="container">
@@ -69,8 +69,8 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
 </ul>
 </li>
@@ -125,7 +125,7 @@
       
   <dl class="get">
 <dt id="get--backends-backend_id-machines-machine_id-shell?host=host_ip&amp;command=shell_command">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</tt><a class="headerlink" href="#get--backends-backend_id-machines-machine_id-shell?host=host_ip&command=shell_command" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</code><a class="headerlink" href="#get--backends-backend_id-machines-machine_id-shell?host=host_ip&command=shell_command" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run shell command in machine. Mist will yield an html body with the command&#8217;s output.</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&amp;command=uptime
@@ -161,7 +161,7 @@ Accept: application/json; charset=UTF-8
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>

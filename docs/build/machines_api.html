@@ -39,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-default ">
     <div class="container">
@@ -69,8 +69,8 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
 </ul>
 </li>
@@ -125,7 +125,7 @@
       
   <dl class="get">
 <dt id="get--backends-backend_id-machines">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#get--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/machines</code><a class="headerlink" href="#get--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all added machines for this backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
@@ -194,7 +194,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id-machines">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#post--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines</code><a class="headerlink" href="#post--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create machine</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
@@ -213,25 +213,6 @@ Accept: application/json; charset=UTF-8
 }
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
-<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
-<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
-<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
-<li><strong>name</strong> &#8211; <em>required</em> Bash command to be run when machine is initiated, given as a string</li>
-<li><strong>image_extra</strong> (<em>string</em>) &#8211; <em>required</em> Needed only by Linode backend, otherwise empty string</li>
-<li><strong>disk</strong> (<em>string</em>) &#8211; <em>required</em> Needed only by Linode backend, otherwise empty string</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 <p><strong>Example response</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
    &quot;public_ips&quot;:
@@ -275,11 +256,186 @@ Accept: application/json; charset=UTF-8
 }
 </pre></div>
 </div>
+<p><strong>Create Machine on EC2</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;devserver&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;t1.micro&quot;,
+    &quot;script&quot;:&quot;echo 1 &gt; /root/config&quot;,
+    &quot;image&quot;:&quot;ami-7c356d2e&quot;,
+    &quot;location&quot;:&quot;0&quot;,
+    &quot;monitoring&quot;: true,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>script</strong> (<em>string</em>) &#8211; <em>optional</em> Script to run after the machine is provisioned</li>
+<li><strong>monitoring</strong> (<em>boolean</em>) &#8211; <em>optional</em> If true, Mist will enable monitoring for this machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Create Machine on Azure</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;devserver&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;ExtraSmall&quot;,
+    &quot;script&quot;:&quot;echo 1 &gt; /root/config&quot;,
+    &quot;image&quot;:&quot;2b171e93f07c4903bcad35bda10acf22__CoreOS-Stable-633.1.0&quot;,
+    &quot;location&quot;:&quot;West US&quot;,
+    &quot;monitoring&quot;: true,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>script</strong> (<em>string</em>) &#8211; <em>optional</em> Script to run after the machine is provisioned</li>
+<li><strong>monitoring</strong> (<em>boolean</em>) &#8211; <em>optional</em> If true, Mist will enable monitoring for this machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Create Machine on DigitalOcean</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;devserver&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;512mb&quot;,
+    &quot;script&quot;:&quot;echo 1 &gt; /root/config&quot;,
+    &quot;image&quot;:&quot;7572830&quot;,
+    &quot;location&quot;:&quot;sfo1&quot;,
+    &quot;monitoring&quot;: true,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>script</strong> (<em>string</em>) &#8211; <em>optional</em> Script to run after the machine is provisioned</li>
+<li><strong>monitoring</strong> (<em>boolean</em>) &#8211; <em>optional</em> If true, Mist will enable monitoring for this machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Create Container on Docker</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;UbuntuContainer&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;default&quot;,
+    &quot;image&quot;:&quot;d0955f21bf24f5bfffd32d2d0bb669d0564701c271bc3dfc64cfc5adfdec2d07&quot;,
+    &quot;docker_env&quot;:
+    {
+        &quot;SOMEVAR&quot;: &quot;True&quot;,
+        &quot;SOMEOTHERVAR&quot;: &quot;False&quot;
+    },
+    &quot;docker_command&quot;: &quot;/bin/bash&quot;,
+    &quot;docker_exposed_ports&quot;:
+    {
+        &quot;8888/tcp&quot;: {},
+        &quot;4977/tcp&quot;: {}
+    },
+      &quot;docker_port_bindings&quot;:
+      {
+            &quot;8888/tcp&quot;:
+            [
+              {
+                &quot;HostPort&quot;: &quot;88888&quot;
+              }
+            ],
+            &quot;4977/tcp&quot;:
+            [
+              {
+                &quot;HostPort&quot;: &quot;4977&quot;
+              }
+            ]
+      }
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>optional</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>docker_env</strong> (<em>dict</em>) &#8211; <em>optional</em> Here you specify Environmental Variables for your docker container</li>
+<li><strong>docker_exposed_ports</strong> (<em>dict</em>) &#8211; <em>optional</em> If you want to expose some ports, specify them here, with this format</li>
+<li><strong>docker_port_bindings</strong> (<em>dict</em>) &#8211; <em>optional</em> Specify the port bindings for your exposed ports</li>
+<li><strong>docker_command</strong> (<em>string</em>) &#8211; <em>required</em> Here you specify the command to run</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Create Machine on GCE (Google Compute Engine)</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;devserver&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;1000&quot;,
+    &quot;script&quot;:&quot;echo 1 &gt; /root/config&quot;,
+    &quot;image&quot;:&quot;5298942163210525420&quot;,
+    &quot;location&quot;:&quot;2221&quot;,
+    &quot;monitoring&quot;: true,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>script</strong> (<em>string</em>) &#8211; <em>optional</em> Script to run after the machine is provisioned</li>
+<li><strong>monitoring</strong> (<em>boolean</em>) &#8211; <em>optional</em> If true, Mist will enable monitoring for this machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="post">
 <dt id="post--backends-backend_id-machines-machine_id">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}</tt><a class="headerlink" href="#post--backends-backend_id-machines-machine_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines/{machine_id}</code><a class="headerlink" href="#post--backends-backend_id-machines-machine_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Machine actions like reboot, destroy, shutdown and start</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>  POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
@@ -307,7 +463,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id-machines-machine_id-metadata">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</tt><a class="headerlink" href="#post--backends-backend_id-machines-machine_id-metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</code><a class="headerlink" href="#post--backends-backend_id-machines-machine_id-metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add tags/metadata for machine</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
@@ -348,7 +504,7 @@ Accept: application/json; charset=UTF-8
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>
