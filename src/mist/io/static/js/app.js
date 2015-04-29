@@ -751,13 +751,20 @@ var setupSocketEvents = function (socket, callback) {
     })
     .on('notify', function (data){
 
+        if (! (data.title && data.body)) {
+            var msg = data.title || data.body;
+            Mist.notificationController.notify(msg);
+            return;
+        }
+
         var dialogBody = [];
 
         // Extract machine information
         var machineId = data.machine_id;
         var backendId = data.backend_id;
         var machine = Mist.backendsController.getMachine(machineId, backendId);
-        if (machine.id) {
+
+        if (machine && machine.id) {
             dialogBody.push({
                 link: machine.name,
                 class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
