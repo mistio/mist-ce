@@ -276,8 +276,8 @@ def add_backend_v_2(user, title, provider, params):
             # the provider if connect_provider doesn't fail
             try:
                 machines = conn.list_nodes()
-            except InvalidCredsError:
-                raise BackendUnauthorizedError()
+            except InvalidCredsError as exc:
+                raise BackendUnauthorizedError(exc)
             except Exception as exc:
                 log.error("Error while trying list_nodes: %r", exc)
                 raise BackendUnavailableError(exc=exc)
