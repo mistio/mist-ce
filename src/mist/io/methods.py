@@ -42,6 +42,7 @@ from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
+from mist.io.helpers import check_host
 from mist.io.exceptions import *
 
 
@@ -218,6 +219,26 @@ def add_backend_v_2(user, title, provider, params):
         raise RequiredParameterMissingError("provider")
     log.info("Adding new backend in provider '%s' with Api-Version: 2", provider)
 
+    # perform hostname validation if hostname is supplied
+    if provider in ['vcloud', 'bare_metal', 'docker', 'libvirt', 'openstack', 'vsphere', 'coreos']:
+        if provider == 'vcloud':
+            hostname = params.get('host', '')
+        elif provider == 'bare_metal':
+            hostname = params.get('machine_ip', '')
+        elif provider == 'docker':
+            hostname = params.get('docker_host', '')
+        elif provider == 'libvirt':
+            hostname = params.get('machine_hostname', '')
+        elif provider == 'openstack':
+            hostname = params.get('auth_url', '')
+        elif provider == 'vsphere':
+            hostname = params.get('host', '')
+        elif provider == 'coreos':
+            hostname = params.get('machine_ip', '')
+
+        if hostname:
+            check_host(hostname)
+
     baremetal = provider == 'bare_metal'
 
     if provider == 'bare_metal':
@@ -324,12 +345,7 @@ def _add_backend_bare_metal(user, title, provider, params):
     except:
         rdp_port = 3389
     machine_hostname = params.get('machine_ip', '')
-    if machine_hostname:
-        try:
-            socket.gethostbyname(machine_hostname)
-        except socket.gaierror:
-            raise BadRequestError("Hostname '%s' isn't resolvable/accessible."
-                                  % machine_hostname)
+
     use_ssh = remove_on_error and os_type == 'unix' and machine_key
     if use_ssh:
         if machine_key not in user.keypairs:
@@ -1345,9 +1361,8 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_destroy = False
         can_start = False
 
-    if conn.type in (config.EC2_PROVIDERS, Provider.LINODE,
-                     Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
-                     Provider.DOCKER, Provider.OPENSTACK, Provider.RACKSPACE):
+    if conn.type in (Provider.LINODE, Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
+                     Provider.DOCKER, Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in config.EC2_PROVIDERS:
         can_rename = True
     else:
         can_rename = False

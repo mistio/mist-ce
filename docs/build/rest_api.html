@@ -33,14 +33,15 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
-    <link rel="prev" title="Modules" href="modules.html" />
+    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="prev" title="Developer Guide" href="developer_guide.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-default ">
     <div class="container">
@@ -70,8 +71,8 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">RESTful API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
 </ul>
 </li>
@@ -105,7 +106,11 @@
               
                 
   <li>
-    <a href="modules.html" title="Previous Chapter: Modules"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm">&laquo; Modules</span>
+    <a href="developer_guide.html" title="Previous Chapter: Developer Guide"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Developer Guide</span>
+    </a>
+  </li>
+  <li>
+    <a href="modules.html" title="Next Chapter: Modules"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Modules &raquo;</span>
     </a>
   </li>
               
@@ -148,7 +153,7 @@ service at <a class="reference external" href="https://mist.io">https://mist.io<
 <h2>Authenticate through <a class="reference external" href="https://mist.io">https://mist.io</a><a class="headerlink" href="#authenticate-through-https-mist-io" title="Permalink to this headline">¶</a></h2>
 <dl class="post">
 <dt id="post-mist.io-auth">
-<tt class="descname">POST </tt><tt class="descname">mist.io/auth</tt><a class="headerlink" href="#post-mist.io-auth" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">mist.io/auth</code><a class="headerlink" href="#post-mist.io-auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Authenticate to mist.io service</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /auth
@@ -197,8 +202,8 @@ use the premioum services of mist such as monitoring, adding rules and alerts to
 <h2>Supported Providers<a class="headerlink" href="#supported-providers" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--providers">
-<tt class="descname">GET </tt><tt class="descname">/providers</tt><a class="headerlink" href="#get--providers" title="Permalink to this definition">¶</a></dt>
-<dd><p>In each GET API request, you have to include the <tt class="docutils literal"><span class="pre">`Api-Version`</span></tt> header</p>
+<code class="descname">GET </code><code class="descname">/providers</code><a class="headerlink" href="#get--providers" title="Permalink to this definition">¶</a></dt>
+<dd><p>In each GET API request, you have to include the <code class="docutils literal"><span class="pre">`Api-Version`</span></code> header</p>
 <div class="highlight-http"><div class="highlight"><pre>{&#39;Api-Version&#39;:2}
 </pre></div>
 </div>
@@ -210,44 +215,48 @@ Accept: application/json; charset=UTF-8
 </pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>{u&#39;supported_providers&#39;:
+<div class="highlight-http"><div class="highlight"><pre>{&#39;supported_providers&#39;:
 [
-  {u&#39;provider&#39;: u&#39;bare_metal&#39;,
-   u&#39;regions&#39;: [],
-   u&#39;title&#39;: u&#39;Other Server&#39;},
-  {u&#39;provider&#39;: u&#39;azure&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;Azure&#39;},
-  {u&#39;provider&#39;: u&#39;ec2&#39;,
-   u&#39;regions&#39;: [{u&#39;id&#39;: u&#39;ec2_ap_northeast&#39;, u&#39;location&#39;: u&#39;Tokyo&#39;},
-    {u&#39;id&#39;: u&#39;ec2_ap_southeast&#39;, u&#39;location&#39;: u&#39;Singapore&#39;},
-    {u&#39;id&#39;: u&#39;ec2_ap_southeast_2&#39;, u&#39;location&#39;: u&#39;Sydney&#39;},
-    {u&#39;id&#39;: u&#39;ec2_eu_west&#39;, u&#39;location&#39;: u&#39;Ireland&#39;},
-    {u&#39;id&#39;: u&#39;ec2_sa_east&#39;, u&#39;location&#39;: u&#39;Sao Paulo&#39;},
-    {u&#39;id&#39;: u&#39;ec2_us_east&#39;, u&#39;location&#39;: u&#39;N. Virginia&#39;},
-    {u&#39;id&#39;: u&#39;ec2_us_west&#39;, u&#39;location&#39;: u&#39;N. California&#39;},
-    {u&#39;id&#39;: u&#39;ec2_us_west_oregon&#39;, u&#39;location&#39;: u&#39;Oregon&#39;}],
-   u&#39;title&#39;: u&#39;EC2&#39;},
-  {u&#39;provider&#39;: u&#39;gce&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;Google Compute Engine&#39;},
-  {u&#39;provider&#39;: u&#39;nephoscale&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;NephoScale&#39;},
-  {u&#39;provider&#39;: u&#39;digitalocean&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;DigitalOcean&#39;},
-  {u&#39;provider&#39;: u&#39;linode&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;Linode&#39;},
-  {u&#39;provider&#39;: u&#39;openstack&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;OpenStack&#39;},
-  {u&#39;provider&#39;: u&#39;rackspace&#39;,
-   u&#39;regions&#39;: [{u&#39;id&#39;: u&#39;dfw&#39;, u&#39;location&#39;: u&#39;Dallas&#39;},
-    {u&#39;id&#39;: u&#39;ord&#39;, u&#39;location&#39;: u&#39;Chicago&#39;},
-    {u&#39;id&#39;: u&#39;iad&#39;, u&#39;location&#39;: u&#39;N. Virginia&#39;},
-    {u&#39;id&#39;: u&#39;lon&#39;, u&#39;location&#39;: u&#39;London&#39;},
-    {u&#39;id&#39;: u&#39;syd&#39;, u&#39;location&#39;: u&#39;Sydney&#39;},
-    {u&#39;id&#39;: u&#39;hkg&#39;, u&#39;location&#39;: u&#39;Hong Kong&#39;},
-    {u&#39;id&#39;: u&#39;rackspace_first_gen:us&#39;, u&#39;location&#39;: u&#39;US-First Gen&#39;},
-    {u&#39;id&#39;: u&#39;rackspace_first_gen:uk&#39;, u&#39;location&#39;: u&#39;UK-First Gen&#39;}],
-   u&#39;title&#39;: u&#39;Rackspace&#39;},
-  {u&#39;provider&#39;: u&#39;softlayer&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;SoftLayer&#39;},
-  {u&#39;provider&#39;: u&#39;hpcloud&#39;,
-   u&#39;regions&#39;: [{u&#39;id&#39;: u&#39;region-a.geo-1&#39;, u&#39;location&#39;: u&#39;US West&#39;},
-    {u&#39;id&#39;: u&#39;region-b.geo-1&#39;, u&#39;location&#39;: u&#39;US East&#39;}],
-   u&#39;title&#39;: u&#39;HP Helion Cloud&#39;},
-  {u&#39;provider&#39;: u&#39;docker&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;Docker&#39;},
-  {u&#39;provider&#39;: u&#39;vcloud&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;VMware vCloud&#39;}
+  {&#39;provider&#39;: &#39;bare_metal&#39;,
+   &#39;regions&#39;: [],
+   &#39;title&#39;: &#39;Other Server&#39;},
+  {&#39;provider&#39;: &#39;azure&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;Azure&#39;},
+  {&#39;provider&#39;: &#39;ec2&#39;,
+   &#39;regions&#39;: [{&#39;id&#39;: &#39;ec2_ap_northeast&#39;, &#39;location&#39;: &#39;Tokyo&#39;},
+    {&#39;id&#39;: &#39;ec2_ap_southeast&#39;, &#39;location&#39;: &#39;Singapore&#39;},
+    {&#39;id&#39;: &#39;ec2_ap_southeast_2&#39;, &#39;location&#39;: &#39;Sydney&#39;},
+    {&#39;id&#39;: &#39;ec2_eu_west&#39;, &#39;location&#39;: &#39;Ireland&#39;},
+    {&#39;id&#39;: &#39;ec2_sa_east&#39;, &#39;location&#39;: &#39;Sao Paulo&#39;},
+    {&#39;id&#39;: &#39;ec2_us_east&#39;, &#39;location&#39;: &#39;N. Virginia&#39;},
+    {&#39;id&#39;: &#39;ec2_us_west&#39;, &#39;location&#39;: &#39;N. California&#39;},
+    {&#39;id&#39;: &#39;ec2_us_west_oregon&#39;, &#39;location&#39;: &#39;Oregon&#39;}],
+   &#39;title&#39;: &#39;EC2&#39;},
+  {&#39;provider&#39;: &#39;gce&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;Google Compute Engine&#39;},
+  {&#39;provider&#39;: &#39;nephoscale&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;NephoScale&#39;},
+  {&#39;provider&#39;: &#39;digitalocean&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;DigitalOcean&#39;},
+  {&#39;provider&#39;: &#39;linode&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;Linode&#39;},
+  {&#39;provider&#39;: &#39;openstack&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;OpenStack&#39;},
+  {&#39;provider&#39;: &#39;rackspace&#39;,
+   &#39;regions&#39;: [{&#39;id&#39;: &#39;dfw&#39;, &#39;location&#39;: &#39;Dallas&#39;},
+    {&#39;id&#39;: &#39;ord&#39;, &#39;location&#39;: &#39;Chicago&#39;},
+    {&#39;id&#39;: &#39;iad&#39;, &#39;location&#39;: &#39;N. Virginia&#39;},
+    {&#39;id&#39;: &#39;lon&#39;, &#39;location&#39;: &#39;London&#39;},
+    {&#39;id&#39;: &#39;syd&#39;, &#39;location&#39;: &#39;Sydney&#39;},
+    {&#39;id&#39;: &#39;hkg&#39;, &#39;location&#39;: &#39;Hong Kong&#39;},
+    {&#39;id&#39;: &#39;rackspace_first_gen:us&#39;, &#39;location&#39;: &#39;US-First Gen&#39;},
+    {&#39;id&#39;: &#39;rackspace_first_gen:uk&#39;, &#39;location&#39;: &#39;UK-First Gen&#39;}],
+   &#39;title&#39;: &#39;Rackspace&#39;},
+  {&#39;provider&#39;: &#39;softlayer&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;SoftLayer&#39;},
+  {&#39;provider&#39;: &#39;hpcloud&#39;,
+   &#39;regions&#39;: [{&#39;id&#39;: &#39;region-a.geo-1&#39;, &#39;location&#39;: &#39;US West&#39;},
+    {&#39;id&#39;: &#39;region-b.geo-1&#39;, &#39;location&#39;: &#39;US East&#39;}],
+   &#39;title&#39;: &#39;HP Helion Cloud&#39;},
+  {&#39;provider&#39;: &#39;docker&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;Docker&#39;},
+  {&#39;provider&#39;: &#39;vcloud&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;VMware vCloud&#39;}
+  {&#39;provider&#39;: &#39;indonesian_vcloud&#39;, &#39;regions&#39;: [],&#39;title&#39;: &#39;Indonesian Cloud&#39;},
+  {&#39;provider&#39;: &#39;libvirt&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;KVM (via libvirt)&#39;},
+  {&#39;provider&#39;: &#39;hostvirtual&#39;, &#39;regions&#39;: [], &#39;title&#39;: &#39;HostVirtual&#39;}]},
+  {u&#39;provider&#39;: u&#39;coreos&#39;, u&#39;regions&#39;: [], u&#39;title&#39;: u&#39;CoreOS&#39;},
   ]
   }
 </pre></div>
@@ -259,7 +268,7 @@ Accept: application/json; charset=UTF-8
 <h2>Backends Actions<a class="headerlink" href="#backends-actions" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--backends">
-<tt class="descname">GET </tt><tt class="descname">/backends</tt><a class="headerlink" href="#get--backends" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends</code><a class="headerlink" href="#get--backends" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all added backends</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends
@@ -296,15 +305,16 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends">
-<tt class="descname">POST </tt><tt class="descname">/backends</tt><a class="headerlink" href="#post--backends" title="Permalink to this definition">¶</a></dt>
-<dd><p>In each POST API request, you have to include the <tt class="docutils literal"><span class="pre">`Api-Version`</span></tt> header</p>
+<code class="descname">POST </code><code class="descname">/backends</code><a class="headerlink" href="#post--backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>In each POST API request, you have to include the <code class="docutils literal"><span class="pre">`Api-Version`</span></code> header</p>
 <div class="highlight-http"><div class="highlight"><pre>{&#39;Api-Version&#39;:2}
 </pre></div>
 </div>
 <p><strong>Add EC2 Backend</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
-    &quot;title&quot;:&quot;EC2 AP Sydney&quot;,
-    &quot;provider&quot;:&quot;ec2_ap_southeast_2&quot;,
+    &quot;title&quot;:&quot;EC2 Ireland&quot;,
+    &quot;provider&quot;:&quot;ec2&quot;,
+    &quot;region&quot;:&quot;ec2_eu_west&quot;
     &quot;api_key&quot;:&quot;POIHJOINPOIMIQCIHA&quot;,
     &quot;api_secret&quot;:&quot;09jLlilkjIU087JKHgjhguy90ur&quot;
 }
@@ -318,6 +328,7 @@ Accept: application/json; charset=UTF-8
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>region</strong> (<em>string</em>) &#8211; <em>(required)</em> Region Id, as found in the supported providers list</li>
 <li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> EC2 API Key</li>
 <li><strong>api_secret</strong> (<em>string</em>) &#8211; <em>(required)</em> EC2 API Secret</li>
 </ul>
@@ -357,8 +368,9 @@ Accept: application/json; charset=UTF-8
 </table>
 <p><strong>Add Rackspace backend</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
-    &quot;title&quot;:&quot;MyRackspace&quot;,
-    &quot;provider&quot;:&quot;rackspace:ord&quot;,
+    &quot;title&quot;:&quot;Rackspace Chicago&quot;,
+    &quot;provider&quot;:&quot;rackspace&quot;,
+    &quot;region&quot;:&quot;ord&quot;,
     &quot;username&quot;:&quot;myuser&quot;,
     &quot;api_key&quot;:&quot;oinoh*jhbJHVJHV77t8&quot;
 }
@@ -372,6 +384,7 @@ Accept: application/json; charset=UTF-8
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>region</strong> (<em>string</em>) &#8211; <em>(required)</em> Region Id as found in supported providers list</li>
 <li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Rackspace username</li>
 <li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> Rackspace API Key</li>
 </ul>
@@ -526,7 +539,9 @@ Accept: application/json; charset=UTF-8
     &quot;title&quot;:&quot;MyDocher&quot;,
     &quot;provider&quot;:&quot;docker&quot;,
     &quot;docker_host&quot;:&quot;http://10.0.0.1&quot;,
-    &quot;docker_port&quot;:&quot;4243&quot;
+    &quot;docker_port&quot;:&quot;2375&quot;,
+    &quot;key_file&quot;:&quot;-----BEGIN RSA PRIVATE KEY-----...&quot;,
+    &quot;cert_file&quot;:&quot;-----BEGIN CERTIFICATE-----....&quot;
 }
 </pre></div>
 </div>
@@ -539,9 +554,39 @@ Accept: application/json; charset=UTF-8
 <li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>docker_host</strong> (<em>string</em>) &#8211; <em>(required)</em> The host of your Docker</li>
-<li><strong>docker_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> The port on which your Docker API is exposed to. By default will be <tt class="docutils literal"><span class="pre">`4243`</span></tt></li>
+<li><strong>docker_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> The port on which your Docker API is exposed to. By default will be <code class="docutils literal"><span class="pre">`4243`</span></code></li>
+<li><strong>key_file</strong> (<em>string</em>) &#8211; <em>(optional)</em> For TLS connections, this is the content of your corresponding key.pem file</li>
+<li><strong>cert_file</strong> (<em>string</em>) &#8211; <em>(optional)</em> For TLS connections, this is the content of your corresponding cert.pem file</li>
 <li><strong>auth_user</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth User</li>
 <li><strong>auth_password</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth Password</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add CoreOS backend</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;Core OS&quot;,
+    &quot;provider&quot;:&quot;coreos&quot;,
+    &quot;machine_ip&quot;:&quot;10.0.0.1&quot;,
+    &quot;machine_user&quot;:&quot;root&quot;,
+    &quot;machine_key&quot;:&quot;mySSHKey&quot;,
+    &quot;machine_port&quot;:&quot;22&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
+<li><strong>machine_user</strong> (<em>string</em>) &#8211; <em>(optional)</em> User to connect with your server</li>
+<li><strong>machine_key</strong> (<em>string</em>) &#8211; <em>(optional)</em> The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.</li>
+<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <code class="docutils literal"><span class="pre">`22`</span></code>, but you can alter this if your ssh-server listen to another port</li>
 </ul>
 </td>
 </tr>
@@ -573,7 +618,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Single Server/Bare Metal backend</strong>:</p>
+<p><strong>Add Single Server/Bare Metal Unix backend</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;MyServer&quot;,
     &quot;provider&quot;:&quot;bare_metal&quot;,
@@ -595,33 +640,43 @@ Accept: application/json; charset=UTF-8
 <li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
 <li><strong>machine_user</strong> (<em>string</em>) &#8211; <em>(required)</em> User to connect with your server</li>
 <li><strong>machine_key</strong> (<em>string</em>) &#8211; <em>(required)</em> The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.</li>
-<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <tt class="docutils literal"><span class="pre">`22`</span></tt>, but you can alter this if your ssh-server listen to another port</li>
+<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <code class="docutils literal"><span class="pre">`22`</span></code>, but you can alter this if your ssh-server listen to another port</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p><strong>Example response</strong>:</p>
+<p><strong>Add Windows Server backend</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
-   &quot;status&quot;: &quot;off&quot;,
-   &quot;tenant_name&quot;: &quot;&quot;,
-   &quot;id&quot;: &quot;48emAUzL9teVYhkyJc9koRaPXEDp&quot;,
-   &quot;index&quot;: 2,
-   &quot;apikey&quot;: &quot;POIHJOINPOIMIQCIHA&quot;,
-   &quot;title&quot;: &quot;EC2 AP Sydney&quot;,
-   &quot;region&quot;: &quot;&quot;,
-   &quot;poll_interval&quot;: 10000,
-   &quot;apiurl&quot;: &quot;&quot;,
-   &quot;provider&quot;: &quot;ec2_ap_southeast_2&quot;,
-   &quot;enabled&quot;: true
+    &quot;title&quot;:&quot;MyWindows&quot;,
+    &quot;provider&quot;:&quot;bare_metal&quot;,
+    &quot;machine_ip&quot;:&quot;10.0.0.1&quot;,
+    &quot;windows&quot;:true,
+    &quot;remote_desktop_port&quot;:&quot;3389&quot;
 }
 </pre></div>
 </div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
+<li><strong>windows</strong> (<em>boolean</em>) &#8211; <em>(required)</em>  This boolean informs mist.io that this Bare Metal server is a Windows Server</li>
+<li><strong>remote_desktop_port</strong> (<em>string</em>) &#8211; <em>(required)</em> The Remote Desktop Port of your Windows Server</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="delete">
 <dt id="delete--backends-backend_id">
-<tt class="descname">DELETE </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#delete--backends-backend_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DELETE </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#delete--backends-backend_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>DELETE /backends/2tK74h4mXbjjLlkjjO4SHn3
@@ -633,7 +688,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="put">
 <dt id="put--backends-backend_id">
-<tt class="descname">PUT </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#put--backends-backend_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PUT </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#put--backends-backend_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>PUT /backends
@@ -661,7 +716,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#post--backends-backend_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#post--backends-backend_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggle state of backend between enabled and disabled</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3
@@ -689,7 +744,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--backends-backend_id-sizes">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/sizes</tt><a class="headerlink" href="#get--backends-backend_id-sizes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/sizes</code><a class="headerlink" href="#get--backends-backend_id-sizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all sizes provided by backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/sizes
@@ -824,7 +879,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--backends-backend_id-locations">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/locations</tt><a class="headerlink" href="#get--backends-backend_id-locations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/locations</code><a class="headerlink" href="#get--backends-backend_id-locations" title="Permalink to this definition">¶</a></dt>
 <dd><p>List locations provided by backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/locations
@@ -859,7 +914,7 @@ Accept: application/json; charset=UTF-8
 <h2>Keys Actions<a class="headerlink" href="#keys-actions" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--keys">
-<tt class="descname">GET </tt><tt class="descname">/keys</tt><a class="headerlink" href="#get--keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/keys</code><a class="headerlink" href="#get--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>List added keys</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys
@@ -900,7 +955,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="put">
 <dt id="put--keys">
-<tt class="descname">PUT </tt><tt class="descname">/keys</tt><a class="headerlink" href="#put--keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PUT </code><code class="descname">/keys</code><a class="headerlink" href="#put--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add Key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>PUT /keys
@@ -930,7 +985,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--keys">
-<tt class="descname">POST </tt><tt class="descname">/keys</tt><a class="headerlink" href="#post--keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/keys</code><a class="headerlink" href="#post--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ask mist to generate a new private key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys
@@ -948,7 +1003,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="delete">
 <dt id="delete--keys-key_id">
-<tt class="descname">DELETE </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#delete--keys-key_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DELETE </code><code class="descname">/keys/{key_id}</code><a class="headerlink" href="#delete--keys-key_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>DELETE /keys/{key_id}
@@ -960,7 +1015,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="put">
 <dt id="put--keys-key_id">
-<tt class="descname">PUT </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#put--keys-key_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PUT </code><code class="descname">/keys/{key_id}</code><a class="headerlink" href="#put--keys-key_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>PUT /keys/{key_id}
@@ -988,7 +1043,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--keys-key_id">
-<tt class="descname">POST </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#post--keys-key_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/keys/{key_id}</code><a class="headerlink" href="#post--keys-key_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set default key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /keys/{key_id}
@@ -1000,7 +1055,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--keys-key_id-private">
-<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}/private</tt><a class="headerlink" href="#get--keys-key_id-private" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/keys/{key_id}/private</code><a class="headerlink" href="#get--keys-key_id-private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get private key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys/{key_id}/private
@@ -1016,7 +1071,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--keys-key_id-public">
-<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}/public</tt><a class="headerlink" href="#get--keys-key_id-public" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/keys/{key_id}/public</code><a class="headerlink" href="#get--keys-key_id-public" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get public key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys/{key_id}/public
@@ -1035,7 +1090,7 @@ Accept: application/json; charset=UTF-8
 <h2>Images Actions<a class="headerlink" href="#images-actions" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--backends-backend_id-images">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/images</tt><a class="headerlink" href="#get--backends-backend_id-images" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/images</code><a class="headerlink" href="#get--backends-backend_id-images" title="Permalink to this definition">¶</a></dt>
 <dd><p>List available images for this backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/images
@@ -1112,7 +1167,7 @@ search through all EC2 images including community and custom images.</p>
 <h2>Machines Actions<a class="headerlink" href="#machines-actions" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--backends-backend_id-machines">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#get--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/machines</code><a class="headerlink" href="#get--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all added machines for this backend</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
@@ -1181,7 +1236,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id-machines">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#post--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines</code><a class="headerlink" href="#post--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create machine</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
@@ -1200,25 +1255,6 @@ Accept: application/json; charset=UTF-8
 }
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
-<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
-<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
-<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
-<li><strong>name</strong> &#8211; <em>required</em> Bash command to be run when machine is initiated, given as a string</li>
-<li><strong>image_extra</strong> (<em>string</em>) &#8211; <em>required</em> Needed only by Linode backend, otherwise empty string</li>
-<li><strong>disk</strong> (<em>string</em>) &#8211; <em>required</em> Needed only by Linode backend, otherwise empty string</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 <p><strong>Example response</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
    &quot;public_ips&quot;:
@@ -1262,11 +1298,186 @@ Accept: application/json; charset=UTF-8
 }
 </pre></div>
 </div>
+<p><strong>Create Machine on EC2</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;devserver&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;t1.micro&quot;,
+    &quot;script&quot;:&quot;echo 1 &gt; /root/config&quot;,
+    &quot;image&quot;:&quot;ami-7c356d2e&quot;,
+    &quot;location&quot;:&quot;0&quot;,
+    &quot;monitoring&quot;: true,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>script</strong> (<em>string</em>) &#8211; <em>optional</em> Script to run after the machine is provisioned</li>
+<li><strong>monitoring</strong> (<em>boolean</em>) &#8211; <em>optional</em> If true, Mist will enable monitoring for this machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Create Machine on Azure</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;devserver&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;ExtraSmall&quot;,
+    &quot;script&quot;:&quot;echo 1 &gt; /root/config&quot;,
+    &quot;image&quot;:&quot;2b171e93f07c4903bcad35bda10acf22__CoreOS-Stable-633.1.0&quot;,
+    &quot;location&quot;:&quot;West US&quot;,
+    &quot;monitoring&quot;: true,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>script</strong> (<em>string</em>) &#8211; <em>optional</em> Script to run after the machine is provisioned</li>
+<li><strong>monitoring</strong> (<em>boolean</em>) &#8211; <em>optional</em> If true, Mist will enable monitoring for this machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Create Machine on DigitalOcean</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;devserver&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;512mb&quot;,
+    &quot;script&quot;:&quot;echo 1 &gt; /root/config&quot;,
+    &quot;image&quot;:&quot;7572830&quot;,
+    &quot;location&quot;:&quot;sfo1&quot;,
+    &quot;monitoring&quot;: true,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>script</strong> (<em>string</em>) &#8211; <em>optional</em> Script to run after the machine is provisioned</li>
+<li><strong>monitoring</strong> (<em>boolean</em>) &#8211; <em>optional</em> If true, Mist will enable monitoring for this machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Create Container on Docker</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;UbuntuContainer&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;default&quot;,
+    &quot;image&quot;:&quot;d0955f21bf24f5bfffd32d2d0bb669d0564701c271bc3dfc64cfc5adfdec2d07&quot;,
+    &quot;docker_env&quot;:
+    {
+        &quot;SOMEVAR&quot;: &quot;True&quot;,
+        &quot;SOMEOTHERVAR&quot;: &quot;False&quot;
+    },
+    &quot;docker_command&quot;: &quot;/bin/bash&quot;,
+    &quot;docker_exposed_ports&quot;:
+    {
+        &quot;8888/tcp&quot;: {},
+        &quot;4977/tcp&quot;: {}
+    },
+      &quot;docker_port_bindings&quot;:
+      {
+            &quot;8888/tcp&quot;:
+            [
+              {
+                &quot;HostPort&quot;: &quot;88888&quot;
+              }
+            ],
+            &quot;4977/tcp&quot;:
+            [
+              {
+                &quot;HostPort&quot;: &quot;4977&quot;
+              }
+            ]
+      }
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>optional</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>docker_env</strong> (<em>dict</em>) &#8211; <em>optional</em> Here you specify Environmental Variables for your docker container</li>
+<li><strong>docker_exposed_ports</strong> (<em>dict</em>) &#8211; <em>optional</em> If you want to expose some ports, specify them here, with this format</li>
+<li><strong>docker_port_bindings</strong> (<em>dict</em>) &#8211; <em>optional</em> Specify the port bindings for your exposed ports</li>
+<li><strong>docker_command</strong> (<em>string</em>) &#8211; <em>required</em> Here you specify the command to run</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Create Machine on GCE (Google Compute Engine)</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;name&quot;:&quot;devserver&quot;,
+    &quot;key&quot;:&quot;mysshkey&quot;,
+    &quot;size&quot;:&quot;1000&quot;,
+    &quot;script&quot;:&quot;echo 1 &gt; /root/config&quot;,
+    &quot;image&quot;:&quot;5298942163210525420&quot;,
+    &quot;location&quot;:&quot;2221&quot;,
+    &quot;monitoring&quot;: true,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>script</strong> (<em>string</em>) &#8211; <em>optional</em> Script to run after the machine is provisioned</li>
+<li><strong>monitoring</strong> (<em>boolean</em>) &#8211; <em>optional</em> If true, Mist will enable monitoring for this machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="post">
 <dt id="post--backends-backend_id-machines-machine_id">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}</tt><a class="headerlink" href="#post--backends-backend_id-machines-machine_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines/{machine_id}</code><a class="headerlink" href="#post--backends-backend_id-machines-machine_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Machine actions like reboot, destroy, shutdown and start</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>  POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
@@ -1294,7 +1505,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--backends-backend_id-machines-machine_id-metadata">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</tt><a class="headerlink" href="#post--backends-backend_id-machines-machine_id-metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</code><a class="headerlink" href="#post--backends-backend_id-machines-machine_id-metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add tags/metadata for machine</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
@@ -1325,7 +1536,7 @@ Accept: application/json; charset=UTF-8
 <h2>Shell<a class="headerlink" href="#shell" title="Permalink to this headline">¶</a></h2>
 <dl class="get">
 <dt id="get--backends-backend_id-machines-machine_id-shell?host=host_ip&amp;command=shell_command">
-<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</tt><a class="headerlink" href="#get--backends-backend_id-machines-machine_id-shell?host=host_ip&command=shell_command" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</code><a class="headerlink" href="#get--backends-backend_id-machines-machine_id-shell?host=host_ip&command=shell_command" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run shell command in machine. Mist will yield an html body with the command&#8217;s output.</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&amp;command=uptime
@@ -1390,7 +1601,7 @@ Accept: application/json; charset=UTF-8
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>

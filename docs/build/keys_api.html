@@ -39,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-default ">
     <div class="container">
@@ -69,8 +69,8 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
 </ul>
 </li>
@@ -125,7 +125,7 @@
       
   <dl class="get">
 <dt id="get--keys">
-<tt class="descname">GET </tt><tt class="descname">/keys</tt><a class="headerlink" href="#get--keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/keys</code><a class="headerlink" href="#get--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>List added keys</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys
@@ -166,7 +166,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="put">
 <dt id="put--keys">
-<tt class="descname">PUT </tt><tt class="descname">/keys</tt><a class="headerlink" href="#put--keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PUT </code><code class="descname">/keys</code><a class="headerlink" href="#put--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add Key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>PUT /keys
@@ -196,7 +196,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--keys">
-<tt class="descname">POST </tt><tt class="descname">/keys</tt><a class="headerlink" href="#post--keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/keys</code><a class="headerlink" href="#post--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ask mist to generate a new private key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys
@@ -214,7 +214,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="delete">
 <dt id="delete--keys-key_id">
-<tt class="descname">DELETE </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#delete--keys-key_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DELETE </code><code class="descname">/keys/{key_id}</code><a class="headerlink" href="#delete--keys-key_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>DELETE /keys/{key_id}
@@ -226,7 +226,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="put">
 <dt id="put--keys-key_id">
-<tt class="descname">PUT </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#put--keys-key_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PUT </code><code class="descname">/keys/{key_id}</code><a class="headerlink" href="#put--keys-key_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>PUT /keys/{key_id}
@@ -254,7 +254,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="post">
 <dt id="post--keys-key_id">
-<tt class="descname">POST </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#post--keys-key_id" title="Permalink to this definition">¶</a></dt>
+<code class="descname">POST </code><code class="descname">/keys/{key_id}</code><a class="headerlink" href="#post--keys-key_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set default key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>POST /keys/{key_id}
@@ -266,7 +266,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--keys-key_id-private">
-<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}/private</tt><a class="headerlink" href="#get--keys-key_id-private" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/keys/{key_id}/private</code><a class="headerlink" href="#get--keys-key_id-private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get private key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys/{key_id}/private
@@ -282,7 +282,7 @@ Accept: application/json; charset=UTF-8
 
 <dl class="get">
 <dt id="get--keys-key_id-public">
-<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}/public</tt><a class="headerlink" href="#get--keys-key_id-public" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GET </code><code class="descname">/keys/{key_id}/public</code><a class="headerlink" href="#get--keys-key_id-public" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get public key</p>
 <p><strong>Example request</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>GET /keys/{key_id}/public
@@ -311,7 +311,7 @@ Accept: application/json; charset=UTF-8
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
     </p>
   </div>
 </footer>
