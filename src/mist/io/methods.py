@@ -253,7 +253,7 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     elif provider == 'hostvirtual':
         backend_id, backend = _add_backend_hostvirtual(title, provider, params)
-	elif provider == 'vultr':
+    elif provider == 'vultr':
         backend_id, backend = _add_backend_vultr(title, provider, params)	
     else:
         raise BadRequestError("Provider unknown.")
@@ -1480,7 +1480,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type == Provider.HOSTVIRTUAL:
         node = _create_machine_hostvirtual(conn, public_key, machine_name, image,
                                          size, location)
-	elif conn.type == Provider.VULTR:
+    elif conn.type == Provider.VULTR:
         node = _create_machine_vultr(conn, public_key, machine_name, image,
                                          size, location)
     else:
