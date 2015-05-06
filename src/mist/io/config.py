@@ -261,6 +261,12 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'HostVirtual',
         'provider' : Provider.HOSTVIRTUAL,
         'regions': []
+    },
+	# Vultr
+    {
+        'title': 'Vultr',
+        'provider' : Provider.VULTR,
+        'regions': []
     }
 ]
 
