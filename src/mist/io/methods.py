@@ -279,6 +279,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     elif provider == 'hostvirtual':
         backend_id, backend = _add_backend_hostvirtual(title, provider, params)
+    elif provider == 'vsphere':
+        backend_id, backend = _add_backend_vsphere(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -1274,6 +1276,8 @@ def connect_provider(backend):
         else:   # API v1
             driver = get_driver('digitalocean_first_gen')
             conn = driver(backend.apikey, backend.apisecret)
+    elif backend.provider == Provider.VSPHERE:
+        conn = driver(host=backend.apiurl, username=backend.apikey, password=backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
     elif backend.provider == 'coreos':
