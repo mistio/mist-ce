@@ -1342,8 +1342,13 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_start = False
         can_destroy = False
         can_stop = False
-        can_reboot = True
+        can_reboot = False
         can_tag = False
+
+        if extra.get('can_reboot', False):
+        # allow reboot action for bare metal with key associated
+            can_reboot = True
+
 
     if conn.type in [Provider.LINODE]:
         if machine_from_api.state is NodeState.PENDING:
@@ -1425,6 +1430,14 @@ def list_machines(user, backend_id):
             except TypeError:
                 m.extra[k] = str(m.extra[k])
 
+        if m.driver.type == 'bare_metal':
+            can_reboot = False
+            keypairs = user.keypairs
+            for key_id in keypairs:
+                for machine in keypairs[key_id].machines:
+                    if [backend_id, m.id] == machine[:2]:
+                        can_reboot = True
+            m.extra['can_reboot'] = can_reboot
         machine = {'id': m.id,
                    'uuid': m.get_uuid(),
                    'name': m.name,
