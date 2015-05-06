@@ -98,6 +98,12 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider': 'bare_metal',
         'regions': []
     },
+    # CoreOS
+    {
+        'title': 'CoreOS',
+        'provider': 'coreos',
+        'regions': [],
+    },
     # Azure
     {
         'title': 'Azure',
@@ -271,6 +277,11 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'Bare Metal Server',
         'provider': 'bare_metal'
+    },
+    # CoreOS
+    {
+        'title': 'CoreOS',
+        'provider': 'coreos'
     },
     # Azure
     {

@@ -80,20 +80,50 @@ define('app/controllers/backend_add', ['app/models/backend'],
 
 
             _showMonitoringPopup: function (backend, payload) {
-                Mist.dialogController.open({
-                    type: DIALOG_TYPES.OK,
-                    head: 'Enable monitoring',
-                    body: [
-                        {
-                            paragraph: 'Run this command on your server to install' +
-                                ' the monitoring agent'
-                        },
-                        {
-                            command: payload.windows ? backend.monitoring.windows_command :
-                                backend.monitoring.unix_command
-                        },
-                    ],
-                });
+                if (payload.windows)
+                    showCommand({
+                        body: [
+                            {
+                                paragraph: 'Run this command on your server\'s power shell' +
+                                    ' to install the monitoring agent:'
+                            },
+                            {
+                                command: backend.monitoring.windows_command
+                            }
+                        ]
+                    });
+                else if (payload.provider == 'coreos')
+                    showCommand({
+                        body: [
+                            {
+                                paragraph: 'Run this command on your server\'s terminal' +
+                                    ' to install the monitoring agent:'
+                            },
+                            {
+                                command: backend.monitoring.coreos_command
+                            }
+                        ]
+                    });
+                else
+                    showCommand({
+                        body: [
+                            {
+                                paragraph: 'Run this command on your server\'s terminal' +
+                                   ' to install the monitoring agent:'
+                            },
+                            {
+                                command: backend.monitoring.unix_command
+                            }
+                        ]
+                    });
+
+                function showCommand (args) {
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.OK,
+                        head: 'Enable monitoring',
+                        body: args.body,
+                    });
+                }
             },
 
 
