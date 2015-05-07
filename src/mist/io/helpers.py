@@ -148,7 +148,7 @@ def parse_ping(stdout):
 
 def amqp_publish(exchange, routing_key, data,
                  ex_type='fanout', ex_declare=False):
-    connection = Connection()
+    connection = Connection(host=config.RABBITMQ_URL)
     channel = connection.channel()
     if ex_declare:
         channel.exchange_declare(exchange=exchange, type=ex_type)
@@ -170,7 +170,7 @@ def amqp_subscribe(exchange, callback, queue='',
             return func(msg)
         return wrapped
 
-    connection = Connection()
+    connection = Connection(config.RABBITMQ_URL)
     channel = connection.channel()
     channel.exchange_declare(exchange=exchange, type=ex_type)
     resp = channel.queue_declare(queue, exclusive=True)
@@ -218,7 +218,7 @@ def amqp_subscribe_user(user, queue, callback):
 
 
 def amqp_user_listening(user):
-    connection = Connection()
+    connection = Connection(config.RABBITMQ_URL)
     channel = connection.channel()
     try:
         channel.exchange_declare(exchange=_amqp_user_exchange(user),
