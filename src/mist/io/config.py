@@ -35,6 +35,7 @@ COMMAND_TIMEOUT = settings.get("COMMAND_TIMEOUT", 20)
 ALLOW_CONNECT_LOCALHOST = settings.get('ALLOW_CONNECT_LOCALHOST', True)
 ALLOW_CONNECT_PRIVATE = settings.get('ALLOW_CONNECT_PRIVATE', True)
 
+MEMCACHED_HOST = settings.get("MEMCACHED_HOST", ["127.0.0.1:11211"])
 RABBITMQ_URL = settings.get("RABBITMQ_URL", 'localhost:5672')
 
 # celery settings
