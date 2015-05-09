@@ -41,7 +41,8 @@ from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
-from mist.io.bare_metal import BareMetalDriver
+from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
+from mist.io.helpers import check_host
 from mist.io.exceptions import *
 
 
@@ -218,10 +219,35 @@ def add_backend_v_2(user, title, provider, params):
         raise RequiredParameterMissingError("provider")
     log.info("Adding new backend in provider '%s' with Api-Version: 2", provider)
 
+    # perform hostname validation if hostname is supplied
+    if provider in ['vcloud', 'bare_metal', 'docker', 'libvirt', 'openstack', 'vsphere', 'coreos']:
+        if provider == 'vcloud':
+            hostname = params.get('host', '')
+        elif provider == 'bare_metal':
+            hostname = params.get('machine_ip', '')
+        elif provider == 'docker':
+            hostname = params.get('docker_host', '')
+        elif provider == 'libvirt':
+            hostname = params.get('machine_hostname', '')
+        elif provider == 'openstack':
+            hostname = params.get('auth_url', '')
+        elif provider == 'vsphere':
+            hostname = params.get('host', '')
+        elif provider == 'coreos':
+            hostname = params.get('machine_ip', '')
+
+        if hostname:
+            check_host(hostname)
+
     baremetal = provider == 'bare_metal'
 
     if provider == 'bare_metal':
         backend_id, mon_dict = _add_backend_bare_metal(user, title, provider, params)
+        log.info("Backend with id '%s' added succesfully.", backend_id)
+        trigger_session_update(user.email, ['backends'])
+        return {'backend_id': backend_id, 'monitoring': mon_dict}
+    elif provider == 'coreos':
+        backend_id, mon_dict = _add_backend_coreos(user, title, provider, params)
         log.info("Backend with id '%s' added succesfully.", backend_id)
         trigger_session_update(user.email, ['backends'])
         return {'backend_id': backend_id, 'monitoring': mon_dict}
@@ -255,6 +281,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_hostvirtual(title, provider, params)
     elif provider == 'vultr':
         backend_id, backend = _add_backend_vultr(title, provider, params)	
+    elif provider == 'vsphere':
+        backend_id, backend = _add_backend_vsphere(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -321,12 +349,7 @@ def _add_backend_bare_metal(user, title, provider, params):
     except:
         rdp_port = 3389
     machine_hostname = params.get('machine_ip', '')
-    if machine_hostname:
-        try:
-            socket.gethostbyname(machine_hostname)
-        except socket.gaierror:
-            raise BadRequestError("Hostname '%s' isn't resolvable/accessible."
-                                  % machine_hostname)
+
     use_ssh = remove_on_error and os_type == 'unix' and machine_key
     if use_ssh:
         if machine_key not in user.keypairs:
@@ -372,6 +395,82 @@ def _add_backend_bare_metal(user, title, provider, params):
                 raise MistError("Couldn't connect to host '%s'."
                                 % machine_hostname)
         user.save()
+    if params.get('monitoring'):
+        try:
+            from mist.core.methods import enable_monitoring as _en_monitoring
+        except ImportError:
+            _en_monitoring = enable_monitoring
+        mon_dict = _en_monitoring(user, backend_id, machine_id,
+                                  no_ssh=not use_ssh)
+    else:
+        mon_dict = {}
+
+    return backend_id, mon_dict
+
+
+def _add_backend_coreos(user, title, provider, params):
+    remove_on_error = params.get('remove_on_error', True)
+    machine_key = params.get('machine_key', '')
+    machine_user = params.get('machine_user', '')
+    os_type = 'coreos'
+
+    try:
+        port = int(params.get('machine_port', 22))
+    except:
+        port = 22
+    machine_hostname = str(params.get('machine_ip', ''))
+
+    if not machine_hostname:
+        raise RequiredParameterMissingError('machine_ip')
+
+    try:
+        socket.gethostbyname(machine_hostname)
+    except socket.gaierror:
+        raise BadRequestError("Hostname '%s' isn't resolvable/accessible."
+                              % machine_hostname)
+
+    use_ssh = remove_on_error and machine_key
+    if use_ssh:
+        if machine_key not in user.keypairs:
+            raise KeypairNotFoundError(machine_key)
+        if not machine_user:
+            machine_user = 'root'
+
+    machine = model.Machine()
+    machine.ssh_port = port
+    if machine_hostname:
+        machine.dns_name = machine_hostname
+        machine.public_ips = [machine_hostname]
+    machine_id = machine_hostname.replace('.', '').replace(' ', '')
+    machine.name = title
+    machine.os_type = os_type
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.enabled = True
+    backend.machines[machine_id] = machine
+    backend_id = backend.get_id()
+
+    with user.lock_n_load():
+        if backend_id in user.backends:
+            raise BackendExistsError(backend_id)
+        user.backends[backend_id] = backend
+        # try to connect. this will either fail and we'll delete the
+        # backend, or it will work and it will create the association
+        if use_ssh:
+            try:
+                ssh_command(
+                    user, backend_id, machine_id, machine_hostname, 'uptime',
+                    key_id=machine_key, username=machine_user, password=None,
+                    port=port
+                )
+            except MachineUnauthorizedError as exc:
+                raise BackendUnauthorizedError(exc)
+            except ServiceUnavailableError as exc:
+                raise MistError("Couldn't connect to host '%s'."
+                                % machine_hostname)
+        user.save()
+
     if params.get('monitoring'):
         try:
             from mist.core.methods import enable_monitoring as _en_monitoring
@@ -1126,7 +1225,7 @@ def connect_provider(backend):
     Backend is expected to be a mist.io.model.Backend
 
     """
-    if backend.provider != 'bare_metal':
+    if backend.provider not in ['bare_metal', 'coreos']:
         driver = get_driver(backend.provider)
     if backend.provider == Provider.AZURE:
         #create a temp file and output the cert there, so that
@@ -1194,8 +1293,12 @@ def connect_provider(backend):
         else:   # API v1
             driver = get_driver('digitalocean_first_gen')
             conn = driver(backend.apikey, backend.apisecret)
+    elif backend.provider == Provider.VSPHERE:
+        conn = driver(host=backend.apiurl, username=backend.apikey, password=backend.apisecret)
     elif backend.provider == 'bare_metal':
         conn = BareMetalDriver(backend.machines)
+    elif backend.provider == 'coreos':
+        conn = CoreOSDriver(backend.machines)
     elif backend.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if backend.apisecret:
@@ -1252,12 +1355,17 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_reboot = False
         can_tag = False
 
-    if conn.type == 'bare_metal':
+    if conn.type in ['bare_metal', 'coreos']:
         can_start = False
         can_destroy = False
         can_stop = False
-        can_reboot = True
+        can_reboot = False
         can_tag = False
+
+        if extra.get('can_reboot', False):
+        # allow reboot action for bare metal with key associated
+            can_reboot = True
+
 
     if conn.type in [Provider.LINODE]:
         if machine_from_api.state is NodeState.PENDING:
@@ -1339,6 +1447,14 @@ def list_machines(user, backend_id):
             except TypeError:
                 m.extra[k] = str(m.extra[k])
 
+        if m.driver.type == 'bare_metal':
+            can_reboot = False
+            keypairs = user.keypairs
+            for key_id in keypairs:
+                for machine in keypairs[key_id].machines:
+                    if [backend_id, m.id] == machine[:2]:
+                        can_reboot = True
+            m.extra['can_reboot'] = can_reboot
         machine = {'id': m.id,
                    'uuid': m.get_uuid(),
                    'name': m.name,
@@ -3669,6 +3785,10 @@ def get_deploy_collectd_command_unix(uuid, password, monitor):
 
 def get_deploy_collectd_command_windows(uuid, password, monitor):
      return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:25826"""""") -interval 10'"''' % (uuid, password, monitor)
+
+
+def get_deploy_collectd_command_coreos(uuid, password, monitor):
+    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
 
 
 def machine_name_validator(provider, name):
