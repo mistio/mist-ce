@@ -751,13 +751,20 @@ var setupSocketEvents = function (socket, callback) {
     })
     .on('notify', function (data){
 
+        if (! (data.title && data.body)) {
+            var msg = data.title || data.body;
+            Mist.notificationController.notify(msg);
+            return;
+        }
+
         var dialogBody = [];
 
         // Extract machine information
         var machineId = data.machine_id;
         var backendId = data.backend_id;
         var machine = Mist.backendsController.getMachine(machineId, backendId);
-        if (machine.id) {
+
+        if (machine && machine.id) {
             dialogBody.push({
                 link: machine.name,
                 class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
@@ -1586,6 +1593,48 @@ var PROVIDER_MAP = {
                     optional: true,
                 },
             ]
+        },
+        {
+            name: 'monitoring',
+            type: 'checkbox',
+            label: 'Enable monitoring',
+            defaultValue: true,
+        }
+    ],
+
+    coreos: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'CoreOS',
+        },
+        {
+            name: 'machine_ip',
+            type: 'text',
+            label: 'Hostname',
+            placeholder: 'DNS or IP '
+        },
+        {
+            name: 'machine_key',
+            type: 'ssh_key',
+            label: 'SSH Key',
+            optional: true,
+        },
+        {
+            showIf: 'machine_key',
+            name: 'machine_user',
+            type: 'text',
+            label: 'User',
+            optional: true,
+            defaultValue: 'root',
+        },
+        {
+            showIf: 'machine_key',
+            name: 'machine_port',
+            type: 'text',
+            label: 'Port',
+            defaultValue: '22',
+            optional: true,
         },
         {
             name: 'monitoring',

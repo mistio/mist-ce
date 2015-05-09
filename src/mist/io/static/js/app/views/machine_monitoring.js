@@ -146,8 +146,7 @@ define('app/views/machine_monitoring',
                     else if (!Mist.current_plan)
                         this._showMissingPlanMessage();
 
-                    // Make sure machine has a key
-                    else if (!this.machine.probed)
+                    else if (!this.machine.probed || this.machine.get('isCoreos'))
                         this._showManualMonitoringCommand();
 
                     // Confrim to enable monitoring
@@ -357,58 +356,59 @@ define('app/views/machine_monitoring',
                     this.machine, function (success, data) {
                         if (success) {
                             if (that.machine.get('isWindows'))
-                                showWindowsPopup(data.windows_command);
+                                showCommand({
+                                    body: [
+                                        {
+                                            paragraph: 'Run this command on your server\'s power shell' +
+                                                ' to install the monitoring agent:'
+                                        },
+                                        {
+                                            command: data.windows_command
+                                        }
+                                    ]
+                                });
+                            else if (that.machine.get('isCoreos'))
+                                showCommand({
+                                    body: [
+                                        {
+                                            paragraph: 'Run this command on your server\'s terminal' +
+                                                ' to install the monitoring agent:'
+                                        },
+                                        {
+                                            command: data.coreos_command
+                                        }
+                                    ]
+                                });
                             else
-                                showUnixPopup(data.unix_command);
+                                showCommand({
+                                    body: [
+                                        {
+                                            paragraph: 'Automatic installation of the monitoring agent' +
+                                                ' requires an SSH key'
+                                        },
+                                        {
+                                            paragraph: 'Run this command on your server\'s terminal' +
+                                                ' to install the monitoring agent:'
+                                        },
+                                        {
+                                            command: data.unix_command
+                                        }
+                                    ]
+                                });
                         }
                         that.set('gettingCommand', false)
                 });
 
-                function showWindowsPopup(command) {
+                function showCommand (args) {
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.OK_CANCEL,
                         head: 'Enable monitoring',
-                        body: [
-                            {
-                                paragraph: 'Run this command on your server\'s console' +
-                                    ' to install the monitoring agent:'
-                            },
-                            {
-                                command: command
-                            },
-                        ],
+                        body: args.body,
                         callback: function (didConfirm) {
-                            if (didConfirm)
-                                Mist.monitoringController.enableMonitoring(
-                                    that.machine, null, true
-                                );
-                        },
-                    });
-                }
-                
-                function showUnixPopup (command) {
-                    Mist.dialogController.open({
-                        type: DIALOG_TYPES.OK_CANCEL,
-                        head: 'Enable monitoring',
-                        body: [
-                            {
-                                paragraph: 'Automatic installation of monitoring' +
-                                    ' requires an SSH key'
-                            },
-                            {
-                                paragraph: 'Run this command on your server for' +
-                                    ' manual installation:'
-                            },
-                            {
-                                command: command
-                            },
-                        ],
-                        callback: function (didConfirm) {
-                            if (didConfirm)
-                                Mist.monitoringController.enableMonitoring(
-                                    that.machine, null, true
-                                );
-                        },
+                            if (!didConfirm) return;
+                            Mist.monitoringController.enableMonitoring(
+                                that.machine, null, true);
+                        }
                     });
                 }
             },

@@ -125,3 +125,11 @@ class BareMetalDriver(object):
         except:
             response = 256
         return response
+
+
+class CoreOSDriver(BareMetalDriver):
+    type = 'coreos'
+    name = 'CoreOS'
+
+    def __repr__(self):
+        return ('<CoreOSDriver>')

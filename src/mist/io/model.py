@@ -119,7 +119,7 @@ class Backend(OODict):
         from mist.io.helpers import b58_encode
         if self.provider == 'docker':
             concat = '%s%s%s' % (self.provider, self.title, self.apiurl)
-        elif self.provider == 'bare_metal':
+        elif self.provider in ['bare_metal', 'coreos']:
             name = self.machines.values()[0].name
             concat = '%s%s%s' % (self.provider, '', name)
         elif self.provider == 'openstack' or 'hpcloud' in self.provider:
