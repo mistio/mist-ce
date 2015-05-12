@@ -34,7 +34,6 @@ from mist.io.exceptions import *
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update
-from mist.io.sockio import MistNamespace, ShellNamespace
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,

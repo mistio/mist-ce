@@ -49,12 +49,12 @@ log = logging.getLogger(__name__)
 
 class MistConnection(SockJSConnection):
     def __init__(self, *args, **kwargs):
-        super(CustomConnection, self).__init__(*args, **kwargs)
-        self.user = user_from_request(self.request)
+        super(MistConnection, self).__init__(*args, **kwargs)
+        # self.user = user_from_request(self.request)
         self.session_id = uuid.uuid4().hex
-        log.info("Initialized %s for user %s. Socket %s. Session %s",
-                 self.__class__.__name__, self.user.email,
-                 self.socket.sessid, self.session_id)
+        # log.info("Initialized %s for user %s. Socket %s. Session %s",
+        #         self.__class__.__name__, self.user.email,
+        #         self.socket.sessid, self.session_id)
         self.init()
 
     def init(self):
@@ -63,7 +63,7 @@ class MistConnection(SockJSConnection):
         # weird issues when trying to subclass. Use init instead because it
         # is called only once and can use super.
         try:
-            super(CustomConnection, self).init()
+            super(MistConnection, self).init()
         except AttributeError:
             pass
 
@@ -107,7 +107,8 @@ class ShellConnection(MistConnection):
             )
         except Exception as exc:
             if self.provider == 'docker':
-                self.shell = Shell(data['host'], provider=data.get('provider', ''))
+                self.shell = Shell(data['host'],
+                                   provider=data.get('provider', ''))
                 key_id, ssh_user = self.shell.autoconfigure(
                     self.user, data['backend_id'], data['machine_id']
                 )
@@ -122,7 +123,9 @@ class ShellConnection(MistConnection):
                 self.disconnect()
                 return
         self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
-        self.channel = self.shell.invoke_shell('xterm', data['cols'], data['rows'])
+        self.channel = self.shell.invoke_shell('xterm',
+                                               data['cols'],
+                                               data['rows'])
         self.spawn(self.get_ssh_data)
 
     def on_shell_data(self, data):
@@ -164,9 +167,9 @@ class ShellConnection(MistConnection):
         super(ShellConnection, self).disconnect(silent=silent)
 
 
-class MainConnection(SockJSConnection):
+class MainConnection(MistConnection):
     def init(self):
-        super(MistConnection, self).init()
+        super(MainConnection, self).init()
         self.update_greenlet = None
         self.running_machines = set()
 
@@ -196,12 +199,17 @@ class MainConnection(SockJSConnection):
             self.update_greenlet.kill()
         self.update_greenlet = self.spawn(update_subscriber, self)
 
-        self.monitoring_greenlet = self.spawn_later(2, check_monitoring_from_socket, self)
-        self.backends_greenlet = self.spawn_later(2, list_backends_from_socket, self)
+        self.monitoring_greenlet = self.spawn_later(
+            2, check_monitoring_from_socket, self
+        )
+        self.backends_greenlet = self.spawn_later(
+            2, list_backends_from_socket, self
+        )
         self.keys_greenlet = self.spawn_later(2, list_keys_from_socket, self)
-        #self.probe_greenlet = self.spawn(probe_subscriber, self)
+        # self.probe_greenlet = self.spawn(probe_subscriber, self)
 
-    def on_stats(self, backend_id, machine_id, start, stop, step, request_id, metrics):
+    def on_stats(self, backend_id, machine_id, start, stop, step, request_id,
+                 metrics):
         error = False
         try:
             data = get_stats(self.user, backend_id, machine_id,
@@ -229,25 +237,32 @@ class MainConnection(SockJSConnection):
         routing_key = msg.delivery_info.get('routing_key')
         log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
-                               'list_networks', 'list_machines', 'list_locations', 'ping']):
+                               'list_networks', 'list_machines',
+                               'list_locations', 'ping']):
             self.emit(routing_key, msg.body)
             if routing_key == 'probe':
                 log.warn('send probe')
 
             if routing_key == 'list_networks':
                 backend_id = msg.body['backend_id']
-                log.warn('Got networks from %s' % self.user.backends[backend_id].title)
+                log.warn('Got networks from %s',
+                         self.user.backends[backend_id].title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = msg.body['machines']
                 backend_id = msg.body['backend_id']
                 # update backend machine count in multi-user setups
                 try:
-                    if multi_user and len(machines) != self.user.backends[backend_id].machine_count:
-                        tasks.update_machine_count.delay(self.user.email, backend_id, len(machines))
-                        log.info('Updated machine count for user %s' % self.user.email)
+                    mcount = self.user.backends[backend_id].machine_count
+                    if multi_user and len(machines) != mcount:
+                        tasks.update_machine_count.delay(self.user.email,
+                                                         backend_id,
+                                                         len(machines))
+                        log.info('Updated machine count for user %s',
+                                 self.user.email)
                 except Exception as e:
-                    log.error('Cannot update machine count for user %s: %r' % (self.user.email, e))
+                    log.error('Cannot update machine count for user %s: %r',
+                              self.user.email, e)
                 for machine in machines:
                     bmid = (backend_id, machine['id'])
                     if bmid in self.running_machines:
@@ -287,8 +302,9 @@ class MainConnection(SockJSConnection):
                 self.keys_greenlet = self.spawn(list_keys_from_socket, self)
             if 'monitoring' in sections:
                 self.monitoring_greenlet.kill()
-                self.monitoring_greenlet = self.spawn(check_monitoring_from_socket,
-                                                      self)
+                self.monitoring_greenlet = self.spawn(
+                    check_monitoring_from_socket, self
+                )
 
 
 def update_subscriber(Connection):

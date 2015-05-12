@@ -19,6 +19,7 @@ require.config({
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         socket: 'lib/sockjs.min',
+        multiplex: 'lib/multiplex',
         term: 'lib/term'
     },
     deps: ['jquery'],
@@ -183,6 +184,14 @@ var appLoader = {
             exec: function () {
                 require(['socket'], function () {
                     appLoader.complete('load socket');
+                });
+            }
+        },
+        'load multiplex': {
+            before: [],
+            exec: function () {
+                require(['multiplex'], function () {
+                    appLoader.complete('load multiplex');
                 });
             }
         },
@@ -898,7 +907,7 @@ function Socket (args) {
 
     var socket = undefined;
     var initialized = false;
-    var namespace = args.namespace;
+    var namespace = args;
 
     function init () {
         if (!initialized) {
@@ -916,9 +925,15 @@ function Socket (args) {
     function connect () {
 
         if (socket === undefined) {
-            socket = io.connect(namespace);
+            warn('b4 connect');
+            warn(args)
+            var sockjs = new SockJS('/socket');
+            socket = new MultiplexedWebSocket(sockjs);
+            warn(socket);
             reconnect();
-        } else if (socket.socket.connected) {
+        }
+
+        /*else if (socket.socket.connected) {
             info(namespace, 'connected');
             init();
         } else if (socket.socket.connecting) {
@@ -927,7 +942,7 @@ function Socket (args) {
         } else {
             socket.socket.connect();
             reconnect();
-        }
+        }*/
     }
 
     function reconnect () {
@@ -1020,10 +1035,11 @@ function Socket_ (args) {
 
 
         load: function (args) {
+            var sockjs = new SockJS('/socket');
 
             this._log('initializing');
             this._parseArguments(args);
-            this.set('socket', io.connect(this.get('namespace')));
+            this.set('socket', new MultiplexedWebSocket(sockjs));
             this.set('events', EventHandler.create());
 
             var that = this;
@@ -1088,7 +1104,7 @@ function Socket_ (args) {
 
             var socket = this.get('socket');
 
-            if (socket.socket.connected) {
+            /*if (socket.socket.connected) {
                 this._log('connected');
                 if (callback instanceof Function)
                     callback();
@@ -1100,7 +1116,7 @@ function Socket_ (args) {
             } else {
                 socket.socket.connect();
                 this._reconnect(callback);
-            }
+            }*/
         },
 
 

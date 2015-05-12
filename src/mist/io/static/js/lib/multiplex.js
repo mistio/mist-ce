@@ -40,7 +40,7 @@ var MultiplexedWebSocket = function(ws) {
             sub.emit('close', {});
             break;
         case 'msg':
-            sub.emit('message', {data: payload});
+            sub.emit('ready', {data: payload});
             break
         }
     });
