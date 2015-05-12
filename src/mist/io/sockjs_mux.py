@@ -13,19 +13,14 @@ class ChannelSession(session.BaseSession):
         self.base.send('msg,' + self.name + ',' + msg)
 
     def on_message(self, msg):
-        print "yo"
         msg_parts = msg.split(',', 1)
-        print msg_parts
-        print "ya"
         handler = 'on_%s' % msg_parts[0]
-        print handler
-        print dir(self.conn)
-        print self.conn
+        args = msg_parts[1] if len(msg_parts) > 1 else ()
         if hasattr(self.conn, handler):
-            print msg_parts[1:]
-            getattr(self.conn, handler)(msg_parts[1:])
+            print "Calling %s with args %s" % (handler, args)
+            getattr(self.conn, handler)(*args)
         else:
-            print "Skaata"
+            print "Calling on_message (default) with args %s" % (handler, args)
             self.conn.on_message(msg)
 
     def close(self, code=3000, message='Go away!'):
