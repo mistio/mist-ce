@@ -12,8 +12,10 @@ import uuid
 import random
 from time import time
 
-import gevent
-from gevent.socket import wait_read, wait_write
+import tornado.ioloop
+import tornado.web
+from sockjs.tornado import SockJSConnection, SockJSRouter
+from mist.io.sockjs_mux import MultiplexConnection
 
 import requests
 
@@ -235,7 +237,7 @@ class MistNamespace(CustomNamespace):
                 log.warn('send probe')
 
             if routing_key == 'list_networks':
-                backend_id = msg.body['backend_id']                
+                backend_id = msg.body['backend_id']
                 log.warn('Got networks from %s' % self.user.backends[backend_id].title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
@@ -337,3 +339,12 @@ def list_keys_from_socket(namespace):
     user = namespace.user
     keys = methods.list_keys(user)
     namespace.emit('list_keys', keys)
+
+
+def make_router():
+    return SockJSRouter(
+        MultiplexConnection.get(
+            ann=AnnConnection,
+            bob=BobConnection,
+        ),
+        '/socket'
