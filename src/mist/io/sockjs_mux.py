@@ -55,7 +55,12 @@ class MultiplexConnection(conn.SockJSConnection):
                 del self.endpoints[chan]
                 session._close()
             elif op == 'msg':
-                session.on_message(parts[2])
+                msg = parts[2]
+                msg_parts = parts.split(',', 1)
+                if len(msg_parts) == 2:
+                    handler = 'on_%s' % msg_parts[0]
+                    if hasattr(session, handler):
+                        getattr(session, handler)(msg_parts[1])
         else:
             if op == 'sub':
                 session = ChannelSession(self.channels[chan],
