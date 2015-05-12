@@ -13,7 +13,20 @@ class ChannelSession(session.BaseSession):
         self.base.send('msg,' + self.name + ',' + msg)
 
     def on_message(self, msg):
-        self.conn.on_message(msg)
+        print "yo"
+        msg_parts = msg.split(',', 1)
+        print msg_parts
+        print "ya"
+        handler = 'on_%s' % msg_parts[0]
+        print handler
+        print dir(self.conn)
+        print self.conn
+        if hasattr(self.conn, handler):
+            print msg_parts[1:]
+            getattr(self.conn, handler)(msg_parts[1:])
+        else:
+            print "Skaata"
+            self.conn.on_message(msg)
 
     def close(self, code=3000, message='Go away!'):
         self.base.send('uns,' + self.name)
@@ -55,19 +68,7 @@ class MultiplexConnection(conn.SockJSConnection):
                 del self.endpoints[chan]
                 session._close()
             elif op == 'msg':
-                print "yo"
-                msg = parts[2]
-                msg_parts = msg.split(',', 1)
-                print msg_parts
-                print "ya"
-                handler = 'on_%s' % msg_parts[0]
-                print handler
-                print dir(session)
-                print session
-                if hasattr(session, handler):
-                    print getattr(session, handler)(msg_parts[1:])
-                else:
-                    print "Skaata"
+                session.on_message(parts[2])
         else:
             if op == 'sub':
                 session = ChannelSession(self.channels[chan],
