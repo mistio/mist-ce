@@ -1,6 +1,6 @@
 """mist.io.socket
 
-Here we define the socketio namespace and handlers.
+Here we define the socketio Connection and handlers.
 
 When a user loads mist.io or comes back online, their browser will request a
 new socket and the initialize function will be triggered on the server within a
@@ -18,8 +18,6 @@ from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
 
 import requests
-
-from socketio.namespace import BaseNamespace
 
 try:
     from mist.core.helpers import user_from_request
@@ -49,9 +47,9 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 
-class CustomNamespace(BaseNamespace):
+class MistConnection(SockJSConnection):
     def __init__(self, *args, **kwargs):
-        super(CustomNamespace, self).__init__(*args, **kwargs)
+        super(CustomConnection, self).__init__(*args, **kwargs)
         self.user = user_from_request(self.request)
         self.session_id = uuid.uuid4().hex
         log.info("Initialized %s for user %s. Socket %s. Session %s",
@@ -60,12 +58,12 @@ class CustomNamespace(BaseNamespace):
         self.init()
 
     def init(self):
-        # IMPORTANT: initialize() is called automatically by BaseNamespace on
+        # IMPORTANT: initialize() is called automatically by BaseConnection on
         # all the classes and mixins in the order of the MRO which creates
         # weird issues when trying to subclass. Use init instead because it
         # is called only once and can use super.
         try:
-            super(CustomNamespace, self).init()
+            super(CustomConnection, self).init()
         except AttributeError:
             pass
 
@@ -80,12 +78,12 @@ class CustomNamespace(BaseNamespace):
         log.info("Disconnecting %s for user %s. Socket %s. Session %s",
                  self.__class__.__name__, self.user.email,
                  self.socket.sessid, self.session_id)
-        return super(CustomNamespace, self).disconnect(silent=silent)
+        return super(MistConnection, self).disconnect(silent=silent)
 
 
-class ShellNamespace(CustomNamespace):
+class ShellConnection(MistConnection):
     def init(self):
-        super(ShellNamespace, self).init()
+        super(ShellConnection, self).init()
         self.channel = None
         self.ssh_info = {}
         self.provider = ''
@@ -163,28 +161,28 @@ class ShellNamespace(CustomNamespace):
     def disconnect(self, silent=False):
         if self.channel:
             self.channel.close()
-        super(ShellNamespace, self).disconnect(silent=silent)
+        super(ShellConnection, self).disconnect(silent=silent)
 
 
-class MistNamespace(CustomNamespace):
+class MainConnection(SockJSConnection):
     def init(self):
-        super(MistNamespace, self).init()
+        super(MistConnection, self).init()
         self.update_greenlet = None
         self.running_machines = set()
 
     def spawn_later(self, delay, fn, *args, **kwargs):
-        """Spawn a new process, attached to this Namespace after no less than
+        """Spawn a new process, attached to this Connection after no less than
         delay seconds.
 
         It will be monitored by the "watcher" process in the Socket. If the
         socket disconnects, all these greenlets are going to be killed, after
-        calling BaseNamespace.disconnect()
+        calling BaseConnection.disconnect()
 
         This method uses the ``exception_handler_decorator``.  See
-        Namespace documentation for more information.
+        Connection documentation for more information.
 
         """
-        # self.log.debug("Spawning sub-Namespace Greenlet: %s" % fn.__name__)
+        # self.log.debug("Spawning sub-Connection Greenlet: %s" % fn.__name__)
         if hasattr(self, 'exception_handler_decorator'):
             fn = self.exception_handler_decorator(fn)
         import gevent
@@ -293,20 +291,20 @@ class MistNamespace(CustomNamespace):
                                                       self)
 
 
-def update_subscriber(namespace):
+def update_subscriber(Connection):
     """Subscribe to RabbitMQ for updates of user data and emit notifications to
     the browser.
 
     """
     # The exchange/queue name consists of a non-empty sequence of these
     # characters: letters, digits, hyphen, underscore, period, or colon.
-    user = namespace.user
+    user = Connection.user
     queue = "mist-socket-%d" % random.randrange(2 ** 20)
-    amqp_subscribe_user(user, queue=queue, callback=namespace.process_update)
+    amqp_subscribe_user(user, queue=queue, callback=Connection.process_update)
 
 
-def check_monitoring_from_socket(namespace):
-    user = namespace.user
+def check_monitoring_from_socket(Connection):
+    user = Connection.user
     try:
         from mist.core import methods as core_methods
         func = core_methods.check_monitoring
@@ -314,15 +312,15 @@ def check_monitoring_from_socket(namespace):
         func = methods.check_monitoring
     try:
         ret = func(user)
-        namespace.emit('monitoring', ret)
+        Connection.emit('monitoring', ret)
     except:
         pass
 
 
-def list_backends_from_socket(namespace):
-    user = namespace.user
+def list_backends_from_socket(Connection):
+    user = Connection.user
     backends = methods.list_backends(user)
-    namespace.emit('list_backends', backends)
+    Connection.emit('list_backends', backends)
     for key, task in (('list_machines', tasks.ListMachines()),
                       ('list_images', tasks.ListImages()),
                       ('list_sizes', tasks.ListSizes()),
@@ -332,19 +330,20 @@ def list_backends_from_socket(namespace):
             if user.backends[backend_id].enabled:
                 cached = task.smart_delay(user.email, backend_id)
                 if cached is not None:
-                    namespace.emit(key, cached)
+                    Connection.emit(key, cached)
 
 
-def list_keys_from_socket(namespace):
-    user = namespace.user
+def list_keys_from_socket(Connection):
+    user = Connection.user
     keys = methods.list_keys(user)
-    namespace.emit('list_keys', keys)
+    Connection.emit('list_keys', keys)
 
 
 def make_router():
     return SockJSRouter(
         MultiplexConnection.get(
-            ann=AnnConnection,
-            bob=BobConnection,
+            main=MainConnection,
+            shell=ShellConnection,
         ),
         '/socket'
+    )

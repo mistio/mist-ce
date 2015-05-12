@@ -21,12 +21,12 @@ requires = [
     'sphinx-bootstrap-theme',
     'celery',
     'gevent',
-    'gevent-socketio',
     'gevent-subprocess',
     'amqp',
     'netaddr',
     'amqp',
-    'websocket-client'
+    'websocket-client',
+    'sockjs-tornado'
 ]
 
 setup(name='mist.io',

@@ -2,7 +2,7 @@ import sys
 
 import tornado.web
 import tornado.ioloop
-from mist.io.sockjs import make_router
+from mist.io.sock import make_router
 
 
 if __name__ == '__main__':

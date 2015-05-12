@@ -26,8 +26,6 @@ except ImportError:
     from mist.io.helpers import user_from_request
     from pyramid.view import view_config
 
-from socketio import socketio_manage
-
 from mist.io import methods
 from mist.io.model import Keypair
 from mist.io.shell import Shell
@@ -182,9 +180,9 @@ def add_backend(request):
     """Adds a new backend."""
 
     params = request.json_body
-    #remove spaces from start/end of string fields that are often included
-    #when pasting keys, preventing thus succesfull connection with the
-    #backend
+    # remove spaces from start/end of string fields that are often included
+    # when pasting keys, preventing thus succesfull connection with the
+    # backend
     for key in params.keys():
         if type(params[key]) in [unicode, str]:
             params[key] = params[key].rstrip().lstrip()
@@ -985,12 +983,3 @@ def list_supported_providers(request):
         return {'supported_providers': config.SUPPORTED_PROVIDERS_V_2}
     else:
         return {'supported_providers': config.SUPPORTED_PROVIDERS}
-
-
-@view_config(route_name='socketio', renderer='json')
-def socketio(request):
-    socketio_manage(request.environ,
-                    namespaces={'/mist': MistNamespace,
-                                '/shell': ShellNamespace},
-                    request=request)
-    return {}
