@@ -175,7 +175,6 @@ class ShellConnection(MistConnection):
 class MainConnection(MistConnection):
     def init(self):
         super(MainConnection, self).init()
-        self.update_greenlet = None
         self.running_machines = set()
         from mist.io.model import User
         self.user = User()
@@ -306,17 +305,11 @@ class MainConnection(MistConnection):
             self.user.refresh()
             sections = result
             if 'backends' in sections:
-                self.backends_greenlet.kill()
-                self.backends_greenlet = self.spawn(list_backends_from_socket,
-                                                    self)
+                self.list_backends()
             if 'keys' in sections:
-                self.keys_greenlet.kill()
-                self.keys_greenlet = self.spawn(list_keys_from_socket, self)
+                self.list_keys()
             if 'monitoring' in sections:
-                self.monitoring_greenlet.kill()
-                self.monitoring_greenlet = self.spawn(
-                    check_monitoring_from_socket, self
-                )
+                self.check_monitoring()
 
 
 def make_router():
