@@ -181,7 +181,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
         if provider == 'vcloud':
             for prefix in ['https://', 'http://']:
-                backend.apiurl = backend.apiurl.strip(prefix)
+                backend.apiurl = backend.apiurl.replace(prefix, '')
             backend.apiurl = backend.apiurl.split('/')[0] #need host, not url
 
         backend_id = backend.get_id()
@@ -502,7 +502,7 @@ def _add_backend_vcloud(title, provider, params):
         if not host:
             raise RequiredParameterMissingError('host')
         for prefix in ['https://', 'http://']:
-            host = host.strip(prefix)
+            host = host.replace(prefix, '')
         host = host.split('/')[0]
     elif provider == 'indonesian_vcloud':
         host = 'compute.idcloudonline.com'
@@ -875,7 +875,7 @@ def _add_backend_vsphere(title, provider, params):
     if not host:
         raise RequiredParameterMissingError('host')
     for prefix in ['https://', 'http://']:
-        host = host.strip(prefix)
+        host = host.replace(prefix, '')
     host = host.split('/')[0]
 
     backend = model.Backend()
@@ -1480,7 +1480,7 @@ def list_machines(user, backend_id):
                         can_reboot = True
             m.extra['can_reboot'] = can_reboot
 
-        if m.driver.type is Provider.NEPHOSCALE:
+        if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
             if 'windows' in m.extra.get('image', '').lower():
                 os_type = 'windows'
             else:
