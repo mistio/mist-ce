@@ -42,7 +42,7 @@ from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
-from mist.io.helpers import check_host
+from mist.io.helpers import check_host, sanitize_host
 from mist.io.exceptions import *
 
 
@@ -237,7 +237,7 @@ def add_backend_v_2(user, title, provider, params):
             hostname = params.get('machine_ip', '')
 
         if hostname:
-            check_host(hostname)
+            check_host(sanitize_host(hostname))
 
     baremetal = provider == 'bare_metal'
 
