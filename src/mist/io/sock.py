@@ -9,6 +9,7 @@ greenlet.
 """
 
 import uuid
+import json
 import random
 from time import time
 
@@ -67,6 +68,9 @@ class MistConnection(SockJSConnection):
             super(MistConnection, self).init()
         except AttributeError:
             pass
+
+    def send(self, msg, data=None):
+        super(MistConnection, self).send(json.dumps({msg: data}))
 
     def disconnect(self, silent=False):
         if multi_user:

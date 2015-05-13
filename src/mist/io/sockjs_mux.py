@@ -20,7 +20,7 @@ class ChannelSession(session.BaseSession):
             print "Calling %s with args %s" % (handler, args)
             getattr(self.conn, handler)(*args)
         else:
-            print "Calling on_message (default) with args %s" % (handler, args)
+            print "Calling on_message (default) with args %s" % args
             self.conn.on_message(msg)
 
     def close(self, code=3000, message='Go away!'):

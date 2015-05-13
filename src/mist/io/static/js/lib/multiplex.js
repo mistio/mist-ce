@@ -28,7 +28,7 @@ var MultiplexedWebSocket = function(ws) {
     this.channels = {};
     this.ws.addEventListener('message', function(e) {
         var t = e.data.split(',');
-        var type = t.shift(), name = t.shift(),  payload = t.join();
+        var type = t.shift(), name = t.shift(), payload = t.join();
         if(!(name in that.channels)) {
             return;
         }
@@ -41,7 +41,7 @@ var MultiplexedWebSocket = function(ws) {
             break;
         case 'msg':
             warn(payload);
-            sub.emit('ready', {data: payload});
+            sub.emit('message', {data: payload});
             break
         }
     });
