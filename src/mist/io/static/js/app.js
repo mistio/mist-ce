@@ -214,8 +214,10 @@ var appLoader = {
         'init app': {
             before: ['load templates', 'init connections'],
             exec: function () {
+                warn('b4initapp');
                 loadApp.apply(null, [function () {
                     appLoader.complete('init app');
+                    warn('initappcomplete');
                 }].concat(appLoader.buffer.files));
             }
         },
@@ -223,42 +225,46 @@ var appLoader = {
             before: ['load socket', 'load ember'],
             exec: function () {
                 appLoader.buffer.ajax = Ajax(CSRF_TOKEN);
-                appLoader.buffer.socket = Socket({
-                    namespace: '/mist',
-                    onInit: function () {
+                warn('b4setupSock');
+                appLoader.buffer.main = new Socket_({
+                    namespace: 'main',
+                    onConnect: function () {
+                        warn('onConnect');
                         appLoader.complete('init connections');
-                    },
-                    onConnect: function (socket) {
                         if (!appLoader)
                             socket.emit('ready');
                     },
                 });
-                appLoader.buffer.logs = new Socket_({
-                    namespace: '/logs',
+                /*appLoader.buffer.logs = new Socket_({
+                    namespace: 'logs',
                     onConnect: function (socket) {
                         if (!appLoader)
                             socket.emit('ready');
                     }
-                });
+                });*/
+                warn('aftersetupSock');
             }
         },
         'init socket events': {
             before: ['init connections', 'init app'],
             exec: function () {
                 Mist.set('ajax', appLoader.buffer.ajax);
-                Mist.set('socket', appLoader.buffer.socket);
+                Mist.set('socket', appLoader.buffer.main);
                 Mist.set('logs', appLoader.buffer.logs);
+                warn('b4setupSockEvents');
+                setupSocketEvents(appLoader.buffer.main);
+                warn('aftersetupSockEvents');
                 appLoader.complete('init socket events');
             }
         },
         'fetch first data': {
             before: ['init socket events'],
             exec: function () {
-                setupSocketEvents(Mist.socket, function () {
+                /*setupSocketEvents(Mist.socket, function () {
                     setupLogsSocketEvents(Mist.logs, function () {
                         appLoader.complete('fetch first data');
                     });
-                });
+                });*/
             }
         },
     }
@@ -417,6 +423,7 @@ var loadApp = function (
     // Ember Application
     App.ready = callback;
     App = Ember.Application.create(App);
+    warn('setting mist');
     window.Mist  = App;
 
     // Globals
@@ -800,7 +807,7 @@ var setupSocketEvents = function (socket, callback) {
     })
     .on('probe', onProbe)
     .on('ping', onProbe)
-    .emit('ready');
+    .send('ready');
 
     function onProbe(data) {
         var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
@@ -901,19 +908,22 @@ function Ajax (csrfToken) {
 //  Socket wrapper
 //
 //
-
+var socket = undefined;
 
 function Socket (args) {
 
-    var socket = undefined;
+    //var socket = undefined;
+    //var mux = undefined;
+    //var main, shell, logs;
     var initialized = false;
-    var namespace = args;
+    var namespace = args.namespace;
+    var channel = undefined;
 
     function init () {
         if (!initialized) {
             info(namespace, 'initializing');
             handleDisconnection();
-            addDebuggingWrapper();
+            //addDebuggingWrapper();
             if (args.onInit instanceof Function)
                 args.onInit(socket);
         }
@@ -923,30 +933,43 @@ function Socket (args) {
     };
 
     function connect () {
+        if (socket === undefined || socket.readyState != 1) {
+          socket = new SockJS('/socket');
+          socket.onclose = function(e){
+            warn('Disconnected!');
+            warn(e);
+          };
+          socket.onopen = function() {
+            setupChannels();
+            if (args.onConnect instanceof Function)
+                args.onConnect(socket);
 
-        if (socket === undefined) {
-            warn('b4 connect');
-            warn(args)
-            var sockjs = new SockJS('/socket');
-            socket = new MultiplexedWebSocket(sockjs);
-            warn(socket);
-            reconnect();
+          }
         }
+        reconnect();
+    }
 
-        /*else if (socket.socket.connected) {
-            info(namespace, 'connected');
-            init();
-        } else if (socket.socket.connecting) {
-            info(namespace, 'connecting');
-            reconnect();
-        } else {
-            socket.socket.connect();
-            reconnect();
-        }*/
+    function setupChannels() {
+      warn(namespace);
+      if (socket.readyState == 1) {
+          mux = new MultiplexedWebSocket(socket);
+          channel = mux.channel(namespace);
+          channel.onopen = function(){
+              warn('onopen');
+              //setupSocketEvents(channel);
+              //channel.send('ready');
+          }
+          //shell = mux.channel('shell');
+          //logs = mux.channel('logs');
+          warn('Connected!');
+      } else {
+          warn('Failed to connect!');
+          warn(socket.readyState);
+      }
     }
 
     function reconnect () {
-        setTimeout(connect, 500);
+        setTimeout(connect, 5000);
     }
 
     function handleDisconnection () {
@@ -960,6 +983,11 @@ function Socket (args) {
             });
         }
     }
+
+    //function on (eventName, callback) {
+    //    channel.addEventListener(eventName, callback);
+    //    return this;
+    //}
 
     function addDebuggingWrapper () {
 
@@ -996,7 +1024,7 @@ function Socket (args) {
 
     connect();
 
-    return socket;
+    return channel;
 }
 
 
@@ -1005,7 +1033,7 @@ function Socket (args) {
 //  Socket Wrapper v2
 //
 //
-
+var sockjs, mux;
 
 function Socket_ (args) {
 
@@ -1025,6 +1053,7 @@ function Socket_ (args) {
         events: null,
         socket: null,
         namespace: null,
+        channel: null,
 
 
         //
@@ -1035,18 +1064,38 @@ function Socket_ (args) {
 
 
         load: function (args) {
-            var sockjs = new SockJS('/socket');
-
             this._log('initializing');
             this._parseArguments(args);
-            this.set('socket', new MultiplexedWebSocket(sockjs));
+
+            if (sockjs === undefined || sockjs.readyState != 1) {
+                sockjs = new SockJS('/socket');
+                sockjs.onclose = function(e){
+                  warn('Disconnected!');
+                  warn(e);
+                };
+                sockjs.onopen = function() {
+                  mux = new MultiplexedWebSocket(sockjs);
+                  var channel = mux.channel(that.get('namespace'));
+                  channel.onopen = function(){
+                      warn('onopen');
+                      //setupSocketEvents(channel);
+                      //channel.send('ready');
+                  }
+                  that.set('channel', channel)
+                };
+            } else {
+                warn('Failed to connect!');
+                warn(socket.readyState);
+            }
+
+            this.set('socket', sockjs);
             this.set('events', EventHandler.create());
 
             var that = this;
             this._connect(function () {
-                that._handleDisconnection();
-                if (that.onInit instanceof Function)
-                    that.onInit(that);
+                //that._handleDisconnection();
+                if (that.onConnect instanceof Function)
+                    that.onConnect(that);
             });
         }.on('init'),
 
@@ -1054,17 +1103,21 @@ function Socket_ (args) {
         on: function (event) {
             var that = this;
             var events = this.get('events');
-            var socket = this.get('socket');
+            var channel = this.get('channel');
 
             events.on.apply(events, arguments);
-            if (!socket.$events || !socket.$events[event])
-                socket.on(event, function (response) {
+            if (!channel.$events || !socket.$events[event])
+                channel.on(event, function (response) {
                     that._log('/'+ event, 'RECEIVE', response);
                     events.trigger.call(events, event, response);
                 });
             return this;
         },
 
+        send: function (args) {
+            var channel = this.get('channel');
+            return channel.send(args);
+        },
 
         off: function () {
             var events = this.get('events');
@@ -1076,19 +1129,19 @@ function Socket_ (args) {
         emit: function () {
             var args = slice(arguments)
             this._log('/'+args[0], 'EMIT', args);
-            var socket = this.get('socket');
-            socket.emit.apply(socket, arguments);
+            var channel = this.get('channel');
+            channel.send.apply(channel, arguments);
             return this;
         },
 
 
         kill: function () {
             this.set('keepAlive', false);
-            var socket = this.get('socket');
-            socket.socket.disconnect();
-            if (socket.$events)
-                for (event in socket.$events)
-                    delete socket.$events[event];
+            var channel = this.get('channel');
+            //socket.socket.disconnect();
+            if (channel.$events)
+                for (event in channel.$events)
+                    delete channel.$events[event];
             return this;
         },
 
@@ -1104,19 +1157,19 @@ function Socket_ (args) {
 
             var socket = this.get('socket');
 
-            /*if (socket.socket.connected) {
+            if (socket.readyState == 1) {
                 this._log('connected');
                 if (callback instanceof Function)
                     callback();
                 if (this.onConnect instanceof Function)
                     this.onConnect(this);
-            } else if (socket.socket.connecting) {
+            } else if (socket.readyState == 0) {
                 this._log('connecting');
                 this._reconnect(callback);
             } else {
-                socket.socket.connect();
+                this._log('not connected... reconnecting');
                 this._reconnect(callback);
-            }*/
+            }
         },
 
 

@@ -10,12 +10,33 @@ DumbEventTarget.prototype.addEventListener = function(type, listener) {
     this._ensure(type);
     this._listeners[type].push(listener);
 };
+DumbEventTarget.prototype.on = function(type, listener) {
+    this.addEventListener(type, listener);
+}
 DumbEventTarget.prototype.emit = function(type) {
+  warn(type);
     this._ensure(type);
-    var args = Array.prototype.slice.call(arguments, 1);
-    if(this['on' + type]) this['on' + type].apply(this, args);
+    var data = arguments[1];
+    if ( data == undefined ) {
+      warn('why undefined?')
+    }
+    else {
+      var keys = Object.keys(data.data);
+      warn('keys');
+      warn(keys);
+      if (keys.length == 1) {
+        type = keys[0];
+        // this._ensure(type);
+        data = data.data[type];
+        warn(type);
+        warn(data);
+      }
+    }
+    //var args = Array.prototype.slice.call(arguments, 1);
+    warn(data);
+    if(this['on' + type]) this['on' + type].apply(this, [data]);
     for(var i=0; i < this._listeners[type].length; i++) {
-        this._listeners[type][i].apply(this, args);
+        this._listeners[type][i].apply(this, [data]);
     }
 };
 
@@ -40,8 +61,7 @@ var MultiplexedWebSocket = function(ws) {
             sub.emit('close', {});
             break;
         case 'msg':
-            warn(payload);
-            sub.emit('message', {data: payload});
+            sub.emit('message', {data: JSON.parse(payload)});
             break
         }
     });
@@ -66,9 +86,6 @@ var Channel = function(ws, name, channels) {
         setTimeout(onopen, 0);
     } else {
         this.ws.addEventListener('open', onopen);
-    }
-    var onmessage = function(e) {
-        console.log('channel on message ' + e);
     }
 };
 Channel.prototype = new DumbEventTarget()
