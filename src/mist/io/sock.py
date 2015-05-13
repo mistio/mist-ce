@@ -124,7 +124,7 @@ class ShellConnection(MistConnection):
                 else:
                     err = str(exc)
                 self.ssh_info['error'] = err
-                self.emit_shell_data(err)
+                self.send_shell_data(err)
                 self.disconnect()
                 return
         self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
@@ -159,12 +159,12 @@ class ShellConnection(MistConnection):
 
                 if not len(data):
                     return
-                self.emit_shell_data(data)
+                self.send_shell_data(data)
         finally:
             self.channel.close()
 
     def emit_shell_data(self, data):
-        self.emit('shell_data', data)
+        self.send('shell_data', data)
 
     def disconnect(self, silent=False):
         if self.channel:
@@ -182,7 +182,7 @@ class MainConnection(MistConnection):
 
     def on_ready(self):
         log.info("Ready to go!")
-        self.pika = PikaClient(self.user.email, self.process_update)
+        self.pika = PikaClient(self.user.email or 'noone', self.process_update)
         self.pika.connect()
         self.list_keys()
         self.list_backends()
@@ -239,26 +239,30 @@ class MainConnection(MistConnection):
         }
         if error:
             ret['error'] = error
-        self.emit('stats', ret)
+        self.send('stats', ret)
 
-    def process_update(self, msg):
-        routing_key = msg.delivery_info.get('routing_key')
+    def process_update(self, ch, method, properties, body):
+        routing_key = method.routing_key
+        try:
+            result = json.loads(body)
+        except:
+            result = body
         log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_networks', 'list_machines',
                                'list_locations', 'ping']):
-            self.emit(routing_key, msg.body)
+            self.send(routing_key, result)
             if routing_key == 'probe':
                 log.warn('send probe')
 
             if routing_key == 'list_networks':
-                backend_id = msg.body['backend_id']
+                backend_id = result['backend_id']
                 log.warn('Got networks from %s',
                          self.user.backends[backend_id].title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
-                machines = msg.body['machines']
-                backend_id = msg.body['backend_id']
+                machines = result['machines']
+                backend_id = result['backend_id']
                 # update backend machine count in multi-user setups
                 try:
                     mcount = self.user.backends[backend_id].machine_count
@@ -292,15 +296,15 @@ class MainConnection(MistConnection):
                         self.user.email, backend_id, machine['id'], ips[0]
                     )
                     if cached is not None:
-                        self.emit('probe', cached)
+                        self.send('probe', cached)
                     cached = tasks.Ping().smart_delay(
                         self.user.email, backend_id, machine['id'], ips[0]
                     )
                     if cached is not None:
-                        self.emit('ping', cached)
+                        self.send('ping', cached)
         elif routing_key == 'update':
             self.user.refresh()
-            sections = msg.body
+            sections = result
             if 'backends' in sections:
                 self.backends_greenlet.kill()
                 self.backends_greenlet = self.spawn(list_backends_from_socket,
