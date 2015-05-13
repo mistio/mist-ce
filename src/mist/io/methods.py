@@ -1480,7 +1480,7 @@ def list_machines(user, backend_id):
                         can_reboot = True
             m.extra['can_reboot'] = can_reboot
 
-        if m.driver.type is Provider.NEPHOSCALE:
+        if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
             if 'windows' in m.extra.get('image', '').lower():
                 os_type = 'windows'
             else:
