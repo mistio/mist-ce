@@ -1446,6 +1446,10 @@ def list_machines(user, backend_id):
                 os_type = 'linux'
             m.extra['os_type'] = os_type
 
+        if m.driver.type in config.EC2_PROVIDERS:
+            # this is windows for windows servers and None for Linux
+            m.extra['os_type'] = m.extra.get('platform', 'linux')
+
         machine = {'id': m.id,
                    'uuid': m.get_uuid(),
                    'name': m.name,
