@@ -180,41 +180,16 @@ class MainConnection(MistConnection):
         from mist.io.model import User
         self.user = User()
 
-    def spawn_later(self, delay, fn, *args, **kwargs):
-        """Spawn a new process, attached to this Connection after no less than
-        delay seconds.
-
-        It will be monitored by the "watcher" process in the Socket. If the
-        socket disconnects, all these greenlets are going to be killed, after
-        calling BaseConnection.disconnect()
-
-        This method uses the ``exception_handler_decorator``.  See
-        Connection documentation for more information.
-
-        """
-        # self.log.debug("Spawning sub-Connection Greenlet: %s" % fn.__name__)
-        if hasattr(self, 'exception_handler_decorator'):
-            fn = self.exception_handler_decorator(fn)
-        import gevent
-        new = gevent.spawn_later(delay, fn, *args, **kwargs)
-        self.jobs.append(new)
-        return new
-
     def on_ready(self):
         log.info("Ready to go!")
         self.pika = PikaClient(self.user.email, self.process_update)
-        print 'created pika client'
         self.pika.connect()
-        print 'pika client connected, back on on_ready'
+        self.list_keys()
         self.list_backends()
-        #self.monitoring_greenlet = self.spawn_later(
-        #    2, check_monitoring_from_socket, self
-        #)
-        #self.backends_greenlet = self.spawn_later(
-        #    2, list_backends_from_socket, self
-        #)
-        #self.keys_greenlet = self.spawn_later(2, list_keys_from_socket, self)
-        # self.probe_greenlet = self.spawn(probe_subscriber, self)
+        self.check_monitoring()
+
+    def list_keys(self):
+        self.send('list_keys', methods.list_keys(self.user))
 
     def list_backends(self):
         backends = methods.list_backends(self.user)
@@ -229,6 +204,17 @@ class MainConnection(MistConnection):
                     cached = task.smart_delay(self.user.email, backend_id)
                     if cached is not None:
                         self.send(key, cached)
+
+    def check_monitoring(self):
+        try:
+            from mist.core import methods as core_methods
+            func = core_methods.check_monitoring
+        except ImportError:
+            func = methods.check_monitoring
+        try:
+            self.send('monitoring', func(user))
+        except:
+            pass
 
     def on_stats(self, backend_id, machine_id, start, stop, step, request_id,
                  metrics):
@@ -327,54 +313,6 @@ class MainConnection(MistConnection):
                 self.monitoring_greenlet = self.spawn(
                     check_monitoring_from_socket, self
                 )
-
-
-def update_subscriber(Connection):
-    """Subscribe to RabbitMQ for updates of user data and emit notifications to
-    the browser.
-
-    """
-    # The exchange/queue name consists of a non-empty sequence of these
-    # characters: letters, digits, hyphen, underscore, period, or colon.
-    user = Connection.user
-    queue = "mist-socket-%d" % random.randrange(2 ** 20)
-    amqp_subscribe_user(user, queue=queue, callback=Connection.process_update)
-
-
-def check_monitoring_from_socket(Connection):
-    user = Connection.user
-    try:
-        from mist.core import methods as core_methods
-        func = core_methods.check_monitoring
-    except ImportError:
-        func = methods.check_monitoring
-    try:
-        ret = func(user)
-        Connection.emit('monitoring', ret)
-    except:
-        pass
-
-
-def list_backends_from_socket(Connection):
-    user = Connection.user
-    backends = methods.list_backends(user)
-    Connection.emit('list_backends', backends)
-    for key, task in (('list_machines', tasks.ListMachines()),
-                      ('list_images', tasks.ListImages()),
-                      ('list_sizes', tasks.ListSizes()),
-                      ('list_networks', tasks.ListNetworks()),
-                      ('list_locations', tasks.ListLocations()),):
-        for backend_id in user.backends:
-            if user.backends[backend_id].enabled:
-                cached = task.smart_delay(user.email, backend_id)
-                if cached is not None:
-                    Connection.emit(key, cached)
-
-
-def list_keys_from_socket(Connection):
-    user = Connection.user
-    keys = methods.list_keys(user)
-    Connection.emit('list_keys', keys)
 
 
 def make_router():
