@@ -39,6 +39,7 @@ from mist.io.exceptions import BadRequestError
 from mist.io import methods
 from mist.io import tasks
 from mist.io.shell import Shell
+from mist.io.pika_tornado import PikaClient
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -172,6 +173,8 @@ class MainConnection(MistConnection):
         super(MainConnection, self).init()
         self.update_greenlet = None
         self.running_machines = set()
+        from mist.io.model import User
+        self.user = User()
 
     def spawn_later(self, delay, fn, *args, **kwargs):
         """Spawn a new process, attached to this Connection after no less than
@@ -195,18 +198,33 @@ class MainConnection(MistConnection):
 
     def on_ready(self):
         log.info("Ready to go!")
-        if self.update_greenlet is not None:
-            self.update_greenlet.kill()
-        self.update_greenlet = self.spawn(update_subscriber, self)
-
-        self.monitoring_greenlet = self.spawn_later(
-            2, check_monitoring_from_socket, self
-        )
-        self.backends_greenlet = self.spawn_later(
-            2, list_backends_from_socket, self
-        )
-        self.keys_greenlet = self.spawn_later(2, list_keys_from_socket, self)
+        self.pika = PikaClient(self.user.email, self.process_update)
+        print 'created pika client'
+        self.pika.connect()
+        print 'pika client connected, back on on_ready'
+        self.list_backends()
+        #self.monitoring_greenlet = self.spawn_later(
+        #    2, check_monitoring_from_socket, self
+        #)
+        #self.backends_greenlet = self.spawn_later(
+        #    2, list_backends_from_socket, self
+        #)
+        #self.keys_greenlet = self.spawn_later(2, list_keys_from_socket, self)
         # self.probe_greenlet = self.spawn(probe_subscriber, self)
+
+    def list_backends(self):
+        backends = methods.list_backends(self.user)
+        self.send('list_backends', backends)
+        for key, task in (('list_machines', tasks.ListMachines()),
+                          ('list_images', tasks.ListImages()),
+                          ('list_sizes', tasks.ListSizes()),
+                          ('list_networks', tasks.ListNetworks()),
+                          ('list_locations', tasks.ListLocations()),):
+            for backend_id in self.user.backends:
+                if self.user.backends[backend_id].enabled:
+                    cached = task.smart_delay(self.user.email, backend_id)
+                    if cached is not None:
+                        self.send(key, cached)
 
     def on_stats(self, backend_id, machine_id, start, stop, step, request_id,
                  metrics):
