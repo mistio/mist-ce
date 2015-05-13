@@ -67,6 +67,9 @@ var Channel = function(ws, name, channels) {
     } else {
         this.ws.addEventListener('open', onopen);
     }
+    var onmessage = function(e) {
+        console.log('channel on message ' + e);
+    }
 };
 Channel.prototype = new DumbEventTarget()
 
