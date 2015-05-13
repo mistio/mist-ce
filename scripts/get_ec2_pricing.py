@@ -42,6 +42,7 @@ EC2_REGIONS = [
     "us-west-1",
     "us-west-2",
     "eu-west-1",
+    "eu-central-1",
     "ap-southeast-1",
     "ap-southeast-2",
     "ap-northeast-1",
@@ -104,6 +105,7 @@ JSON_NAME_TO_EC2_REGIONS_API = {
     "us-west-1" : "us-west-1",
     "us-west-2" : "us-west-2",
     "eu-ireland" : "eu-west-1",
+    "eu-central-1" : "eu-central-1",
     "eu-west-1" : "eu-west-1",
     "apac-sin" : "ap-southeast-1",
     "ap-southeast-1" : "ap-southeast-1",
@@ -111,7 +113,8 @@ JSON_NAME_TO_EC2_REGIONS_API = {
     "apac-syd" : "ap-southeast-2",
     "apac-tokyo" : "ap-northeast-1",
     "ap-northeast-1" : "ap-northeast-1",
-    "sa-east-1" : "sa-east-1"
+    "sa-east-1" : "sa-east-1",
+    "us-gov-west-1" : "us-gov-west-1"
 }
 
 EC2_REGIONS_API_TO_JSON_NAME = {
@@ -119,6 +122,7 @@ EC2_REGIONS_API_TO_JSON_NAME = {
     "us-west-1" : "us-west",
     "us-west-2" : "us-west-2",
     "eu-west-1" : "eu-ireland",
+    "eu-central-1" : "eu-frankfurt",
     "ap-southeast-1" : "apac-sin",
     "ap-southeast-2" : "apac-syd",
     "ap-northeast-1" : "apac-tokyo",
@@ -367,6 +371,7 @@ def get_ec2_ondemand_instances_prices(filter_region=None, filter_instance_type=N
                     if get_specific_region and filter_region != r["region"]:
                         continue
 
+
                     region_name = JSON_NAME_TO_EC2_REGIONS_API[r["region"]]
                     instance_types = []
                     if "instanceTypes" in r:
@@ -433,10 +438,12 @@ if __name__ == "__main__":
     ec2_providers['us-west-1'] = {}
     ec2_providers['us-west-2'] = {}
     ec2_providers['eu-west-1'] = {}
+    ec2_providers['eu-central-1'] = {}
     ec2_providers['ap-southeast-1'] = {}
     ec2_providers['ap-southeast-2'] = {}
     ec2_providers['ap-northeast-1'] = {}
     ec2_providers['sa-east-1'] = {}
+    ec2_providers['us-gov-west-1'] = {}
 
     for reg in data['regions']: 
         region = reg['region']
@@ -463,9 +470,10 @@ if __name__ == "__main__":
     ec2_providers[Provider.EC2_US_WEST] = ec2_providers['us-west-1']
     ec2_providers[Provider.EC2_US_WEST_OREGON] = ec2_providers['us-west-2']
     ec2_providers[Provider.EC2_US_EAST] = ec2_providers['us-east-1'] 
+    ec2_providers[Provider.EC2_EU_CENTRAL] = ec2_providers['eu-central-1'] 
 
     #formatting for easy copy/paste to mist.io/config.py             
-    for provider in [Provider.EC2_EU_WEST, Provider.EC2_SA_EAST, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_SOUTHEAST2, Provider.EC2_AP_SOUTHEAST, Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON, Provider.EC2_US_EAST]:        
+    for provider in [Provider.EC2_EU_CENTRAL, Provider.EC2_EU_WEST, Provider.EC2_SA_EAST, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_SOUTHEAST2, Provider.EC2_AP_SOUTHEAST, Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON, Provider.EC2_US_EAST]:        
         print "        \"%s\": {" % provider         
         for key in ec2_providers[provider].keys()[:-1]:
             print "            \"%s\": %s," % (key, json.dumps(ec2_providers[provider][key]))

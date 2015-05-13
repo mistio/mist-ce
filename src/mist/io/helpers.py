@@ -6,17 +6,20 @@ import sys
 import time
 import json
 import random
+import socket
 import tempfile
 import logging
 import functools
 from hashlib import sha1
 from contextlib import contextmanager
 
+import netaddr
 from amqp import Message
 from amqp.connection import Connection
 from amqp.exceptions import NotFound as AmqpNotFound
 
 from mist.io.model import User
+from mist.io.exceptions import MistError
 
 try:
     from mist.core import config
@@ -298,3 +301,60 @@ class StdStreamCapture(object):
         for name in self.streams:
             setattr(sys, name, self.streams[name])
         return self.get_mux()
+
+
+def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
+               allow_private=config.ALLOW_CONNECT_PRIVATE):
+    """Check if a given host is a valid DNS name or IPv4 address"""
+
+    try:
+        ipaddr = socket.gethostbyname(host)
+    except socket.gaierror:
+        raise MistError("Not a valid IP address or resolvable DNS name: '%s'."
+                        % host)
+
+    if host != ipaddr:
+        msg = "Host '%s' resolves to '%s' which" % (host, ipaddr)
+    else:
+        msg = "Host '%s'" % host
+
+
+    if not netaddr.valid_ipv4(ipaddr):
+        raise MistError(msg + " is not a valid IPv4 address.")
+
+    forbidden_subnets = {
+        '0.0.0.0/8': "used for broadcast messages to the current network",
+        '100.64.0.0/10': ("used for communications between a service provider "
+                          "and its subscribers when using a "
+                          "Carrier-grade NAT"),
+        '169.254.0.0/16': ("used for link-local addresses between two hosts "
+                           "on a single link when no IP address is otherwise "
+                           "specified"),
+        '192.0.0.0/24': ("used for the IANA IPv4 Special Purpose Address "
+                         "Registry"),
+        '192.0.2.0/24': ("assigned as 'TEST-NET' for use solely in "
+                         "documentation and example source code"),
+        '192.88.99.0/24': "used by 6to4 anycast relays",
+        '198.18.0.0/15': ("used for testing of inter-network communications "
+                          "between two separate subnets"),
+        '198.51.100.0/24': ("assigned as 'TEST-NET-2' for use solely in "
+                            "documentation and example source code"),
+        '203.0.113.0/24': ("assigned as 'TEST-NET-3' for use solely in "
+                           "documentation and example source code"),
+        '224.0.0.0/4': "reserved for multicast assignments",
+        '240.0.0.0/4': "reserved for future use",
+        '255.255.255.255/32': ("reserved for the 'limited broadcast' "
+                               "destination address"),
+    }
+    if not allow_localhost:
+        forbidden_subnets['127.0.0.0/8'] = ("used for loopback addresses "
+                                            "to the local host")
+    if not allow_private:
+        for cidr in ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'):
+            forbidden_subnets[cidr] = ("used for local communications "
+                                       "within a private network")
+    cidr = netaddr.smallest_matching_cidr(ipaddr, forbidden_subnets.keys())
+    if cidr:
+        raise MistError("%s is not allowed. It belongs to '%s' "
+                        "which is %s." % (msg, cidr,
+                                          forbidden_subnets[str(cidr)]))
