@@ -130,7 +130,7 @@ def parse_ping(stdout):
         rtt_avg = float(match.groups()[1])
         rtt_max = float(match.groups()[2])
         return {
-            ## "host": host,
+            # "host": host,
             "packets_tx": packets_tx,
             "packets_rx": packets_rx,
             "packets_loss": packets_loss,
@@ -229,7 +229,7 @@ def amqp_user_listening(user):
         connection.close()
 
 
-def trigger_session_update(email, sections=['backends','keys','monitoring']):
+def trigger_session_update(email, sections=['backends', 'keys', 'monitoring']):
     amqp_publish_user(email, routing_key='update', data=sections)
 
 
@@ -243,7 +243,7 @@ def amqp_log(msg):
 
 def amqp_log_listen():
     def echo(msg):
-        ## print msg.delivery_info.get('routing_key')
+        # print msg.delivery_info.get('routing_key')
         print msg.body
 
     amqp_subscribe('mist_debug', echo)
