@@ -63,13 +63,9 @@ require.config({
 
 var appLoader = {
 
-
-    //
     //
     //  Properties
     //
-    //
-
 
     buffer: null,
     progress: null,
@@ -77,11 +73,8 @@ var appLoader = {
 
 
     //
-    //
     //  Initialization
     //
-    //
-
 
     init: function () {
         this.buffer = {};
@@ -92,11 +85,8 @@ var appLoader = {
 
 
     //
-    //
     //  Methods
     //
-    //
-
 
     start: function () {
         forIn(this.steps, function (step) {
@@ -105,16 +95,13 @@ var appLoader = {
         });
     },
 
-
     complete: function (completedStep) {
-
         // Update progress bar
         this.progress += this.progressStep;
         changeLoadProgress(Math.ceil(this.progress))
 
         // Update other steps
         forIn(this.steps, function (step, stepName) {
-
             // Check if "completedStep" is a dependency of "step"
             var index = step.before.indexOf(completedStep);
 
@@ -131,7 +118,6 @@ var appLoader = {
 
 
     finish: function () {
-
         // Clean up variables to save up some memory
         loadApp = null;
         loadFiles = null;
@@ -146,11 +132,8 @@ var appLoader = {
 
 
     //
-    //
     //  Steps
     //
-    //
-
 
     steps: {
         'load ember': {
@@ -261,7 +244,6 @@ var appLoader = {
         },
     }
 };
-
 
 
 var loadFiles = function (callback) {
@@ -431,7 +413,6 @@ var loadApp = function (
     parseProviderMap();
 
     // Ember routes and routers
-
     App.Router.map(function() {
         this.route('machines');
         this.route('images');
@@ -455,7 +436,6 @@ var loadApp = function (
     });
 
     // Ember controllers
-
     App.set('keysController', KeysController.create());
     App.set('logsController', LogsController.create());
     App.set('loginController', LoginController.create());
@@ -490,7 +470,6 @@ var loadApp = function (
     App.set('scriptEditController', ScriptEditController.create());
 
     // Ember custom widgets
-
     App.Select = Ember.Select.extend({
         attributeBindings: [
             'name',
@@ -541,7 +520,6 @@ var loadApp = function (
     });
 
     // Mist functions
-
     App.isScrolledToTop = function () {
         return window.pageYOffset <= 20;
     };
@@ -630,9 +608,7 @@ var loadApp = function (
 };
 
 
-
 var loadImages = function (callback) {
-
     // Spritesheet's name includes a timestamp each
     // time we generate it. So we use this "hack" to
     // get it's path and preload it
@@ -677,7 +653,6 @@ var handleMobileInit = function () {
 
 
 var setupLogsSocketEvents = function (socket, callback) {
-
     socket.on('open_incidents', function (openIncidents) {
         require(['app/models/story'], function (StoryModel) {
             var models = openIncidents.map(function (incident) {
@@ -701,14 +676,13 @@ var setupLogsSocketEvents = function (socket, callback) {
 
 
 var setupSocketEvents = function (socket, callback) {
-
     if (Mist.isCore) {
-    //  This is a temporary ajax-request to get the scripts.
-    //  It should be converted into a "list_scripts" socket handler
-    //  as soon as the backend supports it
-    Mist.ajax.GET('/scripts').success(function (scripts) {
-        Mist.scriptsController.setContent(scripts);
-    });
+        //  TODO: This is a temporary ajax-request to get the scripts.
+        //  It should be converted into a "list_scripts" socket handler
+        //  as soon as the backend supports it
+        Mist.ajax.GET('/scripts').success(function (scripts) {
+            Mist.scriptsController.setContent(scripts);
+        });
     }
 
     socket.on('list_keys', function (keys) {
@@ -757,7 +731,6 @@ var setupSocketEvents = function (socket, callback) {
         Mist.graphsController._handleSocketResponse(data);
     })
     .on('notify', function (data){
-
         var dialogBody = [];
 
         // Extract machine information
@@ -823,14 +796,10 @@ var changeLoadProgress = function (progress) {
 
 
 //
-//
 //  Ajax wrapper
 //
-//
-
 
 function Ajax (csrfToken) {
-
     return new function () {
 
         this.GET = function(url, data) {
@@ -896,9 +865,7 @@ function Ajax (csrfToken) {
 
 
 //
-//
 //  Socket wrapper
-//
 //
 
 var sockjs, mux;
@@ -910,26 +877,18 @@ function Socket_ (args) {
 
     return Ember.Object.extend({
 
-
-        //
         //
         //  Properties
         //
-        //
-
 
         events: null,
         socket: null,
         namespace: null,
         channel: null,
 
-
-        //
         //
         //  Public Methods
         //
-        //
-
 
         load: function (args) {
             this._log('initializing');
@@ -942,7 +901,6 @@ function Socket_ (args) {
                     that.onConnect(that);
             });
         }.on('init'),
-
 
         on: function (event) {
             var that = this;
@@ -969,7 +927,6 @@ function Socket_ (args) {
             return this;
         },
 
-
         emit: function () {
             var args = slice(arguments)
             this._log('/'+args[0], 'EMIT', args);
@@ -977,7 +934,6 @@ function Socket_ (args) {
             channel.send.apply(channel, arguments);
             return this;
         },
-
 
         kill: function () {
             this.set('keepAlive', false);
@@ -991,23 +947,18 @@ function Socket_ (args) {
 
 
         //
-        //
         //  Private Methods
         //
-        //
-
 
         _connect: function (callback) {
-
             var that = this;
             if (sockjs === undefined || sockjs.readyState != 1) {
-                info('Not connected... Reconnecting');
                 sockjs = new SockJS('/socket');
                 sockjs.onopen = function() {
                   mux = new MultiplexedWebSocket(sockjs);
                   var channel = mux.channel(that.get('namespace'));
                   channel.onopen = function(e){
-                      info('Connected.');
+                      info('Connected', that.get('namespace'));
                   }
                   that.set('channel', channel)
                 };
@@ -1022,29 +973,23 @@ function Socket_ (args) {
                     callback();
                 if (this.onConnect instanceof Function)
                     this.onConnect(this);
-            } else if (sockjs.readyState == 0) {
-                this._log('connecting');
-                this._reconnect(callback);
             } else {
-                this._log('not connected... reconnecting');
                 this._reconnect(callback);
             }
         },
 
-
         _reconnect: function (callback) {
             Ember.run.later(this, function () {
+                info('Not connected... Reconnecting');
                 this._connect(callback);
             }, 500);
         },
-
 
         _parseArguments: function (args) {
             forIn(this, args, function (value, property) {
                 this.set(property, value);
             });
         },
-
 
         _handleDisconnection: function () {
             var that = this;
@@ -1055,7 +1000,6 @@ function Socket_ (args) {
                   that._reconnect();
             };
         },
-
 
         _log: function () {
             if (!DEBUG_SOCKET)
@@ -1069,6 +1013,7 @@ function Socket_ (args) {
 
     }).create(args);
 }
+
 
 function virtualKeyboardHeight () {
     var keyboardHeight = 0;
@@ -1090,7 +1035,6 @@ function virtualKeyboardHeight () {
 
 // forEach like function on objects
 function forIn () {
-
     var object = arguments[arguments.length - 2];
     var callback = arguments[arguments.length - 1];
     var thisArg = arguments.length == 3 ? arguments[0] : undefined;
@@ -1128,9 +1072,9 @@ function maxCharsInWidth (fontSize, width) {
     return charCount;
 }
 
+
 // Calculates maximum lines that can be displayed into a fixed height
 function maxLinesInHeight (fontSize, height) {
-
     fontTest.css('font-size', fontSize);
 
     var testString = '';
@@ -1162,9 +1106,11 @@ function startTimer () {
     startTime = Date.now();
 };
 
+
 function getTime () {
     return Date.now() - startTime;
 };
+
 
 // Console aliases
 function log() {
@@ -1284,11 +1230,8 @@ function parseProviderMap () {
 
 
 //
-//
 //  PROTOTYPE EXTENTIONS
 //
-//
-
 
 var extendEmberView = function () {
 
@@ -1313,7 +1256,6 @@ Date.prototype.isFuture = function () {
 };
 
 Date.prototype.getPrettyTime = function (noSeconds) {
-
     var hour = this.getHours();
     var min = this.getMinutes();
     var sec = this.getSeconds();
@@ -1346,7 +1288,6 @@ Date.prototype.getMonthName = function (short) {
 }
 
 Date.prototype.diffToString = function (date) {
-
     var diff = this - date;
     var ret = '';
 
@@ -1371,7 +1312,6 @@ Date.prototype.diffToString = function (date) {
 };
 
 Date.prototype.getTimeFromNow = function () {
-
     var now = new Date();
     var diff = now - this;
     var ret = '';

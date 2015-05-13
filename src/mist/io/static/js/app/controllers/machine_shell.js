@@ -10,13 +10,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
         return Ember.Object.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             view: null,
             cols: null,
@@ -24,13 +20,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             isOpen: null,
             machine: null,
 
-
-            //
             //
             //  Methods
             //
-            //
-
 
             open: function (machine) {
 
@@ -64,15 +56,15 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 this.set('connected', true);
 
                 // Open shell socket
-                Mist.set('shell', Socket({
+                Mist.set('shell', new Socket_({
                     namespace: '/shell',
                     keepAlive: false,
                 }));
 
                 var term = new Terminal({
-                  cols: this.cols,
-                  rows: this.rows,
-                  screenKeys: true
+                    cols: this.cols,
+                    rows: this.rows,
+                    screenKeys: true
                 });
 
                 term.on('data', function (data) {

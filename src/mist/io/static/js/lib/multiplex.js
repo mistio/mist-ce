@@ -12,6 +12,8 @@ DumbEventTarget.prototype.addEventListener = function(type, listener) {
 };
 DumbEventTarget.prototype.on = function(type, listener) {
     this.addEventListener(type, listener);
+    if (DEBUG_SOCKET)
+      info(type);
 }
 DumbEventTarget.prototype.emit = function(type) {
     this._ensure(type);
@@ -23,7 +25,11 @@ DumbEventTarget.prototype.emit = function(type) {
             // this._ensure(type);
             data = data.data[type];
         }
+        if (DEBUG_SOCKET)
+            info(data);
     }
+    //var args = Array.prototype.slice.call(arguments, 1);
+
     if(this['on' + type]) this['on' + type].apply(this, [data]);
     for(var i=0; i < this._listeners[type].length; i++) {
         this._listeners[type][i].apply(this, [data]);
