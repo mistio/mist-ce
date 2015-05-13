@@ -307,7 +307,7 @@ def sanitize_host(host):
     "Return the hostame or ip address out of a URL"
 
     for prefix in ['https://', 'http://']:
-        host = host.strip(prefix)
+        host = host.replace(prefix, '')
 
     host = host.split('/')[0]
     host = host.split(':')[0]
