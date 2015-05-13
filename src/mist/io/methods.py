@@ -1424,6 +1424,47 @@ def list_machines(user, backend_id):
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
 
+        if m.driver.type is Provider.GCE:
+                # show specific extra metadata for GCE. Wrap in try/except
+                # to prevent from future GCE API changes
+
+                # identify Windows servers
+                os_type = 'linux'
+                try:
+                    if 'windows-cloud' in m.extra['disks'][0].get('licenses')[0]:
+                        os_type = 'windows'
+                except:
+                    pass
+                m.extra['os_type'] = os_type
+
+                # windows specific metadata including user/password
+                try:
+                    for item in m.extra.get('metadata', {}).get('items', []):
+                        if item.get('key') in ['gce-initial-windows-password', 'gce-initial-windows-user']:
+                            m.extra[item.get('key')] = item.get('value')
+                except:
+                    pass
+
+                try:
+                    if m.extra.get('boot_disk'):
+                        m.extra['boot_disk_size'] = m.extra.get('boot_disk').size
+                        m.extra['boot_disk_type'] = m.extra.get('boot_disk').extra.get('type')
+                        m.extra.pop('boot_disk')
+                except:
+                    pass
+
+                try:
+                    if m.extra.get('zone'):
+                        m.extra['zone'] = m.extra.get('zone').name
+                except:
+                    pass
+
+                try:
+                    if m.extra.get('machineType'):
+                        m.extra['machineType'] = m.extra.get('machineType').split('/')[-1]
+                except:
+                    pass
+
         for k in m.extra.keys():
             try:
                 json.dumps(m.extra[k])
