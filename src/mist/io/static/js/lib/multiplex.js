@@ -14,26 +14,16 @@ DumbEventTarget.prototype.on = function(type, listener) {
     this.addEventListener(type, listener);
 }
 DumbEventTarget.prototype.emit = function(type) {
-  warn(type);
     this._ensure(type);
-    var data = arguments[1];
-    if ( data == undefined ) {
-      warn('why undefined?')
+    if (arguments.length > 1){
+        var data = arguments[1]
+        var keys = Object.keys(data.data);
+        if (keys.length == 1) {
+            type = keys[0];
+            // this._ensure(type);
+            data = data.data[type];
+        }
     }
-    else {
-      var keys = Object.keys(data.data);
-      warn('keys');
-      warn(keys);
-      if (keys.length == 1) {
-        type = keys[0];
-        // this._ensure(type);
-        data = data.data[type];
-        warn(type);
-        warn(data);
-      }
-    }
-    //var args = Array.prototype.slice.call(arguments, 1);
-    warn(data);
     if(this['on' + type]) this['on' + type].apply(this, [data]);
     for(var i=0; i < this._listeners[type].length; i++) {
         this._listeners[type][i].apply(this, [data]);

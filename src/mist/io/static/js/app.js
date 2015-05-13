@@ -214,10 +214,8 @@ var appLoader = {
         'init app': {
             before: ['load templates', 'init connections'],
             exec: function () {
-                warn('b4initapp');
                 loadApp.apply(null, [function () {
                     appLoader.complete('init app');
-                    warn('initappcomplete');
                 }].concat(appLoader.buffer.files));
             }
         },
@@ -225,24 +223,20 @@ var appLoader = {
             before: ['load socket', 'load ember'],
             exec: function () {
                 appLoader.buffer.ajax = Ajax(CSRF_TOKEN);
-                warn('b4setupSock');
                 appLoader.buffer.main = new Socket_({
                     namespace: 'main',
                     onConnect: function () {
-                        warn('onConnect');
-                        appLoader.complete('init connections');
-                        if (!appLoader)
-                            socket.emit('ready');
+                        if (appLoader)
+                            appLoader.complete('init connections');
                     },
                 });
-                /*appLoader.buffer.logs = new Socket_({
+                appLoader.buffer.logs = new Socket_({
                     namespace: 'logs',
                     onConnect: function (socket) {
                         if (!appLoader)
                             socket.emit('ready');
                     }
-                });*/
-                warn('aftersetupSock');
+                });
             }
         },
         'init socket events': {
@@ -251,20 +245,18 @@ var appLoader = {
                 Mist.set('ajax', appLoader.buffer.ajax);
                 Mist.set('socket', appLoader.buffer.main);
                 Mist.set('logs', appLoader.buffer.logs);
-                warn('b4setupSockEvents');
-                setupSocketEvents(appLoader.buffer.main);
-                warn('aftersetupSockEvents');
-                appLoader.complete('init socket events');
+                setupSocketEvents(Mist.socket, function () {
+                    setupLogsSocketEvents(Mist.logs, function () {
+                        appLoader.complete('init socket events');
+                    });
+                });
+
             }
         },
         'fetch first data': {
             before: ['init socket events'],
             exec: function () {
-                /*setupSocketEvents(Mist.socket, function () {
-                    setupLogsSocketEvents(Mist.logs, function () {
-                        appLoader.complete('fetch first data');
-                    });
-                });*/
+                appLoader.complete('fetch first data');
             }
         },
     }
@@ -423,7 +415,6 @@ var loadApp = function (
     // Ember Application
     App.ready = callback;
     App = Ember.Application.create(App);
-    warn('setting mist');
     window.Mist  = App;
 
     // Globals
@@ -824,7 +815,8 @@ var changeLoadProgress = function (progress) {
         if (progress >= 100) {
             $('body').css('overflow','auto');
             $('#splash').fadeOut(300);
-            appLoader.finish();
+            if (appLoader)
+              appLoader.finish();
         }
     });
 };
@@ -908,131 +900,7 @@ function Ajax (csrfToken) {
 //  Socket wrapper
 //
 //
-var socket = undefined;
 
-function Socket (args) {
-
-    //var socket = undefined;
-    //var mux = undefined;
-    //var main, shell, logs;
-    var initialized = false;
-    var namespace = args.namespace;
-    var channel = undefined;
-
-    function init () {
-        if (!initialized) {
-            info(namespace, 'initializing');
-            handleDisconnection();
-            //addDebuggingWrapper();
-            if (args.onInit instanceof Function)
-                args.onInit(socket);
-        }
-        if (args.onConnect instanceof Function)
-            args.onConnect(socket);
-        initialized = true;
-    };
-
-    function connect () {
-        if (socket === undefined || socket.readyState != 1) {
-          socket = new SockJS('/socket');
-          socket.onclose = function(e){
-            warn('Disconnected!');
-            warn(e);
-          };
-          socket.onopen = function() {
-            setupChannels();
-            if (args.onConnect instanceof Function)
-                args.onConnect(socket);
-
-          }
-        }
-        reconnect();
-    }
-
-    function setupChannels() {
-      warn(namespace);
-      if (socket.readyState == 1) {
-          mux = new MultiplexedWebSocket(socket);
-          channel = mux.channel(namespace);
-          channel.onopen = function(){
-              warn('onopen');
-              //setupSocketEvents(channel);
-              //channel.send('ready');
-          }
-          //shell = mux.channel('shell');
-          //logs = mux.channel('logs');
-          warn('Connected!');
-      } else {
-          warn('Failed to connect!');
-          warn(socket.readyState);
-      }
-    }
-
-    function reconnect () {
-        setTimeout(connect, 5000);
-    }
-
-    function handleDisconnection () {
-
-        // keep socket connections alive by default
-        if (args.keepAlive !== undefined ? args.keepAlive : true) {
-            // Reconnect if connection fails
-            socket.on('disconnect', function () {
-                warn(namespace, 'disconnected');
-                reconnect();
-            });
-        }
-    }
-
-    //function on (eventName, callback) {
-    //    channel.addEventListener(eventName, callback);
-    //    return this;
-    //}
-
-    function addDebuggingWrapper () {
-
-        // This process basically overrides the .on()
-        // function to enable debugging info on every
-        // response received by the client
-
-        // 1. keep a copy of the original socket.on() function
-        var sockon = socket.on;
-
-        // 2. overide the socket's .on() function
-        socket.on = function (event, callback)  {
-
-            // i. keep a copy of the original callback
-            // This is the function written by us to handle
-            // the response data
-            var cb = callback;
-
-            // ii. overide callback to first print the debugging
-            // information and then call the original callback function
-            // (which is saved in cb variable)
-            callback = function (data) {
-                if (DEBUG_SOCKET)
-                    info(new Date().getPrettyTime() +
-                        ' | ' + namespace + '/' + event + ' ', data);
-                cb(data);
-            };
-
-            // iii. Call the original .on() function using the modified
-            // callback function
-            return sockon.apply(socket, arguments);
-        };
-    }
-
-    connect();
-
-    return channel;
-}
-
-
-//
-//  TODO (gtsop): Get rid of the previous wrapper
-//  Socket Wrapper v2
-//
-//
 var sockjs, mux;
 
 function Socket_ (args) {
@@ -1067,33 +935,9 @@ function Socket_ (args) {
             this._log('initializing');
             this._parseArguments(args);
 
-            if (sockjs === undefined || sockjs.readyState != 1) {
-                sockjs = new SockJS('/socket');
-                sockjs.onclose = function(e){
-                  warn('Disconnected!');
-                  warn(e);
-                };
-                sockjs.onopen = function() {
-                  mux = new MultiplexedWebSocket(sockjs);
-                  var channel = mux.channel(that.get('namespace'));
-                  channel.onopen = function(){
-                      warn('onopen');
-                      //setupSocketEvents(channel);
-                      //channel.send('ready');
-                  }
-                  that.set('channel', channel)
-                };
-            } else {
-                warn('Failed to connect!');
-                warn(socket.readyState);
-            }
-
-            this.set('socket', sockjs);
-            this.set('events', EventHandler.create());
-
             var that = this;
             this._connect(function () {
-                //that._handleDisconnection();
+                that._handleDisconnection();
                 if (that.onConnect instanceof Function)
                     that.onConnect(that);
             });
@@ -1155,15 +999,30 @@ function Socket_ (args) {
 
         _connect: function (callback) {
 
-            var socket = this.get('socket');
+            var that = this;
+            if (sockjs === undefined || sockjs.readyState != 1) {
+                info('Not connected... Reconnecting');
+                sockjs = new SockJS('/socket');
+                sockjs.onopen = function() {
+                  mux = new MultiplexedWebSocket(sockjs);
+                  var channel = mux.channel(that.get('namespace'));
+                  channel.onopen = function(e){
+                      info('Connected.');
+                  }
+                  that.set('channel', channel)
+                };
+            }
 
-            if (socket.readyState == 1) {
+            this.set('socket', sockjs);
+            this.set('events', EventHandler.create());
+
+            if (sockjs.readyState == 1) {
                 this._log('connected');
                 if (callback instanceof Function)
                     callback();
                 if (this.onConnect instanceof Function)
                     this.onConnect(this);
-            } else if (socket.readyState == 0) {
+            } else if (sockjs.readyState == 0) {
                 this._log('connecting');
                 this._reconnect(callback);
             } else {
@@ -1189,12 +1048,12 @@ function Socket_ (args) {
 
         _handleDisconnection: function () {
             var that = this;
-            this.get('socket').on('disconnect', function () {
-                that._log('disconnected');
-                // keep socket connections alive by default
-                if (that.get('keepAlive') !== undefined ? that.get('keepAlive') : true)
-                    that._reconnect();
-            });
+            sockjs.onclose = function(e){
+              that._log('disconnected', e.reason);
+              // keep socket connections alive by default
+              if (that.get('keepAlive') !== undefined ? that.get('keepAlive') : true)
+                  that._reconnect();
+            };
         },
 
 
