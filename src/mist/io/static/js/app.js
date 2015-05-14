@@ -204,29 +204,23 @@ var appLoader = {
         'init connections': {
             before: ['load socket', 'load ember', 'init app'],
             exec: function () {
-                warn('init connections');
-                appLoader.buffer.ajax = Ajax(CSRF_TOKEN);
-                appLoader.buffer.main = new Socket({
+                Mist.set('ajax', Ajax(CSRF_TOKEN));
+                Mist.set('socket', new Socket({
                     namespace: 'main',
                     onConnect: function (socket) {
-                        warn('ready')
                         socket.emit('ready');
-                        appLoader.buffer.logs = new Socket({
+                        Mist.set('logs', new Socket({
                             namespace: 'logs',
                             onConnect: function (socket) {
                                 if (socket.channel) {
                                     socket.emit('ready');
                                 }
                             }
-                        });
-                        Mist.set('logs', appLoader.buffer.logs);
+                        }));
                         if (appLoader)
                             appLoader.complete('init connections');
                     },
-                });
-                Mist.set('ajax', appLoader.buffer.ajax);
-                Mist.set('socket', appLoader.buffer.main);
-
+                }));
             }
         },
         'fetch first data': {
@@ -898,8 +892,6 @@ function Socket (args) {
             var that = this;
             this._connect(function () {
                 that._handleDisconnection();
-                if (that.onConnect instanceof Function)
-                    that.onConnect(that);
             });
         }.on('init'),
 
@@ -953,7 +945,8 @@ function Socket (args) {
 
         _connect: function (callback) {
             var that = this;
-            if (sockjs === undefined || sockjs.readyState != 1) {
+
+            if (sockjs === undefined || sockjs.readyState > 1) {
                 sockjs = new SockJS('/socket');
                 sockjs.onopen = function() {
                   mux = new MultiplexedWebSocket(sockjs);
@@ -961,24 +954,25 @@ function Socket (args) {
                   channel.onopen = function(e){
                       setupChannelEvents(Mist.socket, that.get('namespace'), function () {
                           info('Connected', that.get('namespace'));
+                          that._log('Connected', that.get('namespace'));
+                          if (callback instanceof Function)
+                              callback();
+                          if (that.onConnect instanceof Function)
+                              that.onConnect(that);
                       });
                   }
                   that.set('channel', channel)
+                  that.set('socket', sockjs);
+                  that.set('events', EventHandler.create());
                 };
-            }
-
-            this.set('socket', sockjs);
-            this.set('events', EventHandler.create());
-
-            if (sockjs.readyState == 1) {
-                this._log('connected');
-                if (callback instanceof Function)
-                    callback();
-                if (this.onConnect instanceof Function)
-                    this.onConnect(this);
-            } else {
+            } else if (sockjs.readyState == 0) {
+                info('Connecting...');
+                return
+            } /*else {
+                info('Not connected... Reconnecting');
+                info(sockjs.readyState);
                 this._reconnect(callback);
-            }
+            }*/
         },
 
         _reconnect: function (callback) {
