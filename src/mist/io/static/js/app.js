@@ -123,7 +123,6 @@ var appLoader = {
         loadFiles = null;
         loadImages = null;
         handleMobileInit = null;
-        setupSocketEvents = null;
         changeLoadProgress = null;
         appLoader = null;
 
@@ -195,7 +194,7 @@ var appLoader = {
             }
         },
         'init app': {
-            before: ['load templates', 'init connections'],
+            before: ['load templates'],
             exec: function () {
                 loadApp.apply(null, [function () {
                     appLoader.complete('init app');
@@ -203,45 +202,39 @@ var appLoader = {
             }
         },
         'init connections': {
-            before: ['load socket', 'load ember'],
+            before: ['load socket', 'load ember', 'init app'],
             exec: function () {
+                warn('init connections');
                 appLoader.buffer.ajax = Ajax(CSRF_TOKEN);
-                appLoader.buffer.main = new Socket_({
+                appLoader.buffer.main = new Socket({
                     namespace: 'main',
-                    onConnect: function () {
+                    onConnect: function (socket) {
+                        warn('ready')
+                        socket.emit('ready');
+                        appLoader.buffer.logs = new Socket({
+                            namespace: 'logs',
+                            onConnect: function (socket) {
+                                if (socket.channel) {
+                                    socket.emit('ready');
+                                }
+                            }
+                        });
+                        Mist.set('logs', appLoader.buffer.logs);
                         if (appLoader)
                             appLoader.complete('init connections');
                     },
                 });
-                appLoader.buffer.logs = new Socket_({
-                    namespace: 'logs',
-                    onConnect: function (socket) {
-                        if (!appLoader)
-                            socket.emit('ready');
-                    }
-                });
-            }
-        },
-        'init socket events': {
-            before: ['init connections', 'init app'],
-            exec: function () {
                 Mist.set('ajax', appLoader.buffer.ajax);
                 Mist.set('socket', appLoader.buffer.main);
-                Mist.set('logs', appLoader.buffer.logs);
-                setupSocketEvents(Mist.socket, function () {
-                    setupLogsSocketEvents(Mist.logs, function () {
-                        appLoader.complete('init socket events');
-                    });
-                });
 
             }
         },
         'fetch first data': {
-            before: ['init socket events'],
+            before: ['init connections'],
             exec: function () {
                 appLoader.complete('fetch first data');
             }
-        },
+        }
     }
 };
 
@@ -652,7 +645,15 @@ var handleMobileInit = function () {
 };
 
 
-var setupLogsSocketEvents = function (socket, callback) {
+var setupChannelEvents = function (socket, namespace, callback) {
+    if (namespace == 'main')
+        return setupMainChannel(socket, callback);
+    else if (namespace == 'logs')
+        return setupLogChannel(socket, callback);
+};
+
+
+var setupLogChannel = function (socket, callback) {
     socket.on('open_incidents', function (openIncidents) {
         require(['app/models/story'], function (StoryModel) {
             var models = openIncidents.map(function (incident) {
@@ -675,7 +676,7 @@ var setupLogsSocketEvents = function (socket, callback) {
 };
 
 
-var setupSocketEvents = function (socket, callback) {
+var setupMainChannel = function(socket, callback) {
     if (Mist.isCore) {
         //  TODO: This is a temporary ajax-request to get the scripts.
         //  It should be converted into a "list_scripts" socket handler
@@ -870,7 +871,7 @@ function Ajax (csrfToken) {
 
 var sockjs, mux;
 
-function Socket_ (args) {
+function Socket (args) {
 
     if (!window.EventHandler)
         window.EventHandler = Ember.Object.extend(Ember.Evented, {});
@@ -958,7 +959,9 @@ function Socket_ (args) {
                   mux = new MultiplexedWebSocket(sockjs);
                   var channel = mux.channel(that.get('namespace'));
                   channel.onopen = function(e){
-                      info('Connected', that.get('namespace'));
+                      setupChannelEvents(Mist.socket, that.get('namespace'), function () {
+                          info('Connected', that.get('namespace'));
+                      });
                   }
                   that.set('channel', channel)
                 };
