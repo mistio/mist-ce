@@ -358,6 +358,7 @@ def _add_backend_bare_metal(user, title, provider, params):
         if not machine_user:
             machine_user = 'root'
 
+    machine_hostname = sanitize_host(machine_hostname)
     machine = model.Machine()
     machine.ssh_port = port
     machine.remote_desktop_port = rdp_port
@@ -420,12 +421,7 @@ def _add_backend_coreos(user, title, provider, params):
 
     if not machine_hostname:
         raise RequiredParameterMissingError('machine_ip')
-
-    try:
-        socket.gethostbyname(machine_hostname)
-    except socket.gaierror:
-        raise BadRequestError("Hostname '%s' isn't resolvable/accessible."
-                              % machine_hostname)
+    machine_hostname = sanitize_host(machine_hostname)
 
     use_ssh = remove_on_error and machine_key
     if use_ssh:
@@ -501,9 +497,7 @@ def _add_backend_vcloud(title, provider, params):
     if provider == 'vcloud':
         if not host:
             raise RequiredParameterMissingError('host')
-        for prefix in ['https://', 'http://']:
-            host = host.replace(prefix, '')
-        host = host.split('/')[0]
+        host = sanitize_host(host)
     elif provider == 'indonesian_vcloud':
         host = 'compute.idcloudonline.com'
 
@@ -736,7 +730,7 @@ def _add_backend_libvirt(user, title, provider, params):
     machine_hostname = params.get('machine_hostname', '')
     if not machine_hostname:
         raise RequiredParameterMissingError('machine_hostname')
-
+    machine_hostname = sanitize_host(machine_hostname)
     apikey = params.get('machine_user', 'root')
 
     apisecret = params.get('machine_key', '')
@@ -874,9 +868,7 @@ def _add_backend_vsphere(title, provider, params):
     host = params.get('host', '')
     if not host:
         raise RequiredParameterMissingError('host')
-    for prefix in ['https://', 'http://']:
-        host = host.replace(prefix, '')
-    host = host.split('/')[0]
+    host = sanitize_host(host)
 
     backend = model.Backend()
     backend.title = title
