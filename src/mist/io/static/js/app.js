@@ -208,15 +208,15 @@ var appLoader = {
                 Mist.set('socket', new Socket({
                     namespace: 'main',
                     onConnect: function (socket) {
-                        socket.emit('ready');
-                        Mist.set('logs', new Socket({
-                            namespace: 'logs',
-                            onConnect: function (socket) {
-                                if (socket.channel) {
-                                    socket.emit('ready');
-                                }
-                            }
-                        }));
+                        //socket.emit('ready');
+                        //Mist.set('logs', new Socket({
+                        //    namespace: 'logs',
+                        //    onConnect: function (socket) {
+                        //        if (socket.channel) {
+                        //            socket.emit('ready');
+                        //        }
+                        //    }
+                        //}));
                         if (appLoader)
                             appLoader.complete('init connections');
                     },
@@ -766,7 +766,7 @@ var setupMainChannel = function(socket, callback) {
     })
     .on('probe', onProbe)
     .on('ping', onProbe)
-    .send('ready');
+    .emit('ready');
 
     function onProbe(data) {
         var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);

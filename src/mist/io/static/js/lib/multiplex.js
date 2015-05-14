@@ -11,28 +11,29 @@ DumbEventTarget.prototype.addEventListener = function(type, listener) {
     this._listeners[type].push(listener);
 };
 DumbEventTarget.prototype.on = function(type, listener) {
+    info("Adding listener to " + this.name + " for event " + type);
     this.addEventListener(type, listener);
-    if (DEBUG_SOCKET)
-      info(type);
 }
 DumbEventTarget.prototype.emit = function(type) {
-    this._ensure(type);
-    if (arguments.length > 1){
-        var data = arguments[1]
+    var args = Array.prototype.slice.call(arguments, 1);
+    if (args.length == 1) {
+        var data = args[0]
         var keys = Object.keys(data.data);
         if (keys.length == 1) {
             type = keys[0];
-            // this._ensure(type);
             data = data.data[type];
+            args = [data];
         }
-        if (DEBUG_SOCKET)
-            info(data);
     }
-    //var args = Array.prototype.slice.call(arguments, 1);
-
-    if(this['on' + type]) this['on' + type].apply(this, [data]);
-    for(var i=0; i < this._listeners[type].length; i++) {
-        this._listeners[type][i].apply(this, [data]);
+    info("Channel " + this.name + " got event '" + type + "'.");
+    if (args.length) info(args);
+    this._ensure(type);
+    if (!(('on' + type in this) || (this._listeners[type].length))) {
+        warn("No listeners for '" + type + "' in " + this.name + ".");
+    }
+    if (this['on' + type]) this['on' + type].apply(this, args);
+    for (var i=0; i < this._listeners[type].length; i++) {
+        this._listeners[type][i].apply(this, args);
     }
 };
 
