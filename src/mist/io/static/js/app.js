@@ -732,11 +732,17 @@ var setupMainChannel = function(socket, callback) {
         var machineId = data.machine_id;
         var backendId = data.backend_id;
         var machine = Mist.backendsController.getMachine(machineId, backendId);
-        if (machine.id) {
+        if (machine && machine.id) {
             dialogBody.push({
                 link: machine.name,
                 class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 href: '#/machines/' + machineId,
+                closeDialog: true,
+            });
+        } else {
+            warn('Machine not found', machineId, backendId);
+            dialogBody.push({
+                class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 closeDialog: true,
             });
         }
@@ -945,34 +951,23 @@ function Socket (args) {
 
         _connect: function (callback) {
             var that = this;
-
+            warn('_connect', this.get('namespace'));
             if (sockjs === undefined || sockjs.readyState > 1) {
                 sockjs = new SockJS('/socket');
                 sockjs.onopen = function() {
                   mux = new MultiplexedWebSocket(sockjs);
-                  var channel = mux.channel(that.get('namespace'));
-                  channel.onopen = function(e){
-                      setupChannelEvents(Mist.socket, that.get('namespace'), function () {
-                          info('Connected', that.get('namespace'));
-                          that._log('Connected', that.get('namespace'));
-                          if (callback instanceof Function)
-                              callback();
-                          if (that.onConnect instanceof Function)
-                              that.onConnect(that);
-                      });
-                  }
-                  that.set('channel', channel)
+                  Mist.set('mux', mux);
+                  that._setupChannel(callback);
                   that.set('socket', sockjs);
                   that.set('events', EventHandler.create());
                 };
             } else if (sockjs.readyState == 0) {
                 info('Connecting...');
                 return
-            } /*else {
-                info('Not connected... Reconnecting');
-                info(sockjs.readyState);
-                this._reconnect(callback);
-            }*/
+            } else if (sockjs.readyState == 1 && Mist.get(this.get('namespace')) == null) {
+                info('New channel', this.get('namespace'));
+                that._setupChannel();
+            }
         },
 
         _reconnect: function (callback) {
@@ -1007,6 +1002,23 @@ function Socket (args) {
             args.unshift(preText);
             console.log.apply(console, args);
         },
+
+        _setupChannel: function (callback){
+          var channel = Mist.mux.channel(this.get('namespace'));
+          var that = this;
+          info('Connecting', this.get('namespace'))
+          channel.onopen = function(e){
+              setupChannelEvents(that, that.get('namespace'), function () {
+                  info('Connected', that.get('namespace'));
+                  that._log('Connected', that.get('namespace'));
+                  if (callback instanceof Function)
+                      callback();
+                  if (that.onConnect instanceof Function)
+                      that.onConnect(that);
+              });
+          }
+          this.set('channel', channel)
+        }
 
     }).create(args);
 }

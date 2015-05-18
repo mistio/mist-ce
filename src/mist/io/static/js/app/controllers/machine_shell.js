@@ -56,63 +56,65 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 this.set('connected', true);
 
                 // Open shell socket
-                Mist.set('shell', new Socket_({
-                    namespace: '/shell',
+                Mist.set('shell', new Socket({
+                    namespace: 'shell',
                     keepAlive: false,
-                }));
+                    onConnect: function (socket) {
+                        warn('shell connect');
+                        var term = new Terminal({
+                            cols: this.cols,
+                            rows: this.rows,
+                            screenKeys: true
+                        });
 
-                var term = new Terminal({
-                    cols: this.cols,
-                    rows: this.rows,
-                    screenKeys: true
-                });
+                        term.write('Connecting to ' + this.host + '...\r\n');
+                        Mist.set('term', term);
 
-                term.on('data', function (data) {
-                    Mist.shell.emit('shell_data', data);
-                });
+                        Mist.term.on('data', function (data) {
+                            Mist.shell.emit('shell_data', data);
+                        });
 
-                term.open(document.getElementById('shell-return'));
+                        Mist.term.open(document.getElementById('shell-return'));
 
-                Mist.shell.emit('shell_open', {
-                    backend_id: this.machine.backend.id,
-                    machine_id: this.machine.id,
-                    provider: this.machine.backend.provider,
-                    host: this.host,
-                    cols: this.cols,
-                    rows: this.rows,
-                });
+                        Mist.shell.emit('shell_open', {
+                            backend_id: this.machine.backend.id,
+                            machine_id: this.machine.id,
+                            provider: this.machine.backend.provider,
+                            host: this.host,
+                            cols: this.cols,
+                            rows: this.rows,
+                        });
 
-                Mist.shell.firstData = true;
-                Mist.shell.on('shell_data', function (data) {
-                    term.write(data);
-                    if (Mist.shell.firstData) {
-                        $('.terminal').focus();
-                        Mist.shell.firstData = false;
+                        Mist.shell.firstData = true;
+                        Mist.shell.on('shell_data', function (data) {
+                            term.write(data);
+                            if (Mist.shell.firstData) {
+                                $('.terminal').focus();
+                                Mist.shell.firstData = false;
+                            }
+                        });
+
+                        if (!Terminal._textarea)
+
+                            $('.terminal').focus();
+
+                        else {
+
+                            // iOS virtual keyboard focus fix
+                            $(document).off('focusin');
+
+                            // Make the hidden textfield focusable on android
+                            if (Mist.term && Mist.term.isAndroid)
+                                $(Terminal._textarea)
+                                    .css('top', '1%')
+                                    .css('left', 0)
+                                    .width('100%')
+                                    .height($('#shell-return').height());
+
+                            $(Terminal._textarea).show();
+                        }
                     }
-                });
-
-                term.write('Connecting to ' + this.host + '...\r\n');
-                Mist.set('term', term);
-
-                if (!Terminal._textarea)
-
-                    $('.terminal').focus();
-
-                else {
-
-                    // iOS virtual keyboard focus fix
-                    $(document).off('focusin');
-
-                    // Make the hidden textfield focusable on android
-                    if (Mist.term && Mist.term.isAndroid)
-                        $(Terminal._textarea)
-                            .css('top', '1%')
-                            .css('left', 0)
-                            .width('100%')
-                            .height($('#shell-return').height());
-
-                    $(Terminal._textarea).show();
-                }
+                }));
             },
 
 

@@ -94,6 +94,7 @@ class ShellConnection(MistConnection):
         self.provider = ''
 
     def on_shell_open(self, data):
+        print "shell open"
         if self.ssh_info:
             self.disconnect()
         self.ssh_info = {
