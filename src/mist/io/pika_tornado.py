@@ -34,7 +34,7 @@ class PikaClient(object):
         log.info('%s: Connecting to RabbitMQ on localhost:5672',
                  self.__class__.__name__)
         self.connecting = True
-        param = pika.ConnectionParameters()
+        param = pika.ConnectionParameters(host='127.0.0.1', port=5672)
         self.connection = TornadoConnection(param,
                                             on_open_callback=self.on_connected)
         self.connection.add_on_close_callback(self.on_closed)

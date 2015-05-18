@@ -88,13 +88,14 @@ class MistConnection(SockJSConnection):
 
 class ShellConnection(MistConnection):
     def init(self):
+        log.info('ShellConnection.__init__')
         super(ShellConnection, self).init()
         self.channel = None
         self.ssh_info = {}
         self.provider = ''
 
     def on_shell_open(self, data):
-        print "shell open"
+        log.info('on_shell_open')
         if self.ssh_info:
             self.disconnect()
         self.ssh_info = {

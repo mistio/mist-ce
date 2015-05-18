@@ -966,7 +966,7 @@ function Socket (args) {
                 return
             } else if (sockjs.readyState == 1 && Mist.get(this.get('namespace')) == null) {
                 info('New channel', this.get('namespace'));
-                that._setupChannel();
+                that._setupChannel(callback);
             }
         },
 
@@ -1008,6 +1008,7 @@ function Socket (args) {
           var that = this;
           info('Connecting', this.get('namespace'))
           channel.onopen = function(e){
+              warn('channel.onopen');
               setupChannelEvents(that, that.get('namespace'), function () {
                   info('Connected', that.get('namespace'));
                   that._log('Connected', that.get('namespace'));
