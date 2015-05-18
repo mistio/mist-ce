@@ -644,6 +644,7 @@ var setupChannelEvents = function (socket, namespace, callback) {
         return setupMainChannel(socket, callback);
     else if (namespace == 'logs')
         return setupLogChannel(socket, callback);
+    else return callback();
 };
 
 
