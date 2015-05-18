@@ -47,6 +47,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
 
             connect: function () {
+                var that = this;
 
                 if (this.connected) {
                     this.resize();
@@ -55,43 +56,34 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
                 this.set('connected', true);
 
+                // Open terminal
+                var term = new Terminal({
+                    cols: this.cols,
+                    rows: this.rows,
+                    screenKeys: true
+                });
+                term.open(document.getElementById('shell-return'));
+                term.write('Connecting to ' + this.host + '...\r\n');
+                Mist.set('term', term);
+
                 // Open shell socket
                 Mist.set('shell', new Socket({
                     namespace: 'shell',
                     keepAlive: false,
                     onConnect: function (socket) {
                         warn('shell connect');
-                        var term = new Terminal({
-                            cols: this.cols,
-                            rows: this.rows,
-                            screenKeys: true
-                        });
-
-                        term.write('Connecting to ' + this.host + '...\r\n');
-                        Mist.set('term', term);
 
                         Mist.term.on('data', function (data) {
                             Mist.shell.emit('shell_data', data);
                         });
 
-                        Mist.term.open(document.getElementById('shell-return'));
-
                         Mist.shell.emit('shell_open', {
-                            backend_id: this.machine.backend.id,
-                            machine_id: this.machine.id,
-                            provider: this.machine.backend.provider,
-                            host: this.host,
-                            cols: this.cols,
-                            rows: this.rows,
-                        });
-
-                        Mist.shell.firstData = true;
-                        Mist.shell.on('shell_data', function (data) {
-                            term.write(data);
-                            if (Mist.shell.firstData) {
-                                $('.terminal').focus();
-                                Mist.shell.firstData = false;
-                            }
+                            backend_id: that.machine.backend.id,
+                            machine_id: that.machine.id,
+                            provider: that.machine.backend.provider,
+                            host: that.host,
+                            cols: that.cols,
+                            rows: that.rows,
                         });
 
                         if (!Terminal._textarea)

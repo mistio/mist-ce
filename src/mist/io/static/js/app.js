@@ -644,6 +644,8 @@ var setupChannelEvents = function (socket, namespace, callback) {
         return setupMainChannel(socket, callback);
     else if (namespace == 'logs')
         return setupLogChannel(socket, callback);
+    else if (namespace == 'shell')
+      return setupShellChannel(socket, callback);
     else return callback();
 };
 
@@ -666,6 +668,21 @@ var setupLogChannel = function (socket, callback) {
     }).emit('ready');
     Mist.set('openIncidents', []);
     Mist.set('closedIncidents', [])
+    if (callback)
+        callback();
+};
+
+
+var setupShellChannel = function (socket, callback) {
+    socket.firstData = true;
+    socket.on('shell_data', function (data) {
+        Mist.term.write(data);
+        if (socket.firstData) {
+            $('.terminal').focus();
+            socket.firstData = false;
+        }
+    }).emit('ready');
+
     if (callback)
         callback();
 };
@@ -960,7 +977,6 @@ function Socket (args) {
                   Mist.set('mux', mux);
                   that._setupChannel(callback);
                   that.set('socket', sockjs);
-                  that.set('events', EventHandler.create());
                 };
             } else if (sockjs.readyState == 0) {
                 info('Connecting...');
@@ -1020,6 +1036,7 @@ function Socket (args) {
               });
           }
           this.set('channel', channel)
+          this.set('events', EventHandler.create());
         }
 
     }).create(args);
