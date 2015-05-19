@@ -10,12 +10,13 @@ greenlet.
 
 import uuid
 import json
+import socket
 import random
 from time import time
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
-from tornado.iostream import BaseIOStream
+import tornado.iostream
 
 import requests
 
@@ -78,10 +79,11 @@ class MistConnection(SockJSConnection):
         log.info('on_close!')
 
 
-class TornadoShell(BaseIOStream):
+class TornadoShell(tornado.iostream.BaseIOStream):
     def __init__(self, channel):
         super(TornadoShell, self).__init__(read_chunk_size=1024)
         self.channel = channel
+        self.channel.setblocking(0)
 
     def fileno(self):
         return self.channel.fileno()
@@ -90,22 +92,19 @@ class TornadoShell(BaseIOStream):
         self.channel.close()
 
     def read_from_fd(self):
-        log.info('read_from_fd')
-        if self.channel.recv_ready():
-            try:
-                data = self.channel.recv(self.read_chunk_size)
-            except TypeError:
-                # this is meant for docker shell over ws api
-                data = self.channel.recv()
-            log.info('read_from_fd ready')
-            return data.decode('utf-8', 'ignore')
-        log.info('read_from_fd not ready')
+        try:
+            data = self.channel.recv(self.read_chunk_size)
+            if data:
+                return data.decode('utf-8', 'ignore')
+            self.close()
+        except socket.timeout:
+            pass
 
     def write_to_fd(self, data):
-        log.info('write_to_fd: %s', data)
-        if self.channel.send_ready():
+        try:
             return self.channel.send(data.encode('utf-8', 'ignore'))
-        return 0
+        except socket.timeout:
+            return 0
 
     def get_fd_error(self):
         pass
@@ -163,18 +162,21 @@ class ShellConnection(MistConnection):
         # tornado compatible async wrapper around paramiko channel
         self.tornado_channel = TornadoShell(self.channel)
 
-        def callback(data):
-            # log.info('callback')
-            self.emit_shell_data(data)
+        def channel_closed(data):
+            log.info('channel closed')
             self.close()
-            self.tornado_channel.read_bytes(1024, callback, partial=True)
 
-        self.tornado_channel.read_bytes(1024, callback, partial=True)
-        # log.info('on_shell_open finished')
+        self.tornado_channel.read_until_close(
+            callback=channel_closed, streaming_callback=self.emit_shell_data
+        )
+        log.info('on_shell_open finished')
 
     def on_shell_data(self, data):
         # log.info('on_shell_data: %s', data)
-        self.tornado_channel.write(bytes(data))
+        try:
+            self.tornado_channel.write(bytes(data))
+        except tornado.iostream.StreamClosedError:
+            log.info('on_shell_data got stream error')
 
     def on_shell_resize(self, columns, rows):
         log.info("Resizing shell to %d * %d", columns, rows)
