@@ -18,11 +18,13 @@ DumbEventTarget.prototype.emit = function(type) {
     var args = Array.prototype.slice.call(arguments, 1);
     if (args.length == 1) {
         var data = args[0]
-        var keys = Object.keys(data.data);
-        if (keys.length == 1) {
-            type = keys[0];
-            data = data.data[type];
-            args = [data];
+        if (data.data){
+            var keys = Object.keys(data.data);
+            if (keys.length == 1) {
+                type = keys[0];
+                data = data.data[type];
+                args = [data];
+            }
         }
     }
     info("Channel " + this.name + " got event '" + type + "'.");

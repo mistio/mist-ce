@@ -120,7 +120,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 this.view.close();
                 Ember.run.later(this, function () {
                     Mist.term.destroy();
-                    Mist.shell.disconnect();
+                    if (Mist.shell.channel)
+                        Mist.shell.channel.close();
+                    Mist.set('shell', null);
                     this._clear();
                     if (Terminal._textarea)
                         $(Terminal._textarea).hide();

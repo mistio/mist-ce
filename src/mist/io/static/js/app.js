@@ -675,7 +675,10 @@ var setupLogChannel = function (socket, callback) {
 
 var setupShellChannel = function (socket, callback) {
     socket.firstData = true;
-    socket.on('shell_data', function (data) {
+    socket.on('close', function (data) {
+        warn(data);
+        Mist.term.write('Connection closed by remote');
+    }.on('shell_data', function (data) {
         Mist.term.write(data);
         if (socket.firstData) {
             $('.terminal').focus();
