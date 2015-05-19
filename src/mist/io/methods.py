@@ -1617,7 +1617,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type == Provider.AZURE:
         node = _create_machine_azure(conn, key_id, private_key,
                                              public_key, machine_name,
-                                             image, size, location, cloud_service_name=None, azure_port_bindings='')
+                                             image, size, location, cloud_service_name=None, azure_port_bindings=azure_port_bindings)
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
@@ -2102,7 +2102,7 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
 
 
 def _create_machine_azure(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location, cloud_service_name, azure_port_bindings=''):
+                                  machine_name, image, size, location, cloud_service_name, azure_port_bindings):
     """Create a machine Azure.
 
     Here there is no checking done, all parameters are expected to be
@@ -2112,7 +2112,7 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
     key = public_key.replace('\n', '')
 
     port_bindings = []
-    if azure_port_bindings and type(azure_port_bindings) is str:
+    if azure_port_bindings and type(azure_port_bindings) in [str, unicode]:
     # we receive something like: http tcp 80:80, smtp tcp 25:25, https tcp 443:443
     # and transform it to [{'name':'http', 'protocol': 'tcp', 'local_port': 80, 'port': 80},
     # {'name':'smtp', 'protocol': 'tcp', 'local_port': 25, 'port': 25}]
