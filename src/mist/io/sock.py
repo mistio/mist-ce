@@ -13,10 +13,9 @@ import json
 import random
 from time import time
 
-import tornado.ioloop
-import tornado.web
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
+from tornado.iostream import BaseIOStream
 
 import requests
 
@@ -89,11 +88,45 @@ class MistConnection(SockJSConnection):
         return super(MistConnection, self).disconnect(silent=silent)
 
 
+class TornadoShell(BaseIOStream):
+    def __init__(self, channel):
+        super(TornadoShell, self).__init__(read_chunk_size=1024)
+        self.channel = channel
+
+    def fileno(self):
+        return self.channel.fileno()
+
+    def close_fd(self):
+        self.channel.close()
+
+    def read_from_fd(self):
+        log.info('read_from_fd')
+        if self.channel.recv_ready():
+            try:
+                data = self.channel.recv(self.read_chunk_size)
+            except TypeError:
+                # this is meant for docker shell over ws api
+                data = self.channel.recv()
+            log.info('read_from_fd ready')
+            return data.decode('utf-8', 'ignore')
+        log.info('read_from_fd not ready')
+
+    def write_to_fd(self, data):
+        log.info('write_to_fd: %s', data)
+        if self.channel.send_ready():
+            return self.channel.send(data.encode('utf-8', 'ignore'))
+        return 0
+
+    def get_fd_error(self):
+        pass
+
+
 class ShellConnection(MistConnection):
     def init(self):
         log.info('ShellConnection.__init__')
         super(ShellConnection, self).init()
         self.channel = None
+        self.tornado_channel = None
         self.ssh_info = {}
         self.provider = ''
 
@@ -129,44 +162,35 @@ class ShellConnection(MistConnection):
                 else:
                     err = str(exc)
                 self.ssh_info['error'] = err
-                self.send_shell_data(err)
+                self.emit_shell_data(err)
                 self.disconnect()
                 return
         self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
         self.channel = self.shell.invoke_shell('xterm',
                                                data['cols'],
                                                data['rows'])
-        self.spawn(self.get_ssh_data)
+
+        # tornado compatible async wrapper around paramiko channel
+        self.tornado_channel = TornadoShell(self.channel)
+
+        def callback(data):
+            # log.info('callback')
+            self.emit_shell_data(data)
+            self.tornado_channel.read_bytes(1024, callback, partial=True)
+
+        self.tornado_channel.read_bytes(1024, callback, partial=True)
+        # log.info('on_shell_open finished')
 
     def on_shell_data(self, data):
-        self.channel.send(data.encode('utf-8', 'ignore'))
+        # log.info('on_shell_data: %s', data)
+        self.tornado_channel.write(bytes(data))
 
     def on_shell_resize(self, columns, rows):
         log.info("Resizing shell to %d * %d", columns, rows)
         try:
             self.channel.resize_pty(columns, rows)
-        except:
-            pass
-
-    def get_ssh_data(self):
-        try:
-            if self.provider == 'docker':
-                try:
-                    self.channel.send('\n')
-                except:
-                    pass
-            while True:
-                wait_read(self.channel.fileno())
-                try:
-                    data = self.channel.recv(1024).decode('utf-8', 'ignore')
-                except TypeError:
-                    data = self.channel.recv().decode('utf-8', 'ignore')
-
-                if not len(data):
-                    return
-                self.send_shell_data(data)
-        finally:
-            self.channel.close()
+        except Exception as exc:
+            log.error("Error resizing shell: %r", exc)
 
     def emit_shell_data(self, data):
         self.send('shell_data', data)
