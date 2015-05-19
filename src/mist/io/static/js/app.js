@@ -1013,9 +1013,12 @@ function Socket (args) {
         _handleDisconnection: function () {
             var that = this;
             sockjs.onclose = function(e){
-              warn('Disconnected:', e.reason);
-              if (Mist.term)
-                  Mist.term.write('\n\rDisconnected from remote: ', e.reason);
+              warn('Disconnected. ', e.reason);
+              if (Mist.term) {
+                  Mist.term.write('\n\rDisconnected from remote. ');
+                  if (e.reason)
+                    Mist.term.write(e.reason);
+              }
               // keep socket connections alive by default
               if (that.get('keepAlive') !== undefined ? that.get('keepAlive') : true)
                   that._reconnect();
