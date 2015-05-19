@@ -74,18 +74,8 @@ class MistConnection(SockJSConnection):
     def send(self, msg, data=None):
         super(MistConnection, self).send(json.dumps({msg: data}))
 
-    def disconnect(self, silent=False):
-        if multi_user:
-            try:
-                # reload the session to avoid saving a stale or deleted session
-                self.request.environ['beaker.session'].load()
-            except Exception as exc:
-                log.error("%s: Error reloading request session: %r",
-                          self.__class__.__name__, exc)
-        log.info("Disconnecting %s for user %s. Socket %s. Session %s",
-                 self.__class__.__name__, self.user.email,
-                 self.socket.sessid, self.session_id)
-        return super(MistConnection, self).disconnect(silent=silent)
+    def on_close(self):
+        log.info('on_close!')
 
 
 class TornadoShell(BaseIOStream):
@@ -133,7 +123,7 @@ class ShellConnection(MistConnection):
     def on_shell_open(self, data):
         log.info('on_shell_open')
         if self.ssh_info:
-            self.disconnect()
+            self.close()
         self.ssh_info = {
             'backend_id': data['backend_id'],
             'machine_id': data['machine_id'],
@@ -163,7 +153,7 @@ class ShellConnection(MistConnection):
                     err = str(exc)
                 self.ssh_info['error'] = err
                 self.emit_shell_data(err)
-                self.disconnect()
+                self.close()
                 return
         self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
         self.channel = self.shell.invoke_shell('xterm',
@@ -176,6 +166,7 @@ class ShellConnection(MistConnection):
         def callback(data):
             # log.info('callback')
             self.emit_shell_data(data)
+            self.close()
             self.tornado_channel.read_bytes(1024, callback, partial=True)
 
         self.tornado_channel.read_bytes(1024, callback, partial=True)
@@ -195,10 +186,10 @@ class ShellConnection(MistConnection):
     def emit_shell_data(self, data):
         self.send('shell_data', data)
 
-    def disconnect(self, silent=False):
+    def on_close(self):
         if self.channel:
             self.channel.close()
-        super(ShellConnection, self).disconnect(silent=silent)
+        super(ShellConnection, self).on_close()
 
 
 class MainConnection(MistConnection):
