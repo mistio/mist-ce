@@ -490,6 +490,7 @@ def create_machine(request):
         persist = request.json_body.get('persist', False)
         docker_port_bindings = request.json_body.get('docker_port_bindings', {})
         docker_exposed_ports = request.json_body.get('docker_exposed_ports', {})
+        azure_port_bindings = request.json_body.get('azure_port_bindings', '')
         # hostname: if provided it will be attempted to assign a DNS name
         hostname = request.json_body.get('hostname', '')
         plugins = request.json_body.get('plugins')
