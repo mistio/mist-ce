@@ -681,7 +681,7 @@ var setupShellChannel = function (socket, callback) {
             $('.terminal').focus();
             socket.firstData = false;
         }
-    }).emit('ready');
+    });
 
     if (callback)
         callback();
@@ -933,9 +933,19 @@ function Socket (args) {
             return this;
         },
 
-        send: function (args) {
+        send: function () {
+            var args = slice(arguments);
+            if (!args.length) {
+                error('No arguments passed to send');
+                return;
+            }
+            var msg = args[0];
+            args = args.slice(1);
+            this._log('/' + msg, 'EMIT', args);
+            if (args.length) msg += ',' + JSON.stringify(args);
+            warn(msg);
             var channel = this.get('channel');
-            return channel.send(args);
+            return channel.send(msg);
         },
 
         off: function () {
@@ -945,10 +955,7 @@ function Socket (args) {
         },
 
         emit: function () {
-            var args = slice(arguments)
-            this._log('/'+args[0], 'EMIT', args);
-            var channel = this.get('channel');
-            channel.send.apply(channel, arguments);
+            this.send.apply(this, arguments);
             return this;
         },
 

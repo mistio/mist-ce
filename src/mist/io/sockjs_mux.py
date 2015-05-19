@@ -1,5 +1,11 @@
+import json
+import logging
+
 from sockjs.tornado import conn, session
 from sockjs.tornado.transports import base
+
+
+log = logging.getLogger(__name__)
 
 
 class ChannelSession(session.BaseSession):
@@ -16,11 +22,16 @@ class ChannelSession(session.BaseSession):
         msg_parts = msg.split(',', 1)
         handler = 'on_%s' % msg_parts[0]
         args = msg_parts[1] if len(msg_parts) > 1 else ()
+        try:
+            args = json.loads(args)
+        except:
+            log.warning("Couldn't json parse args: %r", args)
         if hasattr(self.conn, handler):
-            print "Calling %s with args %s" % (handler, args)
+            log.info("Calling %s with args %s", handler, args)
             getattr(self.conn, handler)(*args)
         else:
-            print "Calling on_message (default) with args %s" % (args, )
+            log.warning("Couldn't find handler '%s', will call on_message(%s)",
+                        handler, msg)
             self.conn.on_message(msg)
 
     def close(self, code=3000, message='Go away!'):

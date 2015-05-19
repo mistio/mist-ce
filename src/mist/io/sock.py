@@ -52,11 +52,14 @@ log = logging.getLogger(__name__)
 class MistConnection(SockJSConnection):
     def __init__(self, *args, **kwargs):
         super(MistConnection, self).__init__(*args, **kwargs)
+        from mist.io.model import User
+        self.user = User()
         # self.user = user_from_request(self.request)
         self.session_id = uuid.uuid4().hex
         # log.info("Initialized %s for user %s. Socket %s. Session %s",
         #         self.__class__.__name__, self.user.email,
         #         self.socket.sessid, self.session_id)
+
         self.init()
 
     def init(self):
@@ -178,8 +181,6 @@ class MainConnection(MistConnection):
     def init(self):
         super(MainConnection, self).init()
         self.running_machines = set()
-        from mist.io.model import User
-        self.user = User()
 
     def on_ready(self):
         log.info("Ready to go!")
