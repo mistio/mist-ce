@@ -169,7 +169,7 @@ def amqp_subscribe(exchange, callback, queue='',
 
     connection = Connection()
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange, type=ex_type)
+    channel.exchange_declare(exchange=exchange, type=ex_type, auto_delete=true)
     resp = channel.queue_declare(queue, exclusive=True)
     if not routing_keys:
         channel.queue_bind(resp.queue, exchange)

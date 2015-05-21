@@ -231,7 +231,7 @@ class MainConnection(MistConnection):
         except ImportError:
             func = methods.check_monitoring
         try:
-            self.send('monitoring', func(user))
+            self.send('monitoring', func(self.user))
         except:
             pass
 
