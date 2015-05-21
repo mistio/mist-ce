@@ -32,7 +32,6 @@ except ImportError:
     multi_user = False
 
 from mist.io.helpers import amqp_subscribe_user
-from mist.io.helpers import amqp_log
 from mist.io.methods import notify_user
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import BadRequestError
@@ -51,7 +50,10 @@ log = logging.getLogger(__name__)
 
 class MistConnection(SockJSConnection):
     def __init__(self, *args, **kwargs):
+        log.info("%s: Initializing", self.__class__.__name__)
+
         super(MistConnection, self).__init__(*args, **kwargs)
+
         from mist.io.model import User
         self.user = User()
         # self.user = user_from_request(self.request)
@@ -76,7 +78,7 @@ class MistConnection(SockJSConnection):
         super(MistConnection, self).send(json.dumps({msg: data}))
 
     def on_close(self):
-        log.info('on_close!')
+        log.info("%s: on_close event handler", self.__class__.__name__)
 
 
 class TornadoShell(tornado.iostream.BaseIOStream):
@@ -112,7 +114,6 @@ class TornadoShell(tornado.iostream.BaseIOStream):
 
 class ShellConnection(MistConnection):
     def init(self):
-        log.info('ShellConnection.__init__')
         super(ShellConnection, self).init()
         self.channel = None
         self.tornado_channel = None
@@ -120,7 +121,6 @@ class ShellConnection(MistConnection):
         self.provider = ''
 
     def on_shell_open(self, data):
-        log.info('on_shell_open')
         if self.ssh_info:
             self.close()
         self.ssh_info = {
@@ -130,7 +130,6 @@ class ShellConnection(MistConnection):
             'columns': data['cols'],
             'rows': data['rows'],
         }
-        log.info("opened shell")
         self.provider = data.get('provider', '')
         self.shell = Shell(data['host'])
         try:
@@ -145,7 +144,7 @@ class ShellConnection(MistConnection):
                     self.user, data['backend_id'], data['machine_id']
                 )
             else:
-                log.info(str(exc))
+                log.warning(str(exc))
                 if isinstance(exc, MachineUnauthorizedError):
                     err = 'Permission denied (publickey).'
                 else:
@@ -198,11 +197,15 @@ class MainConnection(MistConnection):
     def init(self):
         super(MainConnection, self).init()
         self.running_machines = set()
+        self.pika = None
 
     def on_ready(self):
         log.info("Ready to go!")
-        self.pika = PikaClient(self.user.email or 'noone', self.process_update)
+        self.pika = PikaClient(self.user.email or 'noone',
+                               self.process_update, self.start)
         self.pika.connect()
+
+    def start(self):
         self.list_keys()
         self.list_backends()
         self.check_monitoring()
@@ -222,6 +225,7 @@ class MainConnection(MistConnection):
                 if self.user.backends[backend_id].enabled:
                     cached = task.smart_delay(self.user.email, backend_id)
                     if cached is not None:
+                        log.info("Emitting %s from cache", key)
                         self.send(key, cached)
 
     def check_monitoring(self):
@@ -232,8 +236,8 @@ class MainConnection(MistConnection):
             func = methods.check_monitoring
         try:
             self.send('monitoring', func(self.user))
-        except:
-            pass
+        except Exception as exc:
+            log.warning("Check monitoring failed with: %r", exc)
 
     def on_stats(self, backend_id, machine_id, start, stop, step, request_id,
                  metrics):
@@ -245,7 +249,7 @@ class MainConnection(MistConnection):
             error = str(exc)
             data = []
         except Exception as exc:
-            amqp_log("Error getting stats: %r" % exc)
+            log.error("Exception in get_stats: %r", exc)
             return
 
         ret = {
@@ -289,11 +293,9 @@ class MainConnection(MistConnection):
                         tasks.update_machine_count.delay(self.user.email,
                                                          backend_id,
                                                          len(machines))
-                        log.info('Updated machine count for user %s',
-                                 self.user.email)
-                except Exception as e:
-                    log.error('Cannot update machine count for user %s: %r',
-                              self.user.email, e)
+                except Exception as exc:
+                    log.warning("Error while update_machine_count.delay: %r",
+                                exc)
                 for machine in machines:
                     bmid = (backend_id, machine['id'])
                     if bmid in self.running_machines:
@@ -330,6 +332,14 @@ class MainConnection(MistConnection):
                 self.list_keys()
             if 'monitoring' in sections:
                 self.check_monitoring()
+
+    def on_close(self):
+        if self.pika:
+            try:
+                self.pika.stop()
+            except Exception as exc:
+                log.error("Error closing pika consumer: %r", exc)
+        super(MainConnection, self).on_close()
 
 
 def make_router():

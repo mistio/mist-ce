@@ -16,9 +16,10 @@ log = logging.getLogger(__name__)
 
 class PikaClient(object):
 
-    def __init__(self, email, callback):
+    def __init__(self, email, callback, on_start_consuming=None):
         self.exchange = 'mist-user_%s' % email.replace('@', ':')
         self.callback = callback
+        self.on_start_consuming = on_start_consuming
         self.connected = False
         self.connecting = False
         self.connection = None
@@ -59,7 +60,7 @@ class PikaClient(object):
     def on_exchange_declared(self, frame):
         log.info('%s: Exchange Declared, Declaring Queue',
                  self.__class__.__name__)
-        self.channel.queue_declare(exclusive=True,
+        self.channel.queue_declare(exclusive=True, auto_delete=True,
                                    callback=self.on_queue_declared)
 
     def on_queue_declared(self, frame):
@@ -76,6 +77,8 @@ class PikaClient(object):
         log.info('Consuming on queue %s', self.queue_name)
         self.channel.basic_consume(consumer_callback=self.callback,
                                    queue=self.queue_name)
+        if self.on_start_consuming is not None:
+            self.on_start_consuming()
 
     def on_closed(self, connection):
         log.info('%s: Connection Closed', self.__class__.__name__)
@@ -84,3 +87,7 @@ class PikaClient(object):
         self.connecting = False
         self.channel = None
         self.connection = self.connect()
+
+    def stop(self):
+        log.info('%s: Stop consuming', self.__class__.__name__)
+        self.channel.basic_cancel()
