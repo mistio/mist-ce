@@ -1751,14 +1751,10 @@ var PROVIDER_MAP = {
             defaultValue: 'GCE',
         },
         {
-            name: 'email',
-            type: 'text',
-            label: 'Email address',
-        },
-        {
             name: 'private_key',
+            label: 'JSON key',
             type: 'file',
-            buttonText: 'Add key',
+            buttonText: 'Add JSON key',
         },
         {
             name: 'project_id',
