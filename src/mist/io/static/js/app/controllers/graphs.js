@@ -323,6 +323,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             _fetchStatsEnded: function (response) {
+              var that=this;
                 Ember.run.next(this, function () {
                     this.get('content').forEach(function (graph) {
                         graph.view.draw();
