@@ -642,13 +642,17 @@ def _add_backend_gce(title, provider, params):
     if not project_id:
         raise RequiredParameterMissingError('project_id')
 
-    try:
-        creds = json.loads(private_key)
-        email = creds['client_email']
-        private_key = creds['private_key']
-    except:
-        raise MistError("Make sure you upload a valid json file")
-
+    email = params.get('email', '')
+    if not email:
+        # support both ways to authenticate a service account,
+        # by either using a project id and json key file (highly reccomended)
+        # and also by specifying email, project id and private key file
+        try:
+            creds = json.loads(private_key)
+            email = creds['client_email']
+            private_key = creds['private_key']
+        except:
+            raise MistError("Make sure you upload a valid json file")
 
     backend = model.Backend()
     backend.title = title
