@@ -35,11 +35,11 @@ from mist.io.helpers import amqp_subscribe_user
 from mist.io.methods import notify_user
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import BadRequestError
+from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
 from mist.io import tasks
 from mist.io.shell import Shell
-from mist.io.pika_tornado import PikaClient
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -193,17 +193,46 @@ class ShellConnection(MistConnection):
         super(ShellConnection, self).on_close()
 
 
+class UserUpdatesConsumer(Consumer):
+    def __init__(self, main_sockjs_conn,
+                 amqp_url='amqp://guest:guest@127.0.0.1/'):
+        self.sockjs_conn = main_sockjs_conn
+        email = self.sockjs_conn.user.email or 'noone'
+        super(UserUpdatesConsumer, self).__init__(
+            amqp_url=amqp_url,
+            exchange='mist-user_%s' % email.replace('@', ':'),
+            queue='mist-socket-%d' % random.randrange(2 ** 20),
+            exchange_type='fanout',
+            exchange_kwargs={'auto_delete': True},
+            queue_kwargs={'auto_delete': True, 'exclusive': True},
+        )
+
+    def on_message(self, unused_channel, basic_deliver, properties, body):
+        super(UserUpdatesConsumer, self).on_message(
+            unused_channel, basic_deliver, properties, body
+        )
+        self.sockjs_conn.process_update(
+            unused_channel, basic_deliver, properties, body
+        )
+
+    def start_consuming(self):
+        super(UserUpdatesConsumer, self).start_consuming()
+        self.sockjs_conn.start()
+
+
 class MainConnection(MistConnection):
     def init(self):
         super(MainConnection, self).init()
         self.running_machines = set()
-        self.pika = None
+        self.consumer = None
 
     def on_ready(self):
         log.info("Ready to go!")
-        self.pika = PikaClient(self.user.email or 'noone',
-                               self.process_update, self.start)
-        self.pika.connect()
+        if self.consumer is None:
+            self.consumer = UserUpdatesConsumer(self)
+            self.consumer.run()
+        else:
+            log.error("It seems we have received 'on_ready' more than once.")
 
     def start(self):
         self.list_keys()
@@ -334,9 +363,9 @@ class MainConnection(MistConnection):
                 self.check_monitoring()
 
     def on_close(self):
-        if self.pika:
+        if self.consumer is not None:
             try:
-                self.pika.stop()
+                self.consumer.stop()
             except Exception as exc:
                 log.error("Error closing pika consumer: %r", exc)
         super(MainConnection, self).on_close()
