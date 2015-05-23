@@ -106,14 +106,12 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 if (args.config.timeWindow)
                     this.resolution.change(args.config.timeWindow, true);
 
-                $(window).on('resize', this._handleWindowResize);
             },
 
 
             close: function () {
                 this.stream.stop();
                 this._clear();
-                $(window).off('resize', this._handleWindowResize);
             },
 
 
@@ -180,7 +178,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             _generateRequests: function (args) {
-
                 var requests = [];
                 var offset = this.config.measurementOffset;
                 this.get('content').forEach(function (graph) {
@@ -349,19 +346,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     from: datasource.getFirstTimestamp() || (Date.now() - this.config.timeWindow),
                     until: datasource.getLastTimestamp() || Date.now(),
                 });
-            },
-
-
-            _handleWindowResize: function () {
-
-                var that = Mist.graphsController;
-                clearTimeout(that.resizeLock);
-                that.set('resizeLock', setTimeout(resize, 500));
-                function resize () {
-                    that.content.forEach(function (graph) {
-                        graph.view.autoResize();
-                    });
-                }
             },
 
 

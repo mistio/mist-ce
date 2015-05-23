@@ -8,9 +8,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
 
         'use strict';
 
-        var ANIMATION_FPS = 12;
-        var ANIMATION_DURATION = 9;
-
         return App.GraphListItemView = TemplatedView.extend({
 
 
@@ -56,53 +53,93 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
             //
 
             draw: function () {
+                var graph = this.graph,
+                    datasource = graph.datasources.length && graph.datasources[0],
+                    lastpoint = datasource.datapoints[datasource.datapoints.length-1];
                 if (!this.get('chart')) {
+                    var x = ['x'].pushObjects(datasource.
+                                                datapoints.map(function(point){
+                                                    return point.time
+                                                }));
                     this.set('chart', c3.generate({
                         bindto: '#' + this.graph.id,
                         data: {
-                            columns: this.graph.datasources.map(function (datasource) {
+                            x: 'x',
+                            columns: [x].pushObjects(this.graph.datasources.map(function (datasource) {
                                 var ret = datasource.datapoints.map(function (datapoint) {
                                     return datapoint.value;
                                 });
                                 ret.unshift(datasource.metric.id);
                                 return ret;
-                            })
-                            //columns: [
-                            //        ['data1', 30, 200, 100, 400, 150, 250],
-                            //        ['data2', 50, 20, 10, 40, 15, 25]
-                            //    ],
+                            })),
+                            type: 'area-spline'
                         },
                         axis: {
+                            x: {
+                                type: 'timeseries',
+                                label: {
+                                    text: graph.valueText(lastpoint.value) + datasource.metric.unit,
+                                    position: 'inner-right'
+                                },
+                                tick: {
+                                    format: '%H:%M',
+                                    count: 11
+                                },
+                                padding: {
+                                    left: 0,
+                                    right: 0
+                                }
+                            },
                             y: {
                                 label: {
-                                    text: 'Yolo',
-                                    position: 'outer-middle'
+                                    text: datasource.metric.unit,
+                                    position: 'inner-top'
                                 },
-                            },
+                                tick: {
+                                    format: function(val) {
+                                        return graph.valueText(val)
+                                    }
+                                }
+                            }
+                        },
+                        point: {
+                            r: 0,
+                            focus: {
+                                expand: {
+                                    r: 3
+                                }
+                            }
+                        },
+                        line: {
+                            connectNull: false
+                        },
+                        tooltip: {
+                            format: {
+                                title: function(x) { return x.toTimeString(); },
+                                value: function (value, ratio, id, index) {
+                                    return graph.valueText(value) + datasource.metric.unit;
+                                }
+                            }
                         }
                     }));
                 } else {
+                    var source = this.graph.datasources[0];
+                    var x = ['x', source.datapoints[source.datapoints.length -1].time];
                     this.get('chart').flow({
-                        columns:  this.graph.datasources.map(function (datasource) {
+                        duration: 100,
+                        length: 1,
+                        columns:  [x].pushObjects(this.graph.datasources.map(function (datasource) {
                             return [
                                 datasource.metric.id,
-                                datasource.datapoints[datasource.datapoints.length -1].value
+                                lastpoint.value
                             ];
-                        }),
+                        }))
                     });
+                    if (lastpoint.value)
+                        this.get('chart').axis.labels({'x': graph.valueText(lastpoint.value) + datasource.metric.unit});
                 }
             },
 
-            valueText: function(currentValue){
-                if(currentValue>=1073741824)                               // (1024*1024*1024)
-                    return (currentValue/1073741824).toFixed(2) +'G'; // (1024*1024*1024)
-                else if(currentValue>=1048576)                             // (1024*1024)
-                    return (currentValue/1048576).toFixed(2) +'M';    // (1024*1024)
-                else if(currentValue>=1024)
-                    return (currentValue/1024).toFixed(2) + 'K';
-                else
-                    return currentValue.toFixed(2);
-            },
 
             clearData: function () {
                 this.graph.datasources.forEach(function (datasource) {
@@ -133,9 +170,10 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
 
 
             isVisibleObserver: function () {
-                if (this.isHidden)
+                if (this.isHidden){
+                    warn('hiding', $('#' + this.id).parent());
                     $('#' + this.id).parent().hide(400);
-                else if (this.isHidden !== undefined) {
+                } else if (this.isHidden !== undefined) {
                     $('#' + this.id).parent().show(400);
                     this.draw();
                 }

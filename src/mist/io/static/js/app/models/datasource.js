@@ -107,7 +107,9 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
             getFirstTimestamp: function () {
                 var length = this.datapoints.length;
                 if (!length) return 0;
-                return this.datapoints[length - MAX_DATAPOINTS].time.getTime();
+                if (this.datapoints[length - MAX_DATAPOINTS])
+                    return this.datapoints[length - MAX_DATAPOINTS].time.getTime();
+                return 0;
             }
         });
     }

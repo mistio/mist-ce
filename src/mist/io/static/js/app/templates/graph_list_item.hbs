@@ -8,7 +8,6 @@
 
         <div class="title">
             {{view.graph.title}}
-            <div class="graphValue">-&nbsp;</div>{{#if view.graph.unit}}{{view.graph.unit}}{{/if}}
         </div>
         <!--
             Remove button
@@ -37,7 +36,7 @@
         Graph Body
     -->
 
-    <div {{bind-attr id="view.graph.id"}}>
+    <div class="graph-body" {{bind-attr id="view.graph.id"}}>
     </div>
 
 </div>

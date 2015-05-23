@@ -54,9 +54,9 @@ define('app/models/machine', ['ember'],
             }),
 
             isUnknown: function () {
-                return this.get('state') == 'unknown';    
+                return this.get('state') == 'unknown';
             }.property('state'),
-            
+
             /**
              *  Computed Properties
              */
@@ -105,6 +105,9 @@ define('app/models/machine', ['ember'],
 
 
             hasOpenIncident: function () {
+                if (!Mist.openIncidents) {
+                    return false;
+                }
                 var incident = Mist.openIncidents.findBy('machineId', this.get('id'));
                 if (!incident)
                     return false;
@@ -188,7 +191,7 @@ define('app/models/machine', ['ember'],
             },
 
             rename: function(callback) {
-                this.backend.renameMachine(this.id,callback);    
+                this.backend.renameMachine(this.id,callback);
             },
 
 
