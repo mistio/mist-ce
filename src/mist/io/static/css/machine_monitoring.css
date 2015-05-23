@@ -4,6 +4,10 @@
     overflow: hidden;
 }
 
+.graph-body {
+    height: 200px;
+}
+
 #GraphsArea .valuePopUp{
     z-index: 1;
     display: none;

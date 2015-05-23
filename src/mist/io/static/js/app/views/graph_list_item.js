@@ -54,36 +54,45 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
 
             draw: function () {
                 var graph = this.graph,
-                    datasource = graph.datasources.length && graph.datasources[0],
-                    lastpoint = datasource.datapoints[datasource.datapoints.length-1];
-                if (!this.get('chart')) {
-                    var x = ['x'].pushObjects(datasource.
-                                                datapoints.map(function(point){
-                                                    return point.time
-                                                }));
+                    chart = this.get('chart');
+
+                if (!graph.datasources || !graph.datasources.length)
+                    return;
+
+                var source0 = graph.datasources[0],
+                    unit = source0.metric.unit,
+                    lastpoint = source0.datapoints[source0.datapoints.length-1];
+
+                // prepare x axis column
+                var x = ['x'].pushObjects(source0.datapoints.map(
+                    function(point) { return point.time }
+                ));
+
+                // prepare other columns
+                var cols = [x].pushObjects(this.graph.datasources.map(
+                    function (datasource) {
+                        var ret = datasource.datapoints.map(function (datapoint) {
+                            return datapoint.value;
+                        });
+                        ret.unshift(datasource.metric.id);
+                        return ret;
+                    }
+                ))
+
+                if (!this.get('chart')) { // generate new chart
                     this.set('chart', c3.generate({
-                        bindto: '#' + this.graph.id,
+                        bindto: '#' + graph.id,
                         data: {
                             x: 'x',
-                            columns: [x].pushObjects(this.graph.datasources.map(function (datasource) {
-                                var ret = datasource.datapoints.map(function (datapoint) {
-                                    return datapoint.value;
-                                });
-                                ret.unshift(datasource.metric.id);
-                                return ret;
-                            })),
+                            columns: cols,
                             type: 'area-spline'
                         },
                         axis: {
                             x: {
                                 type: 'timeseries',
-                                label: {
-                                    text: graph.valueText(lastpoint.value) + datasource.metric.unit,
-                                    position: 'inner-right'
-                                },
                                 tick: {
                                     format: '%H:%M',
-                                    count: 11
+                                    count: 5
                                 },
                                 padding: {
                                     left: 0,
@@ -92,7 +101,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                             },
                             y: {
                                 label: {
-                                    text: datasource.metric.unit,
+                                    text: unit,
                                     position: 'inner-top'
                                 },
                                 tick: {
@@ -117,26 +126,32 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                             format: {
                                 title: function(x) { return x.toTimeString(); },
                                 value: function (value, ratio, id, index) {
-                                    return graph.valueText(value) + datasource.metric.unit;
+                                    return graph.valueText(value) + unit;
                                 }
                             }
+                        },
+                        legend: {
+                            position: 'top'
                         }
                     }));
-                } else {
-                    var source = this.graph.datasources[0];
-                    var x = ['x', source.datapoints[source.datapoints.length -1].time];
-                    this.get('chart').flow({
-                        duration: 100,
-                        length: 1,
-                        columns:  [x].pushObjects(this.graph.datasources.map(function (datasource) {
-                            return [
-                                datasource.metric.id,
-                                lastpoint.value
-                            ];
-                        }))
+                } else { // stream new datapoints on existing chart
+                    // Only add values that are not already in the chart
+                    var lastx = chart.data.shown()[0].values.slice(-1)[0].x;
+                    for (var i=0; i < x.length; i++) {
+                        if (x[x.length-1-i]<=lastx)
+                            break
+                    }
+                    if (i > 0 ){
+                        var newcols = []
+                        cols.forEach(function(col) {
+                            newcols.push([col[0]].pushObjects(col.slice(0-i)))
+                        });
+                    }
+                    chart.flow({
+                        duration: 250,
+                        length: i,
+                        columns: newcols
                     });
-                    if (lastpoint.value)
-                        this.get('chart').axis.labels({'x': graph.valueText(lastpoint.value) + datasource.metric.unit});
                 }
             },
 

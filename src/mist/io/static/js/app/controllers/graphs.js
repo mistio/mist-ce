@@ -224,7 +224,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     data.stop,
                     data.step,
                     request.id,
-                    request.metrics
+                    request.metrics // backend will ignore this
                 );
             },
 
@@ -282,7 +282,6 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             _handleResponse: function (request, response,r) {
-
                 if (DEBUG_STATS) {
                     info('Stats response: ', request, r);
                 }
