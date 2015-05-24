@@ -52,9 +52,10 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
             //
             //
 
-            draw: function () {
+            draw: function (reload) {
                 var graph = this.graph,
-                    chart = this.get('chart');
+                    chart = this.get('chart'),
+                    machines = [];
 
                 if (!graph.datasources || !graph.datasources.length)
                     return;
@@ -63,6 +64,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                     unit = source0.metric.unit,
                     lastpoint = source0.datapoints[source0.datapoints.length-1];
 
+                for (var i=0; i < graph.datasources.length; i++)
+                    if (machines.indexOf(graph.datasources[i].machine.name)==-1)
+                        machines.push(graph.datasources[i].machine.name)
                 // prepare x axis column
                 var x = ['x'].pushObjects(source0.datapoints.map(
                     function(point) { return point.time }
@@ -74,7 +78,10 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                         var ret = datasource.datapoints.map(function (datapoint) {
                             return datapoint.value;
                         });
-                        ret.unshift(datasource.metric.id);
+                        if (machines.length > 1)
+                            ret.unshift(datasource.machine.name)
+                        else
+                            ret.unshift(datasource.metric.id);
                         return ret;
                     }
                 ))
@@ -129,16 +136,17 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                                     return graph.valueText(value) + unit;
                                 }
                             }
-                        },
-                        legend: {
-                            position: 'top'
                         }
                     }));
-                } else { // stream new datapoints on existing chart
+                } else if (Mist.graphsController.stream.isStreaming && !reload) { // stream new datapoints in existing chart
                     // Only add values that are not already in the chart
-                    var lastx = chart.data.shown()[0].values.slice(-1)[0].x;
+                    var lastx = null;
+                    try{ // maybe there are no datapoints shown on the chart
+                        lastx = chart.data.shown()[0].values.slice(-1)[0].x;
+                    } catch(e) {}
+
                     for (var i=0; i < x.length; i++) {
-                        if (x[x.length-1-i]<=lastx)
+                        if (lastx && x[x.length-1-i]<=lastx)
                             break
                     }
                     if (i > 0 ){
@@ -152,6 +160,10 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                         length: i,
                         columns: newcols
                     });
+                } else { // Update data in existing chart
+                    chart.load({
+                        columns: cols
+                    })
                 }
             },
 
@@ -186,10 +198,10 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
 
             isVisibleObserver: function () {
                 if (this.isHidden){
-                    warn('hiding', $('#' + this.id).parent());
-                    $('#' + this.id).parent().hide(400);
+                    warn('hiding', '#' + this.graph.id);
+                    $('#' + this.graph.id).parent().hide(400);
                 } else if (this.isHidden !== undefined) {
-                    $('#' + this.id).parent().show(400);
+                    $('#' + this.graph.id).parent().show(400);
                     this.draw();
                 }
             }.observes('isHidden'),

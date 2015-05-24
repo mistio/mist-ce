@@ -1061,6 +1061,21 @@ function Socket_ (args) {
         },
 
 
+        send: function () {
+            var args = slice(arguments);
+            if (!args.length) {
+                error('No arguments passed to send');
+                return;
+            }
+            var msg = args[0];
+            args = args.slice(1);
+            this._log('/' + msg, 'EMIT', args);
+            if (args.length) msg += ',' + JSON.stringify(args);
+            var channel = this.get('channel');
+            return channel.send(msg);
+        },
+
+
         off: function () {
             var events = this.get('events');
             events.off.apply(events, arguments);

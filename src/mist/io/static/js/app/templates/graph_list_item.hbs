@@ -1,4 +1,4 @@
-<div class="graph">
+<div class="graph" draggable="true">
 
     <!--
         Graph Head
@@ -9,6 +9,22 @@
         <div class="title">
             {{view.graph.title}}
         </div>
+
+
+        {{#if view.graph.pendingCreation}}
+
+            <div class="ajax-loader"></div>
+
+        {{else}}
+
+            {{#if view.graph.pendingRemoval}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+
+            {{#if Mist.graphsController.fetchingStats}}
+                <div class="ajax-loader fetching-stats-loader"></div>
+            {{/if}}
+        {{/if}}
         <!--
             Remove button
         -->

@@ -283,7 +283,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
             _handleResponse: function (request, response,r) {
                 if (DEBUG_STATS) {
-                    info('Stats response: ', request, r);
+                    info('Stats response from', new Date(request.from), ' until ', new Date(request.until), r);
                 }
                 request.datasources.forEach(function (datasource) {
 
@@ -292,7 +292,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     var datapoints = this._processedDatapoints(request,
                         response[datasource.metric.id].datapoints);
 
-                    if (this.stream.isStreaming)
+                    if (this.stream.isStreaming && !this.stream.newTimeWindow)
                         datasource.update(datapoints);
                     else
                         datasource.overwrite(datapoints);
@@ -319,16 +319,18 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             _fetchStatsEnded: function (response) {
-              var that=this;
+                var that=this;
                 Ember.run.next(this, function () {
                     this.get('content').forEach(function (graph) {
-                        graph.view.draw();
+                        graph.view.draw(that.stream.isStreaming && that.stream.newTimeWindow);
                     });
                     this.set('fetchingStats', false);
                     if (this.fetchStatsArgs.callback instanceof Function)
                         this.fetchStatsArgs.callback();
                     this.trigger('onFetchStats', response);
+                    that.stream.set('newTimeWindow', null);
                 });
+
             },
 
 
@@ -386,6 +388,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                         measurementStep: newTimeWindow /
                             DISPLAYED_DATAPOINTS,
                     });
+                    this.parent.stream.set('newTimeWindow', true);
                     this.parent.stream.start();
                 }
             }),
@@ -454,12 +457,13 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                     var from = this.parent.fetchStatsArgs.until;
                     var until = from + timeWindow;
 
-                    if (new Date(until).isFuture())
+                    if (new Date(until).isFuture()){
                         this.parent._fetchStats({
                             from: Date.now() - timeWindow,
                             until: Date.now(),
                         });
-                    else
+                        this.parent.stream.start();
+                    } else
                         this.parent._fetchStats({
                             from: from,
                             until: until
@@ -541,8 +545,11 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
                 _stream: function (sessionId, firstTime) {
+                    if (!this._sessionIsAlive(sessionId))
+                        return false;
 
-                    if (this._sessionIsAlive(sessionId)) {
+                    var that = this;
+                    if (document.hidden == false) {
 
                         var now = Date.now();
 
@@ -564,9 +571,16 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                         if (firstTime)
                             this.set('firstStreamingCall', true);
                         this.set('timeOfLastRequest', now);
+                    } else {
+                        // Do not stream when not visible, resume on focus
+                        $(window).on("focus visibilitychange", function(){
+                            $(window).off("focus visibilitychange");
+                            Ember.run.next(function(){
+                                that._stream(sessionId);
+                            });
+                        });
                     }
 
-                    var that = this;
                     function callback () {
                         that.set('firstStreamingCall', false);
                         Ember.run.later(function () {
