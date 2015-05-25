@@ -22,8 +22,8 @@ __ https://mist.io
    :maxdepth: 2
 
    developer_guide
-   modules
    rest_api
+   modules
 
 Indices and tables
 ==================
