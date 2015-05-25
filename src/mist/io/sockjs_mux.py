@@ -5,6 +5,7 @@ from sockjs.tornado import conn, session
 from sockjs.tornado.transports import base
 
 
+session.ConnectionInfo._exposed_headers.add('user-agent')
 log = logging.getLogger(__name__)
 
 

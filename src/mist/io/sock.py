@@ -21,12 +21,12 @@ import tornado.iostream
 import requests
 
 try:
-    from mist.core.helpers import user_from_request
+    from mist.core.helpers import user_from_session_id
     from mist.core import config
     from mist.core.methods import get_stats
     multi_user = True
 except ImportError:
-    from mist.io.helpers import user_from_request
+    from mist.io.helpers import user_from_session_id
     from mist.io import config
     from mist.io.methods import get_stats
     multi_user = False
@@ -48,31 +48,29 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 
-class MistConnection(SockJSConnection):
-    def __init__(self, *args, **kwargs):
-        log.info("%s: Initializing", self.__class__.__name__)
+def get_conn_info(conn_info):
+    real_ip = forwarded_for = user_agent = ''
+    for header in conn_info.headers:
+        if header.lower() == 'x-real-ip':
+            real_ip = conn_info.headers[header]
+        elif header.lower() == 'x-forwarded-for':
+            forwarded_for = conn_info.headers[header]
+        elif header.lower() == 'user-agent':
+            user_agent = conn_info.headers[header]
+    ip = real_ip or forwarded_for or conn_info.ip
+    session_id = ''
+    return ip, user_agent, session_id
 
-        super(MistConnection, self).__init__(*args, **kwargs)
+
+class MistConnection(SockJSConnection):
+    def on_open(self, conn_info):
+        log.info("%s: Initializing", self.__class__.__name__)
+        ip, user_agent, session_id = get_conn_info(conn_info)
 
         from mist.io.model import User
         self.user = User()
-        # self.user = user_from_request(self.request)
+        # self.user = user_from_session_id(self.request)
         self.session_id = uuid.uuid4().hex
-        # log.info("Initialized %s for user %s. Socket %s. Session %s",
-        #         self.__class__.__name__, self.user.email,
-        #         self.socket.sessid, self.session_id)
-
-        self.init()
-
-    def init(self):
-        # IMPORTANT: initialize() is called automatically by BaseConnection on
-        # all the classes and mixins in the order of the MRO which creates
-        # weird issues when trying to subclass. Use init instead because it
-        # is called only once and can use super.
-        try:
-            super(MistConnection, self).init()
-        except AttributeError:
-            pass
 
     def send(self, msg, data=None):
         super(MistConnection, self).send(json.dumps({msg: data}))
@@ -113,8 +111,8 @@ class TornadoShell(tornado.iostream.BaseIOStream):
 
 
 class ShellConnection(MistConnection):
-    def init(self):
-        super(ShellConnection, self).init()
+    def on_open(self, conn_info):
+        super(ShellConnection, self).on_open(conn_info)
         self.channel = None
         self.tornado_channel = None
         self.ssh_info = {}
@@ -221,8 +219,8 @@ class UserUpdatesConsumer(Consumer):
 
 
 class MainConnection(MistConnection):
-    def init(self):
-        super(MainConnection, self).init()
+    def on_open(self, conn_info):
+        super(MainConnection, self).on_open(conn_info)
         self.running_machines = set()
         self.consumer = None
 

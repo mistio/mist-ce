@@ -73,6 +73,10 @@ def user_from_request(request):
     return User()
 
 
+def user_from_session_id(session_id):
+    return User()
+
+
 def user_from_email(email):
     return User()
 
