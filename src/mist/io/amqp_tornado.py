@@ -89,7 +89,8 @@ class Consumer(object):
         """
         self._channel = None
         if self._closing:
-            self._connection.ioloop.stop()
+            # self._connection.ioloop.stop()
+            pass
         else:
             log.warning('Connection closed, reopening in 5 seconds: (%s) %s',
                         reply_code, reply_text)
