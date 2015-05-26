@@ -1904,7 +1904,7 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
-            helpText: 'The username you use to connect to the RackSpace portal',
+            helpText: 'The username you use to connect to the SoftLayer portal',
         },
         {
             name: 'api_key',
@@ -1976,6 +1976,7 @@ var PROVIDER_MAP = {
             type: 'text',
             label: 'Hostname',
             helpText: 'The URL or IP vCloud listens to',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203326759--Adding-credentials-for-VMware-vCloud'
         }
     ],
 
@@ -1998,7 +1999,9 @@ var PROVIDER_MAP = {
         },
         {
             name: 'organization',
-            type: 'text'
+            type: 'text',
+            helpText: 'Name of your oganization',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203321959-Adding-credentials-for-Indonesian-Cloud'
         }
     ],
     vsphere: [
