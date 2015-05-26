@@ -1770,15 +1770,10 @@ var PROVIDER_MAP = {
             defaultValue: 'GCE',
         },
         {
-            name: 'email',
-            type: 'text',
-            label: 'Email address',
-            helpText: 'The email that you use to connect to GCE',
-        },
-        {
             name: 'private_key',
+            label: 'JSON key',
             type: 'file',
-            buttonText: 'Add key',
+            buttonText: 'Add JSON key',
             helpText: 'You can create a new key on your GCE portal',
             helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203433315-Adding-Google-Compute-Engine-to-Mist-io',
         },
