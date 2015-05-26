@@ -18,7 +18,8 @@ require.config({
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
-        socket: 'lib/socket.io',
+        socket: 'lib/sockjs.min',
+        multiplex: 'lib/multiplex',
         term: 'lib/term'
     },
     deps: ['jquery'],
@@ -62,13 +63,9 @@ require.config({
 
 var appLoader = {
 
-
-    //
     //
     //  Properties
     //
-    //
-
 
     buffer: null,
     progress: null,
@@ -76,11 +73,8 @@ var appLoader = {
 
 
     //
-    //
     //  Initialization
     //
-    //
-
 
     init: function () {
         this.buffer = {};
@@ -91,11 +85,8 @@ var appLoader = {
 
 
     //
-    //
     //  Methods
     //
-    //
-
 
     start: function () {
         forIn(this.steps, function (step) {
@@ -104,16 +95,13 @@ var appLoader = {
         });
     },
 
-
     complete: function (completedStep) {
-
         // Update progress bar
         this.progress += this.progressStep;
         changeLoadProgress(Math.ceil(this.progress))
 
         // Update other steps
         forIn(this.steps, function (step, stepName) {
-
             // Check if "completedStep" is a dependency of "step"
             var index = step.before.indexOf(completedStep);
 
@@ -130,13 +118,11 @@ var appLoader = {
 
 
     finish: function () {
-
         // Clean up variables to save up some memory
         loadApp = null;
         loadFiles = null;
         loadImages = null;
         handleMobileInit = null;
-        setupSocketEvents = null;
         changeLoadProgress = null;
         appLoader = null;
 
@@ -145,11 +131,8 @@ var appLoader = {
 
 
     //
-    //
     //  Steps
     //
-    //
-
 
     steps: {
         'load ember': {
@@ -186,6 +169,14 @@ var appLoader = {
                 });
             }
         },
+        'load multiplex': {
+            before: [],
+            exec: function () {
+                require(['multiplex'], function () {
+                    appLoader.complete('load multiplex');
+                });
+            }
+        },
         'load jqm': {
             before: ['load ember'],
             exec: function () {
@@ -203,7 +194,7 @@ var appLoader = {
             }
         },
         'init app': {
-            before: ['load templates', 'init connections'],
+            before: ['load templates'],
             exec: function () {
                 loadApp.apply(null, [function () {
                     appLoader.complete('init app');
@@ -211,50 +202,30 @@ var appLoader = {
             }
         },
         'init connections': {
-            before: ['load socket', 'load ember'],
+            before: ['load socket', 'load ember', 'init app'],
             exec: function () {
-                appLoader.buffer.ajax = Ajax(CSRF_TOKEN);
-                appLoader.buffer.socket = Socket({
-                    namespace: '/mist',
-                    onInit: function () {
-                        appLoader.complete('init connections');
-                    },
+                Mist.set('ajax', Ajax(CSRF_TOKEN));
+                Mist.set('socket', new Socket({
+                    namespace: 'main',
                     onConnect: function (socket) {
-                        if (!appLoader)
-                            socket.emit('ready');
+                        //socket.emit('ready');
+                        Mist.set('logs', new Socket({
+                            namespace: 'logs'
+                        }));
+                        if (appLoader)
+                            appLoader.complete('init connections');
                     },
-                });
-                appLoader.buffer.logs = new Socket_({
-                    namespace: '/logs',
-                    onConnect: function (socket) {
-                        if (!appLoader)
-                            socket.emit('ready');
-                    }
-                });
-            }
-        },
-        'init socket events': {
-            before: ['init connections', 'init app'],
-            exec: function () {
-                Mist.set('ajax', appLoader.buffer.ajax);
-                Mist.set('socket', appLoader.buffer.socket);
-                Mist.set('logs', appLoader.buffer.logs);
-                appLoader.complete('init socket events');
+                }));
             }
         },
         'fetch first data': {
-            before: ['init socket events'],
+            before: ['init connections'],
             exec: function () {
-                setupSocketEvents(Mist.socket, function () {
-                    setupLogsSocketEvents(Mist.logs, function () {
-                        appLoader.complete('fetch first data');
-                    });
-                });
+                appLoader.complete('fetch first data');
             }
-        },
+        }
     }
 };
-
 
 
 var loadFiles = function (callback) {
@@ -424,7 +395,6 @@ var loadApp = function (
     parseProviderMap();
 
     // Ember routes and routers
-
     App.Router.map(function() {
         this.route('machines');
         this.route('images');
@@ -448,7 +418,6 @@ var loadApp = function (
     });
 
     // Ember controllers
-
     App.set('keysController', KeysController.create());
     App.set('logsController', LogsController.create());
     App.set('loginController', LoginController.create());
@@ -483,7 +452,6 @@ var loadApp = function (
     App.set('scriptEditController', ScriptEditController.create());
 
     // Ember custom widgets
-
     App.Select = Ember.Select.extend({
         attributeBindings: [
             'name',
@@ -534,7 +502,6 @@ var loadApp = function (
     });
 
     // Mist functions
-
     App.isScrolledToTop = function () {
         return window.pageYOffset <= 20;
     };
@@ -623,9 +590,7 @@ var loadApp = function (
 };
 
 
-
 var loadImages = function (callback) {
-
     // Spritesheet's name includes a timestamp each
     // time we generate it. So we use this "hack" to
     // get it's path and preload it
@@ -669,8 +634,18 @@ var handleMobileInit = function () {
 };
 
 
-var setupLogsSocketEvents = function (socket, callback) {
+var setupChannelEvents = function (socket, namespace, callback) {
+    if (namespace == 'main')
+        return setupMainChannel(socket, callback);
+    else if (namespace == 'logs')
+        return setupLogChannel(socket, callback);
+    else if (namespace == 'shell')
+      return setupShellChannel(socket, callback);
+    else return callback();
+};
 
+
+var setupLogChannel = function (socket, callback) {
     socket.on('open_incidents', function (openIncidents) {
         require(['app/models/story'], function (StoryModel) {
             var models = openIncidents.map(function (incident) {
@@ -693,15 +668,32 @@ var setupLogsSocketEvents = function (socket, callback) {
 };
 
 
-var setupSocketEvents = function (socket, callback) {
-
-    if (Mist.isCore) {
-    //  This is a temporary ajax-request to get the scripts.
-    //  It should be converted into a "list_scripts" socket handler
-    //  as soon as the backend supports it
-    Mist.ajax.GET('/scripts').success(function (scripts) {
-        Mist.scriptsController.setContent(scripts);
+var setupShellChannel = function (socket, callback) {
+    socket.firstData = true;
+    socket.on('close', function (data) {
+        warn(data);
+        Mist.term.write('Connection closed by remote');
+    }).on('shell_data', function (data) {
+        Mist.term.write(data);
+        if (socket.firstData) {
+            $('.terminal').focus();
+            socket.firstData = false;
+        }
     });
+
+    if (callback)
+        callback();
+};
+
+
+var setupMainChannel = function(socket, callback) {
+    if (Mist.isCore) {
+        //  TODO: This is a temporary ajax-request to get the scripts.
+        //  It should be converted into a "list_scripts" socket handler
+        //  as soon as the backend supports it
+        Mist.ajax.GET('/scripts').success(function (scripts) {
+            Mist.scriptsController.setContent(scripts);
+        });
     }
 
     socket.on('list_keys', function (keys) {
@@ -750,25 +742,23 @@ var setupSocketEvents = function (socket, callback) {
         Mist.graphsController._handleSocketResponse(data);
     })
     .on('notify', function (data){
-
-        if (! (data.title && data.body)) {
-            var msg = data.title || data.body;
-            Mist.notificationController.notify(msg);
-            return;
-        }
-
         var dialogBody = [];
 
         // Extract machine information
         var machineId = data.machine_id;
         var backendId = data.backend_id;
         var machine = Mist.backendsController.getMachine(machineId, backendId);
-
         if (machine && machine.id) {
             dialogBody.push({
                 link: machine.name,
                 class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 href: '#/machines/' + machineId,
+                closeDialog: true,
+            });
+        } else {
+            warn('Machine not found', machineId, backendId);
+            dialogBody.push({
+                class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 closeDialog: true,
             });
         }
@@ -815,21 +805,18 @@ var changeLoadProgress = function (progress) {
         if (progress >= 100) {
             $('body').css('overflow','auto');
             $('#splash').fadeOut(300);
-            appLoader.finish();
+            if (appLoader)
+              appLoader.finish();
         }
     });
 };
 
 
 //
-//
 //  Ajax wrapper
 //
-//
-
 
 function Ajax (csrfToken) {
-
     return new function () {
 
         this.GET = function(url, data) {
@@ -895,167 +882,69 @@ function Ajax (csrfToken) {
 
 
 //
-//
 //  Socket wrapper
 //
-//
 
+var sockjs, mux;
 
 function Socket (args) {
-
-    var socket = undefined;
-    var initialized = false;
-    var namespace = args.namespace;
-
-    function init () {
-        if (!initialized) {
-            info(namespace, 'initializing');
-            handleDisconnection();
-            addDebuggingWrapper();
-            if (args.onInit instanceof Function)
-                args.onInit(socket);
-        }
-        if (args.onConnect instanceof Function)
-            args.onConnect(socket);
-        initialized = true;
-    };
-
-    function connect () {
-
-        if (socket === undefined) {
-            socket = io.connect(namespace);
-            reconnect();
-        } else if (socket.socket.connected) {
-            info(namespace, 'connected');
-            init();
-        } else if (socket.socket.connecting) {
-            info(namespace, 'connecting');
-            reconnect();
-        } else {
-            socket.socket.connect();
-            reconnect();
-        }
-    }
-
-    function reconnect () {
-        setTimeout(connect, 500);
-    }
-
-    function handleDisconnection () {
-
-        // keep socket connections alive by default
-        if (args.keepAlive !== undefined ? args.keepAlive : true) {
-            // Reconnect if connection fails
-            socket.on('disconnect', function () {
-                warn(namespace, 'disconnected');
-                reconnect();
-            });
-        }
-    }
-
-    function addDebuggingWrapper () {
-
-        // This process basically overrides the .on()
-        // function to enable debugging info on every
-        // response received by the client
-
-        // 1. keep a copy of the original socket.on() function
-        var sockon = socket.on;
-
-        // 2. overide the socket's .on() function
-        socket.on = function (event, callback)  {
-
-            // i. keep a copy of the original callback
-            // This is the function written by us to handle
-            // the response data
-            var cb = callback;
-
-            // ii. overide callback to first print the debugging
-            // information and then call the original callback function
-            // (which is saved in cb variable)
-            callback = function (data) {
-                if (DEBUG_SOCKET)
-                    info(new Date().getPrettyTime() +
-                        ' | ' + namespace + '/' + event + ' ', data);
-                cb(data);
-            };
-
-            // iii. Call the original .on() function using the modified
-            // callback function
-            return sockon.apply(socket, arguments);
-        };
-    }
-
-    connect();
-
-    return socket;
-}
-
-
-//
-//  TODO (gtsop): Get rid of the previous wrapper
-//  Socket Wrapper v2
-//
-//
-
-
-function Socket_ (args) {
 
     if (!window.EventHandler)
         window.EventHandler = Ember.Object.extend(Ember.Evented, {});
 
     return Ember.Object.extend({
 
-
-        //
         //
         //  Properties
         //
-        //
-
 
         events: null,
         socket: null,
         namespace: null,
+        channel: null,
 
-
-        //
         //
         //  Public Methods
         //
-        //
-
 
         load: function (args) {
-
             this._log('initializing');
             this._parseArguments(args);
-            this.set('socket', io.connect(this.get('namespace')));
-            this.set('events', EventHandler.create());
 
             var that = this;
             this._connect(function () {
                 that._handleDisconnection();
-                if (that.onInit instanceof Function)
-                    that.onInit(that);
             });
         }.on('init'),
-
 
         on: function (event) {
             var that = this;
             var events = this.get('events');
-            var socket = this.get('socket');
+            var channel = this.get('channel');
 
             events.on.apply(events, arguments);
-            if (!socket.$events || !socket.$events[event])
-                socket.on(event, function (response) {
+            if (!channel.$events || !socket.$events[event])
+                channel.on(event, function (response) {
                     that._log('/'+ event, 'RECEIVE', response);
                     events.trigger.call(events, event, response);
                 });
             return this;
         },
 
+        send: function () {
+            var args = slice(arguments);
+            if (!args.length) {
+                error('No arguments passed to send');
+                return;
+            }
+            var msg = args[0];
+            args = args.slice(1);
+            this._log('/' + msg, 'EMIT', args);
+            if (args.length) msg += ',' + JSON.stringify(args);
+            warn(msg);
+            var channel = this.get('channel');
+            return channel.send(msg);
+        },
 
         off: function () {
             var events = this.get('events');
@@ -1063,60 +952,52 @@ function Socket_ (args) {
             return this;
         },
 
-
         emit: function () {
-            var args = slice(arguments)
-            this._log('/'+args[0], 'EMIT', args);
-            var socket = this.get('socket');
-            socket.emit.apply(socket, arguments);
+            this.send.apply(this, arguments);
             return this;
         },
-
 
         kill: function () {
             this.set('keepAlive', false);
-            var socket = this.get('socket');
-            socket.socket.disconnect();
-            if (socket.$events)
-                for (event in socket.$events)
-                    delete socket.$events[event];
+            var channel = this.get('channel');
+            //socket.socket.disconnect();
+            if (channel.$events)
+                for (event in channel.$events)
+                    delete channel.$events[event];
             return this;
         },
 
 
         //
-        //
         //  Private Methods
         //
-        //
-
 
         _connect: function (callback) {
-
-            var socket = this.get('socket');
-
-            if (socket.socket.connected) {
-                this._log('connected');
-                if (callback instanceof Function)
-                    callback();
-                if (this.onConnect instanceof Function)
-                    this.onConnect(this);
-            } else if (socket.socket.connecting) {
-                this._log('connecting');
-                this._reconnect(callback);
-            } else {
-                socket.socket.connect();
-                this._reconnect(callback);
+            var that = this;
+            warn('_connect', this.get('namespace'));
+            if (sockjs === undefined || sockjs.readyState > 1) {
+                sockjs = new SockJS('/socket');
+                sockjs.onopen = function() {
+                  mux = new MultiplexedWebSocket(sockjs);
+                  Mist.set('mux', mux);
+                  that._setupChannel(callback);
+                  that.set('socket', sockjs);
+                };
+            } else if (sockjs.readyState == 0) {
+                info('Connecting...');
+                return
+            } else if (sockjs.readyState == 1 && Mist.get(this.get('namespace')) == null) {
+                info('New channel', this.get('namespace'));
+                that._setupChannel(callback);
             }
         },
 
-
         _reconnect: function (callback) {
             Ember.run.later(this, function () {
+                info('Not connected... Reconnecting');
                 this._connect(callback);
             }, 500);
         },
-
 
         _parseArguments: function (args) {
             forIn(this, args, function (value, property) {
@@ -1124,17 +1005,20 @@ function Socket_ (args) {
             });
         },
 
-
         _handleDisconnection: function () {
             var that = this;
-            this.get('socket').on('disconnect', function () {
-                that._log('disconnected');
-                // keep socket connections alive by default
-                if (that.get('keepAlive') !== undefined ? that.get('keepAlive') : true)
-                    that._reconnect();
-            });
+            sockjs.onclose = function(e){
+              warn('Disconnected. ', e.reason);
+              if (Mist.term) {
+                  Mist.term.write('\n\rDisconnected from remote. ');
+                  if (e.reason)
+                    Mist.term.write(e.reason);
+              }
+              // keep socket connections alive by default
+              if (that.get('keepAlive') !== undefined ? that.get('keepAlive') : true)
+                  that._reconnect();
+            };
         },
-
 
         _log: function () {
             if (!DEBUG_SOCKET)
@@ -1146,8 +1030,28 @@ function Socket_ (args) {
             console.log.apply(console, args);
         },
 
+        _setupChannel: function (callback){
+          var channel = Mist.mux.channel(this.get('namespace'));
+          var that = this;
+          info('Connecting', this.get('namespace'))
+          channel.onopen = function(e){
+              warn('channel.onopen');
+              setupChannelEvents(that, that.get('namespace'), function () {
+                  info('Connected', that.get('namespace'));
+                  that._log('Connected', that.get('namespace'));
+                  if (callback instanceof Function)
+                      callback();
+                  if (that.onConnect instanceof Function)
+                      that.onConnect(that);
+              });
+          }
+          this.set('channel', channel)
+          this.set('events', EventHandler.create());
+        }
+
     }).create(args);
 }
+
 
 function virtualKeyboardHeight () {
     var keyboardHeight = 0;
@@ -1169,7 +1073,6 @@ function virtualKeyboardHeight () {
 
 // forEach like function on objects
 function forIn () {
-
     var object = arguments[arguments.length - 2];
     var callback = arguments[arguments.length - 1];
     var thisArg = arguments.length == 3 ? arguments[0] : undefined;
@@ -1207,9 +1110,9 @@ function maxCharsInWidth (fontSize, width) {
     return charCount;
 }
 
+
 // Calculates maximum lines that can be displayed into a fixed height
 function maxLinesInHeight (fontSize, height) {
-
     fontTest.css('font-size', fontSize);
 
     var testString = '';
@@ -1241,9 +1144,11 @@ function startTimer () {
     startTime = Date.now();
 };
 
+
 function getTime () {
     return Date.now() - startTime;
 };
+
 
 // Console aliases
 function log() {
@@ -1363,11 +1268,8 @@ function parseProviderMap () {
 
 
 //
-//
 //  PROTOTYPE EXTENTIONS
 //
-//
-
 
 var extendEmberView = function () {
 
@@ -1392,7 +1294,6 @@ Date.prototype.isFuture = function () {
 };
 
 Date.prototype.getPrettyTime = function (noSeconds) {
-
     var hour = this.getHours();
     var min = this.getMinutes();
     var sec = this.getSeconds();
@@ -1425,7 +1326,6 @@ Date.prototype.getMonthName = function (short) {
 }
 
 Date.prototype.diffToString = function (date) {
-
     var diff = this - date;
     var ret = '';
 
@@ -1450,7 +1350,6 @@ Date.prototype.diffToString = function (date) {
 };
 
 Date.prototype.getTimeFromNow = function () {
-
     var now = new Date();
     var diff = now - this;
     var ret = '';

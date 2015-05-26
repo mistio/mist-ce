@@ -26,8 +26,6 @@ except ImportError:
     from mist.io.helpers import user_from_request
     from pyramid.view import view_config
 
-from socketio import socketio_manage
-
 from mist.io import methods
 from mist.io.model import Keypair
 from mist.io.shell import Shell
@@ -36,7 +34,6 @@ from mist.io.exceptions import *
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update
-from mist.io.sockio import MistNamespace, ShellNamespace
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -182,9 +179,9 @@ def add_backend(request):
     """Adds a new backend."""
 
     params = request.json_body
-    #remove spaces from start/end of string fields that are often included
-    #when pasting keys, preventing thus succesfull connection with the
-    #backend
+    # remove spaces from start/end of string fields that are often included
+    # when pasting keys, preventing thus succesfull connection with the
+    # backend
     for key in params.keys():
         if type(params[key]) in [unicode, str]:
             params[key] = params[key].rstrip().lstrip()
@@ -206,7 +203,7 @@ def add_backend(request):
     else:
         apikey = params.get('apikey', '')
         apisecret = params.get('apisecret', '')
-        apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
+        apiurl = params.get('apiurl') or ''  # fixes weird issue w/ none value
         tenant_name = params.get('tenant_name', '')
         # following params are for baremetal
         machine_hostname = params.get('machine_ip', '')
@@ -388,7 +385,7 @@ def get_private_key(request):
     key_id = request.matchdict['key']
     if not key_id:
         raise RequiredParameterMissingError("key_id")
-    if not key_id in user.keypairs:
+    if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
     return user.keypairs[key_id].private
 
@@ -399,7 +396,7 @@ def get_public_key(request):
     key_id = request.matchdict['key']
     if not key_id:
         raise RequiredParameterMissingError("key_id")
-    if not key_id in user.keypairs:
+    if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
     return user.keypairs[key_id].public
 
@@ -470,7 +467,7 @@ def create_machine(request):
         location_id = request.json_body.get('location', None)
         image_id = request.json_body['image']
         size_id = request.json_body['size']
-        #deploy_script received as unicode, but ScriptDeployment wants str
+        # deploy_script received as unicode, but ScriptDeployment wants str
         script = str(request.json_body.get('script', ''))
         # these are required only for Linode/GCE, passing them anyway
         image_extra = request.json_body.get('image_extra', None)
@@ -488,8 +485,10 @@ def create_machine(request):
         async = request.json_body.get('async', False)
         quantity = request.json_body.get('quantity', 1)
         persist = request.json_body.get('persist', False)
-        docker_port_bindings = request.json_body.get('docker_port_bindings', {})
-        docker_exposed_ports = request.json_body.get('docker_exposed_ports', {})
+        docker_port_bindings = request.json_body.get('docker_port_bindings',
+                                                     {})
+        docker_exposed_ports = request.json_body.get('docker_exposed_ports',
+                                                     {})
         # hostname: if provided it will be attempted to assign a DNS name
         hostname = request.json_body.get('hostname', '')
         plugins = request.json_body.get('plugins')
@@ -530,7 +529,7 @@ def machine_actions(request):
     params = request.json_body
     action = params.get('action', '')
     plan_id = params.get('plan_id', '')
-    #plan_id is the id of the plan to resize
+    # plan_id is the id of the plan to resize
     name = params.get('name', '')
 
     if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename'):
@@ -546,7 +545,7 @@ def machine_actions(request):
             methods.resize_machine(user, backend_id, machine_id, plan_id)
         elif action == 'rename':
             methods.rename_machine(user, backend_id, machine_id, name)
-        ## return OK
+        # return OK
         return methods.list_machines(user, backend_id)
     raise BadRequestError()
 
@@ -557,7 +556,7 @@ def machine_rdp(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
-    rdp_port = request.params.get('rdp_port',3389)
+    rdp_port = request.params.get('rdp_port', 3389)
     host = request.params.get('host')
 
     if not host:
@@ -567,7 +566,8 @@ def machine_rdp(request):
     except:
         rdp_port = 3389
 
-    rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % (host, rdp_port)
+    rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % \
+                  (host, rdp_port)
     return Response(content_type='application/octet-stream',
                     content_disposition='attachment; filename="%s.rdp"' % host,
                     charset='utf8',
@@ -863,7 +863,8 @@ def update_metric(request):
     return {}
 
 
-@view_config(route_name='deploy_plugin', request_method='POST', renderer='json')
+@view_config(route_name='deploy_plugin', request_method='POST',
+             renderer='json')
 def deploy_plugin(request):
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
@@ -892,7 +893,8 @@ def deploy_plugin(request):
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
-@view_config(route_name='deploy_plugin', request_method='DELETE', renderer='json')
+@view_config(route_name='deploy_plugin', request_method='DELETE',
+             renderer='json')
 def undeploy_plugin(request):
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
@@ -909,23 +911,24 @@ def undeploy_plugin(request):
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
-## @view_config(route_name='metric', request_method='DELETE', renderer='json')
-## def remove_metric(request):
-    ## user = user_from_request(request)
-    ## metric_id = request.matchdict['metric']
-    ## url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
-    ## headers={'Authorization': get_auth_header(user)}
-    ## try:
-        ## resp = requests.delete(url, headers=headers, verify=config.SSL_VERIFY)
-    ## except requests.exceptions.SSLError as exc:
-        ## raise SSLError()
-    ## except Exception as exc:
-        ## log.error("Exception removing metric: %r", exc)
-        ## raise ServiceUnavailableError()
-    ## if not resp.ok:
-        ## log.error("Error removing metric %d:%s", resp.status_code, resp.text)
-        ## raise BadRequestError(resp.text)
-    ## return resp.json()
+# @view_config(route_name='metric', request_method='DELETE', renderer='json')
+# def remove_metric(request):
+    # user = user_from_request(request)
+    # metric_id = request.matchdict['metric']
+    # url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
+    # headers={'Authorization': get_auth_header(user)}
+    # try:
+        # resp = requests.delete(url, headers=headers,
+        #                        verify=config.SSL_VERIFY)
+    # except requests.exceptions.SSLError as exc:
+        # raise SSLError()
+    # except Exception as exc:
+        # log.error("Exception removing metric: %r", exc)
+        # raise ServiceUnavailableError()
+    # if not resp.ok:
+        # log.error("Error removing metric %d:%s", resp.status_code, resp.text)
+        # raise BadRequestError(resp.text)
+    # return resp.json()
 
 
 @view_config(route_name='rules', request_method='POST', renderer='json')
@@ -985,12 +988,3 @@ def list_supported_providers(request):
         return {'supported_providers': config.SUPPORTED_PROVIDERS_V_2}
     else:
         return {'supported_providers': config.SUPPORTED_PROVIDERS}
-
-
-@view_config(route_name='socketio', renderer='json')
-def socketio(request):
-    socketio_manage(request.environ,
-                    namespaces={'/mist': MistNamespace,
-                                '/shell': ShellNamespace},
-                    request=request)
-    return {}

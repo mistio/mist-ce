@@ -1,15 +1,15 @@
-from socketio.server import SocketIOServer
-from pyramid.paster import get_app
-from gevent import monkey; monkey.patch_all()
+import sys
+
+import tornado.web
+import tornado.ioloop
+from mist.io.sock import make_router
+
 
 if __name__ == '__main__':
-    import sys
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     else:
         port = 8081
-    app = get_app('uwsgi.ini')
-    print 'Listening on port http://127.0.0.1:%s' % port
-    # TODO: try flashsocket transport
-    SocketIOServer(('127.0.0.1', port), app, policy_server=False,
-                   transports=['websocket', 'xhr-polling']).serve_forever()
+    app = tornado.web.Application(make_router().urls)
+    app.listen(port)
+    tornado.ioloop.IOLoop.instance().start()
