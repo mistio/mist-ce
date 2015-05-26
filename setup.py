@@ -26,7 +26,8 @@ requires = [
     'netaddr',
     'amqp',
     'websocket-client',
-    'sockjs-tornado'
+    'sockjs-tornado',
+    'pika',
 ]
 
 setup(name='mist.io',

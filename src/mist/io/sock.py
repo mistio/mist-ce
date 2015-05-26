@@ -59,6 +59,8 @@ def get_conn_info(conn_info):
             user_agent = conn_info.headers[header]
     ip = real_ip or forwarded_for or conn_info.ip
     session_id = ''
+    if 'beaker.session.id' in conn_info.cookies.keys():
+        session_id = conn_info.cookies['beaker.session.id'].value
     return ip, user_agent, session_id
 
 
@@ -66,10 +68,7 @@ class MistConnection(SockJSConnection):
     def on_open(self, conn_info):
         log.info("%s: Initializing", self.__class__.__name__)
         ip, user_agent, session_id = get_conn_info(conn_info)
-
-        from mist.io.model import User
-        self.user = User()
-        # self.user = user_from_session_id(self.request)
+        self.user = user_from_session_id(session_id)
         self.session_id = uuid.uuid4().hex
 
     def send(self, msg, data=None):
