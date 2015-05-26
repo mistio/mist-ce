@@ -209,14 +209,9 @@ var appLoader = {
                     namespace: 'main',
                     onConnect: function (socket) {
                         //socket.emit('ready');
-                        //Mist.set('logs', new Socket({
-                        //    namespace: 'logs',
-                        //    onConnect: function (socket) {
-                        //        if (socket.channel) {
-                        //            socket.emit('ready');
-                        //        }
-                        //    }
-                        //}));
+                        Mist.set('logs', new Socket({
+                            namespace: 'logs'
+                        }));
                         if (appLoader)
                             appLoader.complete('init connections');
                     },
