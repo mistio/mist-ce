@@ -48,6 +48,10 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 
+# hold all open connections to properly clean them up in case of SIGTERM
+CONNECTIONS = set()
+
+
 def get_conn_info(conn_info):
     real_ip = forwarded_for = user_agent = ''
     for header in conn_info.headers:
@@ -70,12 +74,14 @@ class MistConnection(SockJSConnection):
         ip, user_agent, session_id = get_conn_info(conn_info)
         self.user = user_from_session_id(session_id)
         self.session_id = uuid.uuid4().hex
+        CONNECTIONS.add(self)
 
     def send(self, msg, data=None):
         super(MistConnection, self).send(json.dumps({msg: data}))
 
     def on_close(self):
         log.info("%s: on_close event handler", self.__class__.__name__)
+        CONNECTIONS.remove(self)
 
 
 class TornadoShell(tornado.iostream.BaseIOStream):
