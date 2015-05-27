@@ -192,7 +192,7 @@ class ShellConnection(MistConnection):
 
 class UserUpdatesConsumer(Consumer):
     def __init__(self, main_sockjs_conn,
-                 amqp_url='amqp://guest:guest@127.0.0.1/'):
+                 amqp_url=config.AMQP_URL):
         self.sockjs_conn = main_sockjs_conn
         email = self.sockjs_conn.user.email or 'noone'
         super(UserUpdatesConsumer, self).__init__(
