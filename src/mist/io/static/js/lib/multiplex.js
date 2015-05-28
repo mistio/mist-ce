@@ -28,7 +28,6 @@ DumbEventTarget.prototype.emit = function(type) {
         }
     }
     info("Channel " + this.name + " got event '" + type + "'.");
-    if (args.length) info(args);
     this._ensure(type);
     if (!(('on' + type in this) || (this._listeners[type].length))) {
         warn("No listeners for '" + type + "' in " + this.name + ".");
