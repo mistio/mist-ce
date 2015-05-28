@@ -942,7 +942,8 @@ function Socket (args) {
 
         off: function () {
             var events = this.get('events');
-            events.off.apply(events, arguments);
+            if (events)
+                events.off.apply(events, arguments);
             return this;
         },
 
