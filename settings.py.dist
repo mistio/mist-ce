@@ -27,3 +27,8 @@
 
 ## Celery message broker
 #CELERY_BROKER = 'amqp://guest:guest@127.0.0.1:5671//'
+
+
+## Permit connections to localhost/private ip's
+# ALLOW_CONNECT_LOCALHOST = True
+# ALLOW_CONNECT_PRIVATE = True

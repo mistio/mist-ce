@@ -1,7 +1,6 @@
 #get the default AMI's and titles for the 8 EC2 datacenters through endless screen scraping
 #please destroy me when EC2 provides this data through JSON ;)
 import time, datetime, sys, re
-
 try:
     from splinter import Browser
 except:
@@ -14,13 +13,12 @@ EC2_PASS = ""
 URL = 'https://console.aws.amazon.com/'
 browser = Browser()
 browser.visit(URL)
-
 browser.find_by_css('#ap_email').fill(EC2_USER)
 browser.find_by_css('#ap_password').fill(EC2_PASS)
-browser.find_by_css('#signInSubmit').click()
+browser.find_by_css('#signInSubmit-input').click()
 
 then = datetime.datetime.now()
-for provider in ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1']:
+for provider in ['eu-central-1', 'us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1']:
     provider_images = []
     browser.visit('https://console.aws.amazon.com/ec2/v2/home?region=%s' % provider)
     time.sleep(6)
