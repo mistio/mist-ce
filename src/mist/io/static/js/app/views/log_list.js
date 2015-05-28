@@ -170,7 +170,9 @@ define('app/views/log_list', ['app/views/page'],
                         Mist.get('logs').on('logs', this, this.handleResponse);
                         Mist.get('logs').on('event', this, this.handleStream);
                     }, 350);
-                    return;
+                } else {
+                    Mist.get('logs').on('logs', this, this.handleResponse);
+                    Mist.get('logs').on('event', this, this.handleStream);
                 }
             },
 

@@ -205,17 +205,16 @@ var appLoader = {
             before: ['load socket', 'load ember', 'init app'],
             exec: function () {
                 Mist.set('ajax', Ajax(CSRF_TOKEN));
-                Mist.set('socket', new Socket({
+                Mist.set('main', new Socket({
                     namespace: 'main',
                     onConnect: function (socket) {
-                        //socket.emit('ready');
                         Mist.set('logs', new Socket({
                             namespace: 'logs'
                         }));
-                        if (appLoader)
-                            appLoader.complete('init connections');
                     },
                 }));
+                if (appLoader)
+                    appLoader.complete('init connections');
             }
         },
         'fetch first data': {
@@ -699,9 +698,6 @@ var setupMainChannel = function(socket, callback) {
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);
     })
-    .on('list_logs', function (logs) {
-        Mist.logsController.load(logs);
-    })
     .on('list_backends', function (backends) {
         Mist.backendsController.load(backends);
         if (callback)
@@ -902,6 +898,7 @@ function Socket (args) {
         socket: null,
         namespace: null,
         channel: null,
+        attempts: 0,
 
         //
         //  Public Methods
@@ -912,9 +909,7 @@ function Socket (args) {
             this._parseArguments(args);
 
             var that = this;
-            this._connect(function () {
-                that._handleDisconnection();
-            });
+            this._connect();
         }.on('init'),
 
         on: function (event) {
@@ -941,14 +936,14 @@ function Socket (args) {
             args = args.slice(1);
             this._log('/' + msg, 'EMIT', args);
             if (args.length) msg += ',' + JSON.stringify(args);
-            warn(msg);
             var channel = this.get('channel');
             return channel.send(msg);
         },
 
         off: function () {
             var events = this.get('events');
-            events.off.apply(events, arguments);
+            if (events)
+                events.off.apply(events, arguments);
             return this;
         },
 
@@ -974,50 +969,68 @@ function Socket (args) {
 
         _connect: function (callback) {
             var that = this;
-            warn('_connect', this.get('namespace'));
             if (sockjs === undefined || sockjs.readyState > 1) {
-                sockjs = new SockJS('/socket');
+                if (this.attempts > 0) {
+                    info('Not connected... Reconnecting');
+                }
+                this.attempts++;
+                sockjs = new SockJS('/socket', null,
+                    {'protocols_whitelist':
+                        ['websocket', 'xdr-streaming', 'xhr-streaming',
+                         'iframe-eventsource', 'iframe-htmlfile', 'xdr-polling',
+                         'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']}
+                );
                 sockjs.onopen = function() {
-                  mux = new MultiplexedWebSocket(sockjs);
-                  Mist.set('mux', mux);
-                  that._setupChannel(callback);
-                  that.set('socket', sockjs);
+                    mux = new MultiplexedWebSocket(sockjs);
+                    Mist.set('mux', mux);
+                    that._setupChannel(callback);
+                    that.set('socket', sockjs);
+                    that.attempts = 0;
+                };
+                sockjs.onerror = function(e) {
+                    warn('Socket error', e);
+                };
+                sockjs.onclose = function(e){
+                    warn('Disconnected. ', e.reason);
+                    if (Mist.term) {
+                        Mist.term.write('\n\rDisconnected from remote. ');
+                        if (e.reason)
+                            Mist.term.write(e.reason);
+                    }
+                    that._reconnect();
                 };
             } else if (sockjs.readyState == 0) {
                 info('Connecting...');
-                return
-            } else if (sockjs.readyState == 1 && Mist.get(this.get('namespace')) == null) {
+            } else if (sockjs.readyState == 1 && (Mist.get(this.get('namespace')) == null
+                    || Mist.get(this.get('namespace')).get('socket') == null ||
+                    Mist.get(this.get('namespace')).get('socket').readyState == 3)) {
                 info('New channel', this.get('namespace'));
+                if (Mist.get(that.get('namespace')))
+                    Mist.get(that.get('namespace')).set('socket', sockjs);
                 that._setupChannel(callback);
+                return
+            } else if (sockjs.readyState == 1) {
+                // already connected
+                this.attempts = 0;
+                return
             }
         },
 
         _reconnect: function (callback) {
             Ember.run.later(this, function () {
-                info('Not connected... Reconnecting');
-                this._connect(callback);
-            }, 500);
+                Mist.main._connect(function() {
+                    if (Mist.get('logs'))
+                        Mist.logs._connect();
+                    if (Mist.get('shell'))
+                        Mist.shell._connect();
+                });
+            }, this.attempts * 1000);
         },
 
         _parseArguments: function (args) {
             forIn(this, args, function (value, property) {
                 this.set(property, value);
             });
-        },
-
-        _handleDisconnection: function () {
-            var that = this;
-            sockjs.onclose = function(e){
-              warn('Disconnected. ', e.reason);
-              if (Mist.term) {
-                  Mist.term.write('\n\rDisconnected from remote. ');
-                  if (e.reason)
-                    Mist.term.write(e.reason);
-              }
-              // keep socket connections alive by default
-              if (that.get('keepAlive') !== undefined ? that.get('keepAlive') : true)
-                  that._reconnect();
-            };
         },
 
         _log: function () {
@@ -1035,7 +1048,6 @@ function Socket (args) {
           var that = this;
           info('Connecting', this.get('namespace'))
           channel.onopen = function(e){
-              warn('channel.onopen');
               setupChannelEvents(that, that.get('namespace'), function () {
                   info('Connected', that.get('namespace'));
                   that._log('Connected', that.get('namespace'));
