@@ -8,8 +8,6 @@
 
     <div data-role="header">
         <h1>Add cloud</h1>
-        <a class="ui-btn-right" data-icon="info" data-iconpos="notext" data-theme="a"
-            target="_blank" href="https://mistio.zendesk.com/hc/en-us"></a>
     </div>
 
     <div data-role="content" data-theme="a">
@@ -44,11 +42,16 @@
                 {{/each}}
             </ul>
         </div>
+        <style>
 
+        </style>
         <div id="backend-add-fields">
         {{#each field in view.providerFields}}
             {{#if field.show}}
             <div {{bind-attr class="field.className :field Mist.backendAddController.provider.provider"}}>
+
+                <!-- Field Label -->
+
                 {{#if field.label}}
                     {{#unless field.isCheckbox}}
                         <label {{bind-attr for="field.name"}}>
@@ -56,85 +59,99 @@
                         </label>
                     {{/unless}}
                 {{/if}}
-                {{#if field.isText}}
-                    {{view Mist.TextField
-                        data-theme="a"
-                        type=field.type
-                        id=field.name
-                        placeholder=field.placeholder
-                        valueBinding="field.value"}}
-                {{/if}}
-                {{#if field.isFile}}
-                    <a class="ui-btn ui-btn-icon-right ui-icon-plus ui-btn-a ui-corner-all"
-                        {{bind-attr id="field.name"}}
-                        {{action "uploadFile" field target="view"}}>
-                            {{unbound field.buttonText}}
-                    </a>
-                {{/if}}
-                {{#if field.isCheckbox}}
-                    <label>
-                        {{view Mist.Checkbox
-                            data-theme="a"
-                           checkedBinding=field.value}}
-                        {{field.label}}
-                    </label>
-                {{/if}}
-                {{#if field.isKey}}
-                    <div {{bind-attr id="field.name"}}
-                        class="mist-select"
-                        data-role="collapsible"
-                        data-iconpos="right"
-                        data-collapsed-icon="carat-d"
-                        data-expanded-icon="carat-u"
-                        data-theme="a">
-                        <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
-                        <ul data-role="listview">
-                            <li data-icon="false" data-theme="a">
-                                <a {{action "selectKey" "" field target="view"}}>-- None --</a>
-                            </li>
-                            {{#each Mist.keysController.content}}
-                                <li data-icon="false" data-theme="a">
-                                    <a {{action "selectKey" this field target="view"}}>{{this.id}}</a>
-                                </li>
-                            {{/each}}
-                            <li data-icon="false" data-theme="d">
-                                <a {{action "createKeyClicked" field target="view"}}>Add Key</a>
-                            </li>
-                        </ul>
+
+                <!-- Field Wrapper -->
+
+                <div class="field-wrapper">
+                    <div {{bind-attr class=":first-child field.helpText::last-child"}}>
+                        {{#if field.isText}}
+                            {{view Mist.TextField
+                                data-theme="a"
+                                type=field.type
+                                id=field.name
+                                placeholder=field.placeholder
+                                valueBinding="field.value"}}
+                        {{/if}}
+                        {{#if field.isFile}}
+                            <a class="ui-btn ui-btn-a"
+                                {{bind-attr id="field.name"}}
+                                {{action "uploadFile" field target="view"}}>
+                                    {{unbound field.buttonText}}
+                            </a>
+                        {{/if}}
+                        {{#if field.isCheckbox}}
+                            <label>
+                                {{view Mist.Checkbox
+                                    data-theme="a"
+                                   checkedBinding=field.value}}
+                                {{field.label}}
+                            </label>
+                        {{/if}}
+                        {{#if field.isKey}}
+                            <div {{bind-attr id="field.name"}}
+                                class="mist-select"
+                                data-role="collapsible"
+                                data-iconpos="right"
+                                data-collapsed-icon="carat-d"
+                                data-expanded-icon="carat-u"
+                                data-theme="a">
+                                <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
+                                <ul data-role="listview">
+                                    <li data-icon="false" data-theme="a">
+                                        <a {{action "selectKey" "" field target="view"}}>-- None --</a>
+                                    </li>
+                                    {{#each Mist.keysController.content}}
+                                        <li data-icon="false" data-theme="a">
+                                            <a {{action "selectKey" this field target="view"}}>{{this.id}}</a>
+                                        </li>
+                                    {{/each}}
+                                    <li data-icon="false" data-theme="d">
+                                        <a {{action "createKeyClicked" field target="view"}}>Add Key</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        {{/if}}
+                        {{#if field.isRegion}}
+                            <div {{bind-attr id="field.name"}}
+                                class="mist-select"
+                                data-role="collapsible"
+                                data-iconpos="right"
+                                data-collapsed-icon="carat-d"
+                                data-expanded-icon="carat-u"
+                                data-theme="a">
+                                <h4>{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
+                                <ul data-role="listview">
+                                    {{#each view.providerRegions}}
+                                        <li data-icon="false" data-theme="a">
+                                            <a {{action "selectRegion" this field target="view"}}>
+                                                {{this.location}}
+                                            </a>
+                                        </li>
+                                    {{/each}}
+                                </ul>
+                            </div>
+                        {{/if}}
+                        {{#if field.isSlider}}
+                            <select class="toggle-field" data-theme="a" data-role="slider"
+                            {{action "switchToggled" field on="change" target="view"}}>
+                                <option value="0">{{unbound field.offLabel}}</option>
+                                <option value="1">{{unbound field.onLabel}}</option>
+                            </select>
+                        {{/if}}
                     </div>
-                {{/if}}
-                {{#if field.isRegion}}
-                    <div {{bind-attr id="field.name"}}
-                        class="mist-select"
-                        data-role="collapsible"
-                        data-iconpos="right"
-                        data-collapsed-icon="carat-d"
-                        data-expanded-icon="carat-u"
-                        data-theme="a">
-                        <h4>{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
-                        <ul data-role="listview">
-                            {{#each view.providerRegions}}
-                                <li data-icon="false" data-theme="a">
-                                    <a {{action "selectRegion" this field target="view"}}>
-                                        {{this.location}}
-                                    </a>
-                                </li>
-                            {{/each}}
-                        </ul>
-                    </div>
-                {{/if}}
-                {{#if field.isSlider}}
-                    <select class="toggle-field" data-theme="a" data-role="slider"
-                    {{action "switchToggled" field on="change" target="view"}}>
-                        <option value="0">{{unbound field.offLabel}}</option>
-                        <option value="1">{{unbound field.onLabel}}</option>
-                    </select>
-                {{/if}}
+                    {{#if field.helpText}}
+                        <div class="last-child">
+                            <a class="ui-btn ui-btn-a ui-btn-icon-notext ui-icon-question"
+                                {{bind-attr id="field.helpId"}}
+                                {{action "helpClicked" field target="view"}}>
+                            </a>
+                        </div>
+                    {{/if}}
+                </div>
             </div>
             {{/if}}
         {{/each}}
         </div>
-
 
         {{#if Mist.backendsController.addingBackend}}
             <div class="ajax-loader"></div>
@@ -151,6 +168,34 @@
     </div>
 </div>
 
+<div id="help-tooltip-screen"
+    class="ui-popup-screen
+        ui-overlay-b
+        ui-screen-hidden">
+</div>
+<div id="help-tooltip-popup"
+     class="pop
+        ui-popup-container
+        ui-popup-hidden
+        ui-popup-truncate">
+    <div id="help-tooltip"
+         class="ui-popup
+            ui-body-a
+            ui-overlay-shadow
+            ui-corner-all"
+         data-role="popup"
+         data-arrow="true"
+         data-enhanced="true"
+         data-transition="flip">
+        <p>{{view.helpText}}
+            {{#if view.helpHref}}
+            <a target="_blank" {{bind-attr href="view.helpHref"}}>
+                Read more...
+            </a>
+            {{/if}}
+        </p>
+    </div>
+</div>
 
 {{view "keyAdd"}}
 
