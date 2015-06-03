@@ -922,128 +922,86 @@ function program6(depth0,data) {
 Ember.TEMPLATES["graph_list_item"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
+  var buffer = '', stack1, self=this, escapeExpression=this.escapeExpression;
 
 function program1(depth0,data) {
-  
-  var stack1;
-  stack1 = helpers._triageMustache.call(depth0, "view.graph.unit", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  else { data.buffer.push(''); }
-  }
-
-function program3(depth0,data) {
   
   
   data.buffer.push("\n\n            <div class=\"ajax-loader\"></div>\n\n        ");
   }
 
-function program5(depth0,data) {
+function program3(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n\n            ");
-  stack1 = helpers['if'].call(depth0, "view.graph.pendingRemoval", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
+  stack1 = helpers['if'].call(depth0, "view.graph.pendingRemoval", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            <div class=\"ajax-loader fetching-stats-loader\"></div>\n\n            <!--\n                Remove button\n            -->\n\n            ");
-  stack1 = helpers['if'].call(depth0, "Mist.graphsController.config.canModify", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("\n\n            ");
+  stack1 = helpers['if'].call(depth0, "Mist.graphsController.fetchingStats", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            <!--\n                Minimize button\n            -->\n\n            ");
-  stack1 = helpers['if'].call(depth0, "Mist.graphsController.config.canMinimize", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n        ");
+  data.buffer.push("\n        ");
   return buffer;
   }
-function program6(depth0,data) {
+function program4(depth0,data) {
   
   
   data.buffer.push("\n                <div class=\"ajax-loader\"></div>\n            ");
   }
 
+function program6(depth0,data) {
+  
+  
+  data.buffer.push("\n                <div class=\"ajax-loader fetching-stats-loader\"></div>\n            ");
+  }
+
 function program8(depth0,data) {
   
   var buffer = '', stack1;
-  data.buffer.push("\n                ");
+  data.buffer.push("\n            ");
   stack1 = helpers.unless.call(depth0, "view.graph.isBuiltIn", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(9, program9, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            ");
+  data.buffer.push("\n        ");
   return buffer;
   }
 function program9(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n                    <a class=\"ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext\"\n                        ");
+  data.buffer.push("\n                <a class=\"ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext\"\n                    ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "removeClicked", "view.graph", {hash:{
     'target': ("view.actionProxy")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
-  data.buffer.push(">x\n                    </a>\n                ");
+  data.buffer.push(">x\n                </a>\n            ");
   return buffer;
   }
 
 function program11(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n                <a class=\"ui-btn ui-btn-c ui-btn-icon-notext ui-corner-all ui-icon-arrow-d\"\n                    ");
+  data.buffer.push("\n            <a class=\"ui-btn ui-btn-c ui-btn-icon-notext ui-corner-all ui-icon-arrow-d\"\n                ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "collapseClicked", "view.graph", {hash:{
     'target': ("view.actionProxy")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
-  data.buffer.push(">-\n                </a>\n            ");
+  data.buffer.push(">-\n            </a>\n        ");
   return buffer;
   }
 
-function program13(depth0,data) {
-  
-  var buffer = '';
-  data.buffer.push("\n            <g ");
-  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'class': ("this.id")
-  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push(">\n                <path></path>\n            </g>\n        ");
-  return buffer;
-  }
-
-function program15(depth0,data) {
-  
-  var buffer = '', stack1;
-  data.buffer.push("\n        <div class=\"legend\">\n            ");
-  stack1 = helpers.each.call(depth0, "view.graph.datasources", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(16, program16, data),contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("<div class=\"graph\" draggable=\"true\">\n\n    <!--\n        Graph Head\n    -->\n\n    <div class=\"header\">\n\n        <div class=\"title\">\n            ");
+  stack1 = helpers._triageMustache.call(depth0, "view.graph.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n        </div>\n    ");
-  return buffer;
-  }
-function program16(depth0,data) {
-  
-  var buffer = '', stack1;
-  data.buffer.push("\n                <div ");
-  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'class': ("this.id :lineLegend")
-  },hashTypes:{'class': "STRING"},hashContexts:{'class': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push("></div>\n                ");
-  stack1 = helpers._triageMustache.call(depth0, "machine.name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  data.buffer.push("\n        </div>\n\n\n        ");
+  stack1 = helpers['if'].call(depth0, "view.graph.pendingCreation", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            ");
-  return buffer;
-  }
-
-  data.buffer.push("<div class=\"graph\" ");
+  data.buffer.push("\n        <!--\n            Remove button\n        -->\n\n        ");
+  stack1 = helpers['if'].call(depth0, "Mist.graphsController.config.canModify", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n\n        <!--\n            Minimize button\n        -->\n\n        ");
+  stack1 = helpers['if'].call(depth0, "Mist.graphsController.config.canMinimize", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n    </div>\n\n    <!--\n        Graph Body\n    -->\n\n    <div class=\"graph-body\" ");
   data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
     'id': ("view.graph.id")
   },hashTypes:{'id': "STRING"},hashContexts:{'id': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push(">\n\n    <!--\n        Graph Head\n    -->\n\n    <div class=\"header\">\n\n        <div class=\"title\">\n            ");
-  stack1 = helpers._triageMustache.call(depth0, "view.graph.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            <div class=\"graphValue\">-&nbsp;</div>");
-  stack1 = helpers['if'].call(depth0, "view.graph.unit", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n        </div>\n\n        ");
-  stack1 = helpers['if'].call(depth0, "view.graph.pendingCreation", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n    </div>\n\n    <!--\n        Graph Body\n    -->\n\n    <svg>\n        <g class=\"grid-x\"></g>\n        <g class=\"grid-y\"></g>\n        ");
-  stack1 = helpers.each.call(depth0, "view.graph.datasources", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(13, program13, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n        <!--  Visible only when on single line graphs -->\n        <g class=\"valueArea\">\n            <path></path>\n        </g>\n\n        <g class=\"x-axis\"></g>\n        <rect class=\"hideAnimeLine\"></rect>\n        <line class=\"axisLine x\"></line>\n        <line class=\"axisLine y\"></line>\n        <g class=\"y-axis\"></g>\n    </svg>\n\n    <!--\n        Graph Secondary Legend Header\n    -->\n\n    ");
-  stack1 = helpers['if'].call(depth0, "Mist.graphsController.config.showGraphLegend", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(15, program15, data),contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n</div>\n");
+  data.buffer.push(">\n    </div>\n\n</div>\n");
   return buffer;
   
 });
