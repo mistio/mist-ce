@@ -75,7 +75,6 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
             },
 
             update: function (datapoints) {
-
                 datapoints.forEach(function (datapoint) {
 
                     var dtp = Datapoint.create(datapoint);
@@ -85,8 +84,11 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
                     var datapointToOverride = this.datapoints.findBy('time', dtp.time);
                     if (datapointToOverride)
                         datapointToOverride.value = dtp.value;
-                    else if (lastTimestamp < dtp.time.getTime())
+                    else if (lastTimestamp < dtp.time.getTime()){
                         this.datapoints.push(dtp);
+                        while (this.datapoints.length > MAX_DATAPOINTS)
+                            this.datapoints.shift();
+                    }
                 }, this);
             },
 
@@ -107,7 +109,9 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
             getFirstTimestamp: function () {
                 var length = this.datapoints.length;
                 if (!length) return 0;
-                return this.datapoints[length - MAX_DATAPOINTS].time.getTime();
+                if (this.datapoints[length - MAX_DATAPOINTS])
+                    return this.datapoints[length - MAX_DATAPOINTS].time.getTime();
+                return 0;
             }
         });
     }

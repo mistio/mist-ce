@@ -18,6 +18,7 @@ require.config({
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
+        c3: 'lib/c3.min',
         socket: 'lib/socket.io',
         term: 'lib/term'
     },
@@ -33,6 +34,9 @@ require.config({
         },
         'd3': {
             deps: ['jquery']
+        },
+        'c3': {
+            deps: ['d3']
         }
     }
 });
@@ -1054,6 +1058,21 @@ function Socket_ (args) {
                     events.trigger.call(events, event, response);
                 });
             return this;
+        },
+
+
+        send: function () {
+            var args = slice(arguments);
+            if (!args.length) {
+                error('No arguments passed to send');
+                return;
+            }
+            var msg = args[0];
+            args = args.slice(1);
+            this._log('/' + msg, 'EMIT', args);
+            if (args.length) msg += ',' + JSON.stringify(args);
+            var channel = this.get('channel');
+            return channel.send(msg);
         },
 
 
