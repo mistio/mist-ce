@@ -6,6 +6,10 @@ DEBUG_SOCKET = false;
 DEBUG_STATS = false;
 DEBUG_LOGS = false;
 
+// Limit the amount of datapoints to
+// preserve memory (especially on mobile)
+MAX_DATAPOINTS = 60;
+
 // Define libraries
 require.config({
     baseUrl: 'resources/js/',

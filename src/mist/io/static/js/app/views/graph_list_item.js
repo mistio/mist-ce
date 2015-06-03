@@ -91,7 +91,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                             ret.unshift(datasource.metric.id);
                         return ret;
                     }
-                ))
+                ));
 
                 if (!this.get('chart')) { // generate new chart
                     this.set('chart', c3.generate({
@@ -147,31 +147,46 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                     }));
                 } else if (Mist.graphsController.stream.isStreaming && !reload) { // stream new datapoints in existing chart
                     // Only add values that are not already in the chart
-                    var lastx = null;
+                    var lastx = null, maxLength=0;
                     try{ // maybe there are no datapoints shown on the chart
-                        var shown = chart.data.shown(), maxLength=0, jmax=0;
-                        for (var j=0; j < shown.length; j++)
-                            if (shown[j].values.length > maxLength)
-                                jmax = j
-
+                        var shown = chart.data(), jmax=0;
+                        for (var j=0; j < shown.length; j++) {
+                            if (shown[j].values.length > maxLength){
+                                jmax = j;
+                                maxLength = shown[j].values.length;
+                            }
+                        }
                         lastx = chart.data.shown()[jmax].values.slice(-1)[0].x;
                     } catch(e) {}
 
-                    for (var i=0; i < x.length; i++) {
-                        if (lastx && x[x.length-1-i]<=lastx)
-                            break
-                    }
-                    if (i > 0 ){
-                        var newcols = []
-                        cols.forEach(function(col) {
-                            newcols.push([col[0]].pushObjects(col.slice(0-i)))
+                    if (!lastx) { // if chart emty and data load all columns
+                        for (var z=0;z<cols.length; z++) {
+                            if (cols[z].length>1){
+                                chart.flow({
+                                    columns: cols
+                                });
+                                break;
+                            }
+                        }
+                    } else { // else stream only those that are not shown
+                        for (var i=0; i < x.length; i++) {
+                            if (lastx && x[x.length-1-i]<=lastx)
+                                break
+                        }
+                        if (i > 0 ){
+                            var newcols = []
+                            cols.forEach(function(col) {
+                                newcols.push([col[0]].pushObjects(col.slice(0-i)))
+                            });
+                        }
+                        if (maxLength < MAX_DATAPOINTS )
+                            i = 0;
+                        chart.flow({
+                            duration: 250,
+                            length: i,
+                            columns: newcols
                         });
                     }
-                    chart.flow({
-                        duration: 250,
-                        length: i,
-                        columns: newcols
-                    });
                 } else { // Update data in existing chart
                     chart.load({
                         columns: cols
