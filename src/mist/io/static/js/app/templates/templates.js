@@ -3193,7 +3193,7 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
+  data.buffer.push("\n        <a id=\"start-machine-option\" class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "start", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
@@ -3204,7 +3204,7 @@ function program3(depth0,data) {
 function program5(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
+  data.buffer.push("\n        <a id=\"shutdown-machine-option\" class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "shutdown", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
@@ -3215,7 +3215,7 @@ function program5(depth0,data) {
 function program7(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
+  data.buffer.push("\n        <a id=\"reboot-machine-option\" class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "reboot", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
@@ -3226,7 +3226,7 @@ function program7(depth0,data) {
 function program9(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
+  data.buffer.push("\n        <a id=\"destroy-machine-option\" class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "destroy", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
