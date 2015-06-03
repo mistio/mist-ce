@@ -149,7 +149,12 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                     // Only add values that are not already in the chart
                     var lastx = null;
                     try{ // maybe there are no datapoints shown on the chart
-                        lastx = chart.data.shown()[0].values.slice(-1)[0].x;
+                        var shown = chart.data.shown(), maxLength=0, jmax=0;
+                        for (var j=0; j < shown.length; j++)
+                            if (shown[j].values.length > maxLength)
+                                jmax = j
+
+                        lastx = chart.data.shown()[jmax].values.slice(-1)[0].x;
                     } catch(e) {}
 
                     for (var i=0; i < x.length; i++) {
