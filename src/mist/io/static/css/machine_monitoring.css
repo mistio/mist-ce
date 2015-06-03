@@ -4,6 +4,10 @@
     overflow: hidden;
 }
 
+.graph-body {
+    height: 200px;
+}
+
 #GraphsArea .valuePopUp{
     z-index: 1;
     display: none;
@@ -19,18 +23,6 @@
     font-weight:bold;
     color: #404040;
     background-color: #eee; /* W3C */
-}
-
-.graph .grid-x .tick {
-    stroke: #BABABA;
-}
-
-.graph .grid-y .tick {
-    stroke: #EDEDED;
-}
-
-.graph .grid-x path,.graph .grid-y path {
-    stroke-width: 1;
 }
 
 .graphControls {
@@ -120,50 +112,10 @@
     text-indent: 22px;
     -moz-appearance:none;
     -webkit-appearance: none;
-
-
 }
 
-.graph svg {
-    font: 10px Arial;
-    font-weight: bold;
-    color : #363636;
-    overflow: hidden;
-    margin-left: -10px;
-}
-
-.graph .hideAnimeLine,
-.graph svg {
-    fill: #fff;
-    background-color: #fff;
-}
-
-    /*, .x-axis line*/
-.graph .x-axis path, .graph .y-axis path {
-    fill: none;
-    stroke: none;
-    /*stroke: #333333;
-    stroke-width: 1;
-    /*shape-rendering: crispEdges;*/
-}
-
-.graph .x-axis text, .graph .y-axis text{
-    cursor: default;
-    stroke: none;
-    text-anchor: end;
-    fill: #333333;
-}
-
-.graph .axisLine,.graph .selectorLine{
-    fill:none;
-    stroke: #333333;
-    stroke-width: 1;
-}
-
-.area {
-    width: 500px;
-    height: 200px;
-    background-color: #eee;
+.graph .c3-line {
+  stroke-width: 2px ;
 }
 
 #machine-monitoring #machine-monitoring-disabled {

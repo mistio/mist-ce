@@ -1,7 +1,7 @@
 
 /* Import css files
 -----------------------------------------------------------------------------------------------------------*/
-
+@import url('c3.min.css');
 @import url('jquery.mobile.structure-1.4.5.min.css');
 @import url('theme.css');
 @import url('images/sprite-build/sprites.css');
@@ -718,4 +718,47 @@ ul.checkbox-list li label {
 
 .no-width {
     width: 0% !important;
+}
+
+
+
+
+.field-wrapper {
+    display: talbe;
+    width: 100%;
+    margin-top: -0.5em;
+}
+.field-wrapper > div {
+    display: table-cell;
+    vertical-align: middle;
+}
+.field-wrapper * {
+    border-radius: 0;
+}
+.field-wrapper > div > .ui-input-text,
+.field-wrapper > div > .ui-btn {
+    box-sizing: border-box;
+    height: 2.2em;
+}
+.field-wrapper .first-child {
+    width: 100%;
+}
+.field-wrapper div.first-child > * {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.field-wrapper div.last-child > * {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.field-wrapper .first-child > .ui-btn {
+    line-height: .7em;
+}
+.field-wrapper .first-child.last-child {
+    display: block;
+    margin-top: 0.8em;
+}
+
+.ui-icon-question:after {
+    background-position: 6px 3px;
 }
