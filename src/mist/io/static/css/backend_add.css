@@ -2,7 +2,7 @@
 /* Backend Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
 #backend-add label {
-    margin-top: 20px;
+    margin-top: 1em;
 }
 #backend-add .mist-select ul {
     max-height: 165px;
@@ -24,7 +24,7 @@
     margin-bottom: -20px;
 }
 
-#backend-add  .toggle-field {
+#backend-add .toggle-field {
     width: 100%;
 }
 
@@ -44,4 +44,19 @@
 
 #backend-add .docker.on label {
     display: none;
+}
+
+#backend-add .label-wrapper {
+    display: table;
+    width: 100%;
+}
+
+
+#help-tooltip {
+    font-size: 14px;
+    padding: .5em;
+}
+
+#help-tooltip a {
+    font-weight: normal;
 }
