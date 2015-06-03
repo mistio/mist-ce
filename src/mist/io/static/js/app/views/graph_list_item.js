@@ -61,7 +61,14 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                     return;
 
                 var source0 = graph.datasources[0],
-                    unit = source0.metric.unit,
+                    maxpoints = 0;
+
+                // Get the source with the max no of datapoints
+                for (var i=0; i < graph.datasources.length; i++)
+                    if (graph.datasources[i].datapoints.length > maxpoints)
+                        source0 = graph.datasources[i];
+
+                var unit = source0.metric.unit,
                     lastpoint = source0.datapoints[source0.datapoints.length-1];
 
                 for (var i=0; i < graph.datasources.length; i++)
@@ -78,7 +85,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                         var ret = datasource.datapoints.map(function (datapoint) {
                             return datapoint.value;
                         });
-                        if (machines.length > 1)
+                        if (graph.multi)
                             ret.unshift(datasource.machine.name)
                         else
                             ret.unshift(datasource.metric.id);
