@@ -8,10 +8,6 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
 
         'use strict';
 
-        // Limit the amount of datapoints to
-        // preserve memory (especially on mobile)
-        var MAX_DATAPOINTS = 60;
-
         return Ember.Object.extend({
 
 
