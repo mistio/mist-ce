@@ -22,8 +22,9 @@
 #backend-buttons .ui-controlgroup-controls .ui-btn {
     border: 1px solid #fafafa;
     margin-top: 10px;
+    margin-right: .5em;
     padding: 10px 0 9px !important;
-    background-color: transparent;
+    background-color: #F9F8F3;
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn:hover {
     background-color: #eee;

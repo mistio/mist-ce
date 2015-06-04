@@ -1,6 +1,6 @@
 <div id="home-page" data-role="page" class="ui-page-active ui-page">
     <!-- Page header -->
-    <div class="ui-header ui-bar-b">
+    <div class="ui-header ui-bar-a">
         <h1 class="ui-title">mist.io</h1>
         {{view "userMenu"}}
     </div>
@@ -10,7 +10,7 @@
 
         <!-- Add backend button -->
         <a id="add-backend-btn" class="ui-link ui-btn ui-btn-d ui-icon-plus
-            ui-btn-icon-right ui-shadow ui-corner-all ui-mini"
+            ui-btn-icon-left ui-shadow ui-corner-all ui-mini"
             {{action "addBackend" target="view"}} data-mini="true">
                 Add cloud
         </a>
@@ -32,7 +32,7 @@
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
                         <!-- Machines link -->
                         <li class="ui-li-has-count ui-first-child">
-                            <a class="ui-btn" href="#/machines">
+                            <a class="ui-btn ui-btn-icon-left ui-icon-bars ui-alt-icon" href="#/machines">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.backendsController.machineCount}}
                                 </span>
@@ -42,7 +42,7 @@
 
                         <!-- Images link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn" href="#/images">
+                            <a class="ui-btn ui-btn-icon-left ui-icon-bars ui-alt-icon" href="#/images">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.backendsController.imageCount}}
                                 </span>
@@ -53,7 +53,7 @@
                         <!-- Networks link -->
                         {{#if Mist.backendsController.hasNetworks}}
                         <li class="ui-li-has-count">
-                            <a class="ui-btn" href="#/networks">
+                            <a class="ui-btn ui-btn-icon-left ui-icon-bars ui-alt-icon" href="#/networks">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.backendsController.networkCount}}
                                 </span>
@@ -64,7 +64,7 @@
 
                         <!-- Keys link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn" href="#/keys">
+                            <a class="ui-btn ui-btn-icon-left ui-icon-bars ui-alt-icon" href="#/keys">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.keysController.content.length}}
                                 </span>
@@ -75,7 +75,7 @@
                         {{#if Mist.isCore}}
                         <!-- Scripts link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn" href="#/scripts">
+                            <a class="ui-btn ui-btn-icon-left ui-icon-bars ui-alt-icon" href="#/scripts">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.scriptsController.length}}
                                 </span>

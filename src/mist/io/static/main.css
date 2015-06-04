@@ -63,7 +63,7 @@
 }
 .mist-progress {
     border: 1px solid white;
-    border-radius: 25px;
+    border-radius: .1em;
     bottom: 3px;
     height: 0;
     left: 0;
@@ -74,7 +74,7 @@
 }
 .mist-progress-wrapper {
     border: 1px solid white;
-    border-radius: 15px;
+    border-radius: .1em;
     bottom: 58px;
     box-shadow: 0 0 2px rgba(255, 255, 255, 1);
     height: 2px;
@@ -88,7 +88,7 @@
 /* Page formating
 -----------------------------------------------------------------------------------------------------------*/
 body {
-    background-color: #F9F9F9 !important;
+    background-color: #e2e2e2 !important;
 }
 .ui-page > .ui-content {
     padding: .5% 1%;
@@ -135,7 +135,7 @@ body {
     width: 135px;
     height: 75px;
     background-color: #9A9A9A;
-    border-radius: 5px;
+    border-radius: .1em;
 }
 
 /* Form fields
@@ -153,6 +153,10 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 /* Buttons
 -----------------------------------------------------------------------------------------------------------*/
+.ui-btn {
+    text-transform: uppercase;
+}
+
 .ui-btn-icon-left {
     padding: .6em 1.1em .6em 2.5em !important;
 }
@@ -297,7 +301,7 @@ ul.checkbox-list li label {
     display: none;
 }
 .checkbox-link .ui-checkbox label {
-    border-radius: 0.1875em 0 0 0.1875em;
+    border-radius: 0.1em 0 0 0.1em;
     background-color: transparent;
     margin: 0 !important;
     border: none;
@@ -361,7 +365,7 @@ ul.checkbox-list li label {
     padding: 0 6px;
     background: #ddd;
     margin-bottom: 5px;
-    border-radius: 19px;
+    border-radius: .1em;
     display: inline-block;
     border: 1px solid #c4c4c4;
 }
@@ -552,7 +556,7 @@ ul.checkbox-list li label {
  * */
 
 .netleds div {
-    border-radius: 0.2em;
+    border-radius: 0.1em;
     float: right;
     height: 16px;
     margin: 0px 1px;
@@ -585,7 +589,7 @@ ul.checkbox-list li label {
 }
 
 .led {
-    border-radius: 0.15em;
+    border-radius: 0.1em;
     float: right;
     height: 16px;
     margin: 0px 1px;
@@ -703,8 +707,8 @@ ul.checkbox-list li label {
 
 /* Border radius override */
 .ui-corner-all {
-    -webkit-border-radius: .25em /*{global-radii-blocks}*/;
-    border-radius: .25em /*{global-radii-blocks}*/;
+    -webkit-border-radius: .1em /*{global-radii-blocks}*/;
+    border-radius: .1em /*{global-radii-blocks}*/;
 }
 
 /* Body border override */

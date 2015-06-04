@@ -72,9 +72,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                     lastpoint = source0.datapoints[source0.datapoints.length-1];
 
                 // prepare x axis column
-                var x = ['x'].pushObjects(source0.datapoints.map(
+                var x = source0.datapoints.map(
                     function(point) { return point.time }
-                ));
+                );
+
+                if (x[0] != 'x') {
+                    x = ['x'].pushObjects(x);
+                }
 
                 graph.get('batches').forEach(function(batch, batchNo) {
                     // prepare other columns
@@ -87,6 +91,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                                 ret.unshift(datasource.machine.name)
                             else
                                 ret.unshift(datasource.metric.id);
+
+                            if (ret.length > x.length) {
+                                error('got more datapoints than timestamps!')
+                                warn(x, ret);
+                            }
                             return ret;
                         }
                     ));
