@@ -9,6 +9,7 @@ DEBUG_LOGS = false;
 // Limit the amount of datapoints to
 // preserve memory (especially on mobile)
 MAX_DATAPOINTS = 60;
+DATASOURCES_PER_GRAPH = 8;
 
 // Define libraries
 require.config({

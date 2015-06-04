@@ -8,6 +8,10 @@
     height: 200px;
 }
 
+#home-page .graph-body {
+    height: 230px;
+}
+
 #GraphsArea .valuePopUp{
     z-index: 1;
     display: none;

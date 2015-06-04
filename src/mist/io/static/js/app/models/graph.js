@@ -25,11 +25,24 @@ define('app/models/graph', ['ember'],
             datasources: null,
 
 
+
             //
             //
             //  Computed Properties
             //
             //
+
+            batches: function (){
+                var i, j=0, l=this.datasources.length, temparray, chunk = DATASOURCES_PER_GRAPH, ret = [];
+                if (!l)
+                    return ret;
+                for (i=0; i<l; i+=chunk) {
+                    temparray = this.datasources.slice(i,i+chunk);
+                    ret.push({id: this.id + '-' + j++,
+                              body: temparray});
+                }
+                return ret;
+            }.property('datasources'),
 
 
             unit: function () {
