@@ -51,8 +51,9 @@
     <!--
         Graph Body
     -->
-
-    <div class="graph-body" {{bind-attr id="view.graph.id"}}>
-    </div>
+    {{#each view.graph.batches}}
+        <div class="graph-body" {{bind-attr id="id"}}>
+        </div>
+    {{/each}}
 
 </div>
