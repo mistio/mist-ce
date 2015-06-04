@@ -985,6 +985,17 @@ function program11(depth0,data) {
   return buffer;
   }
 
+function program13(depth0,data) {
+  
+  var buffer = '';
+  data.buffer.push("\n        <div class=\"graph-body\" ");
+  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
+    'id': ("id")
+  },hashTypes:{'id': "STRING"},hashContexts:{'id': depth0},contexts:[],types:[],data:data})));
+  data.buffer.push(">\n        </div>\n    ");
+  return buffer;
+  }
+
   data.buffer.push("<div class=\"graph\" draggable=\"true\">\n\n    <!--\n        Graph Head\n    -->\n\n    <div class=\"header\">\n\n        <div class=\"title\">\n            ");
   stack1 = helpers._triageMustache.call(depth0, "view.graph.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -997,11 +1008,10 @@ function program11(depth0,data) {
   data.buffer.push("\n\n        <!--\n            Minimize button\n        -->\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.graphsController.config.canMinimize", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n    </div>\n\n    <!--\n        Graph Body\n    -->\n\n    <div class=\"graph-body\" ");
-  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'id': ("view.graph.id")
-  },hashTypes:{'id': "STRING"},hashContexts:{'id': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push(">\n    </div>\n\n</div>\n");
+  data.buffer.push("\n    </div>\n\n    <!--\n        Graph Body\n    -->\n    ");
+  stack1 = helpers.each.call(depth0, "view.graph.batches", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(13, program13, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n\n</div>\n");
   return buffer;
   
 });
