@@ -120,17 +120,18 @@ class Worker(object):
 
         self.exchange = exchange
         self.conn = conn
-        self.chan = conn.channel()
-        self.chan.queue_declare(self.uuid, exclusive=True)
-        self.chan.queue_bind(self.uuid, self.exchange, '%s.#' % self.uuid)
-        self.chan.basic_consume(self.uuid, callback=self.handle_amqp_msg)
-        log.info("%s: Exchange '%s', RPC queue '%s' with routing key '%s.#'.",
-                 self.lbl, self.exchange, self.uuid, self.uuid)
-
+        self.channels = {}
         self.greenlets = {}
         self.stopped = False
 
         log.info("%s: Initialized.", self.lbl)
+
+    def get_chan(self):
+        gid = id(gevent.getcurrent())
+        log.debug("%s: Get channel with greenlet id '%s'.", self.lbl, gid)
+        if gid not in self.channels:
+            self.channels[gid] = self.conn.channel()
+        return self.channels[gid]
 
     def start(self):
         """Start all greenlets for this worker"""
@@ -143,12 +144,21 @@ class Worker(object):
     def listen_amqp(self):
         """Block on channel messages until an exception raises"""
         log.info("%s: Starting amqp subscriber.""", self.lbl)
+        # must start new channel because this will run in a greenlet
+        # chan = self.get_chan()
+        chan = self.conn.channel()
+        chan.queue_declare(self.uuid, exclusive=True)
+        chan.queue_bind(self.uuid, self.exchange, '%s.#' % self.uuid)
+        chan.basic_consume(self.uuid, callback=self.handle_amqp_msg)
+        log.info("%s: Exchange '%s', queue '%s' with routing key '%s.#'.",
+                 self.lbl, self.exchange, self.uuid, self.uuid)
         try:
             while True:
-                self.chan.wait()
+                chan.wait()
         except BaseException as exc:
             log.error("%s: Amqp consumer received %r, stopping.",
                       self.lbl, exc)
+            chan.close()
 
     def handle_amqp_msg(self, msg):
         """Handle an incoming message from amqp
@@ -181,8 +191,9 @@ class Worker(object):
     def send_amqp_msg(self, data):
         """Send message to amqp"""
         log.info("%s: Sending message to amqp with body %r.", self.lbl, data)
+        chan = self.get_chan()
         msg = data if isinstance(data, amqp.Message) else amqp.Message(data)
-        self.hub.amqp_chan.basic_publish(msg, self.hub.exchange, self.uuid)
+        chan.basic_publish(msg, self.exchange, self.uuid)
 
     def on_echo(self, data):
         """Echo message handler"""
@@ -196,7 +207,8 @@ class Worker(object):
         log.info("%s: Stopping.", self.lbl)
         gevent.killall(self.greenlets.values())
         try:
-            self.chan.close()
+            for chan in self.channels.values():
+                chan.close()
         except Exception as exc:
             log.warning("%s: Error stopping %r", self.lbl, exc)
         self.closed = True
