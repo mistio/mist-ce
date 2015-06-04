@@ -1,5 +1,4 @@
 import uuid
-import json
 import signal
 import logging
 
@@ -9,11 +8,11 @@ import gevent
 import gevent.monkey
 
 
-# Exchange to be used by hub. Should be the same for servers and clients.
+# Exchange to be used by hub. Should be the same for server and clients.
 EXCHANGE = 'hub'
 
 # Routing queue/key for hub requests from clients to servers.
-# Should be the same for servers and clients.
+# Should be the same for server and clients.
 REQUESTS_KEY = 'hub'
 
 
@@ -26,177 +25,221 @@ class ProtocolError(Exception):
     pass
 
 
-class Hub(object):
+class Server(object):
+    """Hub Server"""
 
-    def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY):
+    def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY, workers=None):
+        """Initialize a Hub Server"""
 
-        self.uuid = uuid.uuid4().hex
         self.exchange = exchange
         self.key = key
+        self.worker_cls = {'default': Worker}
+        self.worker_cls.update(workers or {})
+        self.workers = {}
         self.listener = None
-        self.closed = False
-        log.info("Hub Server: Initializing in exchange '%s' "
-                 "with requests queue/key '%s'.", self.key)
+        self.stopped = False
+        self.lbl = "Hub Server"
+        log.info("%s: Initializing.", self.lbl)
 
         # initialize amqp connection and channel, declare exchange
-        self.amqp_conn = amqp.Connection()
-        self.amqp_chan = self.amqp_conn.channel()
-        # self.amqp_chan.basic_qos(0, 1, False)  # prefetch count = 1
-        self.amqp_chan.exchange_declare(self.exchange, 'direct')
+        self.conn = amqp.Connection()
+        self.chan = self.conn.channel()
+        self.chan.exchange_declare(self.exchange, 'topic')
+        log.info("%s: Will use exchange '%s'.", self.lbl, self.exchange)
 
-        # will listen for incoming requests in req_queue
-        self.amqp_chan.queue_declare(self.key)
-        self.amqp_chan.queue_bind(self.key, self.exchange, self.key)
-        self.amqp_chan.basic_consume(self.key, callback=self.on_msg)
-        log.info("Hub Server: Will listen in queue / with key '%s'.", self.key)
+        # declare, bind, set consumer for rpc calls
+        self.chan.basic_qos(0, 1, False)  # prefetch count = 1
+        self.chan.queue_declare(self.key, exclusive=True)
+        self.chan.queue_bind(self.key, self.exchange, '%s.#' % self.key)
+        self.chan.basic_consume(self.key, callback=self.on_rpc)
+        log.info("%s: RPC queue '%s' with routing key '%s.#'.",
+                 self.lbl, self.key, self.key)
 
-        log.info("Hub Server: Initialized.")
+        log.info("%s: Initialized.", self.lbl)
 
-    def on_msg(self, msg):
-        body = msg.body
+    def on_rpc(self, msg):
+        """Handle amqp rpc messages"""
         routing_key = msg.delivery_info.get('routing_key', '')
+        log.info("%s: Received rpc message with routing_key '%s'.",
+                 self.lbl, routing_key)
         try:
-            err_msg = "Invalid body payload %r." % body
-            assert isinstance(body, dict), err_msg
-            assert 'msg_type' in body, err_msg
-            assert 'worker_id' in body, err_msg
-            msg_type = body['msg_type']
-            worker_id = body['worker_id']
-            if msg_type == 'connect':
-                # spawn new worker
-                pass
-            elif msg_type == 'close':
-        except (ProtocolError, AssertionError) as exc:
-            log.error("Hub Server: Exception while handling request: %s", exc)
-        except Exception as exc:
-            log.critical("Hub Server: Unknown exception "
-                         "while handling request: %r", exc)
-
-    def start_worker(self, **kwargs):
-        return
-
-    def parse_msg(self, msg):
-        routing_key = msg.delivery_info.get('routing_key', '')
-        log.info("Hub Server received message with routing key '%s'.",
-                 routing_key)
-        try:
-            body = json.loads(msg.body)
-        except (ValueError, TypeError):
-            raise ProtocolError("Hub Server couldn't json load msg body: %r"
-                                % msg.body)
-        if not (isinstance(body, list) and len(body) == 3 and
-                isinstance(body[0], basestring) and
-                isinstance(body[1], list) and isinstance(body[2], dict)):
-            raise ProtocolError("Invalid body payload: %r" % body)
-        msg_type, args, kwargs = body
-        log.info("Hub Server received %s(*%s, **%s) with routing key '%s'.",
-                 msg_type, args, kwargs, routing_key)
-        log.info(msg.delivery_info.keys())
-        return msg_type, args, kwargs
-
-    def on_request(self, msg):
-        try:
-            msg_type, args, kwargs = self.parse_msg(msg)
-        except ProtocolError as exc:
-            log.error("Error parsing request message: %s", exc)
+            route_parts = routing_key.split('.')
+            assert len(route_parts) == 2
+            assert route_parts[0] == self.key
+            assert route_parts[1] in self.worker_cls
+        except AssertionError:
+            log.error("%s: Invalid routing key '%s'.", self.lbl, routing_key)
             return
-
-    def on_data(self, msg):
-        try:
-            msg_type, args, kwargs = self.parse_msg(msg)
-        except ProtocolError as exc:
-            log.error("Error parsing request message: %s", exc)
-            return
+        worker_cls = self.worker_cls[route_parts[1]]
+        worker = worker_cls(msg.body, self.conn, self.exchange)
+        self.workers[worker.uuid] = worker
+        worker.start()
 
     def run(self):
+        """Run the Hub Server"""
         if self.listener is not None:
-            log.error("%s: Can't call run() twice.", self.lbl)
+            log.warning("%s: Can't call run() twice.", self.lbl)
             return
+        log.info("%s: Starting.", self.lbl)
         self.listener = gevent.spawn(self.listen)
         self.listener.join()
 
     def listen(self):
+        """Block on channel messages until an exception raises"""
+        log.info("%s: Starting amqp consumer.", self.lbl)
         try:
             while True:
-                self.amqp_channel.wait()
+                self.chan.wait()
         except BaseException as exc:
-            log.error("Hub Server amqp consumer received %r, stopping.", exc)
+            log.error("%s: Amqp consumer received %r, stopping.",
+                      self.lbl, exc)
 
     def stop(self):
-        if self.closed:
+        """Stop Hub Server, kill workers, close connections"""
+        if self.stopped:
             return
-        log.info("Stopping Hub Server")
+        log.info("%s: Stopping.", self.lbl)
         if self.listener is not None:
             self.listener.kill()
         try:
-            self.amqp_channel.close()
-            self.amqp_connection.close()
+            self.chan.close()
+            self.conn.close()
         except Exception as exc:
-            log.warning("Error stopping Hub Server: %r", exc)
-        else:
-            self.closed = True
+            log.warning("%s: Error stopping %r", self.lbl, exc)
+        self.closed = True
 
 
 class Worker(object):
-    def __init__(self, hub, **kwargs):
+    """Hub Worker"""
+
+    def __init__(self, params, conn, exchange=EXCHANGE):
         """Initialize a worker proxying a connection"""
-        self.hub = hub
         self.uuid = uuid.uuid4().hex
+        self.lbl = "Hub Worker %s" % self.uuid
+        log.info("%s: Initializing.", self.lbl)
 
-    def on_msg(self, data):
-        """Received message from amqp"""
-        log.info("Worker %s received msg: %s", self.uuid, kwargs)
+        self.exchange = exchange
+        self.conn = conn
+        self.chan = conn.channel()
+        self.chan.queue_declare(self.uuid, exclusive=True)
+        self.chan.queue_bind(self.uuid, self.exchange, '%s.#' % self.uuid)
+        self.chan.basic_consume(self.uuid, callback=self.handle_amqp_msg)
+        log.info("%s: Exchange '%s', RPC queue '%s' with routing key '%s.#'.",
+                 self.lbl, self.exchange, self.uuid, self.uuid)
 
-    def send(self, data):
+        self.greenlets = {}
+        self.stopped = False
+
+        log.info("%s: Initialized.", self.lbl)
+
+    def start(self):
+        """Start all greenlets for this worker"""
+        if self.greenlets:
+            log.warning("%s: Can't call start() twice.", self.lbl)
+            return
+        log.info("%s: Starting.", self.lbl)
+        self.greenlets['amqp_listener'] = gevent.spawn(self.listen_amqp)
+
+    def listen_amqp(self):
+        """Block on channel messages until an exception raises"""
+        log.info("%s: Starting amqp subscriber.""", self.lbl)
+        try:
+            while True:
+                self.chan.wait()
+        except BaseException as exc:
+            log.error("%s: Amqp consumer received %r, stopping.",
+                      self.lbl, exc)
+
+    def handle_amqp_msg(self, msg):
+        """Handle an incoming message from amqp
+
+        A message's body with routing key <uuid>.action will be forwarded
+        to self.on_<action> with the message's body as its single argument.
+
+        """
+        body = msg.body
+        routing_key = msg.delivery_info.get('routing_key', '')
+        log.info("%s: Received message with routing key '%s' and body %r.",
+                 self.lbl, routing_key, body)
+        try:
+            route_parts = routing_key.split('.')
+            assert len(route_parts) == 2, "Routing key should have 2 parts."
+            assert route_parts[0] == self.uuid, "Worker uuid mismatch."
+            action = route_parts[1]
+            attr = 'on_%s' % action
+            assert hasattr(self, attr), "Invalid action %s." % action
+        except AssertionError as exc:
+            log.error("%s: Error parsing amqp msg with routing key '%s' and "
+                      "body %r. %s", self.lbl, routing_key, body, exc)
+            return
+        try:
+            getattr(self, attr)(msg.body)
+        except Exception as exc:
+            log.error("%s: Error parsing amqp msg with routing key '%s' and "
+                      "body %r. %s", self.lbl, routing_key, body, exc)
+
+    def send_amqp_msg(self, data):
         """Send message to amqp"""
+        log.info("%s: Sending message to amqp with body %r.", self.lbl, data)
         msg = data if isinstance(data, amqp.Message) else amqp.Message(data)
         self.hub.amqp_chan.basic_publish(msg, self.hub.exchange, self.uuid)
 
+    def on_echo(self, data):
+        """Echo message handler"""
+        log.info("%s: Received on_echo %r. Will echo back.", self.lbl, data)
+        self.send_amqp_msg(data)
+
     def stop(self):
         """Stop this worker"""
-        pass
-
+        if self.stopped:
+            return
+        log.info("%s: Stopping.", self.lbl)
+        gevent.killall(self.greenlets.values())
+        try:
+            self.chan.close()
+        except Exception as exc:
+            log.warning("%s: Error stopping %r", self.lbl, exc)
+        self.closed = True
 
 
 class Client(object):
-    def __init__(self, exchange=EXCHANGE, req_routing_key=KEY):
-        log.info("Initializing Hub Client.")
+    def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY):
+        self.lbl = "Hub Client"
+        log.info("%s: Initializing.", self.lbl)
         self.exchange = exchange
-        self.req_routing_key = req_routing_key
-        self.amqp_connection = amqp.Connection()
-        self.amqp_channel = self.amqp_connection.channel()
-        self.amqp_channel.exchange_declare(self.exchange, 'direct')
+        self.key = key
 
-        self.callback_queue = self.amqp_channel.queue_declare().queue
-        self.amqp_channel.queue_bind(self.data_queue, self.exchange,
-                                     self.data_queue)
-        self.amqp_channel.basic_consume(self.data_queue,
-                                        callback=self.on_data)
-        log.info("Hub Server bound requests queue '%s' to routing key '%s'.",
-                 self.req_queue, self.req_routing_key)
+        self.conn = amqp.Connection()
+        self.chan = self.conn.channel()
+        self.queue = self.chan.queue_declare(exclusive=True).queue
+        self.chan.queue_bind(self.queue, self.exchange, self.queue)
+        self.chan.basic_consume(self.queue, callback=self.on_msg)
+        self.send_request()
 
-    def send_message(self, msg_type, *args, **kwargs):
-        msg = amqp.Message(json.dumps([msg_type, args, kwargs]))
-        self.amqp_channel.basic_publish(msg, self.exchange, self.routing_key)
-
-    def send_request(self, msg_type, *args, **kwargs):
+    def send_request(self, worker_type='default', **kwargs):
         correlation_id = uuid.uuid4().hex
+        reply_to = self.queue
+        routing_key = '%s.%s' % (self.key, worker_type)
+        msg = amqp.Message(correlation_id=correlation_id, reply_to=reply_to)
+        self.chan.basic_publish(msg, self.exchange, routing_key)
 
-        msg = amqp.Message(json.dumps([msg_type, args, kwargs]))
-        self.amqp_channel.basic_publish(msg, self.exchange,
-                                        self.req_routing_key)
+    def on_msg(self, msg):
+        body = msg.body
+        routing_key = msg.delivery_info.get('routing_key', '')
+        log.info("%s: Received message with routing key '%s' and body %r.",
+                 self.lbl, routing_key, body)
 
 
 def main():
     logfmt = "[%(asctime)-15s][%(levelname)s] %(module)s - %(message)s"
-    loglvl = logging.INFO
+    loglvl = logging.DEBUG
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter(logfmt))
     handler.setLevel(loglvl)
     logging.root.addHandler(handler)
     logging.root.setLevel(loglvl)
 
-    hub = Hub()
+    hub = Server()
 
     def sig_handler(sig=None, frame=None):
         log.warning("Hubo process received SIGTERM/SIGINT")
