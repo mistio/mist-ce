@@ -21,8 +21,68 @@ gevent.monkey.patch_all()
 log = logging.getLogger(__name__)
 
 
-class ProtocolError(Exception):
-    pass
+class AmqpHelper(object):
+    def __init__(self):
+        self.conns = {}
+        self.chans = {}
+        self.lbl = self.__class__.__name__
+
+    @property
+    def greenlet_id(self):
+        """Find current greenlet's id"""
+        return id(gevent.getcurrent())
+
+    @property
+    def conn(self):
+        """Find or create current greenlet's amqp connection"""
+        gid = self.greenlet_id
+        if gid not in self.conns:
+            log.debug("%s: Opening new amqp connection.", self.lbl)
+            self.conns[gid] = amqp.Connection()
+        return self.conns[gid]
+
+    def close_conn(self):
+        """Close current greenlet's amqp connection"""
+        gid = self.greenlet_id
+        if gid not in self.conns:
+            log.warning("%s: No connection open to close.", self.lbl)
+        else:
+            self.conns.pop(gid).close()
+
+    @property
+    def chan(self):
+        """Find or create current greenlet's amqp channel"""
+        gid = self.greenlet_id
+        if gid not in self.chans:
+            conn = self.conn
+            log.debug("%s: Opening new amqp channel.", self.lbl)
+            self.chans[gid] = conn.channel()
+        return self.chans[gid]
+
+    def close_chan(self):
+        """Close current greenlet's amqp channel"""
+        gid = self.greenlet_id
+        if gid not in self.chans:
+            log.warning("%s: No channel open to close.", self.lbl)
+        else:
+            self.chans.pop(gid).close()
+
+    def listen_amqp(self):
+        """Block on channel messages until an exception raises"""
+        log.info("%s: Starting amqp consumer.", self.lbl)
+        try:
+            while True:
+                self.chan.wait()
+        except BaseException as exc:
+            log.error("%s: Amqp consumer received %r, stopping.",
+                      self.lbl, exc)
+            self.close_chan()
+
+    def stop(self):
+        for gid in self.chans.keys():
+            self.chans.pop(gid).close()
+        while self.conns.keys():
+            self.conns.pop(gid).close()
 
 
 class Server(object):
@@ -71,7 +131,7 @@ class Server(object):
             log.error("%s: Invalid routing key '%s'.", self.lbl, routing_key)
             return
         worker_cls = self.worker_cls[route_parts[1]]
-        worker = worker_cls(msg.body, self.conn, self.exchange)
+        worker = worker_cls(msg.body, self.exchange)
         self.workers[worker.uuid] = worker
         worker.start()
 
@@ -109,29 +169,21 @@ class Server(object):
         self.closed = True
 
 
-class Worker(object):
+class Worker(AmqpHelper):
     """Hub Worker"""
 
-    def __init__(self, params, conn, exchange=EXCHANGE):
+    def __init__(self, params, exchange=EXCHANGE):
         """Initialize a worker proxying a connection"""
+        super(Worker, self).__init__()
         self.uuid = uuid.uuid4().hex
         self.lbl = "Hub Worker %s" % self.uuid
         log.info("%s: Initializing.", self.lbl)
 
         self.exchange = exchange
-        self.conn = conn
-        self.channels = {}
         self.greenlets = {}
         self.stopped = False
 
         log.info("%s: Initialized.", self.lbl)
-
-    def get_chan(self):
-        gid = id(gevent.getcurrent())
-        log.debug("%s: Get channel with greenlet id '%s'.", self.lbl, gid)
-        if gid not in self.channels:
-            self.channels[gid] = self.conn.channel()
-        return self.channels[gid]
 
     def start(self):
         """Start all greenlets for this worker"""
@@ -144,21 +196,12 @@ class Worker(object):
     def listen_amqp(self):
         """Block on channel messages until an exception raises"""
         log.info("%s: Starting amqp subscriber.""", self.lbl)
-        # must start new channel because this will run in a greenlet
-        # chan = self.get_chan()
-        chan = self.conn.channel()
-        chan.queue_declare(self.uuid, exclusive=True)
-        chan.queue_bind(self.uuid, self.exchange, '%s.#' % self.uuid)
-        chan.basic_consume(self.uuid, callback=self.handle_amqp_msg)
+        self.chan.queue_declare(self.uuid, exclusive=True)
+        self.chan.queue_bind(self.uuid, self.exchange, '%s.#' % self.uuid)
+        self.chan.basic_consume(self.uuid, callback=self.handle_amqp_msg)
         log.info("%s: Exchange '%s', queue '%s' with routing key '%s.#'.",
                  self.lbl, self.exchange, self.uuid, self.uuid)
-        try:
-            while True:
-                chan.wait()
-        except BaseException as exc:
-            log.error("%s: Amqp consumer received %r, stopping.",
-                      self.lbl, exc)
-            chan.close()
+        super(Worker, self).listen_amqp()
 
     def handle_amqp_msg(self, msg):
         """Handle an incoming message from amqp
@@ -191,9 +234,8 @@ class Worker(object):
     def send_amqp_msg(self, data):
         """Send message to amqp"""
         log.info("%s: Sending message to amqp with body %r.", self.lbl, data)
-        chan = self.get_chan()
         msg = data if isinstance(data, amqp.Message) else amqp.Message(data)
-        chan.basic_publish(msg, self.exchange, self.uuid)
+        self.chan.basic_publish(msg, self.exchange, self.uuid)
 
     def on_echo(self, data):
         """Echo message handler"""
@@ -206,11 +248,7 @@ class Worker(object):
             return
         log.info("%s: Stopping.", self.lbl)
         gevent.killall(self.greenlets.values())
-        try:
-            for chan in self.channels.values():
-                chan.close()
-        except Exception as exc:
-            log.warning("%s: Error stopping %r", self.lbl, exc)
+        super(Worker, self).stop()
         self.closed = True
 
 
