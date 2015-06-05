@@ -69,7 +69,7 @@ class AmqpHelper(object):
 
     def listen_amqp(self):
         """Block on channel messages until an exception raises"""
-        log.info("%s: Starting amqp consumer.", self.lbl)
+        log.info("%s (AmqpHelper): Starting amqp subscriber.", self.lbl)
         try:
             while True:
                 self.chan.wait()
@@ -130,10 +130,24 @@ class Server(object):
         except AssertionError:
             log.error("%s: Invalid routing key '%s'.", self.lbl, routing_key)
             return
+        try:
+            assert 'correlation_id' in msg.properties
+            assert 'reply_to' in msg.properties
+            correlation_id = msg.properties['correlation_id']
+            reply_to = msg.properties['reply_to']
+        except AssertionError:
+            log.error("%s: Couldn't find correlation_id and reply_to for "
+                      "response. Properties: %s", self.lbl, msg.properties)
+            return
+        log.info("%s: Msg has correlation_id '%s' and reply_to '%s'.",
+                 self.lbl, correlation_id, reply_to)
         worker_cls = self.worker_cls[route_parts[1]]
         worker = worker_cls(msg.body, self.exchange)
         self.workers[worker.uuid] = worker
         worker.start()
+        # send back rpc response
+        msg = amqp.Message(worker.uuid, correlation_id=correlation_id)
+        self.chan.basic_publish(msg, self.exchange, reply_to)
 
     def run(self):
         """Run the Hub Server"""
