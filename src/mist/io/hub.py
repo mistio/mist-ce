@@ -266,32 +266,62 @@ class Worker(AmqpHelper):
         self.closed = True
 
 
-class Client(object):
-    def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY):
+class Client(AmqpHelper):
+    def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY,
+                 worker_type='default', **worker_kwargs):
+        super(Client, self).__init__()
         self.lbl = "Hub Client"
         log.info("%s: Initializing.", self.lbl)
         self.exchange = exchange
         self.key = key
 
-        self.conn = amqp.Connection()
-        self.chan = self.conn.channel()
+        # define callback queue
         self.queue = self.chan.queue_declare(exclusive=True).queue
         self.chan.queue_bind(self.queue, self.exchange, self.queue)
         self.chan.basic_consume(self.queue, callback=self.on_msg)
-        self.send_request()
 
-    def send_request(self, worker_type='default', **kwargs):
-        correlation_id = uuid.uuid4().hex
+        # send rpc request
+        self.routing_key = None
+        self.correlation_id = uuid.uuid4().hex
         reply_to = self.queue
         routing_key = '%s.%s' % (self.key, worker_type)
-        msg = amqp.Message(correlation_id=correlation_id, reply_to=reply_to)
+        msg = amqp.Message(worker_kwargs, correlation_id=self.correlation_id,
+                           reply_to=reply_to)
         self.chan.basic_publish(msg, self.exchange, routing_key)
+
+        # wait for rpc response
+        try:
+            while not self.routing_key:
+                self.chan.wait()
+        except BaseException as exc:
+            log.error("%s: Amqp consumer received %r while waiting for RPC "
+                      "response. Stopping.", self.lbl, exc)
+        log.info("%s: Finished waiting for RPC response.", self.lbl)
 
     def on_msg(self, msg):
         body = msg.body
         routing_key = msg.delivery_info.get('routing_key', '')
         log.info("%s: Received message with routing key '%s' and body %r.",
                  self.lbl, routing_key, body)
+
+        if not self.routing_key:
+            # waiting for RPC response
+            if not routing_key == self.queue:
+                log.warning("%s: Got msg with routing key '%s' when expecting "
+                            "'%s'.", self.lbl, routing_key, self.queue)
+                return
+            if self.correlation_id != msg.properties.get('correlation_id'):
+                log.warning(
+                    "%s: Got msg with corr_id '%s' when expecting '%s'.",
+                    self.lbl, msg.properties.get('correlation_id'),
+                    self.correlation_id
+                )
+                return
+            self.routing_key = msg.body
+            log.info("%s: Received RPC response with body %r.",
+                     self.lbl, msg.body)
+        else:
+            log.info("%s: Received msg with body %r.", self.lbl, msg.body)
 
 
 def main():
