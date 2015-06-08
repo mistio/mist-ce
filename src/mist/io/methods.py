@@ -865,6 +865,21 @@ def _add_backend_hostvirtual(title, provider, params):
 
     return backend_id, backend
 
+def _add_backend_vultr(title, provider, params):
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = api_key
+    backend.apisecret = api_key
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
 
 def _add_backend_vultr(title, provider, params):
     api_key = params.get('api_key', '')
@@ -2123,6 +2138,30 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
         )
     except Exception as e:
         raise MachineCreationError("HostVirtual, got exception %s" % e, e)
+
+    return node
+
+def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
+    """Create a machine in Vultr.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+
+    auth = NodeAuthSSHKey(pubkey=key)
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            auth=auth,
+            location=location
+        )
+    except Exception as e:
+        raise MachineCreationError("Vultr, got exception %s" % e, e)
 
     return node
 
