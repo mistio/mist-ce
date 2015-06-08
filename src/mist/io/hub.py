@@ -1,7 +1,6 @@
 import sys
 import uuid
 import signal
-import socket
 import logging
 import argparse
 
@@ -441,17 +440,19 @@ class EchoHubClient(HubClient):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Start Hub Server or client")
+    parser.add_argument('mode', help="Must be 'server' or 'client'.")
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help="Set log level to DEBUG")
+    args = parser.parse_args()
+
     logfmt = "[%(asctime)-15s][%(levelname)s] %(module)s - %(message)s"
-    loglvl = logging.DEBUG
+    loglvl = logging.DEBUG if args.verbose else logging.INFO
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter(logfmt))
     handler.setLevel(loglvl)
     logging.root.addHandler(handler)
     logging.root.setLevel(loglvl)
-
-    parser = argparse.ArgumentParser(description="Start Hub Server or client")
-    parser.add_argument('mode', help="Must be 'server' or 'client'.")
-    args = parser.parse_args()
 
     if args.mode == 'server':
         hub = Server()
