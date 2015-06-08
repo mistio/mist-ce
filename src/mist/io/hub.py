@@ -1,5 +1,6 @@
 import uuid
 import signal
+import socket
 import logging
 
 import amqp
@@ -111,7 +112,7 @@ class Server(object):
         self.chan.basic_qos(0, 1, False)  # prefetch count = 1
         self.chan.queue_declare(self.key, exclusive=True)
         self.chan.queue_bind(self.key, self.exchange, '%s.#' % self.key)
-        self.chan.basic_consume(self.key, callback=self.on_rpc)
+        self.chan.basic_consume(self.key, callback=self.on_rpc, no_ack=True)
         log.info("%s: RPC queue '%s' with routing key '%s.#'.",
                  self.lbl, self.key, self.key)
 
@@ -145,9 +146,10 @@ class Server(object):
         worker = worker_cls(msg.body, self.exchange)
         self.workers[worker.uuid] = worker
         worker.start()
-        # send back rpc response
+        log.info("%s: Sending back RPC response.", self.lbl)
         msg = amqp.Message(worker.uuid, correlation_id=correlation_id)
         self.chan.basic_publish(msg, self.exchange, reply_to)
+        log.info("%s: On RPC handler finished.", self.lbl)
 
     def run(self):
         """Run the Hub Server"""
@@ -157,16 +159,24 @@ class Server(object):
         log.info("%s: Starting.", self.lbl)
         self.listener = gevent.spawn(self.listen)
         self.listener.join()
+        self.info("%s: Run ended.", self.lbl)
 
     def listen(self):
         """Block on channel messages until an exception raises"""
         log.info("%s: Starting amqp consumer.", self.lbl)
         try:
             while True:
+                log.info("%s: Waiting for AMQP message. %s",
+                         self.lbl, id(self.conn))
                 self.chan.wait()
+                # try:
+                #     self.conn.drain_events(1)
+                # except socket.timeout:
+                #     log.info("%s: Drain events timeout.", self.lbl)
         except BaseException as exc:
             log.error("%s: Amqp consumer received %r, stopping.",
                       self.lbl, exc)
+        log.info("%s: Not listening any more.", self.lbl)
 
     def stop(self):
         """Stop Hub Server, kill workers, close connections"""
@@ -212,7 +222,8 @@ class Worker(AmqpHelper):
         log.info("%s: Starting amqp subscriber.""", self.lbl)
         self.chan.queue_declare(self.uuid, exclusive=True)
         self.chan.queue_bind(self.uuid, self.exchange, '%s.#' % self.uuid)
-        self.chan.basic_consume(self.uuid, callback=self.handle_amqp_msg)
+        self.chan.basic_consume(self.uuid, callback=self.handle_amqp_msg,
+                                no_ack=True)
         log.info("%s: Exchange '%s', queue '%s' with routing key '%s.#'.",
                  self.lbl, self.exchange, self.uuid, self.uuid)
         super(Worker, self).listen_amqp()
@@ -256,6 +267,9 @@ class Worker(AmqpHelper):
         log.info("%s: Received on_echo %r. Will echo back.", self.lbl, data)
         self.send_amqp_msg(data)
 
+    def on_close(self, data):
+        self.stop()
+
     def stop(self):
         """Stop this worker"""
         if self.stopped:
@@ -278,7 +292,8 @@ class Client(AmqpHelper):
         # define callback queue
         self.queue = self.chan.queue_declare(exclusive=True).queue
         self.chan.queue_bind(self.queue, self.exchange, self.queue)
-        self.chan.basic_consume(self.queue, callback=self.on_msg)
+        self.chan.basic_consume(self.queue, callback=self.on_msg, no_ack=True)
+        log.info("%s: Initialized amqp connection, channel, queue.", self.lbl)
 
         # send rpc request
         self.worker_id = None
@@ -288,10 +303,13 @@ class Client(AmqpHelper):
         msg = amqp.Message(worker_kwargs, correlation_id=self.correlation_id,
                            reply_to=reply_to)
         self.chan.basic_publish(msg, self.exchange, routing_key)
+        log.info("%s: Just sent RPC request, will wait for response.",
+                 self.lbl)
 
         # wait for rpc response
         try:
             while not self.worker_id:
+                log.info("%s: Waiting for RPC response.", self.lbl)
                 self.chan.wait()
         except BaseException as exc:
             log.error("%s: Amqp consumer received %r while waiting for RPC "
