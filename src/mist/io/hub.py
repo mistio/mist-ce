@@ -184,24 +184,18 @@ class AmqpGeventBase(object):
             self.stop()
 
 
-class Server(object):
+class HubServer(AmqpGeventBase):
     """Hub Server"""
 
     def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY, workers=None):
         """Initialize a Hub Server"""
-        self.exchange = exchange
+        super(HubServer, self).__init__(exchange)
         self.key = key
         self.worker_cls = {'echo': EchoHubWorker}
         self.worker_cls.update(workers or {})
-        self.workers = {}
-        self.listener = None
-        self.stopped = False
-        self.lbl = "Hub Server"
-        log.info("%s: Initializing.", self.lbl)
 
+    def amqp_consume(self):
         # initialize amqp connection and channel, declare exchange
-        self.conn = amqp.Connection()
-        self.chan = self.conn.channel()
         self.chan.exchange_declare(self.exchange, 'topic')
         log.info("%s: Will use exchange '%s'.", self.lbl, self.exchange)
 
@@ -209,16 +203,16 @@ class Server(object):
         self.chan.basic_qos(0, 1, False)  # prefetch count = 1
         self.chan.queue_declare(self.key, exclusive=True)
         self.chan.queue_bind(self.key, self.exchange, '%s.#' % self.key)
-        self.chan.basic_consume(self.key, callback=self.on_rpc, no_ack=True)
+        self.chan.basic_consume(self.key, callback=self.amqp_handle_msg,
+                                no_ack=True)
         log.info("%s: RPC queue '%s' with routing key '%s.#'.",
                  self.lbl, self.key, self.key)
+        super(HubServer, self).amqp_consume()
 
-        log.info("%s: Initialized.", self.lbl)
-
-    def on_rpc(self, msg):
-        """Handle amqp rpc messages"""
+    def amqp_handle_msg(self, msg):
+        """Handle AMQP RPC messages"""
         routing_key = msg.delivery_info.get('routing_key', '')
-        log.info("%s: Received rpc message with routing_key '%s'.",
+        log.info("%s: Received RPC AMQP message with routing_key '%s'.",
                  self.lbl, routing_key)
         try:
             route_parts = routing_key.split('.')
@@ -237,51 +231,15 @@ class Server(object):
             log.error("%s: Couldn't find correlation_id and reply_to for "
                       "response. Properties: %s", self.lbl, msg.properties)
             return
-        log.info("%s: Msg has correlation_id '%s' and reply_to '%s'.",
-                 self.lbl, correlation_id, reply_to)
+        log.debug("%s: Msg has correlation_id '%s' and reply_to '%s'.",
+                  self.lbl, correlation_id, reply_to)
         worker_cls = self.worker_cls[route_parts[1]]
         worker = worker_cls(msg.body, self.exchange)
-        self.workers[worker.uuid] = worker
+        self.greenlets[worker.uuid] = worker
         worker.start()
-        log.info("%s: Sending back RPC response.", self.lbl)
+        log.info("%s: Sending back RPC AMQP response.", self.lbl)
         msg = amqp.Message(worker.uuid, correlation_id=correlation_id)
         self.chan.basic_publish(msg, self.exchange, reply_to)
-        log.info("%s: On RPC handler finished.", self.lbl)
-
-    def run(self):
-        """Run the Hub Server"""
-        if self.listener is not None:
-            log.warning("%s: Can't call run() twice.", self.lbl)
-            return
-        log.info("%s: Starting.", self.lbl)
-        self.listener = gevent.spawn(self.listen)
-        self.listener.join()
-        self.info("%s: Run ended.", self.lbl)
-
-    def listen(self):
-        """Block on channel messages until an exception raises"""
-        log.info("%s: Starting amqp consumer.", self.lbl)
-        try:
-            while True:
-                self.chan.wait()
-        except BaseException as exc:
-            log.error("%s: Amqp consumer received %r, stopping.",
-                      self.lbl, exc)
-        log.info("%s: Not listening any more.", self.lbl)
-
-    def stop(self):
-        """Stop Hub Server, kill workers, close connections"""
-        if self.stopped:
-            return
-        log.info("%s: Stopping.", self.lbl)
-        if self.listener is not None:
-            self.listener.kill()
-        try:
-            self.chan.close()
-            self.conn.close()
-        except Exception as exc:
-            log.warning("%s: Error stopping %r", self.lbl, exc)
-        self.closed = True
 
 
 class HubWorker(AmqpGeventBase):
@@ -318,12 +276,13 @@ class HubWorker(AmqpGeventBase):
 class EchoHubWorker(HubWorker):
     """Echoes back messages sent with routing suffix 'echo'"""
 
-    def on_echo(self, data):
+    def on_echo(self, msg):
         """Echo back messages sent with routing suffix 'echo'"""
-        log.info("%s: Received on_echo %r. Will echo back.", self.lbl, data)
-        self.send_to_client('echo', data)
+        log.info("%s: Received on_echo %r. Will echo back.",
+                 self.lbl, msg.body)
+        self.send_to_client('echo', msg.body)
 
-    def on_close(self, data):
+    def on_close(self, msg):
         """Stop self when msg with routing suffix 'close' received"""
         log.info("%s: Received on_close.", self.lbl)
         self.stop()
@@ -455,7 +414,7 @@ def main():
     logging.root.setLevel(loglvl)
 
     if args.mode == 'server':
-        hub = Server()
+        hub = HubServer()
 
         def sig_handler(sig=None, frame=None):
             log.warning("Hub process received SIGTERM/SIGINT")
@@ -464,11 +423,9 @@ def main():
         # gevent.signal(signal.SIGTERM, sig_handler)
         # gevent.signal(signal.SIGINT, sig_handler)  # KeyboardInterrupt also
 
-        try:
-            hub.run()
-        except BaseException as exc:
-            log.error("Hub run interrupted by exception: %r", exc)
-            hub.stop()
+        hub.start()
+        while True:
+            gevent.sleep(1)
     elif args.mode == 'client':
         client = EchoHubClient()
         client.start()
