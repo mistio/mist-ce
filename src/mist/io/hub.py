@@ -249,7 +249,7 @@ class Worker(AmqpHelper):
         """Send message to amqp"""
         log.info("%s: Sending message to amqp with body %r.", self.lbl, data)
         msg = data if isinstance(data, amqp.Message) else amqp.Message(data)
-        self.chan.basic_publish(msg, self.exchange, self.uuid)
+        self.chan.basic_publish(msg, self.exchange, 'from_%s' % self.uuid)
 
     def on_echo(self, data):
         """Echo message handler"""
@@ -281,7 +281,7 @@ class Client(AmqpHelper):
         self.chan.basic_consume(self.queue, callback=self.on_msg)
 
         # send rpc request
-        self.routing_key = None
+        self.worker_id = None
         self.correlation_id = uuid.uuid4().hex
         reply_to = self.queue
         routing_key = '%s.%s' % (self.key, worker_type)
@@ -291,7 +291,7 @@ class Client(AmqpHelper):
 
         # wait for rpc response
         try:
-            while not self.routing_key:
+            while not self.worker_id:
                 self.chan.wait()
         except BaseException as exc:
             log.error("%s: Amqp consumer received %r while waiting for RPC "
@@ -304,7 +304,7 @@ class Client(AmqpHelper):
         log.info("%s: Received message with routing key '%s' and body %r.",
                  self.lbl, routing_key, body)
 
-        if not self.routing_key:
+        if not self.worker_id:
             # waiting for RPC response
             if not routing_key == self.queue:
                 log.warning("%s: Got msg with routing key '%s' when expecting "
@@ -317,11 +317,30 @@ class Client(AmqpHelper):
                     self.correlation_id
                 )
                 return
-            self.routing_key = msg.body
+            self.worker_id = msg.body
             log.info("%s: Received RPC response with body %r.",
                      self.lbl, msg.body)
+            log.info("%s: Will start listening for routing_key 'from_%s'.",
+                     self.lbl, self.worker_id)
+            self.chan.queue_bind(self.queue, self.exchange,
+                                 'from_%s' % self.worker_id)
         else:
+            # receiving messages
+            if not routing_key == 'from_%s' % self.worker_id:
+                log.warning("%s: Got msg with routing key '%s' when expecting "
+                            "'from_%s'.", self.lbl, routing_key,
+                            self.worker_id)
+                return
             log.info("%s: Received msg with body %r.", self.lbl, msg.body)
+
+    def send_msg(self, action, msg):
+        if not self.worker_id:
+            raise Exception("Routing key not yet received in RPC response.")
+        msg = msg if isinstance(msg, amqp.Message) else amqp.Message(msg)
+        routing_key = '%s.%s' % (self.worker_id, action)
+        log.info("%s: Will emit msg with body '%s' and routing_key '%s'.",
+                 self.lbl, msg.body, routing_key)
+        self.chan.basic_publish(msg, self.exchange, routing_key)
 
 
 def main():
