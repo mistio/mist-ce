@@ -1701,6 +1701,18 @@ var PROVIDER_MAP = {
         },
     ],
 
+	vultr: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Vultr',
+        },
+        {
+            name: 'api_key',
+            type: 'password',
+        },
+    ],
+	
     docker: [
         {
             name: 'title',
