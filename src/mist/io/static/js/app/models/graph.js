@@ -25,11 +25,24 @@ define('app/models/graph', ['ember'],
             datasources: null,
 
 
+
             //
             //
             //  Computed Properties
             //
             //
+
+            batches: function (){
+                var i, j=0, l=this.datasources.length, temparray, chunk = DATASOURCES_PER_GRAPH, ret = [];
+                if (!l)
+                    return ret;
+                for (i=0; i<l; i+=chunk) {
+                    temparray = this.datasources.slice(i,i+chunk);
+                    ret.push({id: this.id + '-' + j++,
+                              body: temparray});
+                }
+                return ret;
+            }.property('datasources'),
 
 
             unit: function () {
@@ -98,7 +111,20 @@ define('app/models/graph', ['ember'],
 
             getLastDatapoint: function () {
                 return this.get('displayedData')[this.datasources[0].id][DISPLAYED_DATAPOINTS - 1];
-            }
+            },
+
+            valueText: function(val){
+                if (val == null || !isNaN(this.value))
+                    return val
+                if(val>=1024*1024*1024)
+                    return (val/(1024*1024*1024)).toFixed(2) +'G';
+                if(val>=1024*1024)
+                    return (val/(1024*1024)).toFixed(2) +'M';
+                if(val>=1024)
+                    return (val/1024).toFixed(2) + 'K';
+
+                return val.toFixed(2);
+            },
         });
     }
 );

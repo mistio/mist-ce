@@ -12,6 +12,7 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
             selectedRegion: null,
+            helpHref: '',
 
 
             //
@@ -178,6 +179,19 @@ define('app/views/backend_add', ['app/views/panel'],
                     Mist.backendAddController.add();
                 },
 
+                helpClicked: function (field) {
+                    this.setProperties({
+                        helpText: field.helpText,
+                        helpHref: field.helpHref,
+                    });
+                    $('#help-tooltip').popup('option', 'positionTo', '#' + field.helpId)
+                    Ember.run.later(function () {
+                    //    $('#help-tooltip').css('top', function(i, v) {
+                    //        return (parseFloat(v) + 10) + 'px';
+                    //    });
+                        $('#help-tooltip').popup('open');
+                    }, 50);
+                },
 
                 switchToggled: function (field) {
                     var interval = 250;

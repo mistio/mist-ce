@@ -306,8 +306,8 @@ def add_backend_v_2(user, title, provider, params):
             # the provider if connect_provider doesn't fail
             try:
                 machines = conn.list_nodes()
-            except InvalidCredsError:
-                raise BackendUnauthorizedError()
+            except InvalidCredsError as exc:
+                raise BackendUnauthorizedError(exc)
             except Exception as exc:
                 log.error("Error while trying list_nodes: %r", exc)
                 raise BackendUnavailableError(exc=exc)
@@ -636,10 +636,6 @@ def _add_backend_digitalocean(title, provider, params):
 
 
 def _add_backend_gce(title, provider, params):
-    email = params.get('email', '')
-    if not email:
-        raise RequiredParameterMissingError('email')
-
     private_key = params.get('private_key', '')
     if not private_key:
         raise RequiredParameterMissingError('private_key')
@@ -647,6 +643,18 @@ def _add_backend_gce(title, provider, params):
     project_id = params.get('project_id', '')
     if not project_id:
         raise RequiredParameterMissingError('project_id')
+
+    email = params.get('email', '')
+    if not email:
+        # support both ways to authenticate a service account,
+        # by either using a project id and json key file (highly reccomended)
+        # and also by specifying email, project id and private key file
+        try:
+            creds = json.loads(private_key)
+            email = creds['client_email']
+            private_key = creds['private_key']
+        except:
+            raise MistError("Make sure you upload a valid json file")
 
     backend = model.Backend()
     backend.title = title

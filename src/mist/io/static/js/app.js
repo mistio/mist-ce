@@ -6,6 +6,11 @@ DEBUG_SOCKET = false;
 DEBUG_STATS = false;
 DEBUG_LOGS = false;
 
+// Limit the amount of datapoints to
+// preserve memory (especially on mobile)
+MAX_DATAPOINTS = 60;
+DATASOURCES_PER_GRAPH = 8;
+
 // Define libraries
 require.config({
     baseUrl: 'resources/js/',
@@ -18,6 +23,7 @@ require.config({
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
+        c3: 'lib/c3.min',
         socket: 'lib/socket.io',
         term: 'lib/term'
     },
@@ -33,6 +39,9 @@ require.config({
         },
         'd3': {
             deps: ['jquery']
+        },
+        'c3': {
+            deps: ['d3']
         }
     }
 });
@@ -1057,6 +1066,21 @@ function Socket_ (args) {
         },
 
 
+        send: function () {
+            var args = slice(arguments);
+            if (!args.length) {
+                error('No arguments passed to send');
+                return;
+            }
+            var msg = args[0];
+            args = args.slice(1);
+            this._log('/' + msg, 'EMIT', args);
+            if (args.length) msg += ',' + JSON.stringify(args);
+            var channel = this.get('channel');
+            return channel.send(msg);
+        },
+
+
         off: function () {
             var events = this.get('events');
             events.off.apply(events, arguments);
@@ -1338,6 +1362,8 @@ function parseProviderMap () {
                 field.placeholder = "";
             if (field.optional)
                 field.placeholder += '(optional)';
+            if (field.helpText)
+                field.helpId = field.name + '_' + 'help';
             if (!field.label &&  field.name)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||
@@ -1530,12 +1556,16 @@ var PROVIDER_MAP = {
         {
             name: 'subscription_id',
             type: 'text',
+            helpText: 'You can find your subscriptionID on the Azure portal',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/202083549-Adding-credentials-for-Azure'
         },
         {
             name: 'certificate',
             type: 'file',
             label: 'Certificate file',
             buttonText: 'Add Certificate',
+            helpText: 'Your Azure certificate PEM file',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/202083549-Adding-credentials-for-Azure'
         }
     ],
 
@@ -1549,7 +1579,8 @@ var PROVIDER_MAP = {
             type: 'text',
             label: 'Hostname',
             optional: true,
-            placeholder: 'DNS or IP '
+            placeholder: 'DNS or IP ',
+            helpText: 'The URL or IP adress that your server listens to'
         },
         {
             name: 'windows',
@@ -1653,6 +1684,8 @@ var PROVIDER_MAP = {
         {
             name: 'token',
             type: 'password',
+            helpText: 'You can find your API Token on the Digital Ocean portal',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201501739--Add-credentials-for-Digital-Ocean',
         },
     ],
 
@@ -1691,6 +1724,8 @@ var PROVIDER_MAP = {
             name: 'docker_host',
             type: 'text',
             label: 'Host',
+            helpText: 'The URL or IP your Docker engine listens to',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201544379-Adding-a-Docker-engine',
         },
         {
             name: 'docker_port',
@@ -1698,6 +1733,8 @@ var PROVIDER_MAP = {
             label: 'Port',
             optional: true,
             defaultValue: '4243',
+            helpText: 'The port your Docker engine listens to',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201544379-Adding-a-Docker-engine',
         },
         {
             type: 'slider',
@@ -1733,7 +1770,9 @@ var PROVIDER_MAP = {
                     label: 'Password',
                     optional: true,
                 }
-            ]
+            ],
+            helpText: 'The type of authentication your Docker engine uses',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201544379-Adding-a-Docker-engine',
         },
     ],
 
@@ -1750,10 +1789,14 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'text',
+            helpText: 'You can find your API key on your Amazon console',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200235718-Adding-credentials-for-Amazon-EC2',
         },
         {
             name: 'api_secret',
             type: 'password',
+            helpText: 'You can find your API secret on your Amazon console',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200235718-Adding-credentials-for-Amazon-EC2',
         }
     ],
 
@@ -1764,18 +1807,18 @@ var PROVIDER_MAP = {
             defaultValue: 'GCE',
         },
         {
-            name: 'email',
-            type: 'text',
-            label: 'Email address',
-        },
-        {
             name: 'private_key',
+            label: 'JSON key',
             type: 'file',
-            buttonText: 'Add key',
+            buttonText: 'Add JSON key',
+            helpText: 'You can create a new key on your GCE portal',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203433315-Adding-Google-Compute-Engine-to-Mist-io',
         },
         {
             name: 'project_id',
             type: 'text',
+            helpText: 'You can find your project ID on your GCE portal',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203433315-Adding-Google-Compute-Engine-to-Mist-io',
         }
     ],
 
@@ -1812,6 +1855,8 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'text',
+            helpText: 'You can create an API key on your Linode portal',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200278166-Adding-credentials-for-Linode',
         }
     ],
 
@@ -1824,10 +1869,12 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
+            helpText: 'The username you use to connect to the Nephoscale portal',
         },
         {
             name: 'password',
             type: 'password',
+            helpText: 'The password you use to connect to the Nephoscale portal',
         }
     ],
 
@@ -1848,6 +1895,8 @@ var PROVIDER_MAP = {
         {
             name: 'auth_url',
             type: 'text',
+            helpText: 'Your OpenStack Auth URL',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200638018-Adding-credentials-for-OpenStack',
         },
         {
             name: 'tenant_name',
@@ -1873,10 +1922,13 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
+            helpText: 'The username you use to connect to the RackSpace portal',
         },
         {
             name: 'api_key',
             type: 'password',
+            helpText: 'You can find your API key on your RackSpace portal',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200235728-Adding-credentials-for-Rackspace',
         }
     ],
 
@@ -1889,10 +1941,13 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
+            helpText: 'The username you use to connect to the SoftLayer portal',
         },
         {
             name: 'api_key',
             type: 'password',
+            helpText: 'You can find your API key on your SoftLayer portal',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200794519-Adding-credentials-for-SoftLayer',
         }
     ],
 
@@ -1906,6 +1961,7 @@ var PROVIDER_MAP = {
             name: 'machine_hostname',
             label: 'KVM hostname',
             type: 'text',
+            helpText: 'The URL or IP that your KVM hypervisor listens to',
         },
         {
             name: 'machine_user',
@@ -1913,6 +1969,7 @@ var PROVIDER_MAP = {
             label: 'ssh user',
             optional: true,
             defaultValue: 'root',
+            helpText: 'The SSH user that Mist.io should try to connect as',
         },
         {
             name: 'ssh_port',
@@ -1926,6 +1983,8 @@ var PROVIDER_MAP = {
             type: 'ssh_key',
             label: 'ssh key',
             optional: true,
+            helpText: 'If you don\'t specify an ssh key, mist.io will assume that you are connecting via tcp (qemu+tcp)',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203342499--Adding-credentials-for-KVM-hypervisors',
         },
 
     ],
@@ -1937,11 +1996,13 @@ var PROVIDER_MAP = {
         },
         {
             name: 'username',
-            type: 'text'
+            type: 'text',
+            helpText: 'The username you use to login to vCloud Director',
         },
         {
             name: 'password',
-            type: 'password'
+            type: 'password',
+            helpText: 'The password you use to login to vCloud Director',
         },
         {
             name: 'organization',
@@ -1951,6 +2012,8 @@ var PROVIDER_MAP = {
             name: 'host',
             type: 'text',
             label: 'Hostname',
+            helpText: 'The URL or IP vCloud listens to',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203326759--Adding-credentials-for-VMware-vCloud'
         }
     ],
 
@@ -1962,16 +2025,20 @@ var PROVIDER_MAP = {
         },
         {
             name: 'username',
-            type: 'text'
+            type: 'text',
+            helpText: 'The username you use to login Indonesian Cloud\'s portal',
 
         },
         {
             name: 'password',
-            type: 'password'
+            type: 'password',
+            helpText: 'The password you use to login Indonesian Cloud\'s portal',
         },
         {
             name: 'organization',
-            type: 'text'
+            type: 'text',
+            helpText: 'Name of your oganization',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203321959-Adding-credentials-for-Indonesian-Cloud'
         }
     ],
     vsphere: [
