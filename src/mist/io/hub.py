@@ -155,6 +155,11 @@ class AmqpGeventBase(object):
         if self.stopped:
             log.warning("%s: Already stopped, can't stop again.", self.lbl)
             return
+        if self.greenlets:
+            log.debug("%s: Stopping all greenlets %s.",
+                      self.lbl, tuple(self.greenlets.keys()))
+            gevent.killall(self.greenlets.values())
+            self.greenlets.clear()
         log.debug("%s: Closing all AMQP channels.", self.lbl)
         for gid in self.chans.keys():
             try:
@@ -169,11 +174,6 @@ class AmqpGeventBase(object):
             except Exception as exc:
                 log.warning("%s: Closing AMQP connection exception %r.",
                             self.lbl, exc)
-        if self.greenlets:
-            log.debug("%s: Stopping all greenlets %s.",
-                      self.lbl, tuple(self.greenlets.keys()))
-            gevent.killall(self.greenlets.values())
-            self.greenlets.clear()
         self.stopped = True
 
     def __del__(self):
@@ -193,6 +193,7 @@ class HubServer(AmqpGeventBase):
         self.key = key
         self.worker_cls = {'echo': EchoHubWorker}
         self.worker_cls.update(workers or {})
+        self.workers = {}
 
     def amqp_consume(self):
         # initialize amqp connection and channel, declare exchange
@@ -235,11 +236,23 @@ class HubServer(AmqpGeventBase):
                   self.lbl, correlation_id, reply_to)
         worker_cls = self.worker_cls[route_parts[1]]
         worker = worker_cls(msg.body, self.exchange)
-        self.greenlets[worker.uuid] = worker
+        self.workers[worker.uuid] = worker
         worker.start()
         log.info("%s: Sending back RPC AMQP response.", self.lbl)
         msg = amqp.Message(worker.uuid, correlation_id=correlation_id)
         self.chan.basic_publish(msg, self.exchange, reply_to)
+
+    def stop(self):
+        """Stop all workers and then call super"""
+        if self.stopped:
+            log.warning("%s: Already stopped, can't stop again.", self.lbl)
+            return
+        if self.workers:
+            log.debug("%s: Stopping all workers %s.",
+                      self.lbl, tuple(self.workers.keys()))
+            for worker_id in self.workers.keys():
+                self.workers.pop(worker_id).stop()
+        super(HubServer, self).stop()
 
 
 class HubWorker(AmqpGeventBase):
@@ -398,6 +411,11 @@ class EchoHubClient(HubClient):
         self.send_to_worker('echo', msg)
 
 
+def run_forever():
+    while True:
+        gevent.sleep(1)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Start Hub Server or client")
     parser.add_argument('mode', help="Must be 'server' or 'client'.")
@@ -406,7 +424,7 @@ def main():
     args = parser.parse_args()
 
     logfmt = "[%(asctime)-15s][%(levelname)s] %(module)s - %(message)s"
-    loglvl = logging.DEBUG if args.verbose else logging.INFO
+    loglvl = logging.DEBUG
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter(logfmt))
     handler.setLevel(loglvl)
@@ -415,24 +433,24 @@ def main():
 
     if args.mode == 'server':
         hub = HubServer()
-
-        def sig_handler(sig=None, frame=None):
-            log.warning("Hub process received SIGTERM/SIGINT")
-            hub.stop()
-
-        # gevent.signal(signal.SIGTERM, sig_handler)
-        # gevent.signal(signal.SIGINT, sig_handler)  # KeyboardInterrupt also
-
-        hub.start()
-        while True:
-            gevent.sleep(1)
     elif args.mode == 'client':
-        client = EchoHubClient()
-        client.start()
-        while True:
-            gevent.sleep(1)
+        hub = EchoHubClient()
     else:
         raise Exception("Unknown mode '%s'." % args.mode)
+
+    hub.start()
+    waiter = gevent.spawn(run_forever)
+
+    def sig_handler(sig=None, frame=None):
+        log.warning("Hub process received SIGTERM/SIGINT")
+        hub.stop()
+        waiter.kill()
+
+    gevent.signal(signal.SIGTERM, sig_handler)
+    gevent.signal(signal.SIGINT, sig_handler)  # KeyboardInterrupt also
+
+    waiter.join()
+    gevent.wait()
 
 
 if __name__ == "__main__":
