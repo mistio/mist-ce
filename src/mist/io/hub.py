@@ -1,5 +1,6 @@
 import sys
 import uuid
+import json
 import signal
 import logging
 import argparse
@@ -119,6 +120,12 @@ class AmqpGeventBase(object):
         some basic_consume call if it needs to receive messages via AMQP.
 
         """
+        if msg.properties.get('content_type') == 'application/json':
+            try:
+                msg.body = json.loads(msg.body)
+            except Exception as exc:
+                log.error("%s: Error json parsing msg body with content type "
+                          "application/json %r.", self.lbl, exc)
         body = msg.body
         routing_key = msg.delivery_info.get('routing_key', '')
         log.debug("%s: Received message with routing key '%s' and body %r.",
@@ -145,7 +152,11 @@ class AmqpGeventBase(object):
     def amqp_send_msg(self, msg='', routing_key=''):
         """Publish AMQP message"""
         if not isinstance(msg, amqp.Message):
-            msg = amqp.Message(msg)
+            if isinstance(msg, str):
+                msg = amqp.Message(msg)
+            else:
+                msg = amqp.Message(json.dumps(msg),
+                                   content_type='application/json')
         log.debug("%s: Sending AMQP msg with routing key '%s' and body %r.",
                   self.lbl, routing_key, msg.body)
         self.chan.basic_publish(msg, self.exchange, routing_key)
@@ -323,9 +334,10 @@ class HubClient(AmqpGeventBase):
         self.correlation_id = uuid.uuid4().hex
         reply_to = self.queue
         routing_key = '%s.%s' % (self.key, self.worker_type)
-        msg = amqp.Message(self.worker_kwargs,
+        msg = amqp.Message(json.dumps(self.worker_kwargs),
                            correlation_id=self.correlation_id,
-                           reply_to=reply_to)
+                           reply_to=reply_to,
+                           content_type='application/json')
         self.amqp_send_msg(msg, routing_key)
         log.info("%s: sent RPC request, will wait for response.", self.lbl)
 
@@ -375,7 +387,7 @@ class HubClient(AmqpGeventBase):
                 return
             super(HubClient, self).amqp_handle_msg(msg)
 
-    def send_to_worker(self, action, msg):
+    def send_to_worker(self, action, msg=''):
         if not self.worker_id:
             raise Exception("Routing key not yet received in RPC response.")
         self.amqp_send_msg(msg, '%s.%s' % (self.worker_id, action))
