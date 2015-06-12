@@ -9,7 +9,7 @@
     <link rel="icon" href="resources/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
 
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" type="text/css">
 
     <link rel="stylesheet" type='text/css' href="resources/main.css"
           tal:condition="not:css_build"/>

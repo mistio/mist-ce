@@ -5,7 +5,7 @@
     clear: both;
 }
 #machine-list-page #create-machine-btn {
-    float: right;
+    margin: 0;
 }
 #machine-list-page #select-machines-btn {
     float: left;

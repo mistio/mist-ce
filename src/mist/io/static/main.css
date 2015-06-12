@@ -36,6 +36,64 @@
 @import url("css/script_list.css");
 
 
+.ui-content, .header-grid {
+    margin: 0px auto;
+    max-width: 1180px;
+}
+
+.user-menu {
+    height: 50px;
+    text-align: right;
+}
+
+h1 {
+    color: #444444;
+    font-size: 18px;
+    font-weight: 300;
+}
+
+h2 {
+    color: #444444;
+    font-size: 16px;
+}
+
+h3 {
+    font-size: 14px;
+    color: #000;
+}
+
+
+.ui-caps {
+    text-transform: uppercase;
+}
+
+.ui-btn-add {
+    font-weight: lighter !important;
+}
+
+.ui-btn-add.ui-btn-icon-left {
+    padding: 1.2em 1.8em 1em 4.3em !important
+}
+
+.ui-btn-add.ui-btn-icon-left:after {
+    left: 1em !important;
+}
+
+.ui-header h1.ui-title{
+    font-size: 24px;
+    text-align: left;
+    margin: 14px 10px;
+    padding: 0;
+    text-shadow: 0 0 0 transparent !important;
+}
+
+
+#home-page ul.ui-listview {
+    font-weight: 300;
+    font-size: 18px;
+    color: #444;
+}
+
 /* Splash
 -----------------------------------------------------------------------------------------------------------*/
 .ui-mobile-rendering > * {
@@ -153,10 +211,6 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 /* Buttons
 -----------------------------------------------------------------------------------------------------------*/
-.ui-btn {
-    text-transform: uppercase;
-}
-
 .ui-btn-icon-left {
     padding: .6em 1.1em .6em 2.5em !important;
 }
@@ -232,9 +286,13 @@ textarea#private-key, #manual-monitoring-popup textarea {
 -----------------------------------------------------------------------------------------------------------*/
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable {
-    margin: 3em 8em -3em 118px !important;
-    position: relative;
-    top: -3.1em;
+    margin-top: -3.6em;
+}
+
+#machine-list-page .ui-filterable .ui-input-search,
+#key-list-page .ui-filterable .ui-input-search {
+    margin-left: 7.5em;
+    margin-right: 35%;
 }
 
 #machine-list-page .ui-filterable input,
@@ -501,8 +559,8 @@ ul.checkbox-list li label {
     a.responsive-button,
     a.responsive-btn {
         padding: 0px !important;
-        width: 2.5em;
-        height: 2.5em;
+        min-width: 2.5em;
+        min-height: 2.5em;
         text-indent: -5000px;
     }
 
@@ -516,14 +574,18 @@ ul.checkbox-list li label {
 -----------------------------------------------------------------------------------------------------------*/
 #me-btn {
     background: transparent;
-    height: 36px;
+    height: 48px;
     padding: 0px;
     border-width: 0px;
-    margin-right: 6px;
+    box-shadow: 0 0 0 0;
 }
 
 #me-btn .gravatar-image {
     border-radius: 2em;
+    border-width: 3px;
+    border-style: solid;
+    border-color: #46d4c9;
+    margin-top: 2px;
 }
 
 #me-btn .user {

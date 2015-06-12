@@ -2,6 +2,11 @@
 /* Graph List View
 -----------------------------------------------------------------------------------------------------------*/
 
+.graph-list {
+    background-color: #F9F8F3;
+    clear: both;
+}
+
 #graph-list-control .align {
     width: 49%;
     display: inline-block;
@@ -99,6 +104,7 @@
     }
     #home-page .graph {
         width: 100%;
+        float: none;
     }
 }
 

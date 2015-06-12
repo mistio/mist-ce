@@ -3,10 +3,30 @@
 -----------------------------------------------------------------------------------------------------------*/
 #backend-buttons {
     display: block;
-    margin-top: -51px;
+    margin-top: 18px;
 }
+
+#backend-buttons a:after {
+    margin-top: -4px;
+    border-radius: 1em;
+    width: 12px;
+    height: 12px;
+}
+
+#backend-buttons a.online:after {
+    background-color: #46d4c9;
+}
+
+#backend-buttons a.offline:after {
+    background-color: #d96557;
+}
+
+#backend-buttons a.waiting:after {
+    background-color: #8c76d1;
+}
+
 #backend-buttons .ui-controlgroup-controls a {
-    padding: 13px 10px 10px 40px !important;
+    padding: 13px 10px 10px 28px !important;
     color: black;
     position: relative;
 }
@@ -20,11 +40,12 @@
     display: block;
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn {
-    border: 1px solid #fafafa;
+    border-width: 0;
     margin-top: 10px;
     margin-right: .5em;
-    padding: 10px 0 9px !important;
+    padding: 5px 0 5px !important;
     background-color: #F9F8F3;
+    box-shadow: 0 4px 9px /*{global-box-shadow-size}*/ rgba(0,0,0,.1) /*{global-box-shadow-color}*/;
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn:hover {
     background-color: #eee;
