@@ -102,10 +102,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                             else
                                 ret.unshift(datasource.metric.id);
 
-                            if (ret.length > x.length) {
-                                error('got more datapoints than timestamps!')
-                                warn(x, ret);
-                            }
                             return ret;
                         }
                     ));
@@ -212,7 +208,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                             },
                             tooltip: {
                                 format: {
-                                    title: function(x) { return x.toISOString(); },
+                                    title: function(x) { return x.toLocaleString(); },
                                     value: function (value, ratio, id, index) {
                                         return graph.valueText(value) + unit;
                                     }
