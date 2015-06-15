@@ -275,6 +275,12 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider' : Provider.HOSTVIRTUAL,
         'regions': []
     },
+	# Vultr
+    {
+        'title': 'Vultr',
+        'provider' : Provider.VULTR,
+        'regions': []
+    },
      # vSphere
     {
         'title': 'VMWare vSphere',
