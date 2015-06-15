@@ -57,6 +57,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                     graph = this.graph,
                     charts = this.get('charts') || [];
 
+                if (reload) {
+                    info('reloading charts');
+                    // destroy old charts
+                    charts.forEach(function(chart){chart.destroy()});
+                    charts = [];
+                }
+
                 if (!graph.datasources || !graph.datasources.length)
                     return;
 
@@ -76,6 +83,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                     function(point) { return point.time }
                 ));
 
+                var tickFormat = '%b %Y', timedelta = x[x.length-1]-x[1];
+
+                if (timedelta < 85000000)
+                    tickFormat = "%H:%M";
+                else if (timedelta < 2549000000)
+                    tickFormat = "%d %b"
+
                 graph.get('batches').forEach(function(batch, batchNo) {
                     // prepare other columns
                     var cols = [x].pushObjects(batch.body.map(
@@ -87,14 +101,65 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                                 ret.unshift(datasource.machine.name)
                             else
                                 ret.unshift(datasource.metric.id);
+
                             return ret;
                         }
                     ));
 
                     var chartType = 'area-spline';
+
                     if (graph.multi)
                         chartType = 'spline';
-                    if (charts.length == batchNo) { // generate new chart
+
+                    if (Mist.graphsController.stream.isStreaming && charts.length > batchNo && !reload) { // stream new datapoints in existing chart
+                        // Only add values that are not already in the chart
+                        var lastx = null, maxLength=0;
+                        try{ // maybe there are no datapoints shown on the chart
+                            var shown = charts[batchNo].data(), jmax=0;
+                            for (var j=0; j < shown.length; j++) {
+                                if (shown[j].values.length > maxLength){
+                                    jmax = j;
+                                    maxLength = shown[j].values.length;
+                                }
+                            }
+                            lastx = charts[batchNo].data.shown()[jmax].values.slice(-1)[0].x;
+                        } catch(e) {}
+
+                        // if chart emty and data or if data in chart older than this batch then load all columns
+                        if (!lastx || (cols[0].length > 1 && lastx < cols[0][1])) {
+                            for (var z=0;z<cols.length; z++) {
+                                if (cols[z].length>1){
+                                    charts[batchNo].flow({
+                                        columns: cols
+                                    });
+                                    break;
+                                }
+                            }
+                        } else { // else stream only those that are not shown
+                            for (var i=0; i < x.length; i++) {
+                                if (lastx && x[x.length-1-i]<=lastx)
+                                    break
+                            }
+                            if (i > 1){
+                                var newcols = []
+                                cols.forEach(function(col) {
+                                    newcols.push([col[0]].pushObjects(col.slice(0-i)))
+                                });
+                            }
+                            if (maxLength < MAX_DATAPOINTS ) {
+                                i = 0; // Do not flow if not enough datapoints in chart
+                            }
+                            try {
+                                charts[batchNo].flow({
+                                    duration: 250,
+                                    length: i,
+                                    columns: newcols
+                                });
+                            } catch(e) {
+                                error(e);
+                            }
+                        }
+                    } else { // generate new chart
                         charts.push(c3.generate({
                             bindto: '#' + batch.id,
                             data: {
@@ -106,8 +171,8 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                                 x: {
                                     type: 'timeseries',
                                     tick: {
-                                        format: '%H:%M',
-                                        count: 5
+                                        format: tickFormat,
+                                        fit: false
                                     },
                                     padding: {
                                         left: 0,
@@ -143,7 +208,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                             },
                             tooltip: {
                                 format: {
-                                    title: function(x) { return x.toTimeString(); },
+                                    title: function(x) { return x.toLocaleString(); },
                                     value: function (value, ratio, id, index) {
                                         return graph.valueText(value) + unit;
                                     }
@@ -151,57 +216,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                             }
                         }));
                         that.set('charts', charts);
-                    } else if (Mist.graphsController.stream.isStreaming && !reload) { // stream new datapoints in existing chart
-                        // Only add values that are not already in the chart
-                        var lastx = null, maxLength=0;
-                        try{ // maybe there are no datapoints shown on the chart
-                            var shown = charts[batchNo].data(), jmax=0;
-                            for (var j=0; j < shown.length; j++) {
-                                if (shown[j].values.length > maxLength){
-                                    jmax = j;
-                                    maxLength = shown[j].values.length;
-                                }
-                            }
-                            lastx = charts[batchNo].data.shown()[jmax].values.slice(-1)[0].x;
-                        } catch(e) {}
-
-                        if (!lastx) { // if chart emty and data load all columns
-                            for (var z=0;z<cols.length; z++) {
-                                if (cols[z].length>1){
-                                    charts[batchNo].flow({
-                                        columns: cols
-                                    });
-                                    break;
-                                }
-                            }
-                        } else { // else stream only those that are not shown
-                            for (var i=0; i < x.length; i++) {
-                                if (lastx && x[x.length-1-i]<=lastx)
-                                    break
-                            }
-                            if (i > 1){
-                                var newcols = []
-                                cols.forEach(function(col) {
-                                    newcols.push([col[0]].pushObjects(col.slice(0-i)))
-                                });
-                            }
-                            if (maxLength < MAX_DATAPOINTS ) {
-                                i = 0; // Do not flow if not enough datapoints in chart
-                            }
-                            try {
-                                charts[batchNo].flow({
-                                    duration: 250,
-                                    length: i,
-                                    columns: newcols
-                                });
-                            } catch(e) {
-                                error(e);
-                            }
-                        }
-                    } else { // Update data in existing chart
-                        charts[batchNo].load({
-                            columns: cols
-                        })
                     }
                 });
             },
