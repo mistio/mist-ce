@@ -1482,12 +1482,15 @@ def list_machines(user, backend_id):
                         m.extra['machineType'] = m.extra.get('machineType').split('/')[-1]
                 except:
                     pass
-
         for k in m.extra.keys():
             try:
                 json.dumps(m.extra[k])
             except TypeError:
                 m.extra[k] = str(m.extra[k])
+
+        if m.driver.type is Provider.AZURE:
+            if m.extra.get('endpoints'):
+                m.extra['endpoints'] = json.dumps(m.extra.get('endpoints', {}))
 
         if m.driver.type == 'bare_metal':
             can_reboot = False
@@ -1532,7 +1535,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
                    script_id='', script_params='', job_id=None, docker_port_bindings={},
-                   docker_exposed_ports={}, hostname='', plugins=None):
+                   docker_exposed_ports={}, azure_port_bindings='', hostname='', plugins=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1640,7 +1643,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type == Provider.AZURE:
         node = _create_machine_azure(conn, key_id, private_key,
                                              public_key, machine_name,
-                                             image, size, location, cloud_service_name=None)
+                                             image, size, location, cloud_service_name=None, azure_port_bindings=azure_port_bindings)
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
@@ -2193,7 +2196,7 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location)
 
 
 def _create_machine_azure(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location, cloud_service_name):
+                                  machine_name, image, size, location, cloud_service_name, azure_port_bindings):
     """Create a machine Azure.
 
     Here there is no checking done, all parameters are expected to be
@@ -2201,6 +2204,27 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
 
     """
     key = public_key.replace('\n', '')
+
+    port_bindings = []
+    if azure_port_bindings and type(azure_port_bindings) in [str, unicode]:
+    # we receive something like: http tcp 80:80, smtp tcp 25:25, https tcp 443:443
+    # and transform it to [{'name':'http', 'protocol': 'tcp', 'local_port': 80, 'port': 80},
+    # {'name':'smtp', 'protocol': 'tcp', 'local_port': 25, 'port': 25}]
+
+        for port_binding in azure_port_bindings.split(','):
+            try:
+                port_dict = port_binding.split()
+                port_name = port_dict[0]
+                protocol = port_dict[1]
+                ports = port_dict[2]
+                local_port = ports.split(':')[0]
+                port = ports.split(':')[1]
+                binding = {'name': port_name, 'protocol': protocol, 'local_port': local_port, 'port': port}
+                port_bindings.append(binding)
+            except:
+                pass
+
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -2208,7 +2232,8 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 size=size,
                 image=image,
                 location=location,
-                ex_cloud_service_name=cloud_service_name
+                ex_cloud_service_name=cloud_service_name,
+                endpoint_ports=port_bindings
             )
         except Exception as e:
             try:
