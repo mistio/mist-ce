@@ -1710,9 +1710,11 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'password',
+            helpText: 'You can find your API Token on the Vultr portal',
+            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/204576609-Add-credentials-for-Vultr'
         },
     ],
-	
+
     docker: [
         {
             name: 'title',

@@ -2175,7 +2175,14 @@ function program31(depth0,data) {
     'placeholder': ("e.g. 80:80"),
     'valueBinding': ("Mist.machineAddController.newMachineDockerPorts")
   },hashTypes:{'id': "STRING",'data-theme': "STRING",'placeholder': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'placeholder': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n        </div>\n\n        <!-- Enable monitoring -->\n        <div id=\"create-machine-monitoring\" class=\"ui-state-disabled\">\n            <label>\n            ");
+  data.buffer.push("\n        </div>\n\n\n        <div class=\"azure\">\n\n            <!-- Expose Ports -->\n            <label>Ports:</label>\n            ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextArea", {hash:{
+    'id': ("create-machine-azure-ports"),
+    'data-theme': ("a"),
+    'placeholder': ("e.g. http tcp 80:80, smtp tcp 25:25, https tcp 443:443"),
+    'valueBinding': ("Mist.machineAddController.newMachineAzurePorts")
+  },hashTypes:{'id': "STRING",'data-theme': "STRING",'placeholder': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'placeholder': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n\n        </div>\n\n\n        <!-- Enable monitoring -->\n        <div id=\"create-machine-monitoring\" class=\"ui-state-disabled\">\n            <label>\n            ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
     'data-theme': ("a"),
     'checkedBinding': ("Mist.machineAddController.newMachineMonitoring")
