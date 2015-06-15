@@ -32,14 +32,13 @@ For vSphere support, you should install pyvmomi library::
 
     ./bin/pip install pyvmomi
 
-In Red Hat based systems the following packages need to be installed:
+In Red Hat based systems the following packages need to be installed::
    
-    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml  gcc libxml2 libxml2-python libxml2-devel
+    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel
 
-For openSUSE distibution, you'll have to additionally install:
+For openSUSE distibution, you'll have to additionally install::
 
     sudo zypper in python-gevent libevent-devel
-
 
 In MacOSX you have to install Xcode and its command line tools. For virtualenv
 you simply run::
@@ -61,7 +60,8 @@ solve this you need to::
 
    ./bin/pip install setuptools --upgrade
 
-If you are using Python 2.6 you'll have to install ipython version 1, otherwise buildout will fail
+If you are using Python 2.6 you'll have to install ipython version 1, otherwise buildout will fail::
+
    ./bin/pip install ipython==1
 
 Deployment
