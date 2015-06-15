@@ -280,7 +280,7 @@ def add_backend_v_2(user, title, provider, params):
     elif provider == 'hostvirtual':
         backend_id, backend = _add_backend_hostvirtual(title, provider, params)
     elif provider == 'vultr':
-        backend_id, backend = _add_backend_vultr(title, provider, params)	
+        backend_id, backend = _add_backend_vultr(title, provider, params)
     elif provider == 'vsphere':
         backend_id, backend = _add_backend_vsphere(title, provider, params)
     else:
@@ -864,7 +864,8 @@ def _add_backend_hostvirtual(title, provider, params):
     backend_id = backend.get_id()
 
     return backend_id, backend
-	
+
+
 def _add_backend_vultr(title, provider, params):
     api_key = params.get('api_key', '')
     if not api_key:
@@ -1261,7 +1262,7 @@ def connect_provider(backend):
     elif backend.provider == Provider.HPCLOUD:
         conn = driver(backend.apikey, backend.apisecret, backend.tenant_name,
                       region=backend.region)
-    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL,Provider.VULTR]:
+    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR]:
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
@@ -1335,7 +1336,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE,Provider.VULTR):
+                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR):
         can_tag = False
 
     # for other states
@@ -2124,7 +2125,7 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
         raise MachineCreationError("HostVirtual, got exception %s" % e, e)
 
     return node
-	
+
 def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
     """Create a machine in Vultr.
 
@@ -2143,6 +2144,47 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location)
             size=size,
             auth=auth,
             location=location
+        )
+    except Exception as e:
+        raise MachineCreationError("Vultr, got exception %s" % e, e)
+
+    return node
+
+
+
+def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
+    """Create a machine in Vultr.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+
+    try:
+        server_key = ''
+        keys = conn.ex_list_ssh_keys()
+        for k in keys:
+            if key == k.ssh_key.replace('\n', ''):
+                server_key = k
+                break
+        if not server_key:
+            server_key = conn.ex_create_ssh_key(machine_name, key)
+    except:
+        server_key = conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
+
+    try:
+        server_key = server_key.id
+    except:
+        pass
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            size=size,
+            image=image,
+            location=location,
+            ssh_key=[server_key]
         )
     except Exception as e:
         raise MachineCreationError("Vultr, got exception %s" % e, e)
