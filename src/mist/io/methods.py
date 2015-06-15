@@ -3872,7 +3872,7 @@ def undeploy_collectd(user, backend_id, machine_id):
 
 def get_deploy_collectd_command_unix(uuid, password, monitor):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O - %s | sudo python - %s %s" % (url, uuid, password)
+    cmd = "wget -O - %s | $(command -v sudo) python - %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
