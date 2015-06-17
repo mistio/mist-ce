@@ -1,3 +1,4 @@
+import sys
 import logging
 
 
@@ -130,11 +131,27 @@ class ShellHubClient(mist.io.hub.main.HubClient):
     def start(self):
         """Call super and also start stdin reader greenlet"""
         super(ShellHubClient, self).start()
+        gevent.sleep(1)
+        data = {
+            'backend_id': 'tUEMvnye1BqMeqNEoLDrFy2EiT8',
+            'machine_id': 'bc41da46814e0c7b69167e2862d400c24419ec3dcdc48a72c4ede789c6ed981e',
+            'host': '69.50.244.209',
+            'columns': 80,
+            'rows': 40,
+        }
+        self.connect(**data)
+        self.greenlets['stdin'] = gevent.spawn(self.send_stdin)
 
     def connect(self, **kwargs):
-        log.info(kwargs)
-        log.info(type(kwargs))
+        log.info("%s: Will connect with kwargs %s.", self.lbl, kwargs)
         self.send_to_worker('connect', kwargs)
+
+    def send_stdin(self):
+        """Continuously read lines from stdin and send them to worker"""
+        while True:
+            gevent.socket.wait_read(sys.stdin.fileno())
+            self.send_data(sys.stdin.readline())
+            gevent.sleep(0)
 
     def send_data(self, data):
         self.send_to_worker('data', data)
@@ -143,10 +160,11 @@ class ShellHubClient(mist.io.hub.main.HubClient):
         self.send_to_worker('rezize', {'columns': columns, 'rows': rows})
 
     def on_data(self, msg):
-        log.info("%s: Received data %r.", self.lbl, msg.body)
+        print msg.body
 
     def stop(self):
         self.send_to_worker('close')
+        super(ShellHubClient, self).stop()
 
 
 if __name__ == "__main__":

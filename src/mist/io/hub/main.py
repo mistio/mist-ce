@@ -450,8 +450,8 @@ def prepare_logging(verbosity=0):
     logging.root.setLevel(loglvl)
 
 
-def main(workers=None, client=EchoHubClient):
-    args = prepare_argparse().parse_args()
+def main(args=None, workers=None, client=EchoHubClient):
+    args = args if args else prepare_argparse().parse_args()
     prepare_logging(args.verbose)
 
     if args.mode == 'server':
