@@ -8,14 +8,14 @@ import gevent.socket
 import mist.io.exceptions
 import mist.io.model
 import mist.io.shell
-import mist.io.hub
+import mist.io.hub.main
 
 
 log = logging.getLogger(__name__)
 
 
-class ShellHubWorker(mist.io.hub.HubWorker):
-    def __init__(self, params, exchange=mist.io.hub.EXCHANGE):
+class ShellHubWorker(mist.io.hub.main.HubWorker):
+    def __init__(self, params, exchange=mist.io.hub.main.EXCHANGE):
         super(ShellHubWorker, self).__init__(params, exchange=exchange)
         self.shell = None
         self.channel = None
@@ -121,9 +121,9 @@ class ShellHubWorker(mist.io.hub.HubWorker):
         super(ShellHubWorker, self).stop()
 
 
-class ShellHubClient(mist.io.hub.HubClient):
-    def __init__(self, exchange=mist.io.hub.EXCHANGE,
-                 key=mist.io.hub.REQUESTS_KEY, **worker_kwargs):
+class ShellHubClient(mist.io.hub.main.HubClient):
+    def __init__(self, exchange=mist.io.hub.main.EXCHANGE,
+                 key=mist.io.hub.main.REQUESTS_KEY, **worker_kwargs):
         super(ShellHubClient, self).__init__(exchange, key, 'shell',
                                              **worker_kwargs)
 
@@ -147,3 +147,8 @@ class ShellHubClient(mist.io.hub.HubClient):
 
     def stop(self):
         self.send_to_worker('close')
+
+
+if __name__ == "__main__":
+    mist.io.hub.main.main(workers={'shell': ShellHubWorker},
+                          client=ShellHubClient)

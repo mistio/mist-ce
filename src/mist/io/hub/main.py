@@ -302,8 +302,7 @@ class EchoHubWorker(HubWorker):
 
     def on_echo(self, msg):
         """Echo back messages sent with routing suffix 'echo'"""
-        log.info("%s: Received on_echo %r. Will echo back.",
-                 self.lbl, msg.body)
+        print "%s: Received on_echo %r. Will echo back." % (self.lbl, msg.body)
         self.send_to_client('echo', msg.body)
 
     def on_close(self, msg):
@@ -414,7 +413,7 @@ class EchoHubClient(HubClient):
 
     def on_echo(self, msg):
         """Called on echo event"""
-        log.info("%s: Received on_echo with msg body %r.", self.lbl, msg.body)
+        print "%s: Received on_echo with msg body %r." % (self.lbl, msg.body)
 
     def send_echo_request(self, msg):
         """Sends an echo request the response to which will trigger on_echo"""
@@ -428,25 +427,37 @@ def run_forever():
         gevent.sleep(1)
 
 
-def main():
+def prepare_argparse():
     parser = argparse.ArgumentParser(description="Start Hub Server or client")
     parser.add_argument('mode', help="Must be 'server' or 'client'.")
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help="Set log level to DEBUG")
-    args = parser.parse_args()
+    parser.add_argument('-v', '--verbose', action='count',
+                        help="Increase verbosity, can be specified twice.")
+    return parser
 
+
+def prepare_logging(verbosity=0):
     logfmt = "[%(asctime)-15s][%(levelname)s] %(module)s - %(message)s"
-    loglvl = logging.DEBUG
+    if verbosity > 1:
+        loglvl = logging.DEBUG
+    elif verbosity == 1:
+        loglvl = logging.INFO
+    else:
+        loglvl = logging.WARNING
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter(logfmt))
     handler.setLevel(loglvl)
     logging.root.addHandler(handler)
     logging.root.setLevel(loglvl)
 
+
+def main(workers=None, client=EchoHubClient):
+    args = prepare_argparse().parse_args()
+    prepare_logging(args.verbose)
+
     if args.mode == 'server':
-        hub = HubServer()
+        hub = HubServer(workers=workers)
     elif args.mode == 'client':
-        hub = EchoHubClient()
+        hub = client()
     else:
         raise Exception("Unknown mode '%s'." % args.mode)
 
