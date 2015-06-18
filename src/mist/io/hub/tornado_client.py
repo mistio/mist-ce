@@ -171,6 +171,23 @@ class HubClient(object):
             )
 
 
+class EchoHubClient(HubClient):
+    def __init__(self, *args, **kwargs):
+        super(EchoHubClient, self).__init__(*args, **kwargs)
+        self.timer = tornado.ioloop.PeriodicCallback(self.ping, 1000)
+
+    def start(self):
+        super(EchoHubClient, self).start()
+        self.timer.start()
+
+    def ping(self):
+        print 'Sending echo request: ping'
+        self.send_to_worker('echo', 'ping')
+
+    def on_echo(self, msg):
+        print 'Received message:', msg
+
+
 def prepare_logging(verbosity=2):
     logfmt = "[%(asctime)-15s][%(levelname)s] %(module)s - %(message)s"
     if verbosity > 1:
@@ -186,21 +203,8 @@ def prepare_logging(verbosity=2):
     logging.root.setLevel(loglvl)
 
 
-class Runner(object):
-    def __init__(self):
-        self.client = HubClient()
-        self.timer = tornado.ioloop.PeriodicCallback(self.ping, 1000)
-
-    def ping(self):
-        self.client.send_to_worker('echo', 'ping')
-
-    def run(self):
-        self.client.start()
-        self.timer.start()
-        ioloop = tornado.ioloop.IOLoop.current()
-        ioloop.start()
-
-
 if __name__ == "__main__":
-    runner = Runner()
-    runner.run()
+    client = EchoHubClient()
+    client.start()
+    ioloop = tornado.ioloop.IOLoop.current()
+    ioloop.start()
