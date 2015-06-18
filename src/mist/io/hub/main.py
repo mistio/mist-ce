@@ -152,7 +152,7 @@ class AmqpGeventBase(object):
     def amqp_send_msg(self, msg='', routing_key=''):
         """Publish AMQP message"""
         if not isinstance(msg, amqp.Message):
-            if isinstance(msg, str):
+            if isinstance(msg, basestring):
                 msg = amqp.Message(msg)
             else:
                 msg = amqp.Message(json.dumps(msg),
@@ -313,11 +313,11 @@ class EchoHubWorker(HubWorker):
 
 class HubClient(AmqpGeventBase):
     def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY,
-                 worker_type='default', **worker_kwargs):
+                 worker_type='default', worker_kwargs=None):
         super(HubClient, self).__init__(exchange=exchange)
         self.key = key
         self.worker_type = worker_type
-        self.worker_kwargs = worker_kwargs
+        self.worker_kwargs = worker_kwargs or {}
 
     def amqp_consume(self):
         """Connect to Hub Server and set up and start AMQP consumer"""
@@ -395,9 +395,10 @@ class HubClient(AmqpGeventBase):
 class EchoHubClient(HubClient):
     """Sends echo request to EchoHubWorker and logs echo response"""
 
-    def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY, **worker_kwargs):
+    def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY,
+                 worker_kwargs=None):
         super(EchoHubClient, self).__init__(exchange, key, 'echo',
-                                            **worker_kwargs)
+                                            worker_kwargs)
 
     def start(self):
         """Call super and also start stdin reader greenlet"""

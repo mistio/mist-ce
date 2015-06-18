@@ -32,7 +32,7 @@ class Consumer(object):
 
     def __init__(self, amqp_url, exchange, queue,
                  exchange_type='topic', routing_key='',
-                 exchange_kwargs=None, queue_kwargs=None):
+                 exchange_kwargs=None, queue_kwargs=None, ack=True):
         """Create a new instance of the consumer class, passing in the AMQP
         URL used to connect to RabbitMQ.
 
@@ -46,6 +46,7 @@ class Consumer(object):
         self.routing_key = routing_key
         self.exchange_kwargs = exchange_kwargs or {}
         self.queue_kwargs = queue_kwargs or {}
+        self.ack = ack
 
         self._connection = None
         self._channel = None
@@ -253,7 +254,8 @@ class Consumer(object):
         """
         log.info('Received message # %s from %s: %s',
                  basic_deliver.delivery_tag, properties.app_id, body)
-        self.acknowledge_message(basic_deliver.delivery_tag)
+        if self.ack:
+            self.acknowledge_message(basic_deliver.delivery_tag)
 
     def on_cancelok(self, unused_frame):
         """This method is invoked by pika when RabbitMQ acknowledges the
@@ -289,7 +291,8 @@ class Consumer(object):
         log.info('Issuing consumer related RPC commands')
         self.add_on_cancel_callback()
         self._consumer_tag = self._channel.basic_consume(self.on_message,
-                                                         self.queue)
+                                                         self.queue,
+                                                         no_ack=not self.ack)
 
     def on_bindok(self, unused_frame):
         """Invoked by pika when the Queue.Bind method has completed. At this

@@ -124,9 +124,9 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
 
 class ShellHubClient(mist.io.hub.main.HubClient):
     def __init__(self, exchange=mist.io.hub.main.EXCHANGE,
-                 key=mist.io.hub.main.REQUESTS_KEY, **worker_kwargs):
+                 key=mist.io.hub.main.REQUESTS_KEY, worker_kwargs=None):
         super(ShellHubClient, self).__init__(exchange, key, 'shell',
-                                             **worker_kwargs)
+                                             worker_kwargs)
 
     def start(self):
         """Call super and also start stdin reader greenlet"""
