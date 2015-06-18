@@ -153,9 +153,9 @@ class HubClient(object):
                           self.lbl, exc, body, attr)
 
     def send_to_worker(self, action, msg=''):
-        if not self.worker_id:
+        if not self.consumer.worker_id:
             raise Exception("Routing key not yet received in RPC response.")
-        routing_key = '%s.%s' % (self.worker_id, action)
+        routing_key = '%s.%s' % (self.consumer.worker_id, action)
         if isinstance(msg, basestring):
             self.consumer._channel.basic_publish(exchange=self.exchange,
                                                  routing_key=routing_key,
@@ -186,11 +186,21 @@ def prepare_logging(verbosity=2):
     logging.root.setLevel(loglvl)
 
 
+class Runner(object):
+    def __init__(self):
+        self.client = HubClient()
+        self.timer = tornado.ioloop.PeriodicCallback(self.ping, 1000)
+
+    def ping(self):
+        self.client.send_to_worker('echo', 'ping')
+
+    def run(self):
+        self.client.start()
+        self.timer.start()
+        ioloop = tornado.ioloop.IOLoop.current()
+        ioloop.start()
+
+
 if __name__ == "__main__":
-    # prepare_logging()
-
-    client = HubClient()
-    client.start()
-
-    ioloop = tornado.ioloop.IOLoop.current()
-    ioloop.start()
+    runner = Runner()
+    runner.run()
