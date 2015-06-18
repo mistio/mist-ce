@@ -451,14 +451,14 @@ def prepare_logging(verbosity=0):
     logging.root.setLevel(loglvl)
 
 
-def main(args=None, workers=None, client=EchoHubClient):
+def main(args=None, workers=None, client=EchoHubClient, worker_kwargs=None):
     args = args if args else prepare_argparse().parse_args()
     prepare_logging(args.verbose)
 
     if args.mode == 'server':
         hub = HubServer(workers=workers)
     elif args.mode == 'client':
-        hub = client()
+        hub = client(worker_kwargs=worker_kwargs)
     else:
         raise Exception("Unknown mode '%s'." % args.mode)
 

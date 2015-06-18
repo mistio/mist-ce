@@ -132,14 +132,7 @@ class ShellHubClient(mist.io.hub.main.HubClient):
         """Call super and also start stdin reader greenlet"""
         super(ShellHubClient, self).start()
         gevent.sleep(1)
-        data = {
-            'backend_id': 'tUEMvnye1BqMeqNEoLDrFy2EiT8',
-            'machine_id': 'bc41da46814e0c7b69167e2862d400c24419ec3dcdc48a72c4ede789c6ed981e',
-            'host': '69.50.244.209',
-            'columns': 80,
-            'rows': 40,
-        }
-        self.connect(**data)
+        self.connect(**self.worker_kwargs)
         self.greenlets['stdin'] = gevent.spawn(self.send_stdin)
 
     def connect(self, **kwargs):
@@ -168,5 +161,12 @@ class ShellHubClient(mist.io.hub.main.HubClient):
 
 
 if __name__ == "__main__":
+    worker_kwargs = {
+        'backend_id': 'tUEMvnye1BqMeqNEoLDrFy2EiT8',
+        'machine_id': 'bc41da46814e0c7b69167e2862d400c24419ec3dcdc48a72c4ede789c6ed981e',
+        'host': '69.50.244.209',
+        'columns': 80,
+        'rows': 40,
+    }
     mist.io.hub.main.main(workers={'shell': ShellHubWorker},
-                          client=ShellHubClient)
+                          client=ShellHubClient, worker_kwargs=worker_kwargs)

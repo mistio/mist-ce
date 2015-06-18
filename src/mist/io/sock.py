@@ -40,6 +40,7 @@ from mist.io.amqp_tornado import Consumer
 from mist.io import methods
 from mist.io import tasks
 from mist.io.shell import Shell
+from mist.io.hub.tornado_shell_client import ShellHubClient
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -84,44 +85,11 @@ class MistConnection(SockJSConnection):
         CONNECTIONS.remove(self)
 
 
-class TornadoShell(tornado.iostream.BaseIOStream):
-    def __init__(self, channel):
-        super(TornadoShell, self).__init__(read_chunk_size=1024)
-        self.channel = channel
-        self.channel.setblocking(0)
-
-    def fileno(self):
-        return self.channel.fileno()
-
-    def close_fd(self):
-        self.channel.close()
-
-    def read_from_fd(self):
-        try:
-            data = self.channel.recv(self.read_chunk_size)
-            if data:
-                return data.decode('utf-8', 'ignore')
-            self.close()
-        except socket.timeout:
-            pass
-
-    def write_to_fd(self, data):
-        try:
-            return self.channel.send(data.encode('utf-8', 'ignore'))
-        except socket.timeout:
-            return 0
-
-    def get_fd_error(self):
-        pass
-
-
 class ShellConnection(MistConnection):
     def on_open(self, conn_info):
         super(ShellConnection, self).on_open(conn_info)
-        self.channel = None
-        self.tornado_channel = None
+        self.hub_client = None
         self.ssh_info = {}
-        self.provider = ''
 
     def on_shell_open(self, data):
         if self.ssh_info:
@@ -133,66 +101,23 @@ class ShellConnection(MistConnection):
             'columns': data['cols'],
             'rows': data['rows'],
         }
-        self.provider = data.get('provider', '')
-        self.shell = Shell(data['host'])
-        try:
-            key_id, ssh_user = self.shell.autoconfigure(
-                self.user, data['backend_id'], data['machine_id']
-            )
-        except Exception as exc:
-            if self.provider == 'docker':
-                self.shell = Shell(data['host'],
-                                   provider=data.get('provider', ''))
-                key_id, ssh_user = self.shell.autoconfigure(
-                    self.user, data['backend_id'], data['machine_id']
-                )
-            else:
-                log.warning(str(exc))
-                if isinstance(exc, MachineUnauthorizedError):
-                    err = 'Permission denied (publickey).'
-                else:
-                    err = str(exc)
-                self.ssh_info['error'] = err
-                self.emit_shell_data(err)
-                self.close()
-                return
-        self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
-        self.channel = self.shell.invoke_shell('xterm',
-                                               data['cols'],
-                                               data['rows'])
-
-        # tornado compatible async wrapper around paramiko channel
-        self.tornado_channel = TornadoShell(self.channel)
-
-        def channel_closed(data):
-            log.info('channel closed')
-            self.close()
-
-        self.tornado_channel.read_until_close(
-            callback=channel_closed, streaming_callback=self.emit_shell_data
-        )
+        self.hub_client = ShellHubClient(worker_kwargs=self.ssh_info)
+        self.hub_client.on_data = self.emit_shell_data
+        self.hub_client.start()
         log.info('on_shell_open finished')
 
     def on_shell_data(self, data):
-        # log.info('on_shell_data: %s', data)
-        try:
-            self.tornado_channel.write(bytes(data))
-        except tornado.iostream.StreamClosedError:
-            log.info('on_shell_data got stream error')
+        self.hub_client.send_data(data)
 
     def on_shell_resize(self, columns, rows):
-        log.info("Resizing shell to %d * %d", columns, rows)
-        try:
-            self.channel.resize_pty(columns, rows)
-        except Exception as exc:
-            log.error("Error resizing shell: %r", exc)
+        self.hub_client.resize(columns, rows)
 
     def emit_shell_data(self, data):
         self.send('shell_data', data)
 
     def on_close(self):
-        if self.channel:
-            self.channel.close()
+        if self.hub_client:
+            self.hub_client.stop()
         super(ShellConnection, self).on_close()
 
 

@@ -15,19 +15,15 @@ class ShellHubClient(HubClient):
 
     def ready_callback(self, *args, **kwargs):
         super(ShellHubClient, self).ready_callback(*args, **kwargs)
-        data = {
-            'backend_id': 'tUEMvnye1BqMeqNEoLDrFy2EiT8',
-            'machine_id': 'bc41da46814e0c7b69167e2862d400c24419ec3dcdc48a72c4ede789c6ed981e',
-            'host': '69.50.244.209',
-            'columns': 80,
-            'rows': 40,
-        }
         import time; time.sleep(1)
-        self.connect(**data)
+        self.connect(**self.worker_kwargs)
 
     def connect(self, **kwargs):
         log.info("%s: Connecting with kwargs %s.", self.lbl, kwargs)
         self.send_to_worker('connect', kwargs)
+
+    def send_data(self, msg):
+        self.send_to_worker('data', msg)
 
     def on_data(self, msg):
         print msg
@@ -41,7 +37,17 @@ class ShellHubClient(HubClient):
 
 
 if __name__ == "__main__":
-    client = ShellHubClient()
+    worker_kwargs = {
+        'backend_id': 'tUEMvnye1BqMeqNEoLDrFy2EiT8',
+        'machine_id': 'bc41da46814e0c7b69167e2862d400c24419ec3dcdc48a72c4ede789c6ed981e',
+        'host': '69.50.244.209',
+        'columns': 80,
+        'rows': 40,
+    }
+    client = ShellHubClient(worker_kwargs=worker_kwargs)
     client.start()
     ioloop = tornado.ioloop.IOLoop.current()
-    ioloop.start()
+    try:
+        ioloop.start()
+    except BaseException as exc:
+        log.error("Exception while running ioloop: %r", exc)
