@@ -16,7 +16,7 @@ class _HubTornadoConsumer(mist.io.amqp_tornado.Consumer):
     """AMQP consumer used by Tornado-compatible hub client"""
 
     def __init__(self, uuid, exchange, worker_type, key, worker_kwargs,
-                 actions_callback, lbl=''):
+                 actions_callback, ready_callback, lbl=''):
 
         self.uuid = uuid
         self.key = key
@@ -24,6 +24,7 @@ class _HubTornadoConsumer(mist.io.amqp_tornado.Consumer):
         self.worker_id = None
         self.worker_kwargs = worker_kwargs or {}
         self.actions_callback = actions_callback
+        self.ready_callback = ready_callback
         self.lbl = lbl or ('%s (%s)' % (self.__class__.__name__, self.uuid))
         super(_HubTornadoConsumer, self).__init__(
             amqp_url='amqp://localhost',
@@ -34,6 +35,7 @@ class _HubTornadoConsumer(mist.io.amqp_tornado.Consumer):
             exchange_kwargs={'auto_delete': True},
             queue_kwargs={'auto_delete': True, 'exclusive': True},
         )
+        log.info("%s: Default ready callback.", self.lbl)
 
     def start_consuming(self):
         """Exchange, channel, consumer ready to start listening"""
@@ -88,7 +90,7 @@ class _HubTornadoConsumer(mist.io.amqp_tornado.Consumer):
             log.debug("%s: Will start listening for routing_key 'from_%s.#'.",
                       self.lbl, self.worker_id)
             self._channel.queue_bind(
-                lambda frame: None,
+                self.ready_callback,
                 self.queue,
                 self.exchange,
                 'from_%s.#' % self.worker_id,
@@ -130,6 +132,7 @@ class HubClient(object):
             uuid=self.uuid, exchange=self.exchange, key=self.key,
             worker_type=self.worker_type, worker_kwargs=self.worker_kwargs,
             lbl=self.lbl, actions_callback=self.handle_msg,
+            ready_callback=self.ready_callback,
         )
 
         self.started = False
@@ -169,6 +172,12 @@ class HubClient(object):
                 ),
                 body=json.dumps(msg),
             )
+
+    def ready_callback(self, *args, **kwargs):
+        log.info("%s: Ready callback triggered.", self.lbl)
+
+    def stop(self):
+        self.consumer.stop()
 
 
 class EchoHubClient(HubClient):
