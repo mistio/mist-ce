@@ -1557,7 +1557,7 @@ var PROVIDER_MAP = {
             name: 'subscription_id',
             type: 'text',
             helpText: 'You can find your subscriptionID on the Azure portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/202083549-Adding-credentials-for-Azure'
+            helpHref: 'http://docs.mist.io/article/18-adding-microsoft-azure'
         },
         {
             name: 'certificate',
@@ -1565,7 +1565,7 @@ var PROVIDER_MAP = {
             label: 'Certificate file',
             buttonText: 'Add Certificate',
             helpText: 'Your Azure certificate PEM file',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/202083549-Adding-credentials-for-Azure'
+            helpHref: 'http://docs.mist.io/article/18-adding-microsoft-azure'
         }
     ],
 
@@ -1580,7 +1580,8 @@ var PROVIDER_MAP = {
             label: 'Hostname',
             optional: true,
             placeholder: 'DNS or IP ',
-            helpText: 'The URL or IP adress that your server listens to'
+            helpText: 'The URL or IP adress that your server listens to',
+            helpHref: 'http://docs.mist.io/article/28-adding-other-servers'
         },
         {
             name: 'windows',
@@ -1685,7 +1686,7 @@ var PROVIDER_MAP = {
             name: 'token',
             type: 'password',
             helpText: 'You can find your API Token on the Digital Ocean portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201501739--Add-credentials-for-Digital-Ocean',
+            helpHref: 'http://docs.mist.io/article/19-adding-digital-ocean',
         },
     ],
 
@@ -1698,6 +1699,8 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'password',
+            helpText: 'You can find your API Token on the HostVirtual portal',
+            helpHref: 'http://docs.mist.io/article/22-adding-hostvirtual'
         },
     ],
 
@@ -1711,7 +1714,7 @@ var PROVIDER_MAP = {
             name: 'api_key',
             type: 'password',
             helpText: 'You can find your API Token on the Vultr portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/204576609-Add-credentials-for-Vultr'
+            helpHref: 'http://docs.mist.io/article/72-adding-vultr'
         },
     ],
 
@@ -1726,7 +1729,7 @@ var PROVIDER_MAP = {
             type: 'text',
             label: 'Host',
             helpText: 'The URL or IP your Docker engine listens to',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201544379-Adding-a-Docker-engine',
+            helpHref: 'http://docs.mist.io/article/20-adding-docker',
         },
         {
             name: 'docker_port',
@@ -1735,7 +1738,7 @@ var PROVIDER_MAP = {
             optional: true,
             defaultValue: '4243',
             helpText: 'The port your Docker engine listens to',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201544379-Adding-a-Docker-engine',
+            helpHref: 'http://docs.mist.io/article/20-adding-docker',
         },
         {
             type: 'slider',
@@ -1773,7 +1776,7 @@ var PROVIDER_MAP = {
                 }
             ],
             helpText: 'The type of authentication your Docker engine uses',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201544379-Adding-a-Docker-engine',
+            helpHref: 'http://docs.mist.io/article/20-adding-docker',
         },
     ],
 
@@ -1791,13 +1794,13 @@ var PROVIDER_MAP = {
             name: 'api_key',
             type: 'text',
             helpText: 'You can find your API key on your Amazon console',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200235718-Adding-credentials-for-Amazon-EC2',
+            helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2',
         },
         {
             name: 'api_secret',
             type: 'password',
             helpText: 'You can find your API secret on your Amazon console',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200235718-Adding-credentials-for-Amazon-EC2',
+            helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2',
         }
     ],
 
@@ -1813,13 +1816,13 @@ var PROVIDER_MAP = {
             type: 'file',
             buttonText: 'Add JSON key',
             helpText: 'You can create a new key on your GCE portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203433315-Adding-Google-Compute-Engine-to-Mist-io',
+            helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
         },
         {
             name: 'project_id',
             type: 'text',
             helpText: 'You can find your project ID on your GCE portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203433315-Adding-Google-Compute-Engine-to-Mist-io',
+            helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
         }
     ],
 
@@ -1844,6 +1847,8 @@ var PROVIDER_MAP = {
         {
             name: 'tenant_name',
             type: 'text',
+            helpText: 'You can find your tenant name on HP Cloud portal',
+            helpHref: 'http://docs.mist.io/article/74-adding-hp-cloud'
         }
     ],
 
@@ -1857,7 +1862,7 @@ var PROVIDER_MAP = {
             name: 'api_key',
             type: 'text',
             helpText: 'You can create an API key on your Linode portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200278166-Adding-credentials-for-Linode',
+            helpHref: 'http://docs.mist.io/article/25-adding-linode',
         }
     ],
 
@@ -1897,7 +1902,7 @@ var PROVIDER_MAP = {
             name: 'auth_url',
             type: 'text',
             helpText: 'Your OpenStack Auth URL',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200638018-Adding-credentials-for-OpenStack',
+            helpHref: 'http://docs.mist.io/article/27-adding-openstack',
         },
         {
             name: 'tenant_name',
@@ -1929,7 +1934,7 @@ var PROVIDER_MAP = {
             name: 'api_key',
             type: 'password',
             helpText: 'You can find your API key on your RackSpace portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200235728-Adding-credentials-for-Rackspace',
+            helpHref: 'http://docs.mist.io/article/29-adding-rackspace',
         }
     ],
 
@@ -1948,7 +1953,7 @@ var PROVIDER_MAP = {
             name: 'api_key',
             type: 'password',
             helpText: 'You can find your API key on your SoftLayer portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200794519-Adding-credentials-for-SoftLayer',
+            helpHref: 'http://docs.mist.io/article/30-adding-softlayer',
         }
     ],
 
@@ -1963,6 +1968,7 @@ var PROVIDER_MAP = {
             label: 'KVM hostname',
             type: 'text',
             helpText: 'The URL or IP that your KVM hypervisor listens to',
+            helpHref: 'http://docs.mist.io/article/24-adding-kvm',
         },
         {
             name: 'machine_user',
@@ -1985,7 +1991,7 @@ var PROVIDER_MAP = {
             label: 'ssh key',
             optional: true,
             helpText: 'If you don\'t specify an ssh key, mist.io will assume that you are connecting via tcp (qemu+tcp)',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203342499--Adding-credentials-for-KVM-hypervisors',
+            helpHref: 'http://docs.mist.io/article/24-adding-kvm',
         },
 
     ],
@@ -2014,7 +2020,7 @@ var PROVIDER_MAP = {
             type: 'text',
             label: 'Hostname',
             helpText: 'The URL or IP vCloud listens to',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203326759--Adding-credentials-for-VMware-vCloud'
+            helpHref: 'http://docs.mist.io/article/31-adding-vmware-vcloud'
         }
     ],
 
@@ -2039,7 +2045,7 @@ var PROVIDER_MAP = {
             name: 'organization',
             type: 'text',
             helpText: 'Name of your oganization',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203321959-Adding-credentials-for-Indonesian-Cloud'
+            helpHref: 'http://docs.mist.io/article/23-adding-indonesian-cloud'
         }
     ],
     vsphere: [
@@ -2060,6 +2066,8 @@ var PROVIDER_MAP = {
             name: 'host',
             type: 'text',
             label: 'Hostname',
+            helpText: 'The URL or IP vSphere listens to',
+            helpHref: 'http://docs.mist.io/article/73-adding-vsphere'
         }
     ]
 };
