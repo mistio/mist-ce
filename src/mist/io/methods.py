@@ -2237,11 +2237,15 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
             )
         except Exception as e:
             try:
-                #get to get the message only out of the XML response
-                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value).group(2)
+                # try to get the message only out of the XML response
+                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value)
+                if not msg:
+                    msg = re.search(r"(Message: ')(.*?)(', Body)", e.value)
+                if msg:
+                    msg = msg.group(2)
             except:
                 msg = e
-            raise MachineCreationError('Azure, got exception %s' % msg, e)
+            raise MachineCreationError('Azure, got exception %s' % msg)
 
         return node
 
