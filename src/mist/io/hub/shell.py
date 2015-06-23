@@ -24,9 +24,13 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
         self.provider = ''
         self.user = mist.io.model.User()
 
-    def on_connect(self, msg):
+    def on_ready(self, msg=''):
+        super(ShellHubWorker, self).on_ready(msg)
+        self.connect()
+
+    def connect(self):
         """Connect to shell"""
-        data = msg.body
+        data = self.params
         for key in ('backend_id', 'machine_id', 'host', 'columns', 'rows'):
             if key not in data:
                 log.error("%s: Missing kwarg '%s' from on_connect.",
@@ -127,12 +131,7 @@ class ShellHubClient(mist.io.hub.main.HubClient):
         """Call super and also start stdin reader greenlet"""
         super(ShellHubClient, self).start()
         gevent.sleep(1)
-        self.connect(**self.worker_kwargs)
         self.greenlets['stdin'] = gevent.spawn(self.send_stdin)
-
-    def connect(self, **kwargs):
-        log.info("%s: Will connect with kwargs %s.", self.lbl, kwargs)
-        self.send_to_worker('connect', kwargs)
 
     def send_stdin(self):
         """Continuously read lines from stdin and send them to worker"""

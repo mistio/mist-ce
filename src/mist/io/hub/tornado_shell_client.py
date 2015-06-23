@@ -13,15 +13,6 @@ class ShellHubClient(HubClient):
         super(ShellHubClient, self).__init__(exchange, key, 'shell',
                                              worker_kwargs)
 
-    def ready_callback(self, *args, **kwargs):
-        super(ShellHubClient, self).ready_callback(*args, **kwargs)
-        import time; time.sleep(1)
-        self.connect(**self.worker_kwargs)
-
-    def connect(self, **kwargs):
-        log.info("%s: Connecting with kwargs %s.", self.lbl, kwargs)
-        self.send_to_worker('connect', kwargs)
-
     def send_data(self, msg):
         self.send_to_worker('data', msg)
 

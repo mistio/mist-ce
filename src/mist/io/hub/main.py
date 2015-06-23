@@ -109,6 +109,15 @@ class AmqpGeventBase(object):
                       self.lbl, exc)
             self.close_chan()
 
+    def parse_json_msg(self, msg):
+        if msg.properties.get('content_type') == 'application/json':
+            if isinstance(msg.body, basestring):
+                try:
+                    msg.body = json.loads(msg.body)
+                except Exception as exc:
+                    log.error("%s: Error json parsing msg body with content "
+                              "type application/json %r.", self.lbl, exc)
+
     def amqp_handle_msg(self, msg):
         """Handle incoming AMQP message
 
@@ -120,12 +129,7 @@ class AmqpGeventBase(object):
         some basic_consume call if it needs to receive messages via AMQP.
 
         """
-        if msg.properties.get('content_type') == 'application/json':
-            try:
-                msg.body = json.loads(msg.body)
-            except Exception as exc:
-                log.error("%s: Error json parsing msg body with content type "
-                          "application/json %r.", self.lbl, exc)
+        self.parse_json_msg(msg)
         body = msg.body
         routing_key = msg.delivery_info.get('routing_key', '')
         log.debug("%s: Received message with routing key '%s' and body %r.",
@@ -246,6 +250,7 @@ class HubServer(AmqpGeventBase):
         log.debug("%s: Msg has correlation_id '%s' and reply_to '%s'.",
                   self.lbl, correlation_id, reply_to)
         worker_cls = self.worker_cls[route_parts[1]]
+        self.parse_json_msg(msg)
         worker = worker_cls(reply_to, correlation_id, msg.body, self.exchange)
         self.workers[worker.uuid] = worker
         worker.start()
@@ -303,7 +308,7 @@ class HubWorker(AmqpGeventBase):
         else:
             super(HubWorker, self).amqp_handle_msg(msg)
 
-    def send_to_client(self, action, msg):
+    def send_to_client(self, action, msg=''):
         """Send AMQP message to clients"""
         self.amqp_send_msg(msg, routing_key='from_%s.%s' % (self.uuid, action))
 
@@ -363,6 +368,7 @@ class HubClient(AmqpGeventBase):
         super(HubClient, self).amqp_consume()
 
     def amqp_handle_msg(self, msg):
+        self.parse_json_msg(msg)
         body = msg.body
         routing_key = msg.delivery_info.get('routing_key', '')
         if not self.worker_id:
