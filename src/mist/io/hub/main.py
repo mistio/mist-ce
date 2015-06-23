@@ -246,12 +246,9 @@ class HubServer(AmqpGeventBase):
         log.debug("%s: Msg has correlation_id '%s' and reply_to '%s'.",
                   self.lbl, correlation_id, reply_to)
         worker_cls = self.worker_cls[route_parts[1]]
-        worker = worker_cls(msg.body, self.exchange)
+        worker = worker_cls(reply_to, correlation_id, msg.body, self.exchange)
         self.workers[worker.uuid] = worker
         worker.start()
-        log.info("%s: Sending back RPC AMQP response.", self.lbl)
-        msg = amqp.Message(worker.uuid, correlation_id=correlation_id)
-        self.chan.basic_publish(msg, self.exchange, reply_to)
 
     def stop(self):
         """Stop all workers and then call super"""
@@ -269,14 +266,28 @@ class HubServer(AmqpGeventBase):
 class HubWorker(AmqpGeventBase):
     """Hub Worker"""
 
-    def __init__(self, params, exchange=EXCHANGE):
+    def __init__(self, reply_to, correlation_id, params, exchange=EXCHANGE):
         """Initialize a worker proxying a connection"""
         super(HubWorker, self).__init__(exchange=exchange)
+        self.reply_to = reply_to
+        self.correlation_id = correlation_id
+        self.params = params
+
+    def send_ready(self):
+        """Send RPC response back to client when worker is ready"""
+        log.info("%s: Sending back RPC AMQP response.", self.lbl)
+        msg = amqp.Message(self.uuid, correlation_id=self.correlation_id)
+        self.chan.basic_publish(msg, self.exchange, self.reply_to)
+
+    def on_ready(self):
+        """Client is ready"""
+        log.info("%s: Got 'ready' from client.", self.lbl)
 
     def amqp_consume(self):
         """Block on channel messages until an exception raises"""
         self.chan.queue_declare(self.uuid, exclusive=True)
         self.chan.queue_bind(self.uuid, self.exchange, '%s.#' % self.uuid)
+        self.send_ready()
         self.chan.basic_consume(self.uuid, callback=self.amqp_handle_msg,
                                 no_ack=True)
         log.debug("%s: Exchange '%s', queue '%s' with routing key '%s.#'.",

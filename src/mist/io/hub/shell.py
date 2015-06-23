@@ -16,8 +16,8 @@ log = logging.getLogger(__name__)
 
 
 class ShellHubWorker(mist.io.hub.main.HubWorker):
-    def __init__(self, params, exchange=mist.io.hub.main.EXCHANGE):
-        super(ShellHubWorker, self).__init__(params, exchange=exchange)
+    def __init__(self, *args, **kwargs):
+        super(ShellHubWorker, self).__init__(*args, **kwargs)
         self.shell = None
         self.channel = None
         self.ssh_info = {}
