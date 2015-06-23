@@ -4,6 +4,7 @@ import json
 import signal
 import logging
 import argparse
+import traceback
 
 import amqp
 
@@ -135,10 +136,11 @@ class AmqpGeventBase(object):
         log.debug("%s: Received message with routing key '%s' and body %r.",
                   self.lbl, routing_key, body)
         try:
-            action = routing_key.split('.')[-1]
+            parts = routing_key.split('.')
+            assert len(parts) >= 2, "Routing key must contain at least 2 parts"
+            action = parts[1]
             log.debug("%s: AMQP msg action is '%s'.", self.lbl, action)
             assert action, "Action must be single word."
-            assert '.' not in action, "Action '%s' contains dots." % action
             attr = 'on_%s' % action
             assert hasattr(self, attr), "No handler for action '%s'." % action
         except AssertionError as exc:
@@ -147,11 +149,12 @@ class AmqpGeventBase(object):
         else:
             log.debug("%s: Will run handler '%s'.", self.lbl, attr)
             try:
-                getattr(self, attr)(msg)
+                return getattr(self, attr)(msg)
             except Exception as exc:
                 log.error("%s: Exception %r while handling AMQP msg with "
                           "routing key '%s' and body %r in %s().",
                           self.lbl, exc, routing_key, body, attr)
+                log.error(traceback.format_exc())
 
     def amqp_send_msg(self, msg='', routing_key=''):
         """Publish AMQP message"""
@@ -225,35 +228,54 @@ class HubServer(AmqpGeventBase):
                  self.lbl, self.key, self.key)
         super(HubServer, self).amqp_consume()
 
-    def amqp_handle_msg(self, msg):
-        """Handle AMQP RPC messages"""
+    def get_resp_details(self, msg):
+        """Find correlation_id and reply_to key for RPC response"""
+        if not (msg.properties.get('correlation_id') and
+                msg.properties.get('reply_to')):
+            raise Exception("%s: No reply_to or correlation_id found in %s.",
+                            self.lbl, msg.properties)
+        correlation_id = msg.properties['correlation_id']
+        reply_to = msg.properties['reply_to']
+        log.debug("%s: Msg has correlation_id '%s' and reply_to '%s'.",
+                  self.lbl, correlation_id, reply_to)
+        return correlation_id, reply_to
+
+    def send_rpc_response(self, msg, response):
+        correlation_id, reply_to = self.get_resp_details(msg)
+        msg = amqp.Message(json.dumps(result),
+                           correlation_id=correlation_id,
+                           content_type='application/json')
+        self.amqp_send_msg(msg, reply_to)
+
+    def on_worker(self, msg):
         routing_key = msg.delivery_info.get('routing_key', '')
         log.info("%s: Received RPC AMQP message with routing_key '%s'.",
                  self.lbl, routing_key)
         try:
             route_parts = routing_key.split('.')
-            assert len(route_parts) == 2
-            assert route_parts[0] == self.key
-            assert route_parts[1] in self.worker_cls
+            assert len(route_parts) == 3
+            assert route_parts[2] in self.worker_cls
         except AssertionError:
             log.error("%s: Invalid routing key '%s'.", self.lbl, routing_key)
             return
-        try:
-            assert 'correlation_id' in msg.properties
-            assert 'reply_to' in msg.properties
-            correlation_id = msg.properties['correlation_id']
-            reply_to = msg.properties['reply_to']
-        except AssertionError:
-            log.error("%s: Couldn't find correlation_id and reply_to for "
-                      "response. Properties: %s", self.lbl, msg.properties)
-            return
-        log.debug("%s: Msg has correlation_id '%s' and reply_to '%s'.",
-                  self.lbl, correlation_id, reply_to)
-        worker_cls = self.worker_cls[route_parts[1]]
+        worker_cls = self.worker_cls[route_parts[2]]
         self.parse_json_msg(msg)
+        correlation_id, reply_to = self.get_resp_details(msg)
         worker = worker_cls(reply_to, correlation_id, msg.body, self.exchange)
         self.workers[worker.uuid] = worker
         worker.start()
+
+    def on_list_workers(self, msg):
+        return self.send_rpc_response(msg, self.list_workers())
+
+    def list_workers(self):
+        types_to_names = {val: key for key, val in self.worker_cls.items()}
+        workers_list = [{'uuid': uuid,
+                         'type': types_to_names[type(worker)],
+                         'params': worker.params}
+                        for uuid, worker in self.workers.items()]
+        log.info("%s: Current workers: %s", self.lbl, workers_list)
+        return workers_list
 
     def stop(self):
         """Stop all workers and then call super"""
@@ -348,7 +370,7 @@ class HubClient(AmqpGeventBase):
         self.worker_id = None
         self.correlation_id = uuid.uuid4().hex
         reply_to = self.queue
-        routing_key = '%s.%s' % (self.key, self.worker_type)
+        routing_key = '%s.worker.%s' % (self.key, self.worker_type)
         msg = amqp.Message(json.dumps(self.worker_kwargs),
                            correlation_id=self.correlation_id,
                            reply_to=reply_to,

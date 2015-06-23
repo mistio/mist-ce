@@ -45,7 +45,7 @@ class _HubTornadoConsumer(mist.io.amqp_tornado.Consumer):
         self.correlation_id = uuid.uuid4().hex
         self._channel.basic_publish(
             exchange=self.exchange,
-            routing_key='%s.%s' % (self.key, self.worker_type),
+            routing_key='%s.worker.%s' % (self.key, self.worker_type),
             properties=pika.BasicProperties(
                 reply_to=self.queue,
                 correlation_id=self.correlation_id,
