@@ -72,7 +72,7 @@ def get_conn_info(conn_info):
 class MistConnection(SockJSConnection):
     def on_open(self, conn_info):
         log.info("%s: Initializing", self.__class__.__name__)
-        ip, user_agent, session_id = get_conn_info(conn_info)
+        self.ip, self.user_agent, session_id = get_conn_info(conn_info)
         self.user = user_from_session_id(session_id)
         self.session_id = uuid.uuid4().hex
         CONNECTIONS.add(self)
@@ -100,6 +100,9 @@ class ShellConnection(MistConnection):
             'host': data['host'],
             'columns': data['cols'],
             'rows': data['rows'],
+            'ip': self.ip,
+            'user_agent': self.user_agent,
+            'email': self.user.email,
         }
         self.hub_client = ShellHubClient(worker_kwargs=self.ssh_info)
         self.hub_client.on_data = self.emit_shell_data

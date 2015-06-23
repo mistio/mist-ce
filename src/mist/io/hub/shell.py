@@ -20,7 +20,12 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
         super(ShellHubWorker, self).__init__(*args, **kwargs)
         self.shell = None
         self.channel = None
-        self.ssh_info = {}
+        for key in ('email', 'backend_id', 'machine_id', 'host',
+                    'columns', 'rows'):
+            if not self.params.get(key):
+                log.error("%s: Param '%s' missing from worker kwargs.",
+                          self.lbl, key)
+                self.stop()
         self.provider = ''
         self.user = mist.io.model.User()
 
@@ -30,21 +35,10 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
 
     def connect(self):
         """Connect to shell"""
-        data = self.params
-        for key in ('backend_id', 'machine_id', 'host', 'columns', 'rows'):
-            if key not in data:
-                log.error("%s: Missing kwarg '%s' from on_connect.",
-                          self.lbl, key)
         if self.shell is not None:
             log.error("%s: Can't call on_connect twice.", self.lbl)
             return
-        self.ssh_info = {
-            'backend_id': data['backend_id'],
-            'machine_id': data['machine_id'],
-            'host': data['host'],
-            'columns': data['columns'],
-            'rows': data['rows'],
-        }
+        data = self.params
         self.provider = data.get('provider', '')
         self.shell = mist.io.shell.Shell(data['host'])
         try:
@@ -66,11 +60,11 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
                     err = 'Permission denied (publickey).'
                 else:
                     err = str(exc)
-                self.ssh_info['error'] = err
                 self.emit_shell_data(err)
+                self.params['error'] = err
                 self.stop()
                 return
-        self.ssh_info.update(key_id=key_id, ssh_user=ssh_user)
+        self.params.update(key_id=key_id, ssh_user=ssh_user)
         self.channel = self.shell.invoke_shell('xterm',
                                                data['columns'], data['rows'])
         self.greenlets['read_stdout'] = gevent.spawn(self.get_ssh_data)
@@ -86,11 +80,12 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
                 columns, rows = msg.body['columns'], msg.body['rows']
                 log.info("%s: Resizing shell to (%s, %s).",
                          self.lbl, columns, rows)
-        try:
-            self.channel.resize_pty(columns, rows)
-        except Exception as exc:
-            log.warning("%s: Error resizing shell to (%s, %s): %r.",
-                        self.lbl, columns, rows, exc)
+                try:
+                    self.channel.resize_pty(columns, rows)
+                    return columns, rows
+                except Exception as exc:
+                    log.warning("%s: Error resizing shell to (%s, %s): %r.",
+                                self.lbl, columns, rows, exc)
 
     def emit_shell_data(self, data):
         self.send_to_client('data', data)
