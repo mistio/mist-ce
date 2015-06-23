@@ -279,7 +279,7 @@ class HubWorker(AmqpGeventBase):
         msg = amqp.Message(self.uuid, correlation_id=self.correlation_id)
         self.chan.basic_publish(msg, self.exchange, self.reply_to)
 
-    def on_ready(self):
+    def on_ready(self, msg=''):
         """Client is ready"""
         log.info("%s: Got 'ready' from client.", self.lbl)
 
@@ -307,7 +307,7 @@ class HubWorker(AmqpGeventBase):
         """Send AMQP message to clients"""
         self.amqp_send_msg(msg, routing_key='from_%s.%s' % (self.uuid, action))
 
-    def on_close(self, msg):
+    def on_close(self, msg=''):
         """Stop self when msg with routing suffix 'close' received"""
         log.info("%s: Received on_close.", self.lbl)
         self.stop()
@@ -388,6 +388,8 @@ class HubClient(AmqpGeventBase):
                       self.lbl, self.worker_id)
             self.chan.queue_bind(self.queue, self.exchange,
                                  'from_%s.#' % self.worker_id)
+            log.info("%s: Notifying worker that we're ready.", self.lbl)
+            self.send_to_worker('ready')
         else:
             # receiving messages
             if not routing_key.startswith('from_%s.' % self.worker_id):

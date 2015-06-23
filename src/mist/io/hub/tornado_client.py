@@ -174,7 +174,8 @@ class HubClient(object):
             )
 
     def ready_callback(self, *args, **kwargs):
-        log.info("%s: Ready callback triggered.", self.lbl)
+        log.info("%s: Ready callback triggered. Notifying worker.", self.lbl)
+        self.send_to_worker('ready')
 
     def stop(self):
         self.consumer.stop()
