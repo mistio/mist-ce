@@ -75,7 +75,6 @@ div.ui-controlgroup-label {
 -----------------------------------------------------------------------------------------------------------*/
 .ui-btn,
 label.ui-btn {
-	font-weight: bold;
 	border-width: 1px;
 	border-style: solid;
 }
@@ -265,7 +264,6 @@ html .ui-bar-a a,
 html .ui-body-a a,
 html body .ui-group-theme-a a {
 	color: #3388cc /*{a-link-color}*/;
-	font-weight: bold;
 }
 .ui-page-theme-a a:visited,
 html .ui-bar-a a:visited,

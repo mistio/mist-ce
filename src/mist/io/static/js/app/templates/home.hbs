@@ -36,7 +36,7 @@
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow ui-caps">
                         <!-- Machines link -->
                         <li class="ui-li-has-count ui-first-child">
-                            <a class="ui-btn ui-btn-icon-left ui-icon-machines ui-alt-icon" href="#/machines">
+                            <a class="ui-btn ui-btn-icon-left icon-machine ui-alt-icon" href="#/machines">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.backendsController.machineCount}}
                                 </span>
@@ -46,7 +46,7 @@
 
                         <!-- Images link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn ui-btn-icon-left ui-icon-images ui-alt-icon" href="#/images">
+                            <a class="ui-btn ui-btn-icon-left icon-image ui-alt-icon" href="#/images">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.backendsController.imageCount}}
                                 </span>
@@ -57,7 +57,7 @@
                         <!-- Networks link -->
                         {{#if Mist.backendsController.hasNetworks}}
                         <li class="ui-li-has-count">
-                            <a class="ui-btn ui-btn-icon-left ui-icon-networks ui-alt-icon" href="#/networks">
+                            <a class="ui-btn ui-btn-icon-left icon-network ui-alt-icon" href="#/networks">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.backendsController.networkCount}}
                                 </span>
@@ -68,7 +68,7 @@
 
                         <!-- Keys link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn ui-btn-icon-left ui-icon-bars ui-alt-icon" href="#/keys">
+                            <a class="ui-btn ui-btn-icon-left icon-keys ui-alt-icon" href="#/keys">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.keysController.content.length}}
                                 </span>
@@ -79,7 +79,7 @@
                         {{#if Mist.isCore}}
                         <!-- Scripts link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn ui-btn-icon-left ui-icon-scripts ui-alt-icon" href="#/scripts">
+                            <a class="ui-btn ui-btn-icon-left icon-script ui-alt-icon" href="#/scripts">
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.scriptsController.length}}
                                 </span>

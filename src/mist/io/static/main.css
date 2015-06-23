@@ -5,6 +5,7 @@
 @import url('jquery.mobile.structure-1.4.5.min.css');
 @import url('theme.css');
 @import url('images/sprite-build/sprites.css');
+@import url("css/icons.css");
 @import url("css/key.css");
 @import url("css/home.css");
 @import url("css/rules.css");
@@ -87,6 +88,12 @@ h3 {
     text-shadow: 0 0 0 transparent !important;
 }
 
+.ui-li-count {
+    border-width: 0px;
+    background-color: transparent !important;
+    color: inherit !important;
+    text-shadow: 0 0 0 transparent !important;
+}
 
 #home-page ul.ui-listview > li {
     font-weight: 300;

@@ -16,12 +16,23 @@
 #backend-buttons a.online:after {
     background-color: #46d4c9;
 }
+#backend-buttons a.online:hover {
+    background-color: #46d4c9;
+}
+
 
 #backend-buttons a.offline:after {
     background-color: #d96557;
 }
+#backend-buttons a.offline:hover {
+    background-color: #d96557;
+}
 
 #backend-buttons a.waiting:after {
+    background-color: #8c76d1;
+}
+
+#backend-buttons a.waiting:hover {
     background-color: #8c76d1;
 }
 
