@@ -240,9 +240,9 @@ class HubServer(AmqpGeventBase):
                   self.lbl, correlation_id, reply_to)
         return correlation_id, reply_to
 
-    def send_rpc_response(self, msg, response):
+    def send_rpc_response(self, msg, response=''):
         correlation_id, reply_to = self.get_resp_details(msg)
-        msg = amqp.Message(json.dumps(result),
+        msg = amqp.Message(json.dumps(response),
                            correlation_id=correlation_id,
                            content_type='application/json')
         self.amqp_send_msg(msg, reply_to)
@@ -265,9 +265,6 @@ class HubServer(AmqpGeventBase):
         self.workers[worker.uuid] = worker
         worker.start()
 
-    def on_list_workers(self, msg):
-        return self.send_rpc_response(msg, self.list_workers())
-
     def list_workers(self):
         types_to_names = {val: key for key, val in self.worker_cls.items()}
         workers_list = [{'uuid': uuid,
@@ -276,6 +273,20 @@ class HubServer(AmqpGeventBase):
                         for uuid, worker in self.workers.items()]
         log.info("%s: Current workers: %s", self.lbl, workers_list)
         return workers_list
+
+    def on_list_workers(self, msg):
+        self.send_rpc_response(msg, self.list_workers())
+
+    def on_stop(self, msg=''):
+        log.info("%s: Received STOP message, stopping.", self.lbl)
+        self.stop()
+        self.send_rpc_response(msg)
+
+    def on_stop_worker(self, msg):
+        log.info("%s: Received STOP %s message, stopping.", self.lbl, msg.body)
+        if msg.body in self.workers:
+            self.workers.pop(msg.body).stop()
+        self.send_rpc_response(msg)
 
     def stop(self):
         """Stop all workers and then call super"""
@@ -469,6 +480,90 @@ class EchoHubClient(HubClient):
     def stop(self):
         self.send_close()
         super(EchoHubClient, self).stop()
+
+
+class Manager():
+    def __init__(self, exchange=EXCHANGE, key=REQUESTS_KEY):
+        self.exchange = exchange
+        self.key = key
+        self.response = None
+        self.correlation_id = ''
+
+        self.conn = amqp.Connection()
+        self.chan = self.conn.channel()
+
+        # define callback queue
+        self.queue = self.chan.queue_declare(exclusive=True).queue
+        self.chan.queue_bind(self.queue, self.exchange, self.queue)
+        self.chan.basic_consume(self.queue, callback=self._recv,
+                                no_ack=True)
+        log.debug("Initialized amqp connection, channel, queue.")
+
+    def _send(self, command, payload=None):
+
+        # send rpc request
+        if self.correlation_id:
+            raise Exception("Can't send second request while already waiting.")
+        self.response = None
+        self.correlation_id = uuid.uuid4().hex
+        routing_key = '%s.%s' % (self.key, command)
+        msg = amqp.Message(json.dumps(payload),
+                           correlation_id=self.correlation_id,
+                           reply_to=self.queue,
+                           content_type='application/json')
+        log.debug("Sending AMQP msg with routing key '%s' and body %r.",
+                  routing_key, msg.body)
+        self.chan.basic_publish(msg, self.exchange, routing_key)
+        log.info("Sent RPC request, will wait for response.")
+
+        # wait for rpc response
+        try:
+            while self.correlation_id:
+                log.debug("Waiting for RPC response.")
+                self.chan.wait()
+        except BaseException as exc:
+            log.error("Amqp consumer received %r while waiting for RPC "
+                      "response. Stopping.", exc)
+        log.info("Finished waiting for RPC response.")
+        response = self.response
+        self.response = None
+        return response
+
+    def _recv(self, msg):
+        routing_key = msg.delivery_info.get('routing_key', '')
+        try:
+            body = json.loads(msg.body)
+        except (ValueError, TypeError):
+            body = msg.body
+        log.debug("Received message with routing key '%s' and body "
+                  "%r, while waiting for RPC response.",
+                  routing_key, body)
+        if not self.correlation_id:
+            log.error("Received msg with routing_key %s and body %s while "
+                      "not expecting an RPC response.",
+                      routing_key, body)
+            return
+        if not routing_key == self.queue:
+            log.warning("Got msg with routing key '%s' when expecting '%s'.",
+                        routing_key, self.queue)
+            return
+        if self.correlation_id != msg.properties.get('correlation_id'):
+            log.warning(
+                "Got msg with corr_id '%s' when expecting '%s'.",
+                msg.properties.get('correlation_id'), self.correlation_id
+            )
+            return
+        self.response = body
+        self.correlation_id = ''
+
+    def list_workers(self):
+        return self._send('list_workers')
+
+    def stop_worker(self, worker_uuid):
+        return self._send('stop_worker', worker_uuid)
+
+    def stop(self):
+        return self._send('stop')
 
 
 def run_forever():
