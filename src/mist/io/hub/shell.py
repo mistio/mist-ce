@@ -111,11 +111,6 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
         finally:
             self.channel.close()
 
-    def on_close(self, msg):
-        """Close shell and clean up"""
-        log.info("%s: Received on_close.", self.lbl)
-        self.stop()
-
     def stop(self):
         if self.channel is not None:
             self.channel.close()
@@ -156,7 +151,7 @@ class ShellHubClient(mist.io.hub.main.HubClient):
         print msg.body
 
     def stop(self):
-        self.send_to_worker('close')
+        self.send_close()
         super(ShellHubClient, self).stop()
 
 

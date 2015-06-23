@@ -296,6 +296,11 @@ class HubWorker(AmqpGeventBase):
         """Send AMQP message to clients"""
         self.amqp_send_msg(msg, routing_key='from_%s.%s' % (self.uuid, action))
 
+    def on_close(self, msg):
+        """Stop self when msg with routing suffix 'close' received"""
+        log.info("%s: Received on_close.", self.lbl)
+        self.stop()
+
 
 class EchoHubWorker(HubWorker):
     """Echoes back messages sent with routing suffix 'echo'"""
@@ -304,11 +309,6 @@ class EchoHubWorker(HubWorker):
         """Echo back messages sent with routing suffix 'echo'"""
         print "%s: Received on_echo %r. Will echo back." % (self.lbl, msg.body)
         self.send_to_client('echo', msg.body)
-
-    def on_close(self, msg):
-        """Stop self when msg with routing suffix 'close' received"""
-        log.info("%s: Received on_close.", self.lbl)
-        self.stop()
 
 
 class HubClient(AmqpGeventBase):
@@ -391,6 +391,9 @@ class HubClient(AmqpGeventBase):
             raise Exception("Routing key not yet received in RPC response.")
         self.amqp_send_msg(msg, '%s.%s' % (self.worker_id, action))
 
+    def send_close(self, msg=''):
+        self.send_to_worker('close', msg)
+
 
 class EchoHubClient(HubClient):
     """Sends echo request to EchoHubWorker and logs echo response"""
@@ -421,6 +424,10 @@ class EchoHubClient(HubClient):
         log.debug("%s: Sending echo request to worker with msg %r.",
                   self.lbl, msg)
         self.send_to_worker('echo', msg)
+
+    def stop(self):
+        self.send_close()
+        super(EchoHubClient, self).stop()
 
 
 def run_forever():
