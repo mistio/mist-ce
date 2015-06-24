@@ -21,8 +21,6 @@ EXCHANGE = 'hub'
 REQUESTS_KEY = 'hub'
 
 
-gevent.monkey.patch_all()
-
 log = logging.getLogger(__name__)
 
 
@@ -595,6 +593,7 @@ def prepare_logging(verbosity=0):
 
 
 def main(args=None, workers=None, client=EchoHubClient, worker_kwargs=None):
+    gevent.monkey.patch_all()
     args = args if args else prepare_argparse().parse_args()
     prepare_logging(args.verbose)
 
