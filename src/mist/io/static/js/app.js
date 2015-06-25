@@ -519,7 +519,9 @@ var loadApp = function (
         ]
     });
     App.TextField = Ember.TextField.extend({
+        tagName: 'input',
         autocapitalize: 'off',
+        classNames: ['ui-input-search'],
         attributeBindings: [
             'data-theme',
             'placeholder',

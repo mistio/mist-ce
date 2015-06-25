@@ -1,3 +1,25 @@
+.log-list {
+    clear: both;
+}
+
+.log-list fieldset {
+    background-color: #FAF9F4;
+    margin: 0;
+}
+
+.log-list ul.ui-listview {
+    margin: 0;
+}
+
+.logs .ui-input-text {
+    width: 188px;
+    float: right;
+    margin-top: -49px;
+    margin-bottom: 15px;
+    margin-right: 10px;
+    position: relative;
+}
+
 .details {
     display: none;
     padding: 5px;
@@ -5,7 +27,7 @@
 }
 
 .details.info-table {
-    background-color: rgb(214, 214, 214);
+    background-color: #D7EEEF;
 }
 
 .details table {
@@ -18,33 +40,42 @@
     white-space: normal;
 }
 
+.log-list ul {
+    font-size: 14px;
+}
+
 .log-list .ui-block-c div {
     float: right;
     margin-left: 10px;
+    color: #7F7F7F;
 }
 
 .log-list .ui-block-a div {
-    float: left;
-    top: 3px;
     position: relative;
     overflow: hidden;
     max-width: 100%;
     text-overflow: ellipsis;
-}
-
-.log-list .filter-wrapper {
-    margin-bottom: 20px;
+    float: left;
+    margin: 0;
 }
 
 .log-list .filter-wrapper fieldset {
     float: left;
+    margin: 0;
+}
+
+.log-list .filter-wrapper fieldset label {
+    font-size: 14px;
+    text-transform: uppercase;
+    border-width: 0px;
 }
 
 .log-list .filter-wrapper .ui-input-text {
-    margin-left: 32.5em;
-    margin-top: 2px;
-    position: relative;
-    top: 7px;
+    display: inline-block;
+    float: right;
+    padding: 0px .5em !important;
+    margin: 0;
+    border: none;
 }
 
 .log-list a .ui-block-a {
@@ -69,7 +100,7 @@
 }
 
 .log-list span.open a {
-    background-color: rgb(214, 214, 214);
+    background-color: #D7EEEF !important;
 }
 
 
@@ -106,4 +137,23 @@
 
 .log-list .tag {
     float: none;
+}
+
+label[for='event-jobs'] {
+    color: #46d4c9 !important;
+}
+label[for='event-requests'] {
+    color: #D48900 !important;
+}
+label[for='event-incidents'] {
+    color: #D96557 !important;
+}
+label[for='event-sessions'] {
+    color: #2ECC71 !important;
+}
+label[for='event-shell'] {
+    color: #0099CC !important;
+}
+label[for='event-error'] {
+    color: #FE3C3A !important;
 }

@@ -67,3 +67,36 @@
 .icon-support:after{content:'\0054';}
 .icon-prev:after{content:'\0055';}
 .icon-next:after{content:'\0056';}
+
+.ui-collapsible .ui-icon-minus:after, .ui-collapsible .ui-icon-plus:after {
+  background-image: none;
+  font-size: 24px;
+  background-color: #fff !important;
+  color: #C1C1C1 !important;
+  width: 24px;
+  height: 24px;
+  left: 24px;
+  top: 26px;
+  -webkit-font-smoothing: none;
+}
+
+.ui-collapsible .ui-icon-minus:after {
+    content:'\0050';
+}
+
+.ui-collapsible .ui-icon-plus:after {
+  content:'\004F';
+}
+
+.ui-collapsible .ui-icon-minus, .ui-collapsible .ui-icon-plus{
+    background-color: #EEEDEB !important;
+    padding: 18px 68px 17px !important;
+    color: #474747 !important;
+}
+
+.ui-collapsible .ui-icon-minus:hover, .ui-collapsible .ui-icon-plus:hover{
+    background-color: #D7EEEF !important;
+}
+
+.ui-collapsible .ui-icon-minus:hover:after, .ui-collapsible .ui-icon-plus:hover:after {
+}

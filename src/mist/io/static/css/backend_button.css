@@ -16,6 +16,9 @@
 #backend-buttons a.online:after {
     background-color: #46d4c9;
 }
+#backend-buttons a.online:hover:after {
+    background-color: #fff !important;
+}
 #backend-buttons a.online:hover {
     background-color: #46d4c9;
 }

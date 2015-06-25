@@ -64,12 +64,16 @@ h3 {
 }
 
 
-.ui-caps {
+.ui-caps, .ui-collapsible-heading {
     text-transform: uppercase;
 }
 
+.ui-collapsible-heading {
+    color: #474747 !important;
+}
 .ui-btn-add {
     font-weight: lighter !important;
+    font-size: 16px;
 }
 
 .ui-btn-add.ui-btn-icon-left {
@@ -90,15 +94,40 @@ h3 {
 
 .ui-li-count {
     border-width: 0px;
+    font-size: 18px !important;
     background-color: transparent !important;
     color: inherit !important;
     text-shadow: 0 0 0 transparent !important;
+    font-weight: 400;
 }
 
 #home-page ul.ui-listview > li {
     font-weight: 300;
-    font-size: 18px;
     color: #444;
+}
+
+#home-page ul.ui-listview > li:nth-child(even) a {
+    background-color: #ECF6F1;
+}
+
+.ui-input-search:after, .ui-input-text:after {
+    right: .6em !important;
+    left: inherit;
+    top: 50%;
+    margin-top: -7px;
+    content: "";
+    background-position: center center;
+    background-repeat: no-repeat;
+    width: 14px;
+    height: 14px;
+    filter: Alpha(Opacity=50);
+    opacity: .5;
+    position: absolute;
+}
+
+.ui-input-search input, .ui-input-text input {
+    padding-left: .75em;
+    padding-right: 1.75em;
 }
 
 /* Splash
@@ -373,11 +402,9 @@ ul.checkbox-list li label {
     height: 41px;
 }
 .tag {
-    border: 1px solid #bfbfbf;
     margin: 1px;
-    color: #555 !important;
+    color: #7F7F7F !important;
     padding: 1px 7px;
-    font-size: 12px;
     font-weight: normal;
     display: inline-block;
     float: right;
@@ -505,7 +532,7 @@ ul.checkbox-list li label {
     max-width: 99%;
 }
 .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
-    border-right-width: 2px;
+    border-right-width: 0px;
 }
 
 #confirmation-popup p {
@@ -612,9 +639,10 @@ ul.checkbox-list li label {
 
 .ui-collapsible-inset .ui-collapsible-content {
     padding-top: 0px;
-    margin-top: -1px;
-    overflow: auto;
-    border: none;
+    overflow: visible;
+    border-width: 0 !important;
+    padding: 0 !important;
+    background-color: transparent;
 }
 
 .single-machine-loader {
