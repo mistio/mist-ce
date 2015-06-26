@@ -65,10 +65,7 @@
         <div class="ajax-loader"></div>
     {{/if}}
 
-    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
-        data-role="listview"
-        data-enhanced="true"
-        data-inset="true">
+    <ul class="ui-listview">
         {{#each Mist.logsController}}
             {{view "logListItem" logBinding="this"}}
         {{/each}}
@@ -77,9 +74,4 @@
     {{#if view.fetchingHistory}}
         <div class="ajax-loader"></div>
     {{/if}}
-
-    {{#if view.noMoreLogs}}
-        <div class="no-logs"></div>
-    {{/if}}
-    <div class="mid-padding"></div>
 </div>

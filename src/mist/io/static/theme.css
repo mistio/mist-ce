@@ -306,7 +306,7 @@ html .ui-bar-a .ui-btn:hover,
 html .ui-body-a .ui-btn:hover,
 html body .ui-group-theme-a .ui-btn:hover,
 html head + body .ui-btn.ui-btn-a:hover {
-	background-color: #D7EEEF !important  /*{a-bhover-background-color}*/;
+	background-color: #D7EEEF /*{a-bhover-background-color}*/;
 	border-color: #D7EEEF /*{a-bhover-border}*/;
 	color: #000000 /*{a-bhover-color}*/;
 	text-shadow: 0 /*{a-bhover-shadow-x}*/ 0px /*{a-bhover-shadow-y}*/ 0 /*{a-bhover-shadow-radius}*/ #eeeeee /*{a-bhover-shadow-color}*/;
