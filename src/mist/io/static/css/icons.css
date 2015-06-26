@@ -50,12 +50,14 @@
 .icon-script:after{content:'\0045';}
 .icon-script:hover{background-color: #D48900 !important;}
 
-.icon-alert:after{content:'\0046';}
+.icon-error:after{content:'\0046';}
 .icon-check:after{content:'\0047';}
 .icon-question:after{content:'\0048';}
 .icon-vm:after{content:'\0049';}
 .icon-bm:after{content:'\004A';}
-.icon-warn:after{content:'\004B';}
+
+.icon-warn{margin-top: -1px !important;}
+.icon-warn:after{content:'\004B'; color: #d96557 !important; font-size: 16px; margin-left: 1px; margin-right: 15px;}
 .icon-trash:after{content:'\004C';}
 .icon-x:after{content:'\004D';}
 .icon-minimize:after{content:'\004E';}

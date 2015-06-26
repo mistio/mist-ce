@@ -5,6 +5,23 @@
 .log-list fieldset {
     background-color: #FAF9F4;
     margin: 0;
+    border-bottom: 1px solid #c9c8c4;
+}
+
+.log-list fieldset .ui-btn {
+    text-transform: uppercase;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    border-bottom: 1px solid #FAF9F5;
+}
+
+.log-list fieldset .ui-btn:hover {
+    background-color: #FAF9F4;
+    border-bottom: 1px solid #7f7f7f !important;
+}
+
+.log-list fieldset .ui-btn-active{
+    border-bottom: 1px solid #444 !important;
 }
 
 .log-list ul.ui-listview {
@@ -133,6 +150,7 @@
 
 .log-list ul li a {
     margin: 0 !important;
+    padding: 0.8em 1em .5em;
 }
 
 .log-list .tag {
