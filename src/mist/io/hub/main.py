@@ -175,6 +175,7 @@ class AmqpGeventBase(object):
             log.debug("%s: Stopping all greenlets %s.",
                       self.lbl, tuple(self.greenlets.keys()))
             gevent.killall(self.greenlets.values())
+            gevent.joinall(self.greenlets.values())
             self.greenlets.clear()
         log.debug("%s: Closing all AMQP channels.", self.lbl)
         for gid in self.chans.keys():
@@ -585,17 +586,17 @@ def prepare_logging(verbosity=0):
         loglvl = logging.INFO
     else:
         loglvl = logging.WARNING
-    handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter(logfmt))
-    handler.setLevel(loglvl)
-    logging.root.addHandler(handler)
+    #handler = logging.StreamHandler()
+    #handler.setFormatter(logging.Formatter(logfmt))
+    #handler.setLevel(loglvl)
+    #logging.root.addHandler(handler)
     logging.root.setLevel(loglvl)
 
 
 def main(args=None, workers=None, client=EchoHubClient, worker_kwargs=None):
     gevent.monkey.patch_all()
     args = args if args else prepare_argparse().parse_args()
-    prepare_logging(args.verbose)
+    prepare_logging(args.verbose or 1)
 
     if args.mode == 'server':
         hub = HubServer(workers=workers)
@@ -604,18 +605,15 @@ def main(args=None, workers=None, client=EchoHubClient, worker_kwargs=None):
     else:
         raise Exception("Unknown mode '%s'." % args.mode)
 
-    hub.start()
-    waiter = gevent.spawn(run_forever)
-
     def sig_handler(sig=None, frame=None):
         log.warning("Hub process received SIGTERM/SIGINT")
         hub.stop()
-        waiter.kill()
+        log.info("Sig handler completed.")
 
     gevent.signal(signal.SIGTERM, sig_handler)
     gevent.signal(signal.SIGINT, sig_handler)  # KeyboardInterrupt also
 
-    waiter.join()
+    hub.start()
     gevent.wait()
 
 
