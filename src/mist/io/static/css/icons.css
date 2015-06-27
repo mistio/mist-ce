@@ -59,12 +59,22 @@
 .icon-warn{margin-top: -1px !important;}
 .icon-warn:after{content:'\004B'; color: #d96557 !important; font-size: 16px; margin-left: 1px; margin-right: 15px;}
 .icon-trash:after{content:'\004C';}
-.icon-x:after{content:'\004D';}
+.icon-x:after {
+    content: '\004D';
+    font-size: 12px;
+    top: 1.72em !important;
+    left: 1.65em !important;
+}
 .icon-minimize:after{content:'\004E';}
 .icon-expand:after{content:'\004F';}
 .icon-collapse:after{content:'\0050';}
 .icon-docs:after{content:'\0051';}
-.icon-user:after{content:'\0052';}
+.icon-user:after{content: '\0052';}
+.icon-docs:after, .icon-user:after{
+    font-size: 16px;
+    left: 1.1em !important;
+    top: 1.1em !important;
+}
 .icon-xx:after{content:'\0053';}
 .icon-support:after{content:'\0054';}
 .icon-prev:after{content:'\0055';}

@@ -84,12 +84,44 @@ h3 {
     left: 1em !important;
 }
 
+.ui-popup {
+    border-width: 0;
+}
+
+.ui-popup .ui-header{
+    background-color: #A4A39F;
+    color: #fff;
+    text-transform: uppercase;
+    padding: 1.3em;
+    text-shadow: 0 0 0 transparent;
+}
+
 .ui-header h1.ui-title{
     font-size: 24px;
     text-align: left;
     margin: 14px 10px;
     padding: 0;
     text-shadow: 0 0 0 transparent !important;
+}
+
+.ui-popup ul.ui-listview{
+    padding: 0;
+    text-transform: uppercase;
+}
+
+.ui-popup ul.ui-listview li a {
+    border: 0;
+    padding: .8em 3.5em !important;
+    font-weight: 400;
+}
+
+.ui-popup ul.ui-listview li a:hover {
+    background-color: #46D4C9;
+    color: #fff;
+}
+.ui-popup ul.ui-listview li a:after {
+    left: .8em;
+    top: 1em;
 }
 
 .ui-li-count {
@@ -773,7 +805,8 @@ ul.checkbox-list li label {
     font-weight: bold;
 }
 .info-table tr {
-    background-color: #F7F7F7;
+    background-color: #FAF9F4;
+    border: 1px solid #FAF9F4;
 }
 .info-table tr.strong {
     background-color: #E8E8E8;;
@@ -786,11 +819,6 @@ ul.checkbox-list li label {
     width: 100%;
     background: #fff;
 }
-
-.info-table tr {
-    border: 1px solid #ccc;
-}
-
 
 /* Dialog
 ------------------------------------------------------------------------------*/
