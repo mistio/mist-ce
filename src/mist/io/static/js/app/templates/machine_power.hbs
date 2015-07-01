@@ -15,19 +15,19 @@
             {{action "actionClicked" "rename" target="view"}}>Rename</a>
         {{/if}}
         {{#if Mist.machinePowerController.canStart}}
-        <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+        <a id="start-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
             {{action "actionClicked" "start" target="view"}}>Start</a>
         {{/if}}
         {{#if Mist.machinePowerController.canShutdown}}
-        <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+        <a id="shutdown-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
             {{action "actionClicked" "shutdown" target="view"}}>Shutdown</a>
         {{/if}}
         {{#if Mist.machinePowerController.canReboot}}
-        <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+        <a id="reboot-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
             {{action "actionClicked" "reboot" target="view"}}>Reboot</a>
         {{/if}}
         {{#if Mist.machinePowerController.canDestroy}}
-        <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+        <a id="destroy-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
             {{action "actionClicked" "destroy" target="view"}}>Destroy</a>
         {{/if}}
         <a class="ui-btn ui-shadow ui-corner-all" {{action "backClicked" target="view"}}>Back</a>

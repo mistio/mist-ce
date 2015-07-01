@@ -6,6 +6,11 @@ DEBUG_SOCKET = false;
 DEBUG_STATS = false;
 DEBUG_LOGS = false;
 
+// Limit the amount of datapoints to
+// preserve memory (especially on mobile)
+MAX_DATAPOINTS = 60;
+DATASOURCES_PER_GRAPH = 8;
+
 // Define libraries
 require.config({
     baseUrl: 'resources/js/',
@@ -21,6 +26,7 @@ require.config({
         d3: 'lib/d3.min',
         socket: 'lib/sockjs.min',
         multiplex: 'lib/multiplex',
+        c3: 'lib/c3.min',
         term: 'lib/term'
     },
     deps: ['jquery', 'common'],
@@ -35,6 +41,9 @@ require.config({
         },
         'd3': {
             deps: ['jquery']
+        },
+        'c3': {
+            deps: ['d3']
         }
     }
 });
@@ -828,6 +837,8 @@ function parseProviderMap () {
                 field.placeholder = "";
             if (field.optional)
                 field.placeholder += '(optional)';
+            if (field.helpText)
+                field.helpId = field.name + '_' + 'help';
             if (!field.label &&  field.name)
                 field.label = field.name.split('_').map(function (word) {
                     if (word == 'api' ||
