@@ -1,21 +1,69 @@
 /* Home Page CSS
 -----------------------------------------------------------------------------------------------------------*/
-#home-page #add-backend-btn {
+#add-backend {
     float: right;
     margin-right: 0px;
     margin-bottom: 13px;
     margin-top: 0;
     top: .7em;
     position: relative;
+    padding: 0;
+    border:0;
+    overflow: visible;
+    z-index: 900;
 }
+
+#add-backend-overlay {
+    z-index: 899;
+}
+
+.ui-btn-add > .ui-collapsible-content {
+    position: absolute;
+    right: 0;
+    text-align: left;
+    min-width: 20em;
+}
+
+.ui-btn-add > h4.ui-collapsible-heading a{
+    background-color: #A4A39F !important;
+    padding: 18px 25px 18px 65px !important;
+    font-size: 16px;
+    padding-left: 70px !important;
+    color: #fff !important;
+    text-shadow: 0 0 0 #46D4C9 !important;
+    font-weight: 300;
+}
+
+.ui-btn-add > h4.ui-collapsible-heading a:hover {
+    border: 1px solid #A4A39F;
+}
+
+.ui-btn-add.ui-collapsible-collapsed > h4.ui-collapsible-heading a {
+    background-color: #46D4C9 !important;
+    text-shadow: 0 0 0 #46D4C9 !important;
+
+}
+
+.ui-btn-add.ui-collapsible-collapsed  > h4.ui-collapsible-heading a:hover{
+    background-color: #2FBAAF !important;
+    border-color: #2FBAAF !important;
+}
+
+.ui-btn-add.ui-collapsible  > h4.ui-collapsible-heading a:active{
+    background-color: #74E9E0 !important;
+    border-color: #74E9E0 !important;
+}
+
 #home-page .ui-listview {
     clear: both;
 }
+
 #home-page .ui-listview .ajax-loader {
     display: inline;
     float: right;
     margin-top: 1px;
 }
+
 @-moz-document url-prefix() {
     #home-page .ui-listview .ajax-loader {
         margin-top: -19px;

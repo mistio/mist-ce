@@ -71,6 +71,7 @@ h3 {
 .ui-collapsible-heading {
     color: #474747 !important;
 }
+
 .ui-btn-add {
     font-weight: lighter !important;
     font-size: 16px;
@@ -86,6 +87,7 @@ h3 {
 
 .ui-popup {
     border-width: 0;
+    font-weight: 400;
 }
 
 .ui-popup .ui-header{
@@ -112,13 +114,13 @@ h3 {
 .ui-popup ul.ui-listview li a {
     border: 0;
     padding: .8em 3.5em !important;
-    font-weight: 400;
 }
 
 .ui-popup ul.ui-listview li a:hover {
     background-color: #46D4C9;
     color: #fff;
 }
+
 .ui-popup ul.ui-listview li a:after {
     left: .8em;
     top: 1em;
@@ -529,7 +531,6 @@ ul.checkbox-list li label {
 
 .mist-select .ui-collapsible-content {
     margin: 0px !important;
-    box-shadow: 0 0 12px #3388cc /*{a-active-background-color}*/ !important;
     padding-top: 0;
 }
 

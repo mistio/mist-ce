@@ -675,7 +675,7 @@ var handleMobileInit = function () {
         $.mobile.linkBindingEnabled = false;
         $.mobile.hashListeningEnabled = false;
         $.mobile.ignoreContentEnabled = true;
-        $.mobile.panel.prototype._bindUpdateLayout = function(){};
+        $.mobile.panel.prototype._bindUpdateLayout = function(){};        
     });
 };
 

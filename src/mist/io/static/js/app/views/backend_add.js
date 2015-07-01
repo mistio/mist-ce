@@ -39,15 +39,19 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
             isReady: function () {
-                var isReady = true
-                this.get('providerFields').some(function (field) {
-                    if (field.optional) return;
-                    if (field.isSlider && !field.name) return;
-                    if (field.value === undefined ||
-                        field.value === null ||
-                        field.value === '')
-                            return isReady = false;
-                });
+                var isReady = true;
+                if (Mist.backendAddController.provider){
+                    this.get('providerFields').some(function (field) {
+                        if (field.optional) return;
+                        if (field.isSlider && !field.name) return;
+                        if (field.value === undefined ||
+                            field.value === null ||
+                            field.value === '')
+                                return isReady = false;
+                    });
+                } else {
+                    return isReady = false;
+                }
                 return isReady;
             }.property('providerFields.@each.value'),
 
