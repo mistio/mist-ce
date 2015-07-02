@@ -1,50 +1,52 @@
 <a id="me-btn"
-   {{action "meClicked" target="view"}}>
-    {{#if view.gravatarURL}}
-        <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
-    {{else}}
-        <div class="gravatar-image user"></div>
-    {{/if}}
-    &nbsp;</a>
+{{action "meClicked" target="view"}}>
+{{#if view.gravatarURL}}
+<img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
+{{else}}
+<span class="gravatar-image user"></span>
+{{/if}}
+&nbsp;</a>
 
 <div id="user-menu-popup" class="ui-mini" data-role="popup" data-position-to="#me-btn" data-theme="c" data-overlay-theme="b" data-transition="flip">
 
-    <div class="ui-header user-email">{{EMAIL}}</div>
+	{{#if Mist.authenticated}}
+	<div class="ui-header user-email">{{EMAIL}}</div>
+	{{/if}}
 
-    <ul class="ui-listview">
+	<ul class="ui-listview">
 
-        <li><a href="https://mistio.zendesk.com/access/login"
-           target="_blank"
-           class="ui-btn ui-btn-icon-left ui-mini icon-support">
-           Support</a></li>
+		<li><a href="https://mistio.zendesk.com/access/login"
+			target="_blank"
+			class="ui-btn ui-btn-icon-left ui-mini icon-support">
+			Support</a></li>
 
-        <li><a href="docs/index.html"
-           target="_blank"
-           class="ui-btn ui-btn-icon-left ui-mini icon-docs">
-           Docs</a></li>
+			<li><a href="docs/index.html"
+				target="_blank"
+				class="ui-btn ui-btn-icon-left ui-mini icon-docs">
+				Docs</a></li>
 
-        {{#if Mist.authenticated}}
+				{{#if Mist.authenticated}}
 
-            <li><a class="ui-btn ui-btn-icon-left ui-mini icon-user"
-               {{bind-attr href="view.accountUrl"}}
-               {{bind-attr target="view.isNotCore"}}>Account</a></li>
+				<li><a class="ui-btn ui-btn-icon-left ui-mini icon-user"
+					{{bind-attr href="view.accountUrl"}}
+					{{bind-attr target="view.isNotCore"}}>Account</a></li>
 
 
-            {{#if Mist.isCore}}
-                <li><a class="ui-btn ui-btn-icon-left ui-mini icon-x"
-                       {{action "logoutClicked" target="view"}}>Logout</a></li>
-            {{/if}}
-        {{else}}
-            {{#unless Mist.isCore}}
-                <li><a class="ui-btn ui-mini"
-                    {{action "loginClicked" target="view"}}>Login</a></li>
-            {{/unless}}
-        {{/if}}
+					{{#if Mist.isCore}}
+					<li><a class="ui-btn ui-btn-icon-left ui-mini icon-x"
+						{{action "logoutClicked" target="view"}}>Logout</a></li>
+						{{/if}}
+						{{else}}
+						{{#unless Mist.isCore}}
+						<li><a class="ui-btn ui-mini"
+							{{action "loginClicked" target="view"}}>Login</a></li>
+							{{/unless}}
+							{{/if}}
 
-    </ul>
+						</ul>
 
-</div>
+					</div>
 
-{{view "login"}}
+					{{view "login"}}
 
-{{view "messageBox"}}
+					{{view "messageBox"}}

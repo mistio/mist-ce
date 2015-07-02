@@ -40,6 +40,7 @@
 .ui-content, .header-grid {
     margin: 0px auto;
     max-width: 1180px;
+    overflow: visible !important;
 }
 
 .user-menu {
@@ -656,10 +657,15 @@ ul.checkbox-list li label {
     border-width: 3px;
     border-style: solid;
     border-color: #46d4c9;
-    margin-top: 2px;
+    margin-top: 8px;
+}
+
+#me-btn .gravatar-image:hover {
+    cursor: pointer;
 }
 
 #me-btn .user {
+    display: inline-block;
     width: 36px;
     height: 36px;
     margin-right: 7px;
