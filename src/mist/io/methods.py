@@ -719,6 +719,7 @@ def _add_backend_docker(title, provider, params):
     # tls auth
     key_file = params.get('key_file', '')
     cert_file = params.get('cert_file', '')
+    ca_cert_file = params.get('ca_cert_file', '')
 
     backend = model.Backend()
     backend.title = title
@@ -727,6 +728,7 @@ def _add_backend_docker(title, provider, params):
     backend.apikey = auth_user
     backend.key_file = key_file
     backend.cert_file = cert_file
+    backend.ca_cert_file = cert_file
     backend.apisecret = auth_password
     backend.apiurl = docker_host
     backend.enabled = True
@@ -1275,6 +1277,13 @@ def connect_provider(backend):
             cert_temp_file = NamedTemporaryFile(delete=False)
             cert_temp_file.write(backend.cert_file)
             cert_temp_file.close()
+            if backend.ca_cert_file:
+                # docker started with tlsverify
+                ca_cert_temp_file = NamedTemporaryFile(delete=False)
+                ca_cert_temp_file.write(backend.ca_cert_file)
+                ca_cert_temp_file.close()
+                libcloud.security.VERIFY_SSL_CERT = True;
+                libcloud.security.CA_CERTS_PATH.insert(0,ca_cert_temp_file.name)
             conn = driver(host=backend.apiurl, port=backend.docker_port, key_file=key_temp_file.name, cert_file=cert_temp_file.name)
         else:
             conn = driver(backend.apikey, backend.apisecret, backend.apiurl, backend.docker_port)

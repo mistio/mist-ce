@@ -1757,6 +1757,14 @@ var PROVIDER_MAP = {
                     buttonText: 'Add certificate',
                     optional: true
                 },
+                {
+                    name: 'ca_cert_file',
+                    type: 'file',
+                    label: 'CA Certificate',
+                    buttonText: 'Add certificate',
+                    optional: true
+                },
+
             ],
             off: [
                 {
