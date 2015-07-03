@@ -87,15 +87,16 @@ h3 {
 }
 
 .ui-popup {
-    border-width: 0;
+    border: none !important;
     font-weight: 400;
 }
 
 .ui-popup .ui-header{
+    border: none !important;
     background-color: #A4A39F;
     color: #fff;
     text-transform: uppercase;
-    padding: 1.3em;
+    padding: 15px 20px;
     text-shadow: 0 0 0 transparent;
 }
 
@@ -105,6 +106,25 @@ h3 {
     margin: 14px 10px;
     padding: 0;
     text-shadow: 0 0 0 transparent !important;
+}
+
+.ui-popup-container .ui-header {
+    border: none !important;
+    background-color: #A4A39F;
+    color: #fff;
+    text-transform: uppercase;
+    padding: 15px 20px;
+    text-shadow: 0 0 0 transparent;
+}
+
+.ui-popup-container .ui-content {
+    -webkit-border-radius: 0 !important;
+    border-radius: 0 !important;
+}
+
+.ui-popup-container h1.ui-title{
+    font-size: 18px;
+    color: #fff;
 }
 
 .ui-popup ul.ui-listview{
@@ -164,9 +184,28 @@ h3 {
     position: absolute;
 }
 
-.ui-input-search input, .ui-input-text input {
+.ui-input-search,
+.ui-input-text {
+    box-shadow: none;
+}
+
+.ui-input-search input,
+.ui-input-text input {
     padding-left: .75em;
     padding-right: 1.75em;
+    background: #fff;
+    border-radius: 0;
+    color: #A4A39F;
+    text-shadow: none;
+    font-size: 14px;
+}
+
+.ui-input-text input {
+    padding-right: .75em;
+}
+
+.ui-input-text:after {
+    display: none;
 }
 
 /* Splash
@@ -181,7 +220,7 @@ h3 {
     position: absolute;
     left: 0;
     top: 0;
-    background: linear-gradient( #3c3c3c /*{a-bar-background-start}*/, #111 /*{a-bar-background-end}*/) /*{b-bar-background-color}*/;
+    background-color: #e2e2e2;
     z-index: 100000;
 }
 .mist-logo {
@@ -569,6 +608,18 @@ ul.checkbox-list li label {
     width: 355px !important;
     max-width: 99%;
 }
+.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-first-child {
+    color: #d96557;
+}
+.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-first-child:hover {
+    border-color: #d96557;
+    background-color: #d96557;
+    color: #FAF9F5;
+}
+.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-first-child:active {
+    border-color: #FAF9F5;
+    background-color: #FAF9F5;
+}
 .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
     border-right-width: 0px;
 }
@@ -657,6 +708,12 @@ ul.checkbox-list li label {
     border-width: 3px;
     border-style: solid;
     border-color: #46d4c9;
+    margin-top: 2px;
+    width: 48px;
+    height: 48px;
+}
+
+#me-btn .gravatar-image.user {
     margin-top: 8px;
 }
 
@@ -843,8 +900,8 @@ ul.checkbox-list li label {
 
 /* Border radius override */
 .ui-corner-all {
-    -webkit-border-radius: .1em /*{global-radii-blocks}*/;
-    border-radius: .1em /*{global-radii-blocks}*/;
+    -webkit-border-radius: 0 /*{global-radii-blocks}*/;
+    border-radius: 0 /*{global-radii-blocks}*/;
 }
 
 /* Body border override */
@@ -864,7 +921,7 @@ ul.checkbox-list li label {
 
 
 .field-wrapper {
-    display: talbe;
+    /*display: table;*/
     width: 100%;
     margin-top: -0.5em;
 }
@@ -872,24 +929,18 @@ ul.checkbox-list li label {
     display: table-cell;
     vertical-align: middle;
 }
+.field-wrapper > div.last-child:not(.first-child) {
+    width: 1%;
+}
+.field-wrapper > div.last-child:not(.first-child) a {
+    background-color: #46d4c9;
+    color: #fff;
+}
 .field-wrapper * {
     border-radius: 0;
 }
-.field-wrapper > div > .ui-input-text,
-.field-wrapper > div > .ui-btn {
-    box-sizing: border-box;
-    height: 2.2em;
-}
-.field-wrapper .first-child {
-    width: 100%;
-}
-.field-wrapper div.first-child > * {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-.field-wrapper div.last-child > * {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+.field-wrapper > div > .ui-input-text {
+    border-width: 1px;
 }
 .field-wrapper .first-child > .ui-btn {
     line-height: .7em;

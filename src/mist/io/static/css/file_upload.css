@@ -7,4 +7,8 @@
 }
 #file-upload textarea {
 	height: 75px !important;
+	background-color: #fff;
+}
+#file-upload div.ui-input-text {
+	border: none;
 }

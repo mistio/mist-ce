@@ -38,6 +38,16 @@
     width: 100%;
     margin-top: .1em;
     margin-bottom: -0.4em;
+    border-color: #A4A39F;
+    box-shadow: none;
+}
+
+#backend-add .ui-slider .ui-slider-label {
+    background-color: #fff;
+}
+
+#backend-add .ui-slider .ui-slider-handle {
+    background-color: #46d4c9;
 }
 
 #backend-add-advanced {
