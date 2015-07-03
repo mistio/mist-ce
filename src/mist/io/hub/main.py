@@ -6,6 +6,8 @@ import logging
 import argparse
 import traceback
 
+from time import sleep
+
 import amqp
 
 import gevent
@@ -74,7 +76,17 @@ class AmqpGeventBase(object):
         """Find or create current greenlet's AMQP channel"""
         gid = self.greenlet_id
         if gid not in self.chans:
-            conn = self.conn
+            i = 0
+            while True:
+                try:
+                    conn = self.conn
+                except:
+                    i += 1
+                    if i > 5:
+                        raise
+                    sleep(3)
+                else:
+                    break
             log.debug("%s: Opening new AMQP channel.", self.lbl)
             self.chans[gid] = conn.channel()
         return self.chans[gid]
@@ -586,10 +598,10 @@ def prepare_logging(verbosity=0):
         loglvl = logging.INFO
     else:
         loglvl = logging.WARNING
-    #handler = logging.StreamHandler()
-    #handler.setFormatter(logging.Formatter(logfmt))
-    #handler.setLevel(loglvl)
-    #logging.root.addHandler(handler)
+    # handler = logging.StreamHandler()
+    # handler.setFormatter(logging.Formatter(logfmt))
+    # handler.setLevel(loglvl)
+    # logging.root.addHandler(handler)
     logging.root.setLevel(loglvl)
 
 

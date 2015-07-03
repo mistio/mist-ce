@@ -103,6 +103,7 @@ class ShellConnection(MistConnection):
             'ip': self.ip,
             'user_agent': self.user_agent,
             'email': self.user.email,
+            'provider': data.get('provider', '')
         }
         self.hub_client = ShellHubClient(worker_kwargs=self.ssh_info)
         self.hub_client.on_data = self.emit_shell_data
