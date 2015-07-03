@@ -589,12 +589,16 @@ var PROVIDER_MAP = {
         {
             name: 'subscription_id',
             type: 'text',
+            helpText: 'You can find your subscriptionID on the Azure portal',
+            helpHref: 'http://docs.mist.io/article/18-adding-microsoft-azure'
         },
         {
             name: 'certificate',
             type: 'file',
             label: 'Certificate file',
             buttonText: 'Add Certificate',
+            helpText: 'Your Azure certificate PEM file',
+            helpHref: 'http://docs.mist.io/article/18-adding-microsoft-azure'
         }
     ],
 
@@ -608,7 +612,9 @@ var PROVIDER_MAP = {
             type: 'text',
             label: 'Hostname',
             optional: true,
-            placeholder: 'DNS or IP '
+            placeholder: 'DNS or IP ',
+            helpText: 'The URL or IP adress that your server listens to',
+            helpHref: 'http://docs.mist.io/article/28-adding-other-servers'
         },
         {
             name: 'windows',
@@ -712,6 +718,8 @@ var PROVIDER_MAP = {
         {
             name: 'token',
             type: 'password',
+            helpText: 'You can find your API Token on the Digital Ocean portal',
+            helpHref: 'http://docs.mist.io/article/19-adding-digital-ocean',
         },
     ],
 
@@ -724,6 +732,22 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'password',
+            helpText: 'You can find your API Token on the HostVirtual portal',
+            helpHref: 'http://docs.mist.io/article/22-adding-hostvirtual'
+        },
+    ],
+
+	vultr: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Vultr',
+        },
+        {
+            name: 'api_key',
+            type: 'password',
+            helpText: 'You can find your API Token on the Vultr portal',
+            helpHref: 'http://docs.mist.io/article/72-adding-vultr'
         },
     ],
 
@@ -737,6 +761,8 @@ var PROVIDER_MAP = {
             name: 'docker_host',
             type: 'text',
             label: 'Host',
+            helpText: 'The URL or IP your Docker engine listens to',
+            helpHref: 'http://docs.mist.io/article/20-adding-docker',
         },
         {
             name: 'docker_port',
@@ -744,6 +770,8 @@ var PROVIDER_MAP = {
             label: 'Port',
             optional: true,
             defaultValue: '4243',
+            helpText: 'The port your Docker engine listens to',
+            helpHref: 'http://docs.mist.io/article/20-adding-docker',
         },
         {
             type: 'slider',
@@ -779,7 +807,9 @@ var PROVIDER_MAP = {
                     label: 'Password',
                     optional: true,
                 }
-            ]
+            ],
+            helpText: 'The type of authentication your Docker engine uses',
+            helpHref: 'http://docs.mist.io/article/20-adding-docker',
         },
     ],
 
@@ -796,10 +826,14 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'text',
+            helpText: 'You can find your API key on your Amazon console',
+            helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2',
         },
         {
             name: 'api_secret',
             type: 'password',
+            helpText: 'You can find your API secret on your Amazon console',
+            helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2',
         }
     ],
 
@@ -810,18 +844,18 @@ var PROVIDER_MAP = {
             defaultValue: 'GCE',
         },
         {
-            name: 'email',
-            type: 'text',
-            label: 'Email address',
-        },
-        {
             name: 'private_key',
+            label: 'JSON key',
             type: 'file',
-            buttonText: 'Add key',
+            buttonText: 'Add JSON key',
+            helpText: 'You can create a new key on your GCE portal',
+            helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
         },
         {
             name: 'project_id',
             type: 'text',
+            helpText: 'You can find your project ID on your GCE portal',
+            helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
         }
     ],
 
@@ -846,6 +880,8 @@ var PROVIDER_MAP = {
         {
             name: 'tenant_name',
             type: 'text',
+            helpText: 'You can find your tenant name on HP Cloud portal',
+            helpHref: 'http://docs.mist.io/article/74-adding-hp-cloud'
         }
     ],
 
@@ -858,6 +894,8 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'text',
+            helpText: 'You can create an API key on your Linode portal',
+            helpHref: 'http://docs.mist.io/article/25-adding-linode',
         }
     ],
 
@@ -870,10 +908,12 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
+            helpText: 'The username you use to connect to the Nephoscale portal',
         },
         {
             name: 'password',
             type: 'password',
+            helpText: 'The password you use to connect to the Nephoscale portal',
         }
     ],
 
@@ -894,6 +934,8 @@ var PROVIDER_MAP = {
         {
             name: 'auth_url',
             type: 'text',
+            helpText: 'Your OpenStack Auth URL',
+            helpHref: 'http://docs.mist.io/article/27-adding-openstack',
         },
         {
             name: 'tenant_name',
@@ -919,10 +961,13 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
+            helpText: 'The username you use to connect to the RackSpace portal',
         },
         {
             name: 'api_key',
             type: 'password',
+            helpText: 'You can find your API key on your RackSpace portal',
+            helpHref: 'http://docs.mist.io/article/29-adding-rackspace',
         }
     ],
 
@@ -935,10 +980,13 @@ var PROVIDER_MAP = {
         {
             name: 'username',
             type: 'text',
+            helpText: 'The username you use to connect to the SoftLayer portal',
         },
         {
             name: 'api_key',
             type: 'password',
+            helpText: 'You can find your API key on your SoftLayer portal',
+            helpHref: 'http://docs.mist.io/article/30-adding-softlayer',
         }
     ],
 
@@ -952,6 +1000,8 @@ var PROVIDER_MAP = {
             name: 'machine_hostname',
             label: 'KVM hostname',
             type: 'text',
+            helpText: 'The URL or IP that your KVM hypervisor listens to',
+            helpHref: 'http://docs.mist.io/article/24-adding-kvm',
         },
         {
             name: 'machine_user',
@@ -959,6 +1009,7 @@ var PROVIDER_MAP = {
             label: 'ssh user',
             optional: true,
             defaultValue: 'root',
+            helpText: 'The SSH user that Mist.io should try to connect as',
         },
         {
             name: 'ssh_port',
@@ -972,6 +1023,8 @@ var PROVIDER_MAP = {
             type: 'ssh_key',
             label: 'ssh key',
             optional: true,
+            helpText: 'If you don\'t specify an ssh key, mist.io will assume that you are connecting via tcp (qemu+tcp)',
+            helpHref: 'http://docs.mist.io/article/24-adding-kvm',
         },
 
     ],
@@ -983,11 +1036,13 @@ var PROVIDER_MAP = {
         },
         {
             name: 'username',
-            type: 'text'
+            type: 'text',
+            helpText: 'The username you use to login to vCloud Director',
         },
         {
             name: 'password',
-            type: 'password'
+            type: 'password',
+            helpText: 'The password you use to login to vCloud Director',
         },
         {
             name: 'organization',
@@ -997,6 +1052,8 @@ var PROVIDER_MAP = {
             name: 'host',
             type: 'text',
             label: 'Hostname',
+            helpText: 'The URL or IP vCloud listens to',
+            helpHref: 'http://docs.mist.io/article/31-adding-vmware-vcloud'
         }
     ],
 
@@ -1008,16 +1065,20 @@ var PROVIDER_MAP = {
         },
         {
             name: 'username',
-            type: 'text'
+            type: 'text',
+            helpText: 'The username you use to login Indonesian Cloud\'s portal',
 
         },
         {
             name: 'password',
-            type: 'password'
+            type: 'password',
+            helpText: 'The password you use to login Indonesian Cloud\'s portal',
         },
         {
             name: 'organization',
-            type: 'text'
+            type: 'text',
+            helpText: 'Name of your oganization',
+            helpHref: 'http://docs.mist.io/article/23-adding-indonesian-cloud'
         }
     ],
     vsphere: [
@@ -1038,6 +1099,8 @@ var PROVIDER_MAP = {
             name: 'host',
             type: 'text',
             label: 'Hostname',
+            helpText: 'The URL or IP vSphere listens to',
+            helpHref: 'http://docs.mist.io/article/73-adding-vsphere'
         }
     ]
 };
