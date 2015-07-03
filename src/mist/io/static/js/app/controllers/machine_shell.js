@@ -10,13 +10,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
         return Ember.Object.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             view: null,
             cols: null,
@@ -24,13 +20,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             isOpen: null,
             machine: null,
 
-
-            //
             //
             //  Methods
             //
-            //
-
 
             open: function (machine) {
 
@@ -55,6 +47,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
 
             connect: function () {
+                var that = this;
 
                 if (this.connected) {
                     this.resize();
@@ -63,64 +56,57 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
 
                 this.set('connected', true);
 
-                // Open shell socket
-                Mist.set('shell', Socket({
-                    namespace: '/shell',
-                    keepAlive: false,
-                }));
-
+                // Open terminal
                 var term = new Terminal({
-                  cols: this.cols,
-                  rows: this.rows,
-                  screenKeys: true
-                });
-
-                term.on('data', function (data) {
-                    Mist.shell.emit('shell_data', data);
-                });
-
-                term.open(document.getElementById('shell-return'));
-
-                Mist.shell.emit('shell_open', {
-                    backend_id: this.machine.backend.id,
-                    machine_id: this.machine.id,
-                    provider: this.machine.backend.provider,
-                    host: this.host,
                     cols: this.cols,
                     rows: this.rows,
+                    screenKeys: true
                 });
-
-                Mist.shell.firstData = true;
-                Mist.shell.on('shell_data', function (data) {
-                    term.write(data);
-                    if (Mist.shell.firstData) {
-                        $('.terminal').focus();
-                        Mist.shell.firstData = false;
-                    }
-                });
-
+                term.open(document.getElementById('shell-return'));
                 term.write('Connecting to ' + this.host + '...\r\n');
                 Mist.set('term', term);
 
-                if (!Terminal._textarea)
+                // Open shell socket
+                Mist.set('shell', new Socket({
+                    namespace: 'shell',
+                    keepAlive: false,
+                    onConnect: function (socket) {
+                        warn('shell connect');
 
-                    $('.terminal').focus();
+                        Mist.term.on('data', function (data) {
+                            Mist.shell.emit('shell_data', data);
+                        });
 
-                else {
+                        Mist.shell.emit('shell_open', {
+                            backend_id: that.machine.backend.id,
+                            machine_id: that.machine.id,
+                            provider: that.machine.backend.provider,
+                            host: that.host,
+                            cols: that.cols,
+                            rows: that.rows,
+                        });
 
-                    // iOS virtual keyboard focus fix
-                    $(document).off('focusin');
+                        if (!Terminal._textarea)
 
-                    // Make the hidden textfield focusable on android
-                    if (Mist.term && Mist.term.isAndroid)
-                        $(Terminal._textarea)
-                            .css('top', '1%')
-                            .css('left', 0)
-                            .width('100%')
-                            .height($('#shell-return').height());
+                            $('.terminal').focus();
 
-                    $(Terminal._textarea).show();
-                }
+                        else {
+
+                            // iOS virtual keyboard focus fix
+                            $(document).off('focusin');
+
+                            // Make the hidden textfield focusable on android
+                            if (Mist.term && Mist.term.isAndroid)
+                                $(Terminal._textarea)
+                                    .css('top', '1%')
+                                    .css('left', 0)
+                                    .width('100%')
+                                    .height($('#shell-return').height());
+
+                            $(Terminal._textarea).show();
+                        }
+                    }
+                }));
             },
 
 
@@ -134,7 +120,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 this.view.close();
                 Ember.run.later(this, function () {
                     Mist.term.destroy();
-                    Mist.shell.disconnect();
+                    if (Mist.shell.channel)
+                        Mist.shell.channel.close();
+                    Mist.set('shell', null);
                     this._clear();
                     if (Terminal._textarea)
                         $(Terminal._textarea).hide();

@@ -485,7 +485,8 @@ class Shell(object):
     """
     Proxy Shell Class to distinguish weather we are talking about Docker or Paramiko Shell
     """
-    def __init__(self, host, provider=None, username=None, key=None, password=None, port=22, enforce_paramiko=False):
+    def __init__(self, host, provider=None, username=None, key=None,
+                 password=None, port=22, enforce_paramiko=False):
         """
 
         :param provider: If docker, then DockerShell
@@ -503,20 +504,24 @@ class Shell(object):
         if provider == 'docker' and not enforce_paramiko:
             self._shell = DockerShell(host)
         else:
-            self._shell = ParamikoShell(host, username=username, key=key, password=password, port=port)
+            self._shell = ParamikoShell(host, username=username, key=key,
+                                        password=password, port=port)
             self.ssh = self._shell.ssh
 
     def autoconfigure(self, user, backend_id, machine_id, key_id=None,
                       username=None, password=None, port=22):
         if isinstance(self._shell, ParamikoShell):
-            return self._shell.autoconfigure(user, backend_id, machine_id, key_id=key_id,
-                                             username=username, password=password, port=port)
+            return self._shell.autoconfigure(
+                user, backend_id, machine_id, key_id=key_id,
+                username=username, password=password, port=port
+            )
         elif isinstance(self._shell, DockerShell):
             return self._shell.autoconfigure(user, backend_id, machine_id)
 
     def connect(self, username, key=None, password=None, port=22):
         if isinstance(self._shell, ParamikoShell):
-            self._shell.connect(username, key=key, password=password, port=port)
+            self._shell.connect(username, key=key, password=password,
+                                port=port)
         elif isinstance(self._shell, DockerShell):
             self._shell.connect()
 
