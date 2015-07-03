@@ -288,7 +288,6 @@ def add_backend_v_2(user, title, provider, params):
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
-
     remove_on_error = params.get('remove_on_error', True)
     # validate backend before adding
     if remove_on_error:
@@ -2655,8 +2654,7 @@ def list_images(user, backend_id, term=None):
         images = starred_images + ec2_images + rest_images
         images = [img for img in images
                   if img.name and img.id[:3] not in ['aki', 'ari']
-                  and 'windows' not in img.name.lower()
-                  and 'hvm' not in img.name.lower()]
+                  and 'windows' not in img.name.lower()]
 
         if term and conn.type == 'docker':
             images = conn.search_images(term=term)[:40]
