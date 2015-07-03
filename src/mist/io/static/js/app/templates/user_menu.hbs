@@ -1,5 +1,4 @@
-<a id="me-btn"
-{{action "meClicked" target="view"}}>
+<a id="me-btn" {{action "meClicked" target="view"}}>
 {{#if view.gravatarURL}}
 <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
 {{else}}
@@ -15,38 +14,35 @@
 
 	<ul class="ui-listview">
 
-		<li><a href="https://mistio.zendesk.com/access/login"
-			target="_blank"
-			class="ui-btn ui-btn-icon-left ui-mini icon-support">
-			Support</a></li>
+        <li><a href="http://docs.mist.io/contact"
+           target="_blank"
+           class="ui-btn ui-btn-icon-left ui-mini icon-support">
+           Support</a></li>
 
-			<li><a href="docs/index.html"
-				target="_blank"
-				class="ui-btn ui-btn-icon-left ui-mini icon-docs">
-				Docs</a></li>
+        <li><a href="http://docs.mist.io/"
+           target="_blank"
+           class="ui-btn ui-btn-icon-left ui-mini icon-docs">
+           Docs</a></li>
 
-				{{#if Mist.authenticated}}
+		{{#if Mist.authenticated}}
+		<li><a class="ui-btn ui-btn-icon-left ui-mini icon-user"
+			{{bind-attr href="view.accountUrl"}}
+			{{bind-attr target="view.isNotCore"}}>Account</a></li>
 
-				<li><a class="ui-btn ui-btn-icon-left ui-mini icon-user"
-					{{bind-attr href="view.accountUrl"}}
-					{{bind-attr target="view.isNotCore"}}>Account</a></li>
+			{{#if Mist.isCore}}
+			<li><a class="ui-btn ui-btn-icon-left ui-mini icon-x"
+				{{action "logoutClicked" target="view"}}>Logout</a></li>
+			{{/if}}
 
+		{{else}}
+		{{#unless Mist.isCore}}
+		<li><a class="ui-btn ui-mini"
+			{{action "loginClicked" target="view"}}>Login</a></li>
+		{{/unless}}
+		{{/if}}
+	</ul>
+</div>
 
-					{{#if Mist.isCore}}
-					<li><a class="ui-btn ui-btn-icon-left ui-mini icon-x"
-						{{action "logoutClicked" target="view"}}>Logout</a></li>
-						{{/if}}
-						{{else}}
-						{{#unless Mist.isCore}}
-						<li><a class="ui-btn ui-mini"
-							{{action "loginClicked" target="view"}}>Login</a></li>
-							{{/unless}}
-							{{/if}}
+{{view "login"}}
 
-						</ul>
-
-					</div>
-
-					{{view "login"}}
-
-					{{view "messageBox"}}
+{{view "messageBox"}}

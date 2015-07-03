@@ -217,7 +217,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             _fetchStatsFromSocket: function (request) {
                 var data = this._generatePayload(request);
                 var machine = request.datasources[0].machine;
-                Mist.socket.emit('stats',
+                Mist.main.emit('stats',
                     machine.backend.id,
                     machine.id,
                     data.start,

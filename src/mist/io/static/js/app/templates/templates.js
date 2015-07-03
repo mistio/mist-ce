@@ -985,6 +985,17 @@ function program11(depth0,data) {
   return buffer;
   }
 
+function program13(depth0,data) {
+  
+  var buffer = '';
+  data.buffer.push("\n        <div class=\"graph-body\" ");
+  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
+    'id': ("id")
+  },hashTypes:{'id': "STRING"},hashContexts:{'id': depth0},contexts:[],types:[],data:data})));
+  data.buffer.push(">\n        </div>\n    ");
+  return buffer;
+  }
+
   data.buffer.push("<div class=\"graph\" draggable=\"true\">\n\n    <!--\n        Graph Head\n    -->\n\n    <div class=\"header\">\n\n        <div class=\"title\">\n            ");
   stack1 = helpers._triageMustache.call(depth0, "view.graph.title", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
@@ -997,11 +1008,10 @@ function program11(depth0,data) {
   data.buffer.push("\n\n        <!--\n            Minimize button\n        -->\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.graphsController.config.canMinimize", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n    </div>\n\n    <!--\n        Graph Body\n    -->\n\n    <div class=\"graph-body\" ");
-  data.buffer.push(escapeExpression(helpers['bind-attr'].call(depth0, {hash:{
-    'id': ("view.graph.id")
-  },hashTypes:{'id': "STRING"},hashContexts:{'id': depth0},contexts:[],types:[],data:data})));
-  data.buffer.push(">\n    </div>\n\n</div>\n");
+  data.buffer.push("\n    </div>\n\n    <!--\n        Graph Body\n    -->\n    ");
+  stack1 = helpers.each.call(depth0, "view.graph.batches", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(13, program13, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n\n</div>\n");
   return buffer;
   
 });
@@ -2165,7 +2175,14 @@ function program31(depth0,data) {
     'placeholder': ("e.g. 80:80"),
     'valueBinding': ("Mist.machineAddController.newMachineDockerPorts")
   },hashTypes:{'id': "STRING",'data-theme': "STRING",'placeholder': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'placeholder': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n        </div>\n\n        <!-- Enable monitoring -->\n        <div id=\"create-machine-monitoring\" class=\"ui-state-disabled\">\n            <label>\n            ");
+  data.buffer.push("\n        </div>\n\n\n        <div class=\"azure\">\n\n            <!-- Expose Ports -->\n            <label>Ports:</label>\n            ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextArea", {hash:{
+    'id': ("create-machine-azure-ports"),
+    'data-theme': ("a"),
+    'placeholder': ("e.g. http tcp 80:80, smtp tcp 25:25, https tcp 443:443"),
+    'valueBinding': ("Mist.machineAddController.newMachineAzurePorts")
+  },hashTypes:{'id': "STRING",'data-theme': "STRING",'placeholder': "STRING",'valueBinding': "STRING"},hashContexts:{'id': depth0,'data-theme': depth0,'placeholder': depth0,'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n\n        </div>\n\n\n        <!-- Enable monitoring -->\n        <div id=\"create-machine-monitoring\" class=\"ui-state-disabled\">\n            <label>\n            ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.Checkbox", {hash:{
     'data-theme': ("a"),
     'checkedBinding': ("Mist.machineAddController.newMachineMonitoring")
@@ -3193,7 +3210,7 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
+  data.buffer.push("\n        <a id=\"start-machine-option\" class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "start", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
@@ -3204,7 +3221,7 @@ function program3(depth0,data) {
 function program5(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
+  data.buffer.push("\n        <a id=\"shutdown-machine-option\" class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "shutdown", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
@@ -3215,7 +3232,7 @@ function program5(depth0,data) {
 function program7(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
+  data.buffer.push("\n        <a id=\"reboot-machine-option\" class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "reboot", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
@@ -3226,7 +3243,7 @@ function program7(depth0,data) {
 function program9(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n        <a class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
+  data.buffer.push("\n        <a id=\"destroy-machine-option\" class=\"ui-btn ui-btn-d ui-shadow ui-corner-all\"\n            ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "actionClicked", "destroy", {hash:{
     'target': ("view")
   },hashTypes:{'target': "STRING"},hashContexts:{'target': depth0},contexts:[depth0,depth0],types:["STRING","STRING"],data:data})));
@@ -4920,7 +4937,7 @@ function program9(depth0,data) {
   data.buffer.push("\n    &nbsp;</a>\n\n<div id=\"user-menu-popup\" class=\"ui-mini\" data-role=\"popup\" data-position-to=\"#me-btn\" data-theme=\"c\" data-overlay-theme=\"b\" data-transition=\"flip\">\n\n    <div data-role=\"content\">\n\n        <div id=\"user-email\">");
   stack1 = helpers._triageMustache.call(depth0, "EMAIL", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>\n\n        <a href=\"https://mistio.zendesk.com/access/login\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Support</a>\n\n        <a href=\"docs/index.html\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Docs</a>\n\n        ");
+  data.buffer.push("</div>\n\n        <a href=\"http://docs.mist.io/contact\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Support</a>\n\n        <a href=\"http://docs.mist.io/\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Docs</a>\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.authenticated", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(8, program8, data),fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n    </div>\n\n</div>\n\n");
