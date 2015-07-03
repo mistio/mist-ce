@@ -15,7 +15,7 @@
     </div>
 
     <div data-role="content">
-        <div class="ui-grid-b">
+        <div class="ui-grid-b machines-header ui-shadow">
             <div class="ui-block-a">
                 <a id="select-machines-btn"
                    class="responsive-button"
@@ -38,7 +38,7 @@
             data-filter="true"
             data-filter-placeholder="Filter..."
             data-theme="c"
-            class="checkbox-list">
+            class="checkbox-list ui-shadow">
             {{#each Mist.backendsController.content}}
                 {{#if this.enabled}}
                     {{#each this.machines.content}}

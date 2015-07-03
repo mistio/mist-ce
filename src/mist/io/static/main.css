@@ -44,7 +44,7 @@
 }
 
 .user-menu {
-    height: 50px;
+    height: auto;
     text-align: right;
 }
 
@@ -400,12 +400,12 @@ textarea#private-key, #manual-monitoring-popup textarea {
 -----------------------------------------------------------------------------------------------------------*/
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable {
-    margin-top: -3.6em;
+    margin-top: -61px;
 }
 
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search {
-    margin-left: 7.5em;
+    margin-left: 140px;
     margin-right: 35%;
 }
 
@@ -413,6 +413,10 @@ textarea#private-key, #manual-monitoring-popup textarea {
 #key-list-page .ui-filterable input,
 #network-list-page .ui-filterable input {
     min-height:2.50em;
+}
+
+#machine-list-page .machines-header {
+    background-color: #EEEDEB;
 }
 
 
@@ -423,38 +427,35 @@ textarea#private-key, #manual-monitoring-popup textarea {
     background-image: none;
 }
 ul.checkbox-list {
-    box-shadow: none;
     background-color: #fafafa;
 }
-ul.checkbox-list li{
-    border: 1px solid #eee;
-}
-ul.checkbox-list li:hover {
-    background-color: #eee;
+ul.checkbox-list li {
+    border-bottom: 1px solid #EEEDEB;
+    background-color: #FAF9F4;
 }
 ul.checkbox-list li a:focus {
     box-shadow: none !important;
 }
-ul.checkbox-list li a, ul.checkbox-list li a:hover, ul.checkbox-list label, ul.checkbox-list label:hover {
-    background-color: transparent !important;
+ul.checkbox-list li a,
+ul.checkbox-list label {
+    background-color: #FAF9F4 !important;
     border-width: 0px !important;
 }
-ul.checkbox-list .ui-grid-b {
-    padding-top: 12px;
-    overflow: visible;
+ul.checkbox-list li:hover a,
+ul.checkbox-list li:hover label {
+    background-color: #EEEDEB !important;
 }
-ul.checkbox-list li a,
-ul.checkbox-list li a:active,
-ul.checkbox-list li a:focus,
-ul.checkbox-list li a:hover,
-ul.checkbox-list li label {
-    background: transparent !important;
+ul.checkbox-list li:hover a {
+    color: #fff;
+}
+ul.checkbox-list .ui-grid-b {
+    overflow: visible;
 }
 
 /* Checkbox link
 -----------------------------------------------------------------------------------------------------------*/
 .checkbox-link a {
-    height: 41px;
+    font-size: 14px;
 }
 .checkbox-link h3 {
     width: 65%;
@@ -469,6 +470,9 @@ ul.checkbox-list li label {
     float: left;
     clear: both;
 }
+.checkbox-link .ui-checkbox:hover {
+    background-color: #FAF9F4;
+}
 .checkbox-link .ui-checkbox input {
     display: none;
 }
@@ -477,7 +481,7 @@ ul.checkbox-list li label {
     background-color: transparent;
     margin: 0 !important;
     border: none;
-    height: 41px;
+    height: 16px;
 }
 .tag {
     margin: 1px;
