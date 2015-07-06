@@ -263,7 +263,7 @@ body {
     background-color: #e2e2e2 !important;
 }
 .ui-page > .ui-content {
-    padding: .5% 1%;
+    padding: 0;
 }
 #monitoring-collapsible .ui-collapsible-content {
     padding: 0 .5% .5%;
@@ -326,7 +326,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
 /* Buttons
 -----------------------------------------------------------------------------------------------------------*/
 .ui-btn-icon-left {
-    padding: .6em 1.1em .6em 2.5em !important;
+    padding: .6em 1.1em .6em 2.9em !important;
 }
 
 .ui-btn-icon-right {
@@ -937,8 +937,16 @@ ul.checkbox-list .ui-grid-b {
     width: 1%;
 }
 .field-wrapper > div.last-child:not(.first-child) a {
-    background-color: #46d4c9;
+    background-color: #b5b5b5;
     color: #fff;
+}
+.field-wrapper > div.last-child:not(.first-child) a:hover {
+    background-color: #a3a3a3;
+    border-color: #a3a3a3;
+}
+.field-wrapper > div.last-child:not(.first-child) a:active {
+    background-color: #46d4c9;
+    border-color: #46d4c9;
 }
 .field-wrapper * {
     border-radius: 0;
@@ -953,7 +961,6 @@ ul.checkbox-list .ui-grid-b {
     display: block;
     margin-top: 0.8em;
 }
-
 .ui-icon-question:after {
     background-position: 6px 3px;
 }

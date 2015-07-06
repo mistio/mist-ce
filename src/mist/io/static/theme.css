@@ -250,9 +250,25 @@ html .ui-body-a .ui-body-inherit,
 html body .ui-group-theme-a .ui-body-inherit,
 html .ui-panel-page-container-a {
 	background-color: #FAF9F4 /*{a-body-background-color}*/;
-	border-color: #A4A39F /*{a-body-border}*/;
+	border-color: #b5b5b5 /*{a-body-border}*/;
 	color: #000000 /*{a-body-color}*/;
 	text-shadow: none /*{a-body-shadow-color}*/;
+}
+.ui-body-a:hover,
+.ui-page-theme-a .ui-body-inherit:hover,
+html .ui-bar-a .ui-body-inherit:hover,
+html .ui-body-a .ui-body-inherit:hover,
+html body .ui-group-theme-a .ui-body-inherit:hover,
+html .ui-panel-page-container-a:hover {
+	border-color: #a3a3a3 /*{a-body-border}*/;
+}
+.ui-body-a input:focus,
+.ui-page-theme-a .ui-body-inherit input:focus,
+html .ui-bar-a .ui-body-inherit input:focus,
+html .ui-body-a .ui-body-inherit input:focus,
+html body .ui-group-theme-a .ui-body-inherit input:focus,
+html .ui-panel-page-container-a input:focus {
+	border-color: #46d4c9 /*{a-body-border}*/;
 }
 .ui-body-a {
 	border-width: 1px;
