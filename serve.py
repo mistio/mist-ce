@@ -1,15 +1,32 @@
-from socketio.server import SocketIOServer
-from pyramid.paster import get_app
-from gevent import monkey; monkey.patch_all()
+import sys
+import signal
+import logging
+
+import tornado.web
+import tornado.ioloop
+
+import mist.io.sock
+
+
+log = logging.getLogger(__name__)
+
+
+def sig_handler(sig, frame):
+    log.warning("SockJS-Tornado process received SIGTERM/SIGINT")
+    for conn in list(mist.io.sock.CONNECTIONS):
+        conn.on_close()
+    tornado.ioloop.IOLoop.instance().stop()
+
 
 if __name__ == '__main__':
-    import sys
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     else:
         port = 8081
-    app = get_app('uwsgi.ini')
-    print 'Listening on port http://127.0.0.1:%s' % port
-    # TODO: try flashsocket transport
-    SocketIOServer(('127.0.0.1', port), app, policy_server=False,
-                   transports=['websocket', 'xhr-polling']).serve_forever()
+
+    signal.signal(signal.SIGTERM, sig_handler)
+    signal.signal(signal.SIGINT, sig_handler)  # also catch KeyboardInterrupt
+
+    app = tornado.web.Application(mist.io.sock.make_router().urls)
+    app.listen(port)
+    tornado.ioloop.IOLoop.instance().start()

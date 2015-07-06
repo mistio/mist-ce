@@ -1701,7 +1701,7 @@ var PROVIDER_MAP = {
         },
     ],
 
-	vultr: [
+    vultr: [
         {
             name: 'title',
             type: 'text',
@@ -1763,8 +1763,7 @@ var PROVIDER_MAP = {
                     label: 'CA Certificate',
                     buttonText: 'Add certificate',
                     optional: true
-                },
-
+                }
             ],
             off: [
                 {

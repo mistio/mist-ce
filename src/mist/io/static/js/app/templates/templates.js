@@ -4937,7 +4937,7 @@ function program9(depth0,data) {
   data.buffer.push("\n    &nbsp;</a>\n\n<div id=\"user-menu-popup\" class=\"ui-mini\" data-role=\"popup\" data-position-to=\"#me-btn\" data-theme=\"c\" data-overlay-theme=\"b\" data-transition=\"flip\">\n\n    <div data-role=\"content\">\n\n        <div id=\"user-email\">");
   stack1 = helpers._triageMustache.call(depth0, "EMAIL", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</div>\n\n        <a href=\"https://mistio.zendesk.com/access/login\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Support</a>\n\n        <a href=\"docs/index.html\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Docs</a>\n\n        ");
+  data.buffer.push("</div>\n\n        <a href=\"http://docs.mist.io/contact\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Support</a>\n\n        <a href=\"http://docs.mist.io/\"\n           target=\"_blank\"\n           class=\"ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini\">\n           Docs</a>\n\n        ");
   stack1 = helpers['if'].call(depth0, "Mist.authenticated", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(8, program8, data),fn:self.program(5, program5, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n\n    </div>\n\n</div>\n\n");
