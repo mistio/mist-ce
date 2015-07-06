@@ -1,14 +1,27 @@
 <div id="image-list-page" data-role="page" class="ui-page-active">
 
-    <div data-role="header" data-theme="b">
+    <div data-role="header" data-theme="a">
+        <!-- Page header -->
+        <div class="ui-header ui-bar-a">
+            <div class="header-grid">
+                <div class="ui-grid-b">
+                    <div class="ui-block-a">
+                        <a href="#" class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
+                        ui-btn-icon-left ui-corner-all">Home</a>
+                    </div>
 
-        <a href="#" class="responsive-button ui-btn-left ui-btn ui-icon-home
-            ui-btn-icon-left ui-shadow ui-corner-all">Home</a>
+                    <div class="ui-block-b">
+                        <h1 class="ui-title">Images</h1>
+                    </div>
 
-        <h1>Images</h1>
-
-        {{view "userMenu"}}
-
+                    <div class="ui-block-c">
+                        <div class="user-menu">
+                            {{view "userMenu"}}
+                        </div>
+                    </div>
+                </div><!-- /grid-b -->
+            </div>
+        </div>
     </div>
 
     <div data-role="content" data-theme="a">

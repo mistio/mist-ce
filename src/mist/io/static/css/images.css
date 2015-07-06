@@ -1,7 +1,19 @@
 
 /* Image List Page CSS
 -----------------------------------------------------------------------------------------------------------*/
-
+#image-list-page .ui-header .ui-btn {
+    background-color: #fff;
+    margin-top: 13px;
+    margin-left: 0;
+}
+#image-list-page .ui-header .ui-btn:hover {
+    color: #fff !important;
+    background-color: #46d4c9;
+    border-color: #46d4c9;
+}
+#image-list-page .ui-block-b .ui-title {
+    text-align: center;
+}
 @-moz-document url-prefix() {
     #image-list-page .checkbox-link h3 {
         width: 50%;

@@ -1,6 +1,24 @@
 
 /* Key List Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+#key-list-page .ui-content {
+    padding-top: 30px;
+    background-color: transparent;
+}
+
+#key-list-page .ui-header .ui-btn {
+    background-color: #fff;
+    margin-top: 13px;
+    margin-left: 0;
+}
+#key-list-page .ui-header .ui-btn:hover {
+    color: #fff !important;
+    background-color: #46d4c9;
+    border-color: #46d4c9;
+}
+#key-list-page .ui-block-b .ui-title {
+    text-align: center;
+}
 #key-list-page .ui-filterable {
     clear: both;
 }
