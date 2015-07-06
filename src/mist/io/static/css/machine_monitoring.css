@@ -134,9 +134,12 @@
 #machine-monitoring #enable-monitoring-label{
     text-align: center;
 }
+#machine-monitoring {
+    text-align: center;
+}
 
 #machine-monitoring #enable-monitoring-btn {
-    width: 165px;
+    display: inline-block;
     margin: 20px auto auto auto;
 }
 

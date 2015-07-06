@@ -1,18 +1,37 @@
 
 /* Machine List Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+#machine-list-page .ui-content {
+    padding-top: 30px;
+}
+
 #machine-list-page .ui-filterable {
     clear: both;
 }
 #machine-list-page #create-machine-btn {
     margin: 0;
+    width: 150px;
+    float: right;
 }
 #machine-list-page #select-machines-btn {
     float: left;
     font-weight: normal;
 }
+#machine-list-page .ui-header .ui-btn {
+    background-color: #fff;
+    margin-top: 13px;
+    margin-left: 0;
+}
+#machine-list-page .ui-header .ui-btn:hover {
+    color: #fff !important;
+    background-color: #46d4c9;
+    border-color: #46d4c9;
+}
+#machine-list-page .ui-block-b .ui-title {
+    text-align: center;
+}
 .running {
-    color: #13B754;
+    color: #46d4c9;
 }
 .pending {
     color: #E09400;

@@ -91,7 +91,11 @@ h3 {
     font-weight: 400;
 }
 
-.ui-popup .ui-header{
+.ui-header {
+    border: none;
+}
+
+.ui-popup .ui-header {
     border: none !important;
     background-color: #A4A39F;
     color: #fff;
@@ -100,7 +104,8 @@ h3 {
     text-shadow: 0 0 0 transparent;
 }
 
-.ui-header h1.ui-title{
+.ui-header .ui-block-a h1.ui-title,
+.ui-header .ui-block-b h1.ui-title {
     font-size: 24px;
     text-align: left;
     margin: 14px 10px;
@@ -134,7 +139,7 @@ h3 {
 
 .ui-popup ul.ui-listview li a {
     border: 0;
-    padding: .8em 3.5em !important;
+    /*padding: .8em 3.5em !important;*/
 }
 
 .ui-popup ul.ui-listview li a:hover {
@@ -405,8 +410,8 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search {
-    margin-left: 140px;
-    margin-right: 35%;
+    margin-left: 160px;
+    margin-right: 280px;
 }
 
 #machine-list-page .ui-filterable input,
@@ -870,7 +875,7 @@ ul.checkbox-list .ui-grid-b {
     border-bottom: 1px solid #CFCFCF;
 }
 .info-table tr td:nth-child(2) {
-    font-weight: bold;
+    font-weight: normal;
 }
 .info-table tr {
     background-color: #FAF9F4;

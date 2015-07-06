@@ -5,10 +5,20 @@
         <div class="ui-header ui-bar-a">
             <div class="header-grid">
                 <div class="ui-grid-b">
-                    <div class="ui-block-a"><a href="#" class="responsive-button ui-btn-left ui-btn ui-icon-bars ui-alt-icon ui-caps
-                        ui-btn-icon-left ui-shadow ui-corner-all">Machines</a></div>
-                    <div class="ui-block-b"></div>
-                    <div class="ui-block-c"><div class="user-menu">{{view "userMenu"}}</div></div>
+                    <div class="ui-block-a">
+                        <a href="#" class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
+                        ui-btn-icon-left ui-corner-all">Home</a>
+                    </div>
+
+                    <div class="ui-block-b">
+                        <h1 class="ui-title">MIST.IO</h1>
+                    </div>
+
+                    <div class="ui-block-c">
+                        <div class="user-menu">
+                            {{view "userMenu"}}
+                        </div>
+                    </div>
                 </div><!-- /grid-b -->
             </div>
         </div>
@@ -18,9 +28,9 @@
         <div class="ui-grid-b machines-header ui-shadow">
             <div class="ui-block-a">
                 <a id="select-machines-btn"
-                   class="responsive-button"
+                   class="responsive-button ui-btn-icon-right"
                    data-role="button"
-                   data-icon="arrow-d"
+                   data-icon="carat-d"
                    {{action "selectClicked" target="view"}}>Select</a>
             </div>
             <div class="ui-block-b"></div>
@@ -28,7 +38,7 @@
                 <a id="create-machine-btn"
                    class="responsive-button ui-btn ui-btn-add ui-btn-d ui-icon-plus
                         ui-btn-icon-left ui-caps"
-                   {{action "createClicked" target="view"}}>Create</a>
+                   {{action "createClicked" target="view"}}>Create Machine</a>
            </div>
         </div><!-- /grid-b -->
 
@@ -36,7 +46,7 @@
             data-role="listview"
             data-inset="true"
             data-filter="true"
-            data-filter-placeholder="Filter..."
+            data-filter-placeholder="Filter machines"
             data-theme="c"
             class="checkbox-list ui-shadow">
             {{#each Mist.backendsController.content}}

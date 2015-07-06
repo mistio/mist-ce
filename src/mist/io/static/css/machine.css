@@ -1,8 +1,38 @@
 
 /* Single Machine Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+#single-machine-page .ui-content {
+    margin-top: 40px;
+    background-color: transparent;
+}
+#single-machine-page .ui-header .ui-btn {
+    background-color: #fff;
+    color: #000;
+    margin-top: 13px;
+    margin-left: 0;
+    text-shadow: none;
+    border-color: #fff;
+}
+#single-machine-page .ui-header .ui-btn:hover {
+    color: #fff !important;
+    background-color: #46d4c9;
+    border-color: #46d4c9;
+}
+#single-machine-page .ui-block-b .ui-title {
+    text-align: center;
+    text-transform: uppercase;
+}
 #single-machine-page .ui-footer {
     display: block;
+}
+#single-machine-page .ui-collapsible .ui-collapsible-heading a {
+    background-color: #eeedeb;
+}
+#single-machine-page .ui-collapsible .ui-collapsible-heading a:hover {
+    border-color: #eeedeb;
+}
+#single-machine-page .ui-collapsible .ui-collapsible-content {
+    background-color: #faf9f4;
 }
 #single-machine-page .info-table {
     width: 100%;
@@ -12,16 +42,22 @@
     width: 50%;
     font-size: 14px;
     padding: 10px 12px;
-    border-bottom: 1px solid #CFCFCF;
+    border-bottom: 1px solid #faf9f4;
+}
+#single-machine-page .info-table tr td:nth-child(1) {
+    padding-left: 54px;
 }
 #single-machine-page .info-table tr td:nth-child(2) {
-    font-weight: bold;
+    color: #7f7f7f;
 }
 #single-machine-page .info-table tr {
-    background-color: #F7F7F7;
+    background-color: #fff;
 }
 #single-machine-page .info-table .ip {
     display: inline-block;
+}
+#single-machine-page .ui-collapsible {
+    margin: 10px 0 20px;
 }
 #single-machine-page #monitoring-disabled p {
     text-align: center;
@@ -31,7 +67,7 @@
     margin: 0 auto;
 }
 #single-machine-page #mist-manage-keys a {
-    margin-top: 4px;
+    margin-top: 15px;
     margin-right: 5px;
 }
 
@@ -106,12 +142,41 @@
 
 .single-machine-header {
     height: 56px;
+    background-color: transparent;
 }
 
-.single-machine-header .ui-title {
-    padding-top: 20px;
-    font-weight: normal;
-    padding-left: 48px;
+.single-machine-header .ui-block-b {
+    text-align: center;
+}
+
+.single-machine-header .ui-block-c {
+    text-align: right;
+}
+
+.single-machine-header #mist-manage-keys .ui-btn {
+    background-color: #46d4c9;
+    color: #fff;
+    border-color: #46d4c9;
+    padding: 18px 25px 18px 50px !important;
+    font-size: 16px;
+}
+.single-machine-header #mist-manage-keys .ui-btn:hover{
+    background-color: #2FBAAF;
+    border-color: #2FBAAF;
+}
+
+.single-machine-header #mist-manage-keys .ui-btn:active{
+    background-color: #74E9E0;
+    border-color: #74E9E0;
+}
+
+.single-machine-header h1 {
+    padding: 30px 60px;
+    background-color: #fff;
+    margin: 0;
+    display: inline-block;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
 @-moz-document url-prefix() {
@@ -126,7 +191,7 @@
 }
 
 .single-machine-header span {
-    margin-top: 4px !important;
+    margin-top: 20px !important;
 }
 
 .info-table .loadleds {

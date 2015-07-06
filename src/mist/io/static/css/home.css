@@ -22,10 +22,6 @@
     z-index: 900;
 }
 
-#add-backend .ui-btn:after {
-    top: 26px;
-}
-
 #add-backend-overlay {
     z-index: 899;
 }
@@ -54,7 +50,10 @@
 .ui-btn-add.ui-collapsible-collapsed > h4.ui-collapsible-heading a {
     background-color: #46D4C9 !important;
     text-shadow: 0 0 0 #46D4C9 !important;
+}
 
+.ui-btn-add > h4.ui-collapsible-heading a:after {
+    top: 26px;
 }
 
 .ui-btn-add.ui-collapsible-collapsed  > h4.ui-collapsible-heading a:hover{
@@ -138,6 +137,7 @@
 
 .incidents .incident.no a:hover {
     background-color: #FAF9F4;
+    color: #7f7f7f !important;
     border-color: #FAF9F4;
     cursor: default;
 }
