@@ -1,5 +1,14 @@
 /* Home Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+
+@media all and (min-width: 600px) {
+    #home-page .ui-block-a {
+        padding-right: 15px;
+    }
+    #home-page .ui-block-b {
+        padding-left: 15px;
+    }
+}
 #add-backend {
     float: right;
     margin-right: 0px;
@@ -11,6 +20,10 @@
     border:0;
     overflow: visible;
     z-index: 900;
+}
+
+#add-backend .ui-btn:after {
+    top: 26px;
 }
 
 #add-backend-overlay {
@@ -103,18 +116,51 @@
     }
 }
 
-ul.incidents span.time {
-    float: right;
-    font-weight: bold;
-    opacity: .75;
-    margin-bottom: -5px;
+.incidents h4 {
+    padding: 11.2px 16px;
+    background-color: #eeedeb;
+    border: 1px solid #eeedeb;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+    margin: 16px 0 0 0;
 }
 
-ul.incidents .ui-icon-alert:after, #machines .ui-icon-alert:after {
+.incidents .incident a {
+    color: #7f7f7f;
+    font-size: 16px;
+    text-shadow: none;
+}
+
+.incidents .incident.no a {
+    padding-left: 11.2px !important;
+}
+
+.incidents .incident.no a:hover {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    cursor: default;
+}
+
+.incidents .ui-listview {
+    margin-top: 0;
+}
+
+.incidents .time {
+    float: right;
+}
+
+.incidents .machine {
+    font-weight: bold;
+    color: #000;
+}
+
+.incidents .ui-icon-alert:after,
+#machines .ui-icon-alert:after {
     background-color: indianred;
 }
 
-ul.incidents .ui-icon-check:after {
+.incidents .ui-icon-check:after {
     background-color: rgba(33, 133, 89, 0.4);
 }
 
@@ -122,20 +168,47 @@ ul.incidents .ui-icon-check:after {
     background-color: rgba(33, 133, 89, .6);
 }
 
-ul.incidents li a.ui-btn{
+.incidents li a.ui-btn {
     font-weight: normal;
     white-space: normal;
-    padding-left: 16px !important;
+    padding-left: 42px !important;
     padding-right: 42px !important;
 }
 
-ul.incidents li a.ui-btn:after {
+.incidents li a.ui-btn:after {
     right: 8px !important;
 }
 
+.incidents li a.icon-check:after {
+    color: #46D4C9;
+}
 
-ul.incidents li a .machine {
-    font-weight: bold;
+.incidents li a.icon-error:after {
+    color: #d96557;
+}
+
+.incidents li a:hover .machine {
+    color: #fff;
+}
+
+.incidents .incident .icon-bm,
+.incidents .incident .icon-vm {
+    position: absolute;
+    top: 13px;
+    left: 15px;
+}
+
+.incidents .incident a.icon-error {
+    color: #fff;
+    background-color: #d96557;
+}
+
+.incidents .incident a.icon-error .machine {
+    color: #fff;
+}
+
+.incidents .incident a.icon-error:after {
+    color: #fff;
 }
 
 #home-page .ui-body {

@@ -93,16 +93,49 @@
 
             <div {{bind-attr class=":ui-block-b"}}>
                 <div class="ui-body">
-                    <div class="incidents ui-shadow">
-                        {{#if Mist.openIncidents}}
+                    <div class="incidents ui-shadow">                        
                         <h4>Incidents</h4>
-                        {{else}}
-                        <h4 class="no">No recent incidents</h4>
-                        {{/if}}
                         <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incident-list">
+                            {{#unless Mist.openIncidents}}
+                            <li class="no incident">
+                                <a href="javascript:void(0)" class="ui-btn">No recent incidents</a>
+                            </li>
+                            {{/unless}}
+                            <li class="incident">
+                                <a class="icon-error ui-btn ui-btn-icon-right"
+                                    {{action "incidentClicked" this target="view"}}>
+                                    <span class="icon-bm"></span>
+                                    <span class="machine">
+                                        NY:
+                                    </span>
+                                    <span class="rule-condition">
+                                        rule
+                                    </span>
+                                    <span class="duration">
+                                        for 24 sec
+                                    </span>
+                                    <span class="time">11 min ago </span>
+                                </a>
+                            </li>
+                            <li class="incident">
+                                <a class="icon-check ui-btn ui-btn-icon-right"
+                                    {{action "incidentClicked" this target="view"}}>
+                                    <span class="icon-vm"></span>
+                                    <span class="machine">
+                                        London:
+                                    </span>
+                                    <span class="rule-condition">
+                                        rule
+                                    </span>
+                                    <span class="duration">
+                                        for 12 sec
+                                    </span>
+                                    <span class="time">12 min ago </span>
+                                </a>
+                            </li>
                             {{#each Mist.openIncidents}}
                                 {{#if this.isClosed}}
-                                    <li class="ui-mini incident">
+                                    <li class="incident">
                                         <a class="ui-icon-check ui-btn ui-btn-icon-right"
                                             {{action "incidentClicked" this target="view"}}>
                                             <span class="machine">
