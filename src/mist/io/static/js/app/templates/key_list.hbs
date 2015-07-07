@@ -25,17 +25,21 @@
     </div>
 
     <div data-role="content" data-theme="a">
-
-        <a id="select-keys-btn"
-           class="responsive-button"
-           data-role="button"
-           data-icon="arrow-d"
-           {{action "selectClicked" target="view"}}>Select</a>
-
-        <a id="add-key-btn"
-           class="responsive-button  ui-btn ui-btn-d ui-icon-plus
-                ui-btn-icon-right ui-shadow ui-corner-all"
-           {{action "addClicked" target="view"}}>Add</a>
+        <div class="ui-grid-b keys-header ui-shadow">
+            <div class="ui-block-a">
+                 <a id="select-keys-btn"
+                   class="responsive-button ui-btn ui-btn-add ui-btn-d ui-icon-carat-d
+                        ui-btn-icon-left ui-corner-all ui-caps ui-caps"
+                   {{action "selectClicked" target="view"}}>Select</a>
+            </div>
+            <div class="ui-block-b"></div>
+            <div class="ui-block-c">
+                <a id="add-key-btn"
+                   class="responsive-button ui-btn ui-btn-add ui-btn-d ui-icon-plus
+                        ui-btn-icon-left ui-corner-all ui-caps"
+                   {{action "addClicked" target="view"}}>Add</a>
+           </div>
+        </div><!-- /grid-b -->
 
         <ul data-role="listview"
             data-filter="true"
@@ -70,13 +74,13 @@
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
-            <a class="ui-btn ui-icon-edit ui-btn-icon-left ui-shadow ui-corner-all"
+            <a class="ui-btn ui-icon-edit ui-btn-icon-right ui-corner-all ui-caps"
                 {{action "renameClicked" target="view"}}>Rename</a>
         </td><td>
-            <a class="ui-btn ui-icon-delete ui-btn-icon-left ui-shadow ui-corner-all"
+            <a class="ui-btn ui-icon-delete ui-btn-icon-right ui-corner-all ui-caps"
                 {{action "deleteClicked" target="view"}}>Delete</a>
         </td><td>
-            <a class="ui-btn ui-icon-gear ui-btn-icon-left ui-shadow ui-corner-all"
+            <a class="ui-btn ui-icon-gear ui-btn-icon-right ui-corner-all ui-caps"
                 {{action "setDefaultClicked" target="view"}}>Set default</a>
         </td></tr></tbody></table>
     </div>

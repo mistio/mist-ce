@@ -11,27 +11,27 @@
          data-position-to="#add-metric-btn">
 
         <div class="ui-header ui-bar-b">
-            <h1 class="ui-title">Add custom metric</h1>
+            <h1 class="ui-title ui-caps">Add custom metric</h1>
         </div>
         <div class="ui-content">
 
             <div class="ui-grid-a">
                 <div class="ui-block-a">
-                    <label for="custom-plugin-name">Name:</label>
+                    <label class="ui-caps" for="custom-plugin-name">Name</label>
                     {{view Mist.TextField
                         id="custom-plugin-name"
                         placeholder="e.g. my metric"
                         valueBinding="Mist.metricAddCustomController.metric.name"}}
                 </div>
                 <div class="ui-block-b">
-                    <label for="custom-plugin-unit">Unit:</label>
+                    <label class="ui-caps" for="custom-plugin-unit">Unit</label>
                     {{view Mist.TextField
                         id="custom-plugin-unit"
                         placeholder="e.g. bytes (optional)"
                         valueBinding="Mist.metricAddCustomController.metric.unit"}}
                 </div>
             </div>
-            <label for="custom-plugin-script">Python script:</label>
+            <label class="ui-caps" for="custom-plugin-script">Python script</label>
             <pre id="custom-plugin-error"></pre>
             {{view Ember.TextArea
                    id="custom-plugin-script"
@@ -57,9 +57,9 @@
             {{/if}}
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                <a class="ui-btn ui-corner-all"
+                <a class="ui-btn ui-corner-all ui-caps"
                     {{action "backClicked" target="view"}}>Back</a>
-                <a class="ui-btn ui-corner-all ui-btn-d ui-state-disabled"
+                <a class="ui-btn ui-corner-all ui-btn-d ui-state-disabled ui-caps"
                     id="deploy" {{action "deployClicked" target="view"}}>Deploy</a>
             </div>
         </div>

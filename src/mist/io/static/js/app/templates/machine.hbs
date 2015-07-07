@@ -269,38 +269,49 @@
     {{view "machinePower" position="#single-machine-power-btn"}}
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
-        <table><tbody><tr><td>
-            <a id="single-machine-tags-btn"
-                {{bind-attr class="id::ui-state-disabled
-                    can_tag::ui-state-disabled
-                    :ui-btn
-                    :ui-btn-icon-left
-                    :ui-icon-grid"}}
-                {{action "tagsClicked" target="view"}}>Tags</a>
-        </td><td>
-            {{#if isWindows}}
-                <a id="single-machine-shell-btn"
-                    target="_blank"
-                    {{bind-attr href="rdpURL" class="canConnect::ui-state-disabled
-                        :ui-btn
-                        :ui-btn-icon-left
-                        :ui-icon-gear"}}>Connect</a>
-            {{else}}
-                <a id="single-machine-shell-btn"
-                    {{bind-attr class="canConnect::ui-state-disabled
-                        :ui-btn
-                        :ui-btn-icon-left
-                        :ui-icon-gear"}}
-                    {{action "shellClicked" target="view"}}>Shell</a>
-            {{/if}}
-        </td><td>
-            <a id="single-machine-power-btn"
-                {{bind-attr class="id::ui-state-disabled
-                    :ui-btn
-                    :ui-btn-icon-left
-                    :ui-icon-bars"}}
-                {{action "powerClicked" target="view"}}>Actions</a>
-        </td></tr></tbody></table>
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <a id="single-machine-tags-btn"
+                            {{bind-attr class="id::ui-state-disabled
+                                can_tag::ui-state-disabled
+                                :ui-btn
+                                :ui-btn-icon-right
+                                :ui-icon-grid"}}
+                            {{action "tagsClicked" target="view"}}>TAGS</a>
+                    </td>
+                    <td>
+                        {{#if isWindows}}
+                            <a id="single-machine-shell-btn"
+                                target="_blank"
+                                {{bind-attr href="rdpURL" class="canConnect::ui-state-disabled
+                                    :ui-btn
+                                    :ui-btn-icon-right
+                                    :ui-icon-gear
+                                    :ui-caps"}}>CONNECT</a>
+                        {{else}}
+                            <a id="single-machine-shell-btn"
+                                {{bind-attr class="canConnect::ui-state-disabled
+                                    :ui-btn
+                                    :ui-btn-icon-right
+                                    :ui-icon-gear
+                                    :ui-caps"}}
+                                {{action "shellClicked" target="view"}}>SHELL</a>
+                        {{/if}}
+                    </td>
+                    <td>
+                        <a id="single-machine-power-btn"
+                            {{bind-attr class="id::ui-state-disabled
+                                :ui-btn
+                                :ui-btn-icon-right
+                                :ui-icon-bars
+                                :ui-caps"}}
+                            {{action "powerClicked" target="view"}}>ACTIONS</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
 </div>

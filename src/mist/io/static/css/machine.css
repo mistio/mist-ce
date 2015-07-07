@@ -1,8 +1,7 @@
 
 /* Single Machine Page CSS
 -----------------------------------------------------------------------------------------------------------*/
-#single-machine-page .ui-content {
-    margin-top: 40px;
+#single-machine-page .ui-content.ui-body-a {
     background-color: transparent;
 }
 #single-machine-page .ui-header .ui-btn {
@@ -42,7 +41,7 @@
     width: 50%;
     font-size: 14px;
     padding: 10px 12px;
-    border-bottom: 1px solid #faf9f4;
+    border-bottom: 1px solid #eeedeb;
 }
 #single-machine-page .info-table tr td:nth-child(1) {
     padding-left: 54px;
@@ -51,7 +50,7 @@
     color: #7f7f7f;
 }
 #single-machine-page .info-table tr {
-    background-color: #fff;
+    background-color: #faf9f4;
 }
 #single-machine-page .info-table .ip {
     display: inline-block;
@@ -141,8 +140,8 @@
 
 
 .single-machine-header {
-    height: 56px;
     background-color: transparent;
+    margin-bottom: 20px;
 }
 
 .single-machine-header .ui-block-b {

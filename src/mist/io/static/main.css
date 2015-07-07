@@ -130,6 +130,8 @@ h3 {
 .ui-popup-container h1.ui-title{
     font-size: 18px;
     color: #fff;
+    text-align: left;
+    padding: 0;
 }
 
 .ui-popup ul.ui-listview{
@@ -353,7 +355,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
     text-align: center;
 }
 .tiny-popup {
-    width: 150px !important;
+    /*width: 150px !important;*/
 }
 .small-popup {
     width: 240px !important;
@@ -403,15 +405,25 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
+#machine-list-page .machines-header {
+    background-color: #EEEDEB;
+    margin-top: 30px;
+}
+
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable {
-    margin-top: -61px;
+    margin-top: -55px;
+    margin-bottom: 10px;
 }
 
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search {
-    margin-left: 160px;
+    margin-left: 180px;
     margin-right: 280px;
+}
+
+#key-list-page .ui-filterable .ui-input-search {
+    margin-right: 160px;
 }
 
 #machine-list-page .ui-filterable input,
@@ -420,7 +432,8 @@ textarea#private-key, #manual-monitoring-popup textarea {
     min-height:2.50em;
 }
 
-#machine-list-page .machines-header {
+#machine-list-page .machines-header,
+#key-list-page .keys-header {
     background-color: #EEEDEB;
 }
 
@@ -515,10 +528,11 @@ ul.checkbox-list .ui-grid-b {
     width: 100%;
 }
 .ui-footer a {
-    padding-left: 0 !important;
+    padding-left: 10px !important;
     padding-right: 0 !important;
     width: 100%;
     margin: 0;
+    box-sizing: border-box;
 }
 
 @media only screen and  (max-width: 340px) {
@@ -534,8 +548,16 @@ ul.checkbox-list .ui-grid-b {
     width: 33.3%;
 }
 
+.tri-action-footer a {
+    text-align: left;
+}
+
 .ui-footer .ui-grid-a a {
     margin:0;
+}
+
+.ui-footer a:after {
+    color: #7f7f7f;
 }
 
 /* Small List Item

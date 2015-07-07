@@ -1,10 +1,6 @@
 
 /* Machine List Page CSS
 -----------------------------------------------------------------------------------------------------------*/
-#machine-list-page .ui-content {
-    padding-top: 30px;
-}
-
 #machine-list-page .ui-filterable {
     clear: both;
 }
@@ -16,6 +12,7 @@
 #machine-list-page #select-machines-btn {
     float: left;
     font-weight: normal;
+    margin: 0;
 }
 #machine-list-page .ui-header .ui-btn {
     background-color: #fff;
