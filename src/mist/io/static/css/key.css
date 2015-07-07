@@ -1,12 +1,40 @@
 
 /* Single Key Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+#single-key-page .ui-content {
+    padding-top: 30px;
+    background-color: transparent;
+}
+
+#single-key-page .ui-header .ui-btn {
+    background-color: #fff;
+    margin-top: 13px;
+    margin-left: 0;
+}
+#single-key-page .ui-header .ui-btn:hover {
+    color: #fff !important;
+    background-color: #46d4c9;
+    border-color: #46d4c9;
+}
+#single-key-page .ui-block-b .ui-title {
+    text-align: center;
+}
 #single-key-page .ui-footer {
     display: block;
 }
 #single-key-page .ui-collapsible .ajax-loader {
     display: inline;
     float: right;
+}
+#single-key-page .ui-collapsible .ui-collapsible-heading a {
+    background-color: #eeedeb;
+}
+#single-key-page .ui-collapsible .ui-collapsible-heading a:hover {
+    border-color: #eeedeb;
+}
+#single-key-page .ui-collapsible .ui-collapsible-content {
+    background-color: #faf9f4;
+    padding: 10px 20px !important;
 }
 @-moz-document url-prefix() {
     #single-key-page .ui-collapsible .ajax-loader {

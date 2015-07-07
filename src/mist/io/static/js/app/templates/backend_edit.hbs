@@ -27,7 +27,7 @@
 
          <!-- Header -->
 
-        <div class="ui-header ui-bar-b">
+        <div class="ui-header ui-bar-b ui-caps">
 
             <h1 class="ui-title">Edit cloud</h1>
 
@@ -54,7 +54,7 @@
 
             <!-- Delete button -->
 
-            <a class="ui-btn ui-shadow ui-corner-all"
+            <a class="ui-btn ui-shadow ui-corner-all ui-caps"
                 {{action "deleteClicked" target="view" on="click"}}>
                 Delete
             </a>
@@ -67,9 +67,9 @@
                     <br />Monitoring for these will be disabled
                 </label>
                 <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <a class="ui-btn ui-shadow ui-corner-all" id="button-confirm-disable"
+                    <a class="ui-btn ui-shadow ui-corner-all" id="button-confirm-disable ui-caps"
                         {{action "yesClicked" target="view"}}>Yes</a>
-                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps"
                         {{action "noClicked" target="view"}}>No</a>
                 </div>
             </div>
@@ -80,7 +80,7 @@
 
             <!-- Back button -->
 
-            <a class="ui-btn ui-shadow ui-corner-all button-back"
+            <a class="ui-btn ui-shadow ui-corner-all button-back ui-caps"
                 {{action "backClicked" target="view"}}>Back</a>
         </div>
     </div>
