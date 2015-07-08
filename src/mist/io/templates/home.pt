@@ -12,7 +12,7 @@
     <link rel="stylesheet" type='text/css' href="resources/main.css"
           tal:condition="not:css_build"/>
 
-    <link rel="stylesheet" href="resources/mist-1435953455.css"
+    <link rel="stylesheet" href="resources/mist-1436359725.css"
           tal:condition="css_build" />
 
     <script tal:content="string: var IS_CORE=${is_core}" />
@@ -33,7 +33,7 @@
                 baseUrl: 'resources/js/',
                 paths: {
                     //the optimized mist.js source file.
-                    "app": "../build/mist-1435953455"
+                    "app": "../build/mist-1436359725"
                 }
             });
             require(["app"]);
