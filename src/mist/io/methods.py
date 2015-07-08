@@ -728,7 +728,7 @@ def _add_backend_docker(title, provider, params):
     backend.apikey = auth_user
     backend.key_file = key_file
     backend.cert_file = cert_file
-    backend.ca_cert_file = cert_file
+    backend.ca_cert_file = ca_cert_file
     backend.apisecret = auth_password
     backend.apiurl = docker_host
     backend.enabled = True
