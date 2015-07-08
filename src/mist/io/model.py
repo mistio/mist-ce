@@ -105,6 +105,7 @@ class Backend(OODict):
     compute_endpoint = StrField()
     key_file = StrField()
     cert_file = StrField()
+    ca_cert_file = StrField()
     ssh_port = IntField(22)
     docker_port = IntField(4243)
     machines = make_field(Machines)()
