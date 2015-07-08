@@ -737,7 +737,7 @@ var PROVIDER_MAP = {
         },
     ],
 
-	vultr: [
+    vultr: [
         {
             name: 'title',
             type: 'text',
@@ -793,6 +793,13 @@ var PROVIDER_MAP = {
                     buttonText: 'Add certificate',
                     optional: true
                 },
+                {
+                    name: 'ca_cert_file',
+                    type: 'file',
+                    label: 'CA Certificate',
+                    buttonText: 'Add CA certificate',
+                    optional: true
+                }
             ],
             off: [
                 {
