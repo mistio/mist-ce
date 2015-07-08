@@ -131,3 +131,6 @@
     max-width: 29%;
     height: 21px;
 }
+#machines .ui-icon-check:after {
+    background-color: #46d4c9;
+}

@@ -18,10 +18,11 @@
 }
 
 #key-add-popup .generate-upload a {
-    width: 69px !important;
+    width: 59px !important;
     overflow: visible;
 }
 
 #key-add-popup textarea {
     height: 75px !important;
+    background-color: #fff;
 }

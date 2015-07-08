@@ -57,3 +57,9 @@
 #single-key-page #dialog.large-popup {
     width: 100% !important;
 }
+
+#single-key-page #public-key {
+    height: 140px;
+    overflow: auto;
+    background-color: rgb(255, 255, 255);
+}

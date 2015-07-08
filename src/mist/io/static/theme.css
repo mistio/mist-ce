@@ -487,7 +487,7 @@ html head + body .ui-btn.ui-btn-b:hover {
 	background-color: #46d4c9 /*{b-bhover-background-color}*/;
 	border-color: #0e9f94 /*{b-bhover-border}*/;
 	color: #fff /*{b-bhover-color}*/;
-	text-shadow: 0 /*{b-bhover-shadow-x}*/ 1px /*{b-bhover-shadow-y}*/ 0 /*{b-bhover-shadow-radius}*/ #555 /*{b-bhover-shadow-color}*/;
+	text-shadow: none /*{b-bhover-shadow-color}*/;
 }
 /* Button down */
 .ui-page-theme-b .ui-btn:active,
@@ -688,9 +688,9 @@ html .ui-bar-c .ui-slider-track .ui-btn-active,
 html .ui-body-c .ui-slider-track .ui-btn-active,
 html body .ui-group-theme-c .ui-slider-track .ui-btn-active,
 html body div.ui-slider-track.ui-body-c .ui-btn-active {
-	background-color: #3388cc /*{c-active-background-color}*/;
+	background-color: #46d4c9 /*{c-active-background-color}*/;
 	border-color: #1c4a70 /*{c-active-border}*/;
-	color: #ffffff /*{c-active-color}*/;
+	color: #46d4c9 /*{c-active-color}*/;
 	text-shadow: 0 /*{c-active-shadow-x}*/ 1px /*{c-active-shadow-y}*/ 0 /*{c-active-shadow-radius}*/ #005599 /*{c-active-shadow-color}*/;
 }
 /* Active radio button icon */

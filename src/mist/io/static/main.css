@@ -411,7 +411,8 @@ textarea#private-key, #manual-monitoring-popup textarea {
 }
 
 #machine-list-page .ui-filterable,
-#key-list-page .ui-filterable {
+#key-list-page .ui-filterable,
+#image-list-page .ui-filterable {
     margin-top: -55px;
     margin-bottom: 10px;
 }
@@ -419,22 +420,35 @@ textarea#private-key, #manual-monitoring-popup textarea {
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search {
     margin-left: 180px;
-    margin-right: 280px;
+    margin-right: 270px;
+}
+#machine-list-page .ui-filterable .ui-input-search,
+#key-list-page .ui-filterable .ui-input-search,
+#image-list-page .ui-filterable .ui-input-search {
+    border-color: #b5b5b5;
 }
 
 #key-list-page .ui-filterable .ui-input-search {
     margin-right: 160px;
 }
 
+#image-list-page .ui-filterable .ui-input-search {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
 #machine-list-page .ui-filterable input,
 #key-list-page .ui-filterable input,
-#network-list-page .ui-filterable input {
+#network-list-page .ui-filterable input,
+#image-list-page .ui-filterable input {
     min-height:2.50em;
 }
 
 #machine-list-page .machines-header,
-#key-list-page .keys-header {
+#key-list-page .keys-header,
+#image-list-page .images-header {
     background-color: #EEEDEB;
+    margin-top: 30px;
 }
 
 
@@ -468,6 +482,9 @@ ul.checkbox-list li:hover a {
 }
 ul.checkbox-list .ui-grid-b {
     overflow: visible;
+}
+.ui-checkbox-on:after {
+    background-color: #46D4C9 !important;
 }
 
 /* Checkbox link
@@ -533,6 +550,7 @@ ul.checkbox-list .ui-grid-b {
     width: 100%;
     margin: 0;
     box-sizing: border-box;
+    text-align: left;
 }
 
 @media only screen and  (max-width: 340px) {
@@ -635,6 +653,18 @@ ul.checkbox-list .ui-grid-b {
 
 /* Confirmation popup
 -----------------------------------------------------------------------------------------------------------*/
+.back {
+    color: #d96557 !important;
+}
+.back:hover {
+    border-color: #d96557 !important;
+    background-color: #d96557 !important;
+    color: #FAF9F5 !important;
+}
+.back:active {
+    border-color: #FAF9F5 !important;
+    background-color: #FAF9F5 !important;
+}
 #confirmation-popup {
     width: 355px !important;
     max-width: 99%;

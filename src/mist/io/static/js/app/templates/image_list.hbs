@@ -30,10 +30,9 @@
             <div class="ajax-loader"></div>
         {{/if}}
 
-        {{view Mist.TextField
-               id="search-term-input"
-               placeholder="Search images ..."
-               valueBinding="Mist.imageSearchController.searchTerm"}}
+        <div class="ui-grid-b images-header ui-shadow">
+            <div class="ui-block-a"></div>
+        </div><!-- /grid-b -->
 
         {{#if Mist.imageSearchController.isSearching}}
             <div class="ajax-loader"></div>
@@ -41,7 +40,9 @@
 
         <ul id="image-list"
             data-role="listview"
+            data-filter="true"
             data-inset="true"
+            data-filter-placeholder="Filter images"
             class="checkbox-list">
             {{#each view.renderedImages}}
                 {{view "imageListItem" imageBinding="this" class="checkbox-link" }}
@@ -52,7 +53,7 @@
             <div class="ajax-loader"></div>
         {{/if}}
 
-        <a id="images-advanced-search" class="ui-btn ui-btn-b ui-shadow ui-corner-all"
+        <a id="images-advanced-search" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
             {{action "searchClicked" target="view"}}>
             <span>
                 {{#if view.searchingImages}}

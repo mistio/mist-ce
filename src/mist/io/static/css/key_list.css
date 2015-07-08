@@ -2,7 +2,6 @@
 /* Key List Page CSS
 -----------------------------------------------------------------------------------------------------------*/
 #key-list-page .ui-content {
-    padding-top: 30px;
     background-color: transparent;
 }
 
@@ -34,6 +33,9 @@
 #key-list-page .tag {
     position: relative;
     top: 5px !important;
+}
+#key-list-page .ui-icon-check:after {
+    background-color: #46d4c9;
 }
 @-moz-document url-prefix() {
     #key-list-page .tag {
