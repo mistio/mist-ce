@@ -1021,3 +1021,12 @@ ul.checkbox-list .ui-grid-b {
 .ui-icon-question:after {
     background-position: 6px 3px;
 }
+.ui-slider {
+    border-color: #b5b5b5 !important;
+}
+.ui-slider .ui-slider-label {
+    background-color: #fff !important;
+}
+.ui-slider .ui-slider-handle {
+  background-color: #46d4c9 !important;
+}
