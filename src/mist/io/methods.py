@@ -1542,8 +1542,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
-                   script_id='', script_params='', job_id=None, docker_port_bindings={},
-                   docker_exposed_ports={}, azure_port_bindings='', hostname='', plugins=None):
+                   script_id='', script_params='', job_id=None,
+                   docker_port_bindings={}, docker_exposed_ports={},
+                   azure_port_bindings='', hostname='', plugins=None,
+                   post_script_id='', post_script_params=''):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1683,6 +1685,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
         )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1692,13 +1696,17 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins
+            hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
         )
     elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
         )
 
 
@@ -3227,7 +3235,7 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False, dry=False, **kwargs):
+                      no_ssh=False, dry=False, deploy_async=True, **kwargs):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
@@ -3267,8 +3275,10 @@ def enable_monitoring(user, backend_id, machine_id,
         return ret_dict
 
     if not no_ssh:
-        mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
-                                            ret_dict['extra_vars'])
+        deploy = mist.io.tasks_deploy_collectd
+        if deploy_async:
+            deploy = deploy.delay
+        deploy(user.email, backend_id, machine_id, ret_dict['extra_vars'])
 
     trigger_session_update(user.email, ['monitoring'])
 
