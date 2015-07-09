@@ -288,7 +288,6 @@ def add_backend_v_2(user, title, provider, params):
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
-
     remove_on_error = params.get('remove_on_error', True)
     # validate backend before adding
     if remove_on_error:
@@ -720,6 +719,7 @@ def _add_backend_docker(title, provider, params):
     # tls auth
     key_file = params.get('key_file', '')
     cert_file = params.get('cert_file', '')
+    ca_cert_file = params.get('ca_cert_file', '')
 
     backend = model.Backend()
     backend.title = title
@@ -728,6 +728,7 @@ def _add_backend_docker(title, provider, params):
     backend.apikey = auth_user
     backend.key_file = key_file
     backend.cert_file = cert_file
+    backend.ca_cert_file = ca_cert_file
     backend.apisecret = auth_password
     backend.apiurl = docker_host
     backend.enabled = True
@@ -1276,6 +1277,13 @@ def connect_provider(backend):
             cert_temp_file = NamedTemporaryFile(delete=False)
             cert_temp_file.write(backend.cert_file)
             cert_temp_file.close()
+            if backend.ca_cert_file:
+                # docker started with tlsverify
+                ca_cert_temp_file = NamedTemporaryFile(delete=False)
+                ca_cert_temp_file.write(backend.ca_cert_file)
+                ca_cert_temp_file.close()
+                libcloud.security.VERIFY_SSL_CERT = True;
+                libcloud.security.CA_CERTS_PATH.insert(0,ca_cert_temp_file.name)
             conn = driver(host=backend.apiurl, port=backend.docker_port, key_file=key_temp_file.name, cert_file=cert_temp_file.name)
         else:
             conn = driver(backend.apikey, backend.apisecret, backend.apiurl, backend.docker_port)
@@ -2237,11 +2245,15 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
             )
         except Exception as e:
             try:
-                #get to get the message only out of the XML response
-                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value).group(2)
+                # try to get the message only out of the XML response
+                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value)
+                if not msg:
+                    msg = re.search(r"(Message: ')(.*?)(', Body)", e.value)
+                if msg:
+                    msg = msg.group(2)
             except:
                 msg = e
-            raise MachineCreationError('Azure, got exception %s' % msg, e)
+            raise MachineCreationError('Azure, got exception %s' % msg)
 
         return node
 
@@ -2651,8 +2663,7 @@ def list_images(user, backend_id, term=None):
         images = starred_images + ec2_images + rest_images
         images = [img for img in images
                   if img.name and img.id[:3] not in ['aki', 'ari']
-                  and 'windows' not in img.name.lower()
-                  and 'hvm' not in img.name.lower()]
+                  and 'windows' not in img.name.lower()]
 
         if term and conn.type == 'docker':
             images = conn.search_images(term=term)[:40]

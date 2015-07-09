@@ -74,7 +74,7 @@ define('app/views/log_list', ['app/views/page'],
 
             search: function () {
 
-                if (!Mist.logs.socket.socket.connected)  {
+                if (!Mist.logs)  {
                     Ember.run.later(this, function () {
                         this.search();
                     }, 350);
@@ -165,8 +165,15 @@ define('app/views/log_list', ['app/views/page'],
 
 
             _initializeSocket: function () {
-                Mist.get('logs').on('logs', this, this.handleResponse);
-                Mist.get('logs').on('event', this, this.handleStream);
+                if (!Mist.logs)  {
+                    Ember.run.later(this, function () {
+                        Mist.get('logs').on('logs', this, this.handleResponse);
+                        Mist.get('logs').on('event', this, this.handleStream);
+                    }, 350);
+                } else {
+                    Mist.get('logs').on('logs', this, this.handleResponse);
+                    Mist.get('logs').on('event', this, this.handleStream);
+                }
             },
 
 

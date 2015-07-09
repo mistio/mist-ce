@@ -66,11 +66,11 @@ def main(global_config, **settings):
         # settings.yaml doesn't exist, continue
         pass
 
-
     configurator = Configurator(root_factory=Root, settings=settings)
 
     # Add custom adapter to the JSON renderer to avoid serialization errors
     json_renderer = JSON()
+
     def string_adapter(obj, request):
         return str(obj)
     json_renderer.add_adapter(object, string_adapter)
@@ -101,20 +101,25 @@ def add_routes(configurator):
 
     configurator.add_route('machines', '/backends/{backend}/machines')
     configurator.add_route('machine', '/backends/{backend}/machines/{machine}')
-    configurator.add_route('machine_rdp', '/backends/{backend}/machines/{machine}/rdp')
+    configurator.add_route('machine_rdp',
+                           '/backends/{backend}/machines/{machine}/rdp')
     configurator.add_route('machine_metadata',
-                     '/backends/{backend}/machines/{machine}/metadata')
-    configurator.add_route('probe', '/backends/{backend}/machines/{machine}/probe')
+                           '/backends/{backend}/machines/{machine}/metadata')
+    configurator.add_route('probe',
+                           '/backends/{backend}/machines/{machine}/probe')
 
     configurator.add_route('monitoring', '/monitoring')
     configurator.add_route('update_monitoring',
-                     '/backends/{backend}/machines/{machine}/monitoring')
-    configurator.add_route('stats', '/backends/{backend}/machines/{machine}/stats')
+                           '/backends/{backend}/machines/{machine}/monitoring')
+    configurator.add_route('stats',
+                           '/backends/{backend}/machines/{machine}/stats')
     configurator.add_route('metrics',
-                     '/backends/{backend}/machines/{machine}/metrics')
+                           '/backends/{backend}/machines/{machine}/metrics')
     configurator.add_route('metric', '/metrics/{metric}')
-    configurator.add_route('deploy_plugin',
-                     '/backends/{backend}/machines/{machine}/plugins/{plugin}')
+    configurator.add_route(
+        'deploy_plugin',
+        '/backends/{backend}/machines/{machine}/plugins/{plugin}'
+    )
 
     configurator.add_route('images', '/backends/{backend}/images')
     configurator.add_route('image', '/backends/{backend}/images/{image:.*}')
@@ -134,5 +139,3 @@ def add_routes(configurator):
     configurator.add_route('rule', '/rules/{rule}')
     configurator.add_route('check_auth', '/auth')
     configurator.add_route('account', '/account')
-
-    configurator.add_route('socketio', '/socket.io/*remaining')

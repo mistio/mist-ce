@@ -1,4 +1,4 @@
-startTimer();
+var startTime = Date.now();
 
 window.App = new Object();
 
@@ -18,20 +18,22 @@ require.config({
     paths: {
         text: 'lib/require/text',
         ember: 'lib/ember-1.6.0.min',
+        common: 'lib/common',
         jquery: 'lib/jquery-2.1.1.min',
         jqm: 'lib/jquery.mobile-1.4.5.min',
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
+        socket: 'lib/sockjs.min',
+        multiplex: 'lib/multiplex',
         c3: 'lib/c3.min',
-        socket: 'lib/socket.io',
         term: 'lib/term'
     },
-    deps: ['jquery'],
+    deps: ['jquery', 'common'],
     callback: function () {
         fontTest = $('#font-test')
         handleMobileInit();
-        appLoader.init();
+        appLoader.init(LOADER_STEPS);
     },
     shim: {
         'ember': {
@@ -47,223 +49,96 @@ require.config({
 });
 
 
-//
-//  Application Loader
-//
-//
-//  Problem: Before hidding the splash screen (the black screen with the logo
-//      that appears when the app loads) a series of steps must be completed.
-//      Due to the many dependencies of mist.io and the serial loading
-//      approach (all steps get executed one by one) the loading time skyrokets.
-//
-//
-//  Solution: A parallel step execution mechanism. Each step gets executed
-//      when only it's own dependencies (which are steps) are completed.
-//
-//
-//  More info: Into the "appLoader" object are defined the steps that need
-//      to be completed in order to hide the splash screen.
-//
-//      Every step defines an "exec" function which is called once all of the
-//      steps in it's "before" array are executed and completed.
-//
-
-
-var appLoader = {
-
-
-    //
-    //
-    //  Properties
-    //
-    //
-
-
-    buffer: null,
-    progress: null,
-    progressStep: null,
-
-
-    //
-    //
-    //  Initialization
-    //
-    //
-
-
-    init: function () {
-        this.buffer = {};
-        this.progress = 0;
-        this.progressStep = 100 / Object.keys(this.steps).length;
-        this.start();
+var LOADER_STEPS = {
+    'load ember': {
+        before: [],
+        exec: function () {
+            require(['ember'], function () {
+                extendEmberView();
+                appLoader.complete('load ember');
+            });
+        },
     },
-
-
-    //
-    //
-    //  Methods
-    //
-    //
-
-
-    start: function () {
-        forIn(this.steps, function (step) {
-            if (step.before.length == 0)
-                step.exec();
-        });
+    'load files': {
+        before: [],
+        exec: function () {
+            loadFiles(function () {
+                appLoader.buffer.files = Array.prototype.slice.call(arguments);
+                appLoader.complete('load files');
+            });
+        }
     },
-
-
-    complete: function (completedStep) {
-
-        // Update progress bar
-        this.progress += this.progressStep;
-        changeLoadProgress(Math.ceil(this.progress))
-
-        // Update other steps
-        forIn(this.steps, function (step, stepName) {
-
-            // Check if "completedStep" is a dependency of "step"
-            var index = step.before.indexOf(completedStep);
-
-            if (index == -1) return;
-
-            // Remove dependency from array
-            step.before.splice(index, 1);
-
-            // If "step" has no more dependencies, execute it
-            if (step.before.length == 0)
-                step.exec();
-        });
+    'load images': {
+        before: [],
+        exec: function () {
+            loadImages(function () {
+                appLoader.complete('load images');
+            });
+        }
     },
-
-
-    finish: function () {
-
-        // Clean up variables to save up some memory
-        loadApp = null;
-        loadFiles = null;
-        loadImages = null;
-        handleMobileInit = null;
-        setupSocketEvents = null;
-        changeLoadProgress = null;
-        appLoader = null;
-
-        info('Loaded in', getTime(), 'ms');
+    'load socket': {
+        before: [],
+        exec: function () {
+            require(['socket'], function () {
+                appLoader.complete('load socket');
+            });
+        }
     },
-
-
-    //
-    //
-    //  Steps
-    //
-    //
-
-
-    steps: {
-        'load ember': {
-            before: [],
-            exec: function () {
-                require(['ember'], function () {
-                    extendEmberView();
-                    appLoader.complete('load ember');
-                });
-            },
-        },
-        'load files': {
-            before: [],
-            exec: function () {
-                loadFiles(function () {
-                    appLoader.buffer.files = Array.prototype.slice.call(arguments);
-                    appLoader.complete('load files');
-                });
-            }
-        },
-        'load images': {
-            before: [],
-            exec: function () {
-                loadImages(function () {
-                    appLoader.complete('load images');
-                });
-            }
-        },
-        'load socket': {
-            before: [],
-            exec: function () {
-                require(['socket'], function () {
-                    appLoader.complete('load socket');
-                });
-            }
-        },
-        'load jqm': {
-            before: ['load ember'],
-            exec: function () {
-                require(['jqm'], function () {
-                    appLoader.complete('load jqm');
-                });
-            }
-        },
-        'load templates': {
-            before: ['load ember', 'load files'],
-            exec: function () {
-                appLoader.buffer.files[0](function () {
-                    appLoader.complete('load templates');
-                });
-            }
-        },
-        'init app': {
-            before: ['load templates', 'init connections'],
-            exec: function () {
-                loadApp.apply(null, [function () {
-                    appLoader.complete('init app');
-                }].concat(appLoader.buffer.files));
-            }
-        },
-        'init connections': {
-            before: ['load socket', 'load ember'],
-            exec: function () {
-                appLoader.buffer.ajax = Ajax(CSRF_TOKEN);
-                appLoader.buffer.socket = Socket({
-                    namespace: '/mist',
-                    onInit: function () {
-                        appLoader.complete('init connections');
-                    },
-                    onConnect: function (socket) {
-                        if (!appLoader)
-                            socket.emit('ready');
-                    },
-                });
-                appLoader.buffer.logs = new Socket_({
-                    namespace: '/logs',
-                    onConnect: function (socket) {
-                        if (!appLoader)
-                            socket.emit('ready');
-                    }
-                });
-            }
-        },
-        'init socket events': {
-            before: ['init connections', 'init app'],
-            exec: function () {
-                Mist.set('ajax', appLoader.buffer.ajax);
-                Mist.set('socket', appLoader.buffer.socket);
-                Mist.set('logs', appLoader.buffer.logs);
-                appLoader.complete('init socket events');
-            }
-        },
-        'fetch first data': {
-            before: ['init socket events'],
-            exec: function () {
-                setupSocketEvents(Mist.socket, function () {
-                    setupLogsSocketEvents(Mist.logs, function () {
-                        appLoader.complete('fetch first data');
-                    });
-                });
-            }
-        },
+    'load multiplex': {
+        before: [],
+        exec: function () {
+            require(['multiplex'], function () {
+                appLoader.complete('load multiplex');
+            });
+        }
+    },
+    'load jqm': {
+        before: ['load ember'],
+        exec: function () {
+            require(['jqm'], function () {
+                appLoader.complete('load jqm');
+            });
+        }
+    },
+    'load templates': {
+        before: ['load ember', 'load files'],
+        exec: function () {
+            appLoader.buffer.files[0](function () {
+                appLoader.complete('load templates');
+            });
+        }
+    },
+    'init app': {
+        before: ['load templates'],
+        exec: function () {
+            loadApp.apply(null, [function () {
+                appLoader.complete('init app');
+            }].concat(appLoader.buffer.files));
+        }
+    },
+    'init connections': {
+        before: ['load socket', 'load ember', 'init app'],
+        exec: function () {
+            Mist.set('ajax', Ajax(CSRF_TOKEN));
+            Mist.set('main', new Socket({
+                namespace: 'main',
+                onConnect: function (socket) {
+                    Mist.set('logs', new Socket({
+                        namespace: 'logs'
+                    }));
+                },
+            }));
+            if (appLoader)
+                appLoader.complete('init connections');
+        }
+    },
+    'fetch first data': {
+        before: ['init connections'],
+        exec: function () {
+            appLoader.complete('fetch first data');
+        }
     }
 };
-
 
 
 var loadFiles = function (callback) {
@@ -433,7 +308,6 @@ var loadApp = function (
     parseProviderMap();
 
     // Ember routes and routers
-
     App.Router.map(function() {
         this.route('machines');
         this.route('images');
@@ -457,7 +331,6 @@ var loadApp = function (
     });
 
     // Ember controllers
-
     App.set('keysController', KeysController.create());
     App.set('logsController', LogsController.create());
     App.set('loginController', LoginController.create());
@@ -492,7 +365,6 @@ var loadApp = function (
     App.set('scriptEditController', ScriptEditController.create());
 
     // Ember custom widgets
-
     App.Select = Ember.Select.extend({
         attributeBindings: [
             'name',
@@ -543,7 +415,6 @@ var loadApp = function (
     });
 
     // Mist functions
-
     App.isScrolledToTop = function () {
         return window.pageYOffset <= 20;
     };
@@ -632,9 +503,7 @@ var loadApp = function (
 };
 
 
-
 var loadImages = function (callback) {
-
     // Spritesheet's name includes a timestamp each
     // time we generate it. So we use this "hack" to
     // get it's path and preload it
@@ -666,20 +535,18 @@ var loadImages = function (callback) {
 };
 
 
-var handleMobileInit = function () {
-    $(document).one('mobileinit', function() {
-        $.mobile.ajaxEnabled = false;
-        $.mobile.pushStateEnabled = false;
-        $.mobile.linkBindingEnabled = false;
-        $.mobile.hashListeningEnabled = false;
-        $.mobile.ignoreContentEnabled = true;
-        $.mobile.panel.prototype._bindUpdateLayout = function(){};
-    });
+var setupChannelEvents = function (socket, namespace, callback) {
+    if (namespace == 'main')
+        return setupMainChannel(socket, callback);
+    else if (namespace == 'logs')
+        return setupLogChannel(socket, callback);
+    else if (namespace == 'shell')
+      return setupShellChannel(socket, callback);
+    else return callback();
 };
 
 
-var setupLogsSocketEvents = function (socket, callback) {
-
+var setupLogChannel = function (socket, callback) {
     socket.on('open_incidents', function (openIncidents) {
         require(['app/models/story'], function (StoryModel) {
             var models = openIncidents.map(function (incident) {
@@ -702,22 +569,36 @@ var setupLogsSocketEvents = function (socket, callback) {
 };
 
 
-var setupSocketEvents = function (socket, callback) {
-
-    if (Mist.isCore) {
-    //  This is a temporary ajax-request to get the scripts.
-    //  It should be converted into a "list_scripts" socket handler
-    //  as soon as the backend supports it
-    Mist.ajax.GET('/scripts').success(function (scripts) {
-        Mist.scriptsController.setContent(scripts);
+var setupShellChannel = function (socket, callback) {
+    socket.firstData = true;
+    socket.on('close', function (data) {
+        warn(data);
+        Mist.term.write('Connection closed by remote');
+    }).on('shell_data', function (data) {
+        Mist.term.write(data);
+        if (socket.firstData) {
+            $('.terminal').focus();
+            socket.firstData = false;
+        }
     });
+
+    if (callback)
+        callback();
+};
+
+
+var setupMainChannel = function(socket, callback) {
+    if (Mist.isCore) {
+        //  TODO: This is a temporary ajax-request to get the scripts.
+        //  It should be converted into a "list_scripts" socket handler
+        //  as soon as the backend supports it
+        Mist.ajax.GET('/scripts').success(function (scripts) {
+            Mist.scriptsController.setContent(scripts);
+        });
     }
 
     socket.on('list_keys', function (keys) {
         Mist.keysController.load(keys);
-    })
-    .on('list_logs', function (logs) {
-        Mist.logsController.load(logs);
     })
     .on('list_backends', function (backends) {
         Mist.backendsController.load(backends);
@@ -760,7 +641,7 @@ var setupSocketEvents = function (socket, callback) {
     })
     .on('notify', function (data){
 
-        if (! (data.title && data.body)) {
+        if (!(data.title && data.body) && !data.machine_id) {
             var msg = data.title || data.body;
             Mist.notificationController.notify(msg);
             return;
@@ -778,6 +659,12 @@ var setupSocketEvents = function (socket, callback) {
                 link: machine.name,
                 class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 href: '#/machines/' + machineId,
+                closeDialog: true,
+            });
+        } else {
+            warn('Machine not found', machineId, backendId);
+            dialogBody.push({
+                class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
                 closeDialog: true,
             });
         }
@@ -817,362 +704,6 @@ var setupSocketEvents = function (socket, callback) {
 };
 
 
-var changeLoadProgress = function (progress) {
-    $('.mist-progress').animate({
-        'width': progress + '%'
-    }, 300, function () {
-        if (progress >= 100) {
-            $('body').css('overflow','auto');
-            $('#splash').fadeOut(300);
-            appLoader.finish();
-        }
-    });
-};
-
-
-//
-//
-//  Ajax wrapper
-//
-//
-
-
-function Ajax (csrfToken) {
-
-    return new function () {
-
-        this.GET = function(url, data) {
-            return this.ajax('GET', url, data);
-        };
-        this.PUT = function(url, data) {
-            return this.ajax('PUT', url, data);
-        };
-        this.POST = function(url, data) {
-            return this.ajax('POST', url, data);
-        };
-        this.DELETE = function(url, data) {
-            return this.ajax('DELETE', url, data);
-        };
-        this.ajax = function(type, url, data) {
-
-            var ret = {};
-            var call = {};
-
-            call.success = function(callback) {
-                ret.success = callback;
-                return call;
-            };
-            call.error = function(callback) {
-                ret.error = callback;
-                return call;
-            };
-            call.complete = function(callback) {
-                ret.complete = callback;
-                return call;
-            };
-            call.ajax = function() {
-
-                var ajaxObject = {
-                    url: url,
-                    type: type,
-                    headers: {
-                        'Csrf-Token': csrfToken,
-                        'Api-Version': 2,
-                    },
-                    complete: function(jqXHR) {
-                        var success = (jqXHR.status == 200);
-                        if (success && ret.success)
-                            ret.success(jqXHR.responseJSON);
-                        if (!success && ret.error)
-                            ret.error(jqXHR.responseText, jqXHR.status);
-                        if (ret.complete)
-                            ret.complete(success, jqXHR.responseJSON, jqXHR);
-                    }
-                };
-
-                if (data && Object.keys(data).length != 0)
-                    ajaxObject.data = JSON.stringify(data);
-
-                $.ajax(ajaxObject);
-
-                return call;
-            };
-            return call.ajax();
-        };
-    }
-};
-
-
-//
-//
-//  Socket wrapper
-//
-//
-
-
-function Socket (args) {
-
-    var socket = undefined;
-    var initialized = false;
-    var namespace = args.namespace;
-
-    function init () {
-        if (!initialized) {
-            info(namespace, 'initializing');
-            handleDisconnection();
-            addDebuggingWrapper();
-            if (args.onInit instanceof Function)
-                args.onInit(socket);
-        }
-        if (args.onConnect instanceof Function)
-            args.onConnect(socket);
-        initialized = true;
-    };
-
-    function connect () {
-
-        if (socket === undefined) {
-            socket = io.connect(namespace);
-            reconnect();
-        } else if (socket.socket.connected) {
-            info(namespace, 'connected');
-            init();
-        } else if (socket.socket.connecting) {
-            info(namespace, 'connecting');
-            reconnect();
-        } else {
-            socket.socket.connect();
-            reconnect();
-        }
-    }
-
-    function reconnect () {
-        setTimeout(connect, 500);
-    }
-
-    function handleDisconnection () {
-
-        // keep socket connections alive by default
-        if (args.keepAlive !== undefined ? args.keepAlive : true) {
-            // Reconnect if connection fails
-            socket.on('disconnect', function () {
-                warn(namespace, 'disconnected');
-                reconnect();
-            });
-        }
-    }
-
-    function addDebuggingWrapper () {
-
-        // This process basically overrides the .on()
-        // function to enable debugging info on every
-        // response received by the client
-
-        // 1. keep a copy of the original socket.on() function
-        var sockon = socket.on;
-
-        // 2. overide the socket's .on() function
-        socket.on = function (event, callback)  {
-
-            // i. keep a copy of the original callback
-            // This is the function written by us to handle
-            // the response data
-            var cb = callback;
-
-            // ii. overide callback to first print the debugging
-            // information and then call the original callback function
-            // (which is saved in cb variable)
-            callback = function (data) {
-                if (DEBUG_SOCKET)
-                    info(new Date().getPrettyTime() +
-                        ' | ' + namespace + '/' + event + ' ', data);
-                cb(data);
-            };
-
-            // iii. Call the original .on() function using the modified
-            // callback function
-            return sockon.apply(socket, arguments);
-        };
-    }
-
-    connect();
-
-    return socket;
-}
-
-
-//
-//  TODO (gtsop): Get rid of the previous wrapper
-//  Socket Wrapper v2
-//
-//
-
-
-function Socket_ (args) {
-
-    if (!window.EventHandler)
-        window.EventHandler = Ember.Object.extend(Ember.Evented, {});
-
-    return Ember.Object.extend({
-
-
-        //
-        //
-        //  Properties
-        //
-        //
-
-
-        events: null,
-        socket: null,
-        namespace: null,
-
-
-        //
-        //
-        //  Public Methods
-        //
-        //
-
-
-        load: function (args) {
-
-            this._log('initializing');
-            this._parseArguments(args);
-            this.set('socket', io.connect(this.get('namespace')));
-            this.set('events', EventHandler.create());
-
-            var that = this;
-            this._connect(function () {
-                that._handleDisconnection();
-                if (that.onInit instanceof Function)
-                    that.onInit(that);
-            });
-        }.on('init'),
-
-
-        on: function (event) {
-            var that = this;
-            var events = this.get('events');
-            var socket = this.get('socket');
-
-            events.on.apply(events, arguments);
-            if (!socket.$events || !socket.$events[event])
-                socket.on(event, function (response) {
-                    that._log('/'+ event, 'RECEIVE', response);
-                    events.trigger.call(events, event, response);
-                });
-            return this;
-        },
-
-
-        send: function () {
-            var args = slice(arguments);
-            if (!args.length) {
-                error('No arguments passed to send');
-                return;
-            }
-            var msg = args[0];
-            args = args.slice(1);
-            this._log('/' + msg, 'EMIT', args);
-            if (args.length) msg += ',' + JSON.stringify(args);
-            var channel = this.get('channel');
-            return channel.send(msg);
-        },
-
-
-        off: function () {
-            var events = this.get('events');
-            events.off.apply(events, arguments);
-            return this;
-        },
-
-
-        emit: function () {
-            var args = slice(arguments)
-            this._log('/'+args[0], 'EMIT', args);
-            var socket = this.get('socket');
-            socket.emit.apply(socket, arguments);
-            return this;
-        },
-
-
-        kill: function () {
-            this.set('keepAlive', false);
-            var socket = this.get('socket');
-            socket.socket.disconnect();
-            if (socket.$events)
-                for (event in socket.$events)
-                    delete socket.$events[event];
-            return this;
-        },
-
-
-        //
-        //
-        //  Private Methods
-        //
-        //
-
-
-        _connect: function (callback) {
-
-            var socket = this.get('socket');
-
-            if (socket.socket.connected) {
-                this._log('connected');
-                if (callback instanceof Function)
-                    callback();
-                if (this.onConnect instanceof Function)
-                    this.onConnect(this);
-            } else if (socket.socket.connecting) {
-                this._log('connecting');
-                this._reconnect(callback);
-            } else {
-                socket.socket.connect();
-                this._reconnect(callback);
-            }
-        },
-
-
-        _reconnect: function (callback) {
-            Ember.run.later(this, function () {
-                this._connect(callback);
-            }, 500);
-        },
-
-
-        _parseArguments: function (args) {
-            forIn(this, args, function (value, property) {
-                this.set(property, value);
-            });
-        },
-
-
-        _handleDisconnection: function () {
-            var that = this;
-            this.get('socket').on('disconnect', function () {
-                that._log('disconnected');
-                // keep socket connections alive by default
-                if (that.get('keepAlive') !== undefined ? that.get('keepAlive') : true)
-                    that._reconnect();
-            });
-        },
-
-
-        _log: function () {
-            if (!DEBUG_SOCKET)
-                return;
-            var args = slice(arguments);
-            var preText = new Date().getPrettyTime() +
-                ' | ' + this.get('namespace');
-            args.unshift(preText);
-            console.log.apply(console, args);
-        },
-
-    }).create(args);
-}
-
 function virtualKeyboardHeight () {
     var keyboardHeight = 0;
 
@@ -1189,27 +720,6 @@ function virtualKeyboardHeight () {
     }
     return keyboardHeight;
 }
-
-
-// forEach like function on objects
-function forIn () {
-
-    var object = arguments[arguments.length - 2];
-    var callback = arguments[arguments.length - 1];
-    var thisArg = arguments.length == 3 ? arguments[0] : undefined;
-
-    if (!(object instanceof Object))
-        return false;
-
-    var keys = Object.keys(object);
-    var keysLength = keys.length;
-    for (var i = 0; i < keysLength; i++) {
-        var ret = callback.call(thisArg, object[keys[i]], keys[i]);
-        if (ret === true)
-            return true;
-    }
-    return false;
-};
 
 
 // Calculates maximum chars that can be displayed into a fixed width
@@ -1231,9 +741,9 @@ function maxCharsInWidth (fontSize, width) {
     return charCount;
 }
 
+
 // Calculates maximum lines that can be displayed into a fixed height
 function maxLinesInHeight (fontSize, height) {
-
     fontTest.css('font-size', fontSize);
 
     var testString = '';
@@ -1258,41 +768,6 @@ function unlockScroll(){
       window.scrollTo(null, $('body').data('y-scroll'))
 }
 
-
-// Simple timer tool for performance measurements
-var startTime;
-function startTimer () {
-    startTime = Date.now();
-};
-
-function getTime () {
-    return Date.now() - startTime;
-};
-
-// Console aliases
-function log() {
-    if (LOGLEVEL > 3)
-        console.log.apply(console, arguments);
-}
-
-function info() {
-    if (LOGLEVEL > 2)
-        console.info.apply(console, arguments);
-}
-
-function warn() {
-    if (LOGLEVEL > 1)
-        console.warn.apply(console, arguments);
-}
-
-function error() {
-    if (LOGLEVEL > 0)
-        console.error.apply(console, arguments);
-}
-
-function slice (args) {
-    return Array.prototype.slice.call(args);
-};
 
 function resetFileInputField (element) {
     element.wrap('<form>').parent('form').trigger('reset');
@@ -1386,731 +861,3 @@ function parseProviderMap () {
         });
     });
 }
-
-
-//
-//
-//  PROTOTYPE EXTENTIONS
-//
-//
-
-
-var extendEmberView = function () {
-
-    Ember.View.prototype.getName = function () {
-        return this.constructor.toString().split('.')[1].split('View')[0];
-    };
-    Ember.View.prototype.getWidgetID = function () {
-        return '#' + this.getName().dasherize();
-    }
-    Ember.View.prototype.getControllerName = function () {
-        return this.getName().decapitalize() + 'Controller';
-    }
-};
-
-
-String.prototype.decapitalize = function () {
-    return this.charAt(0).toLowerCase() + this.slice(1);
-};
-
-Date.prototype.isFuture = function () {
-    return this > new Date();
-};
-
-Date.prototype.getPrettyTime = function (noSeconds) {
-
-    var hour = this.getHours();
-    var min = this.getMinutes();
-    var sec = this.getSeconds();
-
-    var ret = (hour < 10 ? '0' : '') + hour + ':' +
-        (min < 10 ? '0' : '') + min +
-        (noSeconds ? '' : (':' + (sec < 10 ? '0' : '') + sec));
-
-    return ret;
-}
-
-Date.prototype._toString = function () {
-    var d = (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear();
-    return d + ', ' + this.getPrettyTime();
-}
-Date.prototype.getPrettyDate = function (shortMonth) {
-    return this.getMonthName(shortMonth) + ' ' + this.getDate() + ', ' + this.getFullYear();
-}
-
-Date.prototype.getPrettyDateTime = function (shortMonth, noSeconds) {
-    return this.getPrettyDate(shortMonth) + ', ' + this.getPrettyTime(noSeconds);
-}
-
-Date.prototype.getMonthName = function (short) {
-    if (short)
-        return ['Jan','Feb','Mar','Apr','May','Jun','Jul',
-            'Aug','Sep','Oct','Nov','Dec'][this.getMonth()];
-    return ['January','February','March','April','May','June','July',
-        'August','September','October','November','December'][this.getMonth()];
-}
-
-Date.prototype.diffToString = function (date) {
-
-    var diff = this - date;
-    var ret = '';
-
-    if (diff < TIME_MAP.MINUTE)
-        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
-    else if (diff < TIME_MAP.HOUR)
-        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
-    else if (diff < TIME_MAP.DAY)
-        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
-    else if (diff < TIME_MAP.MONTH)
-        ret = parseInt(diff / TIME_MAP.DAY) + ' day';
-    else if (diff < TIME_MAP.YEAR)
-        ret = parseInt(diff / TIME_MAP.MONTH) + ' month';
-    else
-        ret = 'TOO LONG!';
-
-    // Add 's' for plural
-    if (ret.split(' ')[0] != '1')
-        ret = ret + 's';
-
-    return ret;
-};
-
-Date.prototype.getTimeFromNow = function () {
-
-    var now = new Date();
-    var diff = now - this;
-    var ret = '';
-
-    if (diff < 10 * TIME_MAP.SECOND)
-        ret = 'Now';
-
-    else if (diff < TIME_MAP.MINUTE)
-        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
-
-    else if (diff < TIME_MAP.HOUR)
-        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
-
-    else if (diff < TIME_MAP.DAY)
-        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
-
-    else if (diff < 2 * TIME_MAP.DAY)
-        ret = 'Yesterday';
-
-    else if (diff < TIME_MAP.YEAR)
-        ret = this.getMonthName(true) +  ' ' + this.getDate();
-
-    if (ret.indexOf('sec') > -1 ||
-        ret.indexOf('min') > -1 ||
-        ret.indexOf('hour') > -1) {
-
-        // Add 's' for plural
-        if (ret.split(' ')[0] != '1')
-            ret = ret + 's';
-
-        ret = ret + ' ago';
-    }
-
-    return ret;
-}
-
-
-Array.prototype.toStringByProperty = function (property) {
-    return this.map(function (object) {
-        return object[property];
-    }).join(', ');
-}
-
-
-//  GLOBAL DEFINITIONS
-
-var DISPLAYED_DATAPOINTS = 60;
-
-var TIME_MAP = {
-    SECOND: 1000,
-    MINUTE: 60 * 1000,
-    HOUR: 60 * 60 * 1000,
-    DAY: 24 * 60 * 60 * 1000,
-    WEEK: 7 * 24 * 60 * 60 * 1000,
-    MONTH: 30 * 24 * 60 * 60 * 1000,
-    YEAR: 12 * 30 * 24 * 60 * 60 * 1000,
-};
-
-var DIALOG_TYPES = {
-    OK: 0,
-    OK_CANCEL: 1,
-    YES_NO: 2,
-    DONE_BACK: 3,
-    BACK: 4,
-};
-
-var EMAIL_REGEX = /(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
-
-var PROVIDER_MAP = {
-
-    azure: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'Azure',
-        },
-        {
-            name: 'subscription_id',
-            type: 'text',
-            helpText: 'You can find your subscriptionID on the Azure portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/202083549-Adding-credentials-for-Azure'
-        },
-        {
-            name: 'certificate',
-            type: 'file',
-            label: 'Certificate file',
-            buttonText: 'Add Certificate',
-            helpText: 'Your Azure certificate PEM file',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/202083549-Adding-credentials-for-Azure'
-        }
-    ],
-
-    bare_metal: [
-        {
-            name: 'title',
-            type: 'text',
-        },
-        {
-            name: 'machine_ip',
-            type: 'text',
-            label: 'Hostname',
-            optional: true,
-            placeholder: 'DNS or IP ',
-            helpText: 'The URL or IP adress that your server listens to'
-        },
-        {
-            name: 'windows',
-            type: 'slider',
-            label: 'Operating System',
-            onLabel: 'Windows',
-            offLabel: 'Unix',
-            onValue: true,
-            offValue: false,
-            optional: true,
-            on: [
-                {
-                    name: 'remote_desktop_port',
-                    type: 'text',
-                    label: 'Remote Desktop Port',
-                    defaultValue: '3389',
-                    optional: true,
-                }
-            ],
-            off: [
-                {
-                    name: 'machine_key',
-                    type: 'ssh_key',
-                    label: 'SSH Key',
-                    optional: true,
-                },
-                {
-                    showIf: 'machine_key',
-                    name: 'machine_user',
-                    type: 'text',
-                    label: 'User',
-                    optional: true,
-                    defaultValue: 'root',
-                },
-                {
-                    showIf: 'machine_key',
-                    name: 'machine_port',
-                    type: 'text',
-                    label: 'Port',
-                    defaultValue: '22',
-                    optional: true,
-                },
-            ]
-        },
-        {
-            name: 'monitoring',
-            type: 'checkbox',
-            label: 'Enable monitoring',
-            defaultValue: true,
-        }
-    ],
-
-    coreos: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'CoreOS',
-        },
-        {
-            name: 'machine_ip',
-            type: 'text',
-            label: 'Hostname',
-            placeholder: 'DNS or IP '
-        },
-        {
-            name: 'machine_key',
-            type: 'ssh_key',
-            label: 'SSH Key',
-            optional: true,
-        },
-        {
-            showIf: 'machine_key',
-            name: 'machine_user',
-            type: 'text',
-            label: 'User',
-            optional: true,
-            defaultValue: 'root',
-        },
-        {
-            showIf: 'machine_key',
-            name: 'machine_port',
-            type: 'text',
-            label: 'Port',
-            defaultValue: '22',
-            optional: true,
-        },
-        {
-            name: 'monitoring',
-            type: 'checkbox',
-            label: 'Enable monitoring',
-            defaultValue: true,
-        }
-    ],
-
-    digitalocean: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'DigitalOcean',
-        },
-        {
-            name: 'token',
-            type: 'password',
-            helpText: 'You can find your API Token on the Digital Ocean portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201501739--Add-credentials-for-Digital-Ocean',
-        },
-    ],
-
-    hostvirtual: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'HostVirtual',
-        },
-        {
-            name: 'api_key',
-            type: 'password',
-        },
-    ],
-
-	vultr: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'Vultr',
-        },
-        {
-            name: 'api_key',
-            type: 'password',
-            helpText: 'You can find your API Token on the Vultr portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/204576609-Add-credentials-for-Vultr'
-        },
-    ],
-
-    docker: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'Docker',
-        },
-        {
-            name: 'docker_host',
-            type: 'text',
-            label: 'Host',
-            helpText: 'The URL or IP your Docker engine listens to',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201544379-Adding-a-Docker-engine',
-        },
-        {
-            name: 'docker_port',
-            type: 'text',
-            label: 'Port',
-            optional: true,
-            defaultValue: '4243',
-            helpText: 'The port your Docker engine listens to',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201544379-Adding-a-Docker-engine',
-        },
-        {
-            type: 'slider',
-            label: 'Authentication',
-            onLabel: 'TLS',
-            offLabel: 'Basic',
-            on: [
-                {
-                    name: 'key_file',
-                    type: 'file',
-                    label: 'PEM Key',
-                    buttonText: 'Add key',
-                    optional: true
-                },
-                {
-                    name: 'cert_file',
-                    type: 'file',
-                    label: 'PEM Certificate',
-                    buttonText: 'Add certificate',
-                    optional: true
-                },
-            ],
-            off: [
-                {
-                    name: 'auth_user',
-                    type: 'text',
-                    label: 'User',
-                    optional: true,
-                },
-                {
-                    name: 'auth_password',
-                    type: 'password',
-                    label: 'Password',
-                    optional: true,
-                }
-            ],
-            helpText: 'The type of authentication your Docker engine uses',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/201544379-Adding-a-Docker-engine',
-        },
-    ],
-
-    ec2: [
-        {
-            name: 'region',
-            type: 'region',
-        },
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'EC2',
-        },
-        {
-            name: 'api_key',
-            type: 'text',
-            helpText: 'You can find your API key on your Amazon console',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200235718-Adding-credentials-for-Amazon-EC2',
-        },
-        {
-            name: 'api_secret',
-            type: 'password',
-            helpText: 'You can find your API secret on your Amazon console',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200235718-Adding-credentials-for-Amazon-EC2',
-        }
-    ],
-
-    gce: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'GCE',
-        },
-        {
-            name: 'private_key',
-            label: 'JSON key',
-            type: 'file',
-            buttonText: 'Add JSON key',
-            helpText: 'You can create a new key on your GCE portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203433315-Adding-Google-Compute-Engine-to-Mist-io',
-        },
-        {
-            name: 'project_id',
-            type: 'text',
-            helpText: 'You can find your project ID on your GCE portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203433315-Adding-Google-Compute-Engine-to-Mist-io',
-        }
-    ],
-
-    hpcloud: [
-        {
-            name: 'region',
-            type: 'region',
-        },
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'HP',
-        },
-        {
-            name: 'username',
-            type: 'text',
-        },
-        {
-            name: 'password',
-            type: 'password',
-        },
-        {
-            name: 'tenant_name',
-            type: 'text',
-        }
-    ],
-
-    linode: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'Linode',
-        },
-        {
-            name: 'api_key',
-            type: 'text',
-            helpText: 'You can create an API key on your Linode portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200278166-Adding-credentials-for-Linode',
-        }
-    ],
-
-    nephoscale: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'Nephoscale',
-        },
-        {
-            name: 'username',
-            type: 'text',
-            helpText: 'The username you use to connect to the Nephoscale portal',
-        },
-        {
-            name: 'password',
-            type: 'password',
-            helpText: 'The password you use to connect to the Nephoscale portal',
-        }
-    ],
-
-    openstack: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'OpenStack',
-        },
-        {
-            name: 'username',
-            type: 'text',
-        },
-        {
-            name: 'password',
-            type: 'password',
-        },
-        {
-            name: 'auth_url',
-            type: 'text',
-            helpText: 'Your OpenStack Auth URL',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200638018-Adding-credentials-for-OpenStack',
-        },
-        {
-            name: 'tenant_name',
-            type: 'text',
-        },
-        {
-            name: 'region',
-            type: 'text',
-            optional: true,
-        },
-    ],
-
-    rackspace: [
-        {
-            name: 'region',
-            type: 'region',
-        },
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'Rackspace',
-        },
-        {
-            name: 'username',
-            type: 'text',
-            helpText: 'The username you use to connect to the RackSpace portal',
-        },
-        {
-            name: 'api_key',
-            type: 'password',
-            helpText: 'You can find your API key on your RackSpace portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200235728-Adding-credentials-for-Rackspace',
-        }
-    ],
-
-    softlayer: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'SoftLayer',
-        },
-        {
-            name: 'username',
-            type: 'text',
-            helpText: 'The username you use to connect to the SoftLayer portal',
-        },
-        {
-            name: 'api_key',
-            type: 'password',
-            helpText: 'You can find your API key on your SoftLayer portal',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/200794519-Adding-credentials-for-SoftLayer',
-        }
-    ],
-
-    libvirt: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'KVM (libvirt)',
-        },
-        {
-            name: 'machine_hostname',
-            label: 'KVM hostname',
-            type: 'text',
-            helpText: 'The URL or IP that your KVM hypervisor listens to',
-        },
-        {
-            name: 'machine_user',
-            type: 'text',
-            label: 'ssh user',
-            optional: true,
-            defaultValue: 'root',
-            helpText: 'The SSH user that Mist.io should try to connect as',
-        },
-        {
-            name: 'ssh_port',
-            type: 'text',
-            label: 'ssh port',
-            optional: true,
-            defaultValue: '22',
-        },
-        {
-            name: 'machine_key',
-            type: 'ssh_key',
-            label: 'ssh key',
-            optional: true,
-            helpText: 'If you don\'t specify an ssh key, mist.io will assume that you are connecting via tcp (qemu+tcp)',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203342499--Adding-credentials-for-KVM-hypervisors',
-        },
-
-    ],
-    vcloud: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'VMware vCloud'
-        },
-        {
-            name: 'username',
-            type: 'text',
-            helpText: 'The username you use to login to vCloud Director',
-        },
-        {
-            name: 'password',
-            type: 'password',
-            helpText: 'The password you use to login to vCloud Director',
-        },
-        {
-            name: 'organization',
-            type: 'text'
-        },
-        {
-            name: 'host',
-            type: 'text',
-            label: 'Hostname',
-            helpText: 'The URL or IP vCloud listens to',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203326759--Adding-credentials-for-VMware-vCloud'
-        }
-    ],
-
-    indonesian_vcloud: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'Indonesian Cloud'
-        },
-        {
-            name: 'username',
-            type: 'text',
-            helpText: 'The username you use to login Indonesian Cloud\'s portal',
-
-        },
-        {
-            name: 'password',
-            type: 'password',
-            helpText: 'The password you use to login Indonesian Cloud\'s portal',
-        },
-        {
-            name: 'organization',
-            type: 'text',
-            helpText: 'Name of your oganization',
-            helpHref: 'https://mistio.zendesk.com/hc/en-us/articles/203321959-Adding-credentials-for-Indonesian-Cloud'
-        }
-    ],
-    vsphere: [
-        {
-            name: 'title',
-            type: 'text',
-            defaultValue: 'VMware vSphere'
-        },
-        {
-            name: 'username',
-            type: 'text'
-        },
-        {
-            name: 'password',
-            type: 'password'
-        },
-        {
-            name: 'host',
-            type: 'text',
-            label: 'Hostname',
-        }
-    ]
-};
-
-var OS_MAP = [
-    [
-        ['rhel', 'redhat', 'red hat'], 'redhat'
-    ],
-    [
-        ['ubuntu'], 'ubuntu'
-    ],
-    [
-        ['ibm'], 'ibm'
-    ],
-    [
-        ['canonical'], 'canonical'
-    ],
-    [
-        ['sles', 'suse'], 'suse'
-    ],
-    [
-        ['oracle'], 'oracle'
-    ],
-    [
-        ['karmic'], 'karmic'
-    ],
-    [
-        ['opensolaris'], 'opensolaris'
-    ],
-    [
-        ['gentoo'], 'gentoo'
-    ],
-    [
-        ['opensuse'], 'opensuse'
-    ],
-    [
-        ['fedora'], 'fedora'
-    ],
-    [
-        ['centos'], 'centos'
-    ],
-    [
-        ['fedora'], 'fedora'
-    ],
-    [
-        ['debian'], 'debian'
-    ],
-    [
-        ['amazon'], 'amazon'
-    ],
-    [
-        ['windows'], 'windows'
-    ]
-];
