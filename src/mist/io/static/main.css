@@ -362,7 +362,6 @@ textarea#private-key, #manual-monitoring-popup textarea {
 }
 .mid-popup {
     width: 255px !important;
-    max-width: 99%;
 }
 .large-popup {
     width: 290px !important;

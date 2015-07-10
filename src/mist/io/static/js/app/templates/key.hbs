@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <div data-role="content" data-theme="a">
+    <div class="ui-shadow" data-role="content" data-theme="a">
 
         {{#if Mist.keysController.loading}}
         <div class="ajax-loader"></div>
@@ -39,7 +39,7 @@
             <textarea id="public-key" type="text" readonly="readonly" onclick="this.focus();this.select()"></textarea>
         </div>
 
-        <div data-role="collapsible">
+        <div class="ui-shadow" data-role="collapsible">
             <h4>Private key
                 {{#if Mist.keysController.gettingPrivateKey}}
                 <div class="ajax-loader"></div>
@@ -56,7 +56,7 @@
         </div>
 
         {{#if machines}}
-        <div id="single-key-machines" data-role="collapsible">
+        <div class="ui-shadow" id="single-key-machines" data-role="collapsible">
 
             <h4>Machines
                 {{#if Mist.backendsController.loadingMachines}}
