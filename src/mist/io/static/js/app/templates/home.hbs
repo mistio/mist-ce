@@ -1,3 +1,4 @@
+home page
 <div id="home-page" data-role="page" class="ui-page-active ui-page">
     <!-- Page header -->
     <div class="ui-header ui-bar-b">
@@ -18,7 +19,7 @@
         <!-- Backends list -->
         <div id="backend-buttons" data-role="controlgroup" data-type="horizontal"
             class="ui-controlgroup ui-controlgroup-horizontal ui-corner-all">
-            {{#each Mist.backendsController.content}}
+            {{#each Mist.backendsController.model}}
                 {{view "backendButton" backendBinding="this"
                        class="ui-btn ui-input-btn ui-corner-all ui-shadow"}}
             {{/each}}
@@ -66,7 +67,7 @@
                         <li class="ui-li-has-count">
                             <a class="ui-btn" href="#/keys">
                                 <span class="ui-li-count ui-body-inherit">
-                                    {{Mist.keysController.content.length}}
+                                    {{Mist.keysController.model.length}}
                                 </span>
                                 Keys
                             </a>

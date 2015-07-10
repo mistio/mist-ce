@@ -22,7 +22,7 @@ define('app/views/log_list', ['app/views/page'],
             //
             //
 
-
+            templateName: 'log_list',
             firstRequest: true,
             forceFlag: 'all',
             filterString: '',
@@ -96,11 +96,11 @@ define('app/views/log_list', ['app/views/page'],
                     this.set('noMoreLogs', true);
                 this.set('fetchingHistory', false);
                 Ember.run(this, function () {
-                    Mist.logsController._appendContent(
+                    Mist.logsController._appendModel(
                         this.filter(logs)
                     );
                 });
-                if (logs.length && Mist.logsController.content.length < MIN_LOGS_DISPLAYED) {
+                if (logs.length && Mist.logsController.model.length < MIN_LOGS_DISPLAYED) {
                     this.set('disableScrollFetch', true);
                     Ember.run.later(this, function () {
                         this.search();
@@ -113,7 +113,7 @@ define('app/views/log_list', ['app/views/page'],
 
             handleStream: function (log) {
                 Ember.run(this, function () {
-                    Mist.logsController._prependContent(
+                    Mist.logsController._prependModel(
                         this.filter([log])
                     )
                 });
@@ -268,7 +268,7 @@ define('app/views/log_list', ['app/views/page'],
             _updateLogTime: function () {
                 if (this.$()) {
                     Ember.run(this, function () {
-                        Mist.logsController.content.forEach(function (log) {
+                        Mist.logsController.model.forEach(function (log) {
                             log.propertyWillChange('time');
                             log.propertyDidChange('time');
                         });

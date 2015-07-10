@@ -115,8 +115,8 @@ define('app/views/machine_list', ['app/views/page'],
 
                     $('#select-machines-popup').popup('close');
 
-                    Mist.backendsController.content.forEach(function (backend) {
-                        backend.machines.content.forEach(function (machine) {
+                    Mist.backendsController.model.forEach(function (backend) {
+                        backend.machines.model.forEach(function (machine) {
                             machine.set('selected', mode == 'all' || mode == backend.title);
                         });
                     });

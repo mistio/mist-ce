@@ -100,7 +100,7 @@
                                     <li data-icon="false" data-theme="a">
                                         <a {{action "selectKey" "" field target="view"}}>-- None --</a>
                                     </li>
-                                    {{#each Mist.keysController.content}}
+                                    {{#each Mist.keysController.model}}
                                         <li data-icon="false" data-theme="a">
                                             <a {{action "selectKey" this field target="view"}}>{{this.id}}</a>
                                         </li>

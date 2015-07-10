@@ -18,7 +18,7 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
             //
 
 
-            content: [],
+            model: [],
             loading: null,
 
 
@@ -65,7 +65,7 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
 
 
             getDatasource: function (datasourceId) {
-                return this.content.findBy('id', datasourceId);
+                return this.model.findBy('id', datasourceId);
             },
 
 
@@ -84,7 +84,7 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
             _addDatasource: function (datasource) {
                 Ember.run(this, function () {
                     if (this.datasourceExists(datasource.id)) return;
-                    this.content.addObject(Datasource.create(datasource));
+                    this.model.addObject(Datasource.create(datasource));
                     this.trigger('onDatasourceAdd');
                 });
             },

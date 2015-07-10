@@ -29,7 +29,7 @@
             data-inset="true"
             data-filter-placeholder="Filter..."
             class="checkbox-list">
-            {{#each Mist.keysController.content}}
+            {{#each Mist.keysController.model}}
                 {{view "keyListItem" keyBinding="this" class="checkbox-link"}}
             {{/each}}
         </ul>

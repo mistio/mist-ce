@@ -17,7 +17,7 @@ define('app/views/graph_list', ['app/views/templated'],
             //
             //
 
-
+            templateName: "graph_list",
             actionProxy: null,
 
 

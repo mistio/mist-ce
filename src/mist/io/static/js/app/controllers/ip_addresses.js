@@ -13,7 +13,7 @@ define('app/controllers/ip_addresses', [
 
         return BaseArrayController.extend({
 
-            model: IPAddressModel,
+            baseModel: IPAddressModel,
             passOnProperties: ['network']
 
         });

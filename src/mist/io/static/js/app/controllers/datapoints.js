@@ -22,7 +22,7 @@ define('app/controllers/datapoints', ['app/models/datapoint', 'ember'],
             //
 
 
-            content: null,
+            model: null,
             loading: null,
         });
     }

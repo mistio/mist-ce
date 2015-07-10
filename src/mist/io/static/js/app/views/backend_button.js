@@ -17,7 +17,7 @@ define('app/views/backend_button', ['app/views/templated'],
             //
             //
 
-
+            templateName: 'backend_button',
             backend: null,
 
 

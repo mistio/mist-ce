@@ -22,7 +22,7 @@ define('app/controllers/images',
             //
 
 
-            model: ImageModel,
+            baseModel: ImageModel,
             passOnProperties: ['backend'],
 
 

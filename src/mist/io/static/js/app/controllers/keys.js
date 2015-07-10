@@ -18,7 +18,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             //
 
 
-            content: [],
+            model: [],
             selectedKeys: [],
 
             loading: false,
@@ -41,7 +41,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             init: function () {
                 this._super();
-                this.set('content', []);
+                this.set('model', []);
                 this.set('loading', true);
             },
 
@@ -54,7 +54,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
 
             load: function(keys) {
-                this._updateContent(keys);
+                this._updateModel(keys);
                 this.set('loading', false);
             },
 
@@ -203,7 +203,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
 
             getKey: function(keyId) {
-                return this.content.findBy('id', keyId);
+                return this.model.findBy('id', keyId);
             },
 
 
@@ -221,7 +221,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             getMachineKeysCount: function(machine) {
                 var count = 0;
-                this.content.forEach(function(key) {
+                this.model.forEach(function(key) {
                     key.machines.some(function(key_machine) {
                         if (machine.equals(key_machine)) {
                             return ++count;
@@ -238,11 +238,11 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
              *
              */
 
-            _updateContent: function (keys) {
+            _updateModel: function (keys) {
                 Ember.run(this, function() {
 
                     // Remove deleted keys
-                    this.content.forEach(function (key) {
+                    this.model.forEach(function (key) {
                         if (!keys.findBy('id', key.id))
                             this._deleteKey(key.id);
                     }, this);
@@ -269,7 +269,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             _addKey: function(key) {
                 Ember.run(this, function() {
                     if (this.keyExists(key.id)) return;
-                    this.content.addObject(Key.create(key));
+                    this.model.addObject(Key.create(key));
                     this.trigger('onKeyAdd');
                 });
             },
@@ -277,7 +277,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             _deleteKey: function(keyId) {
                 Ember.run(this, function() {
-                    this.content.removeObject(this.getKey(keyId));
+                    this.model.removeObject(this.getKey(keyId));
                     this.trigger('onKeyDelete');
                 });
             },
@@ -294,7 +294,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             _setDefaultKey: function(keyId) {
                 Ember.run(this, function() {
-                    this.content.forEach(function (key) {
+                    this.model.forEach(function (key) {
                         key.set('isDefault', key.id == keyId);
                     });
                     this.trigger('onDefaultKeySet');
@@ -334,7 +334,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             _updateSelectedKeys: function() {
                 Ember.run(this, function() {
                     var newSelectedKeys = [];
-                    this.content.forEach(function(key) {
+                    this.model.forEach(function(key) {
                         if (key.selected) newSelectedKeys.push(key);
                     });
                     this.set('selectedKeys', newSelectedKeys);
@@ -352,7 +352,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             selectedKeysObserver: function() {
                 Ember.run.once(this, '_updateSelectedKeys');
-            }.observes('content.@each.selected')
+            }.observes('model.@each.selected')
         });
     }
 );

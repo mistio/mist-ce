@@ -45,7 +45,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             isOpen: null,
-            content: [],
+            model: [],
             resizeLock: null,
             pendingRequests: [],
             fetchingStats: null,
@@ -92,7 +92,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
                 this.setProperties({
                     'isOpen': true,
-                    'content': args.graphs,
+                    'model': args.graphs,
                 });
 
                 forIn(this, args.config, function (value, property) {
@@ -116,7 +116,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
 
 
             getGraph: function(id) {
-                return this.content.findBy('id', id);
+                return this.model.findBy('id', id);
             },
 
 
@@ -135,7 +135,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             _clear: function () {
                 this.setProperties({
                     'isOpen': false,
-                    'content': [],
+                    'model': [],
                 });
                 this.get('config').setProperties({
                     canModify: true,
@@ -180,7 +180,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             _generateRequests: function (args) {
                 var requests = [];
                 var offset = this.config.measurementOffset;
-                this.get('content').forEach(function (graph) {
+                this.get('model').forEach(function (graph) {
                     graph.datasources.forEach(function (datasource) {
                         var newRequest = StatsRequest.create({
                             from: args.from - offset,
@@ -321,7 +321,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             _fetchStatsEnded: function (response) {
                 var that=this;
                 Ember.run.next(this, function () {
-                    this.get('content').forEach(function (graph) {
+                    this.get('model').forEach(function (graph) {
                         graph.view.draw(that.stream.isStreaming && that.stream.newTimeWindow);
                     });
                     this.set('fetchingStats', false);
@@ -340,8 +340,8 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 // displayed datapoints. Used after closing a streaming
                 // session.
 
-                if (!this.get('content').length) return;
-                var datasource = this.get('content')[0].datasources[0];
+                if (!this.get('model').length) return;
+                var datasource = this.get('model')[0].datasources[0];
 
                 this.set('fetchStatsArgs', {
                     from: datasource.getFirstTimestamp() || (Date.now() - this.config.timeWindow),

@@ -10,7 +10,7 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
         return App.HomeView = PageView.extend({
 
-
+            templateName: 'home',
             hasIncidents: function () {
                 if (Mist.openIncidents)
                     return !!Mist.openIncidents.length;
@@ -25,6 +25,7 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
 
             load: function () {
+                warn('load home view');
                 Ember.run.next(this, function () {
                     this.checkedMonitoringObserver();
                 });
@@ -96,7 +97,7 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
                 if (Mist.graphsController.isOpen) {
                     var listChanged = false;
-                    var existingDatasources = Mist.graphsController.content[0].datasources;
+                    var existingDatasources = Mist.graphsController.model[0].datasources;
                     datasources.some(function (datasource) {
                         var exists = existingDatasources.findBy('id', datasource.id);
                         if (!exists) {

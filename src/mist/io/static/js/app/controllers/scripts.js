@@ -10,7 +10,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
 
         return BaseArrayController.extend({
 
-            model: ScriptModel,
+            baseModel: ScriptModel,
 
             addScript: function (args) {
 

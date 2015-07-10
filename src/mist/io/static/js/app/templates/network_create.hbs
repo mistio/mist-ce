@@ -40,7 +40,7 @@
 
                 <ul data-role="listview" data-theme="a">
 
-                    {{#each Mist.backendsController.content}}
+                    {{#each Mist.backendsController.model}}
                         {{#if this.enabled}}
                             {{#if this.isOpenStack}}
                                 <li data-icon="false">

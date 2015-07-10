@@ -41,10 +41,10 @@ define('app/controllers/base_array', ['ember'],
             //
 
 
-            setContent: function (content) {
-                content = !!content ? content : [];
-                this._passOnProperties(content);
-                this._updateContent(content);
+            setModel: function (model) {
+                model = !!model ? model : [];
+                this._passOnProperties(model);
+                this._updateModel(model);
                 this.set('loading', false);
             },
 
@@ -66,23 +66,23 @@ define('app/controllers/base_array', ['ember'],
             //
 
 
-            _passOnProperties: function (content) {
+            _passOnProperties: function (model) {
                 this.get('passOnProperties').forEach(function (property) {
-                    content.setEach(property, this.get(property));
+                    model.setEach(property, this.get(property));
                 }, this);
             },
 
 
-            _updateContent: function (content) {
+            _updateModel: function (model) {
                 Ember.run(this, function () {
                     // Remove deleted objects
                     this.forEach(function (object) {
-                        if (!content.findBy('id', object.id))
+                        if (!model.findBy('id', object.id))
                             this._deleteObject(object);
                     }, this);
 
                     // Update existing objects or add new ones
-                    content.forEach(function (object) {
+                    model.forEach(function (object) {
                         if (this.objectExists(object.id)) {
                             this._updateObject(object);
                         } else {
@@ -100,7 +100,7 @@ define('app/controllers/base_array', ['ember'],
             _addObject: function (object) {
                 Ember.run(this, function () {
                     if (!this.objectExists(object.id)) {
-                        var newObject = this.get('model').create(object);
+                        var newObject = this.get('baseModel').create(object);
                         this.pushObject(newObject);
                         this.trigger('onAdd', {
                             object: newObject

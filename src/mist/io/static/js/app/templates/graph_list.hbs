@@ -15,7 +15,7 @@
     -->
 
     <div id="graphs">
-        {{#each Mist.graphsController.content}}
+        {{#each Mist.graphsController.model}}
             {{view "graphListItem"
                 graphBinding="this"
                 actionProxyBinding="view.actionProxy"}}

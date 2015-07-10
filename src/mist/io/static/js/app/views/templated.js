@@ -21,7 +21,9 @@ define('app/views/templated', ['ember'],
             init: function () {
 
                 this._super();
-                this.set('template', this.templateForName(this.getName()));
+                //var templateName = this.__proto__._debugContainerKey.split(':')[1].toUnderscore();
+                //warn(templateName);
+                //this.set('templateName', this.templateForName(this.getName()));
             }
         });
     }

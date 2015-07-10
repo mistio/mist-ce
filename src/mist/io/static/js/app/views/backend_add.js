@@ -80,7 +80,7 @@ define('app/views/backend_add', ['app/views/panel'],
                 if (!fields.findBy('type', 'region'))
                     return;
 
-                Mist.backendsController.content.some(function (backend) {
+                Mist.backendsController.model.some(function (backend) {
 
                     // backend.provider == provider.provider won't work
                     // because we still save backends in the database using

@@ -278,7 +278,7 @@ define('app/views/machine_monitoring',
                                 machine,
                                 function (success) {
                                     if (success)
-                                        Mist.graphsController.content.removeObject(graph);
+                                        Mist.graphsController.model.removeObject(graph);
                                 }
                             );
                         else

@@ -22,7 +22,7 @@ define('app/controllers/networks', [
 
 
 			backend: null,
-			model: NetworkModel,
+			baseModel: NetworkModel,
 			passOnProperties: ['backend'],
 
 

@@ -126,7 +126,7 @@ define('app/controllers/image_search', ['ember'],
 
                 var that = this;
                 var searchingBackends = [];
-                Mist.backendsController.content.forEach(function(backend, index) {
+                Mist.backendsController.model.forEach(function(backend, index) {
 
                     if (!backend.enabled)
                         return;

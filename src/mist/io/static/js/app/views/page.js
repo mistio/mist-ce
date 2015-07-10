@@ -8,7 +8,7 @@ define('app/views/page', ['app/views/templated'],
 
         'use strict';
 
-        return TemplatedView.extend({
+        return Ember.View.extend({
 
 
             //

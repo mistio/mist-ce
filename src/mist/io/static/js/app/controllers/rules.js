@@ -21,7 +21,7 @@ define('app/controllers/rules',
             //
             //
 
-            model: RuleModel,
+            baseModel: RuleModel,
             creationPending: false,
 
             aggregateList: [{
@@ -58,12 +58,12 @@ define('app/controllers/rules',
             //
 
 
-            setContent: function (content) {
-                var contentToArray = [];
-                forIn(content, function (rule) {
-                    contentToArray.push(rule);
+            setModel: function (model) {
+                var modelToArray = [];
+                forIn(model, function (rule) {
+                    modelToArray.push(rule);
                 });
-                this._super(contentToArray);
+                this._super(modelToArray);
             },
 
 

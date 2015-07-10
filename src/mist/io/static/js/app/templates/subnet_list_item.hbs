@@ -33,41 +33,41 @@
     {{#if this.gateway_ip}}
     <tr>
         <td>Gateway IP</td>
-        <td>{{unbound this.gateway_ip}}
-        </tr>
-        {{/if}}
-        {{#if this.dns_nameservers.length}}
-        <tr>
-            <td>DNS Nameservers</td>
-            <td>
-                {{#each this.dns_nameservers}}
-                <div class="ip">{{unbound this}}</div>
-                {{/each}}
-            </td>
-        </tr>
-        {{/if}}
-        {{#if allocation_pools.length}}
-        <tr>
-            <td>Allocation pools</td>
-            <td>
-                {{#each this.allocation_pools}}
-                <div class="ip">{{unbound this.start}}</div> -
-                <div class="ip">{{unbound this.end}}</div>
-                {{/each}}
-            </td>
-        </tr>
-        {{/if}}
+        <td>{{unbound this.gateway_ip}}</td>
+    </tr>
+    {{/if}}
+    {{#if this.dns_nameservers.length}}
+    <tr>
+        <td>DNS Nameservers</td>
+        <td>
+            {{#each this.dns_nameservers}}
+            <div class="ip">{{unbound this}}</div>
+            {{/each}}
+        </td>
+    </tr>
+    {{/if}}
+    {{#if allocation_pools.length}}
+    <tr>
+        <td>Allocation pools</td>
+        <td>
+            {{#each this.allocation_pools}}
+            <div class="ip">{{unbound this.start}}</div> -
+            <div class="ip">{{unbound this.end}}</div>
+            {{/each}}
+        </td>
+    </tr>
+    {{/if}}
 
-        {{#if ipAddresses}}
-        <tr>
-            <td class="usable-ips" colspan="2">
-                <h4>Usable ip addresses ({{ipAddresses.length}})</h4>
-                <table>
-                    <tbody>
-                    {{#each ipAddresses}}
-                        {{view "ipAddressListItem" model=this}}
-                    {{/each}}
-                    </tbody>
+    {{#if ipAddresses}}
+    <tr>
+        <td class="usable-ips" colspan="2">
+            <h4>Usable ip addresses ({{ipAddresses.length}})</h4>
+            <table>
+                <tbody>
+                {{#each ipAddresses}}
+                    {{view "ipAddressListItem" model=this}}
+                {{/each}}
+                </tbody>
             </table>
         </td>
     </tr>

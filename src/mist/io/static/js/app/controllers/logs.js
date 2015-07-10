@@ -18,7 +18,7 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
             //
 
 
-            content: [],
+            model: [],
             loading: null,
 
 
@@ -36,37 +36,37 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
             },
 
 
-            _setContent: function (logs) {
+            _setModel: function (logs) {
                 Ember.run(this, function () {
-                    var newContent = [];
+                    var newModel = [];
                     logs.forEach(function (log) {
-                        newContent.push(Log.create(log));
+                        newModel.push(Log.create(log));
                     });
-                    this.set('content', newContent);
+                    this.set('model', newModel);
                     this.trigger('onLogListChange');
                 });
             },
 
 
-            _prependContent: function (logs) {
+            _prependModel: function (logs) {
                 Ember.run(this, function () {
-                    var additionalContent = [];
+                    var additionalModel = [];
                     logs.forEach(function (log) {
-                        additionalContent.push(Log.create(log));
+                        additionalModel.push(Log.create(log));
                     });
-                    this.get('content').unshiftObjects(additionalContent);
+                    this.get('model').unshiftObjects(additionalModel);
                     this.trigger('onLogListChange');
                 });
             },
 
 
-            _appendContent: function (logs) {
+            _appendModel: function (logs) {
                 Ember.run(this, function () {
-                    var additionalContent = [];
+                    var additionalModel = [];
                     logs.forEach(function (log) {
-                        additionalContent.push(Log.create(log));
+                        additionalModel.push(Log.create(log));
                     });
-                    this.get('content').pushObjects(additionalContent);
+                    this.get('model').pushObjects(additionalModel);
                     this.trigger('onLogListChange');
                 });
             }

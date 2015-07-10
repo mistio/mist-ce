@@ -98,11 +98,11 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 Ember.run(this, function () {
 
                     // Add controllers
-                    this.sizes = SizesController.create({backend: this, content: []});
-                    this.images = ImagesController.create({backend: this, content: []});
-                    this.machines = MachinesController.create({backend: this, content: []});
-                    this.locations = LocationsController.create({backend: this, content: []});
-                    this.networks = NetworksController.create({backend: this, content: []});
+                    this.sizes = SizesController.create({backend: this, model: []});
+                    this.images = ImagesController.create({backend: this, model: []});
+                    this.machines = MachinesController.create({backend: this, model: []});
+                    this.locations = LocationsController.create({backend: this, model: []});
+                    this.networks = NetworksController.create({backend: this, model: []});
 
                     // Add events
                     this.sizes.on('onSizeListChange', this, '_updateSizeCount');
@@ -208,7 +208,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             _updateSizeCount: function () {
                 Ember.run(this, function () {
-                    this.set('sizeCount', this.sizes.content.length);
+                    this.set('sizeCount', this.sizes.model.length);
                     this.trigger('onSizeListChange');
                 });
             },
@@ -224,7 +224,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             _updateMachineCount: function () {
                 Ember.run(this, function () {
-                    this.set('machineCount', this.machines.content.length);
+                    this.set('machineCount', this.machines.model.length);
                     this.trigger('onMachineListChange');
                     Mist.backendsController.trigger('onMachineListChange');
                 });
@@ -233,7 +233,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             _updateLocationCount: function () {
                 Ember.run(this, function () {
-                    this.set('locationCount', this.locations.content.length);
+                    this.set('locationCount', this.locations.model.length);
                     this.trigger('onLocationListChange');
                 });
             },
@@ -241,7 +241,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
 
             _updateNetworkCount: function () {
                 Ember.run(this, function () {
-                    this.set('networkCount', this.networks.content.length);
+                    this.set('networkCount', this.networks.model.length);
                     this.trigger('onNetworkListChange');
                 });
             },

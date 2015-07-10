@@ -59,7 +59,7 @@
         data-transition="flip">
 
         <ul data-role="listview">
-            {{#each view.network.backend.machines.content}}
+            {{#each view.network.backend.machines.model}}
             <li data-icon="false">
                 <a {{action "assignMachine" this target="view"}}>
                     {{this.name}}

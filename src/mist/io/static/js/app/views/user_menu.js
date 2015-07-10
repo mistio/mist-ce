@@ -13,7 +13,7 @@ define('app/views/user_menu', ['app/views/templated', 'md5'],
             /**
              *  Properties
              */
-
+            templateName: 'user_menu',
             isNotCore: !IS_CORE,
             accountUrl: URL_PREFIX + '/account',
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +

@@ -28,7 +28,7 @@
                 data-inset="true"
                 data-filter-placeholder="Filter Scripts..."
                 class="checkbox-list">
-                {{#each Mist.scriptsController}}
+                {{#each Mist.scriptsController.model}}
                     {{view "scriptListItem" model="this" scriptBinding="this" class="checkbox-link"}}
                 {{/each}}
             </ul>
@@ -63,5 +63,6 @@
                 <a class="ui-btn ui-btn-icon-left ui-icon-delete"
                     {{action "deleteClicked" target="view"}}>Delete</a>
             </div>
+        </div>
     </div>
 </div>

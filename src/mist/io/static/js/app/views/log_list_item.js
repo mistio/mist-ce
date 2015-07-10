@@ -17,7 +17,7 @@ define('app/views/log_list_item', ['app/views/list_item'],
             //
             //
 
-
+            templateName: 'log_list_item',
             log: null,
             tagName: 'li',
             isCollapsed: true,

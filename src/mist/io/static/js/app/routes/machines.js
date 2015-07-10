@@ -14,7 +14,7 @@ define('app/routes/machines', ['app/routes/base'],
 
             exit: function() {
                 Mist.backendsController.forEach(function(backend) {
-                    backend.machines.content.setEach('selected', false);
+                    backend.machines.model.setEach('selected', false);
                 });
             }
         });

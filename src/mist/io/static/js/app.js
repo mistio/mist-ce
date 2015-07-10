@@ -17,11 +17,13 @@ require.config({
     waitSeconds: 200,
     paths: {
         text: 'lib/require/text',
-        ember: 'lib/ember-1.6.0.min',
+        ember: 'lib/ember-1.8.1',
+//        ember: 'lib/ember.debug',
         common: 'lib/common',
         jquery: 'lib/jquery-2.1.1.min',
         jqm: 'lib/jquery.mobile-1.4.5.min',
         handlebars: 'lib/handlebars-1.3.0.min',
+//        htmlbars: 'lib/ember-template-compiler',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         socket: 'lib/sockjs.min',
@@ -190,6 +192,7 @@ var loadFiles = function (callback) {
         'app/routes/script',
         'app/routes/scripts',
 
+        'app/views/home',
         'app/views/backend_add',
         'app/views/backend_button',
         'app/views/backend_edit',
@@ -200,7 +203,6 @@ var loadFiles = function (callback) {
         'app/views/graph_list_bar',
         'app/views/graph_list_control',
         'app/views/graph_list_item',
-        'app/views/home',
         'app/views/image_list_item',
         'app/views/image_list',
         'app/views/ip_address_list_item',
@@ -282,7 +284,8 @@ var loadApp = function (
     ScriptAddController,
     ScriptEditController,
     ScriptRunController,
-    ScriptsController) {
+    ScriptsController,
+    HomeView) {
 
     // Hide error boxes on page unload
     window.onbeforeunload = function() {
@@ -364,6 +367,13 @@ var loadApp = function (
     App.set('scriptRunController', ScriptRunController.create());
     App.set('scriptEditController', ScriptEditController.create());
 
+    warn('setting views');
+    App.__container__.register('view:home', App.HomeView , { singleton: true });
+    App.__container__.register('view:userMenu', App.UserMenuView);
+    App.__container__.register('view:backendButton', App.BackendButtonView);
+    App.__container__.register('view:graphList', App.GraphListView);
+    App.__container__.register('view:logList', App.LogListView);
+    App.__container__.lookup('view:home').append();
     // Ember custom widgets
     App.Select = Ember.Select.extend({
         attributeBindings: [
@@ -593,7 +603,7 @@ var setupMainChannel = function(socket, callback) {
         //  It should be converted into a "list_scripts" socket handler
         //  as soon as the backend supports it
         Mist.ajax.GET('/scripts').success(function (scripts) {
-            Mist.scriptsController.setContent(scripts);
+            Mist.scriptsController.setModel(scripts);
         });
     }
 
@@ -609,12 +619,12 @@ var setupMainChannel = function(socket, callback) {
     .on('list_sizes', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.sizes.setContent(data.sizes);
+            backend.sizes.setModel(data.sizes);
     })
     .on('list_images', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.images.setContent(data.images);
+            backend.images.setModel(data.images);
     })
     .on('list_machines', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
@@ -624,12 +634,12 @@ var setupMainChannel = function(socket, callback) {
     .on('list_locations', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.locations.setContent(data.locations);
+            backend.locations.setModel(data.locations);
     })
     .on('list_networks', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
-            backend.networks.setContent(data.networks);
+            backend.networks.setModel(data.networks);
     })
     .on('monitoring',function (data){
         Mist.monitoringController._updateMonitoringData(data);

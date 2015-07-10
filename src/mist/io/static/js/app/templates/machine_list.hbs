@@ -31,9 +31,9 @@
             data-filter-placeholder="Filter..."
             data-theme="c"
             class="checkbox-list">
-            {{#each Mist.backendsController.content}}
+            {{#each Mist.backendsController.model}}
                 {{#if this.enabled}}
-                    {{#each this.machines.content}}
+                    {{#each this.machines.model}}
                         {{view "machineListItem"
                             machineBinding="this"
                             class="checkbox-link"}}
@@ -64,7 +64,7 @@
             <li data-icon="false">
                 <a {{action "selectionModeClicked" "none" target="view"}}>None</a>
             </li>
-            {{#each Mist.backendsController.content}}
+            {{#each Mist.backendsController.model}}
                 {{#if this.enabled}}
                     <li data-icon="false">
                         <a {{action "selectionModeClicked" this.title target="view"}}>

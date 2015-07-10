@@ -12,7 +12,7 @@ define('app/controllers/machines', ['app/models/machine'],
              */
 
 
-            content: [],
+            model: [],
             loading: null,
             backend: null,
             failCounter: null,
@@ -35,13 +35,13 @@ define('app/controllers/machines', ['app/models/machine'],
 
             init: function () {
                 this._super();
-                this.set('content', []);
+                this.set('model', []);
                 this.set('loadint', true);
             },
 
 
             load: function (machines) {
-                this._updateContent(machines);
+                this._updateModel(machines);
                 this.set('loading', false);
             },
 
@@ -75,7 +75,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
                 // Construct array of network ids for openstack
                 var networks = [];
-                this.backend.networks.content.forEach(function (network) {
+                this.backend.networks.model.forEach(function (network) {
                     if (network.selected)
                         networks.push(network.id);
                 });
@@ -139,7 +139,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     else
                         dummyMachine.set('pendingCreation', false);
                 }).error(function (message) {
-                    that.content.removeObject(that.content.findBy('name', name));
+                    that.model.removeObject(that.model.findBy('name', name));
                     Mist.notificationController.timeNotify('Failed to create machine: ' + message, 5000);
                 }).complete(function (success, machine) {
                     that.set('addingMachine', false);
@@ -235,7 +235,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             getMachine: function(machineId) {
-                return this.content.findBy('id', machineId);
+                return this.model.findBy('id', machineId);
             },
 
 
@@ -251,13 +251,13 @@ define('app/controllers/machines', ['app/models/machine'],
              */
 
 
-            _updateContent: function(machines) {
+            _updateModel: function(machines) {
                 var that = this;
                 Ember.run(function() {
 
                     // Replace dummy machines (newly created)
 
-                    var dummyMachines = that.content.filterBy('id', -1);
+                    var dummyMachines = that.model.filterBy('id', -1);
 
                     dummyMachines.forEach(function(machine) {
                         var realMachine = machines.findBy('name', machine.name);
@@ -268,13 +268,13 @@ define('app/controllers/machines', ['app/models/machine'],
 
                     // Remove deleted machines
 
-                    that.content.forEach(function(machine) {
+                    that.model.forEach(function(machine) {
                         if (!machines.findBy('id', machine.id))
                             if (machine.id != -1)
-                                that.content.removeObject(machine);
+                                that.model.removeObject(machine);
                     });
 
-                    // Update content
+                    // Update model
 
                     machines.forEach(function(machine) {
                         if (that.machineExists(machine.id)) {
@@ -297,7 +297,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
                             // Add new machine
                             machine.backend = that.backend;
-                            that.content.pushObject(Machine.create(machine));
+                            that.model.pushObject(Machine.create(machine));
                         }
                     });
 
@@ -313,8 +313,8 @@ define('app/controllers/machines', ['app/models/machine'],
                     machine = Machine.create(machine);
                     if (machine.state == 'stopped')
                         machine.set('state', 'pending');
-                    this.content.addObject(machine);
-                    this.content.removeObject(dummyMachine);
+                    this.model.addObject(machine);
+                    this.model.removeObject(dummyMachine);
                     if (key && key.id)
                         Mist.keysController._associateKey(key.id, machine);
                     this.trigger('onMachineListChange');
@@ -325,7 +325,7 @@ define('app/controllers/machines', ['app/models/machine'],
             _updateSelectedMachines: function() {
                 Ember.run(this, function() {
                     var newSelectedMachines = [];
-                    this.content.forEach(function(machine) {
+                    this.model.forEach(function(machine) {
                         if (machine.selected) newSelectedMachines.push(machine);
                     });
                     this.set('selectedMachines', newSelectedMachines);
@@ -376,7 +376,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
             selectedMachinesObserver: function() {
                 Ember.run.once(this, '_updateSelectedMachines');
-            }.observes('content.@each.selected')
+            }.observes('model.@each.selected')
         });
     }
 );
