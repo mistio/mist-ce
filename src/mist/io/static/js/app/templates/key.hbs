@@ -24,13 +24,13 @@
         </div>
     </div>
 
-    <div class="ui-shadow" data-role="content" data-theme="a">
+    <div data-role="content" data-theme="a">
 
         {{#if Mist.keysController.loading}}
         <div class="ajax-loader"></div>
         {{/if}}
 
-         <div data-role="collapsible" data-collapsed="false">
+         <div class="ui-shadow" data-role="collapsible" data-collapsed="false">
             <h4>Public Key
                 {{#if Mist.keysController.gettingPublicKey}}
                 <div class="ajax-loader"></div>
