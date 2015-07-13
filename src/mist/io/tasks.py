@@ -583,7 +583,7 @@ class ListMachines(UserTask):
     result_expires = 60 * 60 * 24
     result_fresh = 10
     polling = True
-    soft_time_limit = 30
+    soft_time_limit = 60
 
     def execute(self, email, backend_id):
         log.warn('Running list machines for user %s backend %s' % (email, backend_id))
@@ -626,7 +626,7 @@ class ProbeSSH(UserTask):
     result_expires = 60 * 60 * 2
     result_fresh = 60 * 2
     polling = True
-    soft_time_limit = 30
+    soft_time_limit = 60
 
     def execute(self, email, backend_id, machine_id, host):
         user = user_from_email(email)
