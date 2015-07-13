@@ -220,7 +220,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                     enable_monitoring(user, backend_id, node.id,
                         name=node.name, dns_name=node.extra.get('dns_name',''),
                         public_ips=ips, no_ssh=False, dry=False, job_id=job_id,
-                        plugins=plugins, async_deploy=False,
+                        plugins=plugins, deploy_async=False,
                     )
                 except Exception as e:
                     print repr(e)
@@ -703,7 +703,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                          post_script_id='', post_script_params='',
                          quantity=1, persist=False, job_id=None,
                          docker_port_bindings={}, docker_exposed_ports={},
-                         hostname='', plugins=None):
+                         azure_port_bindings='', hostname='', plugins=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -737,7 +737,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
              docker_command, 22, script_id, script_params, job_id),
             {'hostname': hostname, 'plugins': plugins,
              'post_script_id': post_script_id,
-             'post_script_params': post_script_params}
+             'post_script_params': post_script_params,
+             'azure_port_bindings': azure_port_bindings}
         ))
 
     def create_machine_wrapper(args_kwargs):
