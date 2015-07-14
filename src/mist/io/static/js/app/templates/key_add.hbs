@@ -40,14 +40,14 @@
 
             <!-- Key Name Field -->
 
-            <label for="key-add-id">Name:</label>
+            <label for="key-add-id">Name</label>
 
             {{view Mist.TextField id="key-add-id"
                    valueBinding="Mist.keyAddController.keyId"}}
 
             <!-- Key Private Field -->
 
-            <label for="key-add-private">Private Key:
+            <label for="key-add-private">Private Key
                 {{#if Mist.keyAddController.generatingKey}}
                     <div class="ajax-loader key-add-loader"></div>
                 {{else}} {{#if Mist.keyAddController.uploadingKey}}
@@ -68,21 +68,22 @@
                 data-role="controlgroup"
                 data-type="horizontal">
 
-                <a class="ui-btn ui-btn-icon-left ui-icon-gear"
+                <a class="ui-btn ui-btn-icon-left ui-icon-gear ui-caps"
                     {{action "generateClicked" target="view"}}>
                         Generate
                 </a>
 
-                <a class="ui-btn ui-btn-icon-right ui-icon-arrow-u"
+                <a class="ui-btn ui-btn-icon-right ui-icon-arrow-u ui-caps"
                     {{action "uploadClicked" target="view"}}>
                         Upload
                 </a>
             </div>
 
             <!-- Hidden Input field for uploading ssh keys -->
-
-            <input id="key-add-upload" type="file" name="file"
-                {{action "uploadInputChanged" on="change" target="view"}}/>
+            <div class="ui-screen-hidden">
+                <input id="key-add-upload" type="file" name="file"
+                    {{action "uploadInputChanged" on="change" target="view"}}/>
+            </div>
 
             {{#if Mist.keyAddController.addingKey}}
                 <div class="ajax-loader"></div>

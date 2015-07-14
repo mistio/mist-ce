@@ -329,6 +329,10 @@ textarea#private-key, #manual-monitoring-popup textarea {
     height: 75px !important;
 }
 
+textarea {
+    background-color: #fff !important;
+}
+
 
 /* Buttons
 -----------------------------------------------------------------------------------------------------------*/
@@ -389,6 +393,15 @@ textarea#private-key, #manual-monitoring-popup textarea {
      */
     width: 325px; /* Useless, but leave it there for reference reasons */
     min-height: 0;
+}
+.side-panel .ui-header {
+    background-color: #A4A39F !important;
+    padding: 0;
+}
+.side-panel .ui-header .ui-title {
+    font-size: 18px;
+    color: #fff;
+    text-shadow: none;
 }
 .side-panel .ui-panel-inner {
     padding: 0;
@@ -667,6 +680,9 @@ ul.checkbox-list .ui-grid-b {
 #confirmation-popup {
     width: 355px !important;
     max-width: 99%;
+}
+.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
+    border: none;
 }
 .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-first-child {
     color: #d96557;
