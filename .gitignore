@@ -1,8 +1,11 @@
 bin
+cloudpy
 dist
 parts
 develop-eggs
 eggs
+bower_components
+node_modules
 include
 /lib
 var
