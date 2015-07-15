@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 		},
 		symlink: {
   			jquery: {
-    			target: '../bower_components/jquery/dist',
+    			target: '../bower_components/jquery/dist/',
     			link: 'dist/jquery',
 				type: 'dir',
 				options: {
