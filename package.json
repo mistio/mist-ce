@@ -11,6 +11,7 @@
     "grunt-cli": "^0.1.13",
     "grunt-contrib-requirejs": "^0.4.4",
     "grunt-ember-templates": "^0.5.0",
+    "grunt-symbolic-link": "^0.3.1",
     "handlebars": "^2.0.0"
   },
   "devDependencies": {},

@@ -16,20 +16,18 @@ require.config({
     baseUrl: 'resources/js/',
     waitSeconds: 200,
     paths: {
-        text: 'lib/require/text',
-//        ember: 'lib/ember-1.8.1',
-        ember: 'lib/ember.debug',
-        common: 'lib/common',
-        jquery: 'lib/jquery-2.1.1.min',
-        jqm: 'lib/jquery.mobile-1.4.5.min',
-//        handlebars: 'lib/handlebars-1.3.0.min',
-        htmlbars: 'lib/ember-template-compiler',
-        md5: 'lib/md5',
-        d3: 'lib/d3.min',
-        socket: 'lib/sockjs.min',
-        multiplex: 'lib/multiplex',
-        c3: 'lib/c3.min',
-        term: 'lib/term'
+        jquery: '../dist/jquery/jquery.min',
+        jqm: '../dist/jqm/js/jquery.mobile-1.4.5.min',
+        text: '../dist/requirejs-text/text',
+        ember: '../dist/ember/ember.debug',
+        compiler: '../dist/ember/ember-template-compiler',
+        socket: '../dist/sockjs/sockjs.min',
+        md5: '../dist/md5/build/md5.min',
+        d3: '../dist/d3/d3.min',
+        c3: '../dist/c3/c3.min',
+        term: '../dist/term.js/src/term',
+        common: 'common',
+        multiplex: 'multiplex'
     },
     deps: ['jquery', 'common'],
     callback: function () {
@@ -39,7 +37,7 @@ require.config({
     },
     shim: {
         'ember': {
-            deps: ['jquery', 'htmlbars']
+            deps: ['jquery', 'compiler']
         },
         'd3': {
             deps: ['jquery']
