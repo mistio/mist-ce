@@ -16,6 +16,7 @@ define('app/views/machine_keys', ['app/views/controlled'],
 
 
             selectedKey: null,
+            controllerName: 'machine_keys',
 
 
             //
@@ -95,7 +96,7 @@ define('app/views/machine_keys', ['app/views/controlled'],
                 viewClicked: function () {
                     $('#key-actions-popup').popup('close');
                     Ember.run.later(this, function () {
-                        Mist.Router.router.transitionTo('key', this.selectedKey);
+                        Mist.__container__.lookup('router:main').transitionTo('key', this.selectedKey);
                     }, 250);
                 },
 

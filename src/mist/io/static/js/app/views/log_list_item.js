@@ -139,7 +139,7 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
 
                 userClicked: function (user) {
-                    Mist.Router.router.transitionTo('user',
+                    Mist.__container__.lookup('router:main').transitionTo('user',
                         Mist.usersController.getUser(
                             this.get('log').get('email')
                         )

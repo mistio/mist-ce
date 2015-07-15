@@ -60,7 +60,7 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                         Mist.notificationController.timeNotify(
                             'Machine not found', 2000);
                     else
-                        Mist.Router.router.transitionTo('machine',
+                        Mist.__container__.lookup('router:main').transitionTo('machine',
                             incident.get('machine'));
                 }
             },

@@ -30,7 +30,6 @@ define('app/views/panel', ['app/views/controlled'],
 
             init: function () {
                 this._super();
-                this.set('panelId', this.getWidgetID());
             },
 
 

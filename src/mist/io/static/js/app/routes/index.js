@@ -13,7 +13,6 @@ define('app/routes/index', ['app/routes/base'],
             documentTitle: 'mist.io - home',
             setupController: function (controller) {
                 warn('setup index lookup');
-                this.container.lookup('view:home');
             }
         });
     }

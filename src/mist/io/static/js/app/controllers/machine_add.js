@@ -147,7 +147,7 @@ define('app/controllers/machine_add', ['ember'],
 
                 // Redirect to machine list view if user is in image list view
                 if ($('#image-list-page').length) {
-                    Mist.Router.router.transitionTo('machines');
+                    Mist.__container__.lookup('router:main').transitionTo('machines');
                 }
             },
 

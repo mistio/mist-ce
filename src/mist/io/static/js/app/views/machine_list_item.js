@@ -10,7 +10,7 @@ define('app/views/machine_list_item', ['app/views/list_item'],
             /**
              *  Properties
              */
-
+            templateName: 'machine_list_item',
             machine: null,
 
             /**

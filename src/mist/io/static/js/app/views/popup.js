@@ -30,7 +30,6 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
 
             init: function () {
                 this._super();
-                this.set('popupId', this.getWidgetID());
             },
 
 

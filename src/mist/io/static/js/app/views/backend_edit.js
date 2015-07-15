@@ -10,6 +10,9 @@ define('app/views/backend_edit', ['app/views/popup'],
 
         return App.BackendEditView = PopupView.extend({
 
+            templateName: 'backend_edit',
+            controllerName: 'backendEditController',
+            popupId: '#backend-edit',
 
             //
             //

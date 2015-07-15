@@ -10,7 +10,7 @@ define('app/views/key_list_item', ['app/views/list_item'],
             /**
              *  Properties
              */
-
+            templateName: 'key_list_item',
             key: null,
 
 

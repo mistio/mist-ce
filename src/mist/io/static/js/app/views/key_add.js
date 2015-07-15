@@ -17,6 +17,9 @@ define('app/views/key_add', ['app/views/popup'],
             //
             //
 
+            templateName: 'key_add',
+            controllerName: 'keyAddController',
+            popupId: '#key-add',
 
             addButton: '#key-add-ok',
             fileInput: '#key-add-upload',

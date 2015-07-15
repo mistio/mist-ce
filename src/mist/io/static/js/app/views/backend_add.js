@@ -10,6 +10,9 @@ define('app/views/backend_add', ['app/views/panel'],
 
         return App.BackendAddView = PanelView.extend({
 
+            templateName: 'backend_add',
+            controllerName: 'backendAddController',
+            panelId: '#backend-add',
 
             selectedRegion: null,
             helpHref: '',

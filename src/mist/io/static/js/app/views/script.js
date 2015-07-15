@@ -117,7 +117,7 @@ define('app/views/script', ['app/views/page'],
                                 script: script,
                                 callback: function (success) {
                                     if (!success) return;
-                                    Mist.Router.router.transitionTo('scripts');
+                                    Mist.__container__.lookup('router:main').transitionTo('scripts');
                                 }
                             })
                         }

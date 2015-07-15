@@ -7,7 +7,7 @@ define('app/views/machine_list', ['app/views/page'],
     function (PageView) {
         return App.MachineListView = PageView.extend({
 
-
+            templateName: 'machine_list',
             selectedMachine: null,
 
             /**

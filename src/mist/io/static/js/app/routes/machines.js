@@ -11,7 +11,9 @@ define('app/routes/machines', ['app/routes/base'],
         return App.MachinesRoute = BaseRoute.extend({
 
             documentTitle: 'mist.io - machines',
-
+            setupController: function (controller) {
+                warn('machines');
+            },
             exit: function() {
                 Mist.backendsController.forEach(function(backend) {
                     backend.machines.model.setEach('selected', false);

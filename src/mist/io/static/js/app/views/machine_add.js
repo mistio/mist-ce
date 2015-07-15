@@ -1,11 +1,14 @@
-define('app/views/machine_add', ['app/views/templated'],
+define('app/views/machine_add', ['app/views/controlled'],
     /**
      *  Machine Add View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
-        return App.MachineAddView = TemplatedView.extend({
+    function (ControlledView) {
+        return App.MachineAddView = ControlledView.extend({
+
+            templateName: 'machine_add',
+            controllerName: 'machineAddController',
 
             /**
              *  Properties
@@ -67,10 +70,6 @@ define('app/views/machine_add', ['app/views/templated'],
                 Mist.scriptsController.on('onChange', this, 'renderFields');
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
                 Mist.backendsController.on('onImagesChange', this, 'renderFields');
-
-                // Connect view with machineAddController
-                var viewId = $('#create-machine-panel').parent().attr('id');
-                Mist.machineAddController.set('view', Ember.View.views[viewId]);
 
              }.on('didInsertElement'),
 

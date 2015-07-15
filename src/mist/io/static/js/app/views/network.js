@@ -103,7 +103,7 @@ define('app/views/network', ['app/views/page'],
                             if (didConfirm) {
                                 that.network.backend.networks.deleteNetwork(networkId, function (success) {
                                     if (success)
-                                        Mist.Router.router.transitionTo('networks');
+                                    Mist.__container__.lookup('router:main').transitionTo('networks');
                                 });
                             }
                         }

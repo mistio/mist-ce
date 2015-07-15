@@ -8,6 +8,9 @@ define('app/views/key_edit', ['app/views/templated'],
 
         return App.KeyEditView = TemplatedView.extend({
 
+            templateName: 'key_edit',
+            controllerName: 'keyEditController',
+
             /**
              *
              *  Methods

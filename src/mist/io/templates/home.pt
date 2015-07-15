@@ -81,28 +81,6 @@
         <h1>Failed to get monitoring data</h1>
     </div>
 
-    <!-- Ember Views -->
-    <script type="text/x-handlebars" data-template-name="application">
-        {{outlet}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="index">
-        {{view "home"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="machines">
-        {{view "machineList"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="images">
-        {{view "imageList"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="networks">
-        {{view "networkList"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="keys">
-        {{view "keyList"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="scripts">
-        {{view "scriptList"}}
-    </script>
 </body>
 
 </html>

@@ -7,6 +7,8 @@ define('app/views/key_list', ['app/views/page'],
     function (PageView) {
         return App.KeyListView = PageView.extend({
 
+            templateName: 'key_list',
+
             /**
              *
              *  Initialization
@@ -19,6 +21,8 @@ define('app/views/key_list', ['app/views/page'],
                 Mist.keysController.on('onSelectedKeysChange', this, 'updateFooter');
 
                 this.updateFooter();
+                warn('key list load');
+                warn(this);
 
             }.on('didInsertElement'),
 

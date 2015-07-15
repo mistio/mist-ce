@@ -11,6 +11,10 @@ define('app/views/dialog', ['app/views/popup'],
         return App.DialogView = PopupView.extend({
 
 
+            templateName: 'dialog',
+            controllerName: 'dialogController',
+            popupId: "#dialog",
+
             //
             //
             //  Computed Properties

@@ -10,6 +10,7 @@ define('app/views/image_list', ['app/views/page'],
 
         return App.ImageListView = PageView.extend({
 
+            templateName: 'image_list',
 
             //
             //

@@ -10,7 +10,7 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
             /**
              *  Properties
              */
-
+            templateName: 'key',
             key: null,
             machines: [],
 
@@ -149,7 +149,7 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
                     var key = this.key;
                     Mist.keyEditController.open(key.id, function (success) {
                         if (success) {
-                            Mist.Router.router.transitionTo('key', key);
+                            Mist.__container__.lookup('router:main').transitionTo('key', Mist.keyEditController.newKeyId);
                         }
                     });
                 },
@@ -172,7 +172,7 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
                             if (didConfirm) {
                                 Mist.keysController.deleteKey(keyId, function (success) {
                                     if (success)
-                                        Mist.Router.router.transitionTo('keys');
+                                    Mist.__container__.lookup('router:main').transitionTo('keys');
                                 });
                             }
                         }

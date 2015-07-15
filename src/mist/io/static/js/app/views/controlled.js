@@ -30,19 +30,33 @@ define('app/views/controlled', ['app/views/templated'],
 
             init: function () {
                 this._super();
-                this.set('controllerName', this.getControllerName());
+                if (!this.get('controllerName')){
+                    this.set('controllerName', this.getControllerName());
+                    warn('setting controller name to ', this.getControllerName());
+                } else
+                    warn(this.get('controllerName'));
+
             },
 
 
             didInsertElement: function () {
                 this._super();
-                Mist.get(this.controllerName).set('view', this);
+                var controller = Mist.get(this.controllerName);
+                if (!controller)
+                    warn('cannot find ', this.controllerName);
+                if (controller) {
+                    warn('setting controller view', this.controllerName);
+                    controller.set('view', this);
+                }
+
             },
 
 
             willDestroyElement: function () {
                 this._super();
-                Mist.get(this.controllerName).set('view', null);
+                var controller = Mist.get(this.controllerName);
+                if (controller)
+                    controller.set('view', null);
             }
         });
     }

@@ -17,13 +17,13 @@ require.config({
     waitSeconds: 200,
     paths: {
         text: 'lib/require/text',
-        ember: 'lib/ember-1.8.1',
-//        ember: 'lib/ember.debug',
+//        ember: 'lib/ember-1.8.1',
+        ember: 'lib/ember.debug',
         common: 'lib/common',
         jquery: 'lib/jquery-2.1.1.min',
         jqm: 'lib/jquery.mobile-1.4.5.min',
-        handlebars: 'lib/handlebars-1.3.0.min',
-//        htmlbars: 'lib/ember-template-compiler',
+//        handlebars: 'lib/handlebars-1.3.0.min',
+        htmlbars: 'lib/ember-template-compiler',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         socket: 'lib/sockjs.min',
@@ -39,7 +39,7 @@ require.config({
     },
     shim: {
         'ember': {
-            deps: ['jquery', 'handlebars']
+            deps: ['jquery', 'htmlbars']
         },
         'd3': {
             deps: ['jquery']
@@ -367,13 +367,7 @@ var loadApp = function (
     App.set('scriptRunController', ScriptRunController.create());
     App.set('scriptEditController', ScriptEditController.create());
 
-    warn('setting views');
-    App.__container__.register('view:home', App.HomeView , { singleton: true });
-    App.__container__.register('view:userMenu', App.UserMenuView);
-    App.__container__.register('view:backendButton', App.BackendButtonView);
-    App.__container__.register('view:graphList', App.GraphListView);
-    App.__container__.register('view:logList', App.LogListView);
-    App.__container__.lookup('view:home').append();
+
     // Ember custom widgets
     App.Select = Ember.Select.extend({
         attributeBindings: [

@@ -27,6 +27,9 @@ define('app/views/script_add', ['app/views/panel'],
             //
             //
 
+            templateName: 'script_add',
+            controllerName: 'scriptAddController',
+            panelId: '#script-add',
 
             scriptTypes: [{
                 label: 'Ansible Playbook',
