@@ -24,8 +24,7 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="/resources/images/favicons/mstile-144x144.png">
     <meta name="theme-color" content="#ffffff">
-    <link rel="stylesheet" media="all" href=""/>
-    <link rel="stylesheet" href="/resources/css/icons.css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="/resources/css/missing.css"/>
 </head>
 
@@ -36,10 +35,30 @@
             <div id="message">
                 <h1>404</h1>
                 <h2>We are sorry, the page you requested<br>cannot be found</h2>
-                <a href="javascript:void(0)"><span class="icon-prev">Back to Mist.io</span></a>
+                <a href="javascript:void(0)" id="back">Back to Mist.io</a>
             </div>
         </div>
     </div>
+    <script>
+        var Missing = {
+            init: function() {
+                document.getElementById('back').onclick = Missing.handler;
+            },
+            hosts: ['localhost', '127.0.0.1'],
+            assignURL: function() {
+                var backURL, currentHostname = window.location.hostname;
+
+                return backURL = Missing.hosts.indexOf(currentHostname) == -1 ? 'https://mist.io' : 'http://127.0.0.1:8000/';
+            },
+            handler: function() {
+                var url = Missing.assignURL();
+                
+                window.location.href = url;
+            }
+        };
+
+        window.onload = Missing.init;
+    </script>
 </body>
 
 </html>
