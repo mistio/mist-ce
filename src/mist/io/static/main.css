@@ -43,6 +43,12 @@
     overflow: visible !important;
 }
 
+#banner-logo {
+    width: 101px;
+    height: auto;
+    margin-top: 7px;
+}
+
 .user-menu {
     height: auto;
     text-align: right;
@@ -116,7 +122,7 @@ h3 {
 .ui-popup-container .ui-header {
     border: none !important;
     background-color: #A4A39F;
-    color: #fff;
+    color: #000;
     text-transform: uppercase;
     padding: 15px 20px;
     text-shadow: 0 0 0 transparent;
@@ -783,7 +789,7 @@ ul.checkbox-list .ui-grid-b {
     border-radius: 2em;
     border-width: 3px;
     border-style: solid;
-    border-color: #64b247;
+    border-color: #fff;
     margin-top: 2px;
     width: 48px;
     height: 48px;
@@ -793,8 +799,10 @@ ul.checkbox-list .ui-grid-b {
     margin-top: 8px;
 }
 
-#me-btn .gravatar-image:hover {
+#me-btn .gravatar-image:hover,
+#me-btn .gravatar-image:active {
     cursor: pointer;
+    border-color: #64b247;
 }
 
 #me-btn .user {
@@ -1043,5 +1051,5 @@ ul.checkbox-list .ui-grid-b {
     background-color: #fff !important;
 }
 .ui-slider .ui-slider-handle {
-  background-color: #46d4c9 !important;
+  background-color: #64b247 !important;
 }

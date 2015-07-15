@@ -57,13 +57,13 @@
 }
 
 .ui-btn-add.ui-collapsible-collapsed  > h4.ui-collapsible-heading a:hover{
-    background-color: #2FBAAF !important;
-    border-color: #2FBAAF !important;
+    background-color: #a2d191 !important;
+    border-color: #a2d191 !important;
 }
 
 .ui-btn-add.ui-collapsible  > h4.ui-collapsible-heading a:active{
-    background-color: #74E9E0 !important;
-    border-color: #74E9E0 !important;
+    background-color: #46862f !important;
+    border-color: #46862f !important;
 }
 
 #home-page .ui-listview {

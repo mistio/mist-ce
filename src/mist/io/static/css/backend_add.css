@@ -1,15 +1,17 @@
 
 /* Backend Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
-#backend-add h4.select-provider a, #backend-add h4 a:hover, #backend-add ul li a:hover{
-    background-color: #46D4C9;
-    border-color: #46D4C9;
+#backend-add h4.select-provider a,
+#backend-add h4 a:hover,
+#backend-add ul li a:hover {
+    background-color: #64b247;
+    border-color: #64b247;
     color: #fff;
-    text-shadow: 0 0 0 #46D4C9;
+    text-shadow: 0 0 0 #64b247;
 }
 
 #backend-add h4, #backend-add ul {
-    border: 1px solid #46D4C9;
+    border: 1px solid #64b247;
 }
 
 #backend-add ul {
@@ -17,8 +19,8 @@
 }
 
 #backend-add h4.select-provider a:hover {
-    background-color: #2FBAAF;
-    border-color: #2FBAAF;
+    background-color: #a2d191;
+    border-color: #a2d191;
 }
 
 #backend-add .ui-content {
@@ -47,7 +49,7 @@
 }
 
 #backend-add .ui-slider .ui-slider-handle {
-    background-color: #46d4c9;
+    background-color: #64b247;
 }
 
 #backend-add-advanced {

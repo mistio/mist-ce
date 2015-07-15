@@ -485,7 +485,7 @@ html .ui-body-b .ui-btn:hover,
 html body .ui-group-theme-b .ui-btn:hover,
 html head + body .ui-btn.ui-btn-b:hover {
 	background-color: #64b247 /*{b-bhover-background-color}*/;
-	border-color: #0e9f94 /*{b-bhover-border}*/;
+	border-color: #307716 /*{b-bhover-border}*/;
 	color: #fff /*{b-bhover-color}*/;
 	text-shadow: none /*{b-bhover-shadow-color}*/;
 }
@@ -495,8 +495,8 @@ html .ui-bar-b .ui-btn:active,
 html .ui-body-b .ui-btn:active,
 html body .ui-group-theme-b .ui-btn:active,
 html head + body .ui-btn.ui-btn-b:active {
-	background-color: #666 /*{b-bdown-background-color}*/;
-	border-color: #555 /*{b-bdown-border}*/;
+	background-color: #46862f /*{b-bdown-background-color}*/;
+	border-color: #307716 /*{b-bdown-border}*/;
 	color: #fff /*{b-bdown-color}*/;
 	text-shadow: 0 /*{b-bdown-shadow-x}*/ 1px /*{b-bdown-shadow-y}*/ 0 /*{b-bdown-shadow-radius}*/ #666 /*{b-bdown-shadow-color}*/;
 }
@@ -812,8 +812,8 @@ html .ui-bar-d .ui-btn:hover,
 html .ui-body-d .ui-btn:hover,
 html body .ui-group-theme-d .ui-btn:hover,
 html head + body .ui-btn.ui-btn-d:hover {
-	background-color: #2fbaaf /*{d-bhover-background-color}*/;
-	border-color: #2fbaaf /*{d-bhover-border}*/;
+	background-color: #a2d191 /*{d-bhover-background-color}*/;
+	border-color: #a2d191 /*{d-bhover-border}*/;
 	color: #fff /*{d-bhover-color}*/;
 	text-shadow: 0 /*{d-bhover-shadow-x}*/ 0px /*{d-bhover-shadow-y}*/ 0 /*{d-bhover-shadow-radius}*/ #2fbaaf /*{d-bhover-shadow-color}*/;
 }
@@ -823,10 +823,10 @@ html .ui-bar-d .ui-btn:active,
 html .ui-body-d .ui-btn:active,
 html body .ui-group-theme-d .ui-btn:active,
 html head + body .ui-btn.ui-btn-d:active {
-	background-color: #74e9e0 /*{d-bdown-background-color}*/;
-	border-color: #74e9e0 /*{d-bdown-border}*/;
+	background-color: #46862f /*{d-bdown-background-color}*/;
+	border-color: #46862f /*{d-bdown-border}*/;
 	color: #fff /*{d-bdown-color}*/;
-	text-shadow: 0 /*{d-bdown-shadow-x}*/ 0px /*{d-bdown-shadow-y}*/ 0 /*{d-bdown-shadow-radius}*/ #74e9e0 /*{d-bdown-shadow-color}*/;
+	text-shadow: 0 /*{d-bdown-shadow-x}*/ 0px /*{d-bdown-shadow-y}*/ 0 /*{d-bdown-shadow-radius}*/ #46862f /*{d-bdown-shadow-color}*/;
 }
 /* Active button */
 .ui-page-theme-d .ui-btn.ui-btn-active,

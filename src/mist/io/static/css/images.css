@@ -54,3 +54,10 @@
     background-color: rgba(0,0,0,0) !important;
     background-repeat: no-repeat !important;
 }
+#image-list a:after {
+    content: '\0056';
+    background-color: transparent;
+    background-image: none;
+    opacity: 1;
+    color: #7F7F7F;
+}

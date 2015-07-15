@@ -48,8 +48,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding-right: 16px;
+    color: #7f7f7f;
 }
 .key-tags {
     float: right;
     margin-top: -8px;
+}
+#key-list a:after {
+    content: '\0056';
+    background-color: transparent;
+    background-image: none;
+    opacity: 1;
+    color: #7F7F7F;
 }

@@ -160,13 +160,13 @@
     font-size: 16px;
 }
 .single-machine-header #mist-manage-keys .ui-btn:hover{
-    background-color: #2FBAAF;
-    border-color: #2FBAAF;
+    background-color: #a2d191;
+    border-color: #a2d191;
 }
 
 .single-machine-header #mist-manage-keys .ui-btn:active{
-    background-color: #74E9E0;
-    border-color: #74E9E0;
+    background-color: #16862f;
+    border-color: #16862f;
 }
 
 .single-machine-header h1 {
