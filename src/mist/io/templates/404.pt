@@ -25,15 +25,18 @@
     <meta name="msapplication-TileImage" content="/resources/images/favicons/mstile-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" media="all" href=""/>
+    <link rel="stylesheet" href="/resources/css/icons.css"/>
     <link rel="stylesheet" href="/resources/css/missing.css"/>
 </head>
 
 <body>
     <div id="splash">
         <div id="container">
-            <a id="logo" href="/"></a>
+            <img src="/resources/images/404.png" alt=""/>
             <div id="message">
-                404. Got lost in the clouds
+                <h1>404</h1>
+                <h2>We are sorry, the page you requested<br>cannot be found</h2>
+                <a href="javascript:void(0)"><span class="icon-prev">Back to Mist.io</span></a>
             </div>
         </div>
     </div>

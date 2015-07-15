@@ -27,11 +27,10 @@
     float: right;
 }
 #single-key-page .ui-collapsible .ui-collapsible-heading a {
-    background-color: #eeedeb;
+    background-color: #d4d4d4;
 }
 #single-key-page .ui-collapsible .ui-collapsible-heading a:hover {
-    border-color: #eeedeb;
-    color: #c1c1c1 !important;
+    border-color: #d4d4d4;
 }
 #single-key-page .ui-collapsible .ui-collapsible-content {
     background-color: #faf9f4;

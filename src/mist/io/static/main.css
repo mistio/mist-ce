@@ -103,7 +103,7 @@ h3 {
 
 .ui-popup .ui-header {
     border: none !important;
-    background-color: #A4A39F;
+    background-color: #d4d4d4;
     color: #fff;
     text-transform: uppercase;
     padding: 15px 20px;
@@ -121,7 +121,7 @@ h3 {
 
 .ui-popup-container .ui-header {
     border: none !important;
-    background-color: #A4A39F;
+    background-color: #d4d4d4;
     color: #000;
     text-transform: uppercase;
     padding: 15px 20px;
@@ -135,7 +135,7 @@ h3 {
 
 .ui-popup-container h1.ui-title{
     font-size: 18px;
-    color: #fff;
+    color: #000;
     text-align: left;
     padding: 0;
 }
@@ -208,7 +208,7 @@ h3 {
     padding-right: 1.75em;
     background: #fff;
     border-radius: 0;
-    color: #A4A39F;
+    color: #d4d4d4;
     text-shadow: none;
     font-size: 14px;
 }
@@ -401,7 +401,7 @@ textarea {
     min-height: 0;
 }
 .side-panel .ui-header {
-    background-color: #A4A39F !important;
+    background-color: #d4d4d4 !important;
     padding: 0;
 }
 .side-panel .ui-header .ui-title {
@@ -424,7 +424,7 @@ textarea {
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
 #machine-list-page .machines-header {
-    background-color: #EEEDEB;
+    background-color: #d4d4d4;
     margin-top: 30px;
 }
 
@@ -465,7 +465,7 @@ textarea {
 #machine-list-page .machines-header,
 #key-list-page .keys-header,
 #image-list-page .images-header {
-    background-color: #EEEDEB;
+    background-color: #d4d4d4;
     margin-top: 30px;
 }
 
@@ -480,7 +480,7 @@ ul.checkbox-list {
     background-color: #fafafa;
 }
 ul.checkbox-list li {
-    border-bottom: 1px solid #EEEDEB;
+    border-bottom: 1px solid #d4d4d4;
     background-color: #FAF9F4;
 }
 ul.checkbox-list li a:focus {
@@ -493,7 +493,7 @@ ul.checkbox-list label {
 }
 ul.checkbox-list li:hover a,
 ul.checkbox-list li:hover label {
-    background-color: #EEEDEB !important;
+    background-color: #d4d4d4 !important;
 }
 ul.checkbox-list li:hover a {
     color: #fff;
