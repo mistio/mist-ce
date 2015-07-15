@@ -14,8 +14,8 @@
 }
 #single-machine-page .ui-header .ui-btn:hover {
     color: #fff !important;
-    background-color: #46d4c9;
-    border-color: #46d4c9;
+    background-color: #64b247;
+    border-color: #64b247;
 }
 #single-machine-page .ui-block-b .ui-title {
     text-align: center;
@@ -29,6 +29,7 @@
 }
 #single-machine-page .ui-collapsible .ui-collapsible-heading a:hover {
     border-color: #eeedeb;
+    color: #C1C1C1 !important;
 }
 #single-machine-page .ui-collapsible .ui-collapsible-content {
     background-color: #faf9f4;
@@ -96,7 +97,6 @@
     width: auto;
     font-size: 12px;
     padding: 6px;
-    margin: ;;
     margin-top: -6px;
     margin-bottom: -5px;
 }
@@ -153,9 +153,9 @@
 }
 
 .single-machine-header #mist-manage-keys .ui-btn {
-    background-color: #46d4c9;
+    background-color: #64b247;
     color: #fff;
-    border-color: #46d4c9;
+    border-color: #64b247;
     padding: 18px 25px 18px 50px !important;
     font-size: 16px;
 }

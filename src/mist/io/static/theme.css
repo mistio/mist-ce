@@ -237,8 +237,8 @@ html body .ui-group-theme-a .ui-bar-inherit {
 .ui-overlay-a,
 .ui-page-theme-a,
 .ui-page-theme-a .ui-panel-wrapper {
-	background-color: #e2e2e2 /*{a-page-background-color}*/;
-	border-color: #e2e2e2 /*{a-page-border}*/;
+	background-color: #e8e8e8 /*{a-page-background-color}*/;
+	border-color: #e8e8e8 /*{a-page-border}*/;
 	color: #000000 /*{a-page-color}*/;
 	text-shadow: none /*{a-page-shadow-color}*/;
 }
@@ -484,7 +484,7 @@ html .ui-bar-b .ui-btn:hover,
 html .ui-body-b .ui-btn:hover,
 html body .ui-group-theme-b .ui-btn:hover,
 html head + body .ui-btn.ui-btn-b:hover {
-	background-color: #46d4c9 /*{b-bhover-background-color}*/;
+	background-color: #64b247 /*{b-bhover-background-color}*/;
 	border-color: #0e9f94 /*{b-bhover-border}*/;
 	color: #fff /*{b-bhover-color}*/;
 	text-shadow: none /*{b-bhover-shadow-color}*/;
@@ -688,9 +688,9 @@ html .ui-bar-c .ui-slider-track .ui-btn-active,
 html .ui-body-c .ui-slider-track .ui-btn-active,
 html body .ui-group-theme-c .ui-slider-track .ui-btn-active,
 html body div.ui-slider-track.ui-body-c .ui-btn-active {
-	background-color: #46d4c9 /*{c-active-background-color}*/;
+	background-color: #64b247 /*{c-active-background-color}*/;
 	border-color: #1c4a70 /*{c-active-border}*/;
-	color: #46d4c9 /*{c-active-color}*/;
+	color: #64b247 /*{c-active-color}*/;
 	text-shadow: 0 /*{c-active-shadow-x}*/ 1px /*{c-active-shadow-y}*/ 0 /*{c-active-shadow-radius}*/ #005599 /*{c-active-shadow-color}*/;
 }
 /* Active radio button icon */
@@ -801,8 +801,8 @@ html .ui-bar-d .ui-btn:visited,
 html .ui-body-d .ui-btn:visited,
 html body .ui-group-theme-d .ui-btn:visited,
 html head + body .ui-btn.ui-btn-d:visited {
-	background-color: #46d4c9 /*{d-bup-background-color}*/;
-	border-color: #46d4c9 /*{d-bup-border}*/;
+	background-color: #64b247 /*{d-bup-background-color}*/;
+	border-color: #64b247 /*{d-bup-border}*/;
 	color: #ffffff /*{d-bup-color}*/;
 	text-shadow: 0 /*{d-bup-shadow-x}*/ 0px /*{d-bup-shadow-y}*/ 0 /*{d-bup-shadow-radius}*/ #46d4c9 /*{d-bup-shadow-color}*/;
 }

@@ -12,7 +12,18 @@
 #machine-list-page #select-machines-btn {
     float: left;
     font-weight: normal;
-    margin: 0;
+    background-color: #fff;
+    color: #A4A390;
+    border-color: #b5b5b5;
+    padding: .4em .75em !important;
+    text-align: left;
+    width: 130px;
+    margin: 11px;
+    font-size: 14px;
+    line-height: 1.6em;
+}
+#machine-list-page #select-machines-btn:hover {
+    color: #A4A390 !important;
 }
 #machine-list-page .ui-header .ui-btn {
     background-color: #fff;
@@ -21,14 +32,14 @@
 }
 #machine-list-page .ui-header .ui-btn:hover {
     color: #fff !important;
-    background-color: #46d4c9;
-    border-color: #46d4c9;
+    background-color: #64b247;
+    border-color: #64b247;
 }
 #machine-list-page .ui-block-b .ui-title {
     text-align: center;
 }
 .running {
-    color: #46d4c9;
+    color: #64b247;
 }
 .pending {
     color: #E09400;

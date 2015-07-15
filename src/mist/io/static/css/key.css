@@ -13,8 +13,8 @@
 }
 #single-key-page .ui-header .ui-btn:hover {
     color: #fff !important;
-    background-color: #46d4c9;
-    border-color: #46d4c9;
+    background-color: #64b247;
+    border-color: #64b247;
 }
 #single-key-page .ui-block-b .ui-title {
     text-align: center;
@@ -31,6 +31,7 @@
 }
 #single-key-page .ui-collapsible .ui-collapsible-heading a:hover {
     border-color: #eeedeb;
+    color: #c1c1c1 !important;
 }
 #single-key-page .ui-collapsible .ui-collapsible-content {
     background-color: #faf9f4;

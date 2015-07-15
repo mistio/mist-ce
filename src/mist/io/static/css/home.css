@@ -39,7 +39,7 @@
     font-size: 16px;
     padding-left: 70px !important;
     color: #fff !important;
-    text-shadow: 0 0 0 #46D4C9 !important;
+    text-shadow: 0 0 0 #64b247 !important;
     font-weight: 300;
 }
 
@@ -48,8 +48,8 @@
 }
 
 .ui-btn-add.ui-collapsible-collapsed > h4.ui-collapsible-heading a {
-    background-color: #46D4C9 !important;
-    text-shadow: 0 0 0 #46D4C9 !important;
+    background-color: #64b247 !important;
+    text-shadow: 0 0 0 #64b247 !important;
 }
 
 .ui-btn-add > h4.ui-collapsible-heading a:after {
@@ -117,8 +117,8 @@
 
 .incidents h4 {
     padding: 11.2px 16px;
-    background-color: #eeedeb;
-    border: 1px solid #eeedeb;
+    background-color: #d1d1d1;
+    border: 1px solid #d1d1d1;
     font-family: 'Open Sans', sans-serif;
     font-size: 18px;
     text-transform: uppercase;
@@ -152,7 +152,6 @@
 
 .incidents .machine {
     font-weight: bold;
-    color: #000;
 }
 
 .incidents .ui-icon-alert:after,
@@ -180,15 +179,11 @@
 }
 
 .incidents li a.icon-check:after {
-    color: #46D4C9;
+    color: #64b247;
 }
 
 .incidents li a.icon-error:after {
     color: #d96557;
-}
-
-.incidents li a:hover .machine {
-    color: #fff;
 }
 
 .incidents .incident .icon-bm,
@@ -199,16 +194,25 @@
 }
 
 .incidents .incident a.icon-error {
-    color: #fff;
-    background-color: #d96557;
+    color: #d96557;
+    background-color: #f7e0dd;
+}
+
+.incidents .incident a.icon-error:hover {
+    color: #d96557 !important;
+    background-color: #f7e0dd;
 }
 
 .incidents .incident a.icon-error .machine {
-    color: #fff;
+    color: #d95557;
 }
 
+/*.incidents li a:hover .machine {
+    color: #d96557;
+}*/
+
 .incidents .incident a.icon-error:after {
-    color: #fff;
+    color: #d96557;
 }
 
 #home-page .ui-body {

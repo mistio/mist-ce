@@ -145,7 +145,7 @@ h3 {
 }
 
 .ui-popup ul.ui-listview li a:hover {
-    background-color: #46D4C9;
+    background-color: #64b247;
     color: #fff;
 }
 
@@ -496,7 +496,7 @@ ul.checkbox-list .ui-grid-b {
     overflow: visible;
 }
 .ui-checkbox-on:after {
-    background-color: #46D4C9 !important;
+    background-color: #64b247 !important;
 }
 
 /* Checkbox link
@@ -783,7 +783,7 @@ ul.checkbox-list .ui-grid-b {
     border-radius: 2em;
     border-width: 3px;
     border-style: solid;
-    border-color: #46d4c9;
+    border-color: #64b247;
     margin-top: 2px;
     width: 48px;
     height: 48px;
