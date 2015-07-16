@@ -33,7 +33,7 @@
                 baseUrl: 'resources/js/',
                 paths: {
                     //the optimized mist.js source file.
-                    "app": "../build/mist-1436359725"
+                    "app": "../dist/mist"
                 }
             });
             require(["app"]);
@@ -42,7 +42,7 @@
                 // not optimized js, usefull for bedugging
                 baseUrl: 'resources/js/'
             });
-            require(["app"]);
+            require(["dev"]);
         }
     </script>
 

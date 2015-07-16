@@ -21,7 +21,7 @@ require.config({
         text: '../dist/requirejs-text/text',
         ember: '../dist/ember/ember.debug',
         elv: '../dist/ember-legacy-views',
-        templates: '../dist/templates',
+        compiler: '../dist/ember/ember-template-compiler',
         socket: '../dist/sockjs/sockjs.min',
         md5: '../dist/md5/build/md5.min',
         d3: '../dist/d3/d3.min',
@@ -39,7 +39,7 @@ require.config({
     },
     shim: {
         'ember': {
-            deps: ['jquery']
+            deps: ['jquery', 'compiler']
         },
         'd3': {
             deps: ['jquery']
@@ -49,6 +49,7 @@ require.config({
         }
     }
 });
+
 
 var LOADER_STEPS = {
     'load ember': {
@@ -105,9 +106,9 @@ var LOADER_STEPS = {
     'load templates': {
         before: ['load ember', 'load files'],
         exec: function () {
-            //appLoader.buffer.files[0](function () {
+            appLoader.buffer.files[0](function () {
                 appLoader.complete('load templates');
-            //});
+            });
         }
     },
     'init app': {
@@ -146,7 +147,7 @@ var LOADER_STEPS = {
 
 var loadFiles = function (callback) {
     require([
-        'templates',
+        'app/templates/templates',
         'app/controllers/backend_add',
         'app/controllers/backend_edit',
         'app/controllers/backends',

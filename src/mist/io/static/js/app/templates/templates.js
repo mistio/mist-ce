@@ -1,6 +1,6 @@
 define('app/templates/templates', ['ember'], function() {
+    warn('raw templates');
   return function (callback) {
-    if (!JS_BUILD) {
       require([
         'text!app/templates/application.hbs',
         'text!app/templates/backend_add.hbs',
@@ -126,8 +126,8 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['subnet_list_item'] = Ember.Handlebars.compile(arguments[59]);
         Ember.TEMPLATES['user_menu'] = Ember.Handlebars.compile(arguments[60]);
         callback();
+        info('loaded raw templates');
       });
       return;
     }
-  }
 });

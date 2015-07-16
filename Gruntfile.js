@@ -2,17 +2,20 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		emberTemplates: {
-			compile: {
-				options: {
-					templateName: function(sourceFile) {
-						return sourceFile.split('/').slice(-1).pop();
-					}
-				},
-				files: {
-					'dist/templates.js': 'src/mist/io/static/js/app/templates/*.hbs',
-				}
-			}
-		},
+	        compile: {
+	            options: {
+	                amd: false,
+	                templateName: function(sourceFile) {
+	                    return sourceFile.split('/').slice(-1).pop();
+	                },
+	                templateCompilerPath: './bower_components/ember/ember-template-compiler.js',
+	                handlebarsPath: 'node_modules/handlebars/dist/handlebars.js'
+	            },
+	            files: {
+					'dist/templates.js': 'src/mist/io/static/js/app/templates/*.hbs'
+	            }
+	        }
+        },
 		bower_concat: {
 			all: {
 				dest: 'dist/vendor.js',
