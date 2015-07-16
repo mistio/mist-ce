@@ -19,8 +19,6 @@
     "jquery-mobile-bower": "~1.4.5",
     "c3": "~0.4.10",
     "ember": "~1.13.4",
-    "ember-legacy-views": "git@github.com:emberjs/ember-legacy-views.git",
-    "ember-legacy-controllers": "git@github.com:emberjs/ember-legacy-controllers.git",
     "md5": "~0.3.0",
     "sockjs": "~0.3.4",
     "term.js": "~0.0.3",

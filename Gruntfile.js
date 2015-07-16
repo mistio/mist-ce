@@ -35,6 +35,15 @@ module.exports = function(grunt) {
 			}
 		},
 		symlink: {
+            dist: {
+                target: '../../../../dist/',
+                link: 'src/mist/io/static/dist',
+                type: 'dir',
+                options: {
+                    overwrite: true,
+                    force: true
+                }
+            },
   			jquery: {
     			target: '../bower_components/jquery/',
     			link: 'dist/jquery',
@@ -158,5 +167,5 @@ module.exports = function(grunt) {
     //grunt.registerTask('js', ['requirejs:accountJS', 'requirejs:manageJS']);
     //grunt.registerTask('css', ['requirejs:accountCSS', 'requirejs:manageCSS']);
 
-	grunt.registerTask('default', ['emberTemplates', 'requirejs', 'symlink', 'string-replace']);
+	grunt.registerTask('default', ['emberTemplates', 'symlink', 'requirejs', 'string-replace']);
 };
