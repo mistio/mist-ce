@@ -9,11 +9,15 @@
         padding-left: 15px;
     }
 }
-#home-page .options-list li a {
+#home-page .options-list li a,
+#home-page .incident-list li a {
     border-top: 1px solid #eeedeb;
+    border-left: none;
+    border-right: none;
 }
 
-#home-page .options-list li:first-child a {
+#home-page .options-list li:first-child a,
+#home-page .incident-list li:first-child a {
     border-top-color: transparent;
 }
 
@@ -139,12 +143,17 @@
     text-shadow: none;
 }
 
+.incidents .incident a:hover {
+    color: #7f7f7f !important;
+    background-color: #f2f2f2;
+}
+
 .incidents .incident.no a {
     padding-left: 11.2px !important;
 }
 
 .incidents .incident.no a:hover {
-    background-color: #FAF9F4;
+    background-color: #f2f2f2;
     color: #7f7f7f !important;
     border-color: #FAF9F4;
     cursor: default;
@@ -170,10 +179,6 @@
 
 .incidents .ui-icon-check:after {
     background-color: rgba(33, 133, 89, 0.4);
-}
-
-#machines .ui-icon-check:after {
-    background-color: rgba(33, 133, 89, .6);
 }
 
 .incidents li a.ui-btn {
