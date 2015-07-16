@@ -147,11 +147,12 @@ h3 {
 
 .ui-popup ul.ui-listview li a {
     border: 0;
+    background-color: #FAF9F4 !important;
     /*padding: .8em 3.5em !important;*/
 }
 
 .ui-popup ul.ui-listview li a:hover {
-    background-color: #64b247;
+    background-color: #7f7f7f !important;
     color: #fff;
 }
 
@@ -406,7 +407,7 @@ textarea {
 }
 .side-panel .ui-header .ui-title {
     font-size: 18px;
-    color: #fff;
+    color: #000;
     text-shadow: none;
 }
 .side-panel .ui-panel-inner {
@@ -480,8 +481,11 @@ ul.checkbox-list {
     background-color: #fafafa;
 }
 ul.checkbox-list li {
-    border-bottom: 1px solid #d4d4d4;
+    border-bottom: 1px solid #eeedeb;
     background-color: #FAF9F4;
+}
+ul.checkbox-list li:last-of-type {
+    border-bottom: none;
 }
 ul.checkbox-list li a:focus {
     box-shadow: none !important;
@@ -492,8 +496,9 @@ ul.checkbox-list label {
     border-width: 0px !important;
 }
 ul.checkbox-list li:hover a,
-ul.checkbox-list li:hover label {
-    background-color: #d4d4d4 !important;
+ul.checkbox-list li:hover label,
+ul.checkbox-list li:hover {
+    background-color: #f2f2f2 !important;
 }
 ul.checkbox-list li:hover a {
     color: #fff;
@@ -522,6 +527,7 @@ ul.checkbox-list .ui-grid-b {
     margin: 0 !important;
     float: left;
     clear: both;
+    background-color: transparent !important;
 }
 .checkbox-link .ui-checkbox:hover {
     background-color: #FAF9F4;
@@ -532,9 +538,8 @@ ul.checkbox-list .ui-grid-b {
 .checkbox-link .ui-checkbox label {
     border-radius: 0.1em 0 0 0.1em;
     background-color: transparent;
-    margin: 0 !important;
+    margin-top: 8px;
     border: none;
-    height: 16px;
 }
 .tag {
     margin: 1px;
@@ -815,6 +820,10 @@ ul.checkbox-list .ui-grid-b {
 #user-menu-popup #user-email {
     text-align: center;
     margin: .5em 0 1em;
+}
+
+#user-menu-popup .ui-btn-icon-left {
+    padding-left: 3.4em !important;
 }
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {

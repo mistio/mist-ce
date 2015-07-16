@@ -9,6 +9,14 @@
         padding-left: 15px;
     }
 }
+#home-page .options-list li a {
+    border-top: 1px solid #eeedeb;
+}
+
+#home-page .options-list li:first-child a {
+    border-top-color: transparent;
+}
+
 #add-backend {
     float: right;
     margin-right: 0px;
@@ -152,6 +160,7 @@
 
 .incidents .machine {
     font-weight: bold;
+    color: #000;
 }
 
 .incidents .ui-icon-alert:after,
@@ -200,7 +209,7 @@
 
 .incidents .incident a.icon-error:hover {
     color: #d96557 !important;
-    background-color: #f7e0dd;
+    background-color: #ECB3AC;
 }
 
 .incidents .incident a.icon-error .machine {
