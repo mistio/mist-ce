@@ -23,7 +23,7 @@ define('app/views/machine_monitoring',
             //
             //
 
-
+            templateName: 'machine_monitoring',
             rules: [],
             graphs: [],
             metrics: [],
