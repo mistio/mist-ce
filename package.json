@@ -14,7 +14,9 @@
     "grunt-symbolic-link": "^0.3.1",
     "handlebars": "^2.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "grunt-string-replace": "^1.2.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

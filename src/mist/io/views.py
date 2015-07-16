@@ -92,6 +92,7 @@ def home(request):
         'is_core': json.dumps(False),
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
+        'last_build': config.LAST_BUILD
     }
 
 

@@ -21,7 +21,7 @@ html, body, #splash {
 }
 
 #logo {
-    background: url("../logo_splash.png") center no-repeat;
+    background: url("/resources/logo_splash.png") center no-repeat;
     width: 96px;
     height: 96px;
     background-position: -52px -35px;

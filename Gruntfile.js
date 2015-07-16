@@ -1,4 +1,5 @@
 module.exports = function(grunt) {
+	var timestamp = Math.floor(Date.now() / 1000);
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		emberTemplates: {
@@ -16,12 +17,20 @@ module.exports = function(grunt) {
 	            }
 	        }
         },
-		bower_concat: {
-			all: {
-				dest: 'dist/vendor.js',
-                exclude: ['requirejs', 'requirejs-text'],
-				bowerOptions: {
-					relative: false
+		requirejs: {
+			mistjs: {
+				options: {
+					name: 'app',
+					baseUrl: 'src/mist/io/static/js',
+					mainConfigFile: 'src/mist/io/static/js/app.js',
+					out: 'dist/mist.js'
+				}
+			},
+			mistcss: {
+				options: {
+					cssIn: 'src/mist/io/static/main.css',
+					out: 'dist/mist.css',
+					optimizeCss: 'standard'
 				}
 			}
 		},
@@ -98,6 +107,44 @@ module.exports = function(grunt) {
 					overwrite: true,
 					force: true
 				}
+			},
+			mistjs: {
+				target: 'dist/mist.js',
+				link: 'dist/mist'+timestamp+'.js'
+			},
+			mistcss: {
+				target: 'dist/mist.css',
+				link: 'dist/mist'+timestamp+'.css'
+			},
+			images: {
+				target: '../src/mist/io/static/images',
+				link: 'dist/images',
+				type: 'dir',
+				options: {
+					overwrite: true,
+					force: true
+				}
+			},
+			states: {
+				target: '../src/mist/io/static/states',
+				link: 'dist/states',
+				type: 'dir',
+				options: {
+					overwrite: true,
+					force: true
+				}
+			},
+
+		},
+		'string-replace': {
+			version: {
+				files: {'settings.py': 'settings.py'},
+				options: {
+					replacements: [{
+						pattern: /LAST_BUILD = .*/,
+						replacement: 'LAST_BUILD = '+timestamp
+					}]
+				}
 			}
 		}
 	});
@@ -106,9 +153,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-bower-concat');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
 	grunt.loadNpmTasks('grunt-symbolic-link');
+	grunt.loadNpmTasks('grunt-string-replace');
 
     //grunt.registerTask('js', ['requirejs:accountJS', 'requirejs:manageJS']);
     //grunt.registerTask('css', ['requirejs:accountCSS', 'requirejs:manageCSS']);
 
-	grunt.registerTask('default', ['bower_concat:all', 'emberTemplates', 'symlink']);
+	grunt.registerTask('default', ['emberTemplates', 'requirejs', 'symlink', 'string-replace']);
 };

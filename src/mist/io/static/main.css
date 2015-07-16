@@ -54,7 +54,7 @@
 .mist-logo {
     width: 280px;
     height: 280px;
-    background: url("logo_splash.png") center no-repeat;
+    background: url("/resources/logo_splash.png") center no-repeat;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -122,7 +122,7 @@ body {
 /* Ajax loader
 -----------------------------------------------------------------------------------------------------------*/
 .ajax-loader {
-    background-image: url("images/spinner.gif");
+    background-image: url("/resources/images/spinner.gif");
     background-position: center !important;
     background-repeat: no-repeat;
     margin: 0 auto;
@@ -131,7 +131,7 @@ body {
 }
 
 .ajax-loader.l {
-    background-image: url('images/ajax-loader.gif');
+    background-image: url('/resources/images/ajax-loader.gif');
     width: 135px;
     height: 75px;
     background-color: #9A9A9A;

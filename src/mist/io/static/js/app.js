@@ -19,7 +19,7 @@ require.config({
         jquery: '../dist/jquery/jquery.min',
         jqm: '../dist/jqm/js/jquery.mobile-1.4.5.min',
         text: '../dist/requirejs-text/text',
-        ember: '../dist/ember/ember.debug',
+        ember: '../dist/ember/ember.prod',
         elv: '../dist/ember-legacy-views',
         templates: '../dist/templates',
         socket: '../dist/sockjs/sockjs.min',
