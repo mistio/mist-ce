@@ -93,7 +93,7 @@
 
             <div {{bind-attr class=":ui-block-b"}}>
                 <div class="ui-body">
-                    <div class="incidents ui-shadow">                        
+                    <div class="incidents ui-shadow">
                         <h4>Incidents</h4>
                         <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incident-list">
                             {{#unless Mist.openIncidents}}
@@ -110,9 +110,6 @@
                                     </span>
                                     <span class="rule-condition">
                                         rule
-                                    </span>
-                                    <span class="duration">
-                                        for 24 sec
                                     </span>
                                     <span class="time">11 min ago </span>
                                 </a>
@@ -136,7 +133,7 @@
                             {{#each Mist.openIncidents}}
                                 {{#if this.isClosed}}
                                     <li class="incident">
-                                        <a class="ui-icon-check ui-btn ui-btn-icon-right"
+                                        <a class="icon-check ui-btn ui-btn-icon-right"
                                             {{action "incidentClicked" this target="view"}}>
                                             <span class="machine">
                                                 {{this.machineName}}:
@@ -151,8 +148,8 @@
                                         </a>
                                     </li>
                                 {{else}}
-                                    <li class="ui-bar-b incident">
-                                        <a class="ui-icon-alert ui-btn ui-btn-icon-right"
+                                    <li class="incident">
+                                        <a class="icon-error ui-btn ui-btn-icon-right"
                                             {{action "incidentClicked" this target="view"}}>
                                             <span class="machine">
                                                 {{this.machineName}}:

@@ -336,6 +336,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 textarea {
     background-color: #fff !important;
+    overflow-y: auto !important;
 }
 
 
@@ -601,6 +602,14 @@ ul.checkbox-list .ui-grid-b {
 
 .ui-footer a:hover:after {
     color: #7f7f7f;
+}
+
+.ui-footer a:active {
+    color: #fff !important;
+}
+
+.ui-footer a:active:after {
+    color: #fff;
 }
 
 /* Small List Item

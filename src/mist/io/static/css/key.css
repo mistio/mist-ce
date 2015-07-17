@@ -62,7 +62,7 @@
 }
 
 #single-key-page #public-key {
-    height: 140px;
+    height: 90px;
     overflow: auto;
-    background-color: rgb(255, 255, 255);
+    font-family: monospace;
 }

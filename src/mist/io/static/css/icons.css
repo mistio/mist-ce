@@ -64,11 +64,7 @@
 .icon-warn{margin-top: -1px !important;}
 .icon-warn:after{content:'\004B'; color: #d96557 !important; font-size: 16px; margin-left: 1px; margin-right: 15px;}
 .icon-trash:after{content:'\004C';}
-.ui-footer .icon-x:after {
-    content: '\004D';
-    font-size: 12px;
-    margin-top: -6px;
-}
+.icon-x:after{content: '\004D';}
 .icon-minimize:after{content:'\004E';}
 .icon-expand:after{content:'\004F';}
 .icon-collapse:after{content:'\0050';}
@@ -92,8 +88,16 @@
 .icon-ok:after{content:'\0063';}
 .icon-cog:after{content:'\0064';}
 .icon-key:after{content:'\0065';}
-.icon-add:before{content:'\0066';}
-
+.icon-add:after{content:'\0066';}
+.icon-lock:after{content:'\006A';}
+.icon-checkbox-off:after{content:'\006B';}
+.icon-checkbox-on:after{content:'\006C';}
+.icon-alert-2:after{content:'\006D';}
+.ui-footer .icon-x:after,
+.ui-footer .icon-xx:after {
+  font-size: 12px;
+  margin-top: -6px;
+}
 .ui-collapsible .ui-icon-minus:after,
 .ui-collapsible .ui-icon-plus:after {
   background-image: none;
