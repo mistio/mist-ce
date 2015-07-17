@@ -400,8 +400,8 @@ html head + body .ui-body-a.ui-focus {
 html .ui-bar-b .ui-bar-inherit,
 html .ui-body-b .ui-bar-inherit,
 html body .ui-group-theme-b .ui-bar-inherit {
-	background-color: #faf9f4 /*{b-bar-background-color}*/;
-	border-color: #faf9f4 /*{b-bar-border}*/;
+	background-color: #d4d4d4 /*{b-bar-background-color}*/;
+	border-color: #d4d4d4 /*{b-bar-border}*/;
 	color: #7f7f7f /*{b-bar-color}*/;
 	text-shadow: none /*{b-bar-shadow-color}*/;
 	font-weight: bold;
