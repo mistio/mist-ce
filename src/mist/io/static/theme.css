@@ -314,7 +314,7 @@ html head + body .ui-btn.ui-btn-a:visited {
 	background-color: #FAF9F4 /*{a-bup-background-color}*/;
 	border-color: transparent /*{a-bup-border}*/;
 	color: #000000 /*{a-bup-color}*/;
-	text-shadow: 0 /*{a-bup-shadow-x}*/ 0px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #FAF9F4 /*{a-bup-shadow-color}*/;
+	text-shadow: none /*{a-bup-shadow-color}*/;
 }
 /* Button hover */
 .ui-page-theme-a .ui-btn:hover,
@@ -322,10 +322,10 @@ html .ui-bar-a .ui-btn:hover,
 html .ui-body-a .ui-btn:hover,
 html body .ui-group-theme-a .ui-btn:hover,
 html head + body .ui-btn.ui-btn-a:hover {
-	background-color: #D7EEEF /*{a-bhover-background-color}*/;
-	border-color: #D7EEEF /*{a-bhover-border}*/;
+	background-color: #f2f2f2 /*{a-bhover-background-color}*/;
+	border-color: #f2f2f2 /*{a-bhover-border}*/;
 	color: #000000 /*{a-bhover-color}*/;
-	text-shadow: 0 /*{a-bhover-shadow-x}*/ 0px /*{a-bhover-shadow-y}*/ 0 /*{a-bhover-shadow-radius}*/ #eeeeee /*{a-bhover-shadow-color}*/;
+	text-shadow: none;
 }
 /* Button down */
 .ui-page-theme-a .ui-btn:active,
@@ -336,7 +336,7 @@ html head + body .ui-btn.ui-btn-a:active {
 	background-color: #FFFFFF /*{a-bdown-background-color}*/;
 	border-color: #eee /*{a-bdown-border}*/;
 	color: #000000 /*{a-bdown-color}*/;
-	text-shadow: 0 /*{a-bdown-shadow-x}*/ 1px /*{a-bdown-shadow-y}*/ 0 /*{a-bdown-shadow-radius}*/ #eeeeee /*{a-bdown-shadow-color}*/;
+	text-shadow: none;
 }
 /* Active button */
 .ui-page-theme-a .ui-btn.ui-btn-active,

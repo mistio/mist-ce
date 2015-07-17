@@ -147,8 +147,6 @@ h3 {
 
 .ui-popup ul.ui-listview li a {
     border: 0;
-    background-color: #FAF9F4 !important;
-    /*padding: .8em 3.5em !important;*/
 }
 
 .ui-popup ul.ui-listview li a:hover {
