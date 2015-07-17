@@ -48,7 +48,7 @@
                 {{/if}}
 
                 {{#if this.link}}
-                    <a {{bind-attr href="this.href" class="this.class" target="this.target"}}
+                    <a {{bind-attr href="this.href" class="this.class uis-caps" target="this.target"}}
                         {{action "linkClicked" this target="view"}}>
                             {{this.link}}
                     </a>
@@ -72,7 +72,7 @@
             {{else}}{{#if view.isBack}}
 
                 <a class="ui-btn ui-btn-a ui-corner-all ui-caps back"
-                    {{action "confirm" target="view"}}>Back</a>
+                    {{action "confirm" target="view"}}>BACK</a>
 
             {{else}}
 
@@ -85,9 +85,9 @@
                     data-type="horizontal">
 
                     {{#if view.isOKCancel}}
-                        <a class="ui-btn ui-caps"
+                        <a class="ui-btn ui-caps back"
                             {{action "reject" target="view"}}>
-                                Cancel
+                                CANCEL
                         </a>
                         <a class="ui-btn ui-btn-d ui-caps"
                             {{action "confirm" target="view"}}>
@@ -96,13 +96,13 @@
                     {{/if}}
 
                     {{#if view.isYesNo}}
-                        <a class="ui-btn ui-btn-d ui-caps"
+                        <a class="ui-btn ui-caps back"
                             {{action "reject" target="view"}}>
-                                No
+                                NO
                         </a>
-                        <a class="ui-btn ui-caps"
+                        <a class="ui-btn ui-btn-d ui-caps"
                             {{action "confirm" target="view"}}>
-                                Yes
+                                YES
                         </a>
                     {{/if}}
 

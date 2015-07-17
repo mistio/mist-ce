@@ -92,6 +92,7 @@
 .icon-ok:after{content:'\0063';}
 .icon-cog:after{content:'\0064';}
 .icon-key:after{content:'\0065';}
+.icon-add:before{content:'\0066';}
 
 .ui-collapsible .ui-icon-minus:after,
 .ui-collapsible .ui-icon-plus:after {

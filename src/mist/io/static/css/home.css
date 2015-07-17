@@ -60,17 +60,22 @@
 }
 
 .ui-btn-add.ui-collapsible-collapsed > h4.ui-collapsible-heading a {
-    background-color: #64b247 !important;
-    text-shadow: 0 0 0 #64b247 !important;
+    background-color: #d1e5c9 !important;
+    text-shadow: 0 0 0 #d1e5c9 !important;
+    color: #64b247 !important;
+    border: 2px solid #64b247;
+    font-weight: 400;
 }
 
 .ui-btn-add > h4.ui-collapsible-heading a:after {
     top: 26px;
+    color: #fff !important;
+    background-color: #64b247 !important;
 }
 
 .ui-btn-add.ui-collapsible-collapsed  > h4.ui-collapsible-heading a:hover{
     background-color: #a2d191 !important;
-    border-color: #a2d191 !important;
+    border-color: #64b247 !important;
 }
 
 .ui-btn-add.ui-collapsible  > h4.ui-collapsible-heading a:active{
