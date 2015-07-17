@@ -48,7 +48,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding-right: 16px;
-    color: #7f7f7f;
+    color: #000;
 }
 .key-tags {
     float: right;

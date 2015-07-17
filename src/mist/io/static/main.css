@@ -595,11 +595,12 @@ ul.checkbox-list .ui-grid-b {
     margin:0;
 }
 
-.ui-footer a:after {
-    color: #7f7f7f;
+.ui-footer a:hover {
+    color: #7f7f7f !important;
 }
+
 .ui-footer a:hover:after {
-    color: #fff;
+    color: #7f7f7f;
 }
 
 /* Small List Item

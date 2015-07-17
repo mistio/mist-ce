@@ -58,7 +58,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding-right: 16px;
-    color: #7F7F7F;
+    color: #000;
 }
 
 /* Conditional for < 550px */

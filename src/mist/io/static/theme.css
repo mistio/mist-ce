@@ -473,9 +473,9 @@ html .ui-bar-b .ui-btn:visited,
 html .ui-body-b .ui-btn:visited,
 html body .ui-group-theme-b .ui-btn:visited,
 html head + body .ui-btn.ui-btn-b:visited {
-	background-color: #f0efea /*{b-bup-background-color}*/;
+	background-color: #7f7f7f /*{b-bup-background-color}*/;
 	border-color: #c1c1c1 /*{b-bup-border}*/;
-	color: #7f7f7f /*{b-bup-color}*/;
+	color: #fff /*{b-bup-color}*/;
 	text-shadow: none /*{b-bup-shadow-color}*/;
 }
 /* Button hover */
@@ -484,9 +484,9 @@ html .ui-bar-b .ui-btn:hover,
 html .ui-body-b .ui-btn:hover,
 html body .ui-group-theme-b .ui-btn:hover,
 html head + body .ui-btn.ui-btn-b:hover {
-	background-color: #64b247 /*{b-bhover-background-color}*/;
-	border-color: #307716 /*{b-bhover-border}*/;
-	color: #fff /*{b-bhover-color}*/;
+	background-color: #c1c1c1 /*{b-bhover-background-color}*/;
+	border-color: #7f7f7f /*{b-bhover-border}*/;
+	color: #7f7f7f /*{b-bhover-color}*/;
 	text-shadow: none /*{b-bhover-shadow-color}*/;
 }
 /* Button down */
@@ -496,7 +496,7 @@ html .ui-body-b .ui-btn:active,
 html body .ui-group-theme-b .ui-btn:active,
 html head + body .ui-btn.ui-btn-b:active {
 	background-color: #46862f /*{b-bdown-background-color}*/;
-	border-color: #307716 /*{b-bdown-border}*/;
+	border-color: #c1c1c1 /*{b-bdown-border}*/;
 	color: #fff /*{b-bdown-color}*/;
 	text-shadow: 0 /*{b-bdown-shadow-x}*/ 1px /*{b-bdown-shadow-y}*/ 0 /*{b-bdown-shadow-radius}*/ #666 /*{b-bdown-shadow-color}*/;
 }
