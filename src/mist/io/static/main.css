@@ -536,9 +536,26 @@ ul.checkbox-list .ui-grid-b {
 }
 .checkbox-link .ui-checkbox label {
     border-radius: 0.1em 0 0 0.1em;
-    background-color: transparent;
-    margin-top: 8px;
+    background-color: transparent !important;
+    margin-top: 7px;
     border: none;
+    box-sizing: border-box;
+    height: 20px;
+}
+.checkbox-link .ui-checkbox label:after {
+    background-image: none !important;
+    background-color: transparent !important;
+    color: #d1d1d1;
+    opacity: 1;
+    text-shadow: none;
+    transition: color .2s linear;
+}
+.checkbox-link .ui-checkbox label:hover:after {
+    color: #64B247;
+}
+.checkbox-link .ui-checkbox label.ui-checkbox-on:after {
+    color: #64B247;
+    text-shadow: none;
 }
 .tag {
     margin: 1px;
@@ -995,6 +1012,7 @@ ul.checkbox-list .ui-grid-b {
     text-align: left;
     max-height: 250px;
     overflow: auto;
+    word-wrap: break-word;
 }
 
 #dialog-popup .duration {

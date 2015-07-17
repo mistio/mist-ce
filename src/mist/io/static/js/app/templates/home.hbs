@@ -101,8 +101,8 @@
                                 <a href="javascript:void(0)" class="icon-check ui-btn ui-btn-icon-right ui-btn">No recent incidents</a>
                             </li>
                             {{/unless}}
-                            <li class="incident">
-                                <a class="icon-error ui-btn ui-btn-icon-right"
+                            <li class="alert incident">
+                                <a class="icon-alert-2 ui-btn ui-btn-icon-right"
                                     {{action "incidentClicked" this target="view"}}>
                                     <span class="icon-bm"></span>
                                     <span class="machine">
@@ -148,8 +148,8 @@
                                         </a>
                                     </li>
                                 {{else}}
-                                    <li class="incident">
-                                        <a class="icon-error ui-btn ui-btn-icon-right"
+                                    <li class="alert incident">
+                                        <a class="icon-alert-2 ui-btn ui-btn-icon-right"
                                             {{action "incidentClicked" this target="view"}}>
                                             <span class="machine">
                                                 {{this.machineName}}:

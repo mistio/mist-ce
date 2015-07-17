@@ -201,7 +201,7 @@
     color: #64b247;
 }
 
-.incidents li a.icon-error:after {
+.incidents li.alert a.icon-error:after {
     color: #d96557;
 }
 
@@ -212,25 +212,21 @@
     left: 15px;
 }
 
-.incidents .incident a.icon-error {
+.incidents .alert.incident a {
     color: #d96557;
     background-color: #f7e0dd;
 }
 
-.incidents .incident a.icon-error:hover {
+.incidents .alert.incident a:hover {
     color: #d96557 !important;
     background-color: #ECB3AC;
 }
 
-.incidents .incident a.icon-error .machine {
+.incidents .alert.incident a .machine {
     color: #d95557;
 }
 
-/*.incidents li a:hover .machine {
-    color: #d96557;
-}*/
-
-.incidents .incident a.icon-error:after {
+.incidents .alert.incident a:after {
     color: #d96557;
 }
 

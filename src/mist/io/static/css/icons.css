@@ -10,14 +10,15 @@
     font-style: normal;
 }
 [class*='icon-']:after{
-	display: inline-block;
-   font-family: 'MistIcons';
-   font-style: normal;
-   font-weight: normal;
-   line-height: 1;
-   -webkit-font-smoothing: antialiased;
-   margin-top: -10px;
-   font-size: 19px;
+  display: inline-block;
+  font-family: 'MistIcons';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  margin-top: -10px;
+  font-size: 19px;
+  text-transform: none;
 }
 
 [class*='icon-']:hover {
@@ -76,7 +77,10 @@
     top: 1.1em !important;
 }
 .icon-xx:after{content:'\0053';}
-.icon-support:after{content:'\0054';}
+.icon-support:after{
+  content:'\0054';
+  margin-top: -12px;
+}
 .icon-prev:after{content:'\0055';}
 .icon-next:after{content:'\0056';}
 .icon-star:after{content:'\0057';}
@@ -89,8 +93,18 @@
 .icon-cog:after{content:'\0064';}
 .icon-key:after{content:'\0065';}
 .icon-add:after{content:'\0066';}
-.icon-lock:after{content:'\006A';}
+.icon-graph-1:after{content:'\0067';}
+.icon-graph-2:after{content:'\0068';}
+.icon-graph-3:after{content:'\0069';}
+.icon-lock:after{
+  content: '\006A';
+  font-size: 18px;
+  margin-top: -13px;
+  margin-left: 2px;
+}
+.ui-checkbox-off:after{content:'\006B';}
 .icon-checkbox-off:after{content:'\006B';}
+.ui-checkbox-on:after{content:'\006C';}
 .icon-checkbox-on:after{content:'\006C';}
 .icon-alert-2:after{content:'\006D';}
 .ui-footer .icon-x:after,

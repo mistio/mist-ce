@@ -42,9 +42,8 @@
     top: 6px;
 }
 
-#image-list-page ul .ui-checkbox-off:after {
-    background-color: rgba(0,0,0,0) !important;
-    background-repeat: no-repeat !important;
+#image-list-page ul li label {
+    margin-top: 9px;
 }
 
 #image-list-page ul .ui-checkbox-on:after {
