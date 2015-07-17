@@ -112,6 +112,10 @@
   font-size: 12px;
   margin-top: -6px;
 }
+#user-menu-popup .icon-x:after {
+  font-size: 14px;
+  margin: -6px 0 0 7px;
+}
 .ui-collapsible .ui-icon-minus:after,
 .ui-collapsible .ui-icon-plus:after {
   background-image: none;
