@@ -1,7 +1,7 @@
 
 /* Single Key Page CSS
 -----------------------------------------------------------------------------------------------------------*/
-#single-key-page .ui-content {
+#single-key-page > .ui-content {
     padding-top: 30px;
     background-color: transparent;
 }
@@ -21,6 +21,9 @@
 }
 #single-key-page .ui-footer {
     display: block;
+}
+#single-key-page .ui-collapsible {
+    margin: 10px 0 20px;
 }
 #single-key-page .ui-collapsible .ajax-loader {
     display: inline;

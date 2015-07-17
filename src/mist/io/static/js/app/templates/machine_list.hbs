@@ -95,7 +95,7 @@
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
-            <a id="machines-tags-btn" class="ui-btn ui-icon-grid ui-btn-icon-right ui-caps ui-shadow ui-corner-all"
+            <a id="machines-tags-btn" class="ui-btn ui-btn-icon-right ui-caps ui-shadow ui-corner-all icon-tag"
                 {{action "tagsClicked" target="view"}}>Tags</a>
         </td><td>
             {{#if view.selectedMachine.isWindows}}
@@ -111,12 +111,12 @@
                     :ui-btn
                     :ui-btn-icon-right
                     :ui-caps
-                    :ui-icon-gear"}}
+                    :icon-shell"}}
                     {{action "shellClicked" target="view"}}>Shell</a>
             {{/if}}
 
         </td><td>
-            <a id="machines-power-btn" data-role="button" data-icon="bars" data-iconpos="right" class="ui-caps" {{action "powerClicked" target="view"}}>Actions</a>
+            <a id="machines-power-btn" class="ui-btn ui-caps ui-btn-icon-right icon-cog" {{action "powerClicked" target="view"}}>Actions</a>
         </td></tr></tbody></table>
     </div>
 
