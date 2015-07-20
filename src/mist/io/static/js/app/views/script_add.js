@@ -12,11 +12,11 @@ define('app/views/script_add', ['app/views/panel'],
         var DEFAULT_GITHUB_URL = 'https://github.com/owner/repo';
         var DEFAULT_SCRIPT = '#!/bin/bash\necho "hello world"';
         var DEFAULT_ANSIBLE_SCRIPT = '- name: Dummy ansible playbook\n' +
-            '   hosts: localhost\n' +
-            '   tasks:\n' +
-            '    - name: Dummy task\n' +
-            '      debug:\n' +
-            '        msg: "Hello World"\n';
+            '  hosts: localhost\n' +
+            '  tasks:\n' +
+            '  - name: Dummy task\n' +
+            '    debug:\n' +
+            '      msg: "Hello World"\n';
 
         return App.ScriptAddView = PanelView.extend({
 
