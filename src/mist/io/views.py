@@ -482,6 +482,8 @@ def create_machine(request):
         docker_command = request.json_body.get('docker_command', None)
         script_id = request.json_body.get('script_id', '')
         script_params = request.json_body.get('script_params', '')
+        post_script_id = request.json_body.get('post_script_id', '')
+        post_script_params = request.json_body.get('post_script_params', '')
         async = request.json_body.get('async', False)
         quantity = request.json_body.get('quantity', 1)
         persist = request.json_body.get('persist', False)
@@ -489,10 +491,10 @@ def create_machine(request):
                                                      {})
         docker_exposed_ports = request.json_body.get('docker_exposed_ports',
                                                      {})
+        azure_port_bindings = request.json_body.get('azure_port_bindings', '')
         # hostname: if provided it will be attempted to assign a DNS name
         hostname = request.json_body.get('hostname', '')
         plugins = request.json_body.get('plugins')
-
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -508,7 +510,10 @@ def create_machine(request):
     kwargs = {'script_id': script_id, 'script_params': script_params,
               'job_id': job_id, 'docker_port_bindings': docker_port_bindings,
               'docker_exposed_ports': docker_exposed_ports,
-              'hostname': hostname, 'plugins': plugins}
+              'azure_port_bindings': azure_port_bindings,
+              'hostname': hostname, 'plugins': plugins,
+              'post_script_id': post_script_id,
+              'post_script_params': post_script_params}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:

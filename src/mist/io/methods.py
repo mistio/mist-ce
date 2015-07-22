@@ -42,7 +42,7 @@ from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
-from mist.io.helpers import check_host
+from mist.io.helpers import check_host, sanitize_host
 from mist.io.exceptions import *
 
 
@@ -181,7 +181,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
         if provider == 'vcloud':
             for prefix in ['https://', 'http://']:
-                backend.apiurl = backend.apiurl.strip(prefix)
+                backend.apiurl = backend.apiurl.replace(prefix, '')
             backend.apiurl = backend.apiurl.split('/')[0] #need host, not url
 
         backend_id = backend.get_id()
@@ -237,7 +237,7 @@ def add_backend_v_2(user, title, provider, params):
             hostname = params.get('machine_ip', '')
 
         if hostname:
-            check_host(hostname)
+            check_host(sanitize_host(hostname))
 
     baremetal = provider == 'bare_metal'
 
@@ -279,6 +279,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_libvirt(user, title, provider, params)
     elif provider == 'hostvirtual':
         backend_id, backend = _add_backend_hostvirtual(title, provider, params)
+    elif provider == 'vultr':
+        backend_id, backend = _add_backend_vultr(title, provider, params)
     elif provider == 'vsphere':
         backend_id, backend = _add_backend_vsphere(title, provider, params)
     else:
@@ -286,7 +288,6 @@ def add_backend_v_2(user, title, provider, params):
 
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
-
     remove_on_error = params.get('remove_on_error', True)
     # validate backend before adding
     if remove_on_error:
@@ -304,8 +305,8 @@ def add_backend_v_2(user, title, provider, params):
             # the provider if connect_provider doesn't fail
             try:
                 machines = conn.list_nodes()
-            except InvalidCredsError:
-                raise BackendUnauthorizedError()
+            except InvalidCredsError as exc:
+                raise BackendUnauthorizedError(exc)
             except Exception as exc:
                 log.error("Error while trying list_nodes: %r", exc)
                 raise BackendUnavailableError(exc=exc)
@@ -358,6 +359,7 @@ def _add_backend_bare_metal(user, title, provider, params):
         if not machine_user:
             machine_user = 'root'
 
+    machine_hostname = sanitize_host(machine_hostname)
     machine = model.Machine()
     machine.ssh_port = port
     machine.remote_desktop_port = rdp_port
@@ -420,12 +422,7 @@ def _add_backend_coreos(user, title, provider, params):
 
     if not machine_hostname:
         raise RequiredParameterMissingError('machine_ip')
-
-    try:
-        socket.gethostbyname(machine_hostname)
-    except socket.gaierror:
-        raise BadRequestError("Hostname '%s' isn't resolvable/accessible."
-                              % machine_hostname)
+    machine_hostname = sanitize_host(machine_hostname)
 
     use_ssh = remove_on_error and machine_key
     if use_ssh:
@@ -501,9 +498,7 @@ def _add_backend_vcloud(title, provider, params):
     if provider == 'vcloud':
         if not host:
             raise RequiredParameterMissingError('host')
-        for prefix in ['https://', 'http://']:
-            host = host.strip(prefix)
-        host = host.split('/')[0]
+        host = sanitize_host(host)
     elif provider == 'indonesian_vcloud':
         host = 'compute.idcloudonline.com'
 
@@ -640,10 +635,6 @@ def _add_backend_digitalocean(title, provider, params):
 
 
 def _add_backend_gce(title, provider, params):
-    email = params.get('email', '')
-    if not email:
-        raise RequiredParameterMissingError('email')
-
     private_key = params.get('private_key', '')
     if not private_key:
         raise RequiredParameterMissingError('private_key')
@@ -651,6 +642,18 @@ def _add_backend_gce(title, provider, params):
     project_id = params.get('project_id', '')
     if not project_id:
         raise RequiredParameterMissingError('project_id')
+
+    email = params.get('email', '')
+    if not email:
+        # support both ways to authenticate a service account,
+        # by either using a project id and json key file (highly reccomended)
+        # and also by specifying email, project id and private key file
+        try:
+            creds = json.loads(private_key)
+            email = creds['client_email']
+            private_key = creds['private_key']
+        except:
+            raise MistError("Make sure you upload a valid json file")
 
     backend = model.Backend()
     backend.title = title
@@ -716,6 +719,7 @@ def _add_backend_docker(title, provider, params):
     # tls auth
     key_file = params.get('key_file', '')
     cert_file = params.get('cert_file', '')
+    ca_cert_file = params.get('ca_cert_file', '')
 
     backend = model.Backend()
     backend.title = title
@@ -724,6 +728,7 @@ def _add_backend_docker(title, provider, params):
     backend.apikey = auth_user
     backend.key_file = key_file
     backend.cert_file = cert_file
+    backend.ca_cert_file = ca_cert_file
     backend.apisecret = auth_password
     backend.apiurl = docker_host
     backend.enabled = True
@@ -736,7 +741,7 @@ def _add_backend_libvirt(user, title, provider, params):
     machine_hostname = params.get('machine_hostname', '')
     if not machine_hostname:
         raise RequiredParameterMissingError('machine_hostname')
-
+    machine_hostname = sanitize_host(machine_hostname)
     apikey = params.get('machine_user', 'root')
 
     apisecret = params.get('machine_key', '')
@@ -862,6 +867,22 @@ def _add_backend_hostvirtual(title, provider, params):
     return backend_id, backend
 
 
+def _add_backend_vultr(title, provider, params):
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = api_key
+    backend.apisecret = api_key
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
 def _add_backend_vsphere(title, provider, params):
     username = params.get('username', '')
     if not username:
@@ -874,9 +895,7 @@ def _add_backend_vsphere(title, provider, params):
     host = params.get('host', '')
     if not host:
         raise RequiredParameterMissingError('host')
-    for prefix in ['https://', 'http://']:
-        host = host.strip(prefix)
-    host = host.split('/')[0]
+    host = sanitize_host(host)
 
     backend = model.Backend()
     backend.title = title
@@ -1244,7 +1263,7 @@ def connect_provider(backend):
     elif backend.provider == Provider.HPCLOUD:
         conn = driver(backend.apikey, backend.apisecret, backend.tenant_name,
                       region=backend.region)
-    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL]:
+    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR]:
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
@@ -1258,6 +1277,13 @@ def connect_provider(backend):
             cert_temp_file = NamedTemporaryFile(delete=False)
             cert_temp_file.write(backend.cert_file)
             cert_temp_file.close()
+            if backend.ca_cert_file:
+                # docker started with tlsverify
+                ca_cert_temp_file = NamedTemporaryFile(delete=False)
+                ca_cert_temp_file.write(backend.ca_cert_file)
+                ca_cert_temp_file.close()
+                libcloud.security.VERIFY_SSL_CERT = True;
+                libcloud.security.CA_CERTS_PATH.insert(0,ca_cert_temp_file.name)
             conn = driver(host=backend.apiurl, port=backend.docker_port, key_file=key_temp_file.name, cert_file=cert_temp_file.name)
         else:
             conn = driver(backend.apikey, backend.apisecret, backend.apiurl, backend.docker_port)
@@ -1318,7 +1344,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE):
+                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR):
         can_tag = False
 
     # for other states
@@ -1424,11 +1450,55 @@ def list_machines(user, backend_id):
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
 
+        if m.driver.type is Provider.GCE:
+                # show specific extra metadata for GCE. Wrap in try/except
+                # to prevent from future GCE API changes
+
+                # identify Windows servers
+                os_type = 'linux'
+                try:
+                    if 'windows-cloud' in m.extra['disks'][0].get('licenses')[0]:
+                        os_type = 'windows'
+                except:
+                    pass
+                m.extra['os_type'] = os_type
+
+                # windows specific metadata including user/password
+                try:
+                    for item in m.extra.get('metadata', {}).get('items', []):
+                        if item.get('key') in ['gce-initial-windows-password', 'gce-initial-windows-user']:
+                            m.extra[item.get('key')] = item.get('value')
+                except:
+                    pass
+
+                try:
+                    if m.extra.get('boot_disk'):
+                        m.extra['boot_disk_size'] = m.extra.get('boot_disk').size
+                        m.extra['boot_disk_type'] = m.extra.get('boot_disk').extra.get('type')
+                        m.extra.pop('boot_disk')
+                except:
+                    pass
+
+                try:
+                    if m.extra.get('zone'):
+                        m.extra['zone'] = m.extra.get('zone').name
+                except:
+                    pass
+
+                try:
+                    if m.extra.get('machineType'):
+                        m.extra['machineType'] = m.extra.get('machineType').split('/')[-1]
+                except:
+                    pass
         for k in m.extra.keys():
             try:
                 json.dumps(m.extra[k])
             except TypeError:
                 m.extra[k] = str(m.extra[k])
+
+        if m.driver.type is Provider.AZURE:
+            if m.extra.get('endpoints'):
+                m.extra['endpoints'] = json.dumps(m.extra.get('endpoints', {}))
 
         if m.driver.type == 'bare_metal':
             can_reboot = False
@@ -1438,6 +1508,18 @@ def list_machines(user, backend_id):
                     if [backend_id, m.id] == machine[:2]:
                         can_reboot = True
             m.extra['can_reboot'] = can_reboot
+
+        if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
+            if 'windows' in m.extra.get('image', '').lower():
+                os_type = 'windows'
+            else:
+                os_type = 'linux'
+            m.extra['os_type'] = os_type
+
+        if m.driver.type in config.EC2_PROVIDERS:
+            # this is windows for windows servers and None for Linux
+            m.extra['os_type'] = m.extra.get('platform', 'linux')
+
         machine = {'id': m.id,
                    'uuid': m.get_uuid(),
                    'name': m.name,
@@ -1460,8 +1542,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
-                   script_id='', script_params='', job_id=None, docker_port_bindings={},
-                   docker_exposed_ports={}, hostname='', plugins=None):
+                   script_id='', script_params='', job_id=None,
+                   docker_port_bindings={}, docker_exposed_ports={},
+                   azure_port_bindings='', hostname='', plugins=None,
+                   post_script_id='', post_script_params=''):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1569,7 +1653,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type == Provider.AZURE:
         node = _create_machine_azure(conn, key_id, private_key,
                                              public_key, machine_name,
-                                             image, size, location, cloud_service_name=None)
+                                             image, size, location, cloud_service_name=None, azure_port_bindings=azure_port_bindings)
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
@@ -1578,6 +1662,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                       location)
     elif conn.type == Provider.HOSTVIRTUAL:
         node = _create_machine_hostvirtual(conn, public_key, machine_name, image,
+                                         size, location)
+    elif conn.type == Provider.VULTR:
+        node = _create_machine_vultr(conn, public_key, machine_name, image,
                                          size, location)
     else:
         raise BadRequestError("Provider unknown.")
@@ -1598,6 +1685,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
         )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1607,13 +1696,17 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins
+            hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
         )
     elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
         )
 
 
@@ -2052,9 +2145,74 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
 
     return node
 
+def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
+    """Create a machine in Vultr.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+
+    auth = NodeAuthSSHKey(pubkey=key)
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            auth=auth,
+            location=location
+        )
+    except Exception as e:
+        raise MachineCreationError("Vultr, got exception %s" % e, e)
+
+    return node
+
+
+
+def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
+    """Create a machine in Vultr.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+
+    try:
+        server_key = ''
+        keys = conn.ex_list_ssh_keys()
+        for k in keys:
+            if key == k.ssh_key.replace('\n', ''):
+                server_key = k
+                break
+        if not server_key:
+            server_key = conn.ex_create_ssh_key(machine_name, key)
+    except:
+        server_key = conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
+
+    try:
+        server_key = server_key.id
+    except:
+        pass
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            size=size,
+            image=image,
+            location=location,
+            ssh_key=[server_key]
+        )
+    except Exception as e:
+        raise MachineCreationError("Vultr, got exception %s" % e, e)
+
+    return node
+
 
 def _create_machine_azure(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location, cloud_service_name):
+                                  machine_name, image, size, location, cloud_service_name, azure_port_bindings):
     """Create a machine Azure.
 
     Here there is no checking done, all parameters are expected to be
@@ -2062,6 +2220,27 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
 
     """
     key = public_key.replace('\n', '')
+
+    port_bindings = []
+    if azure_port_bindings and type(azure_port_bindings) in [str, unicode]:
+    # we receive something like: http tcp 80:80, smtp tcp 25:25, https tcp 443:443
+    # and transform it to [{'name':'http', 'protocol': 'tcp', 'local_port': 80, 'port': 80},
+    # {'name':'smtp', 'protocol': 'tcp', 'local_port': 25, 'port': 25}]
+
+        for port_binding in azure_port_bindings.split(','):
+            try:
+                port_dict = port_binding.split()
+                port_name = port_dict[0]
+                protocol = port_dict[1]
+                ports = port_dict[2]
+                local_port = ports.split(':')[0]
+                port = ports.split(':')[1]
+                binding = {'name': port_name, 'protocol': protocol, 'local_port': local_port, 'port': port}
+                port_bindings.append(binding)
+            except:
+                pass
+
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -2069,15 +2248,20 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 size=size,
                 image=image,
                 location=location,
-                ex_cloud_service_name=cloud_service_name
+                ex_cloud_service_name=cloud_service_name,
+                endpoint_ports=port_bindings
             )
         except Exception as e:
             try:
-                #get to get the message only out of the XML response
-                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value).group(2)
+                # try to get the message only out of the XML response
+                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value)
+                if not msg:
+                    msg = re.search(r"(Message: ')(.*?)(', Body)", e.value)
+                if msg:
+                    msg = msg.group(2)
             except:
                 msg = e
-            raise MachineCreationError('Azure, got exception %s' % msg, e)
+            raise MachineCreationError('Azure, got exception %s' % msg)
 
         return node
 
@@ -2487,8 +2671,7 @@ def list_images(user, backend_id, term=None):
         images = starred_images + ec2_images + rest_images
         images = [img for img in images
                   if img.name and img.id[:3] not in ['aki', 'ari']
-                  and 'windows' not in img.name.lower()
-                  and 'hvm' not in img.name.lower()]
+                  and 'windows' not in img.name.lower()]
 
         if term and conn.type == 'docker':
             images = conn.search_images(term=term)[:40]
@@ -3052,7 +3235,7 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False, dry=False, **kwargs):
+                      no_ssh=False, dry=False, deploy_async=True, **kwargs):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
@@ -3092,8 +3275,10 @@ def enable_monitoring(user, backend_id, machine_id,
         return ret_dict
 
     if not no_ssh:
-        mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
-                                            ret_dict['extra_vars'])
+        deploy = mist.io.tasks_deploy_collectd
+        if deploy_async:
+            deploy = deploy.delay
+        deploy(user.email, backend_id, machine_id, ret_dict['extra_vars'])
 
     trigger_session_update(user.email, ['monitoring'])
 
@@ -3733,7 +3918,7 @@ def undeploy_collectd(user, backend_id, machine_id):
 
 def get_deploy_collectd_command_unix(uuid, password, monitor):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O - %s | sudo python - %s %s" % (url, uuid, password)
+    cmd = "wget -O - %s | $(command -v sudo) python - %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd

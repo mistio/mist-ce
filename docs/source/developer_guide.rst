@@ -36,11 +36,11 @@ For vSphere support, you should install pysphere library::
 
     ./bin/pip install pysphere
 
-In Red Hat based systems the following packages need to be installed:
+In Red Hat based systems the following packages need to be installed::
 
-    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml  gcc libxml2 libxml2-python libxml2-devel
+    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel
 
-For openSUSE distibution, you'll have to additionally install:
+For openSUSE distibution, you'll have to additionally install::
 
     sudo zypper in python-gevent libevent-devel
 

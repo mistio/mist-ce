@@ -118,6 +118,7 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                     graphs: [Graph.create({
                         title: 'Load on all monitored machines',
                         datasources: datasources,
+                        multi: true
                     })],
                     config: {
                         canModify: false,

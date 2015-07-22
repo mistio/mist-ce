@@ -307,6 +307,18 @@ class StdStreamCapture(object):
         return self.get_mux()
 
 
+def sanitize_host(host):
+    "Return the hostame or ip address out of a URL"
+
+    for prefix in ['https://', 'http://']:
+        host = host.replace(prefix, '')
+
+    host = host.split('/')[0]
+    host = host.split(':')[0]
+
+    return host
+
+
 def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
                allow_private=config.ALLOW_CONNECT_PRIVATE):
     """Check if a given host is a valid DNS name or IPv4 address"""
