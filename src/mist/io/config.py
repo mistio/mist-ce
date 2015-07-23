@@ -75,6 +75,7 @@ else:
     RABBITMQ_URL = settings.get("RABBITMQ_URL", 'localhost:5672')
     AMQP_URL = settings.get("AMQP_URL", "amqp://guest:guest@127.0.0.1/")
 
+AMQP_URL = AMQP_URL
 # celery settings
 CELERY_SETTINGS = {
     'BROKER_URL': AMQP_URL,
