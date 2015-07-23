@@ -5,14 +5,41 @@
     clear: both;
 }
 #machine-list-page #create-machine-btn {
+    margin: 0;
+    min-width: 150px;
     float: right;
 }
 #machine-list-page #select-machines-btn {
     float: left;
     font-weight: normal;
+    background-color: #fff;
+    color: #A4A390;
+    border-color: #b5b5b5;
+    padding: .4em .75em !important;
+    text-align: left;
+    width: 130px;
+    margin: 11px;
+    font-size: 14px;
+    line-height: 1.6em;
+}
+#machine-list-page #select-machines-btn:hover {
+    color: #A4A390 !important;
+}
+#machine-list-page .ui-header .ui-btn {
+    background-color: #fff;
+    margin-top: 13px;
+    margin-left: 0;
+}
+#machine-list-page .ui-header .ui-btn:hover {
+    color: #fff !important;
+    background-color: #64b247;
+    border-color: #64b247;
+}
+#machine-list-page .ui-block-b .ui-title {
+    text-align: center;
 }
 .running {
-    color: #13B754;
+    color: #64b247;
 }
 .pending {
     color: #E09400;
@@ -31,6 +58,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding-right: 16px;
+    color: #7F7F7F;
 }
 
 /* Conditional for < 550px */
@@ -109,9 +137,19 @@
     position: absolute;
     right: 116px;
     width: auto !important;
-    top: 19px;
+    top: 8px;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 29%;
     height: 21px;
+}
+#machines .ui-icon-check:after {
+    background-color: #46d4c9;
+}
+#machines a:after {
+    content: '\0056';
+    background-color: transparent;
+    background-image: none;
+    opacity: 1;
+    color: #7F7F7F;
 }

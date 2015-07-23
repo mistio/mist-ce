@@ -16,11 +16,10 @@
 #backend-edit .ui-field-contain {
     overflow: visible;
     height: 50px;
-    border-bottom: 1px solid #ddd !important;
+    border-bottom: none;
     margin: 6px 0;
 }
 
 #backend-edit .button-back {
-    width: 25%;
     margin: 0 auto;
 }

@@ -1,18 +1,7 @@
 <div id="backend-add"
-    data-swipe-close="false"
-    class="side-panel"
-    data-role="panel"
-    data-position="right"
-    data-display="overlay"
     data-theme="c">
-
-    <div data-role="header">
-        <h1>Add cloud</h1>
-    </div>
-
     <div data-role="content" data-theme="a">
 
-        <label>Provider:</label>
         <div id="new-backend-provider"
             class="mist-select"
             data-role="collapsible"
@@ -20,13 +9,14 @@
             data-expanded-icon="carat-u"
             data-iconpos="right"
             data-theme="a">
-            <h4>{{#if Mist.backendAddController.provider.title}}
+            <h4 class="{{if Mist.backendAddController.provider.title '' 'select-provider'}}">
+                {{#if Mist.backendAddController.provider.title}}
                    <span class="provider-icon-small">
                         <span class={{Mist.backendAddController.provider.className}}></span>
                     </span>
                     {{Mist.backendAddController.provider.title}}
                 {{else}}
-                    Select provider
+                    <span class="select-provider">Select provider</span>
                 {{/if}}
             </h4>
             <ul class="mist-select" data-role="listview" data-theme="a">
@@ -161,7 +151,7 @@
             <a class="ui-btn ui-btn-a ui-shadow ui-corner-all" {{action "backClicked" target=view}}>
                 Back
             </a>
-            <a id="new-backend-ok"
+            <a id="new-backend-ok ui-caps"
                 class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d"
                 {{action "addClicked" target=view}}>Add</a>
         </div>
@@ -196,7 +186,5 @@
         </p>
     </div>
 </div>
-
-{{view "keyAdd"}}
 
 {{view "fileUpload"}}

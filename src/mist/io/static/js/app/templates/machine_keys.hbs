@@ -13,7 +13,7 @@
     <div data-role="content" data-theme="c">
 
         <a id="associate-btn"
-            class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
+           class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all ui-caps"
            {{action "associateClicked" target=view}}>Add Key</a>
 
         {{#if Mist.machineKeysController.associatedKeys}}
@@ -30,7 +30,7 @@
             <div class="ajax-loader"></div>
         {{/if}} {{/if}}
 
-        <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target=view}}>Back</a>
+        <a class="ui-btn ui-btn-a ui-corner-all ui-caps" {{action "backClicked" target=view}}>Back</a>
 
     </div>
 
@@ -102,11 +102,11 @@
                value=Mist.machineKeysController.port}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a"
+            <a class="ui-btn ui-btn-a ui-caps"
                 {{action "closeSSH_Details" target=Mist.machineKeysController}}>
                 Cancel
             </a>
-            <a id="tryAssociate" class="ui-btn ui-btn-d"
+            <a id="tryAssociate" class="ui-btn ui-btn-d ui-caps"
                 {{action "customAssociateClicked" target=view}}>Retry</a>
         </div>
 

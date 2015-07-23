@@ -1,23 +1,81 @@
 /* Home Page CSS
 -----------------------------------------------------------------------------------------------------------*/
-#home-page #add-backend-btn {
+
+@media all and (min-width: 600px) {
+    #home-page .ui-block-a {
+        padding-right: 15px;
+    }
+    #home-page .ui-block-b {
+        padding-left: 15px;
+    }
+}
+#add-backend {
     float: right;
     margin-right: 0px;
     margin-bottom: 13px;
     margin-top: 0;
     top: .7em;
     position: relative;
-    height: 18px;
-    line-height: 18px;
+    padding: 0;
+    border:0;
+    overflow: visible;
+    z-index: 900;
 }
+
+#add-backend-overlay {
+    z-index: 899;
+}
+
+.ui-btn-add > .ui-collapsible-content {
+    position: absolute;
+    right: 0;
+    text-align: left;
+    min-width: 20em;
+}
+
+.ui-btn-add > h4.ui-collapsible-heading a{
+    background-color: #A4A39F !important;
+    padding: 18px 25px 18px 65px !important;
+    font-size: 16px;
+    padding-left: 70px !important;
+    color: #fff !important;
+    text-shadow: 0 0 0 #64b247 !important;
+    font-weight: 300;
+}
+
+.ui-btn-add > h4.ui-collapsible-heading a:hover {
+    border: 1px solid #A4A39F;
+}
+
+.ui-btn-add.ui-collapsible-collapsed > h4.ui-collapsible-heading a {
+    background-color: #64b247 !important;
+    text-shadow: 0 0 0 #64b247 !important;
+}
+
+.ui-btn-add > h4.ui-collapsible-heading a:after {
+    top: 26px;
+}
+
+.ui-btn-add.ui-collapsible-collapsed  > h4.ui-collapsible-heading a:hover{
+    background-color: #a2d191 !important;
+    border-color: #a2d191 !important;
+}
+
+.ui-btn-add.ui-collapsible  > h4.ui-collapsible-heading a:active{
+    background-color: #46862f !important;
+    border-color: #46862f !important;
+}
+
 #home-page .ui-listview {
     clear: both;
 }
+
 #home-page .ui-listview .ajax-loader {
     display: inline;
     float: right;
     margin-top: 1px;
 }
+
 @-moz-document url-prefix() {
     #home-page .ui-listview .ajax-loader {
         margin-top: -19px;
@@ -57,18 +115,51 @@
     }
 }
 
-ul.incidents span.time {
-    float: right;
-    font-weight: bold;
-    opacity: .75;
-    margin-bottom: -5px;
+.incidents h4 {
+    padding: 11.2px 16px;
+    background-color: #d1d1d1;
+    border: 1px solid #d1d1d1;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+    margin: 16px 0 0 0;
 }
 
-ul.incidents .ui-icon-alert:after, #machines .ui-icon-alert:after {
+.incidents .incident a {
+    color: #7f7f7f;
+    font-size: 16px;
+    text-shadow: none;
+}
+
+.incidents .incident.no a {
+    padding-left: 11.2px !important;
+}
+
+.incidents .incident.no a:hover {
+    background-color: #FAF9F4;
+    color: #7f7f7f !important;
+    border-color: #FAF9F4;
+    cursor: default;
+}
+
+.incidents .ui-listview {
+    margin-top: 0;
+}
+
+.incidents .time {
+    float: right;
+}
+
+.incidents .machine {
+    font-weight: bold;
+}
+
+.incidents .ui-icon-alert:after,
+#machines .ui-icon-alert:after {
     background-color: indianred;
 }
 
-ul.incidents .ui-icon-check:after {
+.incidents .ui-icon-check:after {
     background-color: rgba(33, 133, 89, 0.4);
 }
 
@@ -76,20 +167,52 @@ ul.incidents .ui-icon-check:after {
     background-color: rgba(33, 133, 89, .6);
 }
 
-ul.incidents li a.ui-btn{
+.incidents li a.ui-btn {
     font-weight: normal;
     white-space: normal;
-    padding-left: 16px !important;
+    padding-left: 42px !important;
     padding-right: 42px !important;
 }
 
-ul.incidents li a.ui-btn:after {
+.incidents li a.ui-btn:after {
     right: 8px !important;
 }
 
+.incidents li a.icon-check:after {
+    color: #64b247;
+}
 
-ul.incidents li a .machine {
-    font-weight: bold;
+.incidents li a.icon-error:after {
+    color: #d96557;
+}
+
+.incidents .incident .icon-bm,
+.incidents .incident .icon-vm {
+    position: absolute;
+    top: 13px;
+    left: 15px;
+}
+
+.incidents .incident a.icon-error {
+    color: #d96557;
+    background-color: #f7e0dd;
+}
+
+.incidents .incident a.icon-error:hover {
+    color: #d96557 !important;
+    background-color: #f7e0dd;
+}
+
+.incidents .incident a.icon-error .machine {
+    color: #d95557;
+}
+
+/*.incidents li a:hover .machine {
+    color: #d96557;
+}*/
+
+.incidents .incident a.icon-error:after {
+    color: #d96557;
 }
 
 #home-page .ui-body {

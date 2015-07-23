@@ -1,0 +1,90 @@
+#!/Users/foinikas/Development/mist.io/bin/python
+
+import sys
+
+sys.path[0:0] = [
+  '/Users/foinikas/Development/mist.io/src',
+  '/Users/foinikas/Development/mist.io/eggs/setuptools-18.0.1-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/PasteScript-2.0.2-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/six-1.9.0-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/PasteDeploy-1.5.2-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/Paste-2.0.2-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/pika-0.9.14-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/sockjs_tornado-1.0.1-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/websocket_client-0.32.0-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/amqp-1.4.6-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/netaddr-0.7.15-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/gevent_subprocess-0.1.1-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/gevent-1.0.2-py2.7-macosx-10.10-intel.egg',
+  '/Users/foinikas/Development/mist.io/eggs/celery-3.1.18-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/sphinx_bootstrap_theme-0.4.7-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/sphinxcontrib_httpdomain-1.3.0-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/behaving-1.2-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/nose-1.3.7-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/requests-2.7.0-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/pycrypto-2.6.1-py2.7-macosx-10.10-intel.egg',
+  '/Users/foinikas/Development/mist.io/eggs/PyYAML-3.11-py2.7-macosx-10.10-intel.egg',
+  '/Users/foinikas/Development/mist.io/src/paramiko',
+  '/Users/foinikas/Development/mist.io/src/libcloud',
+  '/Users/foinikas/Development/mist.io/eggs/pyramid-1.4-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/python_memcached-1.54-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/tornado-4.2-py2.7-macosx-10.10-intel.egg',
+  '/Users/foinikas/Development/mist.io/eggs/backports.ssl_match_hostname-3.4.0.2-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/greenlet-0.4.7-py2.7-macosx-10.10-intel.egg',
+  '/Users/foinikas/Development/mist.io/eggs/kombu-3.0.26-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/billiard-3.3.0.20-py2.7-macosx-10.10-intel.egg',
+  '/Users/foinikas/Development/mist.io/eggs/pytz-2015.4-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/Sphinx-1.3.1-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/splinter-0.7.2-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/behave-1.2.5-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/parse-1.6.6-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/ecdsa-0.13-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/translationstring-1.3-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/venusian-1.0-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/zope.deprecation-4.1.2-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/zope.interface-4.1.2-py2.7-macosx-10.10-intel.egg',
+  '/Users/foinikas/Development/mist.io/eggs/repoze.lru-0.6-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/WebOb-1.4.1-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/Mako-1.0.1-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/Chameleon-2.22-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/certifi-2015.4.28-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/anyjson-0.3.3-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/sphinx_rtd_theme-0.1.8-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/alabaster-0.7.6-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/Babel-1.3-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/snowballstemmer-1.2.0-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/docutils-0.12-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/Pygments-2.0.2-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/Jinja2-2.7.3-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/selenium-2.46.0-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/parse_type-0.3.4-py2.7.egg',
+  '/Users/foinikas/Development/mist.io/eggs/MarkupSafe-0.23-py2.7-macosx-10.10-intel.egg',
+  '/Users/foinikas/Development/mist.io/eggs/enum34-1.0.4-py2.7.egg',
+  ]
+
+
+_interactive = True
+if len(sys.argv) > 1:
+    _options, _args = __import__("getopt").getopt(sys.argv[1:], 'ic:m:')
+    _interactive = False
+    for (_opt, _val) in _options:
+        if _opt == '-i':
+            _interactive = True
+        elif _opt == '-c':
+            exec(_val)
+        elif _opt == '-m':
+            sys.argv[1:] = _args
+            _args = []
+            __import__("runpy").run_module(
+                 _val, {}, "__main__", alter_sys=True)
+
+    if _args:
+        sys.argv[:] = _args
+        __file__ = _args[0]
+        del _options, _args
+        with open(__file__, 'U') as __file__f:
+            exec(compile(__file__f.read(), __file__, "exec"))
+
+if _interactive:
+    del _interactive
+    __import__("code").interact(banner="", local=globals())

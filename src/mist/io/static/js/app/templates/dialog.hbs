@@ -30,7 +30,7 @@
 
         <div class="ui-header ui-bar-b" role="banner">
 
-            <h1 class="ui-title">
+            <h1 class="ui-title ui-caps">
                 {{Mist.dialogController.options.head}}
             </h1>
 
@@ -66,12 +66,12 @@
 
             {{#if view.isOK}}
 
-                <a class="ui-btn ui-btn-a ui-corner-all"
+                <a class="ui-btn ui-btn-a ui-corner-all ui-caps"
                     {{action "confirm" target=view}}>OK</a>
 
             {{else}}{{#if view.isBack}}
 
-                <a class="ui-btn ui-btn-a ui-corner-all"
+                <a class="ui-btn ui-btn-a ui-corner-all ui-caps back"
                     {{action "confirm" target=view}}>Back</a>
 
             {{else}}
@@ -85,22 +85,22 @@
                     data-type="horizontal">
 
                     {{#if view.isOKCancel}}
-                        <a class="ui-btn"
+                        <a class="ui-btn ui-caps"
                             {{action "reject" target=view}}>
                                 Cancel
                         </a>
-                        <a class="ui-btn ui-btn-d"
+                        <a class="ui-btn ui-btn-d ui-caps"
                             {{action "confirm" target=view}}>
                                 OK
                         </a>
                     {{/if}}
 
                     {{#if view.isYesNo}}
-                        <a class="ui-btn ui-btn-d"
+                        <a class="ui-btn ui-btn-d ui-caps"
                             {{action "reject" target=view}}>
                                 No
                         </a>
-                        <a class="ui-btn"
+                        <a class="ui-btn ui-caps"
                             {{action "confirm" target=view}}>
                                 Yes
                         </a>

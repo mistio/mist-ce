@@ -1,33 +1,50 @@
 <div id="key-list-page" data-role="page" class="ui-page-active">
 
-    <div data-role="header" data-theme="b">
+    <div data-role="header" data-theme="a">
+        <!-- Page header -->
+        <div class="ui-header ui-bar-a">
+            <div class="header-grid">
+                <div class="ui-grid-b">
+                    <div class="ui-block-a">
+                        <a href="#" class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
+                        ui-btn-icon-left ui-corner-all">Home</a>
+                    </div>
 
-        <a href="#" class="responsive-button ui-btn-left ui-btn ui-icon-home
-            ui-btn-icon-left ui-shadow ui-corner-all">Home</a>
+                    <div class="ui-block-b">
+                        <h1 class="ui-title">Keys</h1>
+                    </div>
 
-        <h1>Keys</h1>
-
-        {{view "userMenu"}}
-
+                    <div class="ui-block-c">
+                        <div class="user-menu">
+                            {{view "userMenu"}}
+                        </div>
+                    </div>
+                </div><!-- /grid-b -->
+            </div>
+        </div>
     </div>
 
     <div data-role="content" data-theme="a">
+        <div class="ui-grid-b keys-header ui-shadow">
+            <div class="ui-block-a">
+                 <a id="select-keys-btn"
+                   class="responsive-button ui-btn ui-btn-add ui-btn-d ui-icon-carat-d
+                        ui-btn-icon-left ui-caps"
+                   {{action "selectClicked" target="view"}}>Select</a>
+            </div>
+            <div class="ui-block-b"></div>
+            <div class="ui-block-c">
+                <a id="add-key-btn"
+                   class="responsive-button ui-btn ui-btn-add ui-btn-d ui-icon-plus
+                        ui-btn-icon-left ui-caps"
+                   {{action "addClicked" target="view"}}>Add</a>
+           </div>
+        </div><!-- /grid-b -->
 
-        <a id="select-keys-btn"
-           class="responsive-button"
-           data-role="button"
-           data-icon="arrow-d"
-           {{action "selectClicked" target="view"}}>Select</a>
-
-        <a id="add-key-btn"
-           class="responsive-button  ui-btn ui-btn-d ui-icon-plus
-                ui-btn-icon-right ui-shadow ui-corner-all"
-           {{action "addClicked" target="view"}}>Add</a>
-
-        <ul data-role="listview"
+        <ul id="key-list" data-role="listview"
             data-filter="true"
             data-inset="true"
-            data-filter-placeholder="Filter..."
+            data-filter-placeholder="Filter keys"
             class="checkbox-list">
             {{#each Mist.keysController.model as |key|}}
                 {{view "keyListItem" key=key class="checkbox-link"}}
@@ -39,8 +56,6 @@
     </div>
 
     {{view "dialog"}}
-
-    {{view "keyAdd"}}
 
     {{view "keyEdit"}}
 
@@ -57,13 +72,13 @@
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
-            <a class="ui-btn ui-icon-edit ui-btn-icon-left ui-shadow ui-corner-all"
+            <a class="ui-btn ui-icon-edit ui-btn-icon-right ui-corner-all ui-caps"
                 {{action "renameClicked" target="view"}}>Rename</a>
         </td><td>
-            <a class="ui-btn ui-icon-delete ui-btn-icon-left ui-shadow ui-corner-all"
+            <a class="ui-btn ui-icon-delete ui-btn-icon-right ui-corner-all ui-caps"
                 {{action "deleteClicked" target="view"}}>Delete</a>
         </td><td>
-            <a class="ui-btn ui-icon-gear ui-btn-icon-left ui-shadow ui-corner-all"
+            <a class="ui-btn ui-icon-gear ui-btn-icon-right ui-corner-all ui-caps"
                 {{action "setDefaultClicked" target="view"}}>Set default</a>
         </td></tr></tbody></table>
     </div>

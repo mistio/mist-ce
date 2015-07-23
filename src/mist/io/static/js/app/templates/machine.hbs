@@ -1,77 +1,101 @@
 <div id="single-machine-page" data-role="page" class="ui-page-active" data-theme="a">
 
-    <div data-role="header" data-theme="b">
+    <div data-role="header" data-theme="a">
+        <!-- Page header -->
+        <div class="ui-header ui-bar-a">
+            <div class="header-grid">
+                <div class="ui-grid-b">
+                    <div class="ui-block-a">
+                        <a href="#/machines" class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
+                        ui-btn-icon-left ui-corner-all">Machines</a>
+                    </div>
 
-        <a class="ui-btn
-                ui-btn-icon-left
-                ui-icon-arrow-l
-                responsive-button"
-            href="#/machines">Machines</a>
+                    <div class="ui-block-b">
+                        <h1 class="ui-title">{{name}}</h1>
+                    </div>
 
-        <h1>{{name}}</h1>
-
-        {{view "userMenu"}}
-
+                    <div class="ui-block-c">
+                        <div class="user-menu">
+                            {{view "userMenu"}}
+                        </div>
+                    </div>
+                </div><!-- /grid-b -->
+            </div>
+        </div>
     </div>
 
     <div data-role="header" data-theme="a" class="single-machine-header">
+        <div class="header-grid">
+            <div class="ui-grid-b">
+                <div class="ui-block-a">
+                    <!-- Provider Icon -->
+                    <span class="single-view-icon-wrapper">
+                        <span id="single-view-provider-icon"
+                            class={{view.providerIconClass}}>
+                        </span>
+                    </span>
 
-        <!-- Provider Icon -->
-        <span class="single-view-icon-wrapper">
-            <span id="single-view-provider-icon"
-                class={{view.providerIconClass}}>
-            </span>
-        </span>
+                    <!-- OS Icon -->
+                    <span class="single-view-icon-wrapper">
+                        <span id="single-view-image-icon"
+                            class={{view.imageIconClass}}>
+                        </span>
+                    </span>
+                </div>
 
-        <!-- OS Icon -->
-        <span class="single-view-icon-wrapper">
-            <span id="single-view-image-icon"
-                class={{view.imageIconClass}}>
-            </span>
-        </span>
+                <div class="ui-block-b">
+                    <!-- State label -->
+                    <h1 class={{state}}>
+                        {{#unless isUnknown}}
+                            {{state}}
+                        {{/unless}}
+                    </h1>
+                </div>
 
-        <!-- State label -->
-        <h1 class={{state}}>
-            {{#unless isUnknown}}
-                {{state}}
-            {{/unless}}
-        </h1>
-
-        <!-- Show spinner if machines are being loaded -->
-        {{#unless id}}
-            {{#if Mist.backendsController.loadingMachines}}
-                <div class="ajax-loader"></div>
-            {{/if}}
-        {{/unless}}
+                <div class="ui-block-c">
+                    <!-- Show spinner if machines are being loaded -->
+                    {{#unless id}}
+                        {{#if Mist.backendsController.loadingMachines}}
+                            <div class="ajax-loader"></div>
+                        {{/if}}
+                    {{/unless}}
 
 
-        <!-- If machine is not running created, disable keys UI -->
-        {{#unless isWindows}}
-        <span id="mist-manage-keys"
-            class="{{if view.isRunning '' 'ui-state-disabled'}} ui-btn-right">
+                    <!-- If machine is not running created, disable keys UI -->
+                    {{#unless isWindows}}
+                    <span id="mist-manage-keys"
+                        class="{{if view.isRunning '' 'ui-state-disabled'}}">
 
-            <!-- If machine is beging created, hide keys UI -->
-            {{#unless pendingCreation}}
-                {{#if keysCount}}
-                    <a class="ui-btn
-                            ui-shadow
-                            ui-corner-all"
-                        {{action "manageKeysClicked" target=view}}>
-                        {{keysCount}} keys
-                    </a>
-                {{else}}
-                    <a class="ui-btn
-                            ui-btn-d
-                            ui-btn-icon-right
-                            ui-icon-plus
-                            ui-corner-all"
-                        {{action "addKeyClicked" target=view}}>
-                        Add key
-                    </a>
-                {{/if}}
-            {{/unless}}
-        </span>
-        {{/unless}}
+                        <!-- If machine is beging created, hide keys UI -->
+                        {{#unless pendingCreation}}
+                            {{#if keysCount}}
+                                <a class="ui-btn
+                                        ui-shadow
+                                        ui-corner-all
+                                        ui-icon-plus
+                                        ui-btn-icon-left
+                                        ui-caps"
+                                    {{action "manageKeysClicked" target=view}}>
+                                    {{keysCount}} keys
+                                </a>
+                            {{else}}
+                                <a class="ui-btn
+                                        ui-btn-d
+                                        ui-icon-plus
+                                        ui-corner-all
+                                        ui-icon-plus
+                                        ui-btn-icon-left
+                                        ui-caps"
+                                    {{action "addKeyClicked" target=view}}>
+                                    Add key
+                                </a>
+                            {{/if}}
+                        {{/unless}}
+                    </span>
+                    {{/unless}}
+                </div>
+            </div><!-- /grid-b -->
+        </div>
     </div>
 
     <div data-role="content" data-theme="a">
@@ -84,7 +108,7 @@
         -->
 
 
-        <div id="monitoring-collapsible" data-role="collapsible" data-collapsed="false">
+        <div id="monitoring-collapsible" data-role="collapsible" data-collapsed="false" class="ui-shadow">
 
             <h4>Monitoring</h4>
             {{#if view.machine}}
@@ -101,7 +125,7 @@
         -->
 
 
-        <div data-role="collapsible" data-collapsed="false">
+        <div data-role="collapsible" data-collapsed="false" class="ui-shadow">
 
             <h4>Basic Info</h4>
 
@@ -114,7 +138,7 @@
                          {{else}}
                              {{view.lastProbe}}
                              <a id="machine-probe-btn"
-                                class="ui-btn ui-shadow ui-corner-all"
+                                class="ui-btn ui-btn-d ui-shadow"
                                 {{action "probeClicked" target=view}}>
                                     Probe
                             </a>
@@ -212,7 +236,7 @@
         </div>
 
         {{#if view.metadata}}
-            <div id="single-machine-metadata" data-role="collapsible">
+            <div id="single-machine-metadata" data-role="collapsible" class="ui-shadow">
 
                 <h4>Full metadata list</h4>
 
@@ -230,8 +254,6 @@
             </div>
         {{/if}}
 
-        <div class="mid-padding"></div>
-
     </div>
 
     {{view "dialog"}}
@@ -247,30 +269,37 @@
     {{view "machinePower" position="#single-machine-power-btn"}}
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
-        <table><tbody><tr><td>
-            <a id="single-machine-tags-btn"
-                class="{{if id '' 'ui-state-disabled'}}
-                    {{if can_tag '' 'ui-state-disabled'}}
-                    ui-btn ui-btn-icon-left ui-icon-grid"
-                {{action "tagsClicked" target=view}}>Tags</a>
-        </td><td>
-            {{#if isWindows}}
-                <a id="single-machine-shell-btn"
-                    target="_blank"
-                    href={{rdpURL}} class="{{if canConnect '' 'ui-state-disabled'}}
-                        ui-btn ui-btn-icon-left ui-icon-gear">Connect</a>
-            {{else}}
-                <a id="single-machine-shell-btn"
-                    class="{{if canConnect '' 'ui-state-disabled'}}
-                        ui-btn ui-btn-icon-left ui-icon-gear"
-                    {{action "shellClicked" target=view}}>Shell</a>
-            {{/if}}
-        </td><td>
-            <a id="single-machine-power-btn"
-                class="{{if id '' 'ui-state-disabled'}}
-                    ui-btn ui-btn-icon-left ui-icon-bars"
-                {{action "powerClicked" target=view}}>Actions</a>
-        </td></tr></tbody></table>
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <a id="single-machine-tags-btn"
+                            class="{{if id '' 'ui-state-disabled'}}
+                                {{if can_tag '' 'ui-state-disabled'}}
+                                ui-btn ui-btn-icon-left ui-icon-grid ui-caps"
+                            {{action "tagsClicked" target=view}}>Tags</a>
+                    </td>
+                    <td>
+                        {{#if isWindows}}
+                        <a id="single-machine-shell-btn"
+                            target="_blank"
+                            href={{rdpURL}} class="{{if canConnect '' 'ui-state-disabled'}}
+                                ui-btn ui-btn-icon-left ui-icon-gear ui-caps">Connect</a>
+                        {{else}}
+                        <a id="single-machine-shell-btn"
+                            class="{{if canConnect '' 'ui-state-disabled'}}
+                                ui-btn ui-btn-icon-left ui-icon-gear ui-caps"
+                            {{action "shellClicked" target=view}}>Shell</a>
+                        {{/if}}
+                    </td>
+                    <td>
+                        <a id="single-machine-power-btn"
+                            class="{{if id '' 'ui-state-disabled'}}
+                                ui-btn ui-btn-icon-left ui-icon-bars ui-caps"
+                            {{action "powerClicked" target=view}}>Actions</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
 </div>

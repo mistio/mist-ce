@@ -17,7 +17,7 @@ define('app/views/user_menu', ['app/views/templated', 'md5'],
             isNotCore: !IS_CORE,
             accountUrl: URL_PREFIX + '/account',
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +
-                  encodeURIComponent('https://mist.io/resources/images/sprite-images/user.png') +'&s=36'),
+                  encodeURIComponent('https://mist.io/resources/images/sprite-images/user.png') +'&s=96'),
 
 
             /**

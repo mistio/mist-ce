@@ -5,12 +5,12 @@
     </div>
 
     <div data-role="content">
-        <label for="login-email">Email:</label>
+        <label for="login-email">Email</label>
         {{view Mist.TextField
                id="login-email"
                value=Mist.loginController.email}}
 
-        <label for="login-password">Password:</label>
+        <label for="login-password">Password</label>
         {{view Mist.TextField
                id="login-password"
                type="password"
@@ -19,7 +19,7 @@
         {{#if Mist.loginController.loggingIn}}
         <div class="ajax-loader"></div>
         {{/if}}
-        <a {{action "forgot" target="view"}} target="_new">Forgot your password?</a>
+
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a class="ui-btn ui-btn-a ui-shadow ui-corner-all"
                 {{action "backClicked" target="view"}}>Back</a>

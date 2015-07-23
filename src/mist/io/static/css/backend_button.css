@@ -3,10 +3,49 @@
 -----------------------------------------------------------------------------------------------------------*/
 #backend-buttons {
     display: block;
-    margin-top: -51px;
+    margin-top: 18px;
 }
+
+#backend-buttons a:after {
+    margin-top: -4px;
+    border-radius: 1em;
+    width: 12px;
+    height: 12px;
+}
+
+#backend-buttons a.online:after {
+    background-color: #64b247;
+}
+#backend-buttons a.online:hover:after {
+    background-color: #fff !important;
+}
+#backend-buttons a.online:hover {
+    background-color: #64b247;
+}
+
+
+#backend-buttons a.offline:after {
+    background-color: #d96557;
+}
+#backend-buttons a.offline:hover:after {
+    background-color: #fff !important;
+}
+#backend-buttons a.offline:hover {
+    background-color: #d96557;
+}
+
+#backend-buttons a.waiting:after {
+    background-color: #d48900;
+}
+#backend-buttons a.waiting:hover:after {
+    background-color: #fff !important;
+}
+#backend-buttons a.waiting:hover {
+    background-color: #d48900;
+}
+
 #backend-buttons .ui-controlgroup-controls a {
-    padding: 13px 10px 10px 40px !important;
+    padding: 13px 10px 10px 30px !important;
     color: black;
     position: relative;
 }
@@ -20,10 +59,12 @@
     display: block;
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn {
-    border: 1px solid #fafafa;
+    border-width: 0;
     margin-top: 10px;
-    padding: 10px 0 9px !important;
-    background-color: transparent;
+    margin-right: .5em;
+    padding: 5px 0 5px !important;
+    background-color: #F9F8F3;
+    box-shadow: 0 4px 9px /*{global-box-shadow-size}*/ rgba(0,0,0,.1) /*{global-box-shadow-color}*/;
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn:hover {
     background-color: #eee;

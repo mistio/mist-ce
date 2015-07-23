@@ -1,48 +1,48 @@
-<a id="me-btn"
-   class="ui-btn-right ui-btn ui-shadow ui-corner-all"
-   {{action "meClicked" target=view}}>
-    {{#if view.gravatarURL}}
-        <img class="gravatar-image" src={{view.gravatarURL}} />
-    {{else}}
-        <div class="gravatar-image user"></div>
-    {{/if}}
-    &nbsp;</a>
+<a id="me-btn" {{action "meClicked" target=view}}>
+{{#if view.gravatarURL}}
+<img class="gravatar-image" src="{{view.gravatarURL}}" />
+{{else}}
+<span class="gravatar-image user"></span>
+{{/if}}
+&nbsp;</a>
 
 <div id="user-menu-popup" class="ui-mini" data-role="popup" data-position-to="#me-btn" data-theme="c" data-overlay-theme="b" data-transition="flip">
 
-    <div data-role="content">
+	{{#if Mist.authenticated}}
+	<div class="ui-header user-email">{{EMAIL}}</div>
+	{{/if}}
 
-        <div id="user-email">{{EMAIL}}</div>
+	<ul class="ui-listview">
 
-        <a href="http://docs.mist.io/contact"
+        <li><a href="http://docs.mist.io/contact"
            target="_blank"
-           class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini">
-           Support</a>
+           class="ui-btn ui-btn-icon-left ui-mini icon-support">
+           Support</a></li>
 
-        <a href="http://docs.mist.io/"
+        <li><a href="http://docs.mist.io/"
            target="_blank"
-           class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini">
-           Docs</a>
+           class="ui-btn ui-btn-icon-left ui-mini icon-docs">
+           Docs</a></li>
 
         {{#if Mist.authenticated}}
 
-            <a class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini"
+            <li><a class="ui-btn ui-btn-icon-left ui-mini icon-user"
                href={{view.accountUrl}}
-               target={{view.isNotCore}}>Account</a>
+               target={{view.isNotCore}}>Account</a></li>
 
 
             {{#if Mist.isCore}}
-                <a class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini"
-                    {{action "logoutClicked" target=view}}>Logout</a>
+                <li><a class="ui-btn ui-btn-icon-left ui-mini icon-x"
+                    {{action "logoutClicked" target=view}}>Logout</a></li>
             {{/if}}
         {{else}}
             {{#unless Mist.isCore}}
-                <a class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini"
-                    {{action "loginClicked" target=view}}>Login</a>
+                <li><a class="ui-btn ui-mini"
+                    {{action "loginClicked" target=view}}>Login</a></li>
             {{/unless}}
         {{/if}}
 
-    </div>
+    </ul>
 
 </div>
 

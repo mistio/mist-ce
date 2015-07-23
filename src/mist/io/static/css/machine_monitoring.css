@@ -67,10 +67,10 @@
     position: relative;
     left: 10px;
     bottom: -5px;
-    font-weight: bold;
-    color: #404040;
+    color: #444444;
     display: inline-block;
     float: left;
+    text-transform: uppercase;
 }
 
 .graph .ajax-loader {
@@ -134,9 +134,12 @@
 #machine-monitoring #enable-monitoring-label{
     text-align: center;
 }
+#machine-monitoring {
+    text-align: center;
+}
 
 #machine-monitoring #enable-monitoring-btn {
-    width: 165px;
+    display: inline-block;
     margin: 20px auto auto auto;
 }
 

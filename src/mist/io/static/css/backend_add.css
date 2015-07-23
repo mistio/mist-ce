@@ -1,18 +1,55 @@
 
 /* Backend Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
+#backend-add h4.select-provider a,
+#backend-add h4 a:hover,
+#backend-add ul li a:hover {
+    background-color: #64b247;
+    border-color: #64b247;
+    color: #fff;
+    text-shadow: 0 0 0 #64b247;
+}
+
+#backend-add h4, #backend-add ul {
+    border: 1px solid #64b247;
+}
+
+#backend-add ul {
+    border-top-width: 0px;
+}
+
+#backend-add h4.select-provider a:hover {
+    background-color: #a2d191;
+    border-color: #a2d191;
+}
+
+#backend-add .ui-content {
+    background-color: #FAF9F4;
+}
+
 #backend-add label {
     margin-top: 1em;
 }
 #backend-add .mist-select ul {
     max-height: 165px;
     overflow-y: scroll;
+    margin: 0;
 }
 
 #backend-add .ui-slider {
     width: 100%;
     margin-top: .1em;
     margin-bottom: -0.4em;
+    border-color: #A4A39F;
+    box-shadow: none;
+}
+
+#backend-add .ui-slider .ui-slider-label {
+    background-color: #fff;
+}
+
+#backend-add .ui-slider .ui-slider-handle {
+    background-color: #64b247;
 }
 
 #backend-add-advanced {

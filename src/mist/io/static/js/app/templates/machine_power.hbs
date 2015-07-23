@@ -11,26 +11,26 @@
 
     <div data-role="content" data-theme="a">
         {{#if Mist.machinePowerController.canRename}}
-        <a id="rename-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+        <a id="rename-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps"
             {{action "actionClicked" "rename" target=view}}>Rename</a>
         {{/if}}
         {{#if Mist.machinePowerController.canStart}}
-        <a id="start-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+        <a id="start-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps"
             {{action "actionClicked" "start" target=view}}>Start</a>
         {{/if}}
         {{#if Mist.machinePowerController.canShutdown}}
-        <a id="shutdown-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+        <a id="shutdown-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps"
             {{action "actionClicked" "shutdown" target=view}}>Shutdown</a>
         {{/if}}
         {{#if Mist.machinePowerController.canReboot}}
-        <a id="reboot-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+        <a id="reboot-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps"
             {{action "actionClicked" "reboot" target=view}}>Reboot</a>
         {{/if}}
         {{#if Mist.machinePowerController.canDestroy}}
-        <a id="destroy-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+        <a id="destroy-machine-option" class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps"
             {{action "actionClicked" "destroy" target=view}}>Destroy</a>
         {{/if}}
-        <a class="ui-btn ui-shadow ui-corner-all" {{action "backClicked" target=view}}>Back</a>
+        <a class="ui-btn ui-shadow ui-corner-all ui-caps" {{action "backClicked" target=view}}>Back</a>
     </div>
 </div>
 

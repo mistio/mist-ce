@@ -1,19 +1,41 @@
 
 /* Key List Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+#key-list-page .ui-content {
+    background-color: transparent;
+}
+
+#key-list-page .ui-header .ui-btn {
+    background-color: #fff;
+    margin-top: 13px;
+    margin-left: 0;
+}
+#key-list-page .ui-header .ui-btn:hover {
+    color: #fff !important;
+    background-color: #64b247;
+    border-color: #64b247;
+}
+#key-list-page .ui-block-b .ui-title {
+    text-align: center;
+}
 #key-list-page .ui-filterable {
     clear: both;
 }
 #key-list-page #add-key-btn {
     float: right;
+    margin: 0;
 }
 #key-list-page #select-keys-btn {
     float: left;
     font-weight: normal;
+    margin: 0;
 }
 #key-list-page .tag {
     position: relative;
     top: 5px !important;
+}
+#key-list-page .ui-icon-check:after {
+    background-color: #46d4c9;
 }
 @-moz-document url-prefix() {
     #key-list-page .tag {
@@ -26,8 +48,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding-right: 16px;
+    color: #7f7f7f;
 }
 .key-tags {
     float: right;
     margin-top: -8px;
+}
+#key-list a:after {
+    content: '\0056';
+    background-color: transparent;
+    background-image: none;
+    opacity: 1;
+    color: #7F7F7F;
 }

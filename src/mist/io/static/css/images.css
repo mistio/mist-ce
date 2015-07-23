@@ -1,7 +1,32 @@
 
 /* Image List Page CSS
 -----------------------------------------------------------------------------------------------------------*/
-
+#image-list-page .ui-header .ui-btn {
+    background-color: #fff;
+    margin-top: 13px;
+    margin-left: 0;
+}
+#image-list-page .ui-content {
+    background-color: transparent;
+}
+#image-list-page .ui-header .ui-btn:hover {
+    color: #fff !important;
+    background-color: #64b247;
+    border-color: #64b247;
+}
+#image-list-page .ui-block-b .ui-title {
+    text-align: center;
+}
+#image-list-page .images-header {
+    min-height: 57px;
+}
+#image-list-page #image-list a {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+#image-list-page #image-list .staron {
+    height: 19px;
+}
 @-moz-document url-prefix() {
     #image-list-page .checkbox-link h3 {
         width: 50%;
@@ -17,7 +42,7 @@
 
 #image-list-page .checkbox-link h3 {
     position: relative;
-    top: 4px;
+    top: 6px;
 }
 
 #image-list-page ul .ui-checkbox-off:after {
@@ -28,4 +53,11 @@
 #image-list-page ul .ui-checkbox-on:after {
     background-color: rgba(0,0,0,0) !important;
     background-repeat: no-repeat !important;
+}
+#image-list a:after {
+    content: '\0056';
+    background-color: transparent;
+    background-image: none;
+    opacity: 1;
+    color: #7F7F7F;
 }

@@ -131,8 +131,10 @@ define('app/views/log_list_item', ['app/views/list_item'],
                         });
                     } else {
                         var that = this;
-                        this.$('.details').slideUp(function () {
-                           that.set('isCollapsed', true);
+                        Ember.run.next(this, function(){
+                            this.$('.details').slideUp(function () {
+                               that.set('isCollapsed', true);
+                            });
                         });
                     }
                 },
