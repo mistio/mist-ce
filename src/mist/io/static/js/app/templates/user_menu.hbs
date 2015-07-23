@@ -1,8 +1,8 @@
 <a id="me-btn"
    class="ui-btn-right ui-btn ui-shadow ui-corner-all"
-   {{action "meClicked" target="view"}}>
+   {{action "meClicked" target=view}}>
     {{#if view.gravatarURL}}
-        <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
+        <img class="gravatar-image" src={{view.gravatarURL}} />
     {{else}}
         <div class="gravatar-image user"></div>
     {{/if}}
@@ -27,18 +27,18 @@
         {{#if Mist.authenticated}}
 
             <a class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini"
-               {{bind-attr href="view.accountUrl"}}
-               {{bind-attr target="view.isNotCore"}}>Account</a>
+               href={{view.accountUrl}}
+               target={{view.isNotCore}}>Account</a>
 
 
             {{#if Mist.isCore}}
                 <a class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini"
-                    {{action "logoutClicked" target="view"}}>Logout</a>
+                    {{action "logoutClicked" target=view}}>Logout</a>
             {{/if}}
         {{else}}
             {{#unless Mist.isCore}}
                 <a class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-mini"
-                    {{action "loginClicked" target="view"}}>Login</a>
+                    {{action "loginClicked" target=view}}>Login</a>
             {{/unless}}
         {{/if}}
 

@@ -40,8 +40,8 @@
     <tr>
         <td>DNS Nameservers</td>
         <td>
-            {{#each this.dns_nameservers}}
-            <div class="ip">{{unbound this}}</div>
+            {{#each this.dns_nameservers as |nameserver|}}
+            <div class="ip">{{unbound nameserver}}</div>
             {{/each}}
         </td>
     </tr>
@@ -50,9 +50,9 @@
     <tr>
         <td>Allocation pools</td>
         <td>
-            {{#each this.allocation_pools}}
-            <div class="ip">{{unbound this.start}}</div> -
-            <div class="ip">{{unbound this.end}}</div>
+            {{#each this.allocation_pools as |pool|}}
+            <div class="ip">{{unbound pool.start}}</div> -
+            <div class="ip">{{unbound pool.end}}</div>
             {{/each}}
         </td>
     </tr>
@@ -64,8 +64,8 @@
             <h4>Usable ip addresses ({{ipAddresses.length}})</h4>
             <table>
                 <tbody>
-                {{#each ipAddresses}}
-                    {{view "ipAddressListItem" model=this}}
+                {{#each ipAddresses as |ip|}}
+                    {{view "ipAddressListItem" model=ip}}
                 {{/each}}
                 </tbody>
             </table>

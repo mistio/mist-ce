@@ -13,18 +13,15 @@
             <h1 class="ui-title">Select Metric</h1>
         </div>
 
-        <div {{bind-attr class="
-                Mist.metricAddController.metrics.length::no-metrics
-                :ui-content
-                :ui-body-a"}}
-            role="main">
+        <div class="{{if Mist.metricAddController.metrics.length '' 'no-metrics'}} ui-content ui-body-a"
+             role="main">
 
             <a class="ui-btn ui-btn-d ui-corner-all ui-btn-icon-left ui-icon-plus"
-                {{action "customClicked" target="view"}}>custom</a>
+                {{action "customClicked" target=view}}>custom</a>
 
             {{#if Mist.metricAddController.metrics.length}}
                 {{view "metricNode"
-                    nodeBinding="Mist.metricAddController.metricsTree"}}
+                    node=Mist.metricAddController.metricsTree}}
             {{else}}
                 <div class="ui-body-a">
                     <p>Checking available metrics on your server</p>

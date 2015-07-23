@@ -14,12 +14,12 @@
 
         <a id="associate-btn"
             class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
-           {{action "associateClicked" target="view"}}>Add Key</a>
+           {{action "associateClicked" target=view}}>Add Key</a>
 
         {{#if Mist.machineKeysController.associatedKeys}}
         <ul id="machine-keys">
-            {{#each Mist.machineKeysController.associatedKeys}}
-                {{view "machineKeysListItem" keyBinding="this"}}
+            {{#each Mist.machineKeysController.associatedKeys as |key|}}
+                {{view "machineKeysListItem" key=key}}
             {{/each}}
         </ul>
         {{/if}}
@@ -30,7 +30,7 @@
             <div class="ajax-loader"></div>
         {{/if}} {{/if}}
 
-        <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
+        <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target=view}}>Back</a>
 
     </div>
 
@@ -46,9 +46,9 @@
     data-position-to="#machine-keys"
     data-theme="a">
     <ul data-role="listview">
-        <li data-icon="false"><a {{action "removeClicked" target="view"}}>Remove</a></li>
-        <li data-icon="false"><a {{action "probeClicked" target="view"}}>Probe</a></li>
-        <li data-icon="false"><a {{action "viewClicked" target="view"}}>View</a></li>
+        <li data-icon="false"><a {{action "removeClicked" target=view}}>Remove</a></li>
+        <li data-icon="false"><a {{action "probeClicked" target=view}}>Probe</a></li>
+        <li data-icon="false"><a {{action "viewClicked" target=view}}>View</a></li>
     </ul>
 </div>
 
@@ -60,13 +60,13 @@
     data-position-to="#associate-btn">
 
     <ul data-role="listview">
-        {{#each Mist.machineKeysController.nonAssociatedKeys}}
+        {{#each Mist.machineKeysController.nonAssociatedKeys as |key|}}
         <li data-icon="false">
-            <a {{action "nonAssociatedKeyClicked" this target="view"}}>{{this.id}}</a>
+            <a {{action "nonAssociatedKeyClicked" key target=view}}>{{key.id}}</a>
         </li>
         {{/each}}
         <li data-icon="false" data-theme="d">
-            <a {{action "newKeyClicked" target="view"}}>New key</a>
+            <a {{action "newKeyClicked" target=view}}>New key</a>
         </li>
     </ul>
 </div>
@@ -92,22 +92,22 @@
                id="user"
                data-theme="a"
                placeholder="root"
-               valueBinding="Mist.machineKeysController.user"}}
+               value=Mist.machineKeysController.user}}
 
         <label for="port">Port:</label>
         {{view Mist.TextField
                id="port"
                data-theme="a"
                placeholder="22"
-               valueBinding="Mist.machineKeysController.port"}}
+               value=Mist.machineKeysController.port}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a class="ui-btn ui-btn-a"
-                {{action "closeSSH_Details" target="Mist.machineKeysController"}}>
+                {{action "closeSSH_Details" target=Mist.machineKeysController}}>
                 Cancel
             </a>
             <a id="tryAssociate" class="ui-btn ui-btn-d"
-                {{action "customAssociateClicked" target="view"}}>Retry</a>
+                {{action "customAssociateClicked" target=view}}>Retry</a>
         </div>
 
     </div>

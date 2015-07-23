@@ -64,9 +64,7 @@ define('app/views/backend_button', ['app/views/templated'],
             actions: {
 
                 buttonClicked: function () {
-                    $('#backend-edit').popup('option',
-                        'positionTo', '#' + this.elementId);
-                    Mist.backendEditController.open(this.backend);
+                    Mist.backendEditController.open(this.backend, '#' + this.elementId);
                 }
             },
 

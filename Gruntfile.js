@@ -69,6 +69,14 @@ module.exports = function(grunt) {
 					force: true
 				}
 			},
+			requirejs: {
+				target: '../bower_components/requirejs/',
+				link: 'dist/requirejs',
+				options: {
+					overwrite: true,
+					force: true
+				}
+			},
 			requirejs_text: {
 				target: '../bower_components/requirejs-text/',
 				link: 'dist/requirejs-text',

@@ -22,7 +22,7 @@
             data-theme="a">
             <h4>{{#if Mist.backendAddController.provider.title}}
                    <span class="provider-icon-small">
-                        <span {{bind-attr class="Mist.backendAddController.provider.className"}}></span>
+                        <span class={{Mist.backendAddController.provider.className}}></span>
                     </span>
                     {{Mist.backendAddController.provider.title}}
                 {{else}}
@@ -30,13 +30,13 @@
                 {{/if}}
             </h4>
             <ul class="mist-select" data-role="listview" data-theme="a">
-                {{#each Mist.backendsController.providerList}}
+                {{#each Mist.backendsController.providerList as |provider|}}
                     <li data-icon="false">
-                        <a {{action "selectProvider" this target="view"}}>
+                        <a {{action "selectProvider" provider target=view}}>
                             <span class="provider-icon-small">
-                                <span {{bind-attr class="this.className"}}></span>
+                                <span class={{provider.className}}></span>
                             </span>
-                            {{this.title}}
+                            {{provider.title}}
                         </a>
                     </li>
                 {{/each}}
@@ -46,15 +46,15 @@
 
         </style>
         <div id="backend-add-fields">
-        {{#each field in view.providerFields}}
+        {{#each view.providerFields as |field|}}
             {{#if field.show}}
-            <div {{bind-attr class="field.className :field Mist.backendAddController.provider.provider"}}>
+            <div class="{{field.className}} field {{Mist.backendAddController.provider.provider}}">
 
                 <!-- Field Label -->
 
                 {{#if field.label}}
                     {{#unless field.isCheckbox}}
-                        <label {{bind-attr for="field.name"}}>
+                        <label for={{field.name}}>
                             {{unbound field.label}}:
                         </label>
                     {{/unless}}
@@ -63,19 +63,19 @@
                 <!-- Field Wrapper -->
 
                 <div class="field-wrapper">
-                    <div {{bind-attr class=":first-child field.helpText::last-child"}}>
+                    <div class="first-child {{if field.helpText '' 'last-child'}}">
                         {{#if field.isText}}
                             {{view Mist.TextField
                                 data-theme="a"
                                 type=field.type
                                 id=field.name
                                 placeholder=field.placeholder
-                                valueBinding="field.value"}}
+                                value=field.value}}
                         {{/if}}
                         {{#if field.isFile}}
                             <a class="ui-btn ui-btn-a"
-                                {{bind-attr id="field.name"}}
-                                {{action "uploadFile" field target="view"}}>
+                                id={{field.name}}
+                                {{action "uploadFile" field target=view}}>
                                     {{unbound field.buttonText}}
                             </a>
                         {{/if}}
@@ -83,12 +83,12 @@
                             <label>
                                 {{view Mist.Checkbox
                                     data-theme="a"
-                                   checkedBinding=field.value}}
+                                    checked=field.value}}
                                 {{field.label}}
                             </label>
                         {{/if}}
                         {{#if field.isKey}}
-                            <div {{bind-attr id="field.name"}}
+                            <div id={{field.name}}
                                 class="mist-select"
                                 data-role="collapsible"
                                 data-iconpos="right"
@@ -98,21 +98,21 @@
                                 <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
                                 <ul data-role="listview">
                                     <li data-icon="false" data-theme="a">
-                                        <a {{action "selectKey" "" field target="view"}}>-- None --</a>
+                                        <a {{action "selectKey" "" field target=view}}>-- None --</a>
                                     </li>
-                                    {{#each Mist.keysController.model}}
+                                    {{#each Mist.keysController.model as |key|}}
                                         <li data-icon="false" data-theme="a">
-                                            <a {{action "selectKey" this field target="view"}}>{{this.id}}</a>
+                                            <a {{action "selectKey" key field target=view}}>{{key.id}}</a>
                                         </li>
                                     {{/each}}
                                     <li data-icon="false" data-theme="d">
-                                        <a {{action "createKeyClicked" field target="view"}}>Add Key</a>
+                                        <a {{action "createKeyClicked" field target=view}}>Add Key</a>
                                     </li>
                                 </ul>
                             </div>
                         {{/if}}
                         {{#if field.isRegion}}
-                            <div {{bind-attr id="field.name"}}
+                            <div id={{field.name}}
                                 class="mist-select"
                                 data-role="collapsible"
                                 data-iconpos="right"
@@ -121,10 +121,10 @@
                                 data-theme="a">
                                 <h4>{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
                                 <ul data-role="listview">
-                                    {{#each view.providerRegions}}
+                                    {{#each view.providerRegions as |region|}}
                                         <li data-icon="false" data-theme="a">
-                                            <a {{action "selectRegion" this field target="view"}}>
-                                                {{this.location}}
+                                            <a {{action "selectRegion" region field target=view}}>
+                                                {{region.location}}
                                             </a>
                                         </li>
                                     {{/each}}
@@ -133,7 +133,7 @@
                         {{/if}}
                         {{#if field.isSlider}}
                             <select class="toggle-field" data-theme="a" data-role="slider"
-                            {{action "switchToggled" field on="change" target="view"}}>
+                            {{action "switchToggled" field on="change" target=view}}>
                                 <option value="0">{{unbound field.offLabel}}</option>
                                 <option value="1">{{unbound field.onLabel}}</option>
                             </select>
@@ -142,8 +142,8 @@
                     {{#if field.helpText}}
                         <div class="last-child">
                             <a class="ui-btn ui-btn-a ui-btn-icon-notext ui-icon-question"
-                                {{bind-attr id="field.helpId"}}
-                                {{action "helpClicked" field target="view"}}>
+                                id={{field.helpId}}
+                                {{action "helpClicked" field target=view}}>
                             </a>
                         </div>
                     {{/if}}
@@ -158,12 +158,12 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a ui-shadow ui-corner-all" {{action "backClicked" target="view"}}>
+            <a class="ui-btn ui-btn-a ui-shadow ui-corner-all" {{action "backClicked" target=view}}>
                 Back
             </a>
             <a id="new-backend-ok"
-                {{bind-attr class="view.isReady::ui-state-disabled :ui-btn :ui-btn-d"}}
-                {{action "addClicked" target="view"}}>Add</a>
+                class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d"
+                {{action "addClicked" target=view}}>Add</a>
         </div>
     </div>
 </div>
@@ -189,7 +189,7 @@
          data-transition="flip">
         <p>{{view.helpText}}
             {{#if view.helpHref}}
-            <a target="_blank" {{bind-attr href="view.helpHref"}}>
+            <a target="_blank" href={{view.helpHref}}>
                 Read more...
             </a>
             {{/if}}

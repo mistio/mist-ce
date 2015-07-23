@@ -42,8 +42,8 @@
         <div id="single-network-subnets" data-role="collapsible" data-collapsed="false">
             <h4>Subnets ({{subnets.length}})</h4>
 
-            {{#each subnets}}
-                {{view "subnetListItem" model=this}}
+            {{#each subnets as |subnet|}}
+                {{view "subnetListItem" model=subnet}}
             {{/each}}
         </div>
         {{/if}}
@@ -59,10 +59,10 @@
         data-transition="flip">
 
         <ul data-role="listview">
-            {{#each view.network.backend.machines.model}}
+            {{#each view.network.backend.machines.model as |machine|}}
             <li data-icon="false">
-                <a {{action "assignMachine" this target="view"}}>
-                    {{this.name}}
+                <a {{action "assignMachine" machine target=view}}>
+                    {{machine.name}}
                 </a>
             </li>
             {{/each}}
@@ -74,7 +74,7 @@
     {{#if backend.isOpenStack}}
     <div class="single-action-footer" data-role="footer" data-theme="b">
         <a class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete"
-            {{action "deleteClicked" target="view"}}>
+            {{action "deleteClicked" target=view}}>
                 Delete
         </a>
     </div>

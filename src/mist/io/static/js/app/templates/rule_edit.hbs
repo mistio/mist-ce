@@ -9,10 +9,10 @@
          data-transition="flip">
 
         <ul data-role="listview">
-            {{#each view.sortedMetrics}}
+            {{#each view.sortedMetrics as metric}}
             <li data-icon="false">
-                <a class="ui-btn" {{action "metricClicked" this.id target="view"}}>
-                    {{this.name}}
+                <a class="ui-btn" {{action "metricClicked" metric.id target=view}}>
+                    {{metric.name}}
                 </a>
             </li>
             {{/each}}
@@ -32,10 +32,10 @@
          data-transition="flip">
 
         <ul data-role="listview">
-            {{#each Mist.rulesController.operatorList}}
+            {{#each Mist.rulesController.operatorList as operator}}
                 <li data-icon="false">
-                    <a {{action "operatorClicked" this.title target="view"}}>
-                        {{this.symbol}}
+                    <a {{action "operatorClicked" operator.title target=view}}>
+                        {{operator.symbol}}
                     </a>
                 </li>
             {{/each}}
@@ -55,10 +55,10 @@
          data-transition="flip">
 
         <ul data-role="listview">
-            {{#each Mist.rulesController.actionList}}
+            {{#each Mist.rulesController.actionList as |actionitem|}}
                 <li data-icon="false">
-                    <a {{action "actionClicked" this target="view"}}>
-                        {{this}}
+                    <a {{action "actionClicked" actionitem target=view}}>
+                        {{actionitem}}
                     </a>
                 </li>
             {{/each}}
@@ -87,12 +87,12 @@
         <div data-role="content">
 
             {{view Ember.TextArea
-                valueBinding="view.newCommand"
+                value=view.newCommand
                 name="rule-command-content"}}
 
             <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-                <a class="ui-btn ui-btn-a" {{action "backClicked" target="view"}}>Back</a>
-                <a class="ui-btn ui-btn-d" {{action "saveClicked" target="view"}}>Save</a>
+                <a class="ui-btn ui-btn-a" {{action "backClicked" target=view}}>Back</a>
+                <a class="ui-btn ui-btn-d" {{action "saveClicked" target=view}}>Save</a>
             </div>
         </div>
     </div>
@@ -110,10 +110,10 @@
          data-transition="flip">
 
         <ul data-role="listview">
-            {{#each Mist.rulesController.aggregateList}}
+            {{#each Mist.rulesController.aggregateList as |rule|}}
                 <li data-icon="false">
-                    <a {{action "aggregateClicked" this.value target="view"}}>
-                        {{this.title}}
+                    <a {{action "aggregateClicked" rule.value target=view}}>
+                        {{rule.title}}
                     </a>
                 </li>
             {{/each}}

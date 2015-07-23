@@ -71,6 +71,7 @@ define('app/views/machine_monitoring',
             load: function () {
 
                 Mist.set('ma', this);
+                warn('machine ', this);
                 // Add event handlers
                 Mist.rulesController.on('onAdd', this, '_ruleAdded');
                 Mist.rulesController.on('onDelete', this, '_ruleDeleted');

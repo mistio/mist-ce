@@ -32,7 +32,7 @@
         {{#if Mist.graphsController.config.canModify}}
             {{#unless view.graph.isBuiltIn}}
                 <a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext"
-                    {{action "removeClicked" view.graph target="view.actionProxy"}}>x
+                    {{action "removeClicked" view.graph target=view.actionProxy}}>x
                 </a>
             {{/unless}}
         {{/if}}
@@ -43,7 +43,7 @@
 
         {{#if Mist.graphsController.config.canMinimize}}
             <a class="ui-btn ui-btn-c ui-btn-icon-notext ui-corner-all ui-icon-arrow-d"
-                {{action "collapseClicked" view.graph target="view.actionProxy"}}>-
+                {{action "collapseClicked" view.graph target=view.actionProxy}}>-
             </a>
         {{/if}}
     </div>
@@ -51,8 +51,8 @@
     <!--
         Graph Body
     -->
-    {{#each view.graph.batches}}
-        <div class="graph-body" {{bind-attr id="id"}}>
+    {{#each view.graph.batches as |batch|}}
+        <div class="graph-body" id={{id}}>
         </div>
     {{/each}}
 

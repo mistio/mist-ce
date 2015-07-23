@@ -25,7 +25,7 @@
     <script tal:content="string: var CSRF_TOKEN=${csrf_token}" />
     <script tal:content="string: var BETA_FEATURES=${beta_features}" />
 
-    <script src="resources/js/lib/require/require.js"></script>
+    <script src="resources/dist/requirejs/require.js"></script>
 
     <script>
         if (JS_BUILD) {

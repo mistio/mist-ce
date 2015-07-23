@@ -1,6 +1,6 @@
-<div class="graph-button" {{bind-attr id="view.buttonId"}}>
+<div class="graph-button" id={{view.buttonId}}>
     <a class="ui-btn ui-btn-icon-left ui-icon-arrow-u ui-corner-all"
-        {{action "graphButtonClicked" view.graph target="view.actionProxy"}}>
+        {{action "graphButtonClicked" view.graph target=view.actionProxy}}>
             {{unbound view.graph.title}}
     </a>
 </div>

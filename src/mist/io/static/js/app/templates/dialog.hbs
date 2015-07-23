@@ -41,22 +41,22 @@
         <div class="ui-content ui-body-a" role="main">
 
 
-            {{#each Mist.dialogController.options.body}}
+            {{#each Mist.dialogController.options.body as |optionBody|}}
 
-                {{#if this.paragraph}}
-                    <p {{bind-attr class="this.class"}}>{{this.paragraph}}</p>
+                {{#if optionBody.paragraph}}
+                    <p class={{this.class}}>{{optionBody.paragraph}}</p>
                 {{/if}}
 
-                {{#if this.link}}
-                    <a {{bind-attr href="this.href" class="this.class" target="this.target"}}
-                        {{action "linkClicked" this target="view"}}>
-                            {{this.link}}
+                {{#if optionBody.link}}
+                    <a href={{optionBody.href}} class={{optionBody.class}} target={{optionBody.target}}
+                        {{action "linkClicked" optionBody target=view}}>
+                            {{optionBody.link}}
                     </a>
                 {{/if}}
 
-                {{#if this.command}}
+                {{#if optionBody.command}}
                     <pre class="command-container"
-                        {{action "commandClicked" this on="click" target="view"}}>{{this.command}}</pre>
+                        {{action "commandClicked" optionBody on="click" target=view}}>{{optionBody.command}}</pre>
                 {{/if}}
 
             {{/each}}
@@ -67,12 +67,12 @@
             {{#if view.isOK}}
 
                 <a class="ui-btn ui-btn-a ui-corner-all"
-                    {{action "confirm" target="view"}}>OK</a>
+                    {{action "confirm" target=view}}>OK</a>
 
             {{else}}{{#if view.isBack}}
 
                 <a class="ui-btn ui-btn-a ui-corner-all"
-                    {{action "confirm" target="view"}}>Back</a>
+                    {{action "confirm" target=view}}>Back</a>
 
             {{else}}
 
@@ -86,22 +86,22 @@
 
                     {{#if view.isOKCancel}}
                         <a class="ui-btn"
-                            {{action "reject" target="view"}}>
+                            {{action "reject" target=view}}>
                                 Cancel
                         </a>
                         <a class="ui-btn ui-btn-d"
-                            {{action "confirm" target="view"}}>
+                            {{action "confirm" target=view}}>
                                 OK
                         </a>
                     {{/if}}
 
                     {{#if view.isYesNo}}
                         <a class="ui-btn ui-btn-d"
-                            {{action "reject" target="view"}}>
+                            {{action "reject" target=view}}>
                                 No
                         </a>
                         <a class="ui-btn"
-                            {{action "confirm" target="view"}}>
+                            {{action "confirm" target=view}}>
                                 Yes
                         </a>
                     {{/if}}

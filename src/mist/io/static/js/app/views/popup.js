@@ -41,9 +41,15 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
 
 
             open: function (position) {
-                if (position)
-                    $(this.popupId).popup('option', 'positionTo', position);
-                $(this.popupId).popup('open');
+                warn('open popup view', this.popupId, position);
+                var that = this;
+                Ember.run.next(function(){
+                    $(that.popupId).popup();
+                    if (position)
+                        $(that.popupId).popup('option', 'positionTo', position);
+                    $(that.popupId).popup('open');
+                    $('.ui-page-active').parent().trigger('create');
+                });
             },
 
 

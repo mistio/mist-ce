@@ -8,7 +8,7 @@
                 value="on"
                 checked="checked"
                 type="radio"
-                {{action "updateFilterFlags" "all" on="change" target="view"}}>
+                {{action "updateFilterFlags" "all" on="change" target=view}}>
             <label for="event-all">All</label>
 
             <input name="event"
@@ -16,7 +16,7 @@
                 data-mini="true"
                 value="off"
                 type="radio"
-                {{action "updateFilterFlags" "job" on="change" target="view"}}>
+                {{action "updateFilterFlags" "job" on="change" target=view}}>
             <label for="event-jobs">Jobs</label>
 
             <input name="event"
@@ -24,7 +24,7 @@
                 data-mini="true"
                 value="off"
                 type="radio"
-                {{action "updateFilterFlags" "request" on="change" target="view"}}>
+                {{action "updateFilterFlags" "request" on="change" target=view}}>
             <label for="event-requests">Requests</label>
 
             <input name="event"
@@ -32,7 +32,7 @@
                 data-mini="true"
                 value="off"
                 type="radio"
-                {{action "updateFilterFlags" "incident" on="change" target="view"}}>
+                {{action "updateFilterFlags" "incident" on="change" target=view}}>
             <label for="event-incidents">Incidents</label>
 
             <input name="event"
@@ -40,7 +40,7 @@
                 data-mini="true"
                 value="off"
                 type="radio"
-                {{action "updateFilterFlags" "session" on="change" target="view"}}>
+                {{action "updateFilterFlags" "session" on="change" target=view}}>
             <label for="event-sessions">Sessions</label>
 
             <input name="event"
@@ -48,7 +48,7 @@
                 data-mini="true"
                 value="off"
                 type="radio"
-                {{action "updateFilterFlags" "shell" on="change" target="view"}}>
+                {{action "updateFilterFlags" "shell" on="change" target=view}}>
             <label for="event-shell">Shell</label>
 
             <input name="event"
@@ -56,10 +56,10 @@
                 data-mini="true"
                 value="off"
                 type="radio"
-                {{action "updateFilterFlags" "error" on="change" target="view"}}>
+                {{action "updateFilterFlags" "error" on="change" target=view}}>
             <label for="event-error">Errors</label>
         </fieldset>
-        {{view Mist.TextField id="log-filter" valueBinding="view.filterString" placeholder="Filter logs..."}}
+        {{view Mist.TextField id="log-filter" value=view.filterString placeholder="Filter logs..."}}
     </div>
 
     {{#if view.searching}}
@@ -70,8 +70,8 @@
         data-role="listview"
         data-enhanced="true"
         data-inset="true">
-        {{#each Mist.logsController}}
-            {{view "logListItem" logBinding="this"}}
+        {{#each Mist.logsController as |log|}}
+            {{view "logListItem" log=log}}
         {{/each}}
     </ul>
 

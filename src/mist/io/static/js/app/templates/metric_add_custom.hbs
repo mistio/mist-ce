@@ -21,24 +21,24 @@
                     {{view Mist.TextField
                         id="custom-plugin-name"
                         placeholder="e.g. my metric"
-                        valueBinding="Mist.metricAddCustomController.metric.name"}}
+                        value=Mist.metricAddCustomController.metric.name}}
                 </div>
                 <div class="ui-block-b">
                     <label for="custom-plugin-unit">Unit:</label>
                     {{view Mist.TextField
                         id="custom-plugin-unit"
                         placeholder="e.g. bytes (optional)"
-                        valueBinding="Mist.metricAddCustomController.metric.unit"}}
+                        value=Mist.metricAddCustomController.metric.unit}}
                 </div>
             </div>
             <label for="custom-plugin-script">Python script:</label>
             <pre id="custom-plugin-error"></pre>
             {{view Ember.TextArea
                    id="custom-plugin-script"
-                   valueBinding="Mist.metricAddCustomController.metric.script"}}
+                   value=Mist.metricAddCustomController.metric.script}}
 
             <select id="advanced-toggle" data-role="slider" data-theme="a"
-            {{action "advancedToggled" target="view" on="change"}}>
+            {{action "advancedToggled" target=view on="change"}}>
                 <option value="0">Basic settings</option>
                 <option value="1">Advanced settings</option>
             </select>
@@ -47,7 +47,7 @@
                 <label>
                 {{view Mist.Checkbox
                        data-mini="true"
-                       checkedBinding="Mist.metricAddCustomController.metric.type"}}
+                       checked=Mist.metricAddCustomController.metric.type}}
                 Calculate derivative
                 </label>
             </div>
@@ -58,9 +58,9 @@
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
                 <a class="ui-btn ui-corner-all"
-                    {{action "backClicked" target="view"}}>Back</a>
+                    {{action "backClicked" target=view}}>Back</a>
                 <a class="ui-btn ui-corner-all ui-btn-d ui-state-disabled"
-                    id="deploy" {{action "deployClicked" target="view"}}>Deploy</a>
+                    id="deploy" {{action "deployClicked" target=view}}>Deploy</a>
             </div>
         </div>
     </div>

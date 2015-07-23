@@ -7,8 +7,8 @@
         data-role="listview"
         data-enhanced="true"
         data-inset="true">
-        {{#each Mist.logsController}}
-            {{view "logListItem" logBinding="this"}}
+        {{#each Mist.logsController as |log|}}
+            {{view "logListItem" log=log}}
         {{/each}}
     </ul>
 

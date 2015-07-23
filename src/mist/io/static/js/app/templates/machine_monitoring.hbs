@@ -14,39 +14,29 @@
         {{/if}}
 
         <div id="graphs-wrapper"
-            {{bind-attr class="view.pendingFirstStats:hidden"}}>
+            class="{{if view.pendingFirstStats 'hidden'}}">
                 {{view "graphList"
-                    actionProxyBinding="view"}}
+                    actionProxy=view}}
         </div>
 
-        {{view "ruleList" rulesBinding="view.rules"}}
+        {{view "ruleList" rules=view.rules}}
 
         <div id="monitoring-bottom-btns">
             <div data-rule="ui-grid-a">
                 <div class="ui-block-a">
                     <a id="add-rule-button"
-                      {{bind-attr class="
-                            Mist.rulesController.creatingPending:ui-state-disabled
-                            :ui-btn
-                            :ui-corner-all
-                            :ui-btn-d
-                            :ui-btn-icon-left
-                            :ui-icon-plus"}}
-                        {{action "addRuleClicked" target="view"}}>
+                      class="{{if Mist.rulesController.creatingPending 'ui-state-disabled'}}
+                             ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
+                        {{action "addRuleClicked" target=view}}>
                             Add Rule
                     </a>
                 </div>
             </div>
             <div class="ui-block-b">
                 <a id="disable-monitor-btn"
-                    {{bind-attr class="
-                        view.machine.disablingMonitoring:ui-state-disabled
-                        :ui-btn
-                        :ui-corner-all
-                        :ui-btn-b
-                        :ui-btn-icon-left
-                        :ui-icon-delete"}}
-                    {{action "disableMonitoringClicked" target="view"}}>
+                   class="{{if view.machine.disablingMonitoring 'ui-state-disabled'}}
+                          ui-btn ui-corner-all ui-btn-b ui-btn-icon-left ui-icon-delete"
+                    {{action "disableMonitoringClicked" target=view}}>
                         Disable
                 </a>
             </div>
@@ -80,15 +70,10 @@
                 </label>
 
                 <a id="enable-monitoring-btn"
-                    {{bind-attr class="
-                        view.machine.enablingMonitoring:ui-state-disabled
-                        view.gettingCommand:ui-state-disabled
-                        :ui-btn
-                        :ui-corner-all
-                        :ui-btn-d
-                        :ui-btn-icon-left
-                        :ui-icon-star"}}
-                    {{action "enableMonitoringClicked" target="view"}}>
+                    class="{{if view.machine.enablingMonitoring 'ui-state-disabled'}}
+                        {{if view.gettingCommand 'ui-state-disabled'}}
+                        ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-star"
+                    {{action "enableMonitoringClicked" target=view}}>
                         Enable Monitoring
                 </a>
 
@@ -101,4 +86,4 @@
     {{/if}}
 </div>
 
-{{view "ruleEdit" metricsBinding="this.metrics"}}
+{{view "ruleEdit" metrics=this.metrics}}

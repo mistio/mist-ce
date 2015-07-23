@@ -22,22 +22,22 @@
                 data-theme="a"
                 class="mist-select">
                 <h4>
-                    {{#with Mist.scriptRunController.scriptToRun}}
-                        {{#if this.machine}}
-                            {{this.machine.name}}
+                    {{#with Mist.scriptRunController.scriptToRun as |script|}}
+                        {{#if script.machine}}
+                            {{script.machine.name}}
                         {{else}}
                             Select
                         {{/if}}
                     {{/with}}
                 </h4>
                 <ul data-role="listview" data-theme="a">
-                    {{#each Mist.backendsController.model}}
-                    {{#if this.enabled}}
-                        {{#each this.machines.model}}
-                        {{#if this.hasKeys}}
+                    {{#each Mist.backendsController.model as |backend|}}
+                    {{#if backend.enabled}}
+                        {{#each backend.machines.model as |machine|}}
+                        {{#if machine.hasKeys}}
                             <li data-icon="false">
-                                <a {{action "machineClicked" this target="view"}}>
-                                    {{this.name}}
+                                <a {{action "machineClicked" machine target=view}}>
+                                    {{machine.name}}
                                 </a>
                             </li>
                         {{/if}}
@@ -53,7 +53,7 @@
             {{view Mist.TextArea
                 data-theme="a"
                 id="script-params"
-                valueBinding=Mist.scriptRunController.scriptToRun.parameters}}
+                value=Mist.scriptRunController.scriptToRun.parameters}}
         </div>
 
         {{#if Mist.scriptsController.runningScript}}
@@ -62,10 +62,10 @@
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a class="ui-btn ui-btn-a ui-shadow ui-corner-all"
-                {{action "backClicked" target="view"}}>Back</a>
+                {{action "backClicked" target=view}}>Back</a>
             <a id="new-script-ok" data-theme="d"
-                {{bind-attr class="view.isReady::ui-state-disabled :ui-btn :ui-btn-d"}}
-                {{action "runClicked" target="view"}}>Run</a>
+                class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d"
+                {{action "runClicked" target=view}}>Run</a>
         </div>
     </div>
 </div>

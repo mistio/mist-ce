@@ -43,7 +43,7 @@
             <label for="key-add-id">Name:</label>
 
             {{view Mist.TextField id="key-add-id"
-                   valueBinding="Mist.keyAddController.keyId"}}
+                   value=Mist.keyAddController.keyId}}
 
             <!-- Key Private Field -->
 
@@ -56,7 +56,7 @@
             </label>
 
             {{view Ember.TextArea id="key-add-private"
-                   valueBinding="Mist.keyAddController.keyPrivate"}}
+                   value=Mist.keyAddController.keyPrivate}}
 
             <!-- Generate and Upload buttons -->
 

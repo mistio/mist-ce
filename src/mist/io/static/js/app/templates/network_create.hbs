@@ -29,9 +29,9 @@
                 class="mist-select">
 
                 <h4>
-                    {{#with Mist.networkCreateController.network}}
-                        {{#if backend}}
-                            {{backend.title}}
+                    {{#with Mist.networkCreateController.network as |network|}}
+                        {{#if network.backend}}
+                            {{network.backend.title}}
                         {{else}}
                             Select backend
                         {{/if}}
@@ -40,12 +40,12 @@
 
                 <ul data-role="listview" data-theme="a">
 
-                    {{#each Mist.backendsController.model}}
-                        {{#if this.enabled}}
-                            {{#if this.isOpenStack}}
+                    {{#each Mist.backendsController.model as |backend|}}
+                        {{#if backend.enabled}}
+                            {{#if backend.isOpenStack}}
                                 <li data-icon="false">
-                                    <a {{action "backendSelected" this target="view"}}>
-                                        {{this.title}}
+                                    <a {{action "backendSelected" backend target=view}}>
+                                        {{backend.title}}
                                     </a>
                                 </li>
                             {{/if}}
@@ -67,7 +67,7 @@
             {{view Mist.TextField
                 data-theme="a"
                 id="network-create-name"
-                valueBinding="Mist.networkCreateController.network.name"}}
+                value=Mist.networkCreateController.network.name}}
         </div>
 
 
@@ -92,12 +92,12 @@
 
                 <ul data-role="listview" data-theme="a">
                     <li data-icon="false">
-                        <a {{action "adminStateSelected" true target="view"}}>
+                        <a {{action "adminStateSelected" true target=view}}>
                             UP
                         </a>
                     </li>
                     <li data-icon="false">
-                        <a {{action "adminStateSelected" false target="view"}}>
+                        <a {{action "adminStateSelected" false target=view}}>
                             DOWN
                         </a>
                     </li>
@@ -116,7 +116,7 @@
             {{view Mist.Checkbox
                 data-theme="a"
                 id="network-create-subnet-create"
-                checkedBinding="Mist.networkCreateController.network.createSubnet"}}
+                checked=Mist.networkCreateController.network.createSubnet}}
             <label for="network-create-subnet-create">
                 Create Subnet
             </label>
@@ -133,7 +133,7 @@
                     {{view Mist.TextField
                         data-theme="a"
                         id="network-create-subnet-name"
-                        valueBinding="Mist.networkCreateController.network.subnet.name"}}
+                        value=Mist.networkCreateController.network.subnet.name}}
                 </div>
 
 
@@ -145,7 +145,7 @@
                     {{view Mist.TextField
                         data-theme="a"
                         id="network-create-subnet-address"
-                        valueBinding="Mist.networkCreateController.network.subnet.address"}}
+                        value=Mist.networkCreateController.network.subnet.address}}
                 </div>
 
 
@@ -169,12 +169,12 @@
 
                             <ul data-role="listview" data-theme="a">
                                 <li data-icon="false">
-                                    <a {{action "ipvSelected" "IPv4" target="view"}}>
+                                    <a {{action "ipvSelected" "IPv4" target=view}}>
                                         IPv4
                                     </a>
                                 </li>
                                 <li data-icon="false">
-                                    <a {{action "ipvSelected" "IPv6" target="view"}}>
+                                    <a {{action "ipvSelected" "IPv6" target=view}}>
                                         IPv6
                                     </a>
                                 </li>
@@ -192,12 +192,12 @@
                             {{view Mist.TextField
                                 data-theme="a"
                                 id="network-create-subnet-gateway-ip"
-                                valueBinding="Mist.networkCreateController.network.subnet.gatewayIP"}}
+                                value=Mist.networkCreateController.network.subnet.gatewayIP}}
                         </div>
                         {{view Mist.Checkbox
                             data-theme="a"
                             id="network-create-subnet-gateway"
-                            checkedBinding="Mist.networkCreateController.network.subnet.disableGateway"}}
+                            checked=Mist.networkCreateController.network.subnet.disableGateway}}
                         <label for="network-create-subnet-gateway">
                             Disable Gateway
                         </label>
@@ -210,7 +210,7 @@
                     {{view Mist.Checkbox
                         data-theme="a"
                         id="network-create-subnet-dhcp"
-                        checkedBinding="Mist.networkCreateController.network.subnet.enableDHCP"}}
+                        checked=Mist.networkCreateController.network.subnet.enableDHCP}}
                     <label for="network-create-subnet-dhcp">
                         Enable DHCP
                     </label>
@@ -225,7 +225,7 @@
                     {{view Mist.TextArea
                         id="network-create-subnet-allocation-pools"
                         data-theme="a"
-                        valueBinding="Mist.networkCreateController.network.subnet.allocationPools"}}
+                        value=Mist.networkCreateController.network.subnet.allocationPools}}
                 </div>
             </div>
         </div>
@@ -236,9 +236,9 @@
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a class="ui-btn ui-btn-a"
-               {{action "backClicked" target="view"}}>Back</a>
+               {{action "backClicked" target=view}}>Back</a>
             <a class="ui-btn ui-btn-d" id="network-create-ok"
-                {{action "createClicked" target="view"}}>Create</a>
+                {{action "createClicked" target=view}}>Create</a>
         </div>
     </div>
 </div>

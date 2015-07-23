@@ -12,7 +12,7 @@
                 ui-btn-inline
                 ui-btn-icon-notext
                 ui-icon-arrow-l"
-            {{action "backClicked" target="view"}}>
+            {{action "backClicked" target=view}}>
         </a>
         <!--
             Forward Button
@@ -26,12 +26,12 @@
                     ui-btn-inline
                     ui-btn-icon-notext
                     ui-icon-arrow-r"
-                {{action "forwardClicked" target="view"}}>
+                {{action "forwardClicked" target=view}}>
             </a>
         {{/unless}}
-        <div id="time-window-control" {{bind-attr class=":ui-mini Mist.graphsController.stream.isStreaming"}}>
+        <div id="time-window-control" class="ui-mini {{Mist.graphsController.stream.isStreaming}}">
             <a class="ui-btn ui-btn-icon-right ui-icon-carat-d"
-                {{action "timeWindowClicked" target="view"}}>
+                {{action "timeWindowClicked" target=view}}>
                     {{view.timeWindowText}}
             </a>
         </div>
@@ -41,27 +41,27 @@
     <div id="change-time-window" data-role="popup" data-transition="flip" data-position-to="#time-window-control">
         <ul data-role='listview'>
             <li data-icon="false">
-                <a {{action "timeWindowChanged" "minutes" "last 10 mins"target="view"}}>
+                <a {{action "timeWindowChanged" "minutes" "last 10 mins" target=view}}>
                     last 10 mins</a>
             </li>
             <li data-icon="false">
-                <a {{action "timeWindowChanged" "hour" "last hour" target="view"}}>
+                <a {{action "timeWindowChanged" "hour" "last hour" target=view}}>
                     last hour</a>
             </li>
             <li data-icon="false">
-                <a {{action "timeWindowChanged" "day" "last day" target="view"}}>
+                <a {{action "timeWindowChanged" "day" "last day" target=view}}>
                     last day</a>
             </li>
             <li data-icon="false">
-                <a {{action "timeWindowChanged" "week" "last week" target="view"}}>
+                <a {{action "timeWindowChanged" "week" "last week" target=view}}>
                     last week</a>
             </li>
             <li data-icon="false">
-                <a {{action "timeWindowChanged" "month" "last month" target="view"}}>
+                <a {{action "timeWindowChanged" "month" "last month" target=view}}>
                     last month</a>
             </li>
             <li data-icon="false">
-                <a {{action "timeWindowChanged" "range" "range" target="view"}}>
+                <a {{action "timeWindowChanged" "range" "range" target=view}}>
                     custom range</a>
             </li>
         </ul>
@@ -113,11 +113,11 @@
                         data-type="horizontal">
 
                         <a class="ui-btn"
-                            {{action "rangeBackClicked" target="view"}}>
+                            {{action "rangeBackClicked" target=view}}>
                                 Back
                         </a>
                         <a id="key-add-ok" class="ui-btn ui-btn-d"
-                            {{action "rangeOkClicked" target="view"}}>
+                            {{action "rangeOkClicked" target=view}}>
                                 OK
                         </a>
                     </div>

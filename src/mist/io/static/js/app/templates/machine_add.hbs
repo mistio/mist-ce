@@ -18,7 +18,7 @@
         {{view Mist.TextField
                id="create-machine-name"
                data-theme="a"
-               valueBinding="Mist.machineAddController.newMachineName"}}
+               value=Mist.machineAddController.newMachineName}}
 
         <!-- Select Provider -->
 
@@ -32,19 +32,19 @@
             class="mist-select">
             <h4>{{#if Mist.machineAddController.newMachineProvider.provider}}
                    <span class="provider-icon-small">
-                        <span {{bind-attr class="Mist.machineAddController.newMachineProvider.className"}}>
+                        <span class="{{Mist.machineAddController.newMachineProvider.className}}">
                         </span>
                     </span>
                 {{/if}}
                 {{Mist.machineAddController.newMachineProvider.title}}
             </h4>
             <ul data-role="listview" data-theme="a">
-                {{#each Mist.backendsController.model}}
+                {{#each Mist.backendsController.model as |backend|}}
                         {{#if this.canCreateMachine}}
                             <li data-icon="false">
-                                <a {{action "selectProvider" this target="view"}}>
+                                <a {{action "selectProvider" backend target=view}}>
                                     <span class="provider-icon-small">
-                                        <span {{bind-attr class="className"}}></span>
+                                        <span class={{className}}></span>
                                     </span>
                                     {{this.title}}
                                 </a>
@@ -67,26 +67,26 @@
             <h4>
                 {{#if Mist.machineAddController.newMachineImage.id}}
                     <span class="image-icon-small">
-                        <span {{bind-attr class="Mist.machineAddController.newMachineImage.className"}}>
+                        <span class={{Mist.machineAddController.newMachineImage.className}}>
                         </span>
                     </span>
                 {{/if}}
                 {{Mist.machineAddController.newMachineImage.name}}
             </h4>
             <ul data-role="listview" data-theme="a">
-                {{#each Mist.machineAddController.newMachineProvider.images.model}}
+                {{#each Mist.machineAddController.newMachineProvider.images.model as |image|}}
                     {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
                         <li data-icon="false">
                             <span class="image-icon-small">
-                                <span {{bind-attr class="this.className"}}></span>
+                                <span class={{this.className}}></span>
                             </span>
-                            <a {{action "selectImage" this target="view"}}>{{this.name}}</a>
+                            <a {{action "selectImage" image target=view}}>{{this.name}}</a>
                         </li>
                     {{else}} {{#if this.star}}
                         <li data-icon="false">
-                            <a {{action "selectImage" this target="view"}}>
+                            <a {{action "selectImage" image target=view}}>
                                 <span class="image-icon-small">
-                                    <span {{bind-attr class="this.className"}}></span>
+                                    <span class={{this.className}}></span>
                                 </span>
                                 {{this.name}}
                             </a>
@@ -108,11 +108,11 @@
              class="mist-select">
             <h4>{{Mist.machineAddController.newMachineSize.name}}</h4>
             <ul data-role="listview" data-theme="a">
-                {{#each Mist.machineAddController.newMachineProvider.sizes.model}}
+                {{#each Mist.machineAddController.newMachineProvider.sizes.model as |size|}}
                 <li data-icon="false">
-                    <a {{action "selectSize" this target="view"}}>{{this.name}}
+                    <a {{action "selectSize" this target=view}}>{{size.name}}
                         <span class="size-decription">
-                         - disk:{{this.disk}}, ram:{{this.ram}}
+                         - disk:{{size.disk}}, ram:{{size.ram}}
                         </span>
                     </a>
                 </li>
@@ -134,9 +134,9 @@
                  class="mist-select">
                 <h4>{{Mist.machineAddController.newMachineLocation.name}}</h4>
                 <ul data-role="listview" data-theme="a">
-                    {{#each Mist.machineAddController.newMachineProvider.locations.model}}
+                    {{#each Mist.machineAddController.newMachineProvider.locations.model as |location|}}
                     <li data-icon="false">
-                        <a {{action "selectLocation" this target="view"}}>{{this.name}}</a>
+                        <a {{action "selectLocation" location target=view}}>{{location.name}}</a>
                     </li>
                     {{/each}}
                 </ul>
@@ -152,14 +152,14 @@
             {{view Mist.TextArea
                    id="create-machine-env"
                    data-theme="a"
-                   valueBinding="Mist.machineAddController.newMachineDockerEnvironment"}}
+                   value=Mist.machineAddController.newMachineDockerEnvironment}}
 
             <!-- Command -->
             <label for="create-machine-command">Command:</label>
             {{view Mist.TextArea
                    id="create-machine-command"
                    data-theme="a"
-                   valueBinding="Mist.machineAddController.newMachineDockerCommand"}}
+                   value=Mist.machineAddController.newMachineDockerCommand}}
 
         </div>
 
@@ -176,13 +176,13 @@
              class="mist-select">
             <h4>{{Mist.machineAddController.newMachineKey.id}}</h4>
             <ul data-role="listview" data-theme="a">
-                {{#each Mist.keysController.model}}
+                {{#each Mist.keysController.model as |key|}}
                     <li data-icon="false">
-                        <a {{action "selectKey" this target="view"}}>{{this.id}}</a>
+                        <a {{action "selectKey" key target=view}}>{{key.id}}</a>
                     </li>
                 {{/each}}
                 <li data-icon="false" data-theme="d">
-                    <a {{action "createKeyClicked" target="view"}}>Add Key</a>
+                    <a {{action "createKeyClicked" target=view}}>Add Key</a>
                 </li>
             </ul>
         </div>
@@ -200,11 +200,11 @@
                     class="mist-select">
                 <h4>Networks</h4>
                 <fieldset data-role="controlgroup" data-theme="a">
-                    {{#each Mist.machineAddController.newMachineProvider.networks.model}}
-                        <input {{bind-attr id="this.id" name="this.id" checked="this.selected"}}
-                            type="checkbox" {{action "toggleNetworkSelection" this on="change" target="view"}}>
-                        <label {{bind-attr for="this.id"}} data-corners="false">
-                            {{this.name}}
+                    {{#each Mist.machineAddController.newMachineProvider.networks.model as |network|}}
+                        <input id={{network.id}} name={{network.id}} checked={{network.selected}}
+                            type="checkbox" {{action "toggleNetworkSelection" network on="change" target=view}}>
+                        <label for={{network.id}} data-corners="false">
+                            {{network.name}}
                         </label>
                     {{/each}}
                 </fieldset>
@@ -216,7 +216,7 @@
             {{#if Mist.isCore}}
             {{#if Mist.scriptsController.length}}
                 <select class="toggle-field ui-mini" data-theme="a" data-role="slider"
-                {{action "switchToggled" on="change" target="view"}}>
+                {{action "switchToggled" on="change" target=view}}>
                     <option value="basic">basic</option>
                     <option value="advanced">advanced</option>
                 </select>
@@ -228,7 +228,7 @@
                 {{view Mist.TextArea
                        id="create-machine-script"
                        data-theme="a"
-                       valueBinding="Mist.machineAddController.newMachineScript"}}
+                       value=Mist.machineAddController.newMachineScript}}
             </div>
             <div class="script-option advanced">
                 <div id="create-machine-script-select"
@@ -243,9 +243,9 @@
                         {{else}} Select {{/if}}
                     </h4>
                     <ul data-role="listview" data-theme="a">
-                        {{#each Mist.scriptsController}}
+                        {{#each Mist.scriptsController as |script|}}
                             <li data-icon="false">
-                                <a {{action "selectScript" this target="view"}}>{{this.name}}</a>
+                                <a {{action "selectScript" script target=view}}>{{script.name}}</a>
                             </li>
                         {{/each}}
                     </ul>
@@ -254,7 +254,7 @@
                        id="create-machine-script-params"
                        data-theme="a"
                        placeholder="optional parameters"
-                       valueBinding="Mist.machineAddController.newMachineScriptParams"}}
+                       value=Mist.machineAddController.newMachineScriptParams}}
             </div>
         </div>
 
@@ -265,7 +265,7 @@
                    id="create-machine-ports"
                    data-theme="a"
                    placeholder="e.g. 80:80"
-                   valueBinding="Mist.machineAddController.newMachineDockerPorts"}}
+                   value=Mist.machineAddController.newMachineDockerPorts}}
         </div>
 
 
@@ -277,7 +277,7 @@
                    id="create-machine-azure-ports"
                    data-theme="a"
                    placeholder="e.g. http tcp 80:80, smtp tcp 25:25, https tcp 443:443"
-                   valueBinding="Mist.machineAddController.newMachineAzurePorts"}}
+                   value=Mist.machineAddController.newMachineAzurePorts}}
 
         </div>
 
@@ -287,7 +287,7 @@
             <label>
             {{view Mist.Checkbox
                 data-theme="a"
-               checkedBinding="Mist.machineAddController.newMachineMonitoring"}}
+                checked=Mist.machineAddController.newMachineMonitoring}}
             Enable monitoring
             </label>
         </div>

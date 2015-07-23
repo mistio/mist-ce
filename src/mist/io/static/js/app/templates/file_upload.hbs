@@ -13,7 +13,7 @@
         </label>
         {{view Ember.TextArea
                id="upload-area"
-               valueBinding="Mist.fileUploadController.file"}}
+               value=Mist.fileUploadController.file}}
 
         <a class="ui-btn ui-corner-all ui-btn-a ui-btn-icon-right ui-icon-arrow-u"
             {{action "uploadClicked" target="view"}}>Upload</a>

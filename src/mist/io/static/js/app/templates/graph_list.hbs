@@ -6,7 +6,7 @@
     {{#if Mist.graphsController.config.canControl}}
         <div id="top-history">
             {{view "graphListControl"
-                actionProxyBinding="view.actionProxy"}}
+                actionProxy=view.actionProxy}}
         </div>
     {{/if}}
 
@@ -15,10 +15,10 @@
     -->
 
     <div id="graphs">
-        {{#each Mist.graphsController.model}}
+        {{#each Mist.graphsController.model as |graph|}}
             {{view "graphListItem"
-                graphBinding="this"
-                actionProxyBinding="view.actionProxy"}}
+                graph=graph
+                actionProxy=view.actionProxy}}
         {{/each}}
     </div>
 
@@ -28,6 +28,6 @@
 
     {{#if Mist.graphsController.config.canMinimize}}
         {{view "graphListBar"
-            actionProxyBinding="view.actionProxy"}}
+            actionProxy=view.actionProxy}}
     {{/if}}
 {{/if}}

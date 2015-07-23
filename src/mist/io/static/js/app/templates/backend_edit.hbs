@@ -39,13 +39,13 @@
 
             <!-- New backend title text field -->
 
-            {{view Mist.TextField valueBinding="Mist.backendEditController.newTitle"}}
+            {{view Mist.TextField value=Mist.backendEditController.newTitle}}
 
             <!-- Backend state toggle switch -->
 
             <div data-role="fieldcontain">
                 <select id="backend-toggle" data-role="slider"
-                    {{action "stateToggleSwitched" target="view" on="change"}}>
+                    {{action "stateToggleSwitched" target=view on="change"}}>
                         <option value="0">Disabled</option>
                         <option value="1">Enabled</option>
                 </select>
@@ -55,7 +55,7 @@
             <!-- Delete button -->
 
             <a class="ui-btn ui-shadow ui-corner-all"
-                {{action "deleteClicked" target="view" on="click"}}>
+                {{action "deleteClicked" target=view on="click"}}>
                 Delete
             </a>
 
@@ -68,9 +68,9 @@
                 </label>
                 <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
                     <a class="ui-btn ui-shadow ui-corner-all" id="button-confirm-disable"
-                        {{action "yesClicked" target="view"}}>Yes</a>
+                        {{action "yesClicked" target=view}}>Yes</a>
                     <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
-                        {{action "noClicked" target="view"}}>No</a>
+                        {{action "noClicked" target=view}}>No</a>
                 </div>
             </div>
 
@@ -81,7 +81,7 @@
             <!-- Back button -->
 
             <a class="ui-btn ui-shadow ui-corner-all button-back"
-                {{action "backClicked" target="view"}}>Back</a>
+                {{action "backClicked" target=view}}>Back</a>
         </div>
     </div>
 </div>

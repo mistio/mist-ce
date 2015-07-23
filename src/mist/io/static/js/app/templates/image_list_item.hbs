@@ -1,6 +1,6 @@
-<label {{bind-attr class="view.starClass"}}
+<label class={{view.starClass}}
     {{action "toggleImageStar" target="view"}}>
-    {{view Mist.Checkbox checkedBinding="view.image.star"}}
+    {{view Mist.Checkbox checked=view.image.star}}
 </label>
 
 <a {{action "launchImage" target="view"}}>

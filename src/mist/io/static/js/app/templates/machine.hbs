@@ -19,19 +19,19 @@
         <!-- Provider Icon -->
         <span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon"
-                {{bind-attr class="view.providerIconClass"}}>
+                class={{view.providerIconClass}}>
             </span>
         </span>
 
         <!-- OS Icon -->
         <span class="single-view-icon-wrapper">
             <span id="single-view-image-icon"
-                {{bind-attr class="view.imageIconClass"}}>
+                class={{view.imageIconClass}}>
             </span>
         </span>
 
         <!-- State label -->
-        <h1 {{bind-attr class="state"}}>
+        <h1 class={{state}}>
             {{#unless isUnknown}}
                 {{state}}
             {{/unless}}
@@ -48,9 +48,7 @@
         <!-- If machine is not running created, disable keys UI -->
         {{#unless isWindows}}
         <span id="mist-manage-keys"
-            {{bind-attr
-                class="view.isRunning::ui-state-disabled
-                :ui-btn-right"}}>
+            class="{{if view.isRunning '' 'ui-state-disabled'}} ui-btn-right">
 
             <!-- If machine is beging created, hide keys UI -->
             {{#unless pendingCreation}}
@@ -58,7 +56,7 @@
                     <a class="ui-btn
                             ui-shadow
                             ui-corner-all"
-                        {{action "manageKeysClicked" target="view"}}>
+                        {{action "manageKeysClicked" target=view}}>
                         {{keysCount}} keys
                     </a>
                 {{else}}
@@ -67,7 +65,7 @@
                             ui-btn-icon-right
                             ui-icon-plus
                             ui-corner-all"
-                        {{action "addKeyClicked" target="view"}}>
+                        {{action "addKeyClicked" target=view}}>
                         Add key
                     </a>
                 {{/if}}
@@ -89,7 +87,9 @@
         <div id="monitoring-collapsible" data-role="collapsible" data-collapsed="false">
 
             <h4>Monitoring</h4>
-
+            {{#if view.machine}}
+            {{view "machineMonitoring" machine=view.machine}}
+            {{/if}}
 
         </div>
 
@@ -115,7 +115,7 @@
                              {{view.lastProbe}}
                              <a id="machine-probe-btn"
                                 class="ui-btn ui-shadow ui-corner-all"
-                                {{action "probeClicked" target="view"}}>
+                                {{action "probeClicked" target=view}}>
                                     Probe
                             </a>
                          {{/if}}
@@ -132,11 +132,11 @@
                         <td>Load</td>
                         <td>
                             <div class="loadleds">
-                                <div {{bind-attr class="loadavg15 :led"}}>
+                                <div class="{{loadavg15}} led">
                                 </div>
-                                <div {{bind-attr class="loadavg5 :led"}}>
+                                <div class="{{loadavg5}} led">
                                 </div>
-                                <div {{bind-attr class="loadavg1 :led"}}>
+                                <div class="{{loadavg1}} led">
                                 </div>
                             </div>
                             {{loadavg}} {{#if cores}}- {{cores}} cores {{/if}}- {{loadavg5}}
@@ -147,14 +147,14 @@
                     <tr>
                         <td>Latency</td>
                         <td>
-                            <div {{bind-attr class=":netleds"}}>
-                                <div {{bind-attr class="netled4 :netled1"}}>
+                            <div class="netleds">
+                                <div class="{{netled4}} netled1">
                                 </div>
-                                <div {{bind-attr class="netled3 :netled2"}}>
+                                <div class="{{netled3}} netled2">
                                 </div>
-                                <div {{bind-attr class="netled2 :netled3"}}>
+                                <div class="{{netled2}} netled3">
                                 </div>
-                                <div {{bind-attr class="netled1 :netled4"}}>
+                                <div class="{{netled1}} netled4">
                                 </div>
                             </div>
                             {{latency}}ms</td>
@@ -170,8 +170,8 @@
                     <tr>
                         <td>Tags</td>
                         <td>
-                            {{#each tags}}
-                            <span class="tag">{{this}}</span>
+                            {{#each tags as |tag|}}
+                            <span class="tag">{{tag}}</span>
                             {{/each}}
                         </td>
                     </tr>
@@ -180,8 +180,8 @@
                     <tr>
                         <td>Public IPs</td>
                         <td>
-                            {{#each view.public_ips}}
-                                <div class="ip">{{this}}</div>
+                            {{#each view.public_ips as |ip|}}
+                                <div class="ip">{{ip}}</div>
                             {{/each}}
                         </td>
                     </tr>
@@ -190,8 +190,8 @@
                     <tr>
                         <td>Private IPs</td>
                         <td>
-                            {{#each view.private_ips}}
-                                <div class="ip">{{this}}</div>
+                            {{#each view.private_ips as |ip|}}
+                                <div class="ip">{{ip}}</div>
                             {{/each}}
                         </td>
                     </tr>
@@ -201,10 +201,10 @@
                         <td colspan="2"><div class="df">{{view.machine.df}}</div></td>
                     </tr>
                 {{/if}}
-                {{#each view.basicInfo}}
+                {{#each view.basicInfo as |row|}}
                     <tr>
-                        <td>{{key}}</td>
-                        <td>{{value}}</td>
+                        <td>{{row.key}}</td>
+                        <td>{{row.value}}</td>
                     </tr>
                 {{/each}}
             </tbody>
@@ -218,10 +218,10 @@
 
                 <table class="info-table">
                     <tbody>
-                    {{#each view.metadata}}
+                    {{#each view.metadata as |row|}}
                         <tr>
-                            <td>{{key}}</td>
-                            <td>{{value}}</td>
+                            <td>{{row.key}}</td>
+                            <td>{{row.value}}</td>
                         </tr>
                     {{/each}}
                     </tbody>
@@ -249,35 +249,27 @@
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <table><tbody><tr><td>
             <a id="single-machine-tags-btn"
-                {{bind-attr class="id::ui-state-disabled
-                    can_tag::ui-state-disabled
-                    :ui-btn
-                    :ui-btn-icon-left
-                    :ui-icon-grid"}}
-                {{action "tagsClicked" target="view"}}>Tags</a>
+                class="{{if id '' 'ui-state-disabled'}}
+                    {{if can_tag '' 'ui-state-disabled'}}
+                    ui-btn ui-btn-icon-left ui-icon-grid"
+                {{action "tagsClicked" target=view}}>Tags</a>
         </td><td>
             {{#if isWindows}}
                 <a id="single-machine-shell-btn"
                     target="_blank"
-                    {{bind-attr href="rdpURL" class="canConnect::ui-state-disabled
-                        :ui-btn
-                        :ui-btn-icon-left
-                        :ui-icon-gear"}}>Connect</a>
+                    href={{rdpURL}} class="{{if canConnect '' 'ui-state-disabled'}}
+                        ui-btn ui-btn-icon-left ui-icon-gear">Connect</a>
             {{else}}
                 <a id="single-machine-shell-btn"
-                    {{bind-attr class="canConnect::ui-state-disabled
-                        :ui-btn
-                        :ui-btn-icon-left
-                        :ui-icon-gear"}}
-                    {{action "shellClicked" target="view"}}>Shell</a>
+                    class="{{if canConnect '' 'ui-state-disabled'}}
+                        ui-btn ui-btn-icon-left ui-icon-gear"
+                    {{action "shellClicked" target=view}}>Shell</a>
             {{/if}}
         </td><td>
             <a id="single-machine-power-btn"
-                {{bind-attr class="id::ui-state-disabled
-                    :ui-btn
-                    :ui-btn-icon-left
-                    :ui-icon-bars"}}
-                {{action "powerClicked" target="view"}}>Actions</a>
+                class="{{if id '' 'ui-state-disabled'}}
+                    ui-btn ui-btn-icon-left ui-icon-bars"
+                {{action "powerClicked" target=view}}>Actions</a>
         </td></tr></tbody></table>
     </div>
 

@@ -1,8 +1,8 @@
 <label>
     {{#if view.network.backend.isOpenStack}}
-        {{view Mist.Checkbox checkedBinding="view.network.selected"}}
+        {{view Mist.Checkbox checked=view.network.selected}}
     {{else}}
-        {{view Mist.Checkbox checkedBinding="view.network.selected" data-disabled="true"}}
+        {{view Mist.Checkbox checked=view.network.selected data-disabled="true"}}
     {{/if}}
 </label>
 {{#link-to "network" view.network}}

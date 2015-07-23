@@ -31,14 +31,14 @@ define('app/controllers/backend_edit', ['ember'],
             //
 
 
-            open: function (backend) {
+            open: function (backend, position) {
                 this._clear();
                 this.setProperties({
                     backend: backend,
                     newTitle: backend.title,
                     newState: backend.enabled,
                 });
-                this.view.open();
+                this.view.open(position);
             },
 
 

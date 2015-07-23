@@ -1,5 +1,5 @@
-<span {{bind-attr class="view.collapsedClass"}}>
-    <a class="ui-btn" {{action "toggleCollapse" target="view"}}>
+<span class={{view.collapsedClass}}>
+    <a class="ui-btn" {{action "toggleCollapse" target=view}}>
 
         <div class="ui-grid-b">
             <div class="ui-block-a">
@@ -43,10 +43,10 @@
                 </td>
             </tr>
             {{/if}}
-            {{#each view.details}}
+            {{#each view.details as |row|}}
                 <tr>
-                    <td>{{unbound this.key}}</td>
-                    <td><div>{{unbound this.value}}</div></td>
+                    <td>{{unbound row.key}}</td>
+                    <td><div>{{unbound row.value}}</div></td>
                 </tr>
             {{/each}}
             </tbody>

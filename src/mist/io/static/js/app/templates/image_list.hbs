@@ -20,7 +20,7 @@
         {{view Mist.TextField
                id="search-term-input"
                placeholder="Search images ..."
-               valueBinding="Mist.imageSearchController.searchTerm"}}
+               value=Mist.imageSearchController.searchTerm}}
 
         {{#if Mist.imageSearchController.isSearching}}
             <div class="ajax-loader"></div>
@@ -30,8 +30,8 @@
             data-role="listview"
             data-inset="true"
             class="checkbox-list">
-            {{#each view.renderedImages}}
-                {{view "imageListItem" imageBinding="this" class="checkbox-link" }}
+            {{#each view.renderedImages as |image|}}
+                {{view "imageListItem" image=image class="checkbox-link" }}
             {{/each}}
         </ul>
 

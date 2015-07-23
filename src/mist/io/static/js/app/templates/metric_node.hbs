@@ -3,7 +3,7 @@
     <a class="end-node
         ui-btn
         ui-corner-all"
-        {{action "selectMetric" target="view"}}>{{view.node.text}}</a>
+        {{action "selectMetric" target=view}}>{{view.node.text}}</a>
 
 {{else}}
 
@@ -13,12 +13,12 @@
             ui-corner-all
             ui-btn-icon-left
             ui-icon-carat-d"
-            {{action "toggleUnfold" target="view"}}>{{view.node.text}}</a>
+            {{action "toggleUnfold" target=view}}>{{view.node.text}}</a>
     {{/unless}}
 
     <div class="nest">
-        {{#each view.node.subTargets}}
-            {{view "metricNode" nodeBinding="this"}}
+        {{#each view.node.subTargets as |node|}}
+            {{view "metricNode" node=node}}
         {{/each}}
     </div>
 

@@ -41,7 +41,7 @@
 
             {{view Mist.TextField
                 id="script-edit-new-name"
-                valueBinding="Mist.scriptEditController.newName"}}
+                value=Mist.scriptEditController.newName}}
 
             {{#if Mist.scriptsController.renamingScript}}
                 <div class="ajax-loader"></div>
@@ -49,10 +49,10 @@
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
                     <a class="ui-btn ui-btn-a ui-corner-all ui-shadow"
-                       {{action "backClicked" target="view"}}>Back</a>
+                       {{action "backClicked" target=view}}>Back</a>
                     <a id="script-edit-ok"
                         class="ui-btn ui-btn-d ui-corner-all ui-shadow"
-                        {{action "saveClicked" target="view"}}>Save</a>
+                        {{action "saveClicked" target=view}}>Save</a>
             </div>
         </div>
     </div>

@@ -10,14 +10,14 @@
 
     <div data-role="content" data-theme="a">
 
-        {{view Mist.TextField valueBinding="Mist.machineTagsController.newTag"}}
+        {{view Mist.TextField value=Mist.machineTagsController.newTag}}
 
         <a id="add-tag-ok" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
-            {{action "addClicked" target="view"}}>Add</a>
+            {{action "addClicked" target=view}}>Add</a>
 
         <ul data-role="listview">
-            {{#each Mist.machineTagsController.machine.tags}}
-                {{view "machineTagsListItem" tagBinding="this"}}
+            {{#each Mist.machineTagsController.machine.tags as |tag|}}
+                {{view "machineTagsListItem" tag=tag}}
             {{/each}}
         </ul>
 
@@ -28,7 +28,7 @@
         {{/if}} {{/if}}
 
         <a id="add-tag-back" class="ui-btn ui-shadow ui-corner-all"
-            {{action "backClicked" target="view"}}>Back</a>
+            {{action "backClicked" target=view}}>Back</a>
 
     </div>
 
