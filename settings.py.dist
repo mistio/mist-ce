@@ -1,5 +1,10 @@
 """User defined settings"""
 
+## ETCD host
+# The ETCD_HOST should be the docker0 interface ip (in most cases)
+# ETCD_HOST = "127.0.0.1"
+# ETCD_PORT = 4001
+
 ## URI of hosted mist service
 #CORE_URI = "https://mist.io"
 
