@@ -22,6 +22,21 @@ except IOError:
     log.warning("No settings.py file found.")
 except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
+
+# If ETCD host and port are configured in the settings.py file, we'll try
+# to import the etcd client, and use the etcd information instead of the settings.py
+# In any other case we fall back to using defaults and settings.py
+ETCD_HOST = settings.get("ETCD_HOST", None)
+ETCD_PORT = settings.get("ETCD_PORT", None)
+
+if ETCD_HOST:
+    try:
+        import etcd
+        etcd_client = etcd.Client(host=ETCD_HOST, port=int(ETCD_PORT))
+    except ImportError:
+        etcd_client = None
+
+
 CORE_URI = settings.get("CORE_URI", "https://mist.io")
 SSL_VERIFY = settings.get("SSL_VERIFY", True)
 JS_BUILD = settings.get("JS_BUILD", False)
