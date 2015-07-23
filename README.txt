@@ -32,6 +32,10 @@ For vSphere support, you should install pyvmomi library::
 
     ./bin/pip install pyvmomi
 
+For etcd support, you should first install::
+    apt-get install libffi-dev libssl-dev
+    ./bin/pip install python-etcd
+
 In Red Hat based systems the following packages need to be installed::
    
     sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel
