@@ -8,6 +8,9 @@
     #home-page .ui-block-b {
         padding-left: 15px;
     }
+    #home-page .ui-block-a.full-width {
+        padding-right: 0px;
+    }
 }
 #add-backend {
     float: right;
@@ -30,7 +33,6 @@
     position: absolute;
     right: 0;
     text-align: left;
-    min-width: 20em;
 }
 
 .ui-btn-add > h4.ui-collapsible-heading a{

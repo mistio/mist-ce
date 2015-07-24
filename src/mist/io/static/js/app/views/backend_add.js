@@ -125,8 +125,11 @@ define('app/views/backend_add', ['app/views/panel'],
                     this.clear();
                     clearProviderFields(provider);
                     Mist.backendAddController.set('provider', provider);
-                    $('#new-backend-provider').collapsible('collapse');
-                    this.autocompleteCredentials(provider);
+                    var that = this;
+                    Ember.run.next(function(){
+                        $('#new-backend-provider').collapsible('collapse');
+                        that.autocompleteCredentials(provider);    
+                    })
                 },
 
 

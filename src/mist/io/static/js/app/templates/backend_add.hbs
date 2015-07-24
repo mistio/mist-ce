@@ -7,18 +7,18 @@
             data-role="collapsible"
             data-collapsed-icon="carat-d"
             data-expanded-icon="carat-u"
+            data-collapsed="false"
             data-iconpos="right"
             data-theme="a">
+            {{#if Mist.backendAddController.provider.title}}
             <h4 class="{{if Mist.backendAddController.provider.title '' 'select-provider'}}">
-                {{#if Mist.backendAddController.provider.title}}
+
                    <span class="provider-icon-small">
                         <span class={{Mist.backendAddController.provider.className}}></span>
                     </span>
                     {{Mist.backendAddController.provider.title}}
-                {{else}}
-                    <span class="select-provider">Select provider</span>
-                {{/if}}
             </h4>
+            {{/if}}
             <ul class="mist-select" data-role="listview" data-theme="a">
                 {{#each Mist.backendsController.providerList as |provider|}}
                     <li data-icon="false">
@@ -146,15 +146,13 @@
         {{#if Mist.backendsController.addingBackend}}
             <div class="ajax-loader"></div>
         {{/if}}
-
+        {{#if Mist.backendAddController.provider.title}}
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a ui-shadow ui-corner-all" {{action "backClicked" target=view}}>
-                Back
-            </a>
             <a id="new-backend-ok ui-caps"
                 class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d"
                 {{action "addClicked" target=view}}>Add</a>
         </div>
+        {{/if}}
     </div>
 </div>
 

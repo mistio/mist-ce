@@ -10,8 +10,12 @@
     text-shadow: 0 0 0 #64b247;
 }
 
-#backend-add h4, #backend-add ul {
-    border: 1px solid #64b247;
+#backend-add h4.ui-collapsible-heading {
+    display: none;
+}
+
+#backend-add h4.ui-collapsible-heading.ui-collapsible-heading-collapsed {
+    display: block;
 }
 
 #backend-add ul {
@@ -31,7 +35,7 @@
     margin-top: 1em;
 }
 #backend-add .mist-select ul {
-    max-height: 165px;
+    max-height: 565px;
     overflow-y: scroll;
     margin: 0;
 }

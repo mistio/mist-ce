@@ -41,12 +41,11 @@
     margin: 0px auto;
     max-width: 1180px;
     overflow: visible !important;
+    padding: 1.25% 1.25% .75% 1.25%;
 }
 
 #banner-logo {
-    width: 101px;
     height: auto;
-    margin-top: 7px;
 }
 
 .user-menu {
@@ -258,15 +257,15 @@ h3 {
     max-width: 98%;
 }
 .mist-progress-wrapper {
-    border: 1px solid white;
+    border: 1px solid #fff;
     border-radius: .1em;
-    bottom: 58px;
-    box-shadow: 0 0 2px rgba(255, 255, 255, 1);
+    bottom: 35px;
+    box-shadow: 0 0 2px #444;
     height: 2px;
-    left: 92px;
+    left: 74px;
     padding: 0;
     position: absolute;
-    width: 96px;
+    width: 133px;
 }
 
 
@@ -275,9 +274,7 @@ h3 {
 body {
     background-color: #e2e2e2 !important;
 }
-.ui-page > .ui-content {
-    padding: 0;
-}
+
 #monitoring-collapsible .ui-collapsible-content {
     padding: 0 .5% .5%;
     border: 1px solid #f8f8f8;
