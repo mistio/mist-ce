@@ -190,15 +190,12 @@ define('app/views/backend_add', ['app/views/panel'],
                 },
 
                 helpClicked: function (field) {
-                    this.setProperties({
+                    Mist.backendAddController.setProperties({
                         helpText: field.helpText,
                         helpHref: field.helpHref,
                     });
-                    $('#help-tooltip').popup('option', 'positionTo', '#' + field.helpId)
+                    $('#help-tooltip').popup().popup('option', 'positionTo', '#' + field.helpId)
                     Ember.run.later(function () {
-                    //    $('#help-tooltip').css('top', function(i, v) {
-                    //        return (parseFloat(v) + 10) + 'px';
-                    //    });
                         $('#help-tooltip').popup('open');
                     }, 50);
                 },

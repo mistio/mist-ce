@@ -389,11 +389,12 @@ textarea {
     box-shadow: none;
     text-shadow: 0 0 0 transparent !important;
     font-weight: 400;
+    margin-bottom: 0 !important;
 }
 
 .floating-collapsible.ui-collapsible-collapsed, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
     background-color: transparent !important;
-    color: #64b247 !important;
+    color: #177283 !important;
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a {
@@ -407,30 +408,33 @@ textarea {
     left: inherit;
     right: 0px;
     content: '+';
-    border-radius: 1em;
-    top: 12px;
-    color: #64b247 !important;
+    border-radius: 6em;
+    top: 11px;
     background-color: #fff !important;
     font-size: 48px;
-    padding: 0px 0px 0 10px;
+    padding: 0px 3px 17px 14px;
     width: 45px;
-    height: 55px;
-    line-height: 36px;
+    height: 45px;
+    line-height: 45px;
+    color: #d96557 !important;
+    transform: rotate(45deg);
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:after {
     box-shadow: 1px 1px 10px #aaa;
+    color: #177283 !important;
+    transform: none;
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover:after {
     color: #fff !important;
-    background-color: #64b247 !important;
+    background-color: #177283 !important;
     box-shadow: 1px 1px 10px #666;
 }
 
-.floating-collapsible > h4.ui-collapsible-heading > a:active:after {
+.floating-collapsible > h4.ui-collapsible-heading > a:active:after, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:after {
     color: #fff !important;
-    background-color: #46862F !important;
+    background-color: #177283 !important;
 }
 
 .floating-collapsible > .ui-collapsible-content {

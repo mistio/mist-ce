@@ -153,33 +153,4 @@
     </div>
 </div>
 
-<div id="help-tooltip-screen"
-    class="ui-popup-screen
-        ui-overlay-b
-        ui-screen-hidden">
-</div>
-<div id="help-tooltip-popup"
-     class="pop
-        ui-popup-container
-        ui-popup-hidden
-        ui-popup-truncate">
-    <div id="help-tooltip"
-         class="ui-popup
-            ui-body-a
-            ui-overlay-shadow
-            ui-corner-all"
-         data-role="popup"
-         data-arrow="true"
-         data-enhanced="true"
-         data-transition="flip">
-        <p>{{view.helpText}}
-            {{#if view.helpHref}}
-            <a target="_blank" href={{view.helpHref}}>
-                Read more...
-            </a>
-            {{/if}}
-        </p>
-    </div>
-</div>
-
 {{view "fileUpload"}}

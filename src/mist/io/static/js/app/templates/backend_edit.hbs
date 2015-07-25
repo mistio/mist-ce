@@ -39,8 +39,9 @@
 
             <!-- New backend title text field -->
 
+            {{#if Mist.backendEditController.newTitle}}
             {{view Mist.TextField value=Mist.backendEditController.newTitle}}
-
+            {{/if}}
             <!-- Backend state toggle switch -->
 
             <div data-role="fieldcontain">

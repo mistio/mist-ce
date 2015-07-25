@@ -152,14 +152,35 @@
         {{/if}}
     </div>
 
-    <div data-role="popup" id="popupBasic">
-    <p>This is a completely basic popup, no options set.</p>
+    <div id="help-tooltip-screen"
+        class="ui-popup-screen
+            ui-overlay-b
+            ui-screen-hidden">
     </div>
-
-    {{view "dialog"}}
-
-    {{view "backendEdit"}}
-    <div id="add-backend-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
-        {{action "addBackendOverlayClicked" target=view}}></div>
-
+    <div id="help-tooltip-popup"
+         class="pop
+            ui-popup-container
+            ui-popup-hidden
+            ui-popup-truncate">
+        <div id="help-tooltip"
+             class="ui-popup
+                ui-body-a
+                ui-overlay-shadow
+                ui-corner-all"
+             data-role="popup"
+             data-arrow="true"
+             data-enhanced="true"
+             data-transition="flip">
+            <p>{{Mist.backendAddController.helpText}}
+                {{#if Mist.backendAddController.helpHref}}
+                <a target="_blank" href={{Mist.backendAddController.helpHref}}>
+                    Read more...
+                </a>
+                {{/if}}
+            </p>
+        </div>
+    </div>
 </div>
+
+<div id="add-backend-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
+    {{action "addBackendOverlayClicked" target=view}}></div>

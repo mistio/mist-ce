@@ -5,7 +5,7 @@
 .mist-select + div#backend-add-fields {
     display: none !important;
     background-color: #FAF9F4;
-    padding: 1em;    
+    padding: 1em;
 }
 
 .mist-select.ui-collapsible-collapsed + div#backend-add-fields {

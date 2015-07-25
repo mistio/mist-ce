@@ -22,10 +22,7 @@ define('app/views/backend_edit', ['app/views/popup'],
 
 
             open: function (position) {
-                warn('open backend-edit view');
                 this._super(position);
-                $('#monitoring-message').hide();
-                $('#backend-delete-confirm').hide();
             },
 
 
