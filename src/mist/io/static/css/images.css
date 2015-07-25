@@ -24,9 +24,6 @@
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
-#image-list-page #image-list .staron {
-    height: 19px;
-}
 @-moz-document url-prefix() {
     #image-list-page .checkbox-link h3 {
         width: 50%;
@@ -45,9 +42,8 @@
     top: 6px;
 }
 
-#image-list-page ul .ui-checkbox-off:after {
-    background-color: rgba(0,0,0,0) !important;
-    background-repeat: no-repeat !important;
+#image-list-page ul li label {
+    margin-top: 9px;
 }
 
 #image-list-page ul .ui-checkbox-on:after {

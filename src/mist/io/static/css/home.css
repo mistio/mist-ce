@@ -12,9 +12,21 @@
         padding-right: 0px;
     }
 }
+#home-page .options-list li a,
+#home-page .incident-list li a {
+    border-top: 1px solid #eeedeb;
+    border-left: none;
+    border-right: none;
+}
+
+#home-page .options-list li:first-child a,
+#home-page .incident-list li:first-child a {
+    border-top-color: transparent;
+}
+
 #add-backend {
     float: right;
-    margin-right: 0px;
+    margin-right: 10px;
     margin-bottom: 13px;
     margin-top: 0;
     top: .7em;
@@ -27,45 +39,6 @@
 
 #add-backend-overlay {
     z-index: 899;
-}
-
-.ui-btn-add > .ui-collapsible-content {
-    position: absolute;
-    right: 0;
-    text-align: left;
-}
-
-.ui-btn-add > h4.ui-collapsible-heading a{
-    background-color: #A4A39F !important;
-    padding: 18px 25px 18px 65px !important;
-    font-size: 16px;
-    padding-left: 70px !important;
-    color: #fff !important;
-    text-shadow: 0 0 0 #64b247 !important;
-    font-weight: 300;
-}
-
-.ui-btn-add > h4.ui-collapsible-heading a:hover {
-    border: 1px solid #A4A39F;
-}
-
-.ui-btn-add.ui-collapsible-collapsed > h4.ui-collapsible-heading a {
-    background-color: #64b247 !important;
-    text-shadow: 0 0 0 #64b247 !important;
-}
-
-.ui-btn-add > h4.ui-collapsible-heading a:after {
-    top: 26px;
-}
-
-.ui-btn-add.ui-collapsible-collapsed  > h4.ui-collapsible-heading a:hover{
-    background-color: #a2d191 !important;
-    border-color: #a2d191 !important;
-}
-
-.ui-btn-add.ui-collapsible  > h4.ui-collapsible-heading a:active{
-    background-color: #46862f !important;
-    border-color: #46862f !important;
 }
 
 #home-page .ui-listview {
@@ -119,8 +92,8 @@
 
 .incidents h4 {
     padding: 11.2px 16px;
-    background-color: #d1d1d1;
-    border: 1px solid #d1d1d1;
+    background-color: #d4d4d4;
+    border: 1px solid #d4d4d4;
     font-family: 'Open Sans', sans-serif;
     font-size: 18px;
     text-transform: uppercase;
@@ -133,12 +106,17 @@
     text-shadow: none;
 }
 
+.incidents .incident a:hover {
+    color: #7f7f7f !important;
+    background-color: #f2f2f2;
+}
+
 .incidents .incident.no a {
     padding-left: 11.2px !important;
 }
 
 .incidents .incident.no a:hover {
-    background-color: #FAF9F4;
+    background-color: #f2f2f2;
     color: #7f7f7f !important;
     border-color: #FAF9F4;
     cursor: default;
@@ -154,6 +132,7 @@
 
 .incidents .machine {
     font-weight: bold;
+    color: #000;
 }
 
 .incidents .ui-icon-alert:after,
@@ -163,10 +142,6 @@
 
 .incidents .ui-icon-check:after {
     background-color: rgba(33, 133, 89, 0.4);
-}
-
-#machines .ui-icon-check:after {
-    background-color: rgba(33, 133, 89, .6);
 }
 
 .incidents li a.ui-btn {
@@ -184,7 +159,7 @@
     color: #64b247;
 }
 
-.incidents li a.icon-error:after {
+.incidents li.alert a.icon-error:after {
     color: #d96557;
 }
 
@@ -195,25 +170,21 @@
     left: 15px;
 }
 
-.incidents .incident a.icon-error {
+.incidents .alert.incident a {
     color: #d96557;
     background-color: #f7e0dd;
 }
 
-.incidents .incident a.icon-error:hover {
+.incidents .alert.incident a:hover {
     color: #d96557 !important;
-    background-color: #f7e0dd;
+    background-color: #ECB3AC;
 }
 
-.incidents .incident a.icon-error .machine {
+.incidents .alert.incident a .machine {
     color: #d95557;
 }
 
-/*.incidents li a:hover .machine {
-    color: #d96557;
-}*/
-
-.incidents .incident a.icon-error:after {
+.incidents .alert.incident a:after {
     color: #d96557;
 }
 

@@ -6,7 +6,7 @@
 {{/if}}
 &nbsp;</a>
 
-<div id="user-menu-popup" class="ui-mini" data-role="popup" data-position-to="#me-btn" data-theme="c" data-overlay-theme="b" data-transition="flip">
+<div id="user-menu-popup" class="ui-mini" data-role="popup" data-position-to="#me-btn" data-theme="a" data-overlay-theme="b" data-transition="flip">
 
 	{{#if Mist.authenticated}}
 	<div class="ui-header user-email">{{EMAIL}}</div>
@@ -37,13 +37,12 @@
             {{/if}}
         {{else}}
             {{#unless Mist.isCore}}
-                <li><a class="ui-btn ui-mini"
+                <li><a class="ui-btn ui-mini ui-btn-icon-left icon-lock"
                     {{action "loginClicked" target=view}}>Login</a></li>
             {{/unless}}
         {{/if}}
 
     </ul>
-
 </div>
 
 {{view "login"}}

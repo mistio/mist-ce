@@ -13,7 +13,7 @@
     <!-- Page Body -->
     <div role="main" class="ui-content" data-theme="c">
         <!-- Add backend button -->
-        <div id="add-backend" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow" data-role="collapsible" data-collapsed="true">
+        <div id="add-backend" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible" data-role="collapsible" data-collapsed="true">
            <h4>Add cloud</h4>
            {{view "backendAdd"}}
         </div>
@@ -32,7 +32,7 @@
             <div class="{{if view.hasIncidents '' 'full-width'}} ui-block-a">
                 <div class="ui-body">
                     <!-- Navigation -->
-                    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow ui-caps">
+                    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow ui-caps options-list">
                         <!-- Machines link -->
                         <li class="ui-li-has-count ui-first-child">
                             <a class="ui-btn ui-btn-icon-left icon-machine ui-alt-icon" href="#/machines">
@@ -89,51 +89,56 @@
                     </ul>
                 </div>
             </div>
-
+            {{#if view.hasIncidents}}
             <div class="{{if view.hasIncidents '' 'no-width'}} ui-block-b">
                 <div class="ui-body">
-                    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents header">
-                        <li class="ui-li-divider ui-bar-c ui-first-child">Incidents</li>
-                        <li class="ui-li-divider ui-bar-c ui--child" style="display:none;"></li>
-                    </ul>
-                    <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incidents">
-                        {{#each Mist.openIncidents as |incident|}}
-                            {{#if incident.isClosed}}
-                                <li class="ui-mini incident">
-                                    <a class="ui-icon-check ui-btn ui-btn-icon-right"
-                                        {{action "incidentClicked" this target=view}}>
-                                        <span class="machine">
-                                            {{incident.machineName}}:
-                                        </span>
-                                        <span class="rule-condition">
-                                            {{incident.ruleText}}
-                                        </span>
-                                        <span class="duration">
-                                            for {{incident.duration}}
-                                        </span>
-                                        <span class="time">{{incident.closed}} ago </span>
-                                    </a>
-                                </li>
-                            {{else}}
-                                <li class="ui-bar-b incident">
-                                    <a class="ui-icon-alert ui-btn ui-btn-icon-right"
-                                        {{action "incidentClicked" this target="view"}}>
-                                        <span class="machine">
-                                            {{incident.machineName}}:
-                                        </span>
-                                        <span class="rule-condition">
-                                            {{incident.ruleText}}
-                                        </span>
-                                        <span class="time">
-                                            {{incident.prettyTime}}
-                                        </span>
-                                    </a>
-                                </li>
-                            {{/if}}
-                        {{/each}}
-                    </ul>
+                    <div class="incidents ui-shadow">
+                        <h4>Incidents</h4>
+                        <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incident-list">
+                            {{#unless Mist.openIncidents}}
+                            <li class="no incident">
+                                <a href="javascript:void(0)" class="icon-check ui-btn ui-btn-icon-right ui-btn">No recent incidents</a>
+                            </li>
+                            {{/unless}}
+                            {{#each Mist.openIncidents as |incident|}}
+                                {{#if this.isClosed}}
+                                    <li class="incident">
+                                        <a class="icon-check ui-btn ui-btn-icon-right"
+                                            {{action "incidentClicked" incident target=view}}>
+                                            <span class="machine">
+                                                {{this.machineName}}:
+                                            </span>
+                                            <span class="rule-condition">
+                                                {{incident.ruleText}}
+                                            </span>
+                                            <span class="duration">
+                                                for {{incident.duration}}
+                                            </span>
+                                            <span class="time">{{incident.closed}} ago </span>
+                                        </a>
+                                    </li>
+                                {{else}}
+                                    <li class="alert incident">
+                                        <a class="icon-alert-2 ui-btn ui-btn-icon-right"
+                                            {{action "incidentClicked" incident target=view}}>
+                                            <span class="machine">
+                                                {{incident.machineName}}:
+                                            </span>
+                                            <span class="rule-condition">
+                                                {{incident.ruleText}}
+                                            </span>
+                                            <span class="time">
+                                                {{incident.prettyTime}}
+                                            </span>
+                                        </a>
+                                    </li>
+                                {{/if}}
+                            {{/each}}
+                        </ul>
+                    </div>
                 </div>
             </div>
+            {{/if}}
         </div><!-- /grid-a -->
 
         {{view "graphList" actionProxy=view}}
@@ -154,6 +159,7 @@
     {{view "dialog"}}
 
     {{view "backendEdit"}}
-    <div id="add-backend-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"></div>
+    <div id="add-backend-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
+        {{action "addBackendOverlayClicked" target=view}}></div>
 
 </div>

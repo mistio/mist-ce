@@ -30,3 +30,5 @@ local/
 share/
 # vim files
 .*.sw[op]
+bower_components
+node_modules

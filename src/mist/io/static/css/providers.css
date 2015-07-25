@@ -11,9 +11,11 @@
 
 .provider-icon-small,
 .image-icon-small {
-    float:left;
+    float:right;
     width: 24px;
     height: 24px;
+    margin-left: 20px !important;
+    margin-right: -13px !important;
 }
 
 .provider-icon-small span,

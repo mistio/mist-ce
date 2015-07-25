@@ -85,7 +85,7 @@
                     data-type="horizontal">
 
                     {{#if view.isOKCancel}}
-                        <a class="ui-btn ui-caps"
+                        <a class="ui-btn ui-caps back"
                             {{action "reject" target=view}}>
                                 Cancel
                         </a>
@@ -96,11 +96,11 @@
                     {{/if}}
 
                     {{#if view.isYesNo}}
-                        <a class="ui-btn ui-btn-d ui-caps"
+                        <a class="ui-btn ui-caps back"
                             {{action "reject" target=view}}>
                                 No
                         </a>
-                        <a class="ui-btn ui-caps"
+                        <a class="ui-btn ui-btn-d ui-caps"
                             {{action "confirm" target=view}}>
                                 Yes
                         </a>

@@ -1,7 +1,7 @@
 
 /* Single Key Page CSS
 -----------------------------------------------------------------------------------------------------------*/
-#single-key-page .ui-content {
+#single-key-page > .ui-content {
     padding-top: 30px;
     background-color: transparent;
 }
@@ -22,16 +22,18 @@
 #single-key-page .ui-footer {
     display: block;
 }
+#single-key-page .ui-collapsible {
+    margin: 10px 0 20px;
+}
 #single-key-page .ui-collapsible .ajax-loader {
     display: inline;
     float: right;
 }
 #single-key-page .ui-collapsible .ui-collapsible-heading a {
-    background-color: #eeedeb;
+    background-color: #d4d4d4;
 }
 #single-key-page .ui-collapsible .ui-collapsible-heading a:hover {
-    border-color: #eeedeb;
-    color: #c1c1c1 !important;
+    border-color: #d4d4d4;
 }
 #single-key-page .ui-collapsible .ui-collapsible-content {
     background-color: #faf9f4;
@@ -60,7 +62,7 @@
 }
 
 #single-key-page #public-key {
-    height: 140px;
+    height: 90px;
     overflow: auto;
-    background-color: rgb(255, 255, 255);
+    font-family: monospace;
 }

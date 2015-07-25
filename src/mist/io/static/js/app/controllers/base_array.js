@@ -20,6 +20,7 @@ define('app/controllers/base_array', ['ember'],
 
             loading: true,
             passOnProperties: [],
+            model: [],
 
 
             //

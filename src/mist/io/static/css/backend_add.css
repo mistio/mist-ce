@@ -1,6 +1,17 @@
 
 /* Backend Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
+
+.mist-select + div#backend-add-fields {
+    display: none !important;
+    background-color: #FAF9F4;
+    padding: 1em;    
+}
+
+.mist-select.ui-collapsible-collapsed + div#backend-add-fields {
+    display: block !important;
+}
+
 #backend-add h4.select-provider a,
 #backend-add h4 a:hover,
 #backend-add ul li a:hover {
@@ -35,7 +46,7 @@
     margin-top: 1em;
 }
 #backend-add .mist-select ul {
-    max-height: 565px;
+    max-height: 400px;
     overflow-y: scroll;
     margin: 0;
 }

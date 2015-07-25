@@ -82,7 +82,7 @@
                                 <a class="ui-btn
                                         ui-btn-d
                                         ui-icon-plus
-                                        ui-corner-all
+                                        ui-shadow
                                         ui-icon-plus
                                         ui-btn-icon-left
                                         ui-caps"
@@ -268,7 +268,7 @@
 
     {{view "machinePower" position="#single-machine-power-btn"}}
 
-    <div class="tri-action-footer" data-role="footer" data-theme="b">
+    <div class="tri-action-footer ui-shadow" data-role="footer" data-theme="b">
         <table>
             <tbody>
                 <tr>
@@ -276,7 +276,7 @@
                         <a id="single-machine-tags-btn"
                             class="{{if id '' 'ui-state-disabled'}}
                                 {{if can_tag '' 'ui-state-disabled'}}
-                                ui-btn ui-btn-icon-left ui-icon-grid ui-caps"
+                                ui-btn ui-btn-icon-right ui-icon-grid ui-caps icon-tag"
                             {{action "tagsClicked" target=view}}>Tags</a>
                     </td>
                     <td>
@@ -288,14 +288,14 @@
                         {{else}}
                         <a id="single-machine-shell-btn"
                             class="{{if canConnect '' 'ui-state-disabled'}}
-                                ui-btn ui-btn-icon-left ui-icon-gear ui-caps"
+                                ui-btn ui-btn-icon-right ui-icon-shell ui-caps"
                             {{action "shellClicked" target=view}}>Shell</a>
                         {{/if}}
                     </td>
                     <td>
                         <a id="single-machine-power-btn"
                             class="{{if id '' 'ui-state-disabled'}}
-                                ui-btn ui-btn-icon-left ui-icon-bars ui-caps"
+                                ui-btn ui-btn-icon-right icon-cof ui-caps"
                             {{action "powerClicked" target=view}}>Actions</a>
                     </td>
                 </tr>

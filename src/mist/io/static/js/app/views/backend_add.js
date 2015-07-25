@@ -128,8 +128,8 @@ define('app/views/backend_add', ['app/views/panel'],
                     var that = this;
                     Ember.run.next(function(){
                         $('#new-backend-provider').collapsible('collapse');
-                        that.autocompleteCredentials(provider);    
-                    })
+                    });
+                    this.autocompleteCredentials(provider);
                 },
 
 

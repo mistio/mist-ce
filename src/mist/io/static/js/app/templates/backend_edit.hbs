@@ -55,15 +55,15 @@
             <!-- Delete button -->
 
             <a class="ui-btn ui-shadow ui-corner-all"
-                {{action "deleteClicked" target=view on="click"}}>
+                {{action "deleteClicked" target=view}}>
                 Delete
             </a>
 
             <!-- Delete confirmation -->
 
-            <div id="backend-delete-confirm">
+            <div id="backend-delete-confirm" style="display:none">
                 <label>Confirm backend removal?</label>
-                <label id="monitoring-message">There are monitored machines.
+                <label id="monitoring-message" style="display:none">There are monitored machines.
                     <br />Monitoring for these will be disabled
                 </label>
                 <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">

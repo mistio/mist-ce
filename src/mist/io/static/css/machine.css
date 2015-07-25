@@ -1,6 +1,9 @@
 
 /* Single Machine Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+#single-machine-page {
+    padding-bottom: 50px;
+}
 #single-machine-page .ui-content.ui-body-a {
     background-color: transparent;
 }
@@ -25,11 +28,10 @@
     display: block;
 }
 #single-machine-page .ui-collapsible .ui-collapsible-heading a {
-    background-color: #eeedeb;
+    background-color: #d4d4d4;
 }
 #single-machine-page .ui-collapsible .ui-collapsible-heading a:hover {
-    border-color: #eeedeb;
-    color: #C1C1C1 !important;
+    border-color: #d4d4d4;
 }
 #single-machine-page .ui-collapsible .ui-collapsible-content {
     background-color: #faf9f4;
@@ -44,6 +46,9 @@
     padding: 10px 12px;
     border-bottom: 1px solid #eeedeb;
 }
+#single-machine-page .info-table tr:last-child td {
+    border-bottom: none;
+}
 #single-machine-page .info-table tr td:nth-child(1) {
     padding-left: 54px;
 }
@@ -52,6 +57,10 @@
 }
 #single-machine-page .info-table tr {
     background-color: #faf9f4;
+    border: none;
+}
+#single-machine-page .info-table tr:hover {
+    background-color: #f2f2f2;
 }
 #single-machine-page .info-table .ip {
     display: inline-block;

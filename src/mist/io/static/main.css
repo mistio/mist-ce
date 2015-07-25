@@ -102,7 +102,7 @@ h3 {
 
 .ui-popup .ui-header {
     border: none !important;
-    background-color: #A4A39F;
+    background-color: #d4d4d4;
     color: #fff;
     text-transform: uppercase;
     padding: 15px 20px;
@@ -120,7 +120,7 @@ h3 {
 
 .ui-popup-container .ui-header {
     border: none !important;
-    background-color: #A4A39F;
+    background-color: #d4d4d4;
     color: #000;
     text-transform: uppercase;
     padding: 15px 20px;
@@ -134,7 +134,7 @@ h3 {
 
 .ui-popup-container h1.ui-title{
     font-size: 18px;
-    color: #fff;
+    color: #000;
     text-align: left;
     padding: 0;
 }
@@ -146,11 +146,10 @@ h3 {
 
 .ui-popup ul.ui-listview li a {
     border: 0;
-    /*padding: .8em 3.5em !important;*/
 }
 
 .ui-popup ul.ui-listview li a:hover {
-    background-color: #64b247;
+    background-color: #7f7f7f !important;
     color: #fff;
 }
 
@@ -207,7 +206,7 @@ h3 {
     padding-right: 1.75em;
     background: #fff;
     border-radius: 0;
-    color: #A4A39F;
+    color: #7f7f7f;
     text-shadow: none;
     font-size: 14px;
 }
@@ -334,6 +333,7 @@ textarea#private-key, #manual-monitoring-popup textarea {
 
 textarea {
     background-color: #fff !important;
+    overflow-y: auto !important;
 }
 
 
@@ -381,47 +381,84 @@ textarea {
 }
 
 
-/* Side panel
+/* Floating collapsibles
 -----------------------------------------------------------------------------------------------------------*/
-.side-panel {
-    /**
-     *  .ui-panel's default width value is 17em
-     *  but it's on many many selectors in jqm.css.
-     *  Bacause the value "17em" existed only in
-     *  panel related selectors, a mass find/replace
-     *  process took place.
-     *
-     *  The value "325px" is also unique to jqm.css
-     *  so this change can easily be undone or modified
-     */
-    width: 325px; /* Useless, but leave it there for reference reasons */
-    min-height: 0;
-}
-.side-panel .ui-header {
-    background-color: #A4A39F !important;
-    padding: 0;
-}
-.side-panel .ui-header .ui-title {
-    font-size: 18px;
-    color: #fff;
-    text-shadow: none;
-}
-.side-panel .ui-panel-inner {
-    padding: 0;
+.floating-collapsible, .floating-collapsible > h4.ui-collapsible-heading, .floating-collapsible > h4.ui-collapsible-heading > a {
+    background-color: transparent !important;
+    color: #fff !important;
+    box-shadow: none;
+    text-shadow: 0 0 0 transparent !important;
+    font-weight: 400;
 }
 
-.ui-panel-dismiss-open.ui-panel-dismiss-position-right {
-    right: 325px;
+.floating-collapsible.ui-collapsible-collapsed, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
+    background-color: transparent !important;
+    color: #64b247 !important;
 }
 
-.ui-panel-dismiss-open.ui-panel-dismiss-position-right {
-    right: 325px;
+.floating-collapsible > h4.ui-collapsible-heading > a {
+    padding: 20px 80px 20px 80px !important;
+    overflow: visible;
+    border-radius: 0em 1em 1em 0em;
+    border-width: 0px !important;
+}
+
+.floating-collapsible > h4.ui-collapsible-heading > a:after {
+    left: inherit;
+    right: 0px;
+    content: '+';
+    border-radius: 1em;
+    top: 12px;
+    color: #64b247 !important;
+    background-color: #fff !important;
+    font-size: 48px;
+    padding: 0px 0px 0 10px;
+    width: 45px;
+    height: 55px;
+    line-height: 36px;
+}
+
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:after {
+    box-shadow: 1px 1px 10px #aaa;
+}
+
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover:after {
+    color: #fff !important;
+    background-color: #64b247 !important;
+    box-shadow: 1px 1px 10px #666;
+}
+
+.floating-collapsible > h4.ui-collapsible-heading > a:active:after {
+    color: #fff !important;
+    background-color: #46862F !important;
+}
+
+.floating-collapsible > .ui-collapsible-content {
+    position: absolute;
+    right: 0;
+    text-align: left;
+}
+
+.floating-collapsible > .ui-collapsible-content li {
+    width: 100% !important;
+}
+
+
+/* Always show scrollbars */
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
 #machine-list-page .machines-header {
-    background-color: #EEEDEB;
+    background-color: #d4d4d4;
     margin-top: 30px;
 }
 
@@ -462,7 +499,7 @@ textarea {
 #machine-list-page .machines-header,
 #key-list-page .keys-header,
 #image-list-page .images-header {
-    background-color: #EEEDEB;
+    background-color: #d4d4d4;
     margin-top: 30px;
 }
 
@@ -477,8 +514,11 @@ ul.checkbox-list {
     background-color: #fafafa;
 }
 ul.checkbox-list li {
-    border-bottom: 1px solid #EEEDEB;
+    border-bottom: 1px solid #eeedeb;
     background-color: #FAF9F4;
+}
+ul.checkbox-list li:last-of-type {
+    border-bottom: none;
 }
 ul.checkbox-list li a:focus {
     box-shadow: none !important;
@@ -489,8 +529,9 @@ ul.checkbox-list label {
     border-width: 0px !important;
 }
 ul.checkbox-list li:hover a,
-ul.checkbox-list li:hover label {
-    background-color: #EEEDEB !important;
+ul.checkbox-list li:hover label,
+ul.checkbox-list li:hover {
+    background-color: #f2f2f2 !important;
 }
 ul.checkbox-list li:hover a {
     color: #fff;
@@ -519,6 +560,7 @@ ul.checkbox-list .ui-grid-b {
     margin: 0 !important;
     float: left;
     clear: both;
+    background-color: transparent !important;
 }
 .checkbox-link .ui-checkbox:hover {
     background-color: #FAF9F4;
@@ -528,10 +570,26 @@ ul.checkbox-list .ui-grid-b {
 }
 .checkbox-link .ui-checkbox label {
     border-radius: 0.1em 0 0 0.1em;
-    background-color: transparent;
-    margin: 0 !important;
+    background-color: transparent !important;
+    margin-top: 7px;
     border: none;
-    height: 16px;
+    box-sizing: border-box;
+    height: 20px;
+}
+.checkbox-link .ui-checkbox label:after {
+    background-image: none !important;
+    background-color: transparent !important;
+    color: #d1d1d1;
+    opacity: 1;
+    text-shadow: none;
+    transition: color .2s linear;
+}
+.checkbox-link .ui-checkbox label:hover:after {
+    color: #64B247;
+}
+.checkbox-link .ui-checkbox label.ui-checkbox-on:after {
+    color: #64B247;
+    text-shadow: none;
 }
 .tag {
     margin: 1px;
@@ -589,8 +647,20 @@ ul.checkbox-list .ui-grid-b {
     margin:0;
 }
 
-.ui-footer a:after {
+.ui-footer a:hover {
+    color: #7f7f7f !important;
+}
+
+.ui-footer a:hover:after {
     color: #7f7f7f;
+}
+
+.ui-footer a:active {
+    color: #fff !important;
+}
+
+.ui-footer a:active:after {
+    color: #fff;
 }
 
 /* Small List Item
@@ -665,6 +735,11 @@ ul.checkbox-list .ui-grid-b {
     padding: 0 10px;
 }
 
+/* Notification popup */
+
+#notification-popup h1 {
+    color: #fff;
+}
 
 /* Confirmation popup
 -----------------------------------------------------------------------------------------------------------*/
@@ -814,6 +889,10 @@ ul.checkbox-list .ui-grid-b {
     margin: .5em 0 1em;
 }
 
+#user-menu-popup .ui-btn-icon-left {
+    padding-left: 3.4em !important;
+}
+
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
     padding: 15px;
 }
@@ -925,8 +1004,9 @@ ul.checkbox-list .ui-grid-b {
     width: 50% !important;
     box-sizing: border-box !important;
 }
-.ok-cancel > .ui-controlgroup-controls {
-    width: 100%;
+
+.ok-cancel a.ok-only, .ok-cancel > .ui-controlgroup-controls {
+    width: 100% !important;
     box-sizing: border-box;
 }
 
@@ -972,6 +1052,7 @@ ul.checkbox-list .ui-grid-b {
     text-align: left;
     max-height: 250px;
     overflow: auto;
+    word-wrap: break-word;
 }
 
 #dialog-popup .duration {
