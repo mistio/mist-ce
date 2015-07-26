@@ -1,18 +1,17 @@
-define('app/views/backend_add', ['app/views/panel'],
+define('app/views/backend_add', ['app/views/controlled'],
     //
     //  Backend Add View
     //
     //  @returns Class
     //
-    function (PanelView) {
+    function (ControlledView) {
 
         'use strict';
 
-        return App.BackendAddView = PanelView.extend({
+        return App.BackendAddView = ControlledView.extend({
 
             templateName: 'backend_add',
             controllerName: 'backendAddController',
-            panelId: '#backend-add',
 
             selectedRegion: null,
             helpHref: '',

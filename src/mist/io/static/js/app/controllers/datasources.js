@@ -8,7 +8,7 @@ define('app/controllers/datasources', ['app/models/datasource', 'ember'],
 
         'use strict';
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Controller.extend(Ember.Evented, {
 
 
             //

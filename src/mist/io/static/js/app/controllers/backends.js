@@ -8,7 +8,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
         'use strict';
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Controller.extend(Ember.Evented, {
 
 
             //

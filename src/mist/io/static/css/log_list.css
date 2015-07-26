@@ -31,7 +31,7 @@
 .logs .ui-input-text {
     width: 188px;
     float: right;
-    margin-top: -48px;
+    margin-top: -81px;
     margin-right: 10px;
     position: relative;
 }
@@ -154,6 +154,10 @@
 
 .log-list .tag {
     float: none;
+}
+
+input#event-all {
+    display: none;
 }
 
 label[for='event-jobs'] {

@@ -13,7 +13,11 @@ DumbEventTarget.prototype.addEventListener = function(type, listener) {
 DumbEventTarget.prototype.on = function(type, listener) {
     info("Adding listener to " + this.name + " for event " + type);
     this.addEventListener(type, listener);
-}
+};
+DumbEventTarget.prototype.off = function(type, listener) {
+    info("Removing listener to " + this.name + " for event " + type);
+    this.removeEventListener(type, listener);
+};
 DumbEventTarget.prototype.emit = function(type) {
     var args = Array.prototype.slice.call(arguments, 1);
     if (args.length == 1) {

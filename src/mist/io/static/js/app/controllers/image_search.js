@@ -8,7 +8,7 @@ define('app/controllers/image_search', ['ember'],
 
         'use strict';
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Controller.extend(Ember.Evented, {
 
 
             //

@@ -145,7 +145,6 @@ var loadApp = function (
     App.TextField = Ember.TextField.extend({
         autocapitalize: 'off',
         attributeBindings: [
-            'data-theme',
             'placeholder',
             'autocapitalize'
         ],
@@ -299,6 +298,7 @@ var setupChannelEvents = function (socket, namespace, callback) {
 
 
 var setupLogChannel = function (socket, callback) {
+    warn('setting up log channel');
     socket.on('open_incidents', function (openIncidents) {
         require(['app/models/story'], function (StoryModel) {
             var models = openIncidents.map(function (incident) {
@@ -316,6 +316,9 @@ var setupLogChannel = function (socket, callback) {
     }).emit('ready');
     Mist.set('openIncidents', []);
     Mist.set('closedIncidents', [])
+
+    Mist.logsController.load();
+
     if (callback)
         callback();
 };

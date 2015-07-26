@@ -23,6 +23,7 @@ define('app/views/log_list', ['app/views/page'],
             //
 
             templateName: 'log_list',
+            controllerName: 'logsController',
             firstRequest: true,
             forceFlag: 'all',
             filterString: '',
@@ -34,10 +35,12 @@ define('app/views/log_list', ['app/views/page'],
             includeTypes: [],
             includeFilters: [],
             includeEmails: [],
+            includeTerms: [],
 
             excludeTypes: [],
             excludeFilters: [],
             excludeEmails: [],
+            excludeTerms: [],
 
 
             //
@@ -50,18 +53,19 @@ define('app/views/log_list', ['app/views/page'],
             load: function () {
                 this._initializeController();
                 this._initializeScrolling();
-                this._initializeSocket();
                 this._updateLogTime();
                 this.set('firstRequest', true);
                 this.search();
                 Mist.l = this;
+                Ember.run.later(function(){
+                    Mist.logsController.set('prettyTimeReady', true);
+                }, 300);
             }.on('didInsertElement'),
 
 
             unload: function () {
-                this._initializeController();
-                Mist.get('logs').off('logs', this, this.handleResponse);
-                Mist.get('logs').off('event', this, this.handleStream);
+                Mist.logsController.set('view', null);
+                Mist.logsController.set('prettyTimeReady', false);
             }.on('willDestroyElement'),
 
 
@@ -82,10 +86,13 @@ define('app/views/log_list', ['app/views/page'],
                 }
                 if (this.get('noMoreLogs'))
                     return;
-                this.set('fetchingHistory', true);
-                this._processFilterString();
-                Mist.logs.emit('get_logs',  this._generatePayload());
-                this.set('firstRequest', false);
+                var that = this;
+                Ember.run.next(function(){
+                    that.set('fetchingHistory', true);
+                    that._processFilterString();
+                    Mist.logs.emit('get_logs',  that._generatePayload());
+                    that.set('firstRequest', false);
+                });
             },
 
 
@@ -163,22 +170,9 @@ define('app/views/log_list', ['app/views/page'],
             //
             //
 
-
-            _initializeSocket: function () {
-                if (!Mist.logs)  {
-                    Ember.run.later(this, function () {
-                        Mist.get('logs').on('logs', this, this.handleResponse);
-                        Mist.get('logs').on('event', this, this.handleStream);
-                    }, 350);
-                } else {
-                    Mist.get('logs').on('logs', this, this.handleResponse);
-                    Mist.get('logs').on('event', this, this.handleStream);
-                }
-            },
-
-
             _initializeController: function () {
-                Mist.logsController.clear();
+                Mist.logsController.set('view', this);
+                //Mist.logsController._setModel([]);
             },
 
 
@@ -186,13 +180,11 @@ define('app/views/log_list', ['app/views/page'],
                 var that = this;
                 Ember.run.later(function () {
                     $(window).on('scroll', function (e) {
-                        Ember.run.once(function () {
-                            if (Mist.isScrolledToBottom() &&
-                                !that.disableScrollFetch &&
-                                !that.fetchingHistory) {
-                                    that.search();
-                            }
-                        });
+                        if (Mist.isScrolledToBottom() &&
+                            !that.disableScrollFetch &&
+                            !that.fetchingHistory) {
+                                that.search();
+                        }
                     });
                }, 1000);
             },
@@ -416,7 +408,7 @@ define('app/views/log_list', ['app/views/page'],
                var that = this;
                clearTimeout(this.searchLock);
                this.set('searchLock', setTimeout(function () {
-                   Mist.logsController.clear();
+                   Mist.logsController._setModel([]);
                    that.set('noMoreLogs', false);
                    that.set('lastLogTimestamp', null);
                    that.search();

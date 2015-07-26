@@ -12,7 +12,7 @@ define('app/controllers/datapoints', ['app/models/datapoint', 'ember'],
         // display when there is no data
         var EMPTY_DATAPOINTS = [];
 
-        return Ember.ArrayController.extend({
+        return Ember.Controller.extend({
 
 
             //

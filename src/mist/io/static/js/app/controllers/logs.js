@@ -8,7 +8,7 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
 
         'use strict';
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Controller.extend(Ember.Evented, {
 
 
             //
@@ -20,7 +20,32 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
 
             model: [],
             loading: null,
+            view: null,
+            prettyTimeReady: false,
 
+
+            load: function() {
+                warn('load logs controller');
+                if (!Mist.logs)  {
+                    Ember.run.later(this, function () {
+                        Mist.get('logs').on('logs', this, this.handleResponse);
+                        Mist.get('logs').on('event', this, this.handleStream);
+                    }, 350);
+                } else {
+                    Mist.get('logs').on('logs', this, this.handleResponse);
+                    Mist.get('logs').on('event', this, this.handleStream);
+                }
+            },
+
+            handleResponse: function(logs){
+                if (this.get('view'))
+                    this.get('view').handleResponse(logs);
+            },
+
+            handleStream: function(log) {
+                if (this.get('view'))
+                    this.get('view').handleStream(log);
+            },
 
             //
             //

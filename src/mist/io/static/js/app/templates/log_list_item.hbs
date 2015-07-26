@@ -14,7 +14,7 @@
                 <div class="tag">{{unbound view.log.type}}</div>
             </div>
             <div class="ui-block-c">
-                <div class="time">{{view.prettyTime}}</div>
+                <div class="time">{{#if Mist.logsController.prettyTimeReady}}{{view.prettyTime}}{{/if}}</div>
             </div>
         </div>
     </a>

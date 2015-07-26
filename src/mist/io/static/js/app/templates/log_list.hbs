@@ -73,7 +73,7 @@
     {{/if}}
 
     <ul class="ui-listview">
-        {{#each Mist.logsController as |log|}}
+        {{#each Mist.logsController.model as |log|}}
             {{view "logListItem" log=log}}
         {{/each}}
     </ul>

@@ -103,18 +103,6 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
             //
             //
-            //  Initialization
-            //
-            //
-
-
-            load: function () {
-                this.set('isCollapsed', true);
-            }.on('didInsertElement'),
-
-
-            //
-            //
             //  Actions
             //
             //

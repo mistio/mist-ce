@@ -24,16 +24,17 @@ define('app/controllers/key_edit', ['ember'],
              */
 
             open: function (keyId, callback) {
-                $('#rename-key-popup').popup('open');
+
                 this._clear();
                 this.set('keyId', keyId)
                     .set('newKeyId', keyId)
                     .set('callback', callback);
+                this.get('view').open();
             },
 
 
             close: function () {
-                $('#rename-key-popup').popup('close');
+                this.get('view').close();
                 this._clear();
             },
 

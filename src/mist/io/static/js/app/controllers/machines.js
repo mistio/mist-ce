@@ -5,7 +5,7 @@ define('app/controllers/machines', ['app/models/machine'],
      *  @returns Class
      */
     function(Machine) {
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Controller.extend(Ember.Evented, {
 
             /**
              *  Properties

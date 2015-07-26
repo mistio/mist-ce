@@ -233,7 +233,8 @@ function Socket (args) {
             var events = this.get('events');
             var channel = this.get('channel');
 
-            events.on.apply(events, arguments);
+            if (events)
+                events.on.apply(events, arguments);
             if (!channel.$events || !socket.$events[event])
                 channel.on(event, function (response) {
                     that._log('/'+ event, 'RECEIVE', response);

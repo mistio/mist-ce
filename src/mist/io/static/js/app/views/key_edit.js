@@ -1,15 +1,16 @@
-define('app/views/key_edit', ['app/views/templated'],
+define('app/views/key_edit', ['app/views/popup'],
     /**
      *  Key Edit View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
+    function (PopupView) {
 
-        return App.KeyEditView = TemplatedView.extend({
+        return App.KeyEditView = PopupView.extend({
 
             templateName: 'key_edit',
             controllerName: 'keyEditController',
+            popupId: '#rename-key-popup',
 
             /**
              *

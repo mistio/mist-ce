@@ -34,7 +34,7 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
             TIME_MAP.HOUR * 24,
         ];
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Controller.extend(Ember.Evented, {
 
 
             //

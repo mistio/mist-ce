@@ -766,18 +766,6 @@ ul.checkbox-list .ui-grid-b {
 .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
     border: none;
 }
-.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-first-child {
-    color: #d96557;
-}
-.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-first-child:hover {
-    border-color: #d96557;
-    background-color: #d96557;
-    color: #FAF9F5;
-}
-.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-first-child:active {
-    border-color: #FAF9F5;
-    background-color: #FAF9F5;
-}
 .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
     border-right-width: 0px;
 }
