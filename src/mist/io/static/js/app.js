@@ -97,7 +97,6 @@ var LOADER_STEPS = {
         before: ['load ember'],
         exec: function () {
             require(['jqm'], function () {
-                warn('load jqm');
                 appLoader.complete('load jqm');
             });
         }
@@ -114,7 +113,6 @@ var LOADER_STEPS = {
         before: ['load templates'],
         exec: function () {
             loadApp.apply(null, [function () {
-                warn('init app');
                 appLoader.complete('init app');
             }].concat(appLoader.buffer.files));
         }

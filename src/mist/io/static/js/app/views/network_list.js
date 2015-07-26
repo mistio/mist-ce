@@ -10,6 +10,7 @@ define('app/views/network_list', ['app/views/page'],
 
         return App.NetworkListView = PageView.extend({
 
+            templateName: 'network_list',
 
             //
             //

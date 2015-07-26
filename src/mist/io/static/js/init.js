@@ -298,7 +298,7 @@ var setupChannelEvents = function (socket, namespace, callback) {
 
 
 var setupLogChannel = function (socket, callback) {
-    warn('setting up log channel');
+    info('setting up log channel');
     socket.on('open_incidents', function (openIncidents) {
         require(['app/models/story'], function (StoryModel) {
             var models = openIncidents.map(function (incident) {
@@ -327,7 +327,7 @@ var setupLogChannel = function (socket, callback) {
 var setupShellChannel = function (socket, callback) {
     socket.firstData = true;
     socket.on('close', function (data) {
-        warn(data);
+        info(data);
         Mist.term.write('Connection closed by remote');
     }).on('shell_data', function (data) {
         Mist.term.write(data);

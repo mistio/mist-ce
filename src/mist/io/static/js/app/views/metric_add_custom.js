@@ -10,7 +10,8 @@ define('app/views/metric_add_custom', ['app/views/popup'],
 
         return App.MetricAddCustomView = PopupView.extend({
 
-
+            templateName: 'metric_add_custom',
+            controllerName: 'metricAddCustomController',
             //
             //
             //  Methods

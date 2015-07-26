@@ -22,9 +22,7 @@ define('app/views/script_add', ['app/views/panel'],
 
 
             //
-            //
             //  Properties
-            //
             //
 
             templateName: 'script_add',

@@ -10,13 +10,11 @@ define('app/views/network', ['app/views/page'],
 
         return App.NetworkView = PageView.extend({
 
+            templateName: 'network',
 
-            //
             //
             //  Properties
             //
-            //
-
 
             network: null,
             extra: null,
@@ -24,11 +22,8 @@ define('app/views/network', ['app/views/page'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function() {
 
@@ -57,11 +52,8 @@ define('app/views/network', ['app/views/page'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             updateCurrentNetwork: function() {
                 Ember.run(this, function() {
@@ -79,11 +71,8 @@ define('app/views/network', ['app/views/page'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
 
@@ -127,11 +116,8 @@ define('app/views/network', ['app/views/page'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             updateExtra: function () {
                 var newExtra = [];

@@ -10,13 +10,12 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
         return App.RuleView = TemplatedView.extend({
 
+            templateName: 'rule',
 
-            //
+
             //
             //  Properties
             //
-            //
-
 
             isUpdating: null,
             newRuleValue: null,
@@ -24,11 +23,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             //
-            //
             //  Computed Properties
             //
-            //
-
 
             rule: function () {
                 return this.get('model');
@@ -49,11 +45,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 Ember.run.next(this, function () {
@@ -65,11 +58,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             //
-            //
             // Methods
             //
-            //
-
 
             update: function () {
 
@@ -141,11 +131,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
 
@@ -181,11 +168,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             textValuesObserver: function () {
                 Ember.run.once(this, 'update');

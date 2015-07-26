@@ -1,3 +1,9 @@
+.logs.ui-collapsible h4.ui-collapsible-heading a {
+    background-color: #D4D4D4 !important;
+    padding: 18px 70px 18px !important;
+    color: #474747 !important;
+}
+
 .log-list {
     clear: both;
 }
@@ -5,7 +11,7 @@
 .log-list fieldset {
     background-color: #FAF9F4;
     margin: 0;
-    border-bottom: 1px solid #c9c8c4;
+    border-bottom: 1px solid #D4D4D4;
 }
 
 .log-list fieldset .ui-btn {
@@ -144,7 +150,7 @@
 
 .log-list ul li {
     padding: 0 !important;
-    border: none !important;
+    border-bottom: 1px solid #D4D4D4;
 }
 
 .log-list ul li a {

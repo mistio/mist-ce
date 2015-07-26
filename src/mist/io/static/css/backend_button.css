@@ -48,6 +48,7 @@
     padding: 13px 10px 10px 30px !important;
     color: black;
     position: relative;
+    font-size: 16px;
 }
 @-moz-document url-prefix() {
     #backend-buttons .ui-controlgroup-controls a  {
@@ -62,9 +63,9 @@
     border-width: 0;
     margin-top: 10px;
     margin-right: .5em;
-    padding: 5px 0 5px !important;
-    background-color: #F9F8F3;
-    box-shadow: 0 4px 9px /*{global-box-shadow-size}*/ rgba(0,0,0,.1) /*{global-box-shadow-color}*/;
+    padding: 6px 0 6px !important;
+    background-color: #fff;
+    box-shadow: 0 3px 16px rgba(0,0,0,.2) /*{global-box-shadow-color}*/
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn:hover {
     background-color: #eee;

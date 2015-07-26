@@ -1,5 +1,5 @@
 define('app/templates/templates', ['ember'], function() {
-    warn('raw templates');
+  info('loading raw templates');
   return function (callback) {
       require([
         'text!app/templates/application.hbs',

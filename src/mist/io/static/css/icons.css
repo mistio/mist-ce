@@ -118,16 +118,16 @@
 }
 .ui-collapsible .ui-icon-minus:after,
 .ui-collapsible .ui-icon-plus:after {
-  background-image: none;
-  font-size: 26px;
-  background-color: #fff !important;
-  color: #C1C1C1 !important;
-  width: 24px;
-  height: 24px;
-  left: 16px;
-  top: 20px;
-  line-height: 26px;
-  -webkit-font-smoothing: none;
+    background-image: none;
+    font-size: 26px;
+    background-color: #fff !important;
+    color: #C1C1C1 !important;
+    width: 24px;
+    height: 24px;
+    left: 24px;
+    top: 28px;
+    line-height: 24px;
+    -webkit-font-smoothing: none;
 }
 
 .ui-collapsible .ui-icon-minus:after {
@@ -136,18 +136,6 @@
 
 .ui-collapsible .ui-icon-plus:after {
     content:'\004F';
-}
-
-.logs.ui-collapsible .ui-icon-minus,
-.logs.ui-collapsible .ui-icon-plus {
-    background-color: #EEEDEB !important;
-    padding: 18px 68px 17px !important;
-    color: #474747 !important;
-}
-
-.logs.ui-collapsible .ui-icon-minus:hover,
-.logs.ui-collapsible .ui-icon-plus:hover {
-    background-color: #D7EEEF !important;
 }
 
 .logs.ui-collapsible .ui-icon-minus:hover:after,

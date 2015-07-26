@@ -12,6 +12,8 @@ define('app/views/network_create', ['app/views/panel'],
 
         return App.NetworkCreateView = PanelView.extend({
 
+            templateName: 'network_create',
+            controllerName: 'networkCreateController',
 
             createSubnet: false,
             disableGateway: false,

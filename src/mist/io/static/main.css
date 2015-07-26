@@ -172,14 +172,6 @@ h3 {
     color: #444;
 }
 
-.log-list ul.ui-listview > li:nth-child(even) a {
-    background-color: #ECF6F1;
-}
-
-.log-list ul.ui-listview > li:nth-child(even) a:hover {
-    background-color: #D7EEEF /*{a-bhover-background-color}*/;
-}
-
 .ui-input-search:after, .ui-input-text:after {
     right: .6em !important;
     left: inherit;

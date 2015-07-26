@@ -8,6 +8,7 @@ define('app/views/machine_power', ['app/views/templated'],
         return App.MachinePowerView = TemplatedView.extend({
 
             templateId: 'machine_power',
+            controllerName: 'machinePowerController',
 
             /**
              *

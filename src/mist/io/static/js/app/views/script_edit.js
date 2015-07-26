@@ -10,13 +10,13 @@ define('app/views/script_edit', ['app/views/popup'],
 
         return App.ScriptEditView = PopupView.extend({
 
+            templateName: 'script_edit',
+            controllerName: 'scriptEditController',
 
-            //
+
             //
             //  Actions
             //
-            //
-
 
             actions: {
 

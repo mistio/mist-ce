@@ -25,7 +25,6 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
 
 
             load: function() {
-                warn('load logs controller');
                 if (!Mist.logs)  {
                     Ember.run.later(this, function () {
                         Mist.get('logs').on('logs', this, this.handleResponse);

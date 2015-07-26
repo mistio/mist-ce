@@ -11,6 +11,7 @@ define('app/views/script_list', ['app/views/page'],
         return App.ScriptListView = PageView.extend({
 
             templateName: 'script_list',
+            controllerName: 'scriptsController',
 
             load: function () {
 

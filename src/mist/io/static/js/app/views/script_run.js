@@ -9,6 +9,9 @@ define('app/views/script_run', ['app/views/panel'],
 
         return App.ScriptRunView = PanelView.extend({
 
+            templateName: 'script_run',
+            controllerName: 'scriptRunController',
+
             load: function () {
                 Mist.backendsController.on('onMachineListChange', this, 'refreshList');
             }.on('didInsertElement'),

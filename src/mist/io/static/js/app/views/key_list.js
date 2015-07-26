@@ -9,11 +9,9 @@ define('app/views/key_list', ['app/views/page'],
 
             templateName: 'key_list',
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            //
+            //  Initialization
+            //
 
             load: function () {
 
@@ -21,8 +19,6 @@ define('app/views/key_list', ['app/views/page'],
                 Mist.keysController.on('onSelectedKeysChange', this, 'updateFooter');
 
                 this.updateFooter();
-                warn('key list load');
-                warn(this);
 
             }.on('didInsertElement'),
 
@@ -35,11 +31,9 @@ define('app/views/key_list', ['app/views/page'],
             }.on('willDestroyElement'),
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+             //
+             //  Methods
+             //
 
             updateFooter: function () {
                 switch (Mist.keysController.selectedKeys.length) {
@@ -56,11 +50,9 @@ define('app/views/key_list', ['app/views/page'],
             },
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //  Actions
+            //
 
             actions: {
 

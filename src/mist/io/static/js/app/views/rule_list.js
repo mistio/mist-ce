@@ -10,14 +10,11 @@ define('app/views/rule_list', ['app/views/templated'],
 
 		return App.RuleListView = TemplatedView.extend({
 
-
-			//
 			//
 			//  Properties
 			//
-			//
 
-
+			templateName: 'rule_list',
 			rules: null,
 
 		});

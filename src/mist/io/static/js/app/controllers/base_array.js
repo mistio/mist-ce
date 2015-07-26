@@ -8,7 +8,7 @@ define('app/controllers/base_array', ['ember'],
 
         'use strict';
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Controller.extend(Ember.Evented, {
 
 
             //
@@ -31,7 +31,7 @@ define('app/controllers/base_array', ['ember'],
 
 
             selectedObjects: function () {
-                return this.filterBy('selected', true);
+                return this.model.filterBy('selected', true);
             }.property('@each.selected'),
 
 
@@ -51,7 +51,7 @@ define('app/controllers/base_array', ['ember'],
 
 
             getObject: function (id) {
-                return this.findBy('id', id);
+                return this.model.findBy('id', id);
             },
 
 
@@ -77,7 +77,7 @@ define('app/controllers/base_array', ['ember'],
             _updateModel: function (model) {
                 Ember.run(this, function () {
                     // Remove deleted objects
-                    this.forEach(function (object) {
+                    this.model.forEach(function (object) {
                         if (!model.findBy('id', object.id))
                             this._deleteObject(object);
                     }, this);
@@ -102,7 +102,7 @@ define('app/controllers/base_array', ['ember'],
                 Ember.run(this, function () {
                     if (!this.objectExists(object.id)) {
                         var newObject = this.get('baseModel').create(object);
-                        this.pushObject(newObject);
+                        this.model.pushObject(newObject);
                         this.trigger('onAdd', {
                             object: newObject
                         });
@@ -113,7 +113,7 @@ define('app/controllers/base_array', ['ember'],
 
             _deleteObject: function (object) {
                 Ember.run(this, function () {
-                    this.removeObject(object);
+                    this.model.removeObject(object);
                     this.trigger('onDelete', {
                         object: object
                     });

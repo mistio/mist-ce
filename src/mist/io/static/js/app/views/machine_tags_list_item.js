@@ -11,6 +11,7 @@ define('app/views/machine_tags_list_item', ['app/views/list_item'],
              *  Properties
              */
 
+            templateName: 'machine_tags_list_item',
             tag: null,
             tagName: 'span',
 

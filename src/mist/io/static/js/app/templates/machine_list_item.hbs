@@ -10,9 +10,9 @@
                 <span class={{view.machine.state}}>
                 {{view.machine.state}}
 
-                {{#if pendingCreation}}
+                {{#if model.pendingCreation}}
                     <div class='ajax-loader'></div>
-                {{else}} {{#if waitState}}
+                {{else}} {{#if model.waitState}}
                     <div class='ajax-loader'></div>
                 {{/if}} {{/if}}
                 </span>
@@ -25,24 +25,24 @@
                         <span></span>
                     {{/if}}
                 </span>
-                {{#unless pendingCreation}}
-                    <div class="{{probing}} {{probed}}">
+                {{#unless model.pendingCreation}}
+                    <div class="{{model.probing}} {{model.probed}}">
                         <div class="loadleds">
-                            <div class="{{loadavg15}} led">
+                            <div class="{{model.loadavg15}} led">
                             </div>
-                            <div class="{{loadavg5}} led">
+                            <div class="{{model.loadavg5}} led">
                             </div>
-                            <div class="{{loadavg1}} led">
+                            <div class="{{model.loadavg1}} led">
                             </div>
                         </div>
                         <div class="netleds">
-                            <div class="{{netled4}} netled1">
+                            <div class="{{model.netled4}} netled1">
                             </div>
-                            <div class="{{netled3}} netled2">
+                            <div class="{{model.netled3}} netled2">
                             </div>
-                            <div class="{{netled2}} netled3">
+                            <div class="{{model.netled2}} netled3">
                             </div>
-                            <div class="{{netled1}} netled4">
+                            <div class="{{model.netled1}} netled4">
                             </div>
                         </div>
 

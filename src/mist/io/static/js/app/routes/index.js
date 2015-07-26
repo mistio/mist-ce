@@ -8,12 +8,10 @@ define('app/routes/index', ['app/routes/base'],
 
         'use strict';
 
-        return App.IndexRoute = Ember.Route.extend({
+        return App.IndexRoute = BaseRoute.extend({
 
-            documentTitle: 'mist.io - home',
-            setupController: function (controller) {
-                warn('setup index lookup');
-            }
+            documentTitle: 'mist.io - home'
+
         });
     }
 );

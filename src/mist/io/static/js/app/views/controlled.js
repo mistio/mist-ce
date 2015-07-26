@@ -32,9 +32,7 @@ define('app/views/controlled', ['app/views/templated'],
                 this._super();
                 if (!this.get('controllerName')){
                     this.set('controllerName', this.getControllerName());
-                    warn('setting controller name to ', this.getControllerName());
-                } else
-                    warn(this.get('controllerName'));
+                }
 
             },
 
@@ -45,7 +43,6 @@ define('app/views/controlled', ['app/views/templated'],
                 if (!controller)
                     warn('cannot find ', this.controllerName);
                 if (controller) {
-                    warn('setting controller view', this.controllerName);
                     controller.set('view', this);
                 }
 

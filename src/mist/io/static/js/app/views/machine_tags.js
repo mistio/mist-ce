@@ -7,11 +7,11 @@ define('app/views/machine_tags', ['app/views/templated'],
     function (TemplatedView) {
         return App.MachineTagsView = TemplatedView.extend({
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            templateName: 'machine_tags',
+
+            //
+            //  Actions
+            //
 
             actions: {
 

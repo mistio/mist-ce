@@ -12,12 +12,11 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
 
             //
-            //
             //  Properties
             //
-            //
 
-
+            templateName: 'rule_edit',
+            controllerName: 'ruleEditController',
             rule: null,
             metrics: [],
             newCommand: null,

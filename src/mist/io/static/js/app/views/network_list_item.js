@@ -8,7 +8,9 @@ define('app/views/network_list_item', ['app/views/list_item'],
 
 		'use strict';
 
-		return App.NetworkListItemView = ListItemView.extend({});
+		return App.NetworkListItemView = ListItemView.extend({
+			templateName: 'network_list_item'
+		});
 
 	}
 );

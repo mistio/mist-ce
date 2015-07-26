@@ -10,6 +10,8 @@ define('app/views/metric_add', ['app/views/popup'],
 
         return App.MetricAddView = PopupView.extend({
 
+            templateName: 'metric_add',
+            controllerName: 'metricAddController',
 
             //
             //

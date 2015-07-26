@@ -10,13 +10,12 @@ define('app/views/metric_node', ['app/views/templated'],
 
         return App.MetricNodeView = TemplatedView.extend({
 
+            templateName: 'metric_node',
 
-            //
+
             //
             //  Properties
             //
-            //
-
 
             node: null,
             metric: null,
@@ -25,11 +24,8 @@ define('app/views/metric_node', ['app/views/templated'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
 

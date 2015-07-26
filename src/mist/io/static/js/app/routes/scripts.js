@@ -13,7 +13,7 @@ define('app/routes/scripts', ['app/routes/base'],
             documentTitle: 'mist.io - scripts',
 
             exit: function () {
-                Mist.scriptsController.setEach('selected', false);
+                Mist.scriptsController.model.setEach('selected', false);
             }
         });
     }

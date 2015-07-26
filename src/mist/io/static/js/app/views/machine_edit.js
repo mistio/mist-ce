@@ -10,6 +10,7 @@ define('app/views/machine_edit', ['app/views/popup'],
 
         return App.MachineEditView = PopupView.extend({
 
+            templateName: 'machine_edit',
             controllerName: 'machineEditController',
 
             /**

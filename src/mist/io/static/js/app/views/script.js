@@ -10,13 +10,11 @@ define('app/views/script', ['app/views/page'],
 
         return App.ScriptView = PageView.extend({
 
+            templateName: 'script',
 
-            //
             //
             //  Computed Properties
             //
-            //
-
 
             isInline: function () {
                 var script = this.get('model');
@@ -31,11 +29,8 @@ define('app/views/script', ['app/views/page'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
 
@@ -55,11 +50,8 @@ define('app/views/script', ['app/views/page'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             updateView: function () {
 
@@ -80,11 +72,8 @@ define('app/views/script', ['app/views/page'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
 

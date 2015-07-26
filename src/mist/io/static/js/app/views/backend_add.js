@@ -126,6 +126,7 @@ define('app/views/backend_add', ['app/views/controlled'],
                     Mist.backendAddController.set('provider', provider);
                     var that = this;
                     Ember.run.next(function(){
+                        $('.ui-page-active').parent().trigger('create');
                         $('#new-backend-provider').collapsible('collapse');
                     });
                     this.autocompleteCredentials(provider);

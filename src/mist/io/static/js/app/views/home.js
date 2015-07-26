@@ -25,7 +25,6 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
 
             load: function () {
-                warn('load home view');
                 Ember.run.next(this, function () {
                     this.checkedMonitoringObserver();
                 });
