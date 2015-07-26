@@ -36,8 +36,28 @@ define('app/views/controlled', ['app/views/templated'],
                 } else
                     warn(this.get('controllerName'));
 
-            }
+            },
 
+
+            didInsertElement: function () {
+                this._super();
+                var controller = Mist.get(this.controllerName);
+                if (!controller)
+                    warn('cannot find ', this.controllerName);
+                if (controller) {
+                    warn('setting controller view', this.controllerName);
+                    controller.set('view', this);
+                }
+
+            },
+
+
+            willDestroyElement: function () {
+                this._super();
+                var controller = Mist.get(this.controllerName);
+                if (controller)
+                    controller.set('view', null);
+            }
         });
     }
 );

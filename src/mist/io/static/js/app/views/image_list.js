@@ -11,6 +11,7 @@ define('app/views/image_list', ['app/views/page'],
         return App.ImageListView = PageView.extend({
 
             templateName: 'image_list',
+            controllerName: 'imagesController',
 
             //
             //
@@ -41,12 +42,11 @@ define('app/views/image_list', ['app/views/page'],
                 // Handle scrolling
                 var that = this;
                 Ember.run.later(function () {
+                    that.updateDefaultImages();
                     $(window).on('scroll', function (e) {
                         that.set('pageYOffset', window.pageYOffset);
                     });
-                }, 500);
-
-                this.updateDefaultImages();
+                }, 200);
 
             }.on('didInsertElement'),
 

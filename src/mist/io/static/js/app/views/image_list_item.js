@@ -19,6 +19,7 @@ define('app/views/image_list_item', ['app/views/list_item'],
 
 
             image: null,
+            templateName: 'image_list_item',
 
 
             //
