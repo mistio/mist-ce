@@ -28,7 +28,7 @@
   "resolutions": {
     "ember": "~1.13.4",
     "ember-load-initializers": "0.1.5",
-    "jquery": ">= 1.7.0 < 2.2.0",
+    "jquery": "2.1.4",
     "ember-data": "1.13.5",
     "ember-qunit": "0.4.1"
   }

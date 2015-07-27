@@ -56,6 +56,7 @@ var LOADER_STEPS = {
         exec: function () {
             require(['ember'], function () {
                 extendEmberView();
+                Ember.ENV._ENABLE_LEGACY_VIEW_SUPPORT = true;
                 appLoader.complete('load ember');
             });
         },
