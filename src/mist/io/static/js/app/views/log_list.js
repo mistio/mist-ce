@@ -77,6 +77,7 @@ define('app/views/log_list', ['app/views/page'],
 
 
             search: function () {
+                warn('searching logs');
 
                 if (!Mist.logs)  {
                     Ember.run.later(this, function () {
@@ -84,8 +85,9 @@ define('app/views/log_list', ['app/views/page'],
                     }, 350);
                     return;
                 }
-                if (this.get('noMoreLogs'))
+                if (this.get('noMoreLogs') || this._state == 'destroying')
                     return;
+
                 var that = this;
                 Ember.run.next(function(){
                     that.set('fetchingHistory', true);
