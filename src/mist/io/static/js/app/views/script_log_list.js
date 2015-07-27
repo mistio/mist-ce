@@ -10,6 +10,8 @@ define('app/views/script_log_list', ['app/views/log_list'],
 
         return App.ScriptLogListView = LogListView.extend({
 
+            templateName: 'script_log_list',
+
             filterString: Ember.computed.alias('controller.model.id'),
 
             extraParams: Ember.Object.create({

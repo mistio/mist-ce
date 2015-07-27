@@ -17,7 +17,7 @@ define('app/views/machine_keys', ['app/views/controlled'],
 
             selectedKey: null,
             templateName: 'machine_keys',
-            controllerName: 'machine_keys',
+            controllerName: 'machineKeysController',
 
 
             //

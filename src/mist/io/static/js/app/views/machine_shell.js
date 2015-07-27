@@ -13,13 +13,13 @@ define('app/views/machine_shell', ['app/views/popup'],
 
         return App.MachineShellView = PopupView.extend({
 
+            templateName: 'machine_shell',
+            controllerName: 'machineShellController',
 
-            //
+
             //
             // Initialization
             //
-            //
-
 
             load: function () {
                 $(this.popupId)
@@ -39,11 +39,8 @@ define('app/views/machine_shell', ['app/views/popup'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             open: function () {
                 this.setUpUI();
@@ -72,11 +69,8 @@ define('app/views/machine_shell', ['app/views/popup'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
 

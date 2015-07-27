@@ -8,6 +8,7 @@ define('app/views/machine_tags', ['app/views/templated'],
         return App.MachineTagsView = TemplatedView.extend({
 
             templateName: 'machine_tags',
+            controllerName: 'machineTagsController',
 
             //
             //  Actions

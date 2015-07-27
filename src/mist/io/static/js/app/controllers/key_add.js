@@ -112,7 +112,7 @@ define('app/controllers/key_add', ['ember'],
 
 
             _generate: function (success, keyPrivate) {
-                warn('generate callback');
+                info('generate key callback');
                 var that = Mist.keyAddController;
                 that.set('generatingKey', false);
                 if (success)

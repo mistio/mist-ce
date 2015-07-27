@@ -9,7 +9,7 @@
          data-transition="flip">
 
         <ul data-role="listview">
-            {{#each view.sortedMetrics as metric}}
+            {{#each view.sortedMetrics as |metric|}}
             <li data-icon="false">
                 <a class="ui-btn" {{action "metricClicked" metric.id target=view}}>
                     {{metric.name}}
@@ -32,7 +32,7 @@
          data-transition="flip">
 
         <ul data-role="listview">
-            {{#each Mist.rulesController.operatorList as operator}}
+            {{#each Mist.rulesController.operatorList as |operator|}}
                 <li data-icon="false">
                     <a {{action "operatorClicked" operator.title target=view}}>
                         {{operator.symbol}}

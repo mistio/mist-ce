@@ -313,6 +313,12 @@ var setupLogChannel = function (socket, callback) {
             });
             Mist.set('closedIncidents', models);
         });
+    }).on('open_jobs', function (openJobs) {
+        info('received open_jobs: ', openJobs);
+    }).on('open_shells', function (openShells) {
+        info('received open_shells: ', openShells);
+    }).on('open_sessions', function(openSessions) {
+        info('received open_sessions: ', openSessions);
     }).emit('ready');
     Mist.set('openIncidents', []);
     Mist.set('closedIncidents', [])

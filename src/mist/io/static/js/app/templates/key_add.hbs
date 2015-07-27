@@ -69,12 +69,12 @@
                 data-type="horizontal">
 
                 <a class="ui-btn ui-btn-icon-left ui-icon-gear ui-caps"
-                    {{action "generateClicked" target="view"}}>
+                    {{action "generateClicked" target=view}}>
                         Generate
                 </a>
 
                 <a class="ui-btn ui-btn-icon-right ui-icon-arrow-u ui-caps"
-                    {{action "uploadClicked" target="view"}}>
+                    {{action "uploadClicked" target=view}}>
                         Upload
                 </a>
             </div>
@@ -82,7 +82,7 @@
             <!-- Hidden Input field for uploading ssh keys -->
             <div class="ui-screen-hidden">
                 <input id="key-add-upload" type="file" name="file"
-                    {{action "uploadInputChanged" on="change" target="view"}}/>
+                    {{action "uploadInputChanged" on="change" target=view}}/>
             </div>
 
             {{#if Mist.keyAddController.addingKey}}
@@ -100,11 +100,11 @@
                 data-type="horizontal">
 
                 <a class="ui-btn ui-caps back"
-                    {{action "backClicked" target="view"}}>
+                    {{action "backClicked" target=view}}>
                         Back
                 </a>
                 <a id="key-add-ok" class="ui-btn ui-btn-d ui-caps ui-state-disabled"
-                    {{action "addClicked" target="view"}}>
+                    {{action "addClicked" target=view}}>
                         Add
                 </a>
             </div>

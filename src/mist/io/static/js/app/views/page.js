@@ -20,7 +20,7 @@ define('app/views/page', ['app/views/templated'],
 
             didInsertElement: function () {
                 this._super();
-                $('.ui-page-active').parent().trigger('create');
+                $('body').trigger('create');
                 Ember.run.next(function(){
                     $("[data-role='collapsible']").collapsible({
                         collapse: function( event ) {
