@@ -26,14 +26,18 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
 
             load: function() {
                 if (!Mist.logs)  {
-                    Ember.run.later(this, function () {
-                        Mist.get('logs').on('logs', this, this.handleResponse);
-                        Mist.get('logs').on('event', this, this.handleStream);
-                    }, 350);
+                    info('Log channel not yet ready');
+                    Ember.run.later(this, this.load, 350);
                 } else {
                     Mist.get('logs').on('logs', this, this.handleResponse);
                     Mist.get('logs').on('event', this, this.handleStream);
+                    this.search();
                 }
+            },
+
+            search: function() {
+                if (this.get('view'))
+                    this.get('view').search();
             },
 
             handleResponse: function(logs){

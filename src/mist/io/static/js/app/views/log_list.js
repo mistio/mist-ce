@@ -55,11 +55,7 @@ define('app/views/log_list', ['app/views/page'],
                 this._initializeScrolling();
                 this._updateLogTime();
                 this.set('firstRequest', true);
-                this.search();
                 Mist.l = this;
-                Ember.run.later(function(){
-                    Mist.logsController.set('prettyTimeReady', true);
-                }, 300);
             }.on('didInsertElement'),
 
 
@@ -95,6 +91,9 @@ define('app/views/log_list', ['app/views/page'],
                     Mist.logs.emit('get_logs',  that._generatePayload());
                     that.set('firstRequest', false);
                 });
+                Ember.run.later(function(){
+                    Mist.logsController.set('prettyTimeReady', true);
+                }, 300);
             },
 
 
