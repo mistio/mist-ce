@@ -6,9 +6,10 @@
             data-role="collapsible"
             data-collapsed-icon="noicon"
             data-expanded-icon="noicon"
+            data-iconpos="none"
             data-collapsed="false">
             {{#if Mist.backendAddController.provider.title}}
-            <h4 class="{{if Mist.backendAddController.provider.title '' 'select-provider'}}">
+            <h4 class="{{if Mist.backendAddController.provider.title '' 'select-provider'}}" data-icon="false">
 
                    <span class="provider-icon-small">
                         <span class={{Mist.backendAddController.provider.className}}></span>
@@ -16,7 +17,7 @@
                     {{Mist.backendAddController.provider.title}}
             </h4>
             {{/if}}
-            <ul class="mist-select" data-role="listview" data-theme="a">
+            <ul class="mist-select" data-role="listview">
                 {{#each Mist.backendsController.providerList as |provider|}}
                     <li data-icon="false">
                         <a {{action "selectProvider" provider target=view}}>
@@ -103,10 +104,9 @@
                                 class="mist-select"
                                 data-role="collapsible"
                                 data-iconpos="right"
-                                data-collapsed-icon="carat-d"
-                                data-expanded-icon="carat-u"
-                                data-theme="a">
-                                <h4>{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
+                                data-collapsed-icon="noicon"
+                                data-expanded-icon="noicon">
+                                <h4 class="{{if field.value '' 'pendingSelect'}}">{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
                                 <ul data-role="listview">
                                     {{#each view.providerRegions as |region|}}
                                         <li data-icon="false" data-theme="a">

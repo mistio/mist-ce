@@ -1,7 +1,10 @@
 
 /* Backend Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
-
+.mist-select > .ui-collapsible-heading-collapsed.pendingSelect > a {
+    background-color: #177283;
+    color: #fff;
+}
 .mist-select + div#backend-add-fields {
     display: none !important;
     background-color: #FAF9F4;
@@ -12,13 +15,14 @@
     display: block !important;
 }
 
+
 #backend-add h4.select-provider a,
 #backend-add h4 a:hover,
 #backend-add ul li a:hover {
-    background-color: #64b247;
-    border-color: #64b247;
+    background-color: #177283;
+    border-color: #177283;
     color: #fff;
-    text-shadow: 0 0 0 #64b247;
+    text-shadow: 0 0 0 #177283;
 }
 
 #backend-add h4.ui-collapsible-heading {
@@ -33,11 +37,6 @@
     border-top-width: 0px;
 }
 
-#backend-add h4.select-provider a:hover {
-    background-color: #a2d191;
-    border-color: #a2d191;
-}
-
 #backend-add .ui-content {
     background-color: #FAF9F4;
 }
@@ -47,6 +46,7 @@
 }
 #backend-add .mist-select ul {
     max-height: 400px;
+    min-width: 280px;
     overflow-y: scroll;
     margin: 0;
 }
@@ -57,14 +57,6 @@
     margin-bottom: -0.4em;
     border-color: #A4A39F;
     box-shadow: none;
-}
-
-#backend-add .ui-slider .ui-slider-label {
-    background-color: #fff;
-}
-
-#backend-add .ui-slider .ui-slider-handle {
-    background-color: #64b247;
 }
 
 #backend-add-advanced {

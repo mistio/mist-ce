@@ -801,10 +801,10 @@ html .ui-bar-d .ui-btn:visited,
 html .ui-body-d .ui-btn:visited,
 html body .ui-group-theme-d .ui-btn:visited,
 html head + body .ui-btn.ui-btn-d:visited {
-	background-color: #64b247 /*{d-bup-background-color}*/;
-	border-color: #64b247 /*{d-bup-border}*/;
+	background-color: #177283; /*{d-bup-background-color}*/;
+	border-color: #177283; /*{d-bup-border}*/;
 	color: #ffffff /*{d-bup-color}*/;
-	text-shadow: 0 /*{d-bup-shadow-x}*/ 0px /*{d-bup-shadow-y}*/ 0 /*{d-bup-shadow-radius}*/ #46d4c9 /*{d-bup-shadow-color}*/;
+	text-shadow: 0 /*{d-bup-shadow-x}*/ 0px /*{d-bup-shadow-y}*/ 0 /*{d-bup-shadow-radius}*/ #177283; /*{d-bup-shadow-color}*/;
 }
 /* Button hover */
 .ui-page-theme-d .ui-btn:hover,

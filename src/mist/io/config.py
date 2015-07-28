@@ -157,7 +157,7 @@ SUPPORTED_PROVIDERS_V_2 = [
     },
     # GCE
     {
-        'title': 'Google Compute Engine',
+        'title': 'GCE',
         'provider': Provider.GCE,
         'regions': []
     },

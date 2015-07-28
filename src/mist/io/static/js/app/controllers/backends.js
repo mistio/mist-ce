@@ -183,15 +183,18 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 this.trigger('updateMachines');
             }.observes('model.length'),
 
-
+            /*
             updateImageCount: function() {
-                var count = 0;
-                this.model.forEach(function(backend) {
-                    count += backend.images.model.length;
+                var that = this;
+                Ember.run.next(function(){
+                    var count = 0;
+                    that.model.forEach(function(backend) {
+                        count += backend.images.model.length;
+                    });
+                    that.set('imageCount', count);
                 });
-                this.set('imageCount', count);
             }.observes('model.length'),
-
+            */
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS.map(function (provider) {
@@ -367,10 +370,12 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                     var counter = 0;
                     this.model.forEach(function(backend) {
                         if (backend.enabled)
-                            counter += backend.get('imageCount');
+                            counter += backend.images.model.length;
                     });
-                    this.set('imageCount', counter);
-                    this.trigger('onImagesChange');
+                    if (counter != this.get('imageCount')){
+                        this.set('imageCount', counter);
+                        this.trigger('onImagesChange');
+                    }
                 });
             },
 

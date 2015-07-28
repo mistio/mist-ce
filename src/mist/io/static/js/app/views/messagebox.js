@@ -17,7 +17,7 @@ define('app/views/messagebox', ['app/views/templated'],
             //
             //
 
-
+            templateName: 'messagebox',
             popup: '#message-box',
 
 

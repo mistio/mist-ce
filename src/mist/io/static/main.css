@@ -198,7 +198,7 @@ h3 {
     padding-right: 1.75em;
     background: #fff;
     border-radius: 0;
-    color: #7f7f7f;
+    color: #444;
     text-shadow: none;
     font-size: 14px;
 }
@@ -223,7 +223,7 @@ h3 {
     position: absolute;
     left: 0;
     top: 0;
-    background-color: #e2e2e2;
+    background-color: #fff;
     z-index: 100000;
 }
 .mist-logo {
@@ -237,11 +237,8 @@ h3 {
     margin-top: -140px;
 }
 .mist-progress {
-    border: 1px solid white;
-    border-radius: .1em;
-    bottom: 3px;
-    height: 0;
-    left: 0;
+    border: 1px solid #444;
+    border-radius: .2em;
     margin-top: 19px;
     position: absolute;
     top: -19px;
@@ -249,11 +246,11 @@ h3 {
 }
 .mist-progress-wrapper {
     border: 1px solid #fff;
-    border-radius: .1em;
-    bottom: 35px;
+    border-radius: .2em;
+    bottom: 32px;
     box-shadow: 0 0 2px #444;
     height: 2px;
-    left: 74px;
+    left: 72px;
     padding: 0;
     position: absolute;
     width: 133px;
@@ -389,8 +386,12 @@ textarea {
     color: #177283 !important;
 }
 
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
+    padding: 20px 75px 20px 40px !important;
+}
+
 .floating-collapsible > h4.ui-collapsible-heading > a {
-    padding: 20px 80px 20px 80px !important;
+    padding: 20px 110px 20px 20px !important;
     overflow: visible;
     border-radius: 0em 1em 1em 0em;
     border-width: 0px !important;
@@ -398,18 +399,18 @@ textarea {
 
 .floating-collapsible > h4.ui-collapsible-heading > a:after {
     left: inherit;
-    right: 0px;
-    content: '+';
-    border-radius: 6em;
-    top: 11px;
-    background-color: #fff !important;
-    font-size: 48px;
-    padding: 0px 3px 17px 14px;
-    width: 45px;
-    height: 45px;
-    line-height: 45px;
-    color: #d96557 !important;
-    transform: rotate(45deg);
+      right: 0px;
+      text-indent: 0.43em;
+      content: '+';
+      border-radius: 6em;
+      top: 9px;
+      background-color: #fff !important;
+      font-size: 2em;
+      width: 60px;
+      height: 60px;
+      line-height: 1.33em;
+      color: #d96557 !important;
+      transform: rotate(45deg);
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:after {
@@ -1087,8 +1088,8 @@ ul.checkbox-list .ui-grid-b {
     border-color: #a3a3a3;
 }
 .field-wrapper > div.last-child:not(.first-child) a:active {
-    background-color: #46d4c9;
-    border-color: #46d4c9;
+    background-color: #177283;;
+    border-color: #177283;;
 }
 .field-wrapper * {
     border-radius: 0;
@@ -1113,5 +1114,5 @@ ul.checkbox-list .ui-grid-b {
     background-color: #fff !important;
 }
 .ui-slider .ui-slider-handle {
-  background-color: #64b247 !important;
+    background-color: #177283 !important;
 }

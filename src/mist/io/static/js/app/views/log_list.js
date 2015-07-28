@@ -73,8 +73,6 @@ define('app/views/log_list', ['app/views/page'],
 
 
             search: function () {
-                warn('searching logs');
-
                 if (!Mist.logs)  {
                     Ember.run.later(this, function () {
                         this.search();
