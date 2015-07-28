@@ -292,9 +292,7 @@ function Socket (args) {
                 this.attempts++;
                 sockjs = new SockJS('/socket', null,
                     {'protocols_whitelist':
-                        ['websocket', 'xdr-streaming', 'xhr-streaming',
-                         'iframe-eventsource', 'iframe-htmlfile', 'xdr-polling',
-                         'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling']}
+                        ['websocket', 'xhr-polling']}
                 );
                 sockjs.onopen = function() {
                     mux = new MultiplexedWebSocket(sockjs);
