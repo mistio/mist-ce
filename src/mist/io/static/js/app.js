@@ -80,6 +80,7 @@ var LOADER_STEPS = {
         before: [],
         exec: function () {
             require(['socket'], function () {
+                SockJS.websocket.roundTrips = 5;
                 appLoader.complete('load socket');
             });
         }
@@ -564,6 +565,7 @@ var setupLogChannel = function (socket, callback) {
     }).emit('ready');
     Mist.set('openIncidents', []);
     Mist.set('closedIncidents', [])
+    Mist.logsController.load();
     if (callback)
         callback();
 };
