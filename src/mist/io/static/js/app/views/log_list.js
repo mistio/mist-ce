@@ -48,9 +48,13 @@ define('app/views/log_list', ['app/views/page'],
 
 
             load: function () {
-                this._initializeController();
+                if (!Mist.logs)  {
+                    Ember.run.later(this, this.load, 300);
+                    return;
+                }
+                Mist.logsController.clear();
+                Mist.logsController.set('view', this);
                 this._initializeScrolling();
-                this._initializeSocket();
                 this._updateLogTime();
                 this.set('firstRequest', true);
                 this.search();
@@ -59,9 +63,8 @@ define('app/views/log_list', ['app/views/page'],
 
 
             unload: function () {
-                this._initializeController();
-                Mist.get('logs').off('logs', this, this.handleResponse);
-                Mist.get('logs').off('event', this, this.handleStream);
+                Mist.logsController.clear();
+                Mist.logsController.set('view', null);
             }.on('willDestroyElement'),
 
 
@@ -80,7 +83,7 @@ define('app/views/log_list', ['app/views/page'],
                     }, 350);
                     return;
                 }
-                if (this.get('noMoreLogs'))
+                if (this.get('noMoreLogs') || this._state == 'destroying')
                     return;
                 this.set('fetchingHistory', true);
                 this._processFilterString();
@@ -165,20 +168,9 @@ define('app/views/log_list', ['app/views/page'],
 
 
             _initializeSocket: function () {
-                if (!Mist.logs)  {
-                    Ember.run.later(this, function () {
-                        Mist.get('logs').on('logs', this, this.handleResponse);
-                        Mist.get('logs').on('event', this, this.handleStream);
-                    }, 350);
-                } else {
-                    Mist.get('logs').on('logs', this, this.handleResponse);
-                    Mist.get('logs').on('event', this, this.handleStream);
-                }
-            },
-
-
-            _initializeController: function () {
-                Mist.logsController.clear();
+                warn('adding log handlers');
+                Mist.get('logs').on('logs', this, this.handleResponse);
+                Mist.get('logs').on('event', this, this.handleStream);
             },
 
 
