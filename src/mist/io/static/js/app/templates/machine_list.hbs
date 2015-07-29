@@ -105,7 +105,7 @@
                         ui-btn ui-btn-icon-right ui-icon-gear ui-caps">Connect</a>
             {{else}}
                 <a id="machines-shell-btn" class="{{if view.selectedMachine.canConnect '' 'ui-state-disabled'}}
-                    ui-btn ui-btn-icon-right icon-shell ui-caps"
+                    ui-btn ui-btn-icon-right icon-terminal ui-caps"
                     {{action "shellClicked" target=view}}>Shell</a>
             {{/if}}
         </td><td>

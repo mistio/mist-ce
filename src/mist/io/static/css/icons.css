@@ -107,6 +107,14 @@
 .ui-checkbox-on:after{content:'\006C';}
 .icon-checkbox-on:after{content:'\006C';}
 .icon-alert-2:after{content:'\006D';}
+.icon-cloud-check:after{content:'\006E';}
+.icon-list:after{content:'\0070';}
+.icon-terminal:after{content:'\0071';}
+.ui-footer .icon-terminal:after{
+    font-size: 20px;
+    margin-top: -10px;
+}
+.icon-terminal-2:after{content:'\0072';}
 .ui-footer .icon-x:after,
 .ui-footer .icon-xx:after {
   font-size: 12px;
