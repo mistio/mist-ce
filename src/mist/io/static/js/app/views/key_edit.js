@@ -37,7 +37,6 @@ define('app/views/key_edit', ['app/views/popup'],
 
 
                 backClicked: function () {
-                    console.log('back');
                     Mist.keyEditController.close();
                 },
 
