@@ -35,6 +35,15 @@
     margin: 0;
 }
 
+.log-list ul.ui-listview a.ui-btn.error {
+    background-color: #F3DCD5 !important;
+    color: #DC7A6E !important;
+}
+.log-list ul.ui-listview a.ui-btn.error .tag,
+.log-list ul.ui-listview a.ui-btn.error .time {
+    color: #DC7A6E !important;
+}
+
 .log-list .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
     padding: 1.2em 1.6em .8em;
 }
@@ -172,31 +181,36 @@ input#event-all {
     display: none;
 }
 
-label[for='event-jobs'] {
+label[for='event-jobs'],
+.tag.tag-job {
     color: #64b247 !important;
 }
 label[for='event-jobs'].ui-btn:hover, label[for='event-jobs'].ui-btn-active {
     border-bottom: 2px solid #64b247 !important;
 }
-label[for='event-requests'] {
+label[for='event-requests'],
+.tag.tag-request {
     color: #d48900 !important;
 }
 label[for='event-requests'].ui-btn:hover, label[for='event-requests'].ui-btn-active {
     border-bottom: 2px solid #d48900 !important;
 }
-label[for='event-incidents'] {
+label[for='event-incidents'],
+.tag.tag-incident {
     color: #D96557 !important;
 }
 label[for='event-incidents'].ui-btn:hover, label[for='event-incidents'].ui-btn-active {
     border-bottom: 2px solid #D96557 !important;
 }
-label[for='event-sessions'] {
+label[for='event-sessions'],
+.tag.tag-session {
     color: #177283 !important;
 }
 label[for='event-sessions'].ui-btn:hover, label[for='event-sessions'].ui-btn-active {
     border-bottom: 2px solid #177283 !important;
 }
-label[for='event-shell'] {
+label[for='event-shell'],
+.tag.tag-shell {
     color: #838E00 !important;
 }
 label[for='event-shell'].ui-btn:hover, label[for='event-shell'].ui-btn-active {

@@ -1,5 +1,5 @@
 <span class={{view.collapsedClass}}>
-    <a class="ui-btn" {{action "toggleCollapse" target=view}}>
+    <a class="ui-btn {{if view.log.error 'error'}}" {{action "toggleCollapse" target=view}}>
         <div class="ui-grid-b">
             <div class="ui-block-a">
                 {{#if view.log.error}}
@@ -11,7 +11,11 @@
                 </div>
             </div>
             <div class="ui-block-b">
-                <div class="tag">{{unbound view.log.type}}</div>
+                {{#if view.log.error}}
+                    <div class="tag tag-error">{{unbound view.log.type}}</div>
+                {{else}}
+                    <div class="tag tag-{{unbound view.log.type}}">{{unbound view.log.type}}</div>
+                {{/if}}
             </div>
             <div class="ui-block-c">
                 <div class="time">{{#if Mist.logsController.prettyTimeReady}}{{view.prettyTime}}{{/if}}</div>
