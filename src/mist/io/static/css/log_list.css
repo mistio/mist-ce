@@ -27,7 +27,7 @@
     border-bottom: 2px solid #7f7f7f !important;
 }
 
-.log-list fieldset .ui-btn-active{
+.log-list fieldset .ui-btn-active {
     border-bottom: 2px solid #444 !important;
 }
 
@@ -38,6 +38,9 @@
 .log-list ul.ui-listview a.ui-btn.error {
     background-color: #F3DCD5 !important;
     color: #DC7A6E !important;
+}
+.log-list ul.ui-listview a.ui-btn.error:hover {
+    background-color: #E9B0A6 !important;
 }
 .log-list ul.ui-listview a.ui-btn.error .tag,
 .log-list ul.ui-listview a.ui-btn.error .time {
