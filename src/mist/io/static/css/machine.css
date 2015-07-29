@@ -9,16 +9,12 @@
 }
 #single-machine-page .ui-header .ui-btn {
     background-color: #fff;
-    color: #000;
     margin-top: 13px;
     margin-left: 0;
-    text-shadow: none;
     border-color: #fff;
 }
 #single-machine-page .ui-header .ui-btn:hover {
-    color: #fff !important;
-    background-color: #64b247;
-    border-color: #64b247;
+    color: #7f7f7f !important;
 }
 #single-machine-page .ui-block-b .ui-title {
     text-align: center;

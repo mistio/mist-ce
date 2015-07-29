@@ -5,14 +5,13 @@
     background-color: #fff;
     margin-top: 13px;
     margin-left: 0;
+    border-color: #fff;
+}
+#image-list-page .ui-header .ui-btn:hover {
+    color: #7f7f7f !important;
 }
 #image-list-page .ui-content {
     background-color: transparent;
-}
-#image-list-page .ui-header .ui-btn:hover {
-    color: #fff !important;
-    background-color: #64b247;
-    border-color: #64b247;
 }
 #image-list-page .ui-block-b .ui-title {
     text-align: center;

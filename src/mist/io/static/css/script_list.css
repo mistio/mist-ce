@@ -1,3 +1,24 @@
+#script-list-page .ui-header .ui-btn {
+    background-color: #fff;
+    margin-top: 13px;
+    margin-left: 0;
+    border-color: #fff;
+}
+#script-list-page .ui-header .ui-btn:hover {
+    color: #7f7f7f !important;
+}
+#script-list-page .ui-block-b .ui-title {
+    text-align: center;
+}
+#script-list-page #run-script-btn {
+    float: right;
+    margin: 0;
+}
+#script-list-page #select-scripts-btn {
+    float: left;
+    font-weight: normal;
+    margin: 0;
+}
 #script-list-page .list-wrapper .tag {
   float: none;
   margin: 0 auto;

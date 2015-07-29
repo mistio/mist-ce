@@ -461,13 +461,15 @@ textarea {
 
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable,
-#image-list-page .ui-filterable {
+#image-list-page .ui-filterable,
+#script-list-page .ui-filterable {
     margin-top: -55px;
     margin-bottom: 10px;
 }
 
 #machine-list-page .ui-filterable .ui-input-search,
-#key-list-page .ui-filterable .ui-input-search {
+#key-list-page .ui-filterable .ui-input-search,
+#script-list-page .ui-filterable .ui-input-search {
     margin-left: 180px;
     margin-right: 270px;
 }
@@ -477,7 +479,8 @@ textarea {
     border-color: #b5b5b5;
 }
 
-#key-list-page .ui-filterable .ui-input-search {
+#key-list-page .ui-filterable .ui-input-search,
+#script-list-page .ui-filterable .ui-input-search {
     margin-right: 160px;
 }
 
@@ -489,13 +492,15 @@ textarea {
 #machine-list-page .ui-filterable input,
 #key-list-page .ui-filterable input,
 #network-list-page .ui-filterable input,
-#image-list-page .ui-filterable input {
+#image-list-page .ui-filterable input,
+#script-list-page .ui-filterable input {
     min-height:2.50em;
 }
 
 #machine-list-page .machines-header,
 #key-list-page .keys-header,
-#image-list-page .images-header {
+#image-list-page .images-header,
+#script-list-page .scripts-header {
     background-color: #d4d4d4;
     margin-top: 30px;
 }
