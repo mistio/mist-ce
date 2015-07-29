@@ -34,7 +34,24 @@
 .log-list ul.ui-listview {
     margin: 0;
 }
-
+.log-list ul.ui-listview a.ui-btn {
+    padding-right: 40px;
+}
+.log-list ul.ui-listview a.ui-btn:after {
+    font-family: 'MistIcons';
+    font-size: 16px;
+    content: '\0072';
+    background-color: transparent;
+    background-image: none;
+    opacity: 1;
+    color: #7F7F7F;
+    position: absolute;
+    top: 11px;
+    right: 10px;
+}
+.log-list ul.ui-listview .open a.ui-btn:after {
+    content: '\0073';
+}
 .log-list ul.ui-listview a.ui-btn.error {
     background-color: #F3DCD5 !important;
     color: #DC7A6E !important;
@@ -46,7 +63,6 @@
 .log-list ul.ui-listview a.ui-btn.error .time {
     color: #DC7A6E !important;
 }
-
 .log-list .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
     padding: 1.2em 1.6em .8em;
 }
