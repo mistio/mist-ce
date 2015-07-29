@@ -167,16 +167,16 @@ input#event-all {
 }
 
 label[for='event-jobs'] {
-    color: #0099CC !important;
+    color: #64b247 !important;
 }
 label[for='event-jobs'].ui-btn:hover, label[for='event-jobs'].ui-btn-active {
-    border-bottom: 2px solid #0099CC !important;
+    border-bottom: 2px solid #64b247 !important;
 }
 label[for='event-requests'] {
-    color: #795548 !important;
+    color: #d48900 !important;
 }
 label[for='event-requests'].ui-btn:hover, label[for='event-requests'].ui-btn-active {
-    border-bottom: 2px solid #795548 !important;
+    border-bottom: 2px solid #d48900 !important;
 }
 label[for='event-incidents'] {
     color: #D96557 !important;
@@ -191,14 +191,14 @@ label[for='event-sessions'].ui-btn:hover, label[for='event-sessions'].ui-btn-act
     border-bottom: 2px solid #177283 !important;
 }
 label[for='event-shell'] {
-    color: #959E00 !important;
+    color: #838E00 !important;
 }
 label[for='event-shell'].ui-btn:hover, label[for='event-shell'].ui-btn-active {
-    border-bottom: 2px solid #959E00 !important;
+    border-bottom: 2px solid #838E00 !important;
 }
 label[for='event-error'] {
-    color: #FF1B00 !important;
+    color: #FF513D !important;
 }
 label[for='event-error'].ui-btn:hover, label[for='event-error'].ui-btn-active {
-    border-bottom: 2px solid #FF1B00 !important;
+    border-bottom: 2px solid #FF513D !important;
 }
