@@ -34,10 +34,14 @@
     margin: 0;
 }
 
+.log-list .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
+    padding: 1.2em 1.6em .8em;
+}
+
 .logs .ui-input-text {
     width: 188px;
     float: right;
-    margin-top: -81px;
+    margin-top: -91px;
     margin-right: 10px;
     position: relative;
 }
