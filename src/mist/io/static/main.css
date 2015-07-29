@@ -535,6 +535,9 @@ ul.checkbox-list li:hover label,
 ul.checkbox-list li:hover {
     background-color: #f2f2f2 !important;
 }
+ul.checkbox-list li:hover .ui-checkbox label:after {
+    color: #64B247;
+}
 ul.checkbox-list li:hover a {
     color: #fff;
 }
@@ -549,6 +552,7 @@ ul.checkbox-list .ui-grid-b {
 -----------------------------------------------------------------------------------------------------------*/
 .checkbox-link a {
     font-size: 14px;
+    padding: .8em 2.5em .8em 1.1em !important;
 }
 .checkbox-link h3 {
     width: 65%;
@@ -573,7 +577,7 @@ ul.checkbox-list .ui-grid-b {
 .checkbox-link .ui-checkbox label {
     border-radius: 0.1em 0 0 0.1em;
     background-color: transparent !important;
-    margin-top: 7px;
+    margin-top: 10px;
     border: none;
     box-sizing: border-box;
     height: 20px;
