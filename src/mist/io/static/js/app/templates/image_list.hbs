@@ -25,15 +25,11 @@
     </div>
 
     <div data-role="content" data-theme="a">
+        <div class="images-header ui-shadow"></div>
 
         {{#if Mist.backendsController.loadingImages}}
             <div class="ajax-loader"></div>
         {{/if}}
-
-        {{view Mist.TextField
-               id="search-term-input"
-               placeholder="Search images ..."
-               value=Mist.imageSearchController.searchTerm}}
 
         {{#if Mist.imageSearchController.isSearching}}
             <div class="ajax-loader"></div>

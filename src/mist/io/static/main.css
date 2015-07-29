@@ -516,7 +516,7 @@ ul.checkbox-list {
     background-color: #fafafa;
 }
 ul.checkbox-list li {
-    border-bottom: 1px solid #eeedeb;
+    border-bottom: 1px solid #d4d4d4;
     background-color: #FAF9F4;
 }
 ul.checkbox-list li:last-of-type {
@@ -533,7 +533,7 @@ ul.checkbox-list label {
 ul.checkbox-list li:hover a,
 ul.checkbox-list li:hover label,
 ul.checkbox-list li:hover {
-    background-color: #f2f2f2 !important;
+    background-color: #edece8 !important;
 }
 ul.checkbox-list li:hover .ui-checkbox label:after {
     color: #64B247;

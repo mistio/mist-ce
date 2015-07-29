@@ -45,7 +45,7 @@
     border-bottom: none;
 }
 #single-machine-page .info-table tr td:nth-child(1) {
-    padding-left: 54px;
+    padding-left: 70px;
 }
 #single-machine-page .info-table tr td:nth-child(2) {
     color: #7f7f7f;
@@ -100,7 +100,7 @@
     float: right;
     width: auto;
     font-size: 12px;
-    padding: 6px;
+    padding-right: 40px !important;
     margin-top: -6px;
     margin-bottom: -5px;
 }

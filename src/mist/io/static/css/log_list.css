@@ -40,7 +40,7 @@
 }
 
 .logs .ui-input-text {
-    width: 188px;
+    width: 40%;
     float: right;
     margin-top: -91px;
     margin-right: 10px;
@@ -54,7 +54,7 @@
 }
 
 .details.info-table {
-    background-color: #D7EEEF;
+    background-color: #EDECE8;
 }
 
 .details table {
@@ -127,7 +127,7 @@
 }
 
 .log-list span.open a {
-    background-color: #D7EEEF !important;
+    background-color: #EDECE8 !important;
 }
 
 
@@ -161,6 +161,7 @@
 .log-list ul li a {
     margin: 0 !important;
     padding: 0.8em 1em .5em;
+    border: none;
 }
 
 .log-list .tag {

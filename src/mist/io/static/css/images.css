@@ -20,8 +20,8 @@
     min-height: 57px;
 }
 #image-list-page #image-list a {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
 }
 @-moz-document url-prefix() {
     #image-list-page .checkbox-link h3 {
@@ -38,13 +38,20 @@
 
 #image-list-page .checkbox-link h3 {
     position: relative;
-    top: 6px;
+    top: 5px;
 }
 
 #image-list-page ul li label {
-    margin-top: 9px;
+    margin-top: 10px;
 }
-
+#image-list-page .ui-checkbox label.staron:after {
+    background-image: url('../images/sprite-build/icon-sprite-1432130152.png') !important;
+    content: '';
+}
+#image-list-page .ui-checkbox label.staroff:after {
+    background-image: url('../images/sprite-build/icon-sprite-1432130152.png') !important;
+    content: '';
+}
 #image-list-page ul .ui-checkbox-on:after {
     background-color: rgba(0,0,0,0) !important;
     background-repeat: no-repeat !important;

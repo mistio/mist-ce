@@ -322,8 +322,8 @@ html .ui-bar-a .ui-btn:hover,
 html .ui-body-a .ui-btn:hover,
 html body .ui-group-theme-a .ui-btn:hover,
 html head + body .ui-btn.ui-btn-a:hover {
-	background-color: #f2f2f2 /*{a-bhover-background-color}*/;
-	border-color: #f2f2f2 /*{a-bhover-border}*/;
+	background-color: #edece8 /*{a-bhover-background-color}*/;
+	border-color: #edece8 /*{a-bhover-border}*/;
 	color: #000000 /*{a-bhover-color}*/;
 	text-shadow: none;
 }
