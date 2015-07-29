@@ -11,6 +11,7 @@ define('app/controllers/key_edit', ['ember'],
              *  Properties
              */
 
+            view: null,
             keyId: null,
             newKeyId: null,
             callback: null,
@@ -34,6 +35,8 @@ define('app/controllers/key_edit', ['ember'],
 
 
             close: function () {
+                console.log('close');
+                this.view.close();
                 this.get('view').close();
                 this._clear();
             },

@@ -100,9 +100,13 @@
     float: right;
     width: auto;
     font-size: 12px;
-    padding-right: 40px !important;
+    padding-right: 35px !important;
     margin-top: -6px;
     margin-bottom: -5px;
+}
+#single-machine-page #machine-probe-btn:after {
+    margin-top: -8px;
+    font-size: 14px;
 }
 
 #single-machine-page .info-table .ajax-loader {

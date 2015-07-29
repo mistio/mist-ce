@@ -37,6 +37,11 @@
     background-color: #faf9f4;
     padding: 10px 20px !important;
 }
+#single-key-page #private_key {
+    max-width: 100px;
+    margin-left: auto;
+    margin-right: auto;
+}
 @-moz-document url-prefix() {
     #single-key-page .ui-collapsible .ajax-loader {
         margin-top: -20px;

@@ -27,12 +27,14 @@ define('app/controllers/machine_power', ['ember'],
              */
 
             open: function (machines, callback) {
+                console.log('open');
                 this._clear();
                 this.set('callback', callback);
                 this.set('machines', machines instanceof Array ? machines : [machines]);
-                Ember.run.next(function () {
+                console.log(this.get('machines'));
+                Ember.run.later(this, function () {
                     $('#machine-power-popup').popup('open');
-                });
+                }, 100);
             },
 
 
@@ -55,7 +57,7 @@ define('app/controllers/machine_power', ['ember'],
                     this.close();
                     Ember.run.later(function(){
                         Mist.machineEditController.open(machine);
-                    },350)
+                    }, 350)
                     return;
                 }
                 Ember.run.later(function () {
