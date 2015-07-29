@@ -79,10 +79,6 @@
     margin-right: 0px !important;
 }
 
-#monitoring-collapsible h4.ui-collapsible-heading a {
-    height: 20px;
-}
-
 .graph-button {
     display: inline-block;
     width: 150px;

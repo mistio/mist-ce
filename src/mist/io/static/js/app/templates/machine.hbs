@@ -276,7 +276,7 @@
                         <a id="single-machine-tags-btn"
                             class="{{if model.id '' 'ui-state-disabled'}}
                                 {{if model.can_tag '' 'ui-state-disabled'}}
-                                ui-btn ui-btn-icon-right ui-icon-grid ui-caps icon-tag"
+                                ui-btn ui-btn-icon-right ui-caps icon-tag"
                             {{action "tagsClicked" target=view}}>Tags</a>
                     </td>
                     <td>
@@ -288,14 +288,14 @@
                         {{else}}
                         <a id="single-machine-shell-btn"
                             class="{{if model.canConnect '' 'ui-state-disabled'}}
-                                ui-btn ui-btn-icon-right ui-icon-shell ui-caps"
+                                ui-btn ui-btn-icon-right icon-shell ui-caps"
                             {{action "shellClicked" target=view}}>Shell</a>
                         {{/if}}
                     </td>
                     <td>
                         <a id="single-machine-power-btn"
                             class="{{if model.id '' 'ui-state-disabled'}}
-                                ui-btn ui-btn-icon-right icon-cof ui-caps"
+                                ui-btn ui-btn-icon-right icon-cog ui-caps"
                             {{action "powerClicked" target=view}}>Actions</a>
                     </td>
                 </tr>

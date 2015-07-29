@@ -1,7 +1,8 @@
 .logs.ui-collapsible h4.ui-collapsible-heading a {
     background-color: #D4D4D4 !important;
-    padding: 18px 70px 18px !important;
+    padding: 20px 70px 16px !important;
     color: #474747 !important;
+    border: none;
 }
 
 .log-list {

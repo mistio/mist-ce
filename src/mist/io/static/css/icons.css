@@ -124,8 +124,9 @@
     color: #C1C1C1 !important;
     width: 24px;
     height: 24px;
-    left: 24px;
-    top: 28px;
+    left: 30px;
+    /*left: 24px;
+    top: 28px;*/
     line-height: 24px;
     -webkit-font-smoothing: none;
 }

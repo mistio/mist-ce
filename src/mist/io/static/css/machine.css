@@ -29,9 +29,8 @@
 }
 #single-machine-page .ui-collapsible .ui-collapsible-heading a {
     background-color: #d4d4d4;
-}
-#single-machine-page .ui-collapsible .ui-collapsible-heading a:hover {
-    border-color: #d4d4d4;
+    border: none;
+    padding: 20px 70px 16px !important;
 }
 #single-machine-page .ui-collapsible .ui-collapsible-content {
     background-color: #faf9f4;
