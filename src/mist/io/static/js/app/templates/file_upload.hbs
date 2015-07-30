@@ -16,14 +16,14 @@
                value=Mist.fileUploadController.file}}
 
         <a class="ui-btn ui-corner-all ui-btn-a ui-btn-icon-right ui-icon-arrow-u"
-            {{action "uploadClicked" target="view"}}>Upload</a>
+            {{action "uploadClicked" target=view}}>Upload</a>
 
-        <input id="file-upload-input" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
+        <input id="file-upload-input" type="file" name="file" {{action "uploadInputChanged" on="change" target=view}}/>
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-corner-all ui-btn-a ui-caps" {{action "backClicked" target="view"}}>Back</a>
+            <a class="ui-btn ui-corner-all ui-btn-a ui-caps" {{action "backClicked" target=view}}>Back</a>
             <a id="file-upload-ok" class="ui-btn ui-corner-all ui-btn-d ui-state-disabled ui-caps"
-                {{action "doneClicked" target="view"}}>Done</a>
+                {{action "doneClicked" target=view}}>Done</a>
         </div>
     </div>
 </div>
