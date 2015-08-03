@@ -1311,8 +1311,10 @@ def connect_provider(backend):
     elif backend.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if backend.apisecret:
-            with get_temp_file(backend.apisecret) as tmp_key_path:
-                conn = driver(backend.apiurl, user=backend.apikey, ssh_key=tmp_key_path, ssh_port=backend.ssh_port)
+            key_temp_file = NamedTemporaryFile(delete=False)
+            key_temp_file.write(backend.apisecret)
+            key_temp_file.close()
+            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=key_temp_file.name, ssh_port=backend.ssh_port)
         else:
             conn = driver(backend.apiurl, user=backend.apikey)
     else:
