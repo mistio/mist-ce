@@ -912,12 +912,12 @@ ul.checkbox-list .ui-grid-b {
  * */
 
 .netleds div {
-    border-radius: 0.1em;
+    border-radius: 0;
     float: right;
     height: 16px;
     margin: 0px 1px;
-    width: 3px;
-    background-color: rgba(0,0,0,.2)
+    width: 4px;
+    background-color: #000;
 }
 
 .netleds .on {

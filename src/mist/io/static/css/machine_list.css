@@ -38,7 +38,7 @@
     text-align: center;
 }
 .running {
-    color: #64b247;
+    color: #000;
 }
 .pending {
     color: #E09400;
@@ -117,7 +117,7 @@
     width: 21.6% !important;
     text-align: center;
     margin-left: -18px;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 .machine-state .ajax-loader {
