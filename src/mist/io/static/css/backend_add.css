@@ -19,10 +19,18 @@
 #backend-add h4.select-provider a,
 #backend-add h4 a:hover,
 #backend-add ul li a:hover {
-    background-color: #177283;
-    border-color: #177283;
+    background-color: #0099cc;
+    border-color: #0099cc;
     color: #fff;
-    text-shadow: 0 0 0 #177283;
+    text-shadow: 0 0 0 #0099cc;
+}
+
+#backend-add h4.select-provider a:active,
+#backend-add h4 a:active,
+#backend-add ul li a:active {
+    background-color: #66C2E0;
+    border-color: #66C2E0;
+    text-shadow: 0 0 0 #66C2E0;
 }
 
 #backend-add h4.ui-collapsible-heading {

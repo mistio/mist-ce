@@ -381,9 +381,14 @@ textarea {
     margin-bottom: 0 !important;
 }
 
-.floating-collapsible.ui-collapsible-collapsed, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
+.floating-collapsible.ui-collapsible-collapsed,
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
     background-color: transparent !important;
-    color: #177283 !important;
+    color: #0099cc !important;
+}
+
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover {
+    color: #66C2E0 !important;
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
@@ -415,19 +420,19 @@ textarea {
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:after {
     box-shadow: 1px 1px 10px #aaa;
-    color: #177283 !important;
+    color: #0099cc !important;
     transform: none;
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover:after {
-    color: #fff !important;
-    background-color: #177283 !important;
+    color: #66C2E0 !important;
+    background-color: #fff !important;
     box-shadow: 1px 1px 10px #666;
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a:active:after, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:after {
     color: #fff !important;
-    background-color: #177283 !important;
+    background-color: #66C2E0 !important;
 }
 
 .floating-collapsible > .ui-collapsible-content {
@@ -536,7 +541,7 @@ ul.checkbox-list li:hover {
     background-color: #edece8 !important;
 }
 ul.checkbox-list li:hover .ui-checkbox label:after {
-    color: #64B247;
+    color: #000;
 }
 ul.checkbox-list li:hover a {
     color: #fff;
@@ -591,14 +596,14 @@ ul.checkbox-list .ui-grid-b {
     transition: color .2s linear;
 }
 .checkbox-link .ui-checkbox label:hover:after {
-    color: #64B247;
+    color: #000;
 }
 .checkbox-link .ui-checkbox label.ui-checkbox-on:after {
-    color: #64B247;
+    color: #000;
     text-shadow: none;
 }
 .tag {
-    margin: 1px;
+    margin: 2px 1px 1px;
     color: #7F7F7F !important;
     padding: 1px 7px;
     font-weight: normal;
@@ -868,7 +873,7 @@ ul.checkbox-list .ui-grid-b {
 #me-btn .gravatar-image:hover,
 #me-btn .gravatar-image:active {
     cursor: pointer;
-    border-color: #64b247;
+    border-color: #0099cc;
 }
 
 #me-btn .user {
@@ -1122,5 +1127,5 @@ ul.checkbox-list .ui-grid-b {
     background-color: #fff !important;
 }
 .ui-slider .ui-slider-handle {
-    background-color: #177283 !important;
+    background-color: #0099cc !important;
 }
