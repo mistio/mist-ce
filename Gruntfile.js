@@ -192,8 +192,6 @@ module.exports = function(grunt) {
 		'symlink:term',
 		'symlink:images',
 		'symlink:states',
-		'symlink:common',
-		'symlink:multiplex',
 		'requirejs',
 		'symlink:mistjs',
 		'symlink:mistcss',

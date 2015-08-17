@@ -97,7 +97,6 @@ define('app/views/machine_list', ['app/views/page'],
 
 
                 powerClicked: function () {
-                    console.log(Mist.backendsController.selectedMachines);
                     Mist.machinePowerController.open(Mist.backendsController.selectedMachines);
                 },
 
