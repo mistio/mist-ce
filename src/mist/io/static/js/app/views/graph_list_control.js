@@ -48,7 +48,7 @@ define('app/views/graph_list_control', ['app/views/templated'],
             load: function () {
                 Ember.run.next(this, function () {
                     // Make sure element is rendered
-                    this.$().trigger('create');
+                    this.$().enhanceWithin();
                 });
             }.on('didInsertElement'),
 

@@ -37,7 +37,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                     if (!isAny)
                         Ember.run.next(this, function () {
                             $('#' + this.get('rule').id + ' .rule-time-window')
-                                .parent().trigger('create');
+                                .parent().enhanceWithin();
                         });
                     return isAny;
                 }
@@ -52,7 +52,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                 Ember.run.next(this, function () {
                     this.showAdvancedCondition();
                     this.updateTextValues();
-                    $('#'+this.elementId).trigger('create');
+                    $('#'+this.elementId).enhanceWithin();
                 })
             }.on('didInsertElement'),
 

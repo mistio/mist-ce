@@ -43,7 +43,7 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
             open: function (position) {
                 var popupId = this.popupId;
                 Ember.run.next(function(){
-                    $('body').trigger('create');
+                    $('body').enhanceWithin();
                     if (position)
                         $(popupId).popup('option', 'positionTo', position);
                     $(popupId).popup('open');

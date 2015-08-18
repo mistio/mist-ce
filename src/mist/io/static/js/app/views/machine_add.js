@@ -346,7 +346,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                 $('#create-machine-network .ui-collapsible')
                     .removeClass('ui-state-disabled')
                     .parent()
-                    .trigger('create')
+                    .enhanceWithin()
                     .find('label')
                     .removeClass('ui-corner-all');
             },

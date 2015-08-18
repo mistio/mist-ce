@@ -40,7 +40,7 @@ define('app/views/machine_power', ['app/views/templated'],
 
             renderActions: function () {
                 Ember.run.next(function () {
-                    $('#machine-power-popup').trigger('create');
+                    $('#machine-power-popup').enhanceWithin();
                 });
             },
 

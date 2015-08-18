@@ -20,19 +20,19 @@ define('app/views/page', ['app/views/templated'],
 
             didInsertElement: function () {
                 this._super();
-                $('body').trigger('create');
+                $('body').enhanceWithin();
                 Ember.run.next(function(){
                     $("[data-role='collapsible']").collapsible({
                         collapse: function( event ) {
                             $(this).children().next().slideUp(250);
-                            var overlay=$('#' + $(this).attr('id')+'-overlay');
+                            var overlay = $(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
                             if (overlay) {
                                 overlay.removeClass('in').addClass('ui-screen-hidden');
                                 $('body').css('overflow', 'auto');
                             }
                         },
                         expand: function( event, ui ) {
-                            var overlay=$(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
+                            var overlay = $(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
                             if (overlay) {
                                 overlay.removeClass('ui-screen-hidden').addClass('in');
                                 $('body').css('overflow', 'hidden');

@@ -34,8 +34,6 @@ define('app/views/machine', ['app/views/page'],
                 var that = this;
                 Ember.run.next(function() {
                     that.updateCurrentMachine();
-                    if (that.machine.id)
-                        that.updateUptime();
                 });
 
             }.on('didInsertElement'),
@@ -57,16 +55,22 @@ define('app/views/machine', ['app/views/page'],
 
 
             updateCurrentMachine: function() {
-                Ember.run(this, function() {
+                var that = this;
+                Ember.run.next(function() {
                     var machine = Mist.backendsController.getRequestedMachine();
                     if (machine)
-                        this.get('controller').set('model', machine);
+                        that.get('controller').set('model', machine);
 
-                    this.set('machine', this.get('controller').get('model'));
-                    if (this.machine.id)
-                        this.machine.set('keysCount',
-                            Mist.keysController.getMachineKeysCount(this.machine)
+                    if (that.isDestroyed)
+                        return;
+
+                    that.set('machine', that.get('controller').get('model'));
+                    if (that.machine.id) {
+                        that.machine.set('keysCount',
+                            Mist.keysController.getMachineKeysCount(that.machine)
                         );
+                        that.updateUptime();
+                    }
                 });
             },
 

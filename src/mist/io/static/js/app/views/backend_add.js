@@ -69,7 +69,6 @@ define('app/views/backend_add', ['app/views/controlled'],
                 $('#new-backend-provider').collapsible('collapse');
                 $('#backend-add-fields').hide();
                 Ember.run.next(this, function () {
-                    $(this.panelId).trigger('create');
                     Ember.run.later(this, function () {
                         if (Mist.backendAddController.provider)
                             $('#backend-add-fields').fadeIn();
@@ -130,7 +129,7 @@ define('app/views/backend_add', ['app/views/controlled'],
                     Mist.backendAddController.set('provider', provider);
                     var that = this;
                     Ember.run.next(function(){
-                        $('body').trigger('create');
+                        $('body').enhanceWithin();
                         $('#new-backend-provider').collapsible('collapse');
                     });
                     this.autocompleteCredentials(provider);
@@ -167,7 +166,7 @@ define('app/views/backend_add', ['app/views/controlled'],
                     $('#' + field.name).collapsible('collapse');
                     field.set('value', key.id || key);
                     Ember.run.next(this, function () {
-                        this.$().trigger('create');
+                        this.$().enhanceWithin();
                     });
                 },
 

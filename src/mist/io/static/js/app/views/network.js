@@ -36,8 +36,7 @@ define('app/views/network', ['app/views/page'],
                         this.updateExtra();
                     }
                     Ember.run.next(function(){
-                        $('#single-network-subnets').trigger('create');
-                        $('#single-network-subnets').collapsible();
+                        $('#single-network-subnets').collapsible().enhanceWithin();
                     });
                 });
             }.on('didInsertElement'),
@@ -66,7 +65,7 @@ define('app/views/network', ['app/views/page'],
                         this.updateExtra();
                     }
                 });
-                $('#single-network-subnets').trigger('create');
+                $('#single-network-subnets').enhanceWithin();
             },
 
 

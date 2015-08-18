@@ -106,8 +106,7 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
             renderMachines: function () {
                 Ember.run.next(function () {
                     if ($('#single-key-machines').collapsible)
-                        $('#single-key-machines').collapsible()
-                                                 .trigger('create');
+                        $('#single-key-machines').collapsible().enhanceWithin();
                 });
             },
 

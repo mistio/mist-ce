@@ -28,7 +28,7 @@ define('app/views/list_item', ['app/views/templated', 'ember'],
                 var element = $('#' + this.elementId).hide();
                 Ember.run.next(this, function () {
                     try {
-                        element.trigger('create')
+                        element.enhanceWithin()
                             .show()
                             .parent()
                             .listview('refresh');
