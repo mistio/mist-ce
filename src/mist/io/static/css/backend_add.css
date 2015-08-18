@@ -1,6 +1,21 @@
 
-/* Backend Add Panel CSS
------------------------------------------------------------------------------------------------------------*/
+#add-backend {
+    float: right;
+    margin-right: 10px;
+    margin-bottom: 13px;
+    margin-top: 0;
+    top: .7em;
+    position: relative;
+    padding: 0;
+    border:0;
+    overflow: visible;
+    z-index: 900;
+}
+
+#add-backend-overlay {
+    z-index: 899;
+}
+
 .mist-select > .ui-collapsible-heading-collapsed.pendingSelect > a {
     background-color: #177283;
     color: #fff;

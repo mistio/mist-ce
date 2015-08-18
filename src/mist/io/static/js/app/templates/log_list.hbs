@@ -1,4 +1,6 @@
 <div class="log-list">
+    {{view Mist.TextField id="log-filter" value=view.filterString placeholder="Filter logs..."}}
+    
     <fieldset data-role="controlgroup" data-type="horizontal">
         <input name="event"
             id="event-all"
@@ -57,7 +59,6 @@
             {{action "updateFilterFlags" "error" on="change" target=view}}>
         <label for="event-error">Errors</label>
     </fieldset>
-    {{view Mist.TextField id="log-filter" value=view.filterString placeholder="Filter logs..."}}
 
     {{#if view.searching}}
         <div class="ajax-loader"></div>

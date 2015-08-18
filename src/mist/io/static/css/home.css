@@ -21,23 +21,6 @@
     border-top-color: transparent;
 }
 
-#add-backend {
-    float: right;
-    margin-right: 10px;
-    margin-bottom: 13px;
-    margin-top: 0;
-    top: .7em;
-    position: relative;
-    padding: 0;
-    border:0;
-    overflow: visible;
-    z-index: 900;
-}
-
-#add-backend-overlay {
-    z-index: 899;
-}
-
 #home-page .ui-listview {
     clear: both;
 }
@@ -77,7 +60,6 @@
     margin-bottom: 0;
     margin-left: 1em;
 }
-
 
 @media (max-width: 35em) {
     #home-page ul.incidents,
@@ -208,10 +190,6 @@
 
 #home-page .ui-body {
     padding: 0;
-    overflow: visible;
-}
-
-#home-page .ui-grid-a.ui-responsive {
     overflow: visible;
 }
 

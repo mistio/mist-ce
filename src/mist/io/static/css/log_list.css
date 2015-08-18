@@ -19,7 +19,7 @@
     text-transform: uppercase;
     border-left-width: 0px;
     border-right-width: 0px;
-    border-bottom: 1px solid #FAF9F5;
+    border-bottom: 2px solid #FAF9F5 !important;
 }
 
 .log-list fieldset .ui-btn:hover {
@@ -70,7 +70,7 @@
 .logs .ui-input-text {
     width: 40%;
     float: right;
-    margin-top: -91px;
+    margin-top: -45px;
     margin-right: 10px;
     position: relative;
 }
