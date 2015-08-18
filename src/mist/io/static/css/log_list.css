@@ -68,11 +68,17 @@
 }
 
 .logs .ui-input-text {
-    width: 40%;
+    width: 44%;
     float: right;
     margin-top: -45px;
     margin-right: 10px;
     position: relative;
+}
+
+@media (max-width: 35em) {
+    .logs .ui-input-text {
+        width: 25%;
+    }
 }
 
 .details {

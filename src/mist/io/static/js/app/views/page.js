@@ -32,7 +32,7 @@ define('app/views/page', ['app/views/templated'],
                             }
                         },
                         expand: function( event, ui ) {
-                            var overlay=$('#' + $(this).attr('id')+'-overlay');
+                            var overlay=$(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
                             if (overlay) {
                                 overlay.removeClass('ui-screen-hidden').addClass('in');
                                 $('body').css('overflow', 'hidden');
