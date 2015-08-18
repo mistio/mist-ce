@@ -10,7 +10,12 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
         return App.HomeView = PageView.extend({
 
+            //
+            //  Properties
+            //
+
             templateName: 'home',
+
             hasIncidents: function () {
                 if (Mist.openIncidents)
                     return !!Mist.openIncidents.length;
@@ -18,11 +23,8 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 Ember.run.next(this, function () {
@@ -41,17 +43,10 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
-                addBackend: function () {
-                    Mist.backendAddController.open();
-                },
 
                 incidentClicked: function (incident) {
                     var machine = incident.get('machine');
@@ -61,20 +56,13 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                     else
                         Mist.__container__.lookup('router:main').transitionTo('machine',
                             incident.get('machine'));
-                },
-
-                addBackendOverlayClicked: function() {
-                    $('#add-backend').collapsible('collapse');
                 }
             },
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             showGraphs: function () {
 
@@ -135,11 +123,8 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             checkedMonitoringObserver: function () {
                 Ember.run.later(this, function () {

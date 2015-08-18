@@ -31,11 +31,11 @@ define('app/views/machine', ['app/views/page'],
 
                 Mist.backendsController.off('onMachineListChange', this, 'load');
                 Mist.backendsController.on('onMachineListChange', this, 'load');
-
-                Ember.run(this, function() {
-                    this.updateCurrentMachine();
-                    if (this.machine.id)
-                        this.updateUptime();
+                var that = this;
+                Ember.run.next(function() {
+                    that.updateCurrentMachine();
+                    if (that.machine.id)
+                        that.updateUptime();
                 });
 
             }.on('didInsertElement'),

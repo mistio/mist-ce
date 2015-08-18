@@ -31,7 +31,7 @@ define('app/controllers/machine_power', ['ember'],
                 this.set('callback', callback);
                 this.set('machines', machines instanceof Array ? machines : [machines]);
                 Ember.run.next(this, function () {
-                    $('#machine-power-popup').popup('open');
+                    $('#machine-power-popup').popup().popup('open');
                 });
             },
 

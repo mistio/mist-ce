@@ -32,7 +32,6 @@ define('app/controllers/backend_add', ['app/models/backend'],
             open: function (callback) {
                 this._clear();
                 this.view.clear();
-                this.view.open();
                 this.set('callback', callback);
             },
 

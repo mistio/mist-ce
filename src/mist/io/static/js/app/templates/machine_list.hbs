@@ -1,5 +1,4 @@
 <div id="machine-list-page" data-role="page" class="ui-page-active">
-
     <div data-role="header" data-theme="a">
         <!-- Page header -->
         <div class="ui-header ui-bar-a">
@@ -99,11 +98,10 @@
                         {{/if}}
                     </td>
                     <td>
-                        <a id="machines-power-btn" class="ui-caps ui-btn ui-btn-icon-right icon-cog" {{action "powerClicked" target=view}}>Actions</a>
+                        <a id="machines-power-btn" class="ui-caps ui-btn ui-btn-icon-right icon-cog" {{action "actionsClicked" target=view}}>Actions</a>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
-
 </div>

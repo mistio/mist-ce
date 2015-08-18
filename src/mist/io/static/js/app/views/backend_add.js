@@ -120,18 +120,21 @@ define('app/views/backend_add', ['app/views/controlled'],
 
             actions: {
 
+                clickOverlay: function() {
+                    $('#add-backend').collapsible('collapse');
+                },
+
                 selectProvider: function (provider, field) {
                     this.clear();
                     clearProviderFields(provider);
                     Mist.backendAddController.set('provider', provider);
                     var that = this;
                     Ember.run.next(function(){
-                        $('.ui-page-active').parent().trigger('create');
+                        $('body').trigger('create');
                         $('#new-backend-provider').collapsible('collapse');
                     });
                     this.autocompleteCredentials(provider);
                 },
-
 
                 selectRegion: function (region, field) {
                     field.set('value', region.id);
