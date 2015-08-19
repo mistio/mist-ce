@@ -38,7 +38,7 @@
     text-align: center;
 }
 .running {
-    color: #000;
+    color: #444;
 }
 .pending {
     color: #E09400;
@@ -57,7 +57,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding-right: 16px;
-    color: #000;
+    color: #444;
 }
 
 /* Conditional for < 550px */

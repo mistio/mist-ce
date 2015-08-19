@@ -427,7 +427,7 @@ textarea {
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover:after {
     color: #66C2E0 !important;
     background-color: #fff !important;
-    box-shadow: 1px 1px 10px #666;
+    box-shadow: 0 1px 10px #666;
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a:active:after, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:after {
@@ -596,10 +596,10 @@ ul.checkbox-list .ui-grid-b {
     transition: color .2s linear;
 }
 .checkbox-link .ui-checkbox label:hover:after {
-    color: #000;
+    color: #444;
 }
 .checkbox-link .ui-checkbox label.ui-checkbox-on:after {
-    color: #000;
+    color: #444;
     text-shadow: none;
 }
 .tag {
@@ -917,7 +917,7 @@ ul.checkbox-list .ui-grid-b {
     height: 16px;
     margin: 0px 1px;
     width: 4px;
-    background-color: #000;
+    background-color: #444;
 }
 
 .netleds .on {
