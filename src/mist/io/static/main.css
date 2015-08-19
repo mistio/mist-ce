@@ -724,13 +724,18 @@ ul.checkbox-list li label {
 
 
 .field-wrapper {
-    display: talbe;
     width: 100%;
     margin-top: -0.5em;
 }
+.field-wrapper:after {
+    content:'';
+    display:block;
+    clear: both;
+}
 .field-wrapper > div {
-    display: table-cell;
-    vertical-align: middle;
+    display: block;
+    float: left;
+    vertical-align: top;
 }
 .field-wrapper * {
     border-radius: 0;
@@ -741,7 +746,7 @@ ul.checkbox-list li label {
     height: 2.2em;
 }
 .field-wrapper .first-child {
-    width: 100%;
+    width: calc(100% - 28px);
 }
 .field-wrapper div.first-child > * {
     border-top-left-radius: 5px;
@@ -755,7 +760,7 @@ ul.checkbox-list li label {
     line-height: .7em;
 }
 .field-wrapper .first-child.last-child {
-    display: block;
+    width: 100%;
     margin-top: 0.8em;
 }
 
