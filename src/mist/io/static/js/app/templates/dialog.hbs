@@ -66,7 +66,7 @@
 
             {{#if view.isOK}}
 
-                <a class="ui-btn ui-btn-a ui-corner-all ui-caps"
+                <a class="ui-btn ui-btn-a ui-corner-all ui-caps yes"
                     {{action "confirm" target=view}}>OK</a>
 
             {{else}}{{#if view.isBack}}
@@ -83,18 +83,18 @@
                             {{action "reject" target=view}}>
                                 Cancel
                         </a>
-                        <a class="ui-btn ui-btn-d ui-caps"
+                        <a class="ui-btn ui-btn-d ui-caps yes"
                             {{action "confirm" target=view}}>
                                 OK
                         </a>
                     {{/if}}
 
                     {{#if view.isYesNo}}
-                        <a class="ui-btn ui-caps back"
+                        <a class="ui-btn ui-caps yes"
                             {{action "reject" target=view}}>
                                 No
                         </a>
-                        <a class="ui-btn ui-btn-d ui-caps"
+                        <a class="ui-btn ui-btn-d ui-caps no"
                             {{action "confirm" target=view}}>
                                 Yes
                         </a>

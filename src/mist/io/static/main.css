@@ -772,16 +772,23 @@ ul.checkbox-list .ui-grid-b {
 /* Confirmation popup
 -----------------------------------------------------------------------------------------------------------*/
 .back {
-    color: #d96557 !important;
+    color: #000 !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
 }
 .back:hover {
-    border-color: #d96557 !important;
-    background-color: #d96557 !important;
-    color: #FAF9F5 !important;
+    text-decoration: underline !important;
 }
-.back:active {
-    border-color: #FAF9F5 !important;
-    background-color: #FAF9F5 !important;
+.yes {
+    color: #fff !important;
+    background-color: #64b247 !important;
+    border-color: #64b247 !important;
+}
+.no {
+    color: #fff !important;
+    background-color: #d96557 !important;
+    border-color: #d96557 !important;
 }
 #confirmation-popup {
     width: 355px !important;
@@ -1019,6 +1026,13 @@ ul.checkbox-list .ui-grid-b {
 .ok-cancel button {
     width: 50% !important;
     box-sizing: border-box !important;
+    float: left;
+}
+
+.ok-cancel:after {
+    content: '';
+    display: block;
+    clear: both;
 }
 
 .ok-cancel a.ok-only, .ok-cancel > .ui-controlgroup-controls {

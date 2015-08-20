@@ -40,7 +40,7 @@
             <!-- New backend title text field -->
 
             {{#if Mist.backendEditController.newTitle}}
-            {{view Mist.TextField value=Mist.backendEditController.newTitle}}
+                {{view Mist.TextField value=Mist.backendEditController.newTitle}}
             {{/if}}
             <!-- Backend state toggle switch -->
 
@@ -53,13 +53,6 @@
                 <span class="state">{{Mist.backendEditController.backend.state}}</span>
             </div>
 
-            <!-- Delete button -->
-
-            <a class="ui-btn ui-shadow ui-corner-all"
-                {{action "deleteClicked" target=view}}>
-                Delete
-            </a>
-
             <!-- Delete confirmation -->
 
             <div id="backend-delete-confirm" style="display:none">
@@ -68,10 +61,10 @@
                     <br />Monitoring for these will be disabled
                 </label>
                 <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <a class="ui-btn ui-shadow ui-corner-all" id="button-confirm-disable"
-                        {{action "yesClicked" target=view}}>Yes</a>
-                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps yes"
                         {{action "noClicked" target=view}}>No</a>
+                    <a class="ui-btn ui-shadow ui-corner-all ui-caps no" id="button-confirm-disable"
+                        {{action "yesClicked" target=view}}>Yes</a>
                 </div>
             </div>
 
@@ -79,10 +72,16 @@
                 <div class="ajax-loader"></div>
             {{/if}}
 
-            <!-- Back button -->
+            <!-- Delete button - Back button -->
 
-            <a class="ui-btn ui-shadow ui-corner-all button-back ui-caps back"
-                {{action "backClicked" target=view}}>Back</a>
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <a class="ui-btn ui-shadow ui-corner-all button-back ui-caps back"
+                    {{action "backClicked" target=view}}>Back</a>
+                <a class="ui-btn ui-caps ui-shadow ui-corner-all no"
+                    {{action "deleteClicked" target=view}}>
+                    Delete
+                </a>
+            </div>
         </div>
     </div>
 </div>

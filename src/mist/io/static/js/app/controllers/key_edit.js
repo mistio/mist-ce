@@ -26,15 +26,17 @@ define('app/controllers/key_edit', ['ember'],
             open: function (keyId, callback) {
 
                 this._clear();
-                this.set('keyId', keyId)
-                    .set('newKeyId', keyId)
-                    .set('callback', callback);
-                this.get('view').open();
+                this.setProperties({
+                    keyId: keyId,
+                    newKeyId: keyId,
+                    callback: callback,
+                });
+                this.view.open();
             },
 
 
             close: function () {
-                this.get('view').close();
+                this.view.close();
                 this._clear();
             },
 
@@ -72,9 +74,11 @@ define('app/controllers/key_edit', ['ember'],
              */
 
             _clear: function () {
-                this.set('keyId', null)
-                    .set('newKeyId', null)
-                    .set('callback', null);
+                this.setProperties({
+                    keyId: null,
+                    newKeyId: null,
+                    callback: null,
+                });
             },
 
 
