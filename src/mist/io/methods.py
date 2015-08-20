@@ -3277,7 +3277,7 @@ def enable_monitoring(user, backend_id, machine_id,
         return ret_dict
 
     if not no_ssh:
-        deploy = mist.io.tasks_deploy_collectd
+        deploy = mist.io.tasks.deploy_collectd
         if deploy_async:
             deploy = deploy.delay
         deploy(user.email, backend_id, machine_id, ret_dict['extra_vars'])
