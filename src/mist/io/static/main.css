@@ -396,7 +396,7 @@ textarea {
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a {
-    padding: 20px 155px 20px 20px !important;
+    padding: 20px 110px 20px 20px !important;
     overflow: visible;
     border-radius: 0;
     border-width: 0px !important;
@@ -405,20 +405,18 @@ textarea {
 
 .floating-collapsible > h4.ui-collapsible-heading > a:after {
     left: inherit;
-    right: 14px;
+    right: 0px;
+    text-indent: 0.43em;
     content: '+';
     border-radius: 6em;
-    top: 20px;
+    top: 9px;
+    background-color: #fff !important;
     font-size: 2em;
-    background-color: transparent !important;
+    width: 60px;
+    height: 60px;
+    line-height: 1.33em;
     color: #d96557 !important;
     transform: rotate(45deg);
-    display: inline-block;
-    /*-webkit-transition: all .1s ease-out;
-    -moz-transition: all .1s ease-out;
-    -o-transition: all .1s ease-out;
-    -ms-transition: all .1s ease-out;
-    transition: all .1s ease-out;*/
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:after {
@@ -443,19 +441,6 @@ textarea {
     position: absolute;
     right: 0;
     text-align: left;
-}
-
-.floating-collapsible > h4.ui-collapsible-heading .ui-collapsible-heading-status {
-    width: 50px;
-    height: 50px;
-    background-color: #fff;
-    border-radius: 50%;
-    text-indent: -9999em;
-    display: inline-block;
-    clip: inherit;
-    right: 0;
-    top: 5px;
-    text-align: center;
 }
 
 .floating-collapsible > .ui-collapsible-content li {
@@ -1112,28 +1097,37 @@ ul.checkbox-list .ui-grid-b {
 
 
 .field-wrapper {
-    /*display: table;*/
     width: 100%;
     margin-top: -0.5em;
 }
 .field-wrapper > div {
-    display: table-cell;
-    vertical-align: middle;
+    display: block;
+    vertical-align: top;
+    float: left;
 }
-.field-wrapper > div.last-child:not(.first-child) {
-    width: 1%;
+.field-wrapper > div.first-child {
+    width: calc(100% - 34px);
+}
+.field-wrapper > div.first-child.last-child {
+    width: 100%;
+}
+.field-wrapper:after {
+    content: '';
+    display: block;
+    clear: both;
 }
 .field-wrapper > div.last-child:not(.first-child) a {
     background-color: #b5b5b5;
     color: #fff;
+    margin-top: 8px;
 }
 .field-wrapper > div.last-child:not(.first-child) a:hover {
     background-color: #a3a3a3;
     border-color: #a3a3a3;
 }
 .field-wrapper > div.last-child:not(.first-child) a:active {
-    background-color: #177283;;
-    border-color: #177283;;
+    background-color: #177283;
+    border-color: #177283;
 }
 .field-wrapper * {
     border-radius: 0;
