@@ -1,6 +1,9 @@
 
 /* Single Machine Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+.ui-mobile .ui-page-active {
+    overflow: visible;
+}
 #single-machine-page {
     padding-bottom: 50px;
 }
@@ -161,20 +164,22 @@
 }
 
 .single-machine-header #mist-manage-keys .ui-btn {
-    background-color: #64b247;
+    background-color: #0099cc;
     color: #fff;
-    border-color: #64b247;
+    border-color: #0099cc;
     padding: 18px 25px 18px 50px !important;
     font-size: 16px;
 }
 .single-machine-header #mist-manage-keys .ui-btn:hover{
-    background-color: #a2d191;
-    border-color: #a2d191;
+    background-color: #66C2E0;
+    border-color: #66C2E0;
+    color: #fff !important;
 }
 
 .single-machine-header #mist-manage-keys .ui-btn:active{
-    background-color: #16862f;
-    border-color: #16862f;
+    background-color: #396b9e;
+    border-color: #396b9e;
+    color: #fff !important;
 }
 
 .single-machine-header h1 {

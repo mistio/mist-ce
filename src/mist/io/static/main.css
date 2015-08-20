@@ -396,26 +396,29 @@ textarea {
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a {
-    padding: 20px 110px 20px 20px !important;
+    padding: 20px 155px 20px 20px !important;
     overflow: visible;
-    border-radius: 0em 1em 1em 0em;
+    border-radius: 0;
     border-width: 0px !important;
+    background-color: #444 !important;
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a:after {
     left: inherit;
-      right: 0px;
-      text-indent: 0.43em;
-      content: '+';
-      border-radius: 6em;
-      top: 9px;
-      background-color: #fff !important;
-      font-size: 2em;
-      width: 60px;
-      height: 60px;
-      line-height: 1.33em;
-      color: #d96557 !important;
-      transform: rotate(45deg);
+    right: 14px;
+    content: '+';
+    border-radius: 6em;
+    top: 20px;
+    font-size: 2em;
+    background-color: transparent !important;
+    color: #d96557 !important;
+    transform: rotate(45deg);
+    display: inline-block;
+    /*-webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;*/
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:after {
@@ -430,7 +433,8 @@ textarea {
     box-shadow: 0 1px 10px #666;
 }
 
-.floating-collapsible > h4.ui-collapsible-heading > a:active:after, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:after {
+.floating-collapsible > h4.ui-collapsible-heading > a:active:after,
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:after {
     color: #fff !important;
     background-color: #66C2E0 !important;
 }
@@ -439,6 +443,19 @@ textarea {
     position: absolute;
     right: 0;
     text-align: left;
+}
+
+.floating-collapsible > h4.ui-collapsible-heading .ui-collapsible-heading-status {
+    width: 50px;
+    height: 50px;
+    background-color: #fff;
+    border-radius: 50%;
+    text-indent: -9999em;
+    display: inline-block;
+    clip: inherit;
+    right: 0;
+    top: 5px;
+    text-align: center;
 }
 
 .floating-collapsible > .ui-collapsible-content li {
