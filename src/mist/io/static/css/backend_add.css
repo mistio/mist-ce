@@ -23,7 +23,7 @@
 .mist-select + div#backend-add-fields {
     display: none !important;
     background-color: #FAF9F4;
-    padding: 1em;
+    padding: 0 1em 1em;
 }
 
 .mist-select.ui-collapsible-collapsed + div#backend-add-fields {
@@ -34,10 +34,10 @@
 #backend-add h4.select-provider a,
 #backend-add h4 a:hover,
 #backend-add ul li a:hover {
-    background-color: #0099cc;
-    border-color: #0099cc;
+    background-color: #66C2E0;
+    border-color: #66C2E0;
     color: #fff;
-    text-shadow: 0 0 0 #0099cc;
+    text-shadow: 0 0 0 #66C2E0;
 }
 
 #backend-add h4.select-provider a:active,
@@ -56,12 +56,19 @@
     display: block;
 }
 
+#backend-add h4.ui-collapsible-heading.ui-collapsible-heading-collapsed > a{
+    text-align: center !important;
+}
+
 #backend-add ul {
     border-top-width: 0px;
 }
 
-#backend-add .ui-content {
+#backend-add.ui-content {
     background-color: #FAF9F4;
+    padding: 0;
+    width: 281px;
+    margin-top: -8px;
 }
 
 #backend-add label {

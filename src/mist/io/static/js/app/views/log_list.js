@@ -404,14 +404,16 @@ define('app/views/log_list', ['app/views/page'],
 
 
             newSearch: function (interval) {
-               var that = this;
-               clearTimeout(this.searchLock);
-               this.set('searchLock', setTimeout(function () {
-                   Mist.logsController._setModel([]);
-                   that.set('noMoreLogs', false);
-                   that.set('lastLogTimestamp', null);
-                   that.search();
-               }, interval || 700))
+                var that = this;
+                clearTimeout(this.searchLock);
+                this.set('searchLock', setTimeout(function () {
+                    Mist.logsController._setModel([]);
+                    if (that.isDestroyed)
+                        return;
+                    that.set('noMoreLogs', false);
+                    that.set('lastLogTimestamp', null);
+                    that.search();
+                }, interval || 700))
            },
 
 

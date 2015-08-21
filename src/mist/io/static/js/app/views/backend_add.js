@@ -66,13 +66,15 @@ define('app/views/backend_add', ['app/views/controlled'],
 
 
             clear: function () {
-                $('#new-backend-provider').collapsible('collapse');
                 $('#backend-add-fields').hide();
-                Ember.run.next(this, function () {
-                    Ember.run.later(this, function () {
-                        if (Mist.backendAddController.provider)
-                            $('#backend-add-fields').fadeIn();
-                    }, 100);
+                $('#add-backend-overlay').removeClass('ui-screen-hidden').addClass('in');
+                Ember.run.next(function () {
+                    if (Mist.backendAddController.provider){
+                        $('#new-backend-provider').collapsible('collapse');
+                        $('#add-backend').collapsible('expand')
+                        $('#backend-add-fields').fadeIn();
+                        $('body').enhanceWithin();
+                    }
                 });
             },
 
@@ -120,18 +122,14 @@ define('app/views/backend_add', ['app/views/controlled'],
             actions: {
 
                 clickOverlay: function() {
-                    $('#add-backend').collapsible('collapse');
+                    $('#add-backend').collapsible().collapsible('collapse');
                 },
 
                 selectProvider: function (provider, field) {
                     this.clear();
                     clearProviderFields(provider);
                     Mist.backendAddController.set('provider', provider);
-                    var that = this;
-                    Ember.run.next(function(){
-                        $('body').enhanceWithin();
-                        $('#new-backend-provider').collapsible('collapse');
-                    });
+                    //this.clear();
                     this.autocompleteCredentials(provider);
                 },
 

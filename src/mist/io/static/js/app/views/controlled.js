@@ -45,7 +45,6 @@ define('app/views/controlled', ['app/views/templated'],
                 if (controller) {
                     controller.set('view', this);
                 }
-
             },
 
 

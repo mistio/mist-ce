@@ -387,30 +387,31 @@ textarea {
     color: #0099cc !important;
 }
 
-.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover {
-    color: #66C2E0 !important;
-}
-
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
     padding: 20px 75px 20px 40px !important;
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a {
-    padding: 20px 110px 20px 20px !important;
+    padding: 20px 90px 20px 78px !important;
     overflow: visible;
-    border-radius: 0;
+    border-radius: .5em .5em 0 0;
     border-width: 0px !important;
-    background-color: #444 !important;
+    background-color: #D4D4D4 !important;
+    color: #444 !important;
+}
+
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:after {
+    background-color: #fff !important;
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a:after {
     left: inherit;
-    right: 0px;
+    right: 1px;
     text-indent: 0.43em;
     content: '+';
     border-radius: 6em;
-    top: 9px;
-    background-color: #fff !important;
+    top: 11px;
+    background-color: #D4D4D4 !important;
     font-size: 2em;
     width: 60px;
     height: 60px;
@@ -426,8 +427,6 @@ textarea {
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover:after {
-    color: #66C2E0 !important;
-    background-color: #fff !important;
     box-shadow: 0 1px 10px #666;
 }
 
@@ -1138,10 +1137,7 @@ ul.checkbox-list .ui-grid-b {
 .field-wrapper .first-child > .ui-btn {
     line-height: .7em;
 }
-.field-wrapper .first-child.last-child {
-    display: block;
-    margin-top: 0.8em;
-}
+
 .ui-icon-question:after {
     background-position: 6px 3px;
 }

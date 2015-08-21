@@ -1,41 +1,42 @@
 <!-- Add backend button -->
-<div id="add-backend" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible" data-role="collapsible" data-collapsed="true">
+<div id="add-backend" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible"
+     data-role="collapsible"
+     data-collapsed="true">
 
    <h4>Add cloud</h4>
 
-    <div id="backend-add">
-        <div data-role="content">
-            <div id="new-backend-provider"
-                class="mist-select"
-                data-role="collapsible"
-                data-collapsed-icon="noicon"
-                data-expanded-icon="noicon"
-                data-iconpos="none"
-                data-collapsed="false">
-                {{#if Mist.backendAddController.provider.title}}
-                <h4 class="{{if Mist.backendAddController.provider.title '' 'select-provider'}}" data-icon="false">
+    <div id="backend-add" class="ui-content">
+        <div id="new-backend-provider"
+            class="mist-select"
+            data-role="collapsible"
+            data-collapsed-icon="noicon"
+            data-expanded-icon="noicon"
+            data-iconpos="none"
+            data-collapsed="false">
+            {{#if Mist.backendAddController.provider.title}}
+            <h4 class="{{if Mist.backendAddController.provider.title '' 'select-provider'}}" data-icon="false">
 
-                       <span class="provider-icon-small">
-                            <span class={{Mist.backendAddController.provider.className}}></span>
-                        </span>
-                        {{Mist.backendAddController.provider.title}}
-                </h4>
-                {{/if}}
-                <ul class="mist-select" data-role="listview">
-                    {{#each Mist.backendsController.providerList as |provider|}}
-                        <li data-icon="false">
-                            <a {{action "selectProvider" provider target=view}}>
-                                <span class="provider-icon-small">
-                                    <span class={{provider.className}}></span>
-                                </span>
-                                {{provider.title}}
-                            </a>
-                        </li>
-                    {{/each}}
-                </ul>
-            </div>
-
-            <div id="backend-add-fields">
+                   <span class="provider-icon-small">
+                        <span class={{Mist.backendAddController.provider.className}}></span>
+                    </span>
+                    {{Mist.backendAddController.provider.title}}
+            </h4>
+            {{/if}}
+            <ul class="mist-select" data-role="listview">
+                {{#each Mist.backendsController.providerList as |provider|}}
+                    <li data-icon="false">
+                        <a {{action "selectProvider" provider target=view}}>
+                            <span class="provider-icon-small">
+                                <span class={{provider.className}}></span>
+                            </span>
+                            {{provider.title}}
+                        </a>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+        {{#if Mist.backendAddController.provider.title}}
+        <div id="backend-add-fields">
             {{#each view.providerFields as |field|}}
                 {{#if field.show}}
                 <div class="{{field.className}} field {{Mist.backendAddController.provider.provider}}">
@@ -146,15 +147,14 @@
             {{#if Mist.backendsController.addingBackend}}
                 <div class="ajax-loader"></div>
             {{/if}}
-            {{#if Mist.backendAddController.provider.title}}
-                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <a id="new-backend-ok"
-                        class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d ui-caps ok-only"
-                        {{action "addClicked" target=view}}>Add</a>
-                </div>
-            {{/if}}
+
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <a id="new-backend-ok"
+                    class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d ui-caps ok-only"
+                    {{action "addClicked" target=view}}>Add</a>
             </div>
         </div>
+        {{/if}}
     </div>
 
     {{view "fileUpload"}}
