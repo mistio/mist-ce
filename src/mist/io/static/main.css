@@ -769,10 +769,26 @@ ul.checkbox-list .ui-grid-b {
     background-color: #64b247 !important;
     border-color: #64b247 !important;
 }
+.yes:hover {
+    background-color: #77be5d !important;
+    border-color: #77be5d !important;
+}
+.yes:active {
+    background-color: #569a3d !important;
+    border-color: #569a3d !important;
+}
 .no {
     color: #fff !important;
     background-color: #d96557 !important;
     border-color: #d96557 !important;
+}
+.no:hover {
+    background-color: #df7e73 !important;
+    border-color: #df7e73 !important;
+}
+.no:active {
+    background-color: #d34c3b !important;
+    border-color: #d34c3b !important;
 }
 #confirmation-popup {
     width: 355px !important;
