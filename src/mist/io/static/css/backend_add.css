@@ -141,7 +141,21 @@
     font-weight: normal;
 }
 
-.ui-checkbox label:after {
+#backend-add .ui-checkbox label:hover {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    color: #000000 !important;
+}
+
+#backend-add .ui-checkbox label:after {
     background-image: none !important;
     background-color: transparent !important;
+}
+
+#backend-add .ui-checkbox label:hover:after {
+    color: #444444 !important;
+}
+
+#backend-add .ok-cancel {
+    margin-top: 16px;
 }

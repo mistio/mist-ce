@@ -1159,6 +1159,8 @@ ul.checkbox-list .ui-grid-b {
 .field-wrapper .first-child > .ui-btn {
     line-height: .7em;
 }
+.field-wrapper #certificate,
+.field-wrapper #private-key,
 .field-wrapper .ui-input-text input {
     line-height: 21px;
     padding-top: 5.5px;
