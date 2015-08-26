@@ -131,7 +131,7 @@ define('app/views/network', ['app/views/page'],
                 Ember.run.next(function () {
                     $('#single-network-extra').collapsible();
                 });
-            }.observes('network.extra.@each'),
+            }.observes('network.extra.[]'),
         });
     }
 );

@@ -195,7 +195,7 @@ define('app/views/machine', ['app/views/page'],
                 // an number instead of a string which breaks the search
                 return 'image-' + this.machine.backend.images.getImageOS(imageId.toString());
 
-            }.property('machine.extra.@each'),
+            }.property('machine.extra.[]'),
 
 
             upFor: function() {

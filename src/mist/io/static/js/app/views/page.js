@@ -9,7 +9,12 @@ define('app/views/page', ['app/views/templated'],
         'use strict';
 
         return Ember.View.extend({
-
+            init: function () {
+                this._super();
+                Ember.run.next(this, function(){
+                    $('body').enhanceWithin();
+                });
+            }
         });
     }
 );

@@ -82,12 +82,11 @@ define('app/views/log_list', ['app/views/page'],
                 if (this.get('noMoreLogs') || this._state == 'destroying')
                     return;
 
-                var that = this;
-                Ember.run.next(function(){
-                    that.set('fetchingHistory', true);
-                    that._processFilterString();
-                    Mist.logs.emit('get_logs',  that._generatePayload());
-                    that.set('firstRequest', false);
+                Ember.run.next(this, function(){
+                    this.set('fetchingHistory', true);
+                    this._processFilterString();
+                    Mist.logs.emit('get_logs',  this._generatePayload());
+                    this.set('firstRequest', false);
                 });
                 Ember.run.later(function(){
                     Mist.logsController.set('prettyTimeReady', true);

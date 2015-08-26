@@ -12,18 +12,19 @@
 #machine-list-page #select-machines-btn {
     float: left;
     font-weight: normal;
-    background-color: #fff;
-    color: #A4A390;
-    border-color: #b5b5b5;
+    background-color: transparent;
+    color: #b5b5b5;
+    border-width: 0;
     padding: .4em .75em !important;
     text-align: left;
-    width: 130px;
+    width: 14px;
+    height: 22px;
     margin: 11px;
     font-size: 14px;
     line-height: 1.6em;
 }
 #machine-list-page #select-machines-btn:hover {
-    color: #A4A390 !important;
+    color: #444 !important;
 }
 #machine-list-page .ui-header .ui-btn {
     background-color: #fff;

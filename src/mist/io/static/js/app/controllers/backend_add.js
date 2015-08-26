@@ -21,6 +21,28 @@ define('app/controllers/backend_add', ['app/models/backend'],
             callback: null,
             provider: null,
 
+            providerList: function() {
+                return SUPPORTED_PROVIDERS.map(function (provider) {
+                    provider.className = 'provider-';
+                    if (provider.provider == 'bare_metal')
+                        provider.className += 'baremetal';
+                    else if (provider.provider == 'indonesian_vcloud')
+                        provider.className += 'indonesian';
+                    else
+                        provider.className += provider.provider;
+                    return provider;
+                }).sort(function (a, b) {
+                    if (a.provider == 'bare_metal')
+                        return 1;
+                    if (b.provider == 'bare_metal')
+                        return -1;
+                    if (a.title > b.title)
+                        return 1;
+                    if (a.title < b.title)
+                        return -1
+                    return 0;
+                });
+            }.property(),
 
             //
             //

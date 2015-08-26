@@ -101,7 +101,7 @@ define('app/models/machine', ['ember'],
 
             hasKeys: function () {
                 return !!Mist.keysController.getMachineKeysCount(this);
-            }.property('Mist.keysController.model.@each.machines'),
+            }.property('Mist.keysController.model.[].machines'),
 
 
             hasOpenIncident: function () {
@@ -112,7 +112,7 @@ define('app/models/machine', ['ember'],
                 if (!incident)
                     return false;
                 return !incident.get('isClosed');
-            }.property('Mist.openIncidents.@each.machine'),
+            }.property('Mist.openIncidents.[].machine'),
 
 
             isWindows: function () {

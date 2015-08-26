@@ -352,7 +352,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             selectedKeysObserver: function() {
                 Ember.run.once(this, '_updateSelectedKeys');
-            }.observes('model.@each.selected')
+            }.observes('model.[].selected')
         });
     }
 );

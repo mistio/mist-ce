@@ -392,7 +392,7 @@ textarea {
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a {
-    padding: 20px 90px 20px 78px !important;
+    padding: 20px 91px 20px 78px !important;
     overflow: visible;
     border-radius: .5em .5em 0 0;
     border-width: 0px !important;
@@ -476,7 +476,7 @@ textarea {
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search,
 #script-list-page .ui-filterable .ui-input-search {
-    margin-left: 180px;
+    margin-left: 55px;
     margin-right: 270px;
 }
 #machine-list-page .ui-filterable .ui-input-search,
@@ -522,7 +522,7 @@ ul.checkbox-list {
     background-color: #fafafa;
 }
 ul.checkbox-list li {
-    border-bottom: 1px solid #d4d4d4;
+    border-bottom: 1px solid #EEEDEB;
     background-color: #FAF9F4;
 }
 ul.checkbox-list li:last-of-type {
@@ -541,12 +541,7 @@ ul.checkbox-list li:hover label,
 ul.checkbox-list li:hover {
     background-color: #edece8 !important;
 }
-ul.checkbox-list li:hover .ui-checkbox label:after {
-    color: #000;
-}
-ul.checkbox-list li:hover a {
-    color: #fff;
-}
+
 ul.checkbox-list .ui-grid-b {
     overflow: visible;
 }
@@ -587,6 +582,7 @@ ul.checkbox-list .ui-grid-b {
     border: none;
     box-sizing: border-box;
     height: 20px;
+    padding-right: 6px !important;
 }
 .checkbox-link .ui-checkbox label:after {
     background-image: none !important;

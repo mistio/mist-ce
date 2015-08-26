@@ -612,7 +612,7 @@ define('app/views/machine_monitoring',
 
             metricsObsever: function () {
                 Ember.run.once(this, '_updateGraphs');
-            }.observes('metrics.@each'),
+            }.observes('metrics.[]'),
         });
 
 

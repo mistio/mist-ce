@@ -32,11 +32,11 @@ define('app/views/script_list', ['app/views/page'],
 
             canRename: function () {
                 return Mist.scriptsController.get('selectedObjects').length == 1;
-            }.property('Mist.scriptsController.@each.selected'),
+            }.property('Mist.scriptsController.[].selected'),
 
             canDelete: function () {
                 return Mist.scriptsController.get('selectedObjects').length;
-            }.property('Mist.scriptsController.@each.selected'),
+            }.property('Mist.scriptsController.@[].selected'),
 
             updateFooter: function () {
                 if (Mist.scriptsController.get('selectedObjects').length) {

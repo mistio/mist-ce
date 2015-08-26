@@ -32,6 +32,7 @@ define('app/views/controlled', ['app/views/templated'],
                 this._super();
                 if (!this.get('controllerName')){
                     this.set('controllerName', this.getControllerName());
+                    //this.set('controller', Mist.get(this.controllerName));
                 }
 
             },

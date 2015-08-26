@@ -13,33 +13,32 @@
             data-expanded-icon="noicon"
             data-iconpos="none"
             data-collapsed="false">
-            {{#if Mist.backendAddController.provider.title}}
-            <h4 class="{{if Mist.backendAddController.provider.title '' 'select-provider'}}" data-icon="false">
-
+            {{#if view.provider}}
+            <h4 class="{{if view.provider.title '' 'select-provider'}}" data-icon="false">
                    <span class="provider-icon-small">
-                        <span class={{Mist.backendAddController.provider.className}}></span>
+                        <span class={{view.provider.className}}></span>
                     </span>
-                    {{Mist.backendAddController.provider.title}}
+                    {{view.provider.title}}
             </h4>
             {{/if}}
             <ul class="mist-select" data-role="listview">
-                {{#each Mist.backendsController.providerList as |provider|}}
+                {{#each view.providerList as |prov|}}
                     <li data-icon="false">
-                        <a {{action "selectProvider" provider target=view}}>
+                        <a {{action "selectProvider" prov target=view}}>
                             <span class="provider-icon-small">
-                                <span class={{provider.className}}></span>
+                                <span class={{prov.className}}></span>
                             </span>
-                            {{provider.title}}
+                            {{prov.title}}
                         </a>
                     </li>
                 {{/each}}
             </ul>
         </div>
-        {{#if Mist.backendAddController.provider.title}}
+        {{#if view.provider.title}}
         <div id="backend-add-fields">
             {{#each view.providerFields as |field|}}
                 {{#if field.show}}
-                <div class="{{field.className}} field {{Mist.backendAddController.provider.provider}}">
+                <div class="{{field.className}} field {{view.provider.provider}}">
 
                     <!-- Field Label -->
 
@@ -144,7 +143,7 @@
                 {{/if}}
             {{/each}}
 
-            {{#if Mist.backendsController.addingBackend}}
+            {{#if view.controller.addingBackend}}
                 <div class="ajax-loader"></div>
             {{/if}}
 

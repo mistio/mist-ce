@@ -40,11 +40,11 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             hasOpenStack: function () {
                 return !!this.model.filterBy('enabled', true).findBy('isOpenStack', true);
-            }.property('model.@each.isOpenStack', 'model.@each.enabled'),
+            }.property('model.[].isOpenStack', 'model.[].enabled'),
 
             hasNetworks: function () {
                 return !!this.model.findBy('hasNetworks', true);
-            }.property('model.@each.hasNetworks'),
+            }.property('model.[].hasNetworks'),
 
             //
             //
@@ -456,42 +456,42 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             imageCountObserver: function() {
                 Ember.run.once(this, '_updateImageCount');
-            }.observes('model.@each.imageCount'),
+            }.observes('model.[].imageCount'),
 
 
             mahcineCountObserver: function() {
                 Ember.run.once(this, '_updateMachineCount');
-            }.observes('model.@each.machineCount'),
+            }.observes('model.[].machineCount'),
 
 
             networkCountObserver: function () {
                 Ember.run.once(this, '_updateNetworkCount');
-            }.observes('model.@each.networkCount'),
+            }.observes('model.[].networkCount'),
 
 
             loadingImagesObserver: function() {
                 Ember.run.once(this, '_updateLoadingImages');
-            }.observes('model.@each.loadingImages'),
+            }.observes('model.[].loadingImages'),
 
 
             loadingMachinesObserver: function() {
                 Ember.run.once(this, '_updateLoadingMachines');
-            }.observes('model.@each.loadingMachines'),
+            }.observes('model.[].loadingMachines'),
 
 
             loadingNetworksObserver: function () {
                 Ember.run.once(this, '_updateLoadingNetworks');
-            }.observes('model.@each.loadingNetworks'),
+            }.observes('model.[].loadingNetworks'),
 
 
             selectedMachinesObserver: function () {
                 Ember.run.once(this, '_updateSelectedMachines');
-            }.observes('model.@each.selectedMachines'),
+            }.observes('model.[].selectedMachines'),
 
 
             selectedNetworksObserver: function () {
                 Ember.run.once(this, '_updateSelectedNetworks');
-            }.observes('model.@each.selectedNetworks')
+            }.observes('model.[].selectedNetworks')
         });
     }
 );

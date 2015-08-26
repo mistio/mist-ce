@@ -97,12 +97,12 @@ define('app/models/story', ['app/models/base'],
 
             ruleText: function () {
                 return this.get('logs')[0].condition;
-            }.property('logs.@each'),
+            }.property('logs.[]'),
 
 
             machineName: function () {
                 return this.get('logs')[0].machine_name;
-            }.property('logs.@each'),
+            }.property('logs.[]'),
 
 
             isClosed: function () {

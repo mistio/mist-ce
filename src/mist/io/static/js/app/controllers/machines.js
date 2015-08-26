@@ -376,7 +376,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
             selectedMachinesObserver: function() {
                 Ember.run.once(this, '_updateSelectedMachines');
-            }.observes('model.@each.selected')
+            }.observes('model.[].selected')
         });
     }
 );

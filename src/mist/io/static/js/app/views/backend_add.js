@@ -16,18 +16,23 @@ define('app/views/backend_add', ['app/views/controlled'],
             selectedRegion: null,
             helpHref: '',
 
-
             //
             //
             //  Computed Properties
             //
             //
 
-
-            providerFields: function () {
-                return getProviderFields(Mist.backendAddController.provider);
+            provider: function() {
+                return Mist.backendAddController.get('provider');
             }.property('Mist.backendAddController.provider'),
 
+            providerFields: function () {
+                return getProviderFields(this.get('provider'));
+            }.property('provider'),
+
+            providerList: function() {
+                return Mist.backendAddController.get('providerList');
+            }.property(),
 
             hasAdvanced: function () {
                 return !!this.get('providerFields').findBy('advanced');
@@ -35,14 +40,14 @@ define('app/views/backend_add', ['app/views/controlled'],
 
 
             providerRegions: function () {
-                if (Mist.backendAddController.provider)
-                    return Mist.backendAddController.provider.regions;
-            }.property('Mist.backendAddController.provider'),
+                if (this.provider)
+                    return this.provider.regions;
+            }.property('provider'),
 
 
             isReady: function () {
                 var isReady = true;
-                if (Mist.backendAddController.provider){
+                if (this.provider){
                     this.get('providerFields').some(function (field) {
                         if (field.optional) return;
                         if (field.isSlider && !field.name) return;
@@ -55,7 +60,7 @@ define('app/views/backend_add', ['app/views/controlled'],
                     return isReady = false;
                 }
                 return isReady;
-            }.property('providerFields.@each.value'),
+            }.property('providerFields.[].value'),
 
 
             //
@@ -67,14 +72,12 @@ define('app/views/backend_add', ['app/views/controlled'],
 
             clear: function () {
                 $('#backend-add-fields').hide();
-                $('#add-backend-overlay').removeClass('ui-screen-hidden').addClass('in');
-                Ember.run.next(function () {
-                    if (Mist.backendAddController.provider){
-                        $('#new-backend-provider').collapsible('collapse');
-                        $('#add-backend').collapsible('expand')
-                        $('#backend-add-fields').fadeIn();
-                        $('body').enhanceWithin();
-                    }
+                Ember.run.next(this, function () {
+                    $('body').enhanceWithin();
+                    $('#new-backend-provider').collapsible('collapse');
+                    $('#add-backend').collapsible('expand')
+                    $('#backend-add-fields').fadeIn();
+                    $('#add-backend-overlay').removeClass('ui-screen-hidden').addClass('in');
                 });
             },
 
@@ -122,15 +125,16 @@ define('app/views/backend_add', ['app/views/controlled'],
             actions: {
 
                 clickOverlay: function() {
-                    $('#add-backend').collapsible().collapsible('collapse');
+                    $('#add-backend').collapsible('collapse');
                 },
 
                 selectProvider: function (provider, field) {
-                    this.clear();
                     clearProviderFields(provider);
-                    Mist.backendAddController.set('provider', provider);
-                    //this.clear();
-                    this.autocompleteCredentials(provider);
+                    Ember.run.next(this, function(){
+                        Mist.backendAddController.set('provider', provider);
+                        this.clear();
+                        this.autocompleteCredentials(provider);
+                    })
                 },
 
                 selectRegion: function (region, field) {

@@ -28,7 +28,7 @@
         <div class="ui-grid-b machines-header ui-shadow">
             <div class="ui-block-a">
                 <a id="select-machines-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
-                        ui-btn-icon-right" {{action "selectClicked" target=view}}>Select</a>
+                        ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
             </div>
             <div class="ui-block-b"></div>
             <div class="ui-block-c">
@@ -64,6 +64,7 @@
 
     <div id="select-machines-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
         <ul data-role="listview">
+            <li data-role="list-divider">Select</li>
             <li data-icon="false">
                 <a {{action "selectionModeClicked" "all" target=view}}>All</a>
             </li>

@@ -35,7 +35,7 @@ define('app/controllers/images',
 
             hasStarred: function () {
                 return !!this.model.findBy('star', true);
-            }.property('@each.star'),
+            }.property('[].star'),
 
 
             //

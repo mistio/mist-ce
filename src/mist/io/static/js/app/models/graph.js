@@ -60,7 +60,7 @@ define('app/models/graph', ['ember'],
 
             isMultiline: function () {
                 return !!(this.datasources.length > 1);
-            }.property('datasources.@each'),
+            }.property('datasources.[]'),
 
 
             //
