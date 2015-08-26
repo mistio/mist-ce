@@ -148,7 +148,6 @@ define('app/views/backend_add', ['app/views/controlled'],
                     title.set('value', title.defaultValue + ' ' + region.location);
                 },
 
-
                 uploadFile: function (field) {
                     Mist.fileUploadController.open('Upload ' + field.label, field.label,
                         function (uploadedFile) {
@@ -163,7 +162,6 @@ define('app/views/backend_add', ['app/views/controlled'],
                     );
                 },
 
-
                 selectKey: function (key, field) {
                     $('#' + field.name).collapsible('collapse');
                     field.set('value', key.id || key);
@@ -171,7 +169,6 @@ define('app/views/backend_add', ['app/views/controlled'],
                         this.$().enhanceWithin();
                     });
                 },
-
 
                 createKeyClicked: function (field) {
                     Mist.keyAddController.open( function (success, key) {
@@ -183,11 +180,9 @@ define('app/views/backend_add', ['app/views/controlled'],
                     });
                 },
 
-
                 backClicked: function() {
                     Mist.backendAddController.close();
                 },
-
 
                 addClicked: function() {
                     Mist.backendAddController.add();

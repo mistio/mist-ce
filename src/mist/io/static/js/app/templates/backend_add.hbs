@@ -41,7 +41,6 @@
                 <div class="{{field.className}} field {{view.provider.provider}}">
 
                     <!-- Field Label -->
-
                     {{#if field.label}}
                         {{#unless field.isCheckbox}}
                         {{#unless field.isRegion}}
@@ -53,12 +52,10 @@
                     {{/if}}
 
                     <!-- Field Wrapper -->
-
                     <div class="field-wrapper">
                         <div class="first-child {{if field.helpText '' 'last-child'}}">
                             {{#if field.isText}}
                                 {{view Mist.TextField
-                                    data-theme="a"
                                     type=field.type
                                     id=field.name
                                     placeholder=field.placeholder
@@ -74,7 +71,6 @@
                             {{#if field.isCheckbox}}
                                 <label>
                                     {{view Mist.Checkbox
-                                        data-theme="d"
                                         checked=field.value}}
                                     {{field.label}}
                                 </label>
@@ -85,15 +81,14 @@
                                     data-role="collapsible"
                                     data-iconpos="right"
                                     data-collapsed-icon="carat-d"
-                                    data-expanded-icon="carat-u"
-                                    data-theme="d">
+                                    data-expanded-icon="carat-u">
                                     <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
                                     <ul data-role="listview">
-                                        <li data-icon="false" data-theme="d">
+                                        <li data-icon="false">
                                             <a {{action "selectKey" "" field target=view}}>-- None --</a>
                                         </li>
                                         {{#each Mist.keysController.model as |key|}}
-                                            <li data-icon="false" data-theme="a">
+                                            <li data-icon="false">
                                                 <a {{action "selectKey" key field target=view}}>{{key.id}}</a>
                                             </li>
                                         {{/each}}
@@ -112,8 +107,8 @@
                                     data-expanded-icon="noicon">
                                     <h4 class="{{if field.value '' 'pendingSelect'}}">{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
                                     <ul data-role="listview">
-                                        {{#each view.providerRegions as |region|}}
-                                            <li data-icon="false" data-theme="d">
+                                        {{#each view.provider.regions as |region|}}
+                                            <li data-icon="false">
                                                 <a {{action "selectRegion" region field target=view}}>
                                                     {{region.location}}
                                                 </a>
@@ -123,7 +118,7 @@
                                 </div>
                             {{/if}}
                             {{#if field.isSlider}}
-                                <select class="toggle-field" data-theme="a" data-role="slider"
+                                <select class="toggle-field" data-role="slider"
                                 {{action "switchToggled" field on="change" target=view}}>
                                     <option value="0">{{unbound field.offLabel}}</option>
                                     <option value="1">{{unbound field.onLabel}}</option>
@@ -155,10 +150,9 @@
         </div>
         {{/if}}
     </div>
-
-    {{view "fileUpload"}}
-
 </div>
 
 <div id="add-backend-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
      {{action "clickOverlay" target=view}}></div>
+
+{{view "fileUpload"}}

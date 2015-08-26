@@ -10,13 +10,12 @@ define('app/views/file_upload', ['app/views/templated', 'ember'],
 
         return App.FileUploadView = TemplatedView.extend({
 
+            templateName: 'file_upload',
 
-            //
+
             //
             //  Actions
             //
-            //
-
 
             actions: {
 
@@ -28,18 +27,15 @@ define('app/views/file_upload', ['app/views/templated', 'ember'],
                     }
                 },
 
-
                 uploadInputChanged: function () {
                     Mist.fileUploadController.uploadFile({
                         fileInput: $('#file-upload-input')[0]
                     });
                 },
 
-
                 backClicked: function () {
                     Mist.fileUploadController.close();
                 },
-
 
                 doneClicked: function () {
                     Mist.fileUploadController.confirmUpload();
@@ -48,11 +44,8 @@ define('app/views/file_upload', ['app/views/templated', 'ember'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             fileObserver: function () {
                 if (Mist.fileUploadController.file) {

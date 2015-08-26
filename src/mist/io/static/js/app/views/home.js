@@ -21,6 +21,9 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                     return !!Mist.openIncidents.length;
             }.property('Mist.openIncidents'),
 
+            machineCount: function () {
+                return Mist.backendsController.machineCount;
+            }.property('Mist.backendsController.machineCount'),
 
             //
             //  Initialization
