@@ -119,6 +119,9 @@ h3 {
     text-decoration: none;
     outline: none;
 }
+.ui-popup .ui-header .close:hover {
+    cursor: pointer;
+}
 
 .ui-header .ui-block-a h1.ui-title,
 .ui-header .ui-block-b h1.ui-title {
