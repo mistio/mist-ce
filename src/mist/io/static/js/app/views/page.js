@@ -11,7 +11,7 @@ define('app/views/page', ['app/views/templated'],
         return Ember.View.extend({
             init: function () {
                 this._super();
-                Ember.run.next(this, function(){
+                Ember.run.scheduleOnce('afterRender', this, function() {
                     $('body').enhanceWithin();
                 });
             }

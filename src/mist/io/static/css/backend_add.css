@@ -29,7 +29,6 @@
 
 .mist-select.ui-collapsible-collapsed + div#backend-add-fields {
     display: block !important;
-    border-radius: 0 0 .5em .5em;
 }
 
 #backend-add-fields .ui-listview {

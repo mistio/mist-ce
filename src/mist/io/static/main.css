@@ -394,7 +394,6 @@ textarea {
 .floating-collapsible > h4.ui-collapsible-heading > a {
     padding: 20px 91px 20px 78px !important;
     overflow: visible;
-    border-radius: .5em .5em 0 0;
     border-width: 0px !important;
     background-color: #D4D4D4 !important;
     color: #444 !important;
