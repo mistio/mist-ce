@@ -32,6 +32,8 @@
 
             <h1 class="ui-title">Add key</h1>
 
+            <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+
         </div>
 
         <!-- Body -->
@@ -60,20 +62,19 @@
 
             <!-- Generate and Upload buttons -->
 
-            <div class="generate-upload
+            <div class="generate-upload ok-cancel
                     ui-controlgroup
                     ui-controlgroup-horizontal
-                    ui-group-theme-a
+                    ui-group-theme-d
                     ui-corner-all"
                 data-role="controlgroup"
                 data-type="horizontal">
-
-                <a class="ui-btn ui-btn-icon-left ui-icon-gear ui-caps"
+                <a class="ui-btn ui-caps"
                     {{action "generateClicked" target=view}}>
                         Generate
                 </a>
 
-                <a class="ui-btn ui-btn-icon-right ui-icon-arrow-u ui-caps"
+                <a class="ui-btn ui-caps"
                     {{action "uploadClicked" target=view}}>
                         Upload
                 </a>
@@ -99,10 +100,6 @@
                 data-role="controlgroup"
                 data-type="horizontal">
 
-                <a class="ui-btn ui-caps back"
-                    {{action "backClicked" target=view}}>
-                        Back
-                </a>
                 <a id="key-add-ok" class="ui-btn ui-btn-d ui-caps ui-state-disabled"
                     {{action "addClicked" target=view}}>
                         Add

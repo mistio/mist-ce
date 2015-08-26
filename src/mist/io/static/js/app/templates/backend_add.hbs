@@ -74,7 +74,7 @@
                             {{#if field.isCheckbox}}
                                 <label>
                                     {{view Mist.Checkbox
-                                        data-theme="a"
+                                        data-theme="d"
                                         checked=field.value}}
                                     {{field.label}}
                                 </label>
@@ -86,10 +86,10 @@
                                     data-iconpos="right"
                                     data-collapsed-icon="carat-d"
                                     data-expanded-icon="carat-u"
-                                    data-theme="a">
+                                    data-theme="d">
                                     <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
                                     <ul data-role="listview">
-                                        <li data-icon="false" data-theme="a">
+                                        <li data-icon="false" data-theme="d">
                                             <a {{action "selectKey" "" field target=view}}>-- None --</a>
                                         </li>
                                         {{#each Mist.keysController.model as |key|}}
@@ -113,7 +113,7 @@
                                     <h4 class="{{if field.value '' 'pendingSelect'}}">{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
                                     <ul data-role="listview">
                                         {{#each view.providerRegions as |region|}}
-                                            <li data-icon="false" data-theme="a">
+                                            <li data-icon="false" data-theme="d">
                                                 <a {{action "selectRegion" region field target=view}}>
                                                     {{region.location}}
                                                 </a>

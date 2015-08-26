@@ -17,9 +17,8 @@
     top: 0;
 }
 
-#key-add-popup .generate-upload a {
-    width: 59px !important;
-    overflow: visible;
+#key-add-popup .generate-upload {
+    margin-bottom: 10px;
 }
 
 #key-add-popup textarea {

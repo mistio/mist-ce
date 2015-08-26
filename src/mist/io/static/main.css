@@ -117,6 +117,7 @@ h3 {
     color: #d96557;
     font-size: 22px;
     text-decoration: none;
+    outline: none;
 }
 
 .ui-header .ui-block-a h1.ui-title,
@@ -1157,6 +1158,14 @@ ul.checkbox-list .ui-grid-b {
 }
 .field-wrapper .first-child > .ui-btn {
     line-height: .7em;
+}
+.field-wrapper .ui-input-text input {
+    line-height: 21px;
+    padding-top: 5.5px;
+    padding-bottom: 5.5px;
+}
+.field-wrapper .ui-icon-question {
+    height: 32px;
 }
 
 .ui-icon-question:after {

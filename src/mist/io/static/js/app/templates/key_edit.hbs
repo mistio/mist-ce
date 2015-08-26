@@ -4,8 +4,10 @@
      data-overlay-theme="b"
      data-transition="slideup">
 
-    <div data-role="header" data-theme="b">
-        <h1>Rename key</h1>
+    <div class="ui-header ui-bar-b ui-caps">
+        <h1 class="ui-title">Rename key</h1>
+
+        <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
     </div>
 
     <div data-role="content">
@@ -17,8 +19,6 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a ui-caps ui-shadow ui-corner-all back"
-                {{action "backClicked" target=view}}>Back</a>
             <a id="rename-key-ok" class="ui-btn ui-btn-d ui-caps ui-shadow ui-corner-all"
                 {{action "saveClicked" target=view}}>Save</a>
         </div>

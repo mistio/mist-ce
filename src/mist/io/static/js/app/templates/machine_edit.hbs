@@ -31,6 +31,8 @@
 
             <h1 class="ui-title">Rename machine</h1>
 
+            <a href="javascript:void(0)" class="close" {{action "backClicked" target=view}}>&#10005;</a>
+
         </div>
 
         <!-- Body -->
@@ -48,8 +50,6 @@
             {{/if}}
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
-                    <a class="ui-btn ui-btn-a ui-corner-all ui-shadow"
-                       {{action "backClicked" target=view}}>Back</a>
                     <a id="machine-edit-ok"
                         class="ui-btn ui-btn-d ui-corner-all ui-shadow"
                         {{action "saveClicked" target=view}}>Save</a>
