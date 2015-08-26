@@ -1160,11 +1160,13 @@ ul.checkbox-list .ui-grid-b {
     line-height: .7em;
 }
 .field-wrapper #certificate,
-.field-wrapper #private-key,
-.field-wrapper .ui-input-text input {
+.field-wrapper #private_key,
+.field-wrapper .ui-input-text input,
+.field-wrapper .ui-collapsible-heading-toggle,
+.field-wrapper .ui-listview .ui-btn {
     line-height: 21px;
-    padding-top: 5.5px;
-    padding-bottom: 5.5px;
+    padding-top: 5.5px !important;
+    padding-bottom: 5.5px !important;
 }
 .field-wrapper .ui-icon-question {
     height: 32px;
