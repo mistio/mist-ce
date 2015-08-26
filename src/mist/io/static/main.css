@@ -1147,8 +1147,8 @@ ul.checkbox-list .ui-grid-b {
     border-color: #a3a3a3;
 }
 .field-wrapper > div.last-child:not(.first-child) a:active {
-    background-color: #177283;
-    border-color: #177283;
+    background-color: #a3a3a3;
+    border-color: #a3a3a3;
 }
 .field-wrapper * {
     border-radius: 0;

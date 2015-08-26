@@ -150,12 +150,29 @@
 #backend-add .ui-checkbox label:after {
     background-image: none !important;
     background-color: transparent !important;
+    opacity: 1;
+    -webkit-transition: color .2s linear;
+    transition: color .2s linear;
 }
 
-#backend-add .ui-checkbox label:hover:after {
+#backend-add .ui-checkbox label.ui-checkbox-on:after {
+    color: #000;
+}
+
+#backend-add .ui-checkbox label.ui-checkbox-off:after {
+    color: #d1d1d1;
+}
+
+#backend-add .ui-checkbox label.ui-checkbox-off:hover:after {
     color: #444444 !important;
 }
 
 #backend-add .ok-cancel {
     margin-top: 16px;
+}
+
+#backend-add-fields .ui-collapsible-heading-toggle {
+    color: #fff;
+    background-color: #0099cc;
+    font-size: 16px;
 }
