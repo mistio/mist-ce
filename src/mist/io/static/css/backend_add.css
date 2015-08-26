@@ -93,6 +93,8 @@
     margin-bottom: 8px;
     border-color: #A4A39F;
     box-shadow: none;
+    box-sizing: border-box;
+    height: 34px;
 }
 
 #backend-add-advanced {
@@ -171,6 +173,11 @@
     margin-top: 16px;
 }
 
+#backend-add-fields .ui-collapsible-heading-toggle {
+    color: #fff;
+    background-color: #0099cc;
+    font-size: 16px;
+}
 #backend-add-fields .ui-collapsible-heading-toggle {
     color: #fff;
     background-color: #0099cc;
