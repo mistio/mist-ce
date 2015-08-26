@@ -798,17 +798,17 @@ ul.checkbox-list .ui-grid-b {
 }
 .secondary-action {
     color: #000 !important;
-    background-color: #d4d4d4 !important;
-    border-color: #d4d4d4 !important;
+    background-color: #fff !important;
+    border-color: #fff !important;
     font-weight: normal !important;
 }
 .secondary-action:hover {
-    background-color: #e8e8e8 !important;
-    border-color: #e8e8e8 !important;
+    background-color: #fff !important;
+    border-color: #fff !important;
 }
 .secondary-action:active {
-    background-color: #a3a3a3 !important;
-    border-color: #a3a3a3 !important;
+    background-color: #eee !important;
+    border-color: #eee !important;
 }
 #confirmation-popup {
     width: 355px !important;
