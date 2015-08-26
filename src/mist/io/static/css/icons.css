@@ -148,6 +148,20 @@
     content:'\004F';
 }
 
+#machine_key .ui-icon-minus:after {
+    content:'\0073';
+}
+
+#machine_key .ui-icon-plus:after {
+    content:'\0065';
+    background-color: transparent !important;
+    right: 10px;
+    left: inherit;
+    color: #fff !important;
+    font-size: 16px;
+    margin-top: -11px;
+}
+
 .logs.ui-collapsible .ui-icon-minus:hover:after,
 .logs.ui-collapsible .ui-icon-plus:hover:after {
 

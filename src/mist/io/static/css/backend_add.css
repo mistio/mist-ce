@@ -178,8 +178,16 @@
     background-color: #0099cc;
     font-size: 16px;
 }
-#backend-add-fields .ui-collapsible-heading-toggle {
-    color: #fff;
-    background-color: #0099cc;
-    font-size: 16px;
+#backend-add-fields .selected-key .ui-collapsible-heading-toggle {
+    color: #000;
+    background-color: #FAF9F4;
+}
+
+#backend-add-fields .selected-key .ui-collapsible-heading-toggle:hover {
+    border-color: #FAF9F4;
+    color: #000 !important;
+}
+
+#machine_key .selected-key .ui-icon-plus:after {
+    color: #000 !important;
 }

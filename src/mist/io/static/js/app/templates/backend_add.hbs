@@ -79,10 +79,8 @@
                                 <div id={{field.name}}
                                     class="mist-select"
                                     data-role="collapsible"
-                                    data-iconpos="right"
-                                    data-collapsed-icon="carat-d"
-                                    data-expanded-icon="carat-u">
-                                    <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
+                                    data-iconpos="right">
+                                    <h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed {{if field.value 'selected-key' ''}}">{{#if field.value}}{{field.value}}{{else}}SELECT SSH KEY{{/if}}</h4>
                                     <ul data-role="listview">
                                         <li data-icon="false">
                                             <a {{action "selectKey" "" field target=view}}>-- None --</a>
