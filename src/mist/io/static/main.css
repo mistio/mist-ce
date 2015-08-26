@@ -107,6 +107,16 @@ h3 {
     text-transform: uppercase;
     padding: 15px 20px;
     text-shadow: 0 0 0 transparent;
+    position: relative;
+}
+
+.ui-popup .ui-header .close {
+    position: absolute;
+    right: 16px;
+    top: 12px;
+    color: #d96557;
+    font-size: 22px;
+    text-decoration: none;
 }
 
 .ui-header .ui-block-a h1.ui-title,

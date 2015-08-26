@@ -23,3 +23,7 @@
 #backend-edit .button-back {
     margin: 0 auto;
 }
+
+#backend-delete-confirm label {
+    margin: 10px 0;
+}

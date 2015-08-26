@@ -31,6 +31,8 @@
 
             <h1 class="ui-title">Edit cloud</h1>
 
+            <a href="javascript:void(0)" class="close" {{action "backClicked" target=view}}>&#10005;</a>
+
         </div>
 
         <!-- Body -->
@@ -53,6 +55,19 @@
                 <span class="state">{{Mist.backendEditController.backend.state}}</span>
             </div>
 
+            {{#if Mist.backendsController.deletingBackend}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+
+            <!-- Delete button - Back button -->
+
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <a class="ui-btn ui-caps ui-shadow ui-corner-all no"
+                    {{action "deleteClicked" target=view}}>
+                    Delete
+                </a>
+            </div>
+
             <!-- Delete confirmation -->
 
             <div id="backend-delete-confirm" style="display:none">
@@ -61,26 +76,11 @@
                     <br />Monitoring for these will be disabled
                 </label>
                 <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps yes"
+                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps no"
                         {{action "noClicked" target=view}}>No</a>
-                    <a class="ui-btn ui-shadow ui-corner-all ui-caps no" id="button-confirm-disable"
+                    <a class="ui-btn ui-shadow ui-corner-all ui-caps yes" id="button-confirm-disable"
                         {{action "yesClicked" target=view}}>Yes</a>
                 </div>
-            </div>
-
-            {{#if Mist.backendsController.deletingBackend}}
-                <div class="ajax-loader"></div>
-            {{/if}}
-
-            <!-- Delete button - Back button -->
-
-            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                <a class="ui-btn ui-shadow ui-corner-all button-back ui-caps back"
-                    {{action "backClicked" target=view}}>Back</a>
-                <a class="ui-btn ui-caps ui-shadow ui-corner-all no"
-                    {{action "deleteClicked" target=view}}>
-                    Delete
-                </a>
             </div>
         </div>
     </div>
