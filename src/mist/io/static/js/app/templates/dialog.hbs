@@ -34,7 +34,9 @@
                 {{Mist.dialogController.options.head}}
             </h1>
 
-            <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+            {{#unless view.isYesNo}}
+                <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+            {{/unless}}
 
         </div>
 
@@ -92,7 +94,7 @@
                     {{/if}}
 
                     {{#if view.isYesNo}}
-                        <a class="ui-btn ui-caps plain-link"
+                        <a class="ui-btn ui-caps back"
                             {{action "reject" target=view}}>
                                 No
                         </a>

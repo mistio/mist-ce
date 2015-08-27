@@ -51,7 +51,7 @@ h4.pendingSelect > a {
 #backend-add ul li a:hover {
     background-color: #66C2E0;
     border-color: #66C2E0;
-    color: #fff;
+    color: #fff !important;
     text-shadow: 0 0 0 #66C2E0;
 }
 
@@ -204,4 +204,8 @@ h4.pendingSelect > a {
 
 #machine_key .selected-key .ui-icon-plus:after {
     color: #000 !important;
+}
+
+#machine_key_help {
+    margin-top: 24px;
 }
