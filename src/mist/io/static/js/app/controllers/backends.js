@@ -361,7 +361,6 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                     this.model.forEach(function(backend) {
                         if (backend.enabled) counter += backend.machineCount;
                     });
-                    warn('_updateMachineCount', counter);
                     this.set('machineCount', counter);
                     this.trigger('onMachineListChange');
                 });

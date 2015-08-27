@@ -69,6 +69,9 @@ h3 {
     color: #000;
 }
 
+h4 {
+    font-weight: 400;
+}
 
 .ui-caps, .ui-collapsible-heading {
     text-transform: uppercase;
@@ -184,6 +187,7 @@ h3 {
     color: inherit !important;
     text-shadow: 0 0 0 transparent !important;
     font-weight: 400;
+    top: 24px !important;
 }
 
 #home-page ul.ui-listview > li {
@@ -785,7 +789,6 @@ ul.checkbox-list .ui-grid-b {
     border-color: transparent !important;
     box-shadow: none !important;
     font-weight: normal !important;
-    text-decoration: underline !important;
 }
 .plain-link:hover {
     color: #fff !important;
