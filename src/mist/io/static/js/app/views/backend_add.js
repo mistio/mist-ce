@@ -4,13 +4,13 @@ define('app/views/backend_add', ['app/views/controlled'],
     //
     //  @returns Class
     //
-    function (ControlledView) {
+    function (ControlledComponent) {
 
         'use strict';
 
-        return App.BackendAddView = ControlledView.extend({
+        return App.BackendAddView = ControlledComponent.extend({
 
-            templateName: 'backend_add',
+            layoutName: 'backend_add',
             controllerName: 'backendAddController',
 
             selectedRegion: null,

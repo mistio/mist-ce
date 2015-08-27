@@ -4,20 +4,17 @@ define('app/views/key_add', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.KeyAddView = PopupView.extend({
+        return App.KeyAddComponent = PopupComponent.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-            templateName: 'key_add',
+            layoutName: 'key_add',
             controllerName: 'keyAddController',
             popupId: '#key-add',
 
@@ -26,11 +23,8 @@ define('app/views/key_add', ['app/views/popup'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 this.setProperties({

@@ -1,32 +1,25 @@
-define('app/views/controlled', ['app/views/templated'],
+define('app/views/controlled', [],
     //
     //  Controlled View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return TemplatedView.extend({
+        return Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             controllerName: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             init: function () {
                 this._super();
@@ -35,8 +28,28 @@ define('app/views/controlled', ['app/views/templated'],
                     //this.set('controller', Mist.get(this.controllerName));
                 }
 
+                var that = this;
+                Ember.run.next(function(){
+                    $("[data-role='collapsible']").collapsible({
+                        collapse: function(event) {
+                            $(this).children().next().slideUp(250);
+                            var overlay = $(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('in').addClass('ui-screen-hidden');
+                                overlay.height($())
+                            }
+                        },
+                        expand: function(event, ui) {
+                            var overlay = $(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('ui-screen-hidden').addClass('in');
+                            }
+                            $(this).children().next().hide();
+                            $(this).children().next().slideDown(250);
+                        }
+                    });
+                });
             },
-
 
             didInsertElement: function () {
                 this._super();

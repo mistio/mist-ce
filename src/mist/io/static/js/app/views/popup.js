@@ -4,11 +4,11 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
     //
     //  @returns Class
     //
-    function (ControlledView) {
+    function (ControlledComponent) {
 
         'use strict';
 
-        return ControlledView.extend({
+        return ControlledComponent.extend({
 
 
             //
