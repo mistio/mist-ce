@@ -15,6 +15,7 @@ define('app/views/machine_shell', ['app/views/popup'],
 
             templateName: 'machine_shell',
             controllerName: 'machineShellController',
+            popupId: '#machine-shell',
 
 
             //
