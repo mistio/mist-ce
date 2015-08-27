@@ -11,6 +11,23 @@
     margin-left: 0;
     border-color: #fff;
 }
+#key-list-page #select-keys-btn {
+    float: left;
+    font-weight: normal;
+    background-color: transparent;
+    color: #b5b5b5;
+    border-width: 0;
+    padding: .4em .75em !important;
+    text-align: left;
+    width: 14px;
+    height: 22px;
+    margin: 11px;
+    font-size: 14px;
+    line-height: 1.6em;
+}
+#key-list-page #select-keys-btn:hover {
+    color: #444 !important;
+}
 #key-list-page .ui-header .ui-btn:hover {
     color: #7f7f7f !important;
 }
@@ -22,11 +39,6 @@
 }
 #key-list-page #add-key-btn {
     float: right;
-    margin: 0;
-}
-#key-list-page #select-keys-btn {
-    float: left;
-    font-weight: normal;
     margin: 0;
 }
 #key-list-page .tag {
