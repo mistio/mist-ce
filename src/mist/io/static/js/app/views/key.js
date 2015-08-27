@@ -116,7 +116,8 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
             showPublicKey: function () {
                 var that = this;
                 Mist.keysController.getPublicKey(this.key.id, function (success, publicKey) {
-                    that.set('publicKey', publicKey);
+                    if (success && !that.isDestroyed)
+                        that.set('publicKey', publicKey);
                 });
             },
 

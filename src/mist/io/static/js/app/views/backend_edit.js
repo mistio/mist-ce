@@ -4,13 +4,13 @@ define('app/views/backend_edit', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.BackendEditView = PopupView.extend({
+        return App.BackendEditComponent = PopupComponent.extend({
 
-            templateName: 'backend_edit',
+            layoutName: 'backend_edit',
             controllerName: 'backendEditController',
             popupId: '#backend-edit',
 
