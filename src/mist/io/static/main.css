@@ -769,9 +769,27 @@ ul.checkbox-list .ui-grid-b {
     background-color: transparent !important;
     border-color: transparent !important;
     box-shadow: none !important;
+    font-weight: normal !important;
 }
 .back:hover {
     text-decoration: underline !important;
+}
+.plain-link {
+    color: #000 !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    font-weight: normal !important;
+    text-decoration: underline !important;
+}
+.plain-link:hover {
+    color: #fff !important;
+    background-color: #0099cc !important;
+    border-color: #0099cc !important;
+    text-decoration: none !important;
+}
+.plain-link:active {
+    background-color: #0081ac !important;
 }
 .yes {
     color: #fff !important;
