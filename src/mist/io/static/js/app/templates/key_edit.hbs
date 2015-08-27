@@ -13,7 +13,7 @@
     <div data-role="content">
 
         <label for="new-key-name">New name</label>
-        {{view Mist.TextField id="new-key-name" value=Mist.keyEditController.keyId}}
+        {{view Mist.TextField id="new-key-name" value=Mist.keyEditController.newKeyId}}
         {{#if Mist.keysController.renamingKey}}
         <div class="ajax-loader"></div>
         {{/if}}

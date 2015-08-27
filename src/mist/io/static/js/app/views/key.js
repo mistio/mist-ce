@@ -28,7 +28,7 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
                 Mist.keysController.on('onKeyDisassociate', this, 'updateMachines');
                 Mist.backendsController.on('onMachineListChange', this, 'updateMachines');
 
-                this.updateView();
+                Ember.run.next(this, this.updateView);
 
             }.on('didInsertElement'),
 

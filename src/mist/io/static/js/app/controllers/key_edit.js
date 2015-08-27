@@ -31,6 +31,7 @@ define('app/controllers/key_edit', ['ember'],
                     newKeyId: keyId,
                     callback: callback,
                 });
+
                 this.view.open();
             },
 
@@ -42,7 +43,6 @@ define('app/controllers/key_edit', ['ember'],
 
 
             save: function () {
-
                 // If new id is same as old id,
                 // act as if it is saved
                 if (this.keyId == this.newKeyId) {

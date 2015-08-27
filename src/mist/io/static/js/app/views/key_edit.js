@@ -8,7 +8,7 @@ define('app/views/key_edit', ['app/views/popup'],
 
         return App.KeyEditComponent = PopupComponent.extend({
 
-            templateName: 'key_edit',
+            layoutName: 'key_edit',
             controllerName: 'keyEditController',
             popupId: '#rename-key-popup',
 

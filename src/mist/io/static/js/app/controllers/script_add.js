@@ -26,7 +26,6 @@ define('app/controllers/script_add', ['ember'],
             open: function () {
                 this.clear();
                 this.view.clear();
-                this.view.open();
             },
 
 
