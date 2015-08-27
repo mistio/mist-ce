@@ -27,8 +27,10 @@
     <div data-role="content">
         <div class="ui-grid-b scripts-header ui-shadow">
             <div class="ui-block-a">
-                <a id="select-scripts-btn"
-                   class="responsive-button ui-btn ui-btn-d ui-btn-add ui-btn-icon-left ui-icon-carat-d ui-corner-all ui-caps" {{action "selectClicked" target=view}}>Select</a>
+                {{#unless Mist.scriptsController.model.length}}
+                <a id="select-scripts-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
+                        ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
+                {{/unless}}
             </div>
             <div class="ui-block-b"></div>
             <div class="ui-block-c">
@@ -56,7 +58,9 @@
 
     {{view "scriptEdit"}}
 
-    <div id="select-scripts-popup" data-role="popup" data-transition="flip" data-position-to="#select-scripts-btn">
+    <div id="select-scripts-popup" class="ui-mini" data-role="popup" data-transition="flip" data-position-to="#select-scripts-btn">
+        <div class="ui-header ui-caps">Select</div>
+
         <ul data-role='listview'>
             <li data-icon="false">
                 <a {{action "selectionModeClicked" true target=view}}>All</a>

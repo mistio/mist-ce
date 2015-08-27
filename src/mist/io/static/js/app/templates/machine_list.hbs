@@ -27,8 +27,10 @@
     <div data-role="content">
         <div class="ui-grid-b machines-header ui-shadow">
             <div class="ui-block-a">
+                {{#if Mist.backendsController.model.length}}
                 <a id="select-machines-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
                         ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
+                {{/if}}
             </div>
             <div class="ui-block-b"></div>
             <div class="ui-block-c">
