@@ -13,6 +13,8 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
             templateName: 'key',
             key: null,
             machines: [],
+            publicKey: null,
+            privateKey: null,
 
 
             /**
@@ -112,9 +114,9 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
 
 
             showPublicKey: function () {
-                Mist.keysController.getPublicKey(this.key.id, function (success, keyPublic) {
-                    if (success)
-                        $('#public-key').val(keyPublic);
+                var that = this;
+                Mist.keysController.getPublicKey(this.key.id, function (success, publicKey) {
+                    that.set('publicKey', publicKey);
                 });
             },
 
@@ -128,17 +130,10 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
             actions: {
 
                 displayClicked: function () {
-                    Mist.keysController.getPrivateKey(this.key.id, function (success, keyPrivate) {
+                    var that = this;
+                    Mist.keysController.getPrivateKey(this.key.id, function (success, privateKey) {
                         if (success) {
-                            Mist.dialogController.open({
-                                type: DIALOG_TYPES.BACK,
-                                head: 'Private Key',
-                                body: [
-                                    {
-                                        command: keyPrivate
-                                    }
-                                ],
-                            });
+                            that.set('privateKey', privateKey);
                         }
                     });
                 },

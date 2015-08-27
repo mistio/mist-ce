@@ -343,7 +343,7 @@ body {
 
 /* Text fields
 -----------------------------------------------------------------------------------------------------------*/
-textarea#private-key, #manual-monitoring-popup textarea {
+#manual-monitoring-popup textarea {
     height: 75px !important;
 }
 

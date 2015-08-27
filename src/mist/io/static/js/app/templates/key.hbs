@@ -36,7 +36,7 @@
                 <div class="ajax-loader"></div>
                 {{/if}}
             </h4>
-            <textarea id="public-key" type="text" readonly="readonly" onclick="this.focus();this.select()"></textarea>
+            <textarea id="public-key" type="text" readonly="readonly" onclick="this.focus();this.select()" value={{view.publicKey}}></textarea>
         </div>
 
         <div class="ui-shadow" data-role="collapsible">
@@ -45,6 +45,9 @@
                 <div class="ajax-loader"></div>
                 {{/if}}
             </h4>
+            {{#if view.privateKey}}
+            <textarea id="private-key" type="text" readonly="readonly" onclick="this.focus();this.select()" value={{view.privateKey}}></textarea>
+            {{else}}
             <a id="private_key" class="ui-btn
                     ui-btn-d
                     icon-key
@@ -53,6 +56,7 @@
                     ui-caps" {{action "displayClicked" target=view}}>
                 Display
             </a>
+            {{/if}}
         </div>
 
         {{#if model.machines}}

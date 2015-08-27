@@ -60,4 +60,13 @@
     height: 90px;
     overflow: auto;
     font-family: monospace;
+    width: 100%;
+}
+
+#single-key-page #private-key {
+    height: 440px;
+    overflow: auto;
+    font-family: monospace;
+    width: 100%;
+    max-width: 600px;
 }
