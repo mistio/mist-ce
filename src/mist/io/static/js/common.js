@@ -580,7 +580,6 @@ var DIALOG_TYPES = {
 var EMAIL_REGEX = /(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
 
 var PROVIDER_MAP = {
-
     azure: [
         {
             name: 'title',
@@ -596,7 +595,7 @@ var PROVIDER_MAP = {
         {
             name: 'certificate',
             type: 'file',
-            label: 'Certificate file',
+            label: ' ',
             buttonText: 'Add Certificate',
             helpText: 'Your Azure certificate PEM file',
             helpHref: 'http://docs.mist.io/article/18-adding-microsoft-azure'
@@ -852,17 +851,17 @@ var PROVIDER_MAP = {
             defaultValue: 'GCE',
         },
         {
-            name: 'private_key',
-            label: 'JSON key',
-            type: 'file',
-            buttonText: 'Add JSON key',
-            helpText: 'You can create a new key on your GCE portal',
-            helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
-        },
-        {
             name: 'project_id',
             type: 'text',
             helpText: 'You can find your project ID on your GCE portal',
+            helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
+        },
+        {
+            name: 'private_key',
+            label: ' ',
+            type: 'file',
+            buttonText: 'Add JSON key',
+            helpText: 'You can create a new key on your GCE portal',
             helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
         }
     ],
@@ -1012,9 +1011,17 @@ var PROVIDER_MAP = {
             helpHref: 'http://docs.mist.io/article/24-adding-kvm',
         },
         {
+            name: 'machine_key',
+            type: 'ssh_key',
+            label: 'SSH key',
+            optional: true,
+            helpText: 'If you don\'t specify an SSH key, mist.io will assume that you are connecting via tcp (qemu+tcp)',
+            helpHref: 'http://docs.mist.io/article/24-adding-kvm',
+        },
+        {
             name: 'machine_user',
             type: 'text',
-            label: 'ssh user',
+            label: 'SSH user',
             optional: true,
             defaultValue: 'root',
             helpText: 'The SSH user that Mist.io should try to connect as',
@@ -1022,20 +1029,12 @@ var PROVIDER_MAP = {
         {
             name: 'ssh_port',
             type: 'text',
-            label: 'ssh port',
+            label: 'SSH port',
             optional: true,
             defaultValue: '22',
         },
-        {
-            name: 'machine_key',
-            type: 'ssh_key',
-            label: 'ssh key',
-            optional: true,
-            helpText: 'If you don\'t specify an ssh key, mist.io will assume that you are connecting via tcp (qemu+tcp)',
-            helpHref: 'http://docs.mist.io/article/24-adding-kvm',
-        },
-
     ],
+
     vcloud: [
         {
             name: 'title',
@@ -1089,6 +1088,7 @@ var PROVIDER_MAP = {
             helpHref: 'http://docs.mist.io/article/23-adding-indonesian-cloud'
         }
     ],
+
     vsphere: [
         {
             name: 'title',

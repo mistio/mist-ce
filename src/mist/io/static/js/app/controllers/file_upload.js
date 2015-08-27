@@ -39,7 +39,10 @@ define('app/controllers/file_upload', ['ember'],
                     .set('file', defaultText)
                     .set('callback', callback);
 
-                $('#file-upload').popup('open');
+                Ember.run.next(function(){
+                    $('body').enhanceWithin();
+                    $('#file-upload').popup('open');
+                })
             },
 
 

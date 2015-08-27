@@ -44,9 +44,11 @@
                     {{#if field.label}}
                         {{#unless field.isCheckbox}}
                         {{#unless field.isRegion}}
+                        {{#unless field.isKey}}
                             <label for={{field.name}}>
                                 {{unbound field.label}}
                             </label>
+                        {{/unless}}
                         {{/unless}}
                         {{/unless}}
                     {{/if}}
@@ -80,7 +82,7 @@
                                     class="mist-select"
                                     data-role="collapsible"
                                     data-iconpos="right">
-                                    <h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed {{if field.value 'selected-key' ''}}">{{#if field.value}}{{field.value}}{{else}}SELECT SSH KEY{{/if}}</h4>
+                                    <h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed {{if field.value 'selected-key' 'pendingSelect'}}">{{#if field.value}}{{field.value}}{{else}}SELECT SSH KEY{{/if}}</h4>
                                     <ul data-role="listview">
                                         <li data-icon="false">
                                             <a {{action "selectKey" "" field target=view}}>-- None --</a>
@@ -152,5 +154,3 @@
 
 <div id="add-backend-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
      {{action "clickOverlay" target=view}}></div>
-
-{{view "fileUpload"}}

@@ -402,7 +402,7 @@ textarea {
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
-    padding: 20px 75px 20px 40px !important;
+    padding: 20px 25px 20px 90px !important;
 }
 
 .floating-collapsible > h4.ui-collapsible-heading > a {

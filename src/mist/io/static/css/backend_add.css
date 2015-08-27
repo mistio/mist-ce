@@ -10,6 +10,7 @@
     border:0;
     overflow: visible;
     z-index: 900;
+    width: 281px;
 }
 
 #add-backend-overlay {
@@ -17,10 +18,12 @@
     min-height: 800px;
 }
 
-.mist-select > .ui-collapsible-heading-collapsed.pendingSelect > a {
-    background-color: #0099cc;
-    color: #fff;
+h4.pendingSelect > a {
+    background-color: #0099cc !important;
+    color: #fff !important;
+    text-transform: uppercase;
 }
+
 .mist-select + div#backend-add-fields {
     display: none !important;
     background-color: #FAF9F4;
@@ -62,6 +65,7 @@
 
 #backend-add h4.ui-collapsible-heading.ui-collapsible-heading-collapsed > a{
     text-align: center !important;
+    padding-right: 22px;
 }
 
 #backend-add ul {
@@ -174,10 +178,9 @@
 }
 
 #backend-add-fields .ui-collapsible-heading-toggle {
-    color: #fff;
-    background-color: #0099cc;
     font-size: 16px;
 }
+
 #backend-add-fields .selected-key .ui-collapsible-heading-toggle {
     color: #000;
     background-color: #FAF9F4;
