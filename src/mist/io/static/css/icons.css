@@ -164,7 +164,7 @@
 
 .ui-filterable .ui-icon-delete:after {
     background-image: none;
-    content: '\004D';
+    content: '\006b' !important;
 }
 
 .logs.ui-collapsible .ui-icon-minus:hover:after,

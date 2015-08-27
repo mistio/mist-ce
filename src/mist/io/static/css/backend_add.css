@@ -34,8 +34,16 @@ h4.pendingSelect > a {
     display: block !important;
 }
 
+#backend-add-fields .mist-select.ui-collapsible {
+    margin-top: 24px;
+}
+
 #backend-add-fields .ui-listview {
     margin: 0;
+}
+
+#backend-add #new-backend-provider .ui-collapsible-heading {
+    text-transform: none;
 }
 
 #backend-add h4.select-provider a,
@@ -77,7 +85,6 @@ h4.pendingSelect > a {
     padding: 0;
     width: 281px;
     margin-top: -8px;
-    border-radius: 0 0 .5em .5em;
 }
 
 #backend-add label {
@@ -184,6 +191,10 @@ h4.pendingSelect > a {
 #backend-add-fields .selected-key .ui-collapsible-heading-toggle {
     color: #000;
     background-color: #FAF9F4;
+}
+
+#backend-add-fields .ui-collapsible-heading-toggle:hover {
+    border-color: #0099cc;
 }
 
 #backend-add-fields .selected-key .ui-collapsible-heading-toggle:hover {
