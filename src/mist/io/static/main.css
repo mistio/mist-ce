@@ -172,6 +172,11 @@ h3 {
     top: 1em;
 }
 
+.ui-popup.ui-mini .ui-listview a {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
 .ui-li-count {
     border-width: 0px;
     font-size: 18px !important;

@@ -162,6 +162,11 @@
     margin-top: -12px;
 }
 
+.ui-filterable .ui-icon-delete:after {
+    background-image: none;
+    content: '\004D';
+}
+
 .logs.ui-collapsible .ui-icon-minus:hover:after,
 .logs.ui-collapsible .ui-icon-plus:hover:after {
 
