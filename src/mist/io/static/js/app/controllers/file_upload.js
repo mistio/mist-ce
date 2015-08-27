@@ -40,7 +40,6 @@ define('app/controllers/file_upload', ['ember'],
                     .set('callback', callback);
 
                 Ember.run.next(function(){
-                    $('body').enhanceWithin();
                     $('#file-upload').popup('open');
                 })
             },

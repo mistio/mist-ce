@@ -1,16 +1,16 @@
-define('app/views/file_upload', ['app/views/templated', 'ember'],
+define('app/views/file_upload', ['ember'],
     //
     //  File Upload View
     //
     //  @returns Class
     //
-    function(TemplatedView) {
+    function() {
 
         'use strict';
 
-        return App.FileUploadView = TemplatedView.extend({
+        return App.FileUploadComponent = Ember.Component.extend({
 
-            templateName: 'file_upload',
+            layoutName: 'file_upload',
 
 
             //
