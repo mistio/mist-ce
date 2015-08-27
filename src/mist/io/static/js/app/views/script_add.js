@@ -1,10 +1,10 @@
-define('app/views/script_add', ['app/views/panel'],
+define('app/views/script_add', ['app/views/controlled'],
     //
     //  Script Add View
     //
     //  @returns Class
     //
-    function (PanelView) {
+    function (ControlledComponent) {
 
         'use strict';
 
@@ -18,16 +18,15 @@ define('app/views/script_add', ['app/views/panel'],
             '      debug:\n' +
             '        msg: "Hello World"\n';
 
-        return App.ScriptAddView = PanelView.extend({
+        return App.ScriptAddComponent = ControlledComponent.extend({
 
 
             //
             //  Properties
             //
 
-            templateName: 'script_add',
+            layoutName: 'script_add',
             controllerName: 'scriptAddController',
-            panelId: '#script-add',
 
             scriptTypes: [{
                 label: 'Ansible Playbook',

@@ -4,10 +4,10 @@ define('app/views/machine_add', ['app/views/controlled'],
      *
      *  @returns Class
      */
-    function (ControlledView) {
-        return App.MachineAddView = ControlledView.extend({
+    function (ControlledComponent) {
+        return App.MachineAddComponent = ControlledComponent.extend({
 
-            templateName: 'machine_add',
+            layoutName: 'machine_add',
             controllerName: 'machineAddController',
 
             /**

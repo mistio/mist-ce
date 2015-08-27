@@ -4,9 +4,9 @@ define('app/views/key_edit', ['app/views/popup'],
      *
      *  @returns Class
      */
-    function (PopupView) {
+    function (PopupComponent) {
 
-        return App.KeyEditView = PopupView.extend({
+        return App.KeyEditComponent = PopupComponent.extend({
 
             templateName: 'key_edit',
             controllerName: 'keyEditController',

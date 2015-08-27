@@ -4,14 +4,14 @@ define('app/views/dialog', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.DialogView = PopupView.extend({
+        return App.DialogPopupComponent = PopupComponent.extend({
 
 
-            templateName: 'dialog',
+            layoutName: 'dialog',
             controllerName: 'dialogController',
             popupId: "#dialog",
 
