@@ -1,21 +1,18 @@
 #add-script.ui-collapsible-collapsed {
     width: 200px;
-    right: 5px;
     position: inherit;
-    margin-top: -3px;
 }
 
 #add-script {
     width: 281px;
-    position: absolute;
-    right: 5px;
-    top: 78px;
 }
+
 #script-add.ui-content {
     background-color: #FAF9F4;
     padding: 16px;
     width: 249px;
 }
+
 #add-script-overlay {
     z-index: 899;
     min-height: 800px;

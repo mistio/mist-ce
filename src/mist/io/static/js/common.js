@@ -432,19 +432,6 @@ function slice (args) {
 //  PROTOTYPE EXTENTIONS
 //
 
-var extendEmberView = function () {
-
-    Ember.View.prototype.getName = function () {
-        return this.constructor.toString().split('.')[1].split('View')[0];
-    };
-    Ember.View.prototype.getWidgetID = function () {
-        return '#' + this.getName().dasherize();
-    }
-    Ember.View.prototype.getControllerName = function () {
-        return this.getName().decapitalize() + 'Controller';
-    }
-};
-
 
 String.prototype.decapitalize = function () {
     return this.charAt(0).toLowerCase() + this.slice(1);
@@ -470,6 +457,7 @@ Date.prototype._toString = function () {
     var d = (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear();
     return d + ', ' + this.getPrettyTime();
 }
+
 Date.prototype.getPrettyDate = function (shortMonth) {
     return this.getMonthName(shortMonth) + ' ' + this.getDate() + ', ' + this.getFullYear();
 }

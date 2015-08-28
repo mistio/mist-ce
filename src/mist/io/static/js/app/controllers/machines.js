@@ -7,10 +7,9 @@ define('app/controllers/machines', ['app/models/machine'],
     function(Machine) {
         return Ember.Controller.extend(Ember.Evented, {
 
-            /**
-             *  Properties
-             */
-
+            //
+            //  Properties
+            //
 
             model: [],
             loading: null,
@@ -27,11 +26,9 @@ define('app/controllers/machines', ['app/models/machine'],
             sortProperties: ['hasMonitoring', 'probed'],
             */
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            //
+            //  Initialization
+            //
 
             init: function () {
                 this._super();
@@ -39,22 +36,18 @@ define('app/controllers/machines', ['app/models/machine'],
                 this.set('loadint', true);
             },
 
-
             load: function (machines) {
                 this._updateModel(machines);
                 this.set('loading', false);
             },
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //  Methods
+            //
 
             newMachine: function(name, image, size, location, key, script, monitoring,
                 dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts) {
-
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
                 // the server
@@ -67,7 +60,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     'pendingCreation': true
                 });
 
-                this.addObject(dummyMachine);
+                this.model.addObject(dummyMachine);
 
                 // Don't send dummy key text
                 key = Mist.keysController.keyExists(key.id) ? key : null;
@@ -101,7 +94,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         exposedPorts[key] = {};
                     });
                 }
-
 
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
@@ -147,7 +139,6 @@ define('app/controllers/machines', ['app/models/machine'],
                 });
             },
 
-
             shutdownMachine: function(machineId, callback) {
                 var that = this;
                 var machine = this.getMachine(machineId);
@@ -167,7 +158,6 @@ define('app/controllers/machines', ['app/models/machine'],
                     if (callback) callback(success);
                 });
             },
-
 
             destroyMachine: function(machineId, callback) {
                 var that = this;

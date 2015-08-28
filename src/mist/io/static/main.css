@@ -454,7 +454,7 @@ textarea {
     width: 60px;
     height: 60px;
     text-align: center;
-    font-size: 42px;
+    font-size: 44px;
     line-height: 60px;
     border-radius: 50%;
     color: rgba(0,0,0,0.2) !important;
@@ -462,6 +462,7 @@ textarea {
     transition: all .1s ease;
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
+    font-weight: 300;
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:before {
