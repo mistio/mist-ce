@@ -1,6 +1,10 @@
 
 /* Backend Button CSS
 -----------------------------------------------------------------------------------------------------------*/
+#backend-buttons {
+    margin-bottom: 25px;
+}
+
 #backend-buttons a:after {
     margin-top: -4px;
     border-radius: 1em;

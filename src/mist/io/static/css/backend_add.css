@@ -1,6 +1,16 @@
 
+#add-backend.ui-collapsible-collapsed {
+    width: 200px;
+    right: 5px;
+    position: inherit;
+    margin-bottom: -13px !important;
+}
+
 #add-backend {
     width: 281px;
+    position: absolute;
+    right: 5px;
+    top: 79px;
 }
 
 #add-backend-overlay {

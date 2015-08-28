@@ -4,13 +4,13 @@ define('app/views/machine_edit', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.MachineEditView = PopupView.extend({
+        return App.MachineEditComponent = PopupComponent.extend({
 
-            templateName: 'machine_edit',
+            layoutName: 'machine_edit',
             controllerName: 'machineEditController',
 
             /**

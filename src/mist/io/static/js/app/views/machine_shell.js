@@ -4,16 +4,16 @@ define('app/views/machine_shell', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
         var MIN_TERM_ROWS = 24;
         var MIN_TERM_COLUMNS = 80;
 
-        return App.MachineShellView = PopupView.extend({
+        return App.MachineShellComponent = PopupComponent.extend({
 
-            templateName: 'machine_shell',
+            layoutName: 'machine_shell',
             controllerName: 'machineShellController',
             popupId: '#machine-shell',
 
