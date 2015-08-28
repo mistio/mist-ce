@@ -323,8 +323,6 @@ var setupLogChannel = function (socket, callback) {
     Mist.set('openIncidents', []);
     Mist.set('closedIncidents', [])
 
-    Mist.logsController.load();
-
     if (callback)
         callback();
 };

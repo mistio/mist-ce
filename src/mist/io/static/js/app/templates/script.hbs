@@ -5,7 +5,7 @@
         <a href="#/scripts" class="responsive-button ui-btn-left ui-btn ui-icon-arrow-l
             ui-btn-icon-left ui-shadow ui-corner-all">Scripts</a>
 
-        <h1>{{name}}</h1>
+        <h1>{{model.name}}</h1>
 
         {{component "user-menu"}}
 
@@ -27,31 +27,31 @@
 
            <table class="info-table">
            <tbody>
-             {{#if description}}
+             {{#if model.description}}
                  <tr>
                      <td>Description</td>
-                     <td>{{description}}</td>
+                     <td>{{model.description}}</td>
                  </tr>
              {{/if}}
                <tr>
                    <td>Type</td>
-                   <td>{{type}}</td>
+                   <td>{{model.type}}</td>
                </tr>
-               {{#if entrypoint}}
+               {{#if model.entrypoint}}
                    <tr>
                        <td>Entry Point</td>
-                       <td>{{entrypoint}}</td>
+                       <td>{{model.entrypoint}}</td>
                    </tr>
                {{/if}}
                {{#if view.isInline}}
                <tr>
                    <td>Script</td>
-                   <td><div class="command-container">{{script}}</div></td>
+                   <td><div class="command-container">{{model.script}}</div></td>
                </tr>
                {{else}}
                <tr>
                    <td>Url</td>
-                   <td>{{script}}</td>
+                   <td>{{model.script}}</td>
                </tr>
                {{/if}}
            </tbody>
