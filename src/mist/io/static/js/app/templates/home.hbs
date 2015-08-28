@@ -15,9 +15,8 @@
     <div role="main" class="ui-content" data-theme="c">
 
         {{#unless Mist.backendsController.model.length}}
-        <div id="no-backend" class="ui-responsive">
-            <div class="ui-body ui-shadow">
-                <div id="no-backend-inner">
+            <div id="no-collection" class="ui-responsive">
+                <div id="no-collection-inner" class="ui-body ui-shadow">
                     <span class="icon-cloud-check"></span>
                     <h1>Welcome to mist.io</h1>
                     <h2>Get started by adding your clouds.</h2>
@@ -26,7 +25,6 @@
                     </p>
                 </div>
             </div>
-        </div>
         {{/unless}}
 
         {{view "backendAdd"}}

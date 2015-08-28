@@ -8,7 +8,7 @@
     <div id="script-add" class="ui-content">
 
         <div class="form-field">
-            <label for="script-name">Name:</label>
+            <label for="script-name">Name</label>
             {{view Mist.TextField
                 data-theme="a"
                 id="script-name"
@@ -20,7 +20,7 @@
         -->
 
         <div id="script-add-type" class="form-field">
-            <label >Type:</label>
+            <label >Type</label>
             <div class="mist-select"
                 data-role="collapsible"
                 data-iconpos="right"
@@ -51,7 +51,7 @@
         -->
 
         <div id="script-add-source" class="form-field">
-            <label>Source:</label>
+            <label>Source</label>
             <div  class="mist-select"
                 data-role="collapsible"
                 data-iconpos="right"
@@ -79,7 +79,7 @@
 
         <div class="github source">
             <div class="form-field">
-                <label for="github-script-url">Github Repo:</label>
+                <label for="github-script-url">Github Repo</label>
                 {{#view Mist.TextField
                     data-theme="a"
                     id="github-script-url"
@@ -88,7 +88,7 @@
             </div>
 
             <div class="form-field">
-                <label for="github-script-entry-point">Entry point (optional):</label>
+                <label for="github-script-entry-point">Entry point (optional)</label>
                 {{view Mist.TextField
                     data-theme="a"
                     id="github-script-entry-point"
@@ -98,7 +98,7 @@
 
         <div class="url source">
             <div class="form-field">
-                <label for="url-script-url">Url:</label>
+                <label for="url-script-url">Url</label>
                 {{view Mist.TextField
                     data-theme="a"
                     id="url-script-url"
@@ -106,7 +106,7 @@
             </div>
 
             <div class="form-field">
-                <label for="url-script-entry-point">Entry point (optional):</label>
+                <label for="url-script-entry-point">Entry point (optional)</label>
                 {{view Mist.TextField
                     data-theme="a"
                     id="url-script-entry-point"
@@ -116,7 +116,7 @@
 
         <div class="inline source">
             <div class="form-field">
-                <label for="url-script-script">Script:</label>
+                <label for="url-script-script">Script</label>
                 {{view Mist.TextArea
                     data-theme="a"
                     id="url-script-script"
@@ -129,7 +129,7 @@
         -->
 
         <div id="script-add-description" class="form-field">
-          <label>Description (optional):</label>
+          <label>Description (optional)</label>
           {{view Mist.TextArea
               data-theme="a"
               value=Mist.scriptAddController.newScript.description}}
@@ -140,10 +140,8 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a ui-shadow ui-corner-all"
-                {{action "backClicked" target=view}}>Back</a>
             <a id="new-script-ok" data-theme="d"
-                class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d"
+                class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d ui-caps"
                 {{action "addClicked" target=view}}>Add</a>
         </div>
     </div>

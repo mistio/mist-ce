@@ -122,7 +122,7 @@ h4 {
     position: absolute;
     right: 16px;
     top: 12px;
-    color: #d96557;
+    color: rgba(0,0,0,0.2);
     font-size: 22px;
     text-decoration: none;
     outline: none;
@@ -219,8 +219,14 @@ h4 {
 .ui-input-text {
     box-shadow: none;
 }
-
-.ui-input-search input,
+textarea.ui-input-text {
+    border: 1px solid #b5b5b5;
+}
+textarea.ui-input-text:hover {
+    border-color: #a3a3a3;
+}
+textarea.ui-input-text,
+.ui-input-text input,
 .ui-input-text input {
     padding-left: .75em;
     padding-right: 1.75em;
@@ -451,7 +457,7 @@ textarea {
     font-size: 42px;
     line-height: 60px;
     border-radius: 50%;
-    color: #d96557 !important;
+    color: rgba(0,0,0,0.2) !important;
     -webkit-transition: all .1s ease;
     transition: all .1s ease;
     -webkit-transform: rotate(45deg);
@@ -1149,6 +1155,47 @@ ul.checkbox-list .ui-grid-b {
     background: #fff;
 }
 
+/* Welcome clients
+------------------------------------------------------------------------------*/
+#no-collection {
+    margin-bottom: 12px;
+}
+
+#no-collection-inner {
+    text-align: center;
+    padding: 50px 20px !important;
+    background-color: #FAF9F4;
+}
+
+#no-collection-inner .icon-cloud-check:after {
+    color: #A5A4A1;
+    font-size: 165px;
+}
+
+#no-collection-inner h1 {
+    font-size: 36px;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: -5px auto 30px;
+    color: #444;
+}
+
+#no-collection-inner h2 {
+    font-size: 24px;
+    margin: 0 auto 15px;
+    text-transform: uppercase;
+    font-weight: 300;
+    color: #444;
+}
+
+#no-collection-inner p {
+    margin: 0 auto 10px;
+    letter-spacing: 0;
+    margin-top: 0;
+    color: #999;
+    line-height: 1.9em;
+}
+
 /* Dialog
 ------------------------------------------------------------------------------*/
 .command-container {
@@ -1182,9 +1229,6 @@ ul.checkbox-list .ui-grid-b {
 .no-width {
     width: 0% !important;
 }
-
-
-
 
 .field-wrapper {
     width: 100%;

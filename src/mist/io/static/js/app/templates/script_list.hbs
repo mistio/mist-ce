@@ -24,8 +24,22 @@
         </div>
     </div>
 
-    <div data-role="content">
-        {{component "script-add"}}
+    <div role="main" class="ui-content" data-theme="c">
+
+        {{#unless Mist.scriptsController.model.length}}
+            <div id="no-collection" class="ui-responsive">
+                <div  id="no-collection-inner" class="ui-body ui-shadow">
+                    <span class="icon-cloud-check"></span>
+                    <h1>Welcome to mist.io</h1>
+                    <h2>Get started by adding your scripts.</h2>
+                    <p>
+                        Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM & bare metal hosts.
+                    </p>
+                </div>
+            </div>
+
+            {{component "script-add"}}
+        {{/unless}}
 
         {{#if Mist.scriptsController.model.length}}
             <a id="select-scripts-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
