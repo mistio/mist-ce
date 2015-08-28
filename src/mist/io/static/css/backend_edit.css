@@ -21,6 +21,10 @@
     margin: 0 auto;
 }
 
+#backend-edit .ui-input-text {
+    margin: .4em 0 1em;
+}
+
 #backend-delete-confirm label {
     margin: 10px 0;
     text-align: center;
