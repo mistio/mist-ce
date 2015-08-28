@@ -10,14 +10,18 @@ define('app/views/machine_edit', ['app/views/popup'],
 
         return App.MachineEditComponent = PopupComponent.extend({
 
+            //
+            // Properties
+            //
+
             layoutName: 'machine_edit',
             controllerName: 'machineEditController',
+            popupId: '#machine-edit',
 
-            /**
-             *
-             *  Methods
-             *
-             */
+
+            //
+            //  Methods
+            //
 
             updateRenameButton: function () {
                 if (Mist.machineEditController.renamingMachine) {
@@ -29,15 +33,12 @@ define('app/views/machine_edit', ['app/views/popup'],
                 }
             },
 
-            //
+
             //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 backClicked: function () {
                     Mist.machineEditController.close();
                 },
@@ -47,11 +48,10 @@ define('app/views/machine_edit', ['app/views/popup'],
                 }
             },
 
-            /**
-             *
-             *  Observers
-             *
-             */
+
+            //
+            //  Observers
+            //
 
             updateRenameButtonObserver: function () {
                 Ember.run.once(this, 'updateRenameButton');

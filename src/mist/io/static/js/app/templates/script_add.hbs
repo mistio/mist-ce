@@ -18,21 +18,18 @@
         <!--
             Select script type
         -->
-
         <div id="script-add-type" class="form-field">
-            <label >Type</label>
             <div class="mist-select"
-                data-role="collapsible"
-                data-iconpos="right"
-                data-collapsed-icon="carat-d"
-                data-expanded-icon="carat-u"
-                data-theme="a">
+                 data-role="collapsible"
+                 data-collapsed-icon="noicon"
+                 data-expanded-icon="noicon"
+                 data-iconpos="none">
                     <h4>
                         {{#with Mist.scriptAddController.newScript.type as |type|}}
-                                {{#if type}}
+                                {{#if type.label}}
                                     {{type.label}}
                                 {{else}}
-                                    Select
+                                    Select type
                                 {{/if}}
                         {{/with}}
                     </h4>
@@ -51,7 +48,6 @@
         -->
 
         <div id="script-add-source" class="form-field">
-            <label>Source</label>
             <div  class="mist-select"
                 data-role="collapsible"
                 data-iconpos="right"
@@ -60,10 +56,10 @@
                 data-theme="a">
                     <h4>
                         {{#with Mist.scriptAddController.newScript.source as |source|}}
-                                {{#if source}}
+                                {{#if source.label}}
                                     {{source.label}}
                                 {{else}}
-                                    Select
+                                    Select source
                                 {{/if}}
                         {{/with}}
                     </h4>

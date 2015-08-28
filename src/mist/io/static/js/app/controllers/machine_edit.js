@@ -10,13 +10,9 @@ define('app/controllers/machine_edit', ['ember'],
 
         return Ember.Object.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             machine: null,
             newName: '',
@@ -24,11 +20,8 @@ define('app/controllers/machine_edit', ['ember'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             open: function (machine) {
                 this.setProperties({
@@ -38,11 +31,9 @@ define('app/controllers/machine_edit', ['ember'],
                 this.view.open();
             },
 
-
             close: function () {
                 this.view.close();
             },
-
 
             save: function () {
                 var that = this;
