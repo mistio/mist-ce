@@ -57,7 +57,7 @@
 }
 
 #single-key-page #public-key {
-    height: 90px;
+    height: 110px;
     overflow: auto;
     font-family: monospace;
     width: 100%;

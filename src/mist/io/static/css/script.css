@@ -26,7 +26,33 @@
 }
 #single-script-page .ui-collapsible .ui-collapsible-content {
     background-color: #faf9f4;
-    padding: 10px 20px !important;
+    padding: 0 !important;
+}
+#single-script-page .info-table {
+    width: 100%;
+}
+#single-script-page .info-table td {
+    margin: 0;
+    width: 50%;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #eeedeb;
+}
+#single-script-page .info-table tr:last-child td {
+    border-bottom: none;
+}
+#single-script-page .info-table tr td:nth-child(1) {
+    padding-left: 70px;
+}
+#single-script-page .info-table tr td:nth-child(2) {
+    color: #7f7f7f;
+}
+#single-script-page .info-table tr {
+    background-color: #faf9f4;
+    border: none;
+}
+#single-script-page .info-table tr:hover {
+    background-color: #f2f2f2;
 }
 #single-script-page .dual-action-footer {
     display: block;
