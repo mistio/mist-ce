@@ -26,6 +26,8 @@
 
     <div role="main" class="ui-content" data-theme="c">
 
+        {{component "script-add"}}
+
         {{#unless Mist.scriptsController.model.length}}
             <div id="no-collection" class="ui-responsive">
                 <div  id="no-collection-inner" class="ui-body ui-shadow">
@@ -37,8 +39,6 @@
                     </p>
                 </div>
             </div>
-
-            {{component "script-add"}}
         {{/unless}}
 
         {{#if Mist.scriptsController.model.length}}

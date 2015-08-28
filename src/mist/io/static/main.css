@@ -415,7 +415,9 @@ textarea {
     z-index: 900;
 }
 
-.floating-collapsible, .floating-collapsible > h4.ui-collapsible-heading, .floating-collapsible > h4.ui-collapsible-heading > a {
+.floating-collapsible,
+.floating-collapsible > h4.ui-collapsible-heading,
+.floating-collapsible > h4.ui-collapsible-heading > a {
     background-color: transparent !important;
     color: #fff !important;
     box-shadow: none;
@@ -465,6 +467,10 @@ textarea {
     font-weight: 300;
 }
 
+.floating-collapsible > h4.ui-collapsible-heading > a:hover:before {
+    color: #444 !important;
+}
+
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:before {
     box-shadow: 1px 1px 10px #aaa;
     background-color: #fff !important;
@@ -479,7 +485,7 @@ textarea {
 
 .floating-collapsible > h4.ui-collapsible-heading > a:active:before,
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:before {
-    color: #fff !important;
+    color: #444 !important;
     background-color: #66C2E0 !important;
 }
 
@@ -1195,6 +1201,11 @@ ul.checkbox-list .ui-grid-b {
     margin-top: 0;
     color: #999;
     line-height: 1.9em;
+}
+
+#no-collection-inner .floating-collapsible {
+    float: none;
+    margin: 20px auto;
 }
 
 /* Dialog
