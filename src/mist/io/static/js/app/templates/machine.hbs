@@ -16,7 +16,7 @@
 
                     <div class="ui-block-c">
                         <div class="user-menu">
-                            {{view "userMenu"}}
+                            {{component "user-menu"}}
                         </div>
                     </div>
                 </div><!-- /grid-b -->
@@ -105,29 +105,19 @@
 
 
         <!--
-
              Monitoring collapsible
-
         -->
-
-
         <div id="monitoring-collapsible" data-role="collapsible" data-collapsed="false" class="ui-shadow">
-
             <h4>Monitoring</h4>
             {{#if view.machine}}
             {{view "machineMonitoring" machine=view.machine}}
             {{/if}}
-
         </div>
 
 
         <!--
-
              Information collapsibles
-
         -->
-
-
         <div data-role="collapsible" data-collapsed="false" class="ui-shadow">
 
             <h4>Basic Info</h4>
@@ -261,15 +251,15 @@
 
     {{component "dialog-popup"}}
 
-    {{view "metricAdd"}}
+    {{component "metric-add"}}
 
-    {{view "machineKeys"}}
+    {{component "machine-keys"}}
 
-    {{view "machineTags"}}
+    {{component "machine-tags"}}
 
     {{component "machine-shell"}}
 
-    {{view "machinePower" position="#single-machine-power-btn"}}
+    {{component "machine-power" position="#single-machine-power-btn"}}
 
     <div class="tri-action-footer ui-shadow" data-role="footer" data-theme="b">
         <table>

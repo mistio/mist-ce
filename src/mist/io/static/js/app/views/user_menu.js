@@ -1,19 +1,19 @@
-define('app/views/user_menu', ['app/views/templated', 'md5'],
+define('app/views/user_menu', ['md5'],
     /**
      *  User Menu View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
+    function () {
 
         'user strict';
 
-        return App.UserMenuView = TemplatedView.extend({
+        return App.UserMenuComponent = Ember.Component.extend({
 
             /**
              *  Properties
              */
-            templateName: 'user_menu',
+            layoutName: 'user_menu',
             isNotCore: !IS_CORE,
             accountUrl: URL_PREFIX + '/account',
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +

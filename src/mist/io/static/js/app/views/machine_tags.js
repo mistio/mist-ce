@@ -1,13 +1,13 @@
-define('app/views/machine_tags', ['app/views/templated'],
+define('app/views/machine_tags', [],
     /**
      *  Machine Tags View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
-        return App.MachineTagsView = TemplatedView.extend({
+    function () {
+        return App.MachineTagsComponent = Ember.Component.extend({
 
-            templateName: 'machine_tags',
+            layoutName: 'machine_tags',
             controllerName: 'machineTagsController',
 
             //
@@ -15,12 +15,9 @@ define('app/views/machine_tags', ['app/views/templated'],
             //
 
             actions: {
-
-
                 addClicked: function () {
                     Mist.machineTagsController.add();
                 },
-
 
                 backClicked: function () {
                     Mist.machineTagsController.close();

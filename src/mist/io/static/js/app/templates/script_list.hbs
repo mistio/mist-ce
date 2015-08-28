@@ -16,7 +16,7 @@
 
                     <div class="ui-block-c">
                         <div class="user-menu">
-                            {{view "userMenu"}}
+                            {{component "user-menu"}}
                         </div>
                     </div>
                 </div><!-- /grid-b -->
@@ -37,7 +37,7 @@
                 data-filter-placeholder="Filter Scripts..."
                 class="checkbox-list">
                 {{#each Mist.scriptsController.model as |script|}}
-                    {{view "scriptListItem" model=script script=script class="checkbox-link"}}
+                    {{component "script-list-item" script=script class="checkbox-link"}}
                 {{/each}}
             </ul>
         {{/if}}

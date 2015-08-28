@@ -39,10 +39,12 @@ define('app/views/image_list', ['app/views/page'],
                 Mist.imageSearchController.on('onSearchEnd', this, 'updateBaseImages');
                 Mist.backendsController.on('onImagesChange', this, 'updateDefaultImages');
 
-                // Handle scrolling
                 var that = this;
-                Ember.run.later(function () {
-                    that.updateDefaultImages();
+                Ember.run.later(this, function () {
+                    if (!this.isDestroyed)
+                        Mist.backendsController.trigger('onImagesChange');
+
+                    // Handle scrolling
                     $(window).on('scroll', function (e) {
                         that.set('pageYOffset', window.pageYOffset);
                     });
@@ -98,8 +100,10 @@ define('app/views/image_list', ['app/views/page'],
                     });
                 });
                 Mist.imageSearchController.set('images', newImages);
-                this.set('defaultImages', newImages);
-                this.updateBaseImages();
+                if (!this.isDestroyed){
+                    this.set('defaultImages', newImages);
+                    this.updateBaseImages();
+                }
             },
 
 

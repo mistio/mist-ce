@@ -8,7 +8,7 @@
 
         <h1>Networks</h1>
 
-        {{view "userMenu"}}
+        {{component "user-menu"}}
 
     </div>
 
@@ -28,7 +28,7 @@
             {{#each Mist.backendsController as |backend|}}
                 {{#if backend.enabled}}
                   {{#each backend.networks as |network|}}
-                        {{view "networkListItem"
+                        {{component "network-list-item"
                             network=network
                             class="checkbox-link"}}
                   {{/each}}

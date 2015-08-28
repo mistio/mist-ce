@@ -1,10 +1,10 @@
 <label>{{view Mist.Checkbox checked="selected"}}</label>
 
-{{#link-to "script" this.model}}
+{{#link-to "script" script}}
     <div class="ui-grid-b">
-        <div class="ui-block-a">{{name}}</div>
+        <div class="ui-block-a">{{script.name}}</div>
         <div class="ui-block-b">
-          <span class="tag">{{type}}</span>
+          <span class="tag">{{script.type}}</span>
         </div>
         <div class="ui-block-c"></div>
     </div>

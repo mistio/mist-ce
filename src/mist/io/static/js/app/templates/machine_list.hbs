@@ -15,7 +15,7 @@
 
                     <div class="ui-block-c">
                         <div class="user-menu">
-                            {{view "userMenu"}}
+                            {{component "user-menu"}}
                         </div>
                     </div>
                 </div>
@@ -44,7 +44,7 @@
             {{#each Mist.backendsController.model as |backend|}}
                 {{#if backend.enabled}}
                     {{#each backend.machines.model as |machine|}}
-                        {{view "machineListItem" machine=machine class="checkbox-link"}}
+                        {{component "machine-list-item" machine=machine class="checkbox-link"}}
                     {{/each}}
                 {{/if}}
             {{/each}}
@@ -58,11 +58,11 @@
 
     {{component "machine-add"}}
 
-    {{view "machineTags"}}
+    {{component "machine-tags"}}
 
     {{component "machine-shell"}}
 
-    {{view "machinePower" position="#machines-power-btn"}}
+    {{component "machine-power" position="#machines-power-btn"}}
 
     <div id="select-machines-popup" class="ui-mini" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
         <div class="ui-header ui-caps">Select</div>

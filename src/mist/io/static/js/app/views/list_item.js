@@ -1,11 +1,11 @@
-define('app/views/list_item', ['app/views/templated', 'ember'],
+define('app/views/list_item', [],
     /**
      *  List Item View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
-        return TemplatedView.extend({
+    function () {
+        return Ember.Component.extend({
 
             /**
              *  Properties

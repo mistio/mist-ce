@@ -4,30 +4,23 @@ define('app/views/image_list_item', ['app/views/list_item'],
     //
     //  @returns Class
     //
-    function (ListItemView) {
+    function (ListItemComponent) {
 
         'use strict';
 
-        return App.ImageListItemView = ListItemView.extend({
+        return App.ImageListItemComponent = ListItemComponent.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             image: null,
-            templateName: 'image_list_item',
+            layoutName: 'image_list_item',
 
 
-            //
             //
             //  Computed Properties
             //
-            //
-
 
             starClass: function () {
                 return this.image.star ? 'staron' : 'staroff';
@@ -35,15 +28,10 @@ define('app/views/image_list_item', ['app/views/list_item'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
-
                 toggleImageStar: function () {
                     var that = this;
                     this.image.toggle(function (success, star) {
@@ -52,7 +40,6 @@ define('app/views/image_list_item', ['app/views/list_item'],
                         }
                     });
                 },
-
 
                 launchImage: function () {
                     this.image.backend.images.model.addObject(this.image);

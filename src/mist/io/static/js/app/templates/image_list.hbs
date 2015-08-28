@@ -16,7 +16,7 @@
 
                     <div class="ui-block-c">
                         <div class="user-menu">
-                            {{view "userMenu"}}
+                            {{component "user-menu"}}
                         </div>
                     </div>
                 </div><!-- /grid-b -->
@@ -42,7 +42,7 @@
             data-filter-placeholder="Filter images"
             class="checkbox-list">
             {{#each view.renderedImages as |image|}}
-                {{view "imageListItem" image=image class="checkbox-link"}}
+                {{component "image-list-item" image=image class="checkbox-link"}}
             {{/each}}
         </ul>
 

@@ -16,7 +16,7 @@
 
                     <div class="ui-block-c">
                         <div class="user-menu">
-                            {{view "userMenu"}}
+                            {{component "user-menu"}}
                         </div>
                     </div>
                 </div><!-- /grid-b -->
@@ -47,7 +47,7 @@
             data-filter-placeholder="Filter keys"
             class="checkbox-list">
             {{#each Mist.keysController.model as |key|}}
-                {{view "keyListItem" key=key class="checkbox-link"}}
+                {{component "key-list-item" key=key class="checkbox-link"}}
             {{/each}}
         </ul>
 

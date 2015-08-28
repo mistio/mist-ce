@@ -4,13 +4,13 @@ define('app/views/machine_list_item', ['app/views/list_item'],
      *
      *  @returns Class
      */
-    function (ListItemView) {
-        return App.MachineListItemView = ListItemView.extend({
+    function (ListItemComponent) {
+        return App.MachineListItemComponent = ListItemComponent.extend({
 
             /**
              *  Properties
              */
-            templateName: 'machine_list_item',
+            layoutName: 'machine_list_item',
             machine: null,
 
             /**

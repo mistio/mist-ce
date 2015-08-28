@@ -8,7 +8,7 @@ define('app/views/backend_add', ['app/views/controlled'],
 
         'use strict';
 
-        return App.BackendAddView = ControlledComponent.extend({
+        return App.BackendAddComponent = ControlledComponent.extend({
 
             layoutName: 'backend_add',
             controllerName: 'backendAddController',

@@ -4,28 +4,21 @@ define('app/views/machine_keys', ['app/views/controlled'],
     //
     //  @returns Class
     //
-    function (ControlledView) {
-        return App.MachineKeysView = ControlledView.extend({
+    function (ControlledComponent) {
+        return App.MachineKeysComponent = ControlledComponent.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             selectedKey: null,
-            templateName: 'machine_keys',
+            layoutName: 'machine_keys',
             controllerName: 'machineKeysController',
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             renderNonAssocatedKeys: function () {
                 Ember.run.next(function () {
@@ -35,20 +28,15 @@ define('app/views/machine_keys', ['app/views/controlled'],
 
 
             //
-            //
             //  Actions
-            //
             //
 
             actions: {
-
-
                 associateClicked: function () {
                     $('#non-associated-keys-popup').popup('option',
                         'positionTo', '#mist-manage-keys');
                     $('#non-associated-keys-popup').popup('open');
                 },
-
 
                 customAssociateClicked: function(){
                     var machinesCtrl = Mist.machineKeysController;
@@ -57,7 +45,6 @@ define('app/views/machine_keys', ['app/views/controlled'],
                     machinesCtrl.associate(machinesCtrl.lastAssocKey,null,machinesCtrl.user,machinesCtrl.port);
                 },
 
-
                 nonAssociatedKeyClicked: function (key) {
                     $('#non-associated-keys-popup').popup('close');
                     Mist.machineKeysController.associate(key);
@@ -65,7 +52,6 @@ define('app/views/machine_keys', ['app/views/controlled'],
                     // In case user associates key from "Add key" button
                     $('#machine-keys-panel').panel('open');
                 },
-
 
                 newKeyClicked: function() {
                     $('#non-associated-keys-popup').popup('close');
@@ -81,18 +67,15 @@ define('app/views/machine_keys', ['app/views/controlled'],
                     }, 300);
                 },
 
-
                 removeClicked: function () {
                     Mist.machineKeysController.disassociate(this.selectedKey);
                     $('#key-actions-popup').popup('close');
                 },
 
-
                 probeClicked: function () {
                     Mist.machineKeysController.probe(this.selectedKey);
                     $('#key-actions-popup').popup('close');
                 },
-
 
                 viewClicked: function () {
                     $('#key-actions-popup').popup('close');
@@ -101,12 +84,10 @@ define('app/views/machine_keys', ['app/views/controlled'],
                     }, 250);
                 },
 
-
                 cancelClicked: function () {
                     this.set('selectedKey', null);
                     $('#key-actions-popup').popup('close');
                 },
-
 
                 backClicked: function () {
                     Mist.machineKeysController.close();
@@ -115,11 +96,8 @@ define('app/views/machine_keys', ['app/views/controlled'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             nonAssociatedKeysObserver: function () {
                 Ember.run.once(this, 'renderNonAssocatedKeys');

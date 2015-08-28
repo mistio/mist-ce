@@ -1,37 +1,30 @@
-define('app/views/backend_button', ['app/views/templated'],
+define('app/views/backend_button', [],
     //
     //  Backend Button View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return App.BackendButtonView = TemplatedView.extend({
+        return App.BackendButtonComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-            templateName: 'backend_button',
+            layoutName: 'backend_button',
             backend: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 this.renderBackends();
             }.on('didInsertElement'),
-
 
             unload: function () {
                 this.renderBackends();
@@ -39,11 +32,8 @@ define('app/views/backend_button', ['app/views/templated'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             renderBackends: function () {
                 Ember.run.next(function () {
@@ -54,19 +44,14 @@ define('app/views/backend_button', ['app/views/templated'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 buttonClicked: function () {
                     Mist.backendEditController.open(this.backend, '#' + this.elementId);
                 }
             }
-
         });
     }
 );

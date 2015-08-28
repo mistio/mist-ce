@@ -4,13 +4,13 @@ define('app/views/metric_add_custom', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.MetricAddCustomView = PopupView.extend({
+        return App.MetricAddCustomComponent = PopupComponent.extend({
 
-            templateName: 'metric_add_custom',
+            layoutName: 'metric_add_custom',
             controllerName: 'metricAddCustomController',
             //
             //

@@ -4,11 +4,11 @@ define('app/views/log_list_item', ['app/views/list_item'],
     //
     //  @returns Class
     //
-    function (ListItemView) {
+    function (ListItemComponent) {
 
         'use strict';
 
-        return App.LogListItemView = ListItemView.extend({
+        return App.LogListItemComponent = ListItemComponent.extend({
 
 
             //
@@ -17,7 +17,7 @@ define('app/views/log_list_item', ['app/views/list_item'],
             //
             //
 
-            templateName: 'log_list_item',
+            layoutName: 'log_list_item',
             log: null,
             tagName: 'li',
             isCollapsed: true,

@@ -4,12 +4,12 @@ define('app/views/network_list_item', ['app/views/list_item'],
 	//
 	//	@returns Class
 	//
-	function (ListItemView) {
+	function (ListItemComponent) {
 
 		'use strict';
 
-		return App.NetworkListItemView = ListItemView.extend({
-			templateName: 'network_list_item'
+		return App.NetworkListItemComponent = ListItemComponent.extend({
+			layoutName: 'network_list_item'
 		});
 
 	}

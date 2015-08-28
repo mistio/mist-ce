@@ -4,23 +4,21 @@ define('app/views/rule_edit', ['app/views/controlled'],
     //
     //  @returns Class
     //
-    function (ControlledView) {
+    function (ControlledComponent) {
 
         'use strict';
 
-        return App.RuleEditView = ControlledView.extend({
-
+        return App.RuleEditComponent = ControlledComponent.extend({
 
             //
             //  Properties
             //
 
-            templateName: 'rule_edit',
+            layoutName: 'rule_edit',
             controllerName: 'ruleEditController',
             rule: null,
             metrics: [],
             newCommand: null,
-
 
             sortedMetrics: function () {
                 var metrics = this.get('metrics');
@@ -31,11 +29,8 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             open: function (property) {
 
@@ -56,11 +51,9 @@ define('app/views/rule_edit', ['app/views/controlled'],
                 });
             },
 
-
             close: function (property) {
                 $('#rule-' + property).popup('close');
             },
-
 
             openCommandEditor: function () {
                 Mist.ruleEditController.close('action');
@@ -69,7 +62,6 @@ define('app/views/rule_edit', ['app/views/controlled'],
                     this.set('newCommand', this.rule.command);
                 }, 500);
             },
-
 
             closeCommandEditor: function () {
                 Mist.ruleEditController.close('command');
@@ -80,20 +72,15 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 metricClicked: function (metric) {
                     Mist.ruleEditController.edit({
                         metric: metric
                     });
                 },
-
 
                 operatorClicked: function (operator) {
                     Mist.ruleEditController.edit({
@@ -101,13 +88,11 @@ define('app/views/rule_edit', ['app/views/controlled'],
                     });
                 },
 
-
                 aggregateClicked: function (aggregate) {
                     Mist.ruleEditController.edit({
                         aggregate: aggregate
                     });
                 },
-
 
                 actionClicked: function (action) {
                     if (action == 'command')
@@ -118,14 +103,12 @@ define('app/views/rule_edit', ['app/views/controlled'],
                         });
                 },
 
-
                 saveClicked: function () {
                     Mist.ruleEditController.edit({
                         action: 'command',
                         command: this.newCommand
                     });
                 },
-
 
                 backClicked: function () {
                     this.closeCommandEditor();

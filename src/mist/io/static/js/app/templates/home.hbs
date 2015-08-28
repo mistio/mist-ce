@@ -6,7 +6,7 @@
             <div class="ui-grid-b">
                 <div class="ui-block-a"><img src="/resources/images/logo.png" id="banner-logo" alt=""></div>
                 <div class="ui-block-b"></div>
-                <div class="ui-block-c"><div class="user-menu">{{view "userMenu"}}</div></div>
+                <div class="ui-block-c"><div class="user-menu">{{component "user-menu"}}</div></div>
             </div><!-- /grid-b -->
         </div>
     </div>
@@ -14,17 +14,7 @@
     <!-- Page Body -->
     <div role="main" class="ui-content" data-theme="c">
 
-       {{view "backendAdd"}}
-
-        <!-- Backends list -->
-        <div id="backend-buttons" data-role="controlgroup" data-type="horizontal"
-            class="ui-controlgroup ui-controlgroup-horizontal ui-caps">
-            {{#each Mist.backendsController.model as |backend|}}
-                {{view "backendButton" backend=backend
-                       class="ui-btn ui-input-btn ui-shadow"}}
-            {{/each}}
-        </div>
-
+        {{#unless Mist.backendsController.model.length}}
         <div id="no-backend" class="ui-responsive">
             <div class="ui-body ui-shadow">
                 <div id="no-backend-inner">
@@ -32,10 +22,22 @@
                     <h1>Welcome to mist.io</h1>
                     <h2>Get started by adding your clouds.</h2>
                     <p>
-                        Mist.io supports public & private computing clouds, as well as<br>Docker, CoreOS, KVM, & bare metal hosts.
+                        Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM, & bare metal hosts.
                     </p>
                 </div>
             </div>
+        </div>
+        {{/unless}}
+
+        {{component "backend-add"}}
+
+        <!-- Backends list -->
+        <div id="backend-buttons" data-role="controlgroup" data-type="horizontal"
+            class="ui-controlgroup ui-controlgroup-horizontal ui-caps">
+            {{#each Mist.backendsController.model as |backend|}}
+                {{component "backend-button" backend=backend
+                       class="ui-btn ui-input-btn ui-shadow"}}
+            {{/each}}
         </div>
 
         {{#if Mist.backendsController.model.length}}
