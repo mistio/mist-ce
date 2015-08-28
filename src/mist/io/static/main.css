@@ -1090,6 +1090,11 @@ ul.checkbox-list .ui-grid-b {
     width: 100% !important;
 }
 
+.ok-cancel a.ui-first-child.ui-last-child.half,
+.ok-cancel button.ui-first-child.ui-last-child.half {
+    width: 50% !important;
+}
+
 .ok-cancel:after {
     content: '';
     display: block;

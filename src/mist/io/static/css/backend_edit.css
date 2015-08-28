@@ -9,9 +9,6 @@
     bottom: 11px;
     left: 24px;
 }
-#backend-edit label {
-    text-align: center;
-}
 
 #backend-edit .ui-field-contain {
     overflow: visible;
@@ -26,4 +23,5 @@
 
 #backend-delete-confirm label {
     margin: 10px 0;
+    text-align: center;
 }

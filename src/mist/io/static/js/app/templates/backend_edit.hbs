@@ -40,12 +40,13 @@
         <div role="main" class="ui-content" data-theme="a">
 
             <!-- New backend title text field -->
-
+            <label for=newTitle>Title</label>
             {{#if Mist.backendEditController.newTitle}}
                 {{view Mist.TextField value=Mist.backendEditController.newTitle}}
             {{/if}}
             <!-- Backend state toggle switch -->
 
+            <label for=newTitle>State</label>
             <div class="ui-field-contain">
                 <select id="backend-toggle" data-role="slider"
                     {{action "stateToggleSwitched" target=view on="change"}}>
@@ -62,7 +63,7 @@
             <!-- Delete button - Back button -->
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                <a class="ui-btn ui-caps ui-shadow ui-corner-all no"
+                <a class="ui-btn ui-caps ui-shadow ui-corner-all half no"
                     {{action "deleteClicked" target=view}}>
                     Delete
                 </a>
@@ -76,7 +77,7 @@
                     <br />Monitoring for these will be disabled
                 </label>
                 <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps plain-link"
+                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all ui-caps back"
                         {{action "noClicked" target=view}}>No</a>
                     <a class="ui-btn ui-shadow ui-corner-all ui-caps no" id="button-confirm-disable"
                         {{action "yesClicked" target=view}}>Yes</a>
