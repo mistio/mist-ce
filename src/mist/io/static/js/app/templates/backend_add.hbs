@@ -57,7 +57,7 @@
                     <div class="field-wrapper">
                         <div class="first-child {{if field.helpText '' 'last-child'}}">
                             {{#if field.isText}}
-                                {{view Mist.TextField
+                                {{input type="text"
                                     type=field.type
                                     id=field.name
                                     placeholder=field.placeholder
@@ -138,7 +138,7 @@
                 {{/if}}
             {{/each}}
 
-            {{#if view.controller.addingBackend}}
+            {{#if Mist.backendsController.addingBackend}}
                 <div class="ajax-loader"></div>
             {{/if}}
 

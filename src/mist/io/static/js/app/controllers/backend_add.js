@@ -61,7 +61,6 @@ define('app/controllers/backend_add', ['app/models/backend'],
             close: function () {
                 this._clear();
                 this.view.close();
-                this.view.clear();
             },
 
 

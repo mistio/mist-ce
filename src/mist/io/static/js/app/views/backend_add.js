@@ -60,7 +60,7 @@ define('app/views/backend_add', ['app/views/controlled'],
                     return isReady = false;
                 }
                 return isReady;
-            }.property('providerFields.[].value'),
+            }.property('providerFields.@each.value'),
 
 
             //
@@ -75,12 +75,16 @@ define('app/views/backend_add', ['app/views/controlled'],
                 Ember.run.next(this, function () {
                     $('body').enhanceWithin();
                     $('#new-backend-provider').collapsible('collapse');
-                    $('#add-backend').collapsible('expand')
+                    $('#add-backend').collapsible('expand');
                     $('#backend-add-fields').fadeIn();
                     $('#add-backend-overlay').removeClass('ui-screen-hidden').addClass('in');
                 });
             },
 
+            close: function () {
+                $('#add-backend').collapsible('collapse');
+                $('#new-backend-provider').collapsible('expand');
+            },
 
             autocompleteCredentials: function (provider) {
                 var fields = this.get('providerFields');
