@@ -35,17 +35,14 @@
 @import url("css/metric_add_custom.css");
 @import url("css/script.css");
 @import url("css/script_list.css");
+@import url("css/script_add.css");
 
 
 .ui-content, .header-grid {
     margin: 0px auto;
-    max-width: 1180px;
+    max-width: 1200px;
     overflow: visible !important;
-    padding: 1.25% 1.25% .75% 1.25%;
-}
-
-#banner-logo {
-    width: 120px;
+    padding: 1.2% 1.25% .6% 1.25%;
 }
 
 .user-menu {
@@ -377,9 +374,6 @@ textarea {
 #dialog .ui-content{
     text-align: center;
 }
-.tiny-popup {
-    /*width: 150px !important;*/
-}
 .small-popup {
     width: 240px !important;
 }
@@ -399,6 +393,18 @@ textarea {
 
 /* Floating collapsibles
 -----------------------------------------------------------------------------------------------------------*/
+.floating-collapsible {
+    float: right;
+    margin-bottom: 13px;
+    margin-top: 0;
+    top: 2px;
+    position: relative;
+    padding: 0;
+    border:0;
+    overflow: visible;
+    z-index: 900;
+}
+
 .floating-collapsible, .floating-collapsible > h4.ui-collapsible-heading, .floating-collapsible > h4.ui-collapsible-heading > a {
     background-color: transparent !important;
     color: #fff !important;
@@ -493,8 +499,7 @@ textarea {
 
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable,
-#image-list-page .ui-filterable,
-#script-list-page .ui-filterable {
+#image-list-page .ui-filterable {
     margin-top: -55px;
     margin-bottom: 10px;
 }
@@ -503,17 +508,12 @@ textarea {
 #key-list-page .ui-filterable .ui-input-search,
 #script-list-page .ui-filterable .ui-input-search {
     margin-left: 55px;
-    margin-right: 270px;
+    margin-right: 250px;
 }
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search,
 #image-list-page .ui-filterable .ui-input-search {
     border-color: #b5b5b5;
-}
-
-#key-list-page .ui-filterable .ui-input-search,
-#script-list-page .ui-filterable .ui-input-search {
-    margin-right: 160px;
 }
 
 #image-list-page .ui-filterable .ui-input-search {
@@ -939,8 +939,8 @@ ul.checkbox-list .ui-grid-b {
     border-style: solid;
     border-color: #fff;
     margin-top: 2px;
-    width: 48px;
-    height: 48px;
+    float: right;
+    margin-right: 3px;
 }
 
 #me-btn .gravatar-image.user {

@@ -4,13 +4,13 @@ define('app/views/script_edit', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.ScriptEditView = PopupView.extend({
+        return App.ScriptEditComponent = PopupComponent.extend({
 
-            templateName: 'script_edit',
+            layoutName: 'script_edit',
             controllerName: 'scriptEditController',
 
 

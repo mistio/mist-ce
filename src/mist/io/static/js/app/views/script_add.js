@@ -146,6 +146,9 @@ define('app/views/script_add', ['app/views/controlled'],
 
 
             actions: {
+                clickOverlay: function() {
+                    $('#add-script').collapsible('collapse');
+                },
 
                 selectType: function (type) {
                     this.selectType(type);

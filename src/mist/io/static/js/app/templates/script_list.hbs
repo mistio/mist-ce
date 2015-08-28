@@ -27,31 +27,27 @@
     <div data-role="content">
         {{component "script-add"}}
 
-        <div class="ui-grid-b scripts-header ui-shadow">
-            <div class="ui-block-a">
-                {{#unless Mist.scriptsController.model.length}}
-                <a id="select-scripts-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
-                        ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
-                {{/unless}}
-            </div>
-            <div class="ui-block-b"></div>
-        </div><!-- /grid-b -->
+        {{#if Mist.scriptsController.model.length}}
+            <a id="select-scripts-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
+                ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
 
-        <ul data-role="listview"
-            data-filter="true"
-            data-inset="true"
-            data-filter-placeholder="Filter Scripts..."
-            class="checkbox-list">
-            {{#each Mist.scriptsController.model as |script|}}
-                {{view "scriptListItem" model=script script=script class="checkbox-link"}}
-            {{/each}}
-        </ul>
+            <ul data-role="listview"
+                data-filter="true"
+                data-inset="true"
+                data-filter-placeholder="Filter Scripts..."
+                class="checkbox-list">
+                {{#each Mist.scriptsController.model as |script|}}
+                    {{view "scriptListItem" model=script script=script class="checkbox-link"}}
+                {{/each}}
+            </ul>
+        {{/if}}
+
         <div class="mid-padding"></div>
     </div>
 
     {{component "dialog-popup"}}
 
-    {{view "scriptEdit"}}
+    {{component "script-edit"}}
 
     <div id="select-scripts-popup" class="ui-mini" data-role="popup" data-transition="flip" data-position-to="#select-scripts-btn">
         <div class="ui-header ui-caps">Select</div>
