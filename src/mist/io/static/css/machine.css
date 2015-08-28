@@ -2,7 +2,7 @@
 /* Single Machine Page CSS
 -----------------------------------------------------------------------------------------------------------*/
 .ui-mobile .ui-page-active {
-    overflow: visible;
+    overflow: auto;
 }
 #single-machine-page {
     padding-bottom: 50px;

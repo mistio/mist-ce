@@ -530,7 +530,6 @@ textarea {
 #script-list-page .ui-filterable .ui-input-search {
     margin-left: 55px;
     margin-right: 215px;
-    height: 37px
 }
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search,
@@ -550,7 +549,6 @@ textarea {
 #script-list-page .ui-filterable input {
     min-height: 35px;
     position: relative;
-    top: -45px;
 }
 
 #machine-list-page .machines-header,
