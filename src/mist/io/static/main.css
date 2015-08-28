@@ -624,6 +624,9 @@ ul.checkbox-list .ui-grid-b {
     color: #444;
     font-weight: bold;
 }
+.checkbox-link a:hover {
+    color: #444 !important;
+}
 .checkbox-link h3 {
     width: 65%;
     display: inline-block !important;
