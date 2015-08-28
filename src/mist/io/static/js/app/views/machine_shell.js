@@ -23,12 +23,14 @@ define('app/views/machine_shell', ['app/views/popup'],
             //
 
             load: function () {
-                $(this.popupId)
-                    .on('popupafteropen', afterOpenHandler)
-                    .on('popupbeforeposition', beforeOpenHandler)
-                    .parent()
-                    .addClass(Mist.isClientMobile ? 'mobile' : 'desktop')
-                    .addClass(Mist.isClientMoblie ? 'huge-popup' : '');
+                Ember.run.next(this, function(){
+                    $(this.popupId)
+                        .on('popupafteropen', afterOpenHandler)
+                        .on('popupbeforeposition', beforeOpenHandler)
+                        .parent()
+                        .addClass(Mist.isClientMobile ? 'mobile' : 'desktop')
+                        .addClass(Mist.isClientMoblie ? 'huge-popup' : '');
+                });
             }.on('didInsertElement'),
 
 
@@ -94,7 +96,6 @@ define('app/views/machine_shell', ['app/views/popup'],
 
 
         function afterOpenHandler (e) {
-
             $(e.currentTarget).off('blur');
             $(document).off('focusin');
 
@@ -108,7 +109,6 @@ define('app/views/machine_shell', ['app/views/popup'],
 
 
         function beforeOpenHandler (e) {
-
             // Initialize shell before popup opens when user is on mobile.
             // Else, the shell will be resized and repositioned while visible
             // and will appear glitchy
@@ -117,7 +117,6 @@ define('app/views/machine_shell', ['app/views/popup'],
 
 
         function initShell () {
-
             if (Mist.isClientMobile)
                 mobileCalibration();
             else
@@ -126,9 +125,7 @@ define('app/views/machine_shell', ['app/views/popup'],
             Mist.machineShellController.connect();
         }
 
-
         function desktopCalibration () {
-
             // Heavy (performance wise) callibration of shell
             // Takes up the whole window and uses as many chars
             // fit in the shell area
@@ -194,7 +191,6 @@ define('app/views/machine_shell', ['app/views/popup'],
 
 
         function mobileCalibration () {
-
             // Light (performance wise) callibration of shell
             // Takes up only enough area to fit a standard sized
             // terminal
