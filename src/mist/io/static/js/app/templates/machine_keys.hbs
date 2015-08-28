@@ -19,7 +19,7 @@
         {{#if Mist.machineKeysController.associatedKeys}}
         <ul id="machine-keys">
             {{#each Mist.machineKeysController.associatedKeys as |key|}}
-                {{view "machineKeysListItem" key=key}}
+                {{component "machine-keys-list-item" key=key}}
             {{/each}}
         </ul>
         {{/if}}

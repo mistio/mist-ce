@@ -4,11 +4,11 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
     //
     //  @returns Class
     //
-    function (ListItemView) {
+    function (ListItemComponent) {
 
         'use strict'
 
-        return App.IpAddressListItemView = ListItemView.extend({
+        return App.IpAddressListItemComponent = ListItemComponent.extend({
 
             tagName: 'tr',
             pendingToggle: null,

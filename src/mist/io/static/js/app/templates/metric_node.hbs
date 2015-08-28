@@ -18,7 +18,7 @@
 
     <div class="nest">
         {{#each view.node.subTargets as |node|}}
-            {{view "metricNode" node=node}}
+            {{component "metric-node" node=node}}
         {{/each}}
     </div>
 

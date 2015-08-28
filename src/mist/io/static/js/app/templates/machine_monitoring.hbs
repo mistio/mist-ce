@@ -1,6 +1,6 @@
 <div id="machine-monitoring">
 
-    {{#if view.machine.hasMonitoring}}
+    {{#if machine.hasMonitoring}}
 
         {{#if view.pendingFirstStats}}
             <div id="machine-monitoring-disabled">
@@ -46,7 +46,7 @@
 
         <div id="machine-monitoring-disabled">
 
-            {{#if view.machine.enablingMonitoring}}
+            {{#if machine.enablingMonitoring}}
 
                 <label id="enable-monitoring-label">
                     Enabling monitoring, please wait...
@@ -54,7 +54,7 @@
 
                 <div class="ajax-loader l"></div>
 
-            {{else}} {{#if view.machine.disablingMonitoring}}
+            {{else}} {{#if machine.disablingMonitoring}}
 
                 <label id="enable-monitoring-label">
                     Disabling monitoring...

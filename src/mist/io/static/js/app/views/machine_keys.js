@@ -80,7 +80,7 @@ define('app/views/machine_keys', ['app/views/controlled'],
                 viewClicked: function () {
                     $('#key-actions-popup').popup('close');
                     Ember.run.later(this, function () {
-                        Mist.__container__.lookup('router:main').transitionTo('key', this.selectedKey);
+                        Mist.__container__.lookup('router:main').transitionTo('key', this.selectedKey.id);
                     }, 250);
                 },
 

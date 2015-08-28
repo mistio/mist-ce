@@ -65,7 +65,7 @@
             <table>
                 <tbody>
                 {{#each ipAddresses as |ip|}}
-                    {{view "ipAddressListItem" model=ip}}
+                    {{component "ip-address-list-item" model=ip}}
                 {{/each}}
                 </tbody>
             </table>

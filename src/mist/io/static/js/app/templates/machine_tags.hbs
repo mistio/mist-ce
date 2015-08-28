@@ -17,7 +17,7 @@
 
         <ul data-role="listview">
             {{#each Mist.machineTagsController.machine.tags as |tag|}}
-                {{view "machineTagsListItem" tag=tag}}
+                {{component "machine-tags-list-item" tag=tag}}
             {{/each}}
         </ul>
 

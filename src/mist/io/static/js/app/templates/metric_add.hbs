@@ -20,7 +20,7 @@
                 {{action "customClicked" target=view}}>custom</a>
 
             {{#if Mist.metricAddController.metrics.length}}
-                {{view "metricNode"
+                {{component "metric-node"
                     node=Mist.metricAddController.metricsTree}}
             {{else}}
                 <div class="ui-body-a">

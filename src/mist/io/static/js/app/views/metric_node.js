@@ -1,16 +1,16 @@
-define('app/views/metric_node', ['app/views/templated'],
+define('app/views/metric_node', [],
     //
     //  Metric Node View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return App.MetricNodeView = TemplatedView.extend({
+        return App.MetricNodeComponent = Ember.Component.extend({
 
-            templateName: 'metric_node',
+            layoutName: 'metric_node',
 
 
             //
@@ -28,7 +28,6 @@ define('app/views/metric_node', ['app/views/templated'],
             //
 
             load: function () {
-
                 this.set('element', $('#'+this.elementId));
                 this.indentNode();
 
@@ -39,16 +38,12 @@ define('app/views/metric_node', ['app/views/templated'],
                     this.set('metric',
                         Mist.metricAddController.getMetric(
                             this.node.target));
-
             }.on('didInsertElement'),
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             indentNode: function () {
                 // Loop starts from 1 because 0 nested items
@@ -57,9 +52,7 @@ define('app/views/metric_node', ['app/views/templated'],
                     $('<div class="margin"></div>').insertBefore(this.element);
             },
 
-
             foldChildren: function () {
-
                 this.set('unfold', false);
 
                 // Change icons
@@ -70,7 +63,6 @@ define('app/views/metric_node', ['app/views/templated'],
                 this.element.find('.nest').eq(0).slideUp();
             },
 
-
             foldSiblings: function () {
                 var siblings = this.element.siblings().filter('.ember-view');
                 siblings.toArray().forEach(function (sibling) {
@@ -78,15 +70,12 @@ define('app/views/metric_node', ['app/views/templated'],
                 });
             },
 
-
             preCenterNode: function () {
                 this.set('prevOffsetTop', this.element.offset().top);
                 this.set('prevWinScrollTop', $(window).scrollTop());
             },
 
-
             centerNode: function () {
-
                 if (!this.element) return;
                 var afterOffsetTop = this.element.offset().top;
                 var afterWinScrollTop = $(window).scrollTop();
@@ -101,7 +90,6 @@ define('app/views/metric_node', ['app/views/templated'],
 
 
             unfoldChildren: function () {
-
                 this.preCenterNode();
 
                 this.set('unfold', true);
@@ -122,21 +110,16 @@ define('app/views/metric_node', ['app/views/templated'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 toggleUnfold: function () {
                     if (this.unfold)
                         this.foldChildren();
                     else
                         this.unfoldChildren();
                 },
-
 
                 selectMetric: function () {
                     var that = this;

@@ -4,15 +4,17 @@ define('app/views/machine_keys_list_item', ['app/views/list_item'],
      *
      *  @returns Class
      */
-    function(ListItemView) {
-        return App.MachineKeysListItemView = ListItemView.extend({
+    function(ListItemComponent) {
+        return App.MachineKeysListItemComponent = ListItemComponent.extend({
 
-            templateName: 'machine_keys_list_item',
+            layoutName: 'machine_keys_list_item',
             tagName: 'span',
             keyIcon: null,
 
             load: function() {
-                this.keyObserver();
+                Ember.run.next(this, function() {
+                    this.keyObserver();
+                })
             }.on('didInsertElement'),
 
             keyObserver: function() {
@@ -39,7 +41,6 @@ define('app/views/machine_keys_list_item', ['app/views/list_item'],
             }.observes('this.key.probing', 'this.key.machines'),
 
             actions: {
-
                 associatedKeyClicked: function (key) {
                     this.get('parentView').set('selectedKey', key);
                     $('#key-actions-popup').popup('open');

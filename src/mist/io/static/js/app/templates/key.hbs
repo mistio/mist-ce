@@ -69,7 +69,7 @@
             </h4>
             <ul data-role="listview" class="checkbox-list" data-inset="true">
                 {{#each view.machines as |machine|}}
-                    {{view "machineListItem"
+                    {{component "machine-list-item"
                            machine=machine
                            class="checkbox-link"}}
                 {{/each}}

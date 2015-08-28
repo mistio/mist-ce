@@ -3,13 +3,13 @@ define('app/views/script_run', ['app/views/panel'],
     //  Script Run View
     //
     //  @returns Class
-    function (PanelView) {
+    function (PanelComponent) {
 
         'use strict';
 
-        return App.ScriptRunView = PanelView.extend({
+        return App.ScriptRunComponent = PanelComponent.extend({
 
-            templateName: 'script_run',
+            layoutName: 'script_run',
             controllerName: 'scriptRunController',
 
             load: function () {

@@ -43,7 +43,7 @@
             <h4>Subnets ({{subnets.length}})</h4>
 
             {{#each subnets as |subnet|}}
-                {{view "subnetListItem" model=subnet}}
+                {{component "subnet-list-item" model=subnet}}
             {{/each}}
         </div>
         {{/if}}

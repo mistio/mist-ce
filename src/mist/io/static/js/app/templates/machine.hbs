@@ -110,7 +110,7 @@
         <div id="monitoring-collapsible" data-role="collapsible" data-collapsed="false" class="ui-shadow">
             <h4>Monitoring</h4>
             {{#if view.machine}}
-            {{view "machineMonitoring" machine=view.machine}}
+            {{component "machine-monitoring" machine=view.machine}}
             {{/if}}
         </div>
 

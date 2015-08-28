@@ -1,16 +1,16 @@
-define('app/views/rule', ['app/views/templated', 'ember'],
+define('app/views/rule', [],
     //
     //  Rule View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict'
 
-        return App.RuleView = TemplatedView.extend({
+        return App.RuleItemComponent = Ember.Component.extend({
 
-            templateName: 'rule',
+            layoutName: 'rule',
 
 
             //
@@ -135,31 +135,25 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             //
 
             actions: {
-
                 openMetricPopup: function () {
                     Mist.ruleEditController.open(this.get('rule'), 'metric');
                 },
-
 
                 openOperatorPopup: function () {
                     Mist.ruleEditController.open(this.get('rule'), 'operator');
                 },
 
-
                 openActionPopup: function () {
                     Mist.ruleEditController.open(this.get('rule'), 'action');
                 },
-
 
                 openAggregatePopup: function () {
                     Mist.ruleEditController.open(this.get('rule'), 'aggregate');
                 },
 
-
                 deleteRuleClicked: function () {
                     Mist.rulesController.deleteRule(this.get('rule'));
                 },
-
 
                 openAdvancedCondition: function () {
                     this.showAdvancedCondition(true);
@@ -174,7 +168,6 @@ define('app/views/rule', ['app/views/templated', 'ember'],
             textValuesObserver: function () {
                 Ember.run.once(this, 'update');
             }.observes('newRuleValue', 'newRuleTimeWindow'),
-
 
             timeWindowObserver: function () {
                 Ember.run.once(this, 'updateTextValues');

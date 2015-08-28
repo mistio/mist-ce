@@ -8,7 +8,7 @@
         data-enhanced="true"
         data-inset="true">
         {{#each Mist.logsController as |log|}}
-            {{view "logListItem" log=log}}
+            {{component "log-list-item" log=log}}
         {{/each}}
     </ul>
 
