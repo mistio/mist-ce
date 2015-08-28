@@ -128,6 +128,14 @@ h4 {
     outline: none;
 }
 .ui-popup .ui-header .close:hover {
+    color: #444;
+}
+
+.ui-popup .ui-header .close:active {
+    color: #fff !important;
+}
+
+.ui-popup .ui-header .close:hover {
     cursor: pointer;
 }
 
@@ -485,7 +493,7 @@ textarea {
 
 .floating-collapsible > h4.ui-collapsible-heading > a:active:before,
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:before {
-    color: #444 !important;
+    color: #fff !important;
     background-color: #66C2E0 !important;
 }
 
