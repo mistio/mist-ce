@@ -45,6 +45,10 @@
     padding: 1.2% 1.25% .6% 1.25%;
 }
 
+#banner-logo {
+    width: 121px;
+}
+
 .user-menu {
     height: auto;
     text-align: right;
@@ -944,6 +948,7 @@ ul.checkbox-list .ui-grid-b {
     margin-top: 2px;
     float: right;
     margin-right: 3px;
+    width: 50px;
 }
 
 #me-btn .gravatar-image.user {

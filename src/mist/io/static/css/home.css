@@ -98,12 +98,12 @@
 }
 
 .incidents.noΙncidents .no-incident h4 {
-    margin-bottom: 0;
+    margin: 15px auto 0;
 }
 
 .incidents.noΙncidents .no-incident .icon-check:after {
-    margin: 0;
-    font-size: 48px;
+    margin: 5px 0 0 0;
+    font-size: 50px;
     color: #64b247;
 }
 
