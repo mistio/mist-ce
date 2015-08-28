@@ -5,7 +5,10 @@
 
 #add-script {
     width: 281px;
-    margin-bottom: 25px !important;
+}
+
+.clearfix {
+    clear: both;
 }
 
 #script-add.ui-content {

@@ -528,7 +528,8 @@ textarea {
 
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable,
-#image-list-page .ui-filterable {
+#image-list-page .ui-filterable,
+#script-list-page .ui-filterable {
     margin-top: -55px;
     margin-bottom: 10px;
 }
@@ -539,9 +540,15 @@ textarea {
     margin-left: 55px;
     margin-right: 215px;
 }
+#script-list-page .ui-filterable .ui-input-search {
+    margin-left: 55px;
+    margin-right: 10px;
+}
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search,
-#image-list-page .ui-filterable .ui-input-search {
+#image-list-page .ui-filterable .ui-input-search,
+#script-list-page .ui-filterable .ui-input-search {
+    background-color: #fff;
     border-color: #b5b5b5;
 }
 
@@ -565,6 +572,10 @@ textarea {
 #script-list-page .scripts-header {
     background-color: #d4d4d4;
     margin-top: 30px;
+}
+#script-list-page .scripts-header {
+    background-color: #d4d4d4;
+    margin-top: 15px;
 }
 
 
@@ -610,6 +621,8 @@ ul.checkbox-list .ui-grid-b {
 .checkbox-link a {
     font-size: 14px;
     padding: .8em 2.5em .8em 1.1em !important;
+    color: #444;
+    font-weight: bold;
 }
 .checkbox-link h3 {
     width: 65%;
@@ -656,12 +669,13 @@ ul.checkbox-list .ui-grid-b {
     text-shadow: none;
 }
 .tag {
-    margin: 2px 1px 1px;
-    color: #7F7F7F !important;
-    padding: 1px 7px;
+    margin: 0;
+    color: #444 !important;
+    padding: 0 7px;
     font-weight: normal;
     display: inline-block;
     float: right;
+    font-weight: bold;
 }
 
 #image-list .checkbox-link .tag {

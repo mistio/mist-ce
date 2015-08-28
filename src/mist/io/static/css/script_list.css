@@ -31,15 +31,25 @@
     float: right;
     margin: 0;
 }
+#script-list-page #add-script-btn {
+    float: right;
+    margin: 0;
+}
 #script-list-page #select-scripts-btn {
     float: left;
     font-weight: normal;
     margin: 0;
 }
-#script-list-page .list-wrapper .tag {
-  float: none;
-  margin: 0 auto;
-}
 #script-list-page .list-wrapper .ui-block-b {
   text-align: center;
+}
+#script-list-page .ui-icon-check:after {
+    background-color: #46d4c9;
+}
+#script-list a:after {
+    content: '\0056';
+    background-color: transparent;
+    background-image: none;
+    opacity: 1;
+    color: #7F7F7F;
 }
