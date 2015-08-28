@@ -15,16 +15,12 @@ define('app/views/backend_edit', ['app/views/popup'],
             popupId: '#backend-edit',
 
             //
-            //
             //  Methods
             //
-            //
-
 
             open: function (position) {
                 this._super(position);
             },
-
 
             updateStateSlider: function () {
                 var newState = Mist.backendEditController.newState ? '1' : '0';
@@ -33,11 +29,8 @@ define('app/views/backend_edit', ['app/views/popup'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
 
@@ -58,6 +51,7 @@ define('app/views/backend_edit', ['app/views/popup'],
 
                 yesClicked: function () {
                     Mist.backendEditController.delete();
+                    $('#backend-delete-confirm').slideUp();
                 },
 
 
