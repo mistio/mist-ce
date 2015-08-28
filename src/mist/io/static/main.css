@@ -431,43 +431,47 @@ textarea {
 .floating-collapsible > h4.ui-collapsible-heading > a {
     padding: 20px 91px 20px 78px !important;
     overflow: visible;
-    border-width: 0px !important;
+    border: none !important;
     background-color: #D4D4D4 !important;
     color: #444 !important;
 }
 
-.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:after {
-    background-color: #fff !important;
+.floating-collapsible > h4.ui-collapsible-heading > a:after {
+    display: none;
 }
 
-.floating-collapsible > h4.ui-collapsible-heading > a:after {
-    left: inherit;
-    right: 1px;
-    text-indent: 0.43em;
+.floating-collapsible > h4.ui-collapsible-heading > a:before {
     content: '+';
-    border-radius: 6em;
-    top: 11px;
-    background-color: #D4D4D4 !important;
-    font-size: 2em;
+    position: absolute;
+    right: 1px;
+    top: 1px;
     width: 60px;
     height: 60px;
-    line-height: 1.33em;
+    text-align: center;
+    font-size: 42px;
+    line-height: 60px;
+    border-radius: 50%;
     color: #d96557 !important;
+    -webkit-transition: all .1s ease;
+    transition: all .1s ease;
+    -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
 }
 
-.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:after {
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:before {
     box-shadow: 1px 1px 10px #aaa;
+    background-color: #fff !important;
     color: #0099cc !important;
+    -webkit-transform: none;
     transform: none;
 }
 
-.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover:after {
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover:before {
     box-shadow: 0 1px 10px #666;
 }
 
-.floating-collapsible > h4.ui-collapsible-heading > a:active:after,
-.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:after {
+.floating-collapsible > h4.ui-collapsible-heading > a:active:before,
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:before {
     color: #fff !important;
     background-color: #66C2E0 !important;
 }
