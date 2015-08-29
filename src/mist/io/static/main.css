@@ -45,6 +45,10 @@
     padding: 1.2% 1.25% .6% 1.25%;
 }
 
+.header-grid {
+    padding: 16px 14px;
+}
+
 #banner-logo {
     width: 121px;
 }

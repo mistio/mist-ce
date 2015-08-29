@@ -1,18 +1,21 @@
 .logs.ui-collapsible h4.ui-collapsible-heading a {
     background-color: #D4D4D4 !important;
     padding: 20px 70px 16px !important;
-    color: #000;
     border: none;
 }
 
 .log-list {
     clear: both;
+    background-color: #FAF9F4;
+}
+
+.log-list .ui-btn {
+    color: #444;
 }
 
 .log-list fieldset {
     background-color: #FAF9F4;
     margin: 0;
-    border-bottom: 1px solid #D4D4D4;
 }
 
 .log-list fieldset .ui-btn {
@@ -33,6 +36,7 @@
 
 .log-list ul.ui-listview {
     margin: 0;
+    border-top: 1px solid #d4d4d4;
 }
 .log-list ul.ui-listview a.ui-btn {
     padding-right: 40px;
@@ -64,7 +68,10 @@
     color: #DC7A6E !important;
 }
 .log-list .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
-    padding: 1.2em 1.6em .8em;
+    padding: 1.2em 1.5em .8em;
+    box-sizing: border-box;
+    font-size: 14px;
+    height: 47px;
 }
 
 .logs .ui-input-text {
@@ -89,16 +96,29 @@
 
 .details.info-table {
     background-color: #EDECE8;
+    padding: 0;
 }
 
 .details table {
     width: 100%;
     table-layout: fixed;
+    border-collapse: collapse;
 }
 
+.details table tr:hover {
+    background-color: #f2f2f2;
+    border-color: #f2f2f2;
+}
 .details table td {
     word-wrap: break-word;
     white-space: normal;
+    font-weight: 400;
+    border: none;
+    color: #000;
+    border-bottom: 1px solid #eeedeb;
+}
+.details table td:nth-child(2) {
+    color: #7f7f7f;
 }
 
 .log-list ul {
@@ -194,7 +214,7 @@
 
 .log-list ul li a {
     margin: 0 !important;
-    padding: 0.8em 1em .5em;
+    padding: .8em 1em .8em;
     border: none;
 }
 
@@ -208,10 +228,10 @@ input#event-all {
 
 label[for='event-jobs'],
 .tag.tag-job {
-    color: #64b247 !important;
+    color: #0099cc !important;
 }
 label[for='event-jobs'].ui-btn:hover, label[for='event-jobs'].ui-btn-active {
-    border-bottom: 2px solid #64b247 !important;
+    border-bottom: 2px solid #0099cc !important;
 }
 label[for='event-requests'],
 .tag.tag-request {
