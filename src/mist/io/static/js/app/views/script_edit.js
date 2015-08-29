@@ -12,6 +12,7 @@ define('app/views/script_edit', ['app/views/popup'],
 
             layoutName: 'script_edit',
             controllerName: 'scriptEditController',
+            popupId: '#script-edit-popup',
 
 
             //

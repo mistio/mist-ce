@@ -32,11 +32,11 @@ define('app/views/script_list', ['app/views/page'],
 
             canRename: function () {
                 return Mist.scriptsController.get('selectedObjects').length == 1;
-            }.property('Mist.scriptsController.[].selected'),
+            }.property('Mist.scriptsController.model.@each.selected'),
 
             canDelete: function () {
                 return Mist.scriptsController.get('selectedObjects').length;
-            }.property('Mist.scriptsController.@[].selected'),
+            }.property('Mist.scriptsController.model.@each.selected'),
 
             updateFooter: function () {
                 if (Mist.scriptsController.get('selectedObjects').length) {
@@ -71,7 +71,7 @@ define('app/views/script_list', ['app/views/page'],
                 selectionModeClicked: function (mode) {
                     $('#select-scripts-popup').popup('close');
                     Ember.run(function () {
-                        Mist.scriptsController.forEach(function (script) {
+                        Mist.scriptsController.model.forEach(function (script) {
                             script.set('selected', mode);
                         });
                     });

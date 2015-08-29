@@ -28,6 +28,9 @@
     background-color: #faf9f4;
     padding: 0 !important;
 }
+#single-script-page .ui-footer.dual-action-footer {
+    display: block;
+}
 #single-script-page .info-table {
     width: 100%;
 }

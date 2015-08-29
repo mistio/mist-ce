@@ -32,7 +32,7 @@ define('app/controllers/base_array', ['ember'],
 
             selectedObjects: function () {
                 return this.model.filterBy('selected', true);
-            }.property('[].selected'),
+            }.property('model.@each.selected'),
 
 
             //
@@ -144,7 +144,7 @@ define('app/controllers/base_array', ['ember'],
                         objects: this.get('selectedObjects')
                     });
                 });
-            }.observes('[].selected')
+            }.observes('model.@each.selected')
         })
     }
 );

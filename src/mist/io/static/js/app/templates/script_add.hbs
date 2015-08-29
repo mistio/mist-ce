@@ -136,8 +136,8 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a id="new-script-ok" data-theme="d"
-                class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d ui-caps"
+            <a id="new-script-ok"
+                class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d ui-caps ok-only"
                 {{action "addClicked" target=view}}>Add</a>
         </div>
     </div>

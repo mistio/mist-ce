@@ -24,7 +24,7 @@ define('app/controllers/key_edit', ['ember'],
              */
 
             open: function (keyId, callback) {
-
+                console.log(this.view.popupId);
                 this._clear();
                 this.setProperties({
                     keyId: keyId,

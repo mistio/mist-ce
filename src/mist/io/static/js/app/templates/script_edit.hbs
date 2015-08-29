@@ -1,17 +1,9 @@
-<!-- Popup Overlay -->
-
-<div id="script-edit-screen"
-    class="ui-popup-screen
-        ui-overlay-b
-        ui-screen-hidden">
-</div>
-
 <!-- Popup Wrapper -->
 <div id="script-edit-popup"
-     class="pop
-        ui-popup-container
-        ui-popup-hidden
-        ui-popup-truncate">
+    class="small-popup"
+    data-role="popup"
+    data-overlay-theme="b"
+    data-transition="slideup">
 
     <!-- Popup -->
 
@@ -27,10 +19,10 @@
 
          <!-- Header -->
 
-        <div class="ui-header ui-bar-b">
-
+        <div class="ui-header ui-bar-b ui-caps">
             <h1 class="ui-title">Rename script</h1>
 
+            <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
         </div>
 
         <!-- Body -->
@@ -48,11 +40,9 @@
             {{/if}}
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
-                    <a class="ui-btn ui-btn-a ui-corner-all ui-shadow"
-                       {{action "backClicked" target=view}}>Back</a>
-                    <a id="script-edit-ok"
-                        class="ui-btn ui-btn-d ui-corner-all ui-shadow"
-                        {{action "saveClicked" target=view}}>Save</a>
+                <a id="script-edit-ok"
+                    class="ui-btn ui-btn-d ui-corner-all"
+                    {{action "saveClicked" target=view}}>Save</a>
             </div>
         </div>
     </div>
