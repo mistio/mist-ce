@@ -1,10 +1,10 @@
 <div id="script-run"
-    data-swipe-close="false"
     class="large-popup"
     data-role="popup"
     data-position="right"
     data-display="overlay"
-    data-theme="c">
+    data-overlay-theme="b"
+    data-transition="slideup">
 
     <div id="run-script"
          class="large-popup
@@ -13,8 +13,7 @@
             ui-overlay-shadow
             ui-corner-all"
          data-role="popup"
-         data-enhanced="true"
-         data-transition="flip">
+         data-enhanced="true">
 
         <div class="ui-header ui-bar-b ui-caps">
             <h1 class="ui-title">Run script</h1>
@@ -31,7 +30,7 @@
                     data-iconpos="right"
                     data-collapsed-icon="carat-d"
                     data-expanded-icon="carat-u"
-                    data-theme="a"
+                    data-theme="d"
                     class="mist-select">
                     <h4>
                         {{#with Mist.scriptRunController.scriptToRun as |script|}}

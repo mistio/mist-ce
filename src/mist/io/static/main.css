@@ -763,11 +763,11 @@ ul.checkbox-list .ui-grid-b {
 }
 
 .ui-footer a:active {
-    color: #444 !important;
+    color: #fff !important;
 }
 
 .ui-footer a:active:after {
-    color: #444;
+    color: #fff;
 }
 
 /* Small List Item
