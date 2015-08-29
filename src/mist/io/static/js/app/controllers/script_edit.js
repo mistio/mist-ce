@@ -30,9 +30,6 @@ define('app/controllers/script_edit', ['ember'],
 
 
             open: function (script) {
-                console.log(script);
-                console.log(script.name);
-                console.log(this.view);
                 this.setProperties({
                     script: script,
                     newName: script.name

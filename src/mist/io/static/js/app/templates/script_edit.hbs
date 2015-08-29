@@ -30,20 +30,21 @@
         <div role="main" class="ui-content" data-theme="a">
 
             <!-- New backend name text field -->
+            <form {{action "saveClicked" on="submit" target=view}}>
+                {{view Mist.TextField
+                    id="script-edit-new-name"
+                    value=Mist.scriptEditController.newName}}
 
-            {{view Mist.TextField
-                id="script-edit-new-name"
-                value=Mist.scriptEditController.newName}}
+                {{#if Mist.scriptsController.renamingScript}}
+                    <div class="ajax-loader"></div>
+                {{/if}}
 
-            {{#if Mist.scriptsController.renamingScript}}
-                <div class="ajax-loader"></div>
-            {{/if}}
-
-            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
-                <a id="script-edit-ok"
-                    class="ui-btn ui-btn-d ui-corner-all"
-                    {{action "saveClicked" target=view}}>Save</a>
-            </div>
+                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
+                    <button type="submit" id="script-edit-ok"
+                        class="ui-btn ui-btn-d ui-caps"
+                        {{action "saveClicked" target=view}}>Save</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

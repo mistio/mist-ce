@@ -374,6 +374,10 @@ textarea {
 
 /* Buttons
 -----------------------------------------------------------------------------------------------------------*/
+.ui-btn:focus {
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
 .ui-btn-icon-left {
     padding: .6em 1.1em .6em 2.9em !important;
 }
