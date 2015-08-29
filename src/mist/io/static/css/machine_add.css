@@ -35,6 +35,24 @@
     max-height: 120px;
     overflow-y: scroll;
 }
+#create-machine-panel .ui-collapsible-heading-toggle {
+    font-size: 16px;
+}
+#create-machine-panel .ui-collapsible-heading > a {
+    background-color: #0099cc !important;
+    border-color: #0099cc !important;
+    color: #fff !important;
+    text-transform: uppercase;
+}
+#create-machine-panel .ui-collapsible .ui-listview {
+    margin: 0;
+}
+#create-machine-panel .ui-collapsible .ui-listview .ui-btn,
+#create-machine-panel .ui-collapsible-heading-toggle {
+    line-height: 21px;
+    padding-top: 5.5px !important;
+    padding-bottom: 5.5px !important;
+}
 #create-machine-panel .ok-cancel div:first-child .ui-btn {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;

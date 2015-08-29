@@ -21,9 +21,9 @@
         <div id="script-add-type" class="form-field">
             <div class="mist-select"
                  data-role="collapsible"
-                 data-collapsed-icon="noicon"
-                 data-expanded-icon="noicon"
-                 data-iconpos="none">
+                 data-collapsed-icon="carat-d"
+                 data-expanded-icon="carat-u"
+                 data-iconpos="right">
                     <h4>
                         {{#with Mist.scriptAddController.newScript.type as |type|}}
                                 {{#if type.label}}
@@ -52,8 +52,7 @@
                 data-role="collapsible"
                 data-iconpos="right"
                 data-collapsed-icon="carat-d"
-                data-expanded-icon="carat-u"
-                data-theme="a">
+                data-expanded-icon="carat-u">
                     <h4>
                         {{#with Mist.scriptAddController.newScript.source as |source|}}
                                 {{#if source.label}}

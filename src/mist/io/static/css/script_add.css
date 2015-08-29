@@ -21,3 +21,22 @@
     z-index: 899;
     min-height: 800px;
 }
+
+#script-add .ui-collapsible-heading-toggle {
+    font-size: 16px;
+}
+#script-add .ui-collapsible-heading > a {
+    background-color: #0099cc !important;
+    border-color: #0099cc !important;
+    color: #fff !important;
+    text-transform: uppercase;
+}
+#script-add .ui-collapsible .ui-listview {
+    margin: 0;
+}
+#script-add .ui-collapsible .ui-listview .ui-btn,
+#script-add .ui-collapsible-heading-toggle {
+    line-height: 21px;
+    padding-top: 5.5px !important;
+    padding-bottom: 5.5px !important;
+}

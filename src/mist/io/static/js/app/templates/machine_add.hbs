@@ -110,7 +110,7 @@
             <ul data-role="listview" >
                 {{#each Mist.machineAddController.newMachineProvider.sizes.model as |size|}}
                 <li data-icon="false">
-                    <a {{action "selectSize" this target=view}}>{{size.name}}
+                    <a {{action "selectSize" size target=view}}>{{size.name}}
                         <span class="size-decription">
                          - disk:{{size.disk}}, ram:{{size.ram}}
                         </span>
