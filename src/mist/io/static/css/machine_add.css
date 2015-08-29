@@ -5,11 +5,31 @@
     min-width: 320px;
     width: 45%;
 }
+#create-machine-panel .ui-panel-inner {
+    padding: 0;
+}
+#create-machine-panel .ui-content {
+    padding: 0 1em 1em;
+}
 #create-machine-panel .docker {
 	display:none;
 }
 #create-machine-panel label {
-    margin-top: 10px;
+    margin-top: 1em;
+}
+#create-machine-panel .ui-header {
+    text-align: left;
+    font-size: 18px;
+    padding: 20px 91px 20px 16px !important;
+    overflow: visible;
+    border: none !important;
+    background-color: #D4D4D4 !important;
+    color: #444 !important;
+}
+#create-machine-panel .ui-header .ui-title {
+    padding: 0;
+    margin: 0;
+    text-align: left;
 }
 #create-machine-panel .ui-collapsible-content {
     max-height: 120px;
@@ -53,4 +73,23 @@
 }
 #create-machine-panel #script .ui-collapsible {
     clear:both;
+}
+#create-machine-panel .ui-checkbox label:after {
+    background-image: none !important;
+    background-color: transparent !important;
+    opacity: 1;
+    -webkit-transition: color .2s linear;
+    transition: color .2s linear;
+}
+
+#create-machine-panel .ui-checkbox label.ui-checkbox-on:after {
+    color: #000;
+}
+
+#create-machine-panel .ui-checkbox label.ui-checkbox-off:after {
+    color: #d1d1d1;
+}
+
+#create-machine-panel .ui-checkbox label.ui-checkbox-off:hover:after {
+    color: #444444 !important;
 }
