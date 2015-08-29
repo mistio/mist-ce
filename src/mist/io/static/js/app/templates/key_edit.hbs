@@ -12,16 +12,17 @@
 
     <div data-role="content">
 
-        <label for="new-key-name">New name</label>
-        {{view Mist.TextField id="new-key-name" value=Mist.keyEditController.newKeyId}}
-        {{#if Mist.keysController.renamingKey}}
-        <div class="ajax-loader"></div>
-        {{/if}}
+        <form {{action "saveClicked" on="submit" target=view}}>
+            <label for="new-key-name">New name</label>
+            {{view Mist.TextField id="new-key-name" value=Mist.keyEditController.newKeyId}}
+            {{#if Mist.keysController.renamingKey}}
+            <div class="ajax-loader"></div>
+            {{/if}}
 
-        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a id="rename-key-ok" class="ui-btn ui-btn-d ui-caps"
-                {{action "saveClicked" target=view}}>Save</a>
-        </div>
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <button type="submit" id="rename-key-ok" class="ui-btn ui-btn-d ui-caps">Save</button>
+            </div>
+        </form>
 
     </div>
 
