@@ -610,6 +610,7 @@ ul.checkbox-list li a,
 ul.checkbox-list label {
     background-color: #FAF9F4 !important;
     border-width: 0px !important;
+    color: #444 !important;
 }
 ul.checkbox-list li:hover a,
 ul.checkbox-list li:hover label,

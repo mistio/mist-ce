@@ -57,7 +57,7 @@
 }
 
 #single-key-page #public-key {
-    height: 110px;
+    height: 118px;
     overflow: auto;
     font-family: monospace;
     width: 100%;
@@ -68,5 +68,13 @@
     overflow: auto;
     font-family: monospace;
     width: 100%;
-    max-width: 600px;
+    max-width: 610px;
+}
+
+#single-key-page textarea {
+    font-size: 14px;
+    line-height: 1.4em;
+    padding: 10px 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

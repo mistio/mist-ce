@@ -148,15 +148,11 @@
 }
 
 .command-container {
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     overflow-x: auto;
-    border: 1px solid #AAA;
     font-family: monospace;
-    border-radius: 4px;
     text-shadow: none;
     background: #444;
     font-size: 11px;
-    color: #efeff1;
+    color: #fff;
     padding: 6px;
 }
