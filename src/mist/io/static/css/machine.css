@@ -182,6 +182,10 @@
     color: #fff !important;
 }
 
+.single-machine-header .header-grid {
+    padding-top: 0;
+}
+
 .single-machine-header h1 {
     padding: 30px 60px;
     background-color: #fff;

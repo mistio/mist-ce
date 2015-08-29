@@ -75,13 +75,21 @@
     }
 }
 
+#dashboard-options > div {
+    margin-bottom: 30px;
+}
+
+#dashboard-options .ui-listview {
+    margin: 0;
+}
+
 .incidents > h4 {
     padding: 11.2px 16px;
     background-color: #d4d4d4;
     border: 1px solid #d4d4d4;
     font-family: 'Open Sans', sans-serif;
     font-size: 18px;
-    margin: 16px 0 0 0;
+    margin: 0;
 }
 
 .incidents.noΙncidents > h4 {
