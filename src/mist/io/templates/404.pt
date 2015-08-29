@@ -52,7 +52,7 @@
             },
             handler: function() {
                 var url = Missing.assignURL();
-                
+
                 window.location.href = url;
             }
         };
