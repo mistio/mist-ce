@@ -485,8 +485,8 @@ html .ui-body-b .ui-btn:hover,
 html body .ui-group-theme-b .ui-btn:hover,
 html head + body .ui-btn.ui-btn-b:hover {
 	background-color: #c1c1c1 /*{b-bhover-background-color}*/;
-	border-color: #7f7f7f /*{b-bhover-border}*/;
-	color: #7f7f7f /*{b-bhover-color}*/;
+	border-color: #444 /*{b-bhover-border}*/;
+	color: #444 /*{b-bhover-color}*/;
 	text-shadow: none /*{b-bhover-shadow-color}*/;
 }
 /* Button down */

@@ -78,6 +78,7 @@ define('app/views/script', ['app/views/page'],
             actions: {
 
                 runClicked: function () {
+                    console.log(this.get('model'));
                     Mist.scriptRunController.open(this.get('model'));
                 },
 

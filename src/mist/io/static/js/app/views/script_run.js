@@ -1,16 +1,17 @@
-define('app/views/script_run', ['app/views/panel'],
+define('app/views/script_run', ['app/views/popup'],
     //
     //  Script Run View
     //
     //  @returns Class
-    function (PanelComponent) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.ScriptRunComponent = PanelComponent.extend({
+        return App.ScriptRunComponent = PopupComponent.extend({
 
             layoutName: 'script_run',
             controllerName: 'scriptRunController',
+            popupId: '#script-run',
 
             load: function () {
                 Mist.backendsController.on('onMachineListChange', this, 'refreshList');
@@ -29,6 +30,10 @@ define('app/views/script_run', ['app/views/panel'],
             isReady: function () {
                 return Mist.scriptRunController.scriptToRun.machine.id;
             }.property('Mist.scriptRunController.scriptToRun.machine'),
+
+            //
+            //  Actions
+            //
 
             actions: {
                 machineClicked: function (machine) {

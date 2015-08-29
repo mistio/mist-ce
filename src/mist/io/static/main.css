@@ -755,19 +755,19 @@ ul.checkbox-list .ui-grid-b {
 }
 
 .ui-footer a:hover {
-    color: #7f7f7f !important;
+    color: #444 !important;
 }
 
 .ui-footer a:hover:after {
-    color: #7f7f7f;
+    color: #444;
 }
 
 .ui-footer a:active {
-    color: #fff !important;
+    color: #444 !important;
 }
 
 .ui-footer a:active:after {
-    color: #fff;
+    color: #444;
 }
 
 /* Small List Item
@@ -1004,6 +1004,21 @@ ul.checkbox-list .ui-grid-b {
     padding: 0px;
     border-width: 0px;
     box-shadow: 0 0 0 0;
+}
+
+#me-btn .name {
+    margin-top: 22px;
+    position: relative;
+    display: inline-block;
+    font-size: 14px;
+    color: #444;
+    font-weight: 700;
+    text-shadow: none;
+    text-transform: uppercase;
+}
+
+#me-btn .name:hover {
+    cursor: pointer;
 }
 
 #me-btn .gravatar-image {

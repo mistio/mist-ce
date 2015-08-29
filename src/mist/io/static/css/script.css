@@ -67,3 +67,22 @@
 #single-script-page .log-list ul li a {
     margin: 0;
 }
+#script-run .ui-collapsible .ui-collapsible-heading-toggle {
+    font-size: 16px;
+}
+#script-run .ui-collapsible .ui-collapsible-heading > a {
+    background-color: #0099cc !important;
+    border-color: #0099cc !important;
+    color: #fff !important;
+    text-transform: uppercase;
+}
+#script-run .ui-collapsible .ui-listview {
+    margin: 0;
+}
+#script-run .ui-collapsible .ui-listview .ui-btn,
+#script-run .ui-collapsible .ui-collapsible-heading a {
+    line-height: 21px;
+    padding-top: 5.5px !important;
+    padding-bottom: 5.5px !important;
+    padding-left: 17.6px !important;
+}

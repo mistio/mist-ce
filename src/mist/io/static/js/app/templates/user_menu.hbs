@@ -1,9 +1,13 @@
 <a id="me-btn" {{action "meClicked" target=view}}>
-{{#if view.gravatarURL}}
-<img class="gravatar-image" src="{{view.gravatarURL}}" />
-{{else}}
-<span class="gravatar-image user"></span>
-{{/if}}
+	{{#if Mist.authenticated}}
+		<span class="name">{{EMAIL}}</span>
+	{{/if}}
+	
+	{{#if view.gravatarURL}}
+		<img class="gravatar-image" src="{{view.gravatarURL}}" />
+	{{else}}
+		<span class="gravatar-image user"></span>
+	{{/if}}
 &nbsp;</a>
 
 <div id="user-menu-popup" class="ui-mini" data-role="popup" data-position-to="#me-btn" data-theme="a" data-overlay-theme="b" data-transition="flip">
