@@ -55,7 +55,7 @@ define('app/controllers/machine_add', ['ember'],
                $('#create-machine-image').addClass('ui-state-disabled');
                $('#create-machine-size').addClass('ui-state-disabled');
                $('#create-machine-key').addClass('ui-state-disabled');
-                $('#create-machine-panel .ui-collapsible').collapsible('option', 'collapsedIcon', 'arrow-d')
+                $('#create-machine-panel .ui-collapsible').collapsible('option', 'collapsedIcon', 'carat-d')
                     .collapsible('collapse');
 
                 this._clear();

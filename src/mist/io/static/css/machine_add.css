@@ -33,7 +33,7 @@
 }
 #create-machine-panel .ui-collapsible-content {
     max-height: 120px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 #create-machine-panel .ui-collapsible-heading-toggle {
     font-size: 16px;
