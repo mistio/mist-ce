@@ -376,12 +376,19 @@ body {
 /* Ajax loader
 -----------------------------------------------------------------------------------------------------------*/
 .ajax-loader {
-    background-image: url("/resources/images/spinner.gif");
+    background-image: url("/resources/images/loader.gif");
     background-position: center !important;
     background-repeat: no-repeat;
+    background-size: 16px;
     margin: 0 auto;
     height: 16px;
     width: 16px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
+    .ajax-loader {
+        background-image: url("/resources/images/loader@2x.gif");
+    }
 }
 
 .ajax-loader.l {
