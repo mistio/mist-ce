@@ -22,6 +22,7 @@
     background-color: #d4d4d4;
     border: none;
     padding: 20px 70px 16px !important;
+    font-weight: 400;
 }
 #single-machine-page .ui-collapsible .ui-collapsible-content {
     background-color: #faf9f4;
