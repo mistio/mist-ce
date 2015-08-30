@@ -1,83 +1,25 @@
-html, body, #splash {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    font-family: "Open Sans", sans-serif;
-    background-color: #e8e8e8;
-}
-
-#container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin: 20px auto;
-    width: 600px;
-    width: 600px;
-    padding: 50px;
-    box-shadow: 0 0 20px rgba(0,0,0,.125);
-    border-radius: 2px;
-    max-width: 95%;
-    text-align: center;
-    background-color: #FAF9F4;
-    box-sizing: border-box;
-}
-
-@media screen and (min-height: 700px) {
-  #container {
-    margin: 0 auto;
-    top: 50%;
-    -moz-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
-  }
-}
-
-#logo {
-    background: url("/resources/logo_splash.png") center no-repeat;
-    width: 96px;
-    height: 96px;
-    background-position: -52px -35px;
-    border-radius: 100%;
-    cursor: pointer;
-    box-shadow: 2px 2px 4px #767694;
-    display: block;
-}
-
-@media screen and (min-width: 500px) and (min-height: 700px) {
-  #container {
-    margin: 0 auto;
-    top: 50%;
-    -moz-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
-  }
-}
-
-#container img {
-    width: 200px;
+#error-inner img {
+    width: 160px;
     height: auto;
 }
 
-#container h1 {
-    font-size: 60px;
+#error-inner h1 {
+    font-size: 40px;
     font-family: "Open Sans", sans-serif;
     text-shadow: 2px 2px 0 #d4d4d4;
     margin: 10px 0 20px;
+    letter-spacing: 3px;
 }
 
-#container h2 {
-    font-size: 28px;
+#error-inner h2 {
+    font-size: 26px;
     line-height: 1.4em;
     font-family: "Open Sans", sans-serif;
     font-weight: 300;
     text-transform: uppercase;
 }
 
-#container a {
+#error-inner a {
     padding: 15px 20px;
     color: #000;
     background-color: #d4d4d4;
@@ -87,6 +29,13 @@ html, body, #splash {
     display: inline-block;
 }
 
-#container a:hover {
+#error-inner a:hover {
     color: #fff;
+}
+
+#error-inner {
+    margin: 30px auto;
+    text-align: center;
+    padding: 100px;
+    background-color: #FAF9F4;
 }
