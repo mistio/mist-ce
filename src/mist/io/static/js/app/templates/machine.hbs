@@ -12,6 +12,9 @@
 
                     <div class="ui-block-b">
                         <h1 class="ui-title">{{model.name}}</h1>
+                        {{#unless model.isUnknown}}
+                            <h4 class="ui-title">{{model.state}}</h4>
+                        {{/unless}}
                     </div>
 
                     <div class="ui-block-c">
@@ -26,7 +29,7 @@
 
     <div data-role="header" data-theme="c" class="single-machine-header">
         <div class="header-grid">
-            <div class="ui-grid-b">
+            <div class="ui-grid-a">
                 <div class="ui-block-a">
                     <!-- Provider Icon -->
                     <span class="single-view-icon-wrapper">
@@ -44,15 +47,6 @@
                 </div>
 
                 <div class="ui-block-b">
-                    <!-- State label -->
-                    <h1 class={{model.state}}>
-                        {{#unless model.isUnknown}}
-                            {{model.state}}
-                        {{/unless}}
-                    </h1>
-                </div>
-
-                <div class="ui-block-c">
                     <!-- Show spinner if machines are being loaded -->
                     {{#unless model.id}}
                         {{#if Mist.backendsController.loadingMachines}}

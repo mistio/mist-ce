@@ -10,10 +10,23 @@
 #single-machine-page .ui-content.ui-body-c {
     background-color: transparent;
     border: none;
+    padding-top: 0;
 }
 #single-machine-page .ui-block-b .ui-title {
     text-align: center;
     text-transform: uppercase;
+}
+#single-machine-page .ui-block-b h1.ui-title {
+    margin: 2px auto 2px;
+}
+#single-machine-page .ui-block-b h4.ui-title {
+    font-weight: 700;
+    color: #0099cc;
+    padding: 0;
+    margin-top: 5px;
+}
+#single-machine-page .single-machine-header .ui-block-b {
+    text-align: right;
 }
 #single-machine-page .ui-footer {
     display: block;
@@ -169,7 +182,6 @@
 
 .single-machine-header {
     background-color: transparent;
-    margin-bottom: 20px;
 }
 
 .single-machine-header .ui-block-b {
@@ -201,6 +213,7 @@
 
 .single-machine-header .header-grid {
     padding-top: 0;
+    padding-bottom: 0;
 }
 
 .single-machine-header h1 {
