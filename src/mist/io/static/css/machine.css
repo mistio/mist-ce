@@ -7,6 +7,10 @@
 #single-machine-page {
     padding-bottom: 50px;
 }
+#single-machine-page .ui-content.ui-body-c {
+    background-color: transparent;
+    border: none;
+}
 #single-machine-page .ui-block-b .ui-title {
     text-align: center;
     text-transform: uppercase;

@@ -74,6 +74,23 @@
     height: 47px;
 }
 
+@media (max-width: 720px) {
+    .log-list .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
+        padding: 1.2em 1.2em .8em;
+        font-size: 12px;
+        height: 42px;
+    }
+}
+
+@media (max-width: 600px) {
+    .log-list .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
+        padding: 1.2em .8em .8em;
+        box-sizing: border-box;
+        font-size: 11px;
+        height: 40px;
+    }
+}
+
 .logs .ui-input-text {
     width: 44%;
     float: right;

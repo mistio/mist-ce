@@ -52,12 +52,12 @@
 /* Conditional for < 600px */
 @media only screen and  (max-width: 600px) {
     #machines .checkbox-link > a {
-        height: 40px;
+        height: 50px;
     }
 
     #machines .checkbox-link .ui-checkbox label {
         margin-top: 0;
-        height: 62px;
+        height: 70px;
     }
 
     .machine-state span {
@@ -67,7 +67,7 @@
     .machine-state {
         position: absolute;
         left: 0px;
-        top: 35px;
+        top: 45px;
         font-size: 0.9em;
         margin-left: 0 !important;
     }
@@ -75,14 +75,14 @@
     .machine-name {
         position: relative;
         bottom: -2px;
-        font-size: 0.9em;
+        font-size: 1em;
         margin-left: -15px;
         width: 80% !important;
     }
 
     .machine-tags {
         right: 38px !important;
-        top: 36px !important;
+        top: 46px !important;
         max-width: 49% !important;
     }
 

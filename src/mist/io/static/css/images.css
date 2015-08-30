@@ -11,8 +11,13 @@
     min-height: 57px;
 }
 #image-list-page #image-list a {
+    padding-left: 0 !important;
     padding-top: 1px !important;
     padding-bottom: 1px !important;
+}
+#image-list-page .checkbox-link .ui-checkbox label {
+    margin: 0;
+    height: 38px;
 }
 @-moz-document url-prefix() {
     #image-list-page .checkbox-link h3 {
@@ -26,10 +31,31 @@
         bottom: 33px;
     }
 }
+/* Conditional for < 600px */
+@media only screen and  (max-width: 600px) {
+    #image-list-page .checkbox-link h3 {
+        width: 100%;
+        position: relative;
+        top: 4px;
+    }
+
+    #image-list-page .checkbox-link .ui-checkbox label {
+        height: 70px;
+    }
+
+    #image-list-page .checkbox-link .tag {
+        float: left;
+        padding: 0 7px 0 0;
+    }
+    #image-list-page .checkbox-link .tag.title {
+        float: right;
+        padding: 0 7px 0 0;
+    }
+}
 
 #image-list-page .checkbox-link h3 {
     position: relative;
-    top: 5px;
+    top: 4px;
 }
 
 #image-list-page ul li label {
