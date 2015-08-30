@@ -23,18 +23,6 @@
     font-size: 14px;
     line-height: 1.6em;
 }
-#machine-list-page #select-machines-btn:hover {
-    color: #444 !important;
-}
-#machine-list-page .ui-header .ui-btn {
-    background-color: #fff;
-    margin-top: 13px;
-    margin-left: 0;
-    border-color: #fff;
-}
-#machine-list-page .ui-header .ui-btn:hover {
-    color: #7f7f7f !important;
-}
 #machine-list-page .ui-block-b .ui-title {
     text-align: center;
 }
@@ -61,8 +49,16 @@
     color: #444;
 }
 
-/* Conditional for < 550px */
-@media only screen and  (max-width: 550px) {
+/* Conditional for < 600px */
+@media only screen and  (max-width: 600px) {
+    #machines .checkbox-link > a {
+        height: 40px;
+    }
+
+    #machines .checkbox-link .ui-checkbox label {
+        margin-top: 0;
+        height: 62px;
+    }
 
     .machine-state span {
         float: left;
@@ -78,15 +74,15 @@
 
     .machine-name {
         position: relative;
-        bottom: 6px;
+        bottom: -2px;
         font-size: 0.9em;
-        margin-left: -17px;
-        width: 50% !important;
+        margin-left: -15px;
+        width: 80% !important;
     }
 
     .machine-tags {
-        right: 96px !important;
-        top: 20px !important;
+        right: 38px !important;
+        top: 36px !important;
         max-width: 49% !important;
     }
 
@@ -94,22 +90,15 @@
         font-size: 10px !important;
         margin-bottom: 3px !important;
     }
-}
-
-@media only screen and  (max-width: 430px) {
 
     .machine-leds {
         position: relative;
-        bottom: 26px !important;
+        bottom: 12px !important;
     }
 
-    .machine-tags {
-        right: 38px !important;
-        top: 33px !important;
-    }
-
-    .machine-name {
-        width: 80% !important;
+    .machine-leds {
+        position: relative;
+        bottom: 12px !important;
     }
 }
 

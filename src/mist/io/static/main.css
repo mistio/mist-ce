@@ -257,6 +257,44 @@ textarea.ui-input-text,
     display: none;
 }
 
+/* Navigation Back Links
+-----------------------------------------------------------------------------------------------------------*/
+.ui-header .nav-back.ui-btn {
+    background-color: #fff !important;
+    margin-top: 15px !important;
+    margin-left: 0 !important;
+    border-color: #fff !important;
+}
+ .ui-header .nav-back.ui-btn:hover {
+    color: #7f7f7f !important;
+}
+@media only screen and  (max-width: 550px) {
+    .ui-header .nav-back.ui-btn span {
+        display: none !important;
+    }
+
+    .ui-header .nav-back.ui-btn {
+       margin-top: 5px !important;
+       height: 30px !important;
+    }
+
+    .ui-header .nav-back.ui-btn:after {
+        font-size: 24px;
+        width: 30px !important;
+        height: 30px !important;
+    }
+    .header-grid .ui-grid-b>.ui-block-a,
+    .header-grid .ui-grid-b>.ui-block-c {
+        width: 20%;
+    }
+    .header-grid .ui-grid-b>.ui-block-c {
+        float: right;
+    }
+    .header-grid .ui-grid-b>.ui-block-b {
+        width: 60%;
+    }
+}
+
 /* Splash
 -----------------------------------------------------------------------------------------------------------*/
 .ui-mobile-rendering > * {
@@ -718,7 +756,6 @@ ul.checkbox-list .ui-grid-b {
 @media only screen and  (max-width: 340px) {
     .ui-footer .ui-btn {
         font-size: 10px;
-        text-indent: 10px;
     }
 }
 .ui-footer.dual-action-footer td {
@@ -984,10 +1021,10 @@ ul.checkbox-list .ui-grid-b {
 
     a.responsive-button,
     a.responsive-btn {
-        padding: 0px !important;
+        /*padding: 0px !important;
         min-width: 2.5em;
-        min-height: 2.5em;
-        text-indent: -5000px;
+        min-height: 2.5em;*/
+        /*text-indent: -5000px;*/
     }
 
     #machine-list-page .ui-filterable, #key-list-page .ui-filterable  {
@@ -999,6 +1036,7 @@ ul.checkbox-list .ui-grid-b {
 /* User menu
 -----------------------------------------------------------------------------------------------------------*/
 #me-btn {
+    display: block;
     background: transparent;
     height: 48px;
     padding: 0px;
@@ -1014,6 +1052,12 @@ ul.checkbox-list .ui-grid-b {
     font-weight: 700;
     text-shadow: none;
     text-transform: uppercase;
+}
+
+@media only screen and (max-width: 600px) {
+    #me-btn .name {
+        display: none;
+    }
 }
 
 #me-btn .name:hover {

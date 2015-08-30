@@ -142,6 +142,15 @@
     display: inline-block;
     margin: 20px auto auto auto;
 }
+@media only screen and  (max-width: 500px) {
+    #machine-monitoring #enable-monitoring-btn {
+        font-size: 14px;
+        margin-top: 10px;
+    }
+    #machine-monitoring #enable-monitoring-btn:after {
+        font-size: 16px;
+    }
+}
 
 #graphs-wrapper.hidden {
     display: none;
