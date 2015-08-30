@@ -25,6 +25,19 @@
     </div>
 
     <div data-role="content">
+        {{#unless Mist.backendsController.model.length}}
+            <div id="no-collection" class="ui-responsive">
+                <div id="no-collection-inner" class="ui-body ui-shadow">
+                    <span class="icon-machine"></span>
+                    <h1>Manage your machines with mist.io</h1>
+                    <h2>Start adding your machines.</h2>
+                    <p>
+                        Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM & bare metal hosts.
+                    </p>
+                </div>
+            </div>
+        {{/unless}}
+
         <div class="ui-grid-b machines-header ui-shadow">
             <div class="ui-block-a">
                 {{#if Mist.backendsController.model.length}}

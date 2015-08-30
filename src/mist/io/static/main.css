@@ -1272,7 +1272,7 @@ ul.checkbox-list .ui-grid-b {
 /* Welcome clients
 ------------------------------------------------------------------------------*/
 #no-collection {
-    margin-bottom: 12px;
+    margin: 25px auto 15px;
 }
 
 #no-collection-inner {
@@ -1281,9 +1281,23 @@ ul.checkbox-list .ui-grid-b {
     background-color: #FAF9F4;
 }
 
-#no-collection-inner .icon-cloud-check:after {
+#no-collection-inner [class*='icon-']:after {
     color: #A5A4A1;
     font-size: 165px;
+}
+
+#no-collection-inner .icon-machine:after {
+    font-size: 145px;
+}
+
+#no-collection-inner .icon-script:after,
+#no-collection-inner .icon-keys:after {
+    margin-bottom: 30px;
+    font-size: 105px;
+}
+
+#no-collection-inner [class*='icon-']:hover {
+    background-color: transparent !important;
 }
 
 #no-collection-inner h1 {

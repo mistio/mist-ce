@@ -32,6 +32,19 @@
             <div class="clearfix"></div>
         </div>
 
+        {{#unless Mist.scriptsController.model.length}}
+            <div id="no-collection" class="ui-responsive">
+                <div id="no-collection-inner" class="ui-body ui-shadow">
+                    <span class="icon-script"></span>
+                    <h1>Manage your scripts with mist.io</h1>
+                    <h2>Start adding your scripts.</h2>
+                    <p>
+                        Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM & bare metal hosts.
+                    </p>
+                </div>
+            </div>
+        {{/unless}}
+
         <div class="ui-grid-a scripts-header ui-shadow">
             <div class="ui-block-a">
                 {{#if Mist.scriptsController.model.length}}
@@ -53,8 +66,6 @@
                 {{/each}}
             </ul>
         {{/if}}
-
-
 
         <div class="mid-padding"></div>
     </div>

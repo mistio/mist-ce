@@ -13,17 +13,17 @@
     padding-top: 0;
 }
 #single-machine-page .ui-block-b .ui-title {
-    text-align: center;
-    text-transform: uppercase;
+    text-align: center;    
 }
 #single-machine-page .ui-block-b h1.ui-title {
     margin: 2px auto 2px;
 }
 #single-machine-page .ui-block-b h4.ui-title {
     font-weight: 700;
-    color: #0099cc;
+    color: #64b247;
     padding: 0;
     margin-top: 5px;
+    text-transform: uppercase;
 }
 #single-machine-page .single-machine-header .ui-block-b {
     text-align: right;
