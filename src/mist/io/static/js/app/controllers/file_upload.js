@@ -69,6 +69,21 @@ define('app/controllers/file_upload', ['ember'],
 
                 var that = this;
                 var reader = new FileReader();
+                var input = args.fileInput;
+
+                if (input.files && input.files[0]) {
+                    var validExtensions = ['pem', 'txt', 'pub', ''],
+                        filename = input.files[0].name,
+						ext = (filename.indexOf('.') > -1) ? filename.split('.').pop().toLowerCase() : '',
+						valid = validExtensions.indexOf(ext) > -1;
+
+                    if (!valid) {
+                        Mist.notificationController.notify('Please try to upload a valid file');
+                        console.log('Oh no, this is a .' + ext + ' file.');
+                        console.log('Marios lets me pass only .pem and .txt files!');
+                        return;
+                    }
+                }
 
                 reader.onloadend = function (e) {
                     var success;
@@ -76,7 +91,7 @@ define('app/controllers/file_upload', ['ember'],
                         that.set('file', e.target.result);
                         success = true;
                     } else {
-                        Mist.notificationsController.notify('Failed to upload file');
+                        Mist.notificationController.notify('Failed to upload file');
                         success = false
                     }
                     that.set('uploadingFile', false);
