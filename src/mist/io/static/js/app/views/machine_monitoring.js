@@ -426,7 +426,7 @@ define('app/views/machine_monitoring',
             },
 
             _updateRules: function () {
-                Mist.rulesController.forEach(function (rule) {
+                Mist.rulesController.model.forEach(function (rule) {
                     if (this.machine.equals(rule.machine))
                         if (!this.rules.findBy('id', rule.id))
                             this.rules.pushObject(rule);
