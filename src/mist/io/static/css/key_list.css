@@ -33,7 +33,7 @@
 }
 #key-list-page .tag {
     position: relative;
-    top: 5px !important;
+    top: 6px !important;
 }
 #key-list-page .ui-icon-check:after {
     background-color: #46d4c9;

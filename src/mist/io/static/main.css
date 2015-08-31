@@ -1026,14 +1026,6 @@ ul.checkbox-list .ui-grid-b {
 
 @media only screen and (max-width: 550px) {
 
-    a.responsive-button,
-    a.responsive-btn {
-        /*padding: 0px !important;
-        min-width: 2.5em;
-        min-height: 2.5em;*/
-        /*text-indent: -5000px;*/
-    }
-
     #machine-list-page .ui-filterable, #key-list-page .ui-filterable  {
         margin-left: 50px !important;
         margin-right: 50px !important;
@@ -1056,7 +1048,7 @@ ul.checkbox-list .ui-grid-b {
     display: inline-block;
     font-size: 12.5px;
     color: #444;
-    font-weight: 700;
+    font-weight: 400;
     text-shadow: none;
     text-transform: uppercase;
 }
