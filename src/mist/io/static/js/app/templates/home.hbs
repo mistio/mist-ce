@@ -103,7 +103,7 @@
 
             <div class="ui-block-b">
                 <div class="ui-body ui-shadow">
-                    <div class="incidents {{if view.hasIncidents '' 'noΙncidents'}}">
+                    <div class="incidents {{if view.hasIncidents '' 'no-incidents'}} {{if Mist.isCore 'is-core' '' }} {{if Mist.backendsController.hasNetworks 'has-networks' ''}}">
                         <h4 class="ui-caps">Incidents</h4>
                         {{#if view.hasIncidents}}
                             <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incident-list">

@@ -94,27 +94,44 @@
     margin: 0;
 }
 
-.incidents.noΙncidents > h4 {
+.incidents.no-incidents > h4 {
     background-color: #64b247;
     color: #fff;
     border: 1px solid #64b247;
 }
 
-.incidents.noΙncidents .no-incident {
+.incidents.no-incidents .no-incident {
     text-align: center;
     background-color: #FAF9F4;
-    padding: 20px 0;
-    height: 95px;
+    padding: 0;
+    height: 89px;
+    box-sizing: border-box;
 }
 
-.incidents.noΙncidents .no-incident h4 {
-    margin: 15px auto 0;
+.incidents.no-incidents .no-incident h4 {
+    margin: 2px auto 0;
 }
 
-.incidents.noΙncidents .no-incident .icon-check:after {
+.incidents.no-incidents .no-incident .icon-check:after {
     margin: 5px 0 0 0;
     font-size: 50px;
     color: #64b247;
+}
+
+.incidents.no-incidents.is-core .no-incident,
+.incidents.no-incidents.has-networks .no-incident {
+    height: 135px;
+    padding: 20px 0;
+}
+
+.incidents.no-incidents.is-core .no-incident h4,
+.incidents.no-incidents.has-networks .no-incident h4 {
+    margin: 15px 0 0 0;
+}
+
+.incidents.no-incidents.is-core.has-networks .no-incident {
+    height: 180px;
+    padding: 40px 0;
 }
 
 .incidents .incident a {
