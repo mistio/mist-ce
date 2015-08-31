@@ -61,7 +61,7 @@ define('app/controllers/key_add', ['ember'],
 
 
             upload: function () {
-                // this.set('uploadingKey', true);
+                this.set('uploadingKey', true);
                 Mist.fileUploadController.uploadFile({
                     fileInput: this.view.fileInput[0],
                     callback: this._upload
