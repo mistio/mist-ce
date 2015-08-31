@@ -29,7 +29,7 @@ def visit(context):
     except NoSuchElementException:
         pass
     timeout = 120 if LOCAL else 160
-    context.browser.get(context.mist_url)
+    context.browser.get(context.mist_config['MIST_URL'])
     end_time = time() + timeout
     while time() < end_time:
         try:
