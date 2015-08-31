@@ -3,6 +3,7 @@ Feature: Actions for Keys
 
   Background:
     When I visit mist.io
+    Then I wait for the mist.io splash page to load
 
   @keys-actions
   Scenario: Add Key

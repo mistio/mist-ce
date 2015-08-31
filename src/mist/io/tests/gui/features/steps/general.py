@@ -1,5 +1,6 @@
 from behave import *
 from time import time, sleep
+from selenium.common.exceptions import NoSuchElementException
 
 try:
     from mist.io.tests.settings import LOCAL
@@ -7,27 +8,78 @@ except ImportError:
     LOCAL = True
     pass
 
+
 @when(u'I visit mist.io')
 def visit(context):
-    if not LOCAL:
-        end_time = time() + 160
+    """
+    This method will visit the mist.io instance specified by MIST_URL in the
+    settings file and if it lands on the sign in page then it will wait for
+    the page to load, otherwise if it lands in the splash page then it will
+    sleep for one second and then proceed. If you wish to wait for the splash
+    page to load then you should use the "Then I wait for the mist.io splash
+    page to load" rule.
+    :param context:
+    :return:
+    """
+    try:
+        sleep(1)
+        context.browser.find_element_by_id("splash")
+        sleep(1)
+        return
+    except NoSuchElementException:
+        pass
+    timeout = 120 if LOCAL else 160
+    context.browser.get(context.mist_url)
+    end_time = time() + timeout
+    while time() < end_time:
+        try:
+            login_page = context.browser.find_element_by_id("signup-popup")
+            display = login_page.value_of_css_property("display")
+            width = login_page.value_of_css_property("width")
 
-        while time() < end_time:
-            try:
-                context.browser.get(context.mist_url)
-                splash_loadout(context)
+            if 'block' in display:
+                if width == '1px':
+                    return
+                else:
+                    raise NoSuchElementException
+
+            if not display or 'none' in display:
                 return
-            except:
-                sleep(5)
-    else:
-        end_time = time() + 120
-        while time() < end_time:
-            try:
-                context.browser.get(context.mist_url)
-                splash_loadout(context)
-                return
-            except:
-                sleep(5)
+
+        except NoSuchElementException as e:
+            sleep(5)
+
+    assert False, u'Page took longer than %s seconds to load' % str(timeout)
+
+
+@then(u'I wait for the mist.io splash page to load')
+def standard_splash_waiting(context):
+    """
+    Function that waits for the splash to load. The maximum time for the page
+    to load is 60 seconds in this case
+    """
+    wait_for_splash_to_load(context)
+
+
+@then(u'I wait for the mist.io splash page to load for max {seconds} seconds')
+def splash_waiting_with_timeout(context, seconds):
+    """
+    Function that waits for the splash page to load but fora maximum amount
+    of seconds
+    """
+    wait_for_splash_to_load(context, timeout=int(seconds))
+
+
+def wait_for_splash_to_load(context, timeout=60):
+    current_time = time()
+    end = current_time + timeout
+    while time() < end:
+        splash_page = context.browser.find_element_by_id("splash")
+        display = splash_page.value_of_css_property("display")
+
+        if 'none' in display:
+            return
+    assert False, u'Page took longer than %s seconds to load' % str(timeout)
 
 
 @when(u'I wait for {seconds} seconds')
@@ -63,7 +115,6 @@ def click_button(context, text):
             return
 
     assert False, u'Could not find button that contains %s' % text
-
 
 
 @when(u'I click the "{text}" button inside the "{popup}" popup')
@@ -115,13 +166,3 @@ def assert_title_is(context, text):
 def assert_title_contains(context, text):
     assert text in context.browser.title
 
-
-def splash_loadout(context, timeout=20):
-    end_time = time() + timeout
-    while time() < end_time:
-        splash_page = context.browser.find_element_by_id("splash")
-        display = splash_page.value_of_css_property("display")
-        if 'none' in display:
-            return
-        sleep(2)
-    assert False, u'Page took longer than %s seconds to load' % str(timeout)

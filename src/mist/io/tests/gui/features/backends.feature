@@ -2,8 +2,8 @@
 Feature: Add second-tier backends
 
   Background:
-    Given backends credentials
     When I visit mist.io
+    Then I wait for the mist.io splash page to load
 
   @all-backends
   Scenario Outline:
