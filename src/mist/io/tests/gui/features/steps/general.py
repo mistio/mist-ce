@@ -21,6 +21,7 @@ def visit(context):
     :param context:
     :return:
     """
+    context.browser.get(context.mist_config['MIST_URL'])
     try:
         sleep(1)
         context.browser.find_element_by_id("splash")
@@ -29,7 +30,6 @@ def visit(context):
     except NoSuchElementException:
         pass
     timeout = 120 if LOCAL else 160
-    context.browser.get(context.mist_config['MIST_URL'])
     end_time = time() + timeout
     while time() < end_time:
         try:
