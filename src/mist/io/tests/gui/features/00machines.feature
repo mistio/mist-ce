@@ -2,8 +2,8 @@
 Feature: Machines
 
   Background:
-    Given backends credentials
     When I visit mist.io
+    Then I wait for the mist.io splash page to load
 
   @machines-ec2
   Scenario: Machine Actions EC2
