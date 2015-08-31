@@ -45,7 +45,7 @@ module.exports = function(grunt) {
                 }
             },
             jquery: {
-                target: '../bower_components/jquery/',
+                target: '../bower_components/jquery/dist/',
                 link: 'dist/jquery',
                 type: 'dir',
                 options: {
@@ -179,7 +179,6 @@ module.exports = function(grunt) {
     grunt.registerTask('default', [
 		'emberTemplates',
 		'symlink:dist',
-		'symlink:dist_core',
 		'symlink:jquery',
 		'symlink:jqm',
 		'symlink:ember',

@@ -1,31 +1,39 @@
 {
-    "name": "mist.io",
-    "version": "0.9.9",
-    "homepage": "https://github.com/mistio/mist.io",
-    "authors": [
-        "Dimitris Moraitis <dimo@mist.io>",
-        "Marios Fakiolas <marios@mist.io>"
-    ],
-    "description": "flexible cloud management",
-    "license": "AGPL-3.0",
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "test",
-        "tests"
-    ],
-    "dependencies": {
-        "jquery-mobile-bower": "~1.4.5",
-        "c3": "~0.4.10",
-        "ember": "~1.13.4",
-        "md5": "~0.3.0",
-        "sockjs": "~0.3.4",
-        "term.js": "~0.0.3",
-        "requirejs": "~2.1.19",
-        "requirejs-text": "~2.0.14"
-    },
-    "resolutions": {
-        "jquery": "~2.1.4"
-    }
+  "name": "mist.io",
+  "version": "0.9.9",
+  "homepage": "https://github.com/mistio/mist.io",
+  "authors": [
+    "Dimitris Moraitis <dimo@mist.io>",
+    "Marios Fakiolas <marios@mist.io>"
+  ],
+  "description": "flexible cloud management",
+  "license": "AGPL-3.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "jquery-mobile-bower": "~1.4.5",
+    "d3": "~3.5.6",
+    "c3": "~0.4.10",
+    "ember": "~1.13.9",
+    "md5": "~0.3.0",
+    "sockjs": "~0.3.4",
+    "term.js": "~0.0.3",
+    "requirejs": "~2.1.19",
+    "requirejs-text": "~2.0.14"
+  },
+  "resolutions": {
+    "jquery": "~2.1.4",
+    "ember": "~1.13.9",
+    "d3": "~3.5.6",
+    "ember-data": "1.13.5",
+    "ember-load-initializers": "0.1.5",
+    "ember-qunit": "0.4.1",
+    "qunit": "~1.18.0"
+  }
 }
