@@ -64,7 +64,9 @@
     margin-right: .5em;
     padding: 6px 0 6px !important;
     background-color: #fff;
-    box-shadow: 0 3px 16px rgba(0,0,0,.2) /*{global-box-shadow-color}*/
+    webkit-box-shadow: 0 4px 9px /*{global-box-shadow-size}*/ rgba(0,0,0,.1);
+    -moz-box-shadow: 0 4px 9px /*{global-box-shadow-size}*/ rgba(0,0,0,.1);
+    box-shadow: 0 4px 9px /*{global-box-shadow-size}*/ rgba(0,0,0,.1);
 }
 #backend-buttons .ui-controlgroup-controls .ui-btn:hover {
     background-color: #eee;

@@ -14,6 +14,8 @@
     border-top: 1px solid #eeedeb;
     border-left: none;
     border-right: none;
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
 }
 
 #home-page .options-list li:first-child a,

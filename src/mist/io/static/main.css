@@ -1080,6 +1080,8 @@ ul.checkbox-list .ui-grid-b {
     float: right;
     margin-right: 3px;
     width: 50px;
+    -webkit-transition: all .1s ease-in-out;
+    transition: all .1s ease-in-out;
 }
 
 #me-btn .gravatar-image.user {
