@@ -1,5 +1,4 @@
 <div class="graph" draggable="true">
-
     <!--
         Graph Head
     -->
@@ -7,17 +6,17 @@
     <div class="header">
 
         <div class="title">
-            {{view.graph.title}}
+            {{graph.title}}
         </div>
 
 
-        {{#if view.graph.pendingCreation}}
+        {{#if graph.pendingCreation}}
 
             <div class="ajax-loader"></div>
 
         {{else}}
 
-            {{#if view.graph.pendingRemoval}}
+            {{#if graph.pendingRemoval}}
                 <div class="ajax-loader"></div>
             {{/if}}
 
@@ -30,9 +29,9 @@
         -->
 
         {{#if Mist.graphsController.config.canModify}}
-            {{#unless view.graph.isBuiltIn}}
+            {{#unless graph.isBuiltIn}}
                 <a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext"
-                    {{action "removeClicked" view.graph target=view.actionProxy}}>x
+                    {{action "removeClicked" graph target=view.actionProxy}}>x
                 </a>
             {{/unless}}
         {{/if}}
@@ -43,7 +42,7 @@
 
         {{#if Mist.graphsController.config.canMinimize}}
             <a class="ui-btn ui-btn-c ui-btn-icon-notext ui-corner-all ui-icon-arrow-d"
-                {{action "collapseClicked" view.graph target=view.actionProxy}}>-
+                {{action "collapseClicked" graph target=view.actionProxy}}>-
             </a>
         {{/if}}
     </div>
@@ -52,7 +51,7 @@
         Graph Body
     -->
     {{#each view.graph.batches as |batch|}}
-        <div class="graph-body" id={{id}}>
+        <div class="graph-body" id={{batch.id}}>
         </div>
     {{/each}}
 

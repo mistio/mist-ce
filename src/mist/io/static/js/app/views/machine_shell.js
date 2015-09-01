@@ -185,6 +185,7 @@ define('app/views/machine_shell', ['app/views/popup'],
             $('#shell-return')
                 .css('font-size', fontSize);
 
+            info('calibrating desktop shell at', numOfColumns, numOfRows);
             Mist.machineShellController.set('cols', numOfColumns);
             Mist.machineShellController.set('rows', numOfRows);
         }
@@ -225,6 +226,7 @@ define('app/views/machine_shell', ['app/views/popup'],
             var popup = $('#machine-shell-popup');
             popup.css('left', ((window.innerWidth - popup.width()) / 2) + 'px');
 
+            info('calibrating mobile shell at', numOfColumns, numOfRows);
             Mist.machineShellController.set('cols', MIN_TERM_COLUMNS);
             Mist.machineShellController.set('rows', MIN_TERM_ROWS);
         }
