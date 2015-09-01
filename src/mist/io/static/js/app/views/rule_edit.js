@@ -35,7 +35,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
             open: function (property) {
 
                 this.set('rule', Mist.ruleEditController.rule);
-                this.set('metrics', this._parentView.metrics);
+                this.set('metrics', this.parentView.metrics);
 
                 // Get button on which to position the popup
                 var button = '#' + this.rule.id +

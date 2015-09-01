@@ -15,11 +15,10 @@
 
         <div id="graphs-wrapper"
             class="{{if view.pendingFirstStats 'hidden'}}">
-                {{view "graphList"
-                    actionProxy=view}}
+                {{component "graph-list" actionProxy=view}}
         </div>
 
-        {{view "ruleList" rules=view.rules}}
+        {{component "rule-list" rules=view.rules}}
 
         <div id="monitoring-bottom-btns">
             <div data-rule="ui-grid-a">

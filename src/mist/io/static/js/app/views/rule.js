@@ -52,7 +52,7 @@ define('app/views/rule', [],
                 Ember.run.next(this, function () {
                     this.showAdvancedCondition();
                     this.updateTextValues();
-                    $('#'+this.elementId).enhanceWithin();
+                    $('.ui-page-active').enhanceWithin();
                 })
             }.on('didInsertElement'),
 

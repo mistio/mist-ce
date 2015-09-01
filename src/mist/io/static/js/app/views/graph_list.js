@@ -1,26 +1,21 @@
-define('app/views/graph_list', ['app/views/templated'],
+define('app/views/graph_list', [],
     //
-    //  Graph List View
+    //  Graph List Component
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return App.GraphListView = TemplatedView.extend({
+        return App.GraphListComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-            templateName: "graph_list",
+            layoutName: "graph_list",
             actionProxy: null,
-
-
         });
     }
 );
