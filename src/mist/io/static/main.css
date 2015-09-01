@@ -747,10 +747,6 @@ ul.checkbox-list .ui-grid-b {
     width: 100%;
     bottom: 0;
 }
-.ui-footer table {
-    margin-left: -1px;
-    width: 100%;
-}
 .ui-footer a {
     padding-left: 10px !important;
     padding-right: 0 !important;
@@ -765,33 +761,34 @@ ul.checkbox-list .ui-grid-b {
         font-size: 10px;
     }
 }
-.ui-footer.dual-action-footer td {
-    width: 50%;
-}
-.ui-footer.tri-action-footer td {
-    width: 33.3%;
-}
-.ui-footer.dual-action-footer {
+.ui-footer.single-action-footer,
+.ui-footer.dual-action-footer,
+.ui-footer.tri-action-footer {
     box-sizing: border-box;
 }
-.ui-footer.dual-action-footer .ui-grid-a > div {
-    padding: 3px 2px;
-}
+.ui-footer.single-action-footer,
+.ui-footer.dual-action-footer .ui-grid-a > div,
 .ui-footer.tri-action-footer .ui-grid-b > div {
     padding: 3px 2px;
 }
+.ui-footer.single-action-footer,
 .ui-footer.dual-action-footer,
 .ui-footer.tri-action-footer {
     border: none;
 }
+.ui-footer.single-action-footer,
 .ui-footer.dual-action-footer a,
 .ui-footer.tri-action-footer a {
     margin: 0;
 }
+.ui-footer.single-action-footer a {
+    padding: .6em 2.5em .6em 1.1em !important;
+}
 
-
-.tri-action-footer a {
-    text-align: left;
+.ui-footer.single-action-footer a:after {
+    position: absolute;
+    right: 1em;
+    top: 50%;
 }
 
 .ui-footer .ui-grid-a a {
@@ -1204,7 +1201,7 @@ ul.checkbox-list .ui-grid-b {
 ------------------------------------------------------------------------------*/
 .ok-cancel {
     width: 100%;
-    margin: 12px 0 0;
+    margin: 16px 0 0;
     padding-bottom: 0 !important;
     box-sizing: border-box;
 }

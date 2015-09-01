@@ -5,6 +5,10 @@
     background-color: #E8E8E8;
 }
 
+#single-network-page .ui-block-b .ui-title {
+    text-align: center;
+}
+
 #single-network-page .usable-ips h4{
     margin-top: 0px;
 }

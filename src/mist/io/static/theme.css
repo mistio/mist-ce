@@ -566,7 +566,7 @@ html .ui-body-c .ui-bar-inherit,
 html body .ui-group-theme-c .ui-bar-inherit {
 	background-color: #e9e9e9 /*{c-bar-background-color}*/;
 	border-color: #dddddd /*{c-bar-border}*/;
-	color: #333333 /*{c-bar-color}*/;
+	color: #444 /*{c-bar-color}*/;
 	text-shadow: 0 /*{c-bar-shadow-x}*/ 1px /*{c-bar-shadow-y}*/ 0 /*{c-bar-shadow-radius}*/ #eeeeee /*{c-bar-shadow-color}*/;
 	font-weight: bold;
 }
@@ -580,7 +580,7 @@ html body .ui-group-theme-c .ui-bar-inherit {
 .ui-page-theme-c .ui-panel-wrapper {
 	background-color: #f8f8f8 /*{c-page-background-color}*/;
 	border-color: #f8f8f8 /*{c-page-border}*/;
-	color: #000000 /*{c-page-color}*/;
+	color: #444 /*{c-page-color}*/;
 	text-shadow: 0 /*{c-page-shadow-x}*/ 1px /*{c-page-shadow-y}*/ 0 /*{c-page-shadow-radius}*/ #f8f8f8 /*{c-page-shadow-color}*/;
 }
 /* Body: Read-only lists, text inputs, collapsible content */
@@ -592,8 +592,8 @@ html body .ui-group-theme-c .ui-body-inherit,
 html .ui-panel-page-container-c {
 	background-color: #f8f8f8 /*{c-body-background-color}*/;
 	border-color: #dddddd /*{c-body-border}*/;
-	color: #333333 /*{c-body-color}*/;
-	text-shadow: 0 /*{c-body-shadow-x}*/ 1px /*{c-body-shadow-y}*/ 0 /*{c-body-shadow-radius}*/ #f3f3f3 /*{c-body-shadow-color}*/;
+	color: #444 /*{c-body-color}*/;
+	text-shadow: none;
 }
 .ui-body-c {
 	border-width: 1px;
@@ -691,7 +691,7 @@ html body div.ui-slider-track.ui-body-c .ui-btn-active {
 	background-color: #64b247 /*{c-active-background-color}*/;
 	border-color: #1c4a70 /*{c-active-border}*/;
 	color: #64b247 /*{c-active-color}*/;
-	text-shadow: 0 /*{c-active-shadow-x}*/ 1px /*{c-active-shadow-y}*/ 0 /*{c-active-shadow-radius}*/ #005599 /*{c-active-shadow-color}*/;
+	text-shadow: none;
 }
 /* Active radio button icon */
 .ui-page-theme-c .ui-radio-on:after,

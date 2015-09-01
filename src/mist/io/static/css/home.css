@@ -14,8 +14,6 @@
     border-top: 1px solid #eeedeb;
     border-left: none;
     border-right: none;
-    -webkit-transition: all .2s ease-in-out;
-    transition: all .2s ease-in-out;
 }
 
 #home-page .options-list li:first-child a,
@@ -113,8 +111,8 @@
 }
 
 .incidents.no-incidents .no-incident .icon-check:after {
-    margin: 5px 0 0 0;
-    font-size: 50px;
+    margin: 10px 0 0 0;
+    font-size: 40px;
     color: #64b247;
 }
 
@@ -127,6 +125,12 @@
 .incidents.no-incidents.is-core .no-incident h4,
 .incidents.no-incidents.has-networks .no-incident h4 {
     margin: 15px 0 0 0;
+}
+
+.incidents.no-incidents.is-core .no-incident .icon-check:after,
+.incidents.no-incidents.has-networks .no-incident .icon-check:after {
+    margin: 5px 0 0 0;
+    font-size: 50px;
 }
 
 .incidents.no-incidents.is-core.has-networks .no-incident {

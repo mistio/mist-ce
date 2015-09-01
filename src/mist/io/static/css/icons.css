@@ -134,8 +134,6 @@
     width: 24px;
     height: 24px;
     left: 30px;
-    /*left: 24px;
-    top: 28px;*/
     line-height: 24px;
     -webkit-font-smoothing: none;
 }
@@ -165,9 +163,4 @@
 .ui-filterable .ui-icon-delete:after {
     background-image: none;
     content: '\006b' !important;
-}
-
-.logs.ui-collapsible .ui-icon-minus:hover:after,
-.logs.ui-collapsible .ui-icon-plus:hover:after {
-
 }

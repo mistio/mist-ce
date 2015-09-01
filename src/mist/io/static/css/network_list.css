@@ -8,6 +8,10 @@
     margin: 10px 118px -44px 0px !important;
 }
 
+#network-list-page .ui-block-b .ui-title {
+    text-align: center;
+}
+
 #network-list-page .checkbox-link .tag {
     position: relative;
     bottom: -6px;

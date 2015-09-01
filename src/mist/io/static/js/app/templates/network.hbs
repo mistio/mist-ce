@@ -1,14 +1,27 @@
 <div id="single-network-page" data-role="page" class="ui-page-active">
+    <div data-role="header" data-theme="a">
+        <!-- Page header -->
+        <div class="ui-header ui-bar-a">
+            <div class="header-grid">
+                <div class="ui-grid-b">
+                    <div class="ui-block-a">
+                        <a href="#/networks" class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
+                        ui-btn-icon-left ui-corner-all nav-back"><span>Networks</span></a>
+                    </div>
 
-    <div data-role="header" data-theme="b">
+                    <div class="ui-block-b">
+                        <h1 class="ui-title">Networks</h1>
+                    </div>
 
-        <a href="#/networks" class="responsive-button ui-btn-left ui-btn ui-icon-arrow-l
-            ui-btn-icon-left ui-shadow ui-corner-all nav-back"><span>Networks</span></a>
-
-        <h1>{{name}}</h1>
-
-        {{component "user-menu"}}
-
+                    <div class="ui-block-c">
+                        <div class="user-menu">
+                            {{component "user-menu"}}
+                        </div>
+                    </div>
+                </div>
+                <!-- /grid-b -->
+            </div>
+        </div>
     </div>
 
     <div data-role="content" data-theme="a">
@@ -73,7 +86,7 @@
 
     {{#if backend.isOpenStack}}
     <div class="single-action-footer" data-role="footer" data-theme="b">
-        <a class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete"
+        <a class="ui-btn ui-caps ui-btn-icon-right icon-xx"
             {{action "deleteClicked" target=view}}>
                 Delete
         </a>
