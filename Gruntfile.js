@@ -134,6 +134,15 @@ module.exports = function(grunt) {
                     force: true
                 }
             },
+            fonts: {
+                target: '../src/mist/io/static/fonts',
+                link: 'dist/fonts',
+                type: 'dir',
+                options: {
+                    overwrite: true,
+                    force: true
+                }
+            },
             states: {
                 target: '../src/mist/io/static/states',
                 link: 'dist/states',
@@ -190,6 +199,7 @@ module.exports = function(grunt) {
 		'symlink:c3',
 		'symlink:term',
 		'symlink:images',
+		'symlink:fonts',
 		'symlink:states',
 		'requirejs',
 		'symlink:mistjs',

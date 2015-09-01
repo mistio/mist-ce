@@ -6,7 +6,7 @@ define('app/views/user_menu', ['md5'],
      */
     function () {
 
-        'user strict';
+        'use strict';
 
         return App.UserMenuComponent = Ember.Component.extend({
 
