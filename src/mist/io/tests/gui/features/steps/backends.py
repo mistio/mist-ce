@@ -52,13 +52,13 @@ def given_backend(context, backend):
     else:
         assert False, u'Could not find credentials for %s' % backend
 
-    context.execute_steps('''
-    When I click the "Add cloud" button
-    And I click the button that contains "Select provider"
-    And I click the "%s" button
-    And I use my "%s" credentials
-    And I click the "Add" button
-    Then the "%s" backend should be added within 30 seconds
+    context.execute_steps(u'''
+        When I click the "Add cloud" button
+        And I click the button that contains "Select provider"
+        And I click the "%s" button
+        And I use my "%s" credentials
+        And I click the "Add" button
+        Then the "%s" backend should be added within 30 seconds
     ''' % (backend, creds, backend))
 
 
@@ -132,8 +132,11 @@ def backend_creds(context, backend):
         api_key = context.browser.find_element_by_id("api_key")
         api_key.send_keys(context.mist_config['CREDENTIALS']['SOFTLAYER']['api_key'])
     elif "EC2" in backend:
-        context.execute_steps(u'When I click the button that contains "Select Region"')
-        context.execute_steps(u'When I click the button that contains "%s"' % context.mist_config['CREDENTIALS']['EC2']['region'])
+        context.execute_steps(u'''
+                When I click the button that contains "Select Region"
+                And I wait for 1 seconds
+                When I click the button that contains "%s"
+        ''' % context.mist_config['CREDENTIALS']['EC2']['region'])
         sleep(1)
         title = context.browser.find_element_by_id("title")
         for i in range(20):

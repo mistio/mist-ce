@@ -32,7 +32,6 @@ Feature: Machines
     Then I should see the "randomly_created" machine added within 10 seconds
     And "randomly_created" machine state should be "running" within 400 seconds
     When I wait for 5 seconds
-#    And "randomly_created" machine should be probed within 400 seconds
 
     When I choose the "randomly_created" machine
     And I click the "Actions" button
