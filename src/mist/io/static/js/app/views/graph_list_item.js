@@ -10,37 +10,26 @@ define('app/views/graph_list_item', ['d3', 'c3'],
 
         return App.GraphListItemComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
             layoutName: 'graph_list_item',
-
             graph: null,
-
             unit: null,
             isHidden: null,
             actionProxy: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
-
                 Ember.run.next(this, function () {
                     this.graph.set('view', this);
                 });
-
             }.on('didInsertElement'),
-
 
             unload: function () {
 
@@ -48,9 +37,7 @@ define('app/views/graph_list_item', ['d3', 'c3'],
 
 
             //
-            //
             //  Methods
-            //
             //
 
             draw: function (reload) {
@@ -225,13 +212,11 @@ define('app/views/graph_list_item', ['d3', 'c3'],
                 });
             },
 
-
             clearData: function () {
                 this.graph.datasources.forEach(function (datasource) {
                     datasource.clear();
                 });
             },
-
 
             enableAnimation: function () {
                 this.set('animationEnabled', true);
@@ -239,20 +224,15 @@ define('app/views/graph_list_item', ['d3', 'c3'],
 
 
             //
-            //
             //  Observers
             //
-            //
 
-
-            isStreamingObserver: function () {
-                return; // TODO: fixme
+            /*isStreamingObserver: function () {
                 if (Mist.graphsController.stream.isStreaming)
                     this.enableAnimation();
                 else
                     this.disableAnimation(true);
-            }.observes('Mist.graphsController.stream.isStreaming'),
-
+            }.observes('Mist.graphsController.stream.isStreaming'),*/
 
             isVisibleObserver: function () {
                 if (this.isHidden){
@@ -264,14 +244,12 @@ define('app/views/graph_list_item', ['d3', 'c3'],
                 }
             }.observes('isHidden'),
 
-
             isEmptyObserver: function () {
                 if (this.graph.isEmpty)
                     $('#' + this.id).parent().hide(500);
                 else
                     $('#' + this.id).parent().show(500);
             }.observes('graph.isEmpty'),
-
 
             fetchingStatsObserver: function () {
                 return; //TODO fixme

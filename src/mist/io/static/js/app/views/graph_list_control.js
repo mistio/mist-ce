@@ -1,22 +1,20 @@
-define('app/views/graph_list_control', ['app/views/templated'],
+define('app/views/graph_list_control', [],
     //
     //  Graph List Control View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return App.GraphListControlView = TemplatedView.extend({
+        return App.GraphListControlComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
+            layoutName: 'graph_list_control',
             selectedTimeWindow: '',
 
             timeWindowText: function () {
@@ -39,11 +37,8 @@ define('app/views/graph_list_control', ['app/views/templated'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 Ember.run.next(this, function () {
@@ -54,11 +49,8 @@ define('app/views/graph_list_control', ['app/views/templated'],
 
 
             //
-            //
             //  Pseudo-Private Methods
             //
-            //
-
 
             _openRangeSelectionPopup: function () {
                 Ember.run.later(this, function () {
@@ -70,11 +62,9 @@ define('app/views/graph_list_control', ['app/views/templated'],
                 }, 300);
             },
 
-
             _closeRangeSelectionPopup: function () {
                 $('#pick-range').popup('close');
             },
-
 
             _validateRange: function (from, until) {
                 if (from == 'Invalid Date') {
@@ -105,18 +95,13 @@ define('app/views/graph_list_control', ['app/views/templated'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 timeWindowClicked: function () {
                     $('#change-time-window').popup('open');
                 },
-
 
                 timeWindowChanged: function (newTimeWindow, title) {
                     $('#change-time-window').popup('close');
@@ -127,7 +112,6 @@ define('app/views/graph_list_control', ['app/views/templated'],
                         this.set('selectedTimeWindow', title);
                     }
                 },
-
 
                 rangeOkClicked: function () {
                     var from = $('#pick-range #range-start').val();
@@ -153,16 +137,13 @@ define('app/views/graph_list_control', ['app/views/templated'],
                     }
                 },
 
-
                 rangeBackClicked: function () {
                     this._closeRangeSelectionPopup();
                 },
 
-
                 backClicked: function () {
                     Mist.graphsController.history.goBack();
                 },
-
 
                 forwardClicked: function () {
                     Mist.graphsController.history.goForward();

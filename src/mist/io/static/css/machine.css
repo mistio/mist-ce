@@ -79,6 +79,7 @@
 }
 #single-machine-page .ui-collapsible {
     margin: 10px 0 20px;
+    clear: both;
 }
 #single-machine-page #monitoring-disabled p {
     text-align: center;

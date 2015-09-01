@@ -5,7 +5,7 @@
     -->
     {{#if Mist.graphsController.config.canControl}}
         <div id="top-history">
-            {{view "graphListControl"
+            {{component "graph-list-control"
                 actionProxy=view.actionProxy}}
         </div>
     {{/if}}
@@ -27,7 +27,7 @@
     -->
 
     {{#if Mist.graphsController.config.canMinimize}}
-        {{view "graphListBar"
+        {{component "graph-list-bar"
             actionProxy=view.actionProxy}}
     {{/if}}
 </div>
