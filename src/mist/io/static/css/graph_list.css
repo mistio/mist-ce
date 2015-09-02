@@ -2,6 +2,10 @@
 /* Graph List View
 -----------------------------------------------------------------------------------------------------------*/
 
+.graph-body .c3-axis {
+    stroke-width: 0;
+}
+
 .graph-list {
     background-color: #F9F8F3;
     clear: both;
