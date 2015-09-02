@@ -5,18 +5,18 @@
 
         <a class="rule-button rule-metric ui-btn ui-btn-inline ui-shadow ui-corner-all"
             {{action "openMetricPopup" target=view}}>
-                {{metric.name}}
+                {{rule.metric.name}}
         </a>
 
         <a class="rule-button rule-operator ui-btn ui-btn-inline ui-shadow ui-corner-all"
             {{action "openOperatorPopup" target=view}}>
-                {{operator.symbol}}
+                {{rule.operator.symbol}}
         </a>
 
         {{view Mist.TextField class="rule-value" type="number"
             value=view.newRuleValue}}
 
-        <div class="rule-unit rule-text">{{metric.unit}}</div>
+        <div class="rule-unit rule-text">{{rule.metric.unit}}</div>
     </div>
 
     <a class="rule-button rule-more ui-btn ui-btn-inline ui-shadow ui-corner-all"
@@ -30,7 +30,7 @@
 
         <a class="rule-button rule-aggregate ui-btn ui-btn-inline ui-shadow ui-corner-all"
             {{action "openAggregatePopup" target=view}}>
-                {{aggregate.title}}
+                {{rule.aggregate.title}}
         </a>
 
         <div class="rule-for rule-text">value</div>
@@ -52,7 +52,7 @@
 
     <a class="rule-button rule-action ui-btn ui-btn-inline ui-shadow ui-corner-all"
         {{action "openActionPopup" target=view}}>
-            {{actionToTake}}
+            {{rule.actionToTake}}
     </a>
 
     {{#if pendingAction}}

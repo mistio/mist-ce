@@ -1,7 +1,7 @@
 <div class="rules-container" data-role="listview">
 
     {{#each view.rules as |rule|}}
-        {{component "rule-item" model=rule}}
+        {{component "rule-item" rule=rule}}
     {{/each}}
 
     {{#if Mist.rulesController.creationPending}}
