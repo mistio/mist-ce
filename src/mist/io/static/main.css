@@ -654,12 +654,15 @@ ul.checkbox-list li a:focus {
 }
 ul.checkbox-list li a,
 ul.checkbox-list label {
-    background-color: #FAF9F4 !important;
     border-width: 0px !important;
     color: #444 !important;
 }
-ul.checkbox-list li:hover a,
-ul.checkbox-list li:hover label,
+ul.checkbox-list li a {
+    background-color: transparent !important;
+}
+ul.checkbox-list li {
+    background-color: #FAF9F4 !important;
+}
 ul.checkbox-list li:hover {
     background-color: #edece8 !important;
 }

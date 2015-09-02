@@ -12,6 +12,26 @@ define('app/views/machine_list_item', ['app/views/list_item'],
              */
             layoutName: 'machine_list_item',
             machine: null,
+            classNameBindings: ['machineState', 'monitoringIcon'],
+
+
+            /**
+             *  Computed Properties
+             */
+
+            machineState: function() {
+                return this.machine.get('state');
+            }.property('machine.state'),
+
+            monitoringIcon: function() {
+                if (this.machine.hasMonitoring){
+                    if (this.machine.get('hasOpenIncident'))
+                        return 'ui-icon-alert';
+                    return 'ui-icon-check';
+                }
+                return 'ui-icon-none';
+            }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
+
 
             /**
              *
@@ -28,15 +48,6 @@ define('app/views/machine_list_item', ['app/views/list_item'],
                     }
                 });
             },
-
-            monitoringIcon: function() {
-                if (this.machine.hasMonitoring){
-                    if (this.machine.get('hasOpenIncident'))
-                        return 'ui-icon-alert';
-                    return 'ui-icon-check';
-                }
-                return 'ui-icon-none';
-            }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
 
 
             /**
@@ -83,7 +94,7 @@ define('app/views/machine_list_item', ['app/views/list_item'],
 
             machineSelectedObserver: function () {
                 Ember.run.once(this, 'updateCheckbox');
-            }.observes('machine.selected'),
+            }.observes('machine.selected')
         });
     }
 );

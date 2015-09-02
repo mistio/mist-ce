@@ -39,22 +39,30 @@
     font-size: 14px;
     line-height: 1.6em;
 }
+#machine-list-page ul.checkbox-list li.stopped {
+    background-color: #d96557 !important;
+    color: #fff !important;
+}
+#machine-list-page ul.checkbox-list li.stopped:hover {
+    background-color: #dc7265 !important;
+}
+
 #machine-list-page .ui-block-b .ui-title {
     text-align: center;
 }
-.running {
+.running .machine-state span {
     color: #64b247;
 }
-.pending {
+.pending .machine-state span {
     color: #E09400;
 }
-.rebooting {
+.rebooting .machine-state span {
     color: #4E68BB;
 }
-.terminated {
+.terminated .machine-state span {
     color: #AAAAAA;
 }
-.stopped {
+.stopped .machine-state span {
     color: #777777;
 }
 .machine-name {
@@ -153,4 +161,18 @@
     background-image: none;
     opacity: 1;
     color: #7F7F7F;
+}
+
+.stopped label:after {
+    color: #fff !important;
+}
+
+.stopped .machine-state span,
+.stopped .machine-name,
+.stopped .machine-tags .tag,
+.stopped a:after {
+    color: #fff !important;
+}
+.stopped .machine-leds .netleds div {
+    background-color: #fff;
 }

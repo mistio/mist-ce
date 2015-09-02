@@ -173,20 +173,8 @@
     color: #000;
 }
 
-.incidents .ui-icon-alert:after,
-#machines .ui-icon-alert:after {
-    background-color: indianred;
-}
-
 .incidents .ui-icon-check:after {
     background-color: rgba(33, 133, 89, 0.4);
-}
-
-.incidents li a.ui-btn {
-    font-weight: normal;
-    white-space: normal;
-    padding-left: 42px !important;
-    padding-right: 42px !important;
 }
 
 .incidents li a.ui-btn:after {
@@ -209,21 +197,36 @@
 }
 
 .incidents .alert.incident a {
-    color: #d96557;
-    background-color: #f7e0dd;
+    color: #fff;
+    background-color: #d96557;
+    padding-right: 70px !important;
+}
+.incidents .alert.incident a:after {
+    content: '\0056';
+    background-color: transparent;
+    background-image: none;
+    opacity: 1;
+    color: #7F7F7F;
 }
 
 .incidents .alert.incident a:hover {
-    color: #d96557 !important;
-    background-color: #ECB3AC;
+    color: #fff !important;
+    background-color: #dc7265;
+}
+
+.incidents .alert.incident a .icon-alert-2 {
+    float: right;
+    right: 40px;
+    top: 10px;
+    position: absolute;
 }
 
 .incidents .alert.incident a .machine {
-    color: #d95557;
+    color: #fff;
 }
 
 .incidents .alert.incident a:after {
-    color: #d96557;
+    color: #fff;
 }
 
 #home-page .ui-body {

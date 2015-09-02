@@ -1,6 +1,6 @@
 {{#unless view.machine.isGhost}}
     <label>{{view Mist.Checkbox checked=view.machine.selected}}</label>
-    {{#link-to "machine" view.machine class=view.monitoringIcon}}
+    {{#link-to "machine" view.machine}}
 
         <div class="ui-grid-b">
             <div class="ui-block-a machine-name">{{view.machine.name}}</div>
@@ -69,9 +69,7 @@
             <div class="ui-block-a machine-name">{{view.machine.name}}</div>
 
             <span class="ui-block-b machine-state">
-                <span class={{view.machine.state}}>
-                    {{view.machine.state}}
-                </span>
+                <span>{{view.machine.state}}</span>
             </span>
 
         </div>
