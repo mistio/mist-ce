@@ -1,10 +1,11 @@
 
 #add-backend.ui-collapsible-collapsed {
-    width: 220px;
+    width: 215px;
 }
 
 #add-backend {
     width: 281px;
+    margin: 5px 0 !important;
 }
 
 #add-backend-overlay {
