@@ -1,18 +1,18 @@
 {{#unless view.machine.isGhost}}
-    <label>{{view Mist.Checkbox checked=view.machine.selected}}</label>
-    {{#link-to "machine" view.machine}}
+    <label>{{view Mist.Checkbox checked=machine.selected}}</label>
+    {{#link-to "machine" machine}}
 
         <div class="ui-grid-b">
-            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
+            <div class="ui-block-a machine-name">{{machine.name}}</div>
 
             <span class="ui-block-b machine-state">
-                {{#unless view.machine.isUnknown}}
+                {{#unless machine.isUnknown}}
                 <span class={{view.machine.state}}>
-                {{view.machine.state}}
+                {{machine.state}}
 
-                {{#if model.pendingCreation}}
+                {{#if machine.pendingCreation}}
                     <div class='ajax-loader'></div>
-                {{else}} {{#if model.waitState}}
+                {{else}} {{#if machine.waitState}}
                     <div class='ajax-loader'></div>
                 {{/if}} {{/if}}
                 </span>
@@ -21,27 +21,27 @@
 
             <div class="ui-block-c machine-leds">
 
-                {{#unless model.pendingCreation}}
+                {{#unless machine.pendingCreation}}
                     <span class="icon-dummy monitoring-state"></span>
 
-                    <div class="{{model.probing}} {{model.probed}}">
+                    <div class="{{machine.probing}} {{machine.probed}}">
                         <div class="loadleds">
-                            <div class="{{model.loadavg15}} led">
+                            <div class="{{machine.loadavg15}} led">
                             </div>
-                            <div class="{{model.loadavg5}} led">
+                            <div class="{{machine.loadavg5}} led">
                             </div>
-                            <div class="{{model.loadavg1}} led">
+                            <div class="{{machine.loadavg1}} led">
                             </div>
                         </div>
 
                         <div class="netleds">
-                            <div class="{{model.netled4}} netled1">
+                            <div class="{{machine.netled4}} netled1">
                             </div>
-                            <div class="{{model.netled3}} netled2">
+                            <div class="{{machine.netled3}} netled2">
                             </div>
-                            <div class="{{model.netled2}} netled3">
+                            <div class="{{machine.netled2}} netled3">
                             </div>
-                            <div class="{{model.netled1}} netled4">
+                            <div class="{{machine.netled1}} netled4">
                             </div>
                         </div>
                     </div>
@@ -50,8 +50,8 @@
             </div>
 
             <div class="ui-block-c machine-tags">
-                <span class="tag">{{view.machine.backend.title}}</span>
-                {{#each view.machine.tags as |tag|}}
+                <span class="tag">{{machine.backend.title}}</span>
+                {{#each machine.tags as |tag|}}
                 <span class="tag">{{tag}}</span>
                 {{/each}}
             </div>
@@ -63,10 +63,10 @@
     <a class="ui-icon-delete" {{action "disassociateGhostMachine" target=view}}>
 
         <div class="ui-grid-b">
-            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
+            <div class="ui-block-a machine-name">{{machine.name}}</div>
 
             <span class="ui-block-b machine-state">
-                <span>{{view.machine.state}}</span>
+                <span>{{machine.state}}</span>
             </span>
 
         </div>

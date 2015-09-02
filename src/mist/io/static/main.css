@@ -1135,13 +1135,18 @@ ul.checkbox-list .ui-grid-b {
 /* Leds
  * */
 
+.netleds {
+    left: -10px;
+    position: relative;
+}
+
 .netleds div {
     border-radius: 0;
     float: right;
     height: 16px;
     margin: 0px 1px;
     width: 4px;
-    background-color: #444;
+    background-color: #7f7f7f;
 }
 
 .netleds .on {
@@ -1165,7 +1170,7 @@ ul.checkbox-list .ui-grid-b {
 
 .loadleds {
     position: relative;
-    left: 6px
+    left: -5px
 }
 
 .led {
@@ -1199,19 +1204,19 @@ ul.checkbox-list .ui-grid-b {
 }
 
 .hot {
-    background-color: #DD1E2F !important;
+    background-color: #D96557 !important;
 }
 .warm {
-    background-color: #EBB035 !important;
+    background-color: #FFC65D !important;
 }
 .eco {
-    background-color: #218559 !important;
+    background-color: #64B247 !important;
 }
 .cool {
-    background-color: #06A2CB !important;
+    background-color: #4CC3D9 !important;
 }
 .cold {
-    background: #396b9e /*{b-bup-background-color}*/linear-gradient( #5f9cc5 /*{d-bup-background-start}*/, #396b9e /*{d-bup-background-end}*/) /*{d-bup-background-color}*/ !important;
+    background-color: #66C2E0 !important;
 }
 
 /* OK - Cancel

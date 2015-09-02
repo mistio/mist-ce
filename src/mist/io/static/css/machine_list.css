@@ -176,12 +176,12 @@
 .monitoring-state {
     float: right;
     height: 16px;
-    margin-right: 20px;
+    margin-right: 15px;
 }
 
 .no-monitoring .monitoring-state:after {
     content:'\0048';
-    color: #7f7f7f;
+    color: #A5A4A1;
 }
 
 .has-monitoring .monitoring-state:after {
