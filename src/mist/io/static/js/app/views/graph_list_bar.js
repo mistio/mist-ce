@@ -31,7 +31,7 @@ define('app/views/graph_list_bar', [],
                 // machine view.
 
                 try {
-                this.set('machine', this.actionProxy.get('machine'));
+                    this.set('machine', this.actionProxy.get('machine'));
                 } catch (e) {}
             }.on('didInsertElement')
         });
