@@ -63,25 +63,11 @@
                         <!-- If machine is beging created, hide keys UI -->
                         {{#unless model.pendingCreation}}
                             {{#if model.keysCount}}
-                                <a class="ui-btn
-                                        ui-btn-d
-                                        ui-btn-add
-                                        ui-icon-plus
-                                        ui-btn-icon-left
-                                        ui-caps"
-                                    {{action "manageKeysClicked" target=view}}>
-                                    {{model.keysCount}} keys
-                                </a>
+                                <a class="creation-button ui-shadow ui-btn ui-btn-d ui-caps ui-btn-icon-right ui-icon-plus"
+                                   {{action "manageKeysClicked" target=view}}>{{model.keysCount}} keys</a>
                             {{else}}
-                                <a class="ui-btn
-                                        ui-btn-d
-                                        ui-btn-add
-                                        ui-icon-plus
-                                        ui-btn-icon-left
-                                        ui-caps"
-                                    {{action "addKeyClicked" target=view}}>
-                                    Add key
-                                </a>
+                                <a class="creation-button ui-shadow ui-btn ui-btn-d ui-caps ui-btn-icon-right ui-icon-plus"
+                                   {{action "addKeyClicked" target=view}}>Add key</a>
                             {{/if}}
                         {{/unless}}
                     </span>

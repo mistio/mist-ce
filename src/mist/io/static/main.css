@@ -1079,7 +1079,7 @@ ul.checkbox-list .ui-grid-b {
     border-width: 3px;
     border-style: solid;
     border-color: #fff;
-    margin-top: 2px;
+    margin: 2px 3px 0 0;
     float: right;
     width: 50px;
     -webkit-transition: all .1s ease-in-out;

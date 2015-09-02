@@ -39,6 +39,27 @@
 #single-machine-page .ui-block-b h4.ui-title.stopped {
     color: #d96557;
 }
+#single-machine-page .creation-button {
+    margin: 0;
+    float: right;
+    padding: 20px 60px 20px 20px !important;
+    font-weight: 400 !important;
+    font-size: 18px;
+}
+#single-machine-page .creation-button:after {
+    background-image: none;
+    margin: 0;
+    content: '+';
+    color: #fff !important;
+    position: absolute;
+    right: 1px;
+    top: -6px;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 34px;
+    line-height: 60px;
+}
 #single-machine-page .single-machine-header .ui-block-b {
     text-align: right;
 }
@@ -104,7 +125,6 @@
 }
 #single-machine-page #mist-manage-keys a {
     margin-top: 15px;
-    margin-right: 5px;
 }
 
 #single-machine-page #monitoring-bottom-btns {
@@ -205,25 +225,6 @@
 
 .single-machine-header .ui-block-c {
     text-align: right;
-}
-
-.single-machine-header #mist-manage-keys .ui-btn {
-    background-color: #0099cc;
-    color: #fff;
-    border-color: #0099cc;
-    padding: 18px 25px 18px 50px !important;
-    font-size: 16px;
-}
-.single-machine-header #mist-manage-keys .ui-btn:hover{
-    background-color: #66C2E0;
-    border-color: #66C2E0;
-    color: #fff !important;
-}
-
-.single-machine-header #mist-manage-keys .ui-btn:active{
-    background-color: #396b9e;
-    border-color: #396b9e;
-    color: #fff !important;
 }
 
 .single-machine-header .header-grid {

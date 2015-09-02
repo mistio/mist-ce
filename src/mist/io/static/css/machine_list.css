@@ -42,11 +42,11 @@
 #machine-list-page .ui-filterable .ui-input-search {
     margin-right: 280px;
 }
-#machine-list-page ul.checkbox-list li.stopped {
+#machine-list-page ul.checkbox-list li.has-incident {
     background-color: #d96557 !important;
     color: #fff !important;
 }
-#machine-list-page ul.checkbox-list li.stopped:hover {
+#machine-list-page ul.checkbox-list li.has-incident:hover {
     background-color: #dc7265 !important;
 }
 
@@ -65,7 +65,7 @@
 .terminated .machine-state span {
     color: #AAAAAA;
 }
-.stopped .machine-state span {
+.has-incident .machine-state span {
     color: #777777;
 }
 .machine-name {
@@ -108,7 +108,7 @@
     }
 
     .machine-tags {
-        right: 38px !important;
+        right: 50px !important;
         top: 46px !important;
         max-width: 49% !important;
     }
@@ -151,7 +151,7 @@
 .machine-tags {
     float: right;
     position: absolute;
-    right: 116px;
+    right: 150px;
     width: auto !important;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -159,16 +159,37 @@
     height: 21px;
 }
 
-.stopped label:after {
+.has-incident label:after {
     color: #fff !important;
 }
 
-.stopped .machine-state span,
-.stopped .machine-name,
-.stopped .machine-tags .tag,
-.stopped a:after {
+.has-incident .machine-state span,
+.has-incident .machine-name,
+.has-incident .machine-tags .tag,
+.has-incident a:after {
     color: #fff !important;
 }
-.stopped .machine-leds .netleds div {
+.has-incident .machine-leds .netleds div {
     background-color: #fff;
+}
+
+.monitoring-state {
+    float: right;
+    height: 16px;
+    margin-right: 20px;
+}
+
+.no-monitoring .monitoring-state:after {
+    content:'\0048';
+    color: #7f7f7f;
+}
+
+.has-monitoring .monitoring-state:after {
+    content:'\0047';
+    color: #64b247 !important;
+}
+
+.has-incident .monitoring-state:after {
+    content:'\006D';
+    color: #fff !important;
 }

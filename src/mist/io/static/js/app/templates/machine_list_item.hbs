@@ -20,12 +20,10 @@
             </span>
 
             <div class="ui-block-c machine-leds">
-                <span>
-                    {{#if view.machine.hasMonitoring}}
-                        <span></span>
-                    {{/if}}
-                </span>
+
                 {{#unless model.pendingCreation}}
+                    <span class="icon-dummy monitoring-state"></span>
+
                     <div class="{{model.probing}} {{model.probed}}">
                         <div class="loadleds">
                             <div class="{{model.loadavg15}} led">
@@ -35,6 +33,7 @@
                             <div class="{{model.loadavg1}} led">
                             </div>
                         </div>
+
                         <div class="netleds">
                             <div class="{{model.netled4}} netled1">
                             </div>
@@ -45,9 +44,7 @@
                             <div class="{{model.netled1}} netled4">
                             </div>
                         </div>
-
                     </div>
-
                 {{/unless}}
 
             </div>

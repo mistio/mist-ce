@@ -34,7 +34,7 @@ define('app/views/machine_keys', ['app/views/controlled'],
             actions: {
                 associateClicked: function () {
                     $('#non-associated-keys-popup').popup('option',
-                        'positionTo', '#mist-manage-keys');
+                        'positionTo', '.creation-button');
                     $('#non-associated-keys-popup').popup('open');
                 },
 

@@ -12,7 +12,7 @@ define('app/views/machine_list_item', ['app/views/list_item'],
              */
             layoutName: 'machine_list_item',
             machine: null,
-            classNameBindings: ['machineState', 'monitoringIcon'],
+            classNameBindings: ['machineState', 'monitoringState'],
 
 
             /**
@@ -23,13 +23,13 @@ define('app/views/machine_list_item', ['app/views/list_item'],
                 return this.machine.get('state');
             }.property('machine.state'),
 
-            monitoringIcon: function() {
+            monitoringState: function() {
                 if (this.machine.hasMonitoring){
                     if (this.machine.get('hasOpenIncident'))
-                        return 'ui-icon-alert';
-                    return 'ui-icon-check';
+                        return 'has-incident';
+                    return 'has-monitoring';
                 }
-                return 'ui-icon-none';
+                return 'no-monitoring';
             }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
 
 
