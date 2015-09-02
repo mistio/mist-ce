@@ -40,6 +40,7 @@
 }
 .log-list ul.ui-listview a.ui-btn {
     padding-right: 40px;
+    padding-left: 20px;
 }
 .log-list ul.ui-listview a.ui-btn:after {
     font-family: 'MistIcons';
@@ -53,19 +54,31 @@
     top: 11px;
     right: 10px;
 }
+.log-list ul.ui-listview a.ui-btn:after {
+    right: 19px !important;
+}
 .log-list ul.ui-listview .open a.ui-btn:after {
     content: '\0073';
 }
 .log-list ul.ui-listview a.ui-btn.error {
-    background-color: #F3DCD5 !important;
-    color: #DC7A6E !important;
+    background-color: #d96557 !important;
+    color: #fff !important;
+}
+.log-list ul.ui-listview a.ui-btn.error:after {
+    color: #fff !important;
 }
 .log-list ul.ui-listview a.ui-btn.error:hover {
-    background-color: #E9B0A6 !important;
+    background-color: #dc7265 !important;
+}
+.log-list ul.ui-listview a.ui-btn.error .icon-warn {
+    margin-bottom: -4px;
+}
+.log-list ul.ui-listview a.ui-btn.error .icon-warn:after {
+    color: #fff !important;
 }
 .log-list ul.ui-listview a.ui-btn.error .tag,
 .log-list ul.ui-listview a.ui-btn.error .time {
-    color: #DC7A6E !important;
+    color: #fff !important;
 }
 .log-list .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
     padding: 1.2em 1.5em .8em;
@@ -144,7 +157,7 @@
 
 .log-list .ui-block-c div {
     float: right;
-    margin-left: 10px;
+    margin-right: 10px;
     color: #7F7F7F;
 }
 

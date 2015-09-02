@@ -19,7 +19,7 @@
     color: #444 !important;
 }
 #script-list-page .ui-filterable .ui-input-search {
-    margin-right: 215px !important;
+    margin-right: 230px !important;
 }
 #script-list-page #run-script-btn {
     float: right;
@@ -39,11 +39,4 @@
 }
 #script-list-page .ui-icon-check:after {
     background-color: #46d4c9;
-}
-#script-list a:after {
-    content: '\0056';
-    background-color: transparent;
-    background-image: none;
-    opacity: 1;
-    color: #7F7F7F;
 }

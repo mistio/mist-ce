@@ -7,7 +7,7 @@
 #machine-list-page .creation-button {
     margin: 0;
     float: right;
-    padding: 20px 60px 20px 20px !important;
+    padding: 20px 60px 20px 25px !important;
     font-weight: 400 !important;
     font-size: 18px;
 }
@@ -38,6 +38,9 @@
     margin: 18px 5px 10px 11px;
     font-size: 14px;
     line-height: 1.6em;
+}
+#machine-list-page .ui-filterable .ui-input-search {
+    margin-right: 280px;
 }
 #machine-list-page ul.checkbox-list li.stopped {
     background-color: #d96557 !important;
@@ -154,13 +157,6 @@
     text-overflow: ellipsis;
     max-width: 29%;
     height: 21px;
-}
-#machines a:after {
-    content: '\0056';
-    background-color: transparent;
-    background-image: none;
-    opacity: 1;
-    color: #7F7F7F;
 }
 
 .stopped label:after {

@@ -14,7 +14,7 @@
     <!-- Page Body -->
     <div role="main" class="ui-content" data-theme="c">
 
-        {{#if Mist.backendsController.model.length}}
+        {{#unless Mist.backendsController.model.length}}
             <div id="no-collection" class="ui-responsive">
                 <div id="no-collection-inner" class="ui-body ui-shadow">
                     <span class="icon-cloud-check"></span>
@@ -26,7 +26,7 @@
                     {{view "backendAdd"}}
                 </div>
             </div>
-        {{/if}}
+        {{/unless}}
 
         {{view "backendAdd"}}
 
@@ -153,38 +153,6 @@
                                 <span class="icon-check"></span>
                                 <h4 class="ui-caps">No Recent Incidents</h4>
                             </div>
-                            <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incident-list">
-                                <li class="alert incident">
-                                    <a class="ui-btn ui-btn-icon-right"
-                                        {{action "incidentClicked" incident target=view}}>
-                                        <span class="machine">
-                                            adasd:
-                                        </span>
-                                        <span class="rule-condition">
-                                            asd
-                                        </span>
-                                        <span class="time">
-                                            asd
-                                        </span>
-                                        <span class="icon-alert-2"></span>
-                                    </a>
-                                </li>
-                                <li class="alert incident">
-                                    <a class="ui-btn ui-btn-icon-right"
-                                        {{action "incidentClicked" incident target=view}}>
-                                        <span class="machine">
-                                            adasd:
-                                        </span>
-                                        <span class="rule-condition">
-                                            asd
-                                        </span>
-                                        <span class="time">
-                                            asd
-                                        </span>
-                                        <span class="icon-alert-2"></span>
-                                    </a>
-                                </li>
-                            </ul>
                         {{/if}}
                     </div>
                 </div>

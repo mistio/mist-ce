@@ -20,10 +20,24 @@
 }
 #single-machine-page .ui-block-b h4.ui-title {
     font-weight: 700;
-    color: #64b247;
     padding: 0;
     margin-top: 5px;
     text-transform: uppercase;
+}
+#single-machine-page .ui-block-b h4.ui-title.running {
+    color: #64b247;
+}
+#single-machine-page .ui-block-b h4.ui-title.pending {
+    color: #E09400;
+}
+#single-machine-page .ui-block-b h4.ui-title.rebooting {
+    color: #4E68BB;
+}
+#single-machine-page .ui-block-b h4.ui-title.terminated {
+    color: #AAAAAA;
+}
+#single-machine-page .ui-block-b h4.ui-title.stopped {
+    color: #d96557;
 }
 #single-machine-page .single-machine-header .ui-block-b {
     text-align: right;
