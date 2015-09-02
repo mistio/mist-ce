@@ -56,6 +56,7 @@ def given_backend(context, backend):
         When I click the "Add cloud" button
         And I click the button that contains "Select provider"
         And I click the "%s" button
+        And I wait for 1 seconds
         And I use my "%s" credentials
         And I click the "Add" button
         Then the "%s" backend should be added within 30 seconds
