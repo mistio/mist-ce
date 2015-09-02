@@ -41,24 +41,29 @@
         <div class="ui-content ui-body-a" role="main">
 
             <!-- Key Name Field -->
+            <div class="form-field">
+                <label for="key-add-id">Name</label>
 
-            <label for="key-add-id">Name</label>
+                {{view Mist.TextField id="keyadd-id"
+                       value=Mist.keyAddController.keyId}}
+            </div>
 
-            {{view Mist.TextField id="keyadd-id"
-                   value=Mist.keyAddController.keyId}}
 
             <!-- Key Private Field -->
+            <div class="form-field">
+                <label for="key-add-private">Private Key
+                    {{#if Mist.keyAddController.generatingKey}}
+                        <div class="ajax-loader key-add-loader"></div>
+                    {{else}} {{#if Mist.keyAddController.uploadingKey}}
+                        <div class="ajax-loader key-add-loader"></div>
+                    {{/if}} {{/if}}
 
-            <label for="key-add-private">Private Key
-                {{#if Mist.keyAddController.generatingKey}}
-                    <div class="ajax-loader key-add-loader"></div>
-                {{else}} {{#if Mist.keyAddController.uploadingKey}}
-                    <div class="ajax-loader key-add-loader"></div>
-                {{/if}} {{/if}}
-            </label>
+                    {{view Ember.TextArea id="key-add-private"
+                           value=Mist.keyAddController.keyPrivate}}
+                </label>
+            </div>
 
-            {{view Ember.TextArea id="key-add-private"
-                   value=Mist.keyAddController.keyPrivate}}
+
 
             <!-- Generate and Upload buttons -->
 

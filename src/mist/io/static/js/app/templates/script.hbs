@@ -30,9 +30,11 @@
             <div class="ajax-loader"></div>
         {{/if}}
 
-        <a id="run-script-btn"
-           class="responsive-button ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus"
-           {{action "runClicked" target=view}}>Run</a>
+        <div class="creation-button-container">
+            <a id="run-script-btn"
+               class="responsive-button creation-button ui-shadow ui-btn ui-btn-d ui-caps ui-btn-icon-right ui-icon-plus"
+               {{action "runClicked" target=view}}>Run Script</a>
+        </div>
 
        <div class="ui-shadow" data-role="collapsible" data-collapsed="false">
 

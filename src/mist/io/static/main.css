@@ -486,11 +486,24 @@ textarea {
     font-weight: 400;
     margin-bottom: 0 !important;
 }
+.floating-collapsible {
+    webkit-box-shadow: 0 4px 9px rgba(0,0,0,.1);
+    -moz-box-shadow: 0 4px 9px rgba(0,0,0,.1);
+    box-shadow: 0 4px 9px rgba(0,0,0,.1);
+}
 
 .floating-collapsible.ui-collapsible-collapsed,
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
-    background-color: transparent !important;
-    color: #0099cc !important;
+    background-color: #0099cc !important;
+    color: #fff !important;
+}
+.floating-collapsible.ui-collapsible-collapsed:hover,
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading:hover, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover {
+    background-color: #66C2E0 !important;
+}
+.floating-collapsible.ui-collapsible-collapsed:active,
+.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading:active, .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active {
+    background-color: #0081AC !important;
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
@@ -533,21 +546,9 @@ textarea {
 }
 
 .floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:before {
-    box-shadow: 1px 1px 10px #aaa;
-    background-color: #fff !important;
-    color: #0099cc !important;
+    color: #fff !important;
     -webkit-transform: none;
     transform: none;
-}
-
-.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:hover:before {
-    box-shadow: 0 1px 10px #666;
-}
-
-.floating-collapsible > h4.ui-collapsible-heading > a:active:before,
-.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a:active:before {
-    color: #fff !important;
-    background-color: #66C2E0 !important;
 }
 
 .floating-collapsible > .ui-collapsible-content {
@@ -583,15 +584,15 @@ textarea {
 #key-list-page .ui-filterable,
 #image-list-page .ui-filterable,
 #script-list-page .ui-filterable {
-    margin-top: -55px;
-    margin-bottom: 10px;
+    margin-top: -57px;
+    margin-bottom: 12px;
 }
 
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search,
 #script-list-page .ui-filterable .ui-input-search {
     margin-left: 55px;
-    margin-right: 215px;
+    margin-right: 260px;
 }
 #script-list-page .ui-filterable .ui-input-search {
     margin-left: 55px;
@@ -885,6 +886,9 @@ ul.checkbox-list .ui-grid-b {
 
 /* Notification popup */
 
+#notification-popup {
+    border: none;
+}
 #notification-popup h1 {
     color: #fff;
 }

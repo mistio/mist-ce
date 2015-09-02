@@ -11,12 +11,15 @@
     text-align: left;
     width: 14px;
     height: 22px;
-    margin: 11px !important;
+    margin: 18px 5px 10px 11px !important;
     font-size: 14px;
     line-height: 1.6em;
 }
 #script-list-page #select-scripts-btn:hover {
     color: #444 !important;
+}
+#script-list-page .ui-filterable .ui-input-search {
+    margin-right: 215px !important;
 }
 #script-list-page #run-script-btn {
     float: right;

@@ -27,7 +27,7 @@
     <div role="main" class="ui-content" data-theme="c">
 
         <div class="add-script-container">
-            {{component "script-add"}}
+
 
             <div class="clearfix"></div>
         </div>
@@ -39,7 +39,9 @@
                             ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
                 {{/if}}
             </div>
-            <div class="ui-block-b"></div>
+            <div class="ui-block-b">
+                {{component "script-add"}}
+            </div>
         </div><!-- /grid-b -->
 
         {{#if Mist.scriptsController.model.length}}
