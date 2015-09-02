@@ -154,6 +154,9 @@ define('app/views/graph_list_item', ['d3', 'c3'],
                     } else { // generate new chart
                         charts.push(c3.generate({
                             bindto: '#' + batch.id,
+                            padding: {
+                                right: 20
+                            },
                             data: {
                                 x: 'x',
                                 columns: cols,
@@ -205,6 +208,9 @@ define('app/views/graph_list_item', ['d3', 'c3'],
                                         return graph.valueText(value) + unit;
                                     }
                                 }
+                            },
+                            color: {
+                                pattern: ['#0099CC', '#D96557', '#FFC65D', '#2ECC71', '#FF1B00', '#000000', '#C87600']
                             }
                         }));
                         that.set('charts', charts);
