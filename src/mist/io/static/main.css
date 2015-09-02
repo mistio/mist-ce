@@ -582,8 +582,12 @@ textarea {
 
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable,
-#image-list-page .ui-filterable,
 #script-list-page .ui-filterable {
+    margin-top: -59px;
+    margin-bottom: 14px;
+}
+
+#image-list-page .ui-filterable {
     margin-top: -57px;
     margin-bottom: 12px;
 }

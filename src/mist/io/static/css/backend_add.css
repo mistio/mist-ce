@@ -207,3 +207,8 @@ h4.pendingSelect > a {
 #machine_key_help {
     margin-top: 24px;
 }
+
+#certificate,
+#private_key {
+    text-transform: uppercase;
+}
