@@ -156,7 +156,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 29%;
-    height: 21px;
+    height: 18px;
 }
 
 .has-incident label:after {

@@ -1,4 +1,3 @@
-
 /* Single Key Page CSS
 -----------------------------------------------------------------------------------------------------------*/
 #single-key-page > .ui-content {
@@ -27,6 +26,9 @@
     background-color: #faf9f4;
     padding: 10px 20px !important;
 }
+#single-key-page .ui-collapsible .ui-collapsible-content .ui-listview {
+    margin: 0;
+}
 #single-key-page #private_key {
     max-width: 100px;
     margin-left: auto;
@@ -37,6 +39,10 @@
         margin-top: -20px;
     }
 }
+#single-key-machines.ui-collapsible .ui-collapsible-content {
+    padding: 0 !important;
+}
+
 #single-key-machines .checkbox-link .ui-checkbox {
     display: none;
 }
@@ -59,7 +65,7 @@
     overflow: auto;
     font-family: monospace;
     width: 100%;
-    max-width: 610px;
+    max-width: 645px;
 }
 
 #single-key-page textarea {

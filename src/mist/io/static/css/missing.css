@@ -23,7 +23,8 @@
     padding: 15px 20px;
     color: #000;
     background-color: #d4d4d4;
-    box-shadow: 0 2px 10px rgba(0,0,0,.375);
+    -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
     text-transform: uppercase;
     text-decoration: none;
     display: inline-block;

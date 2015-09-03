@@ -58,6 +58,12 @@ span.terminal-cursor {
     right: 2px;
     bottom: 2px;
     position: absolute;
+    border-radius: 0;
+    border: none;
+}
+#machine-shell-popup.desktop .ui-btn:hover {
+    background-color: #FAF9F4 !important;
+    text-decoration: underline !important;
 }
 
 #machine-shell-popup.desktop,

@@ -487,9 +487,9 @@ textarea {
     margin-bottom: 0 !important;
 }
 .floating-collapsible {
-    webkit-box-shadow: 0 4px 9px rgba(0,0,0,.1);
-    -moz-box-shadow: 0 4px 9px rgba(0,0,0,.1);
-    box-shadow: 0 4px 9px rgba(0,0,0,.1);
+    webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    -moz-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
 
 .floating-collapsible.ui-collapsible-collapsed,
@@ -743,14 +743,20 @@ ul.checkbox-list .ui-grid-b {
 .tag {
     margin: 0;
     color: #444 !important;
-    padding: 0 7px;
+    padding: 0 6px 0 0;
     font-weight: normal;
     display: inline-block;
     float: right;
 }
 
+@media only screen and  (max-width: 600px) {
+    .tag {
+        padding: 0 12px 0 0;
+    }
+}
+
 #image-list .checkbox-link .tag {
-    margin: 11px 1px;
+    margin: 11px 10px 11px 0px;
 }
 
 /* Footer
@@ -1083,7 +1089,7 @@ ul.checkbox-list .ui-grid-b {
     border-width: 3px;
     border-style: solid;
     border-color: #fff;
-    margin: 2px 0px 0 0;
+    margin: 2px 3px 0 0;
     float: right;
     width: 50px;
     -webkit-transition: all .1s ease-in-out;
@@ -1147,10 +1153,12 @@ ul.checkbox-list .ui-grid-b {
     margin: 0px 1px;
     width: 4px;
     background-color: #7f7f7f;
+    opacity: .4;
 }
 
 .netleds .on {
-    background-color: rgba(0,0,0,0.6);
+    background-color: #7f7f7f;
+    opacity: 1;
 }
 
 .netled4 {

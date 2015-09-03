@@ -92,6 +92,12 @@
 #create-machine-panel #script .ui-collapsible {
     clear:both;
 }
+#create-machine-panel .ui-checkbox label:hover {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    color: #000000 !important;
+}
+
 #create-machine-panel .ui-checkbox label:after {
     background-image: none !important;
     background-color: transparent !important;

@@ -70,7 +70,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding-right: 16px;
-    color: #000;
+    color: #444;
 }
 .key-tags {
     float: right;
