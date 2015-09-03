@@ -1,16 +1,11 @@
-<div id="create-machine-panel"
-     data-swipe-close="false"
-     class="side-panel"
-     data-role="panel"
-     data-position="right"
-     data-display="overlay"
-     data-theme="a">
+<!-- Add machine button -->
+<div id="create-machine" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible"
+     data-role="collapsible"
+     data-collapsed="true">
 
-    <div data-role="header">
-        <h1 class="ui-title ui-caps">Create Machine</h1>
-    </div>
+    <h4>Create Machine</h4>
 
-    <div data-role="content" >
+    <div id="machine-create" data-role="content" >
 
         <!-- Select Name -->
 
@@ -304,5 +299,8 @@
         </div>
     </div>
 </div>
+
+<div id="create-machine-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
+     {{action "clickOverlay" target=view}}></div>
 
 {{component "key-add"}}

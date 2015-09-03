@@ -12,10 +12,6 @@
     position: relative;
 }
 
-.clearfix {
-    clear: both;
-}
-
 #script-add.ui-content {
     background-color: #FAF9F4;
     padding: 16px;
@@ -72,5 +68,4 @@
 
 #script-list {
     margin-top: -53px;
-    box-shadow: none;
 }

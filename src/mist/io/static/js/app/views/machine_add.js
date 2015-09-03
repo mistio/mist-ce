@@ -109,7 +109,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                     // Render collapsibles
                     if ($('.ui-collapsible').collapsible) {
-                        $('.ui-collapsible').collapsible();
+                        $('.ui-collapsible').collapsible().enhanceWithin();
                     }
 
                     // Render listviews
@@ -178,6 +178,10 @@ define('app/views/machine_add', ['app/views/controlled'],
              */
 
             actions: {
+
+                clickOverlay: function() {
+                    $('#create-machine').collapsible('collapse');
+                },
 
                 switchToggled: function () {
                     var value = this.$('#script select').val();

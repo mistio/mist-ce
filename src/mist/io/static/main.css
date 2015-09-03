@@ -622,6 +622,7 @@ textarea {
 #script-list-page .ui-filterable input {
     min-height: 35px;
     position: relative;
+    padding-left: 10.5px;
 }
 
 #machine-list-page .machines-header,
@@ -630,12 +631,10 @@ textarea {
 #script-list-page .scripts-header {
     background-color: #d4d4d4;
     margin-top: 30px;
-}
-#script-list-page .scripts-header {
-    background-color: #d4d4d4;
-    margin-top: 15px;
     overflow: visible;
 }
+#machine-list-page .machines-header:after,
+#key-list-page .keys-header:after,
 #script-list-page .scripts-header:after {
     content: '';
     clear: both;

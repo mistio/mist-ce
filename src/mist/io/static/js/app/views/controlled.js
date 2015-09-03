@@ -34,6 +34,7 @@ define('app/views/controlled', [],
                         collapse: function(event) {
                             $(this).children().next().slideUp(250);
                             var overlay = $(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
+                            // console.log(overlay);
                             if (overlay) {
                                 overlay.removeClass('in').addClass('ui-screen-hidden');
                                 overlay.height($())
@@ -41,6 +42,7 @@ define('app/views/controlled', [],
                         },
                         expand: function(event, ui) {
                             var overlay = $(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
+                            // console.log(overlay);
                             if (overlay) {
                                 overlay.removeClass('ui-screen-hidden').addClass('in');
                             }

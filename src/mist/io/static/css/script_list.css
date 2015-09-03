@@ -14,6 +14,7 @@
     margin: 18px 5px 10px 11px !important;
     font-size: 14px;
     line-height: 1.6em;
+    z-index: 2;
 }
 #script-list-page #select-scripts-btn:hover {
     color: #444 !important;
@@ -27,11 +28,6 @@
 }
 #script-list-page #add-script-btn {
     float: right;
-    margin: 0;
-}
-#script-list-page #select-scripts-btn {
-    float: left;
-    font-weight: normal;
     margin: 0;
 }
 #script-list-page .list-wrapper .ui-block-b {

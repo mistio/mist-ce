@@ -1,23 +1,43 @@
 
 /* Machine Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
-#create-machine-panel {
-    min-width: 320px;
-    width: 45%;
+#create-machine {
+    width: 281px;
+    box-shadow: none;
+    position: relative;
+    z-index: 10000;
+    top: 0;
+    right: 0;
 }
-#create-machine-panel .ui-panel-inner {
+
+#create-machine.ui-collapsible-collapsed {
+    width: 255px;
+    position: relative;
+}
+
+#create-machine.floating-collapsible > h4.ui-collapsible-heading > a {
+    padding: 20px 91px 20px 35px !important;
+}
+
+#create-machine-overlay {
+    z-index: 899;
+    min-height: 800px;
+}
+#machine-create .ui-panel-inner {
     padding: 0;
 }
-#create-machine-panel .ui-content {
-    padding: 0 1em 1em;
+#machine-create.ui-content {
+    background-color: #FAF9F4;
+    padding: 16px;
+    width: 249px;
 }
-#create-machine-panel .docker {
+#machine-create .docker {
 	display:none;
 }
-#create-machine-panel label {
+#machine-create label {
     margin-top: 1em;
 }
-#create-machine-panel .ui-header {
+#machine-create .ui-header {
     text-align: left;
     font-size: 18px;
     padding: 20px 91px 20px 16px !important;
@@ -26,62 +46,62 @@
     background-color: #D4D4D4 !important;
     color: #444 !important;
 }
-#create-machine-panel .ui-header .ui-title {
+#machine-create .ui-header .ui-title {
     padding: 0;
     margin: 0;
     text-align: left;
 }
-#create-machine-panel .ui-collapsible-content {
+#machine-create .ui-collapsible-content {
     max-height: 120px;
     overflow-y: auto;
 }
-#create-machine-panel .ui-collapsible-heading-toggle {
+#machine-create .ui-collapsible-heading-toggle {
     font-size: 16px;
 }
-#create-machine-panel .ui-collapsible-heading > a {
+#machine-create .ui-collapsible-heading > a {
     background-color: #0099cc !important;
     border-color: #0099cc !important;
     color: #fff !important;
     text-transform: uppercase;
 }
-#create-machine-panel .ui-collapsible .ui-listview {
+#machine-create .ui-collapsible .ui-listview {
     margin: 0;
 }
-#create-machine-panel .ui-collapsible .ui-listview .ui-btn,
-#create-machine-panel .ui-collapsible-heading-toggle {
+#machine-create .ui-collapsible .ui-listview .ui-btn,
+#machine-create .ui-collapsible-heading-toggle {
     line-height: 21px;
     padding-top: 5.5px !important;
     padding-bottom: 5.5px !important;
 }
-#create-machine-panel h4.select-provider a,
-#create-machine-panel h4 a:hover,
-#create-machine-panel ul li a:hover {
+#machine-create h4.select-provider a,
+#machine-create h4 a:hover,
+#machine-create ul li a:hover {
     background-color: #66C2E0;
     border-color: #66C2E0;
     color: #fff !important;
     text-shadow: 0 0 0 #66C2E0;
 }
 
-#create-machine-panel h4.select-provider a:active,
-#create-machine-panel h4 a:active,
-#create-machine-panel ul li a:active {
+#machine-create h4.select-provider a:active,
+#machine-create h4 a:active,
+#machine-create ul li a:active {
     background-color: #66C2E0;
     border-color: #66C2E0;
     text-shadow: 0 0 0 #66C2E0;
 }
-#create-machine-panel .ui-collapsible-heading-toggle {
+#machine-create .ui-collapsible-heading-toggle {
     font-size: 16px;
 }
 
-#create-machine-panel .selected-key .ui-collapsible-heading-toggle {
+#machine-create .selected-key .ui-collapsible-heading-toggle {
     color: #000 !important;
     background-color: #FAF9F4 !important;
 }
-#create-machine-panel .ok-cancel div:first-child .ui-btn {
+#machine-create .ok-cancel div:first-child .ui-btn {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
 }
-#create-machine-panel .ok-cancel div:nth-child(2) .ui-btn {
+#machine-create .ok-cancel div:nth-child(2) .ui-btn {
 	border-top-left-radius: 0px;
 	border-bottom-left-radius: 0px;
 }
@@ -102,27 +122,27 @@
 #create-machine-network .ui-collapsible-content {
 	padding: 0;
 }
-#create-machine-panel #script .ui-slider {
+#machine-create #script .ui-slider {
     width: 40%;
     float: right;
 }
-#create-machine-panel #script label {
+#machine-create #script label {
     float: left;
 }
-#create-machine-panel #script textarea {
+#machine-create #script textarea {
     height: auto !important;
     clear: both;
 }
-#create-machine-panel #script .ui-collapsible {
+#machine-create #script .ui-collapsible {
     clear:both;
 }
-#create-machine-panel .ui-checkbox label:hover {
+#machine-create .ui-checkbox label:hover {
     background-color: #FAF9F4;
     border-color: #FAF9F4;
     color: #000000 !important;
 }
 
-#create-machine-panel .ui-checkbox label:after {
+#machine-create .ui-checkbox label:after {
     background-image: none !important;
     background-color: transparent !important;
     opacity: 1;
@@ -130,14 +150,14 @@
     transition: color .2s linear;
 }
 
-#create-machine-panel .ui-checkbox label.ui-checkbox-on:after {
+#machine-create .ui-checkbox label.ui-checkbox-on:after {
     color: #000;
 }
 
-#create-machine-panel .ui-checkbox label.ui-checkbox-off:after {
+#machine-create .ui-checkbox label.ui-checkbox-off:after {
     color: #d1d1d1;
 }
 
-#create-machine-panel .ui-checkbox label.ui-checkbox-off:hover:after {
+#machine-create .ui-checkbox label.ui-checkbox-off:hover:after {
     color: #444444 !important;
 }

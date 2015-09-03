@@ -34,8 +34,7 @@
             </div>
             <div class="ui-block-b"></div>
             <div class="ui-block-c">
-                <a id="create-machine-btn" class="creation-button responsive-button ui-btn ui-btn-add ui-btn-d ui-icon-plus
-                        ui-btn-icon-right ui-caps" {{action "createClicked" target=view}}>Create Machine</a>
+                {{component "machine-add"}}
             </div>
         </div>
         <!-- /grid-b -->
@@ -55,8 +54,6 @@
     </div>
 
     {{component "dialog-popup"}}
-
-    {{component "machine-add"}}
 
     {{component "machine-tags"}}
 

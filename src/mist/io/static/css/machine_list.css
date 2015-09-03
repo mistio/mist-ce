@@ -10,6 +10,10 @@
     padding: 20px 60px 20px 25px !important;
     font-weight: 400 !important;
     font-size: 18px;
+    position: relative;
+    top: 0;
+    right: 0;
+    z-index: 1000;
 }
 #machine-list-page .creation-button:after {
     background-image: none;
@@ -38,6 +42,10 @@
     margin: 18px 5px 10px 11px;
     font-size: 14px;
     line-height: 1.6em;
+    z-index: 2;
+}
+#machine-list-page #select-machines-btn:hover {
+        color: #444 !important;
 }
 #machine-list-page .ui-filterable .ui-input-search {
     margin-right: 280px;
@@ -52,6 +60,13 @@
 
 #machine-list-page .ui-block-b .ui-title {
     text-align: center;
+}
+
+#machines {
+    margin-top: -53px;
+}
+#machines .ui-listview {
+    box-shadow: none;
 }
 .running .machine-state span {
     color: #64b247;

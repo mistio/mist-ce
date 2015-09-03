@@ -44,13 +44,13 @@ define('app/controllers/machine_add', ['ember'],
                 $('#create-machine-panel .ui-panel-inner').animate({scrollTop:0}, 'slow');
                 $('#create-machine-panel').panel('open');
                 $('.ui-panel-dismiss-position-right').css('right',($('.ui-panel-position-right.ui-panel-open').width()));
-                Ember.run.next(function(){
-                    var panelHeight = $('.ui-panel-open').height(),
-                        pageHeight = $('.ui-page-active').height();
-                    if ( panelHeight > pageHeight) {
-                        $('.ui-page-active').height(panelHeight);
-                    }
-                });
+                // Ember.run.next(function(){
+                //     var panelHeight = $('.ui-panel-open').height(),
+                //         pageHeight = $('.ui-page-active').height();
+                //     if ( panelHeight > pageHeight) {
+                //         $('.ui-page-active').height(panelHeight);
+                //     }
+                // });
                $('#create-machine-location').addClass('ui-state-disabled');
                $('#create-machine-image').addClass('ui-state-disabled');
                $('#create-machine-size').addClass('ui-state-disabled');

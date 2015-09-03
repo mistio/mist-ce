@@ -17,6 +17,7 @@
     margin: 18px 5px 10px 11px;
     font-size: 14px;
     line-height: 1.6em;
+    z-index: 2;
 }
 #key-list-page #select-keys-btn:hover {
     color: #444 !important;
@@ -80,5 +81,4 @@
 
 #key-list {
     margin-top: -53px;
-    box-shadow: none;
 }
