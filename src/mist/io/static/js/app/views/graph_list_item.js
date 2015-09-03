@@ -211,12 +211,6 @@ define('app/views/graph_list_item', ['d3', 'c3'],
                             },
                             color: {
                                 pattern: ['#0099CC', '#8c76d1', '#D46355', '#FFC65D', '#64B247', '#FF1B00', '#000000', '#C87600']
-                            },
-                            grid: {
-                                x: {
-                                    show: true,
-                                    class: 'pipa'
-                                }
                             }
                         }));
                         that.set('charts', charts);
