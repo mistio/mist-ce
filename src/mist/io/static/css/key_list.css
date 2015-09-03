@@ -27,6 +27,10 @@
     padding: 20px 60px 20px 25px !important;
     font-weight: 400 !important;
     font-size: 18px;
+    position: relative;
+    top: 0;
+    right: 0;
+    z-index: 1000;
 }
 #key-list-page .creation-button:after {
     background-image: none;
@@ -47,9 +51,6 @@
 }
 #key-list-page .ui-block-b .ui-title {
     text-align: center;
-}
-#key-list-page .ui-filterable {
-    clear: both;
 }
 #key-list-page .tag {
     position: relative;
@@ -75,4 +76,9 @@
 .key-tags {
     float: right;
     margin-top: -8px;
+}
+
+#key-list {
+    margin-top: -53px;
+    box-shadow: none;
 }

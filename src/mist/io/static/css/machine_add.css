@@ -53,6 +53,30 @@
     padding-top: 5.5px !important;
     padding-bottom: 5.5px !important;
 }
+#create-machine-panel h4.select-provider a,
+#create-machine-panel h4 a:hover,
+#create-machine-panel ul li a:hover {
+    background-color: #66C2E0;
+    border-color: #66C2E0;
+    color: #fff !important;
+    text-shadow: 0 0 0 #66C2E0;
+}
+
+#create-machine-panel h4.select-provider a:active,
+#create-machine-panel h4 a:active,
+#create-machine-panel ul li a:active {
+    background-color: #66C2E0;
+    border-color: #66C2E0;
+    text-shadow: 0 0 0 #66C2E0;
+}
+#create-machine-panel .ui-collapsible-heading-toggle {
+    font-size: 16px;
+}
+
+#create-machine-panel .selected-key .ui-collapsible-heading-toggle {
+    color: #000 !important;
+    background-color: #FAF9F4 !important;
+}
 #create-machine-panel .ok-cancel div:first-child .ui-btn {
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;

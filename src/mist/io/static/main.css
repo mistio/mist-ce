@@ -268,7 +268,7 @@ textarea.ui-input-text,
  .ui-header .nav-back.ui-btn:hover {
     color: #7f7f7f !important;
 }
-@media only screen and  (max-width: 550px) {
+@media only screen and  (max-width: 600px) {
     .ui-header .nav-back.ui-btn span {
         display: none !important;
     }
@@ -583,8 +583,9 @@ textarea {
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable,
 #script-list-page .ui-filterable {
-    margin-top: -59px;
-    margin-bottom: 14px;
+    position: relative;
+    top: -59px;
+    z-index: 1;
 }
 
 #image-list-page .ui-filterable {
@@ -633,6 +634,12 @@ textarea {
 #script-list-page .scripts-header {
     background-color: #d4d4d4;
     margin-top: 15px;
+    overflow: visible;
+}
+#script-list-page .scripts-header:after {
+    content: '';
+    clear: both;
+    display: table;
 }
 
 

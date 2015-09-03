@@ -1,10 +1,15 @@
-#add-script.ui-collapsible-collapsed {
-    width: 200px;
-    position: inherit;
-}
-
 #add-script {
     width: 281px;
+    box-shadow: none;
+    position: relative;
+    z-index: 10000;
+    top: 0;
+    right: 0;
+}
+
+#add-script.ui-collapsible-collapsed {
+    width: 200px;
+    position: relative;
 }
 
 .clearfix {
@@ -39,4 +44,33 @@
     line-height: 21px;
     padding-top: 5.5px !important;
     padding-bottom: 5.5px !important;
+}
+#script-add h4.select-provider a,
+#script-add h4 a:hover,
+#script-add ul li a:hover {
+    background-color: #66C2E0;
+    border-color: #66C2E0;
+    color: #fff !important;
+    text-shadow: 0 0 0 #66C2E0;
+}
+
+#script-add h4.select-provider a:active,
+#script-add h4 a:active,
+#script-add ul li a:active {
+    background-color: #66C2E0;
+    border-color: #66C2E0;
+    text-shadow: 0 0 0 #66C2E0;
+}
+#script-add .ui-collapsible-heading-toggle {
+    font-size: 16px;
+}
+
+#script-add .selected-key .ui-collapsible-heading-toggle {
+    color: #000 !important;
+    background-color: #FAF9F4 !important;
+}
+
+#script-list {
+    margin-top: -53px;
+    box-shadow: none;
 }
