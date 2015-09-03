@@ -73,7 +73,7 @@ def splash_waiting_with_timeout(context, seconds):
     wait_for_splash_to_load(context, timeout=(int(seconds)-10))
 
 
-def wait_for_splash_to_appear(context, timeout=10):
+def wait_for_splash_to_appear(context, timeout=20):
     end = time() + timeout
     while time() < end:
         try:
