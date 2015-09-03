@@ -13,7 +13,6 @@
         {{#if graph.pendingCreation}}
 
             <div class="ajax-loader"></div>
-
         {{else}}
 
             {{#if graph.pendingRemoval}}
@@ -30,7 +29,7 @@
 
         {{#if Mist.graphsController.config.canModify}}
             {{#unless graph.isBuiltIn}}
-                <a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext"
+                <a class="ui-btn ui-shadow icon-xx ui-btn-icon-notext"
                     {{action "removeClicked" graph target=view.actionProxy}}>x
                 </a>
             {{/unless}}
@@ -41,7 +40,7 @@
         -->
 
         {{#if Mist.graphsController.config.canMinimize}}
-            <a class="ui-btn ui-btn-c ui-btn-icon-notext ui-corner-all ui-icon-arrow-d"
+            <a class="ui-btn ui-btn-c ui-btn-icon-notext icon-down"
                 {{action "collapseClicked" graph target=view.actionProxy}}>-
             </a>
         {{/if}}

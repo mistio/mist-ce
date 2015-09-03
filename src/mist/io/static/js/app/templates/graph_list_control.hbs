@@ -8,7 +8,6 @@
             class="time
                 ui-btn
                 ui-mini
-                ui-corner-all
                 ui-btn-inline
                 ui-btn-icon-notext
                 ui-icon-carat-l
@@ -23,7 +22,6 @@
                 class="time
                     ui-btn
                     ui-mini
-                    ui-corner-all
                     ui-btn-inline
                     ui-btn-icon-notext
                     ui-icon-carat-r
@@ -87,8 +85,7 @@
                 class="small-popup
                     ui-popup
                     ui-body-inherit
-                    ui-overlay-shadow
-                    ui-corner-all"
+                    ui-overlay-shadow"
                 data-role="popup"
                 data-enhanced="true"
                 data-position-to="#time-window-control"
@@ -109,16 +106,15 @@
                     <div class="ok-cancel
                             ui-controlgroup
                             ui-controlgroup-horizontal
-                            ui-group-theme-a
-                            ui-corner-all"
+                            ui-group-theme-a"
                         data-role="controlgroup"
                         data-type="horizontal">
 
-                        <a class="ui-btn"
+                        <a class="ui-btn ui-caps back"
                             {{action "rangeBackClicked" target=view}}>
                                 Back
                         </a>
-                        <a id="key-add-ok" class="ui-btn ui-btn-d"
+                        <a id="key-add-ok" class="ui-btn ui-caps yes"
                             {{action "rangeOkClicked" target=view}}>
                                 OK
                         </a>

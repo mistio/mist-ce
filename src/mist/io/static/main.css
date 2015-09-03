@@ -487,7 +487,7 @@ textarea {
     margin-bottom: 0 !important;
 }
 .floating-collapsible {
-    webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
     -moz-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
@@ -1354,7 +1354,7 @@ ul.checkbox-list .ui-grid-b {
 
 #no-collection-inner .floating-collapsible {
     float: none;
-    margin: 20px auto;
+    margin: 20px auto !important;
 }
 
 /* Dialog

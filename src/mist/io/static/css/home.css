@@ -75,7 +75,8 @@
     }
 }
 
-#dashboard-options > div {
+#dashboard-options > div,
+.graph-list {
     margin-bottom: 30px;
 }
 
