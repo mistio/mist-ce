@@ -6,7 +6,7 @@
                 <div class="ui-grid-b">
                     <div class="ui-block-a">
                         <a href="#" class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
-                        ui-btn-icon-left ui-corner-all nav-back"><span>Home</span></a>
+                        ui-btn-icon-left nav-back"><span>Home</span></a>
                     </div>
 
                     <div class="ui-block-b">
@@ -40,7 +40,7 @@
         </div>
         <!-- /grid-b -->
 
-        <ul id="machines" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter machines" data-theme="c" class="checkbox-list ui-shadow">
+        <ul id="machines" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter machines" data-theme="c" class="checkbox-list">
             {{#each Mist.backendsController.model as |backend|}}
                 {{#if backend.enabled}}
                     {{#each backend.machines.model as |machine|}}
@@ -89,7 +89,7 @@
     <div class="tri-action-footer" data-role="footer" data-theme="b">
         <div class="ui-grid-b">
             <div class="ui-block-a">
-                <a id="machines-tags-btn" class="ui-btn icon-tag ui-btn-icon-right ui-caps ui-shadow ui-corner-all" {{action "tagsClicked" target=view}}>Tags</a>
+                <a id="machines-tags-btn" class="ui-btn icon-tag ui-btn-icon-right ui-caps" {{action "tagsClicked" target=view}}>Tags</a>
             </div>
             <div class="ui-block-b">
                 {{#if view.selectedMachine.isWindows}}
