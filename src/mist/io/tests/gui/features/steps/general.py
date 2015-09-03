@@ -58,6 +58,7 @@ def standard_splash_waiting(context):
     Function that waits for the splash to load. The maximum time for the page
     to load is 60 seconds in this case
     """
+    wait_for_splash_to_appear(context)
     wait_for_splash_to_load(context)
 
 
@@ -65,14 +66,26 @@ def standard_splash_waiting(context):
 def splash_waiting_with_timeout(context, seconds):
     """
     Function that waits for the splash page to load but fora maximum amount
-    of seconds
+    of seconds. The amount of time given must be enough for the splash page
+    to appear first and then also load.
     """
-    wait_for_splash_to_load(context, timeout=int(seconds))
+    wait_for_splash_to_appear(context, 10)
+    wait_for_splash_to_load(context, timeout=(int(seconds)-10))
+
+
+def wait_for_splash_to_appear(context, timeout=10):
+    end = time() + timeout
+    while time() < end:
+        try:
+            context.browser.find_element_by_id("splash")
+            return
+        except NoSuchElementException:
+            sleep(1)
+    assert False, u'Splash did not appear after %s seconds' % str(timeout)
 
 
 def wait_for_splash_to_load(context, timeout=60):
-    current_time = time()
-    end = current_time + timeout
+    end = time() + timeout
     while time() < end:
         splash_page = context.browser.find_element_by_id("splash")
         display = splash_page.value_of_css_property("display")
