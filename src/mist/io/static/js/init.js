@@ -361,6 +361,7 @@ var setupMainChannel = function(socket, callback) {
     })
     .on('list_backends', function (backends) {
         Mist.backendsController.load(backends);
+        Mist.backendsController.set('loaded');
         if (callback)
             callback();
         callback = null;

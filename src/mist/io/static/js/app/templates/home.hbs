@@ -13,8 +13,8 @@
 
     <!-- Page Body -->
     <div role="main" class="ui-content" data-theme="c">
-
-        {{#unless Mist.backendsController.model.length}}
+        {{#if Mist.backendsController.loaded}}
+        {{#unless Mist.backendsController.model}}
             <div id="no-collection" class="ui-responsive">
                 <div id="no-collection-inner" class="ui-body ui-shadow">
                     <span class="icon-cloud-check"></span>
@@ -27,6 +27,7 @@
                 </div>
             </div>
         {{/unless}}
+        {{/if}}
 
         {{view "backendAdd"}}
 

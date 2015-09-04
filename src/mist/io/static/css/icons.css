@@ -44,9 +44,9 @@
 .icon-image:after{content:'\0042';}
 .icon-image:hover{background-color: #0099cc !important;}
 
-.icon-network{color: #795598 !important;}
+.icon-network{color: #795548 !important;}
 .icon-network:after{content:'\0043';}
-.icon-network:hover{background-color: #795598 !important;}
+.icon-network:hover{background-color: #795548 !important;}
 
 .icon-keys{color: #D96557 !important;}
 .icon-keys:after{content:'\0044';}

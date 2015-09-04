@@ -50,6 +50,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/network_create.hbs',
         'text!app/templates/network_list.hbs',
         'text!app/templates/network_list_item.hbs',
+        'text!app/templates/networks.hbs',
         'text!app/templates/rule.hbs',
         'text!app/templates/rule_edit.hbs',
         'text!app/templates/rule_list.hbs',
@@ -112,19 +113,20 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['network_create'] = Ember.Handlebars.compile(arguments[45]);
         Ember.TEMPLATES['network_list'] = Ember.Handlebars.compile(arguments[46]);
         Ember.TEMPLATES['network_list_item'] = Ember.Handlebars.compile(arguments[47]);
-        Ember.TEMPLATES['rule'] = Ember.Handlebars.compile(arguments[48]);
-        Ember.TEMPLATES['rule_edit'] = Ember.Handlebars.compile(arguments[49]);
-        Ember.TEMPLATES['rule_list'] = Ember.Handlebars.compile(arguments[50]);
-        Ember.TEMPLATES['script'] = Ember.Handlebars.compile(arguments[51]);
-        Ember.TEMPLATES['script_add'] = Ember.Handlebars.compile(arguments[52]);
-        Ember.TEMPLATES['script_edit'] = Ember.Handlebars.compile(arguments[53]);
-        Ember.TEMPLATES['script_list'] = Ember.Handlebars.compile(arguments[54]);
-        Ember.TEMPLATES['script_list_item'] = Ember.Handlebars.compile(arguments[55]);
-        Ember.TEMPLATES['script_log_list'] = Ember.Handlebars.compile(arguments[56]);
-        Ember.TEMPLATES['script_run'] = Ember.Handlebars.compile(arguments[57]);
-        Ember.TEMPLATES['scripts'] = Ember.Handlebars.compile(arguments[58]);
-        Ember.TEMPLATES['subnet_list_item'] = Ember.Handlebars.compile(arguments[59]);
-        Ember.TEMPLATES['user_menu'] = Ember.Handlebars.compile(arguments[60]);
+        Ember.TEMPLATES['networks'] = Ember.Handlebars.compile(arguments[48]);
+        Ember.TEMPLATES['rule'] = Ember.Handlebars.compile(arguments[49]);
+        Ember.TEMPLATES['rule_edit'] = Ember.Handlebars.compile(arguments[50]);
+        Ember.TEMPLATES['rule_list'] = Ember.Handlebars.compile(arguments[51]);
+        Ember.TEMPLATES['script'] = Ember.Handlebars.compile(arguments[52]);
+        Ember.TEMPLATES['script_add'] = Ember.Handlebars.compile(arguments[53]);
+        Ember.TEMPLATES['script_edit'] = Ember.Handlebars.compile(arguments[54]);
+        Ember.TEMPLATES['script_list'] = Ember.Handlebars.compile(arguments[55]);
+        Ember.TEMPLATES['script_list_item'] = Ember.Handlebars.compile(arguments[56]);
+        Ember.TEMPLATES['script_log_list'] = Ember.Handlebars.compile(arguments[57]);
+        Ember.TEMPLATES['script_run'] = Ember.Handlebars.compile(arguments[58]);
+        Ember.TEMPLATES['scripts'] = Ember.Handlebars.compile(arguments[59]);
+        Ember.TEMPLATES['subnet_list_item'] = Ember.Handlebars.compile(arguments[60]);
+        Ember.TEMPLATES['user_menu'] = Ember.Handlebars.compile(arguments[61]);
         callback();
         info('loaded raw templates');
       });

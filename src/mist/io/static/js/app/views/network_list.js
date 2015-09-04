@@ -12,36 +12,26 @@ define('app/views/network_list', ['app/views/page'],
 
             templateName: 'network_list',
 
-            //
+
             //
             //  Initialization
             //
-            //
-
 
             load: function () {
-
                 // Add event listeners
                 Mist.backendsController.on('onSelectedNetworksChange', this, 'updateFooter');
                 this.updateFooter();
-
             }.on('didInsertElement'),
 
-
             unload: function () {
-
                 // Remove event listeners
                 Mist.keysController.off('onSelectedNetworksChange', this, 'updateFooter');
-
             }.on('willDestroyElement'),
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             updateFooter: function () {
                 if (Mist.backendsController.selectedNetworks.length)
@@ -52,21 +42,15 @@ define('app/views/network_list', ['app/views/page'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 createClicked: function () {
                     Mist.networkCreateController.open();
                 },
 
-
                 deleteClicked: function () {
-
                     var networkNames = Mist.backendsController
                         .selectedNetworks.toStringByProperty('name');
 

@@ -14,13 +14,9 @@ define('app/models/network', [
 
         return BaseModel.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             status: null,
             subnets: null,
@@ -29,11 +25,8 @@ define('app/models/network', [
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             load: function () {
                 var subnets = this.get('subnets')
@@ -44,9 +37,7 @@ define('app/models/network', [
                 this._updateSubnets(subnets);
             }.on('init'),
 
-
             update: function (data) {
-
                 // Do not modify original data because it introduces
                 // debuging problems
                 var newData = Ember.Object.create(data);
@@ -59,7 +50,7 @@ define('app/models/network', [
             },
 
             _updateSubnets: function (subnets) {
-                this.get('subnets').setContent(subnets);
+                this.get('subnets').setModel(subnets);
             },
         });
     }
