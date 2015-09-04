@@ -38,24 +38,13 @@ define('app/controllers/machine_add', ['ember'],
                 // In case page is scrolled, opening the
                 // panel introduces an unpleasant view.
                 // Scrolling to top fixes that
-                $('#create-machine-panel .docker').hide();
-                $('#create-machine-panel .azure').hide();
-                $('.ui-page-active').animate({scrollTop:0}, 'slow');
-                $('#create-machine-panel .ui-panel-inner').animate({scrollTop:0}, 'slow');
-                $('#create-machine-panel').panel('open');
-                $('.ui-panel-dismiss-position-right').css('right',($('.ui-panel-position-right.ui-panel-open').width()));
-                // Ember.run.next(function(){
-                //     var panelHeight = $('.ui-panel-open').height(),
-                //         pageHeight = $('.ui-page-active').height();
-                //     if ( panelHeight > pageHeight) {
-                //         $('.ui-page-active').height(panelHeight);
-                //     }
-                // });
-               $('#create-machine-location').addClass('ui-state-disabled');
-               $('#create-machine-image').addClass('ui-state-disabled');
-               $('#create-machine-size').addClass('ui-state-disabled');
-               $('#create-machine-key').addClass('ui-state-disabled');
-                $('#create-machine-panel .ui-collapsible').collapsible('option', 'collapsedIcon', 'carat-d')
+                $('#machine-create .docker').hide();
+                $('#machine-create .azure').hide();
+                $('#create-machine-location').addClass('ui-state-disabled');
+                $('#create-machine-image').addClass('ui-state-disabled');
+                $('#create-machine-size').addClass('ui-state-disabled');
+                $('#create-machine-key').addClass('ui-state-disabled');
+                $('#machine-create .ui-collapsible').collapsible('option', 'collapsedIcon', 'carat-d')
                     .collapsible('collapse');
 
                 this._clear();
@@ -65,7 +54,7 @@ define('app/controllers/machine_add', ['ember'],
 
 
             close: function() {
-                $('#create-machine-panel').panel('close');
+                $('#machine-create').panel('close');
                 this._clear();
             },
 
@@ -177,7 +166,6 @@ define('app/controllers/machine_add', ['ember'],
 
 
             _updateFormReady: function() {
-
                 var formReady = false;
                 if (this.newMachineName &&
                     this.newMachineSize.id &&

@@ -5,7 +5,7 @@
     width: 281px;
     box-shadow: none;
     position: relative;
-    z-index: 10000;
+    z-index: 1000;
     top: 0;
     right: 0;
 }
@@ -13,6 +13,7 @@
 #create-machine.ui-collapsible-collapsed {
     width: 255px;
     position: relative;
+    z-index: 2;
 }
 
 #create-machine.floating-collapsible > h4.ui-collapsible-heading > a {

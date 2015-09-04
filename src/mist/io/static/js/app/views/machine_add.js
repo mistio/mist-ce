@@ -123,46 +123,47 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             showDockerMenu: function () {
                 this.hideDockerMenu();
-                $('#create-machine-panel #location').hide();
-                $('#create-machine-panel #script').hide();
-                $('#create-machine-panel #size').hide();
-                $('#create-machine-panel #key').hide();
+                $('#machine-create #location').hide();
+                $('#machine-create #script').hide();
+                $('#machine-create #size').hide();
+                $('#machine-create #key').hide();
                 $('#create-machine-monitoring').hide();
-                $('#create-machine-panel .docker').show();
-                $('#create-machine-panel #ports').show();
+                $('#machine-create .docker').show();
+                $('#machine-create #ports').show();
             },
 
 
             showMistDockerMenu: function () {
                 this.hideDockerMenu();
-                $('#create-machine-panel #location').hide();
-                $('#create-machine-panel #size').hide();
-                $('#create-machine-panel #ports').show();
+                $('#machine-create #location').hide();
+                $('#machine-create #size').hide();
+                $('#machine-create #ports').show();
             },
 
 
             hideDockerMenu: function () {
-                $('#create-machine-panel #location').show();
-                $('#create-machine-panel #script').show();
-                $('#create-machine-panel #size').show();
-                $('#create-machine-panel #key').show();
+                $('#machine-create #location').show();
+                $('#machine-create #script').show();
+                $('#machine-create #size').show();
+                $('#machine-create #key').show();
                 $('#create-machine-monitoring').show();
-                $('#create-machine-panel .docker').hide();
-                $('#create-machine-panel #ports').hide();
+                $('#machine-create .docker').hide();
+                $('#machine-create #ports').hide();
             },
 
 
             showAzureMenu: function () {
-                $('#create-machine-panel .azure').show();
+                $('#machine-create .azure').show();
             },
 
 
             hideAzureMenu: function () {
-                $('#create-machine-panel .azure').hide();
+                $('#machine-create .azure').hide();
             },
 
 
              updateLaunchButton: function () {
+                 console.log(Mist.machineAddController.formReady);
                 if (Mist.machineAddController.formReady) {
                     $('#create-machine-ok').removeClass('ui-state-disabled');
                 } else {
@@ -211,10 +212,10 @@ define('app/views/machine_add', ['app/views/controlled'],
                     $('#create-machine-location').addClass('ui-state-disabled');
                     $('#create-machine-size').addClass('ui-state-disabled');
                     $('#create-machine-key').addClass('ui-state-disabled');
-                    $('#create-machine-panel .docker textarea').addClass('ui-state-disabled');
-                    $('#create-machine-panel .docker .ui-checkbox').addClass('ui-state-disabled');
+                    $('#machine-create .docker textarea').addClass('ui-state-disabled');
+                    $('#machine-create .docker .ui-checkbox').addClass('ui-state-disabled');
                     $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
-                    $('#create-machine-panel #ports').addClass('ui-state-disabled');
+                    $('#machine-create #ports').addClass('ui-state-disabled');
 
                     if (backend.get('requiresNetworkOnCreation')) {
                         if (backend.networks.model.length > 0) {
@@ -266,10 +267,10 @@ define('app/views/machine_add', ['app/views/controlled'],
                            $('#create-machine-key').removeClass('ui-state-disabled');
                        } else {
                            view.showDockerMenu();
-                           $('#create-machine-panel .docker textarea')
+                           $('#machine-create .docker textarea')
                                 .removeClass('ui-state-disabled');
                        }
-                       $('#create-machine-panel #ports').removeClass('ui-state-disabled');
+                       $('#machine-create #ports').removeClass('ui-state-disabled');
                    }
                 },
 
@@ -282,8 +283,8 @@ define('app/views/machine_add', ['app/views/controlled'],
                                              .set('newMachineSize', size);
 
                     $('#create-machine-location').removeClass('ui-state-disabled');
-                    $('#create-machine-panel .docker textarea').removeClass('ui-state-disabled');
-                    $('#create-machine-panel .docker .ui-checkbox').removeClass('ui-state-disabled');
+                    $('#machine-create .docker textarea').removeClass('ui-state-disabled');
+                    $('#machine-create .docker .ui-checkbox').removeClass('ui-state-disabled');
                     $('#create-machine-key').addClass('ui-state-disabled');
                     $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
 

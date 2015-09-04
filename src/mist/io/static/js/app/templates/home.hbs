@@ -48,55 +48,55 @@
                     <ul class="ui-listview ui-listview-inset ui-corner-all ui-caps options-list">
                         <!-- Machines link -->
                         <li class="ui-li-has-count ui-first-child">
-                            <a class="ui-btn ui-btn-icon-left icon-machine ui-alt-icon" href="#/machines">
+                            {{#link-to 'machines' class="ui-btn ui-btn-icon-left icon-machine ui-alt-icon"}}
                                 <span class="ui-li-count ui-body-inherit">
                                     {{view.machineCount}}
                                 </span>
                                 Machines
-                            </a>
+                            {{/link-to}}
                         </li>
 
                         <!-- Images link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn ui-btn-icon-left icon-image ui-alt-icon" href="#/images">
+                            {{#link-to 'images' class="ui-btn ui-btn-icon-left icon-image ui-alt-icon"}}
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.backendsController.imageCount}}
                                 </span>
                                 Images
-                            </a>
+                            {{/link-to}}
                         </li>
 
                         <!-- Networks link -->
                         {{#if Mist.backendsController.hasNetworks}}
                         <li class="ui-li-has-count">
-                            <a class="ui-btn ui-btn-icon-left icon-network ui-alt-icon" href="#/networks">
+                            {{#link-to 'networks' class="ui-btn ui-btn-icon-left icon-network ui-alt-icon"}}
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.backendsController.networkCount}}
                                 </span>
                                 Networks
-                            </a>
+                            {{/link-to}}
                         </li>
                         {{/if}}
 
                         <!-- Keys link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn ui-btn-icon-left icon-keys ui-alt-icon" href="#/keys">
+                            {{#link-to 'keys' class="ui-btn ui-btn-icon-left icon-keys ui-alt-icon"}}
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.keysController.model.length}}
                                 </span>
                                 Keys
-                            </a>
+                            {{/link-to}}
                         </li>
 
                         {{#if Mist.isCore}}
                         <!-- Scripts link -->
                         <li class="ui-li-has-count">
-                            <a class="ui-btn ui-btn-icon-left icon-script ui-alt-icon" href="#/scripts">
+                            {{#link-to 'scripts' class="ui-btn ui-btn-icon-left icon-script ui-alt-icon"}}
                                 <span class="ui-li-count ui-body-inherit">
                                     {{Mist.scriptsController.model.length}}
                                 </span>
                                 Scripts
-                            </a>
+                            {{/link-to}}
                         </li>
                         {{/if}}
                     </ul>

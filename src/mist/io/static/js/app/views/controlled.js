@@ -33,16 +33,16 @@ define('app/views/controlled', [],
                     $("[data-role='collapsible']").collapsible({
                         collapse: function(event) {
                             $(this).children().next().slideUp(250);
-                            var overlay = $(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
-                            // console.log(overlay);
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
                             if (overlay) {
                                 overlay.removeClass('in').addClass('ui-screen-hidden');
                                 overlay.height($())
                             }
                         },
                         expand: function(event, ui) {
-                            var overlay = $(this).attr('id') ? $('#' + $(this).attr('id')+'-overlay') : false;
-                            // console.log(overlay);
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
                             if (overlay) {
                                 overlay.removeClass('ui-screen-hidden').addClass('in');
                             }

@@ -13,6 +13,7 @@ define('app/routes/index', ['app/routes/base'],
             documentTitle: 'mist.io - home',
 
             activate: function() {
+                this._super();
                 Ember.run.later(function(){
                     Mist.logsController.load();
                 }, 200);
