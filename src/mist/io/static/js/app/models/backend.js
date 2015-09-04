@@ -9,9 +9,9 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
         LocationsController, NetworksController) {
         return Ember.Object.extend(Ember.Evented, {
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
             id: null,
             host: null,
@@ -87,16 +87,12 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             }.property('provider'),
 
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            //
+            //  Initialization
+            //
 
             load: function () {
-
                 Ember.run(this, function () {
-
                     // Add controllers
                     this.sizes = SizesController.create({backend: this, model: []});
                     this.images = ImagesController.create({backend: this, model: []});
@@ -133,42 +129,33 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             }.on('init'),
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
-
+            //
+            //  Methods
+            //
 
             getMachine: function (machineId) {
                 return this.machines.getMachine(machineId);
             },
 
-
             getNetwork: function (networkId) {
                 return this.networks.getObject(networkId);
             },
-
 
             getMonitoredMachines: function () {
                 return this.machines.getMonitoredMachines();
             },
 
-
             shutdownMachine: function (machineId, callback) {
                 this.machines.shutdownMachine(machineId, callback);
             },
-
 
             destroyMachine: function (machineId, callback) {
                 this.machines.destroyMachine(machineId, callback);
             },
 
-
             rebootMachine: function (machineId, callback) {
                 this.machines.rebootMachine(machineId, callback);
             },
-
 
             startMachine: function (machineId, callback) {
                 this.machines.startMachine(machineId, callback);
@@ -187,7 +174,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 this.images.toggleImageStar(imageId, callback);
             },
 
-
             getSimpleProvider: function () {
                 if (this.provider.indexOf('ec2') == 0) return 'ec2';
                 if (this.provider.indexOf('hpcloud') == 0) return 'hpcloud';
@@ -199,12 +185,9 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
-
+            //
+            //  Pseudo-Private Methods
+            //
 
             _updateSizeCount: function () {
                 Ember.run(this, function () {
@@ -213,14 +196,12 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 });
             },
 
-
             _updateImageCount: function () {
                 Ember.run(this, function () {
                     this.set('imageCount', this.get('images').get('length'));
                     this.trigger('onImagesChange');
                 });
             },
-
 
             _updateMachineCount: function () {
                 Ember.run(this, function () {
@@ -230,14 +211,12 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 });
             },
 
-
             _updateLocationCount: function () {
                 Ember.run(this, function () {
                     this.set('locationCount', this.locations.model.length);
                     this.trigger('onLocationListChange');
                 });
             },
-
 
             _updateNetworkCount: function () {
                 Ember.run(this, function () {
@@ -253,14 +232,12 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 });
             },
 
-
             _updateSelectedNetworks: function () {
                 Ember.run(this, function () {
                     this.set('selectedNetworks', this.networks.get('selectedObjects'));
                     this.trigger('onSelectedNetworksChange');
                 });
             },
-
 
             _updateState: function () {
                 if (this.enabled) {
@@ -275,47 +252,38 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //  Observers
+            //
 
             enabledObserver: function () {
                 Ember.run.once(this, '_toggle');
             }.observes('enabled'),
 
 
-            /**
-             *
-             *  Dynamic Observers
-             *
-             */
+            //
+            //  Dynamic Observers
+            //
 
             loadingSizesObserver: function () {
                 this.set('loadingSizes', this.sizes.loading);
             },
 
-
             loadingImagesObserver: function () {
                 this.set('loadingImages', this.images.loading);
             },
-
 
             loadingMachinesObserver: function () {
                 this.set('loadingMachines', this.machines.loading);
             },
 
-
             loadingLocationsObserver: function () {
                 this.set('loadingLocations', this.locations.loading);
             },
 
-
             loadingNetworksObserver: function () {
                 this.set('loadingNeworks', this.networks.loading);
             },
-
 
             stateObserver: function () {
                 Ember.run.once(this, '_updateState');

@@ -7,9 +7,9 @@ define('app/models/key', ['ember'],
     function() {
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
             id: null,
             probing: null,
@@ -18,20 +18,18 @@ define('app/models/key', ['ember'],
             isDefault: null,
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
-            // Depricated
+            //
+            //  Methods
+            //
+
+            // Deprecated FIXME
             associate: function(machine, callback, user , port) {
                 Mist.keysController.associateKey(this.id, machine, callback, user, port);
             },
-            // Depricated
+            // Deprecated FIXME
             disassociate: function(machine, callback) {
                 Mist.keysController.disassociateKey(this.id, machine, null, callback);
             },
-
         });
     }
 );

@@ -13,24 +13,17 @@ define('app/models/subnet', [
 
         return BaseModel.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             network: null,
             ipAddresses: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function (data) {
                 this.set('ipAddresses',
@@ -43,18 +36,15 @@ define('app/models/subnet', [
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             update: function (data) {
                 if (data.ipaddress_list_status) {
                     data.ipaddress_list_status.forEach(function (ip) {
                         ip.id = ip.ipaddress;
                     })
-                    this.get('ipAddresses').setContent(data.ipaddress_list_status);
+                    this.get('ipAddresses').setModel(data.ipaddress_list_status);
                 }
                 this._super(data);
             }

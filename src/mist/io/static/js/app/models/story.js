@@ -10,13 +10,9 @@ define('app/models/story', ['app/models/base'],
 
         return BaseModel.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             convertProperties: {
                 backend_id: 'backendId',
@@ -27,7 +23,6 @@ define('app/models/story', ['app/models/base'],
                 rule_id: 'ruleId',
                 story_id: 'id',
             },
-
 
             processProperties: {
                 startedAt: function (startedAt) {
@@ -44,26 +39,20 @@ define('app/models/story', ['app/models/base'],
 
 
             //
-            //
             //  Computed properties
             //
-            //
-
 
             backend: function () {
                 return Mist.backendsController.getBackend(this.get('backendId'));
             }.property('backendId'),
 
-
             machine: function () {
                 return Mist.backendsController.getMachine(this.get('machineId'));
             }.property('machineId'),
 
-
             rule: function () {
                 return Mist.rulesController.getObject(this.get('ruleId'));
             }.property('ruleId'),
-
 
             duration: function () {
                 var start = this.get('startedAt');
@@ -73,16 +62,13 @@ define('app/models/story', ['app/models/base'],
                 return end.diffToString(start);
             }.property('startedAt', 'finishedAt', 'Mist.clock.minute'),
 
-
             start: function () {
                 return this.get('startedAt').getPrettyTime();
             }.property('startedAt'),
 
-
             closed: function () {
                 return new Date().diffToString(this.get('finishedAt'));
             }.property('finishedAt', 'Mist.clock.minute'),
-
 
             prettyTime: function () {
                 var timeFromNow = this.get('startedAt')
@@ -94,16 +80,13 @@ define('app/models/story', ['app/models/base'],
                 return timeFromNow;
             }.property('startedAt', 'Mist.clock.second'),
 
-
             ruleText: function () {
                 return this.get('logs')[0].condition;
             }.property('logs.[]'),
 
-
             machineName: function () {
                 return this.get('logs')[0].machine_name;
             }.property('logs.[]'),
-
 
             isClosed: function () {
                 return this.get('finishedAt') > this.get('startedAt');

@@ -9,7 +9,6 @@ define('app/models/location', ['app/models/base'],
         'use strict';
 
         return BaseModel.extend({
-
             country: null,
             processProperties: {
                 name: function (name) {

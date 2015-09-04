@@ -10,24 +10,17 @@ define('app/models/ip_address', ['app/models/base'],
 
         return BaseModel.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             server: null,
             reserved: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function (data) {
                 this.update(this);
@@ -35,11 +28,8 @@ define('app/models/ip_address', ['app/models/base'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             reserve: function (args) {
                 this.get('network').get('backend').get('networks').reserveIP({
@@ -49,7 +39,6 @@ define('app/models/ip_address', ['app/models/base'],
                     ip: this,
                 });
             },
-
 
             update: function (data) {
                 if (data.server) {

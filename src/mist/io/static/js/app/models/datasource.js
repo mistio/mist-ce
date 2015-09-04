@@ -10,13 +10,9 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
 
         return Ember.Object.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             id: null,
             metric: null,
@@ -25,11 +21,8 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             init: function () {
                 this._super();
@@ -48,11 +41,8 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             clear: function () {
                 this.set('datapoints', []);
@@ -88,19 +78,16 @@ define('app/models/datasource', ['app/models/datapoint', 'ember'],
                 }, this);
             },
 
-
             overwrite: function (datapoints) {
                 this.set('datapoints', []);
                 this.update(datapoints);
             },
-
 
             getLastTimestamp: function () {
                 var length = this.datapoints.length;
                 if (!length) return 0;
                 return this.datapoints[length - 1].time.getTime();
             },
-
 
             getFirstTimestamp: function () {
                 var length = this.datapoints.length;
