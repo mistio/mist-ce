@@ -82,8 +82,8 @@ def home(request):
     return {
         'project': 'mist.io',
         'email': json.dumps(user.email),
-        'first_name': '',
-        'last_name': '',
+        'first_name': json.dumps(""),
+        'last_name': json.dumps(""),
         'supported_providers': json.dumps(config.SUPPORTED_PROVIDERS_V_2),
         'core_uri': json.dumps(config.CORE_URI),
         'auth': json.dumps(bool(user.mist_api_token)),
