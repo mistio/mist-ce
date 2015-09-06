@@ -1,6 +1,7 @@
 from behave import *
 from time import time, sleep
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, WebDriverException
+from selenium.webdriver import ActionChains
 
 try:
     from mist.io.tests.settings import LOCAL
@@ -18,8 +19,6 @@ def visit(context):
     sleep for one second and then proceed. If you wish to wait for the splash
     page to load then you should use the "Then I wait for the mist.io splash
     page to load" rule.
-    :param context:
-    :return:
     """
     context.browser.get(context.mist_config['MIST_URL'])
     try:
@@ -100,34 +99,17 @@ def wait(context, seconds):
     sleep(int(seconds))
 
 
-@when(u'I click the "{text}" button')
+@when(u'I click the button "{text}"')
 def click_button(context, text):
-    try:
-        buttons = context.browser.find_elements_by_class_name("ui-btn")
-        for button in buttons:
-            if button.text == text:
-                button.click()
-                return
-    except:
-        sleep(1)
-        buttons = context.browser.find_elements_by_class_name("ui-btn")
-        for button in buttons:
-            if button.text == text:
-                button.click()
-                return
-
-    assert False, u'Could not find %s button' % text
-
-
-@when(u'I click the button that contains "{text}"')
-def click_button(context, text):
+    """
+    This function will try to click a button that says exactly the same thing as
+    the text given. If it doesn't find any button like that then it will try
+    to find a button that contains the text given.
+    """
     buttons = context.browser.find_elements_by_class_name("ui-btn")
-    for button in buttons:
-        if text in button.text:
-            button.click()
-            return
-
-    assert False, u'Could not find button that contains %s' % text
+    click_button_from_collection(context, text, buttons,
+                                 u'Could not find button that contains %s'
+                                 % text)
 
 
 @when(u'I click the "{text}" button inside the "{popup}" popup')
@@ -136,19 +118,17 @@ def click_button_within_popup(context, text, popup):
     for pop in popups:
         if popup in pop.text:
             buttons = pop.find_elements_by_class_name("ui-btn")
-            for button in buttons:
-                if text in button.text:
-                    button.click()
-                    return
-
-    assert False, u'Could not find %s button in %s popup' % (text, popup)
+            click_button_from_collection(context, text, buttons,
+                                         u'Could not find %s button in %s popup'
+                                         % (text, popup))
 
 
 @when(u'I click the "{text}" button inside the "{panel_title}" panel')
 def click_button_within_panel(context, text, panel_title):
     panels = context.browser.find_elements_by_class_name("ui-panel-open")
     if not panels:
-        assert False, u'No open panels found. Maybe the driver got refocused or the panel failed to open'
+        assert False, u'No open panels found. Maybe the driver got refocused ' \
+                      u'or the panel failed to open'
 
     found_panel = None
     for panel in panels:
@@ -158,16 +138,52 @@ def click_button_within_panel(context, text, panel_title):
             break
 
     if not found_panel:
-        assert False, u'Panel with Title %s could not be found. Maybe the driver got refocused or the panel ' \
-                      u'failed to open or there is no panel with that title' % panel_title
+        assert False, u'Panel with Title %s could not be found. Maybe the ' \
+                      u'driver got refocused or the panel failed to open or ' \
+                      u'there is no panel with that title' % panel_title
 
     buttons = found_panel.find_elements_by_class_name("ui-btn")
-    for button in buttons:
-        if text in button.text:
-            button.click()
-            return
+    click_button_from_collection(context, text, buttons,
+                                 u'Could not find %s button inside %s panel' %
+                                 (text, panel_title))
 
-    assert False, u'Could not find %s button inside %s panel' % (text, panel_title)
+
+def click_button_from_collection(context, text, button_collection, error_message):
+    for button in button_collection:
+        if text == button.text:
+            for i in range(0, 2):
+                try:
+                    clicketi_click(context, button)
+                    return
+                except WebDriverException:
+                    sleep(1)
+            assert False, u'Could not click button that says %s' % button.text
+
+    for button in button_collection:
+        if text in button.text:
+            for i in range(0, 2):
+                try:
+                    clicketi_click(context, button)
+                    return
+                except WebDriverException:
+                    sleep(1)
+            assert False, u'Could not click button that says %s' % button.text
+    assert False, error_message
+
+
+def clicketi_click(context, button):
+    """
+    trying two different ways of clicking a button because sometimes the
+    Chrome driver for no apparent reason misinterprets the offset and
+    size of the button
+    """
+    try:
+        button.click()
+    except WebDriverException:
+        action_chain = ActionChains(context.browser)
+        action_chain.move_to_element(button)
+        action_chain.click()
+        action_chain.perform()
 
 
 @then(u'the title should be "{text}"')

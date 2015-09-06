@@ -9,8 +9,9 @@ Feature: Machines
   Scenario: Machine Actions EC2
     Given "EC2" backend added
     Then Images counter should be greater than 0 within 80 seconds
-    When I click the button that contains "Machines"
-    And I click the "Create" button
+    When I click the button "Machines"
+    And I wait for 1 seconds
+    And I click the button "Create"
     And I fill in a random machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
     And I click the "EC2" button inside the "Create Machine" panel
@@ -34,16 +35,16 @@ Feature: Machines
     When I wait for 5 seconds
 
     When I choose the "randomly_created" machine
-    And I click the "Actions" button
+    And I click the button "Actions"
     And I wait for 1 seconds
-    And I click the "Reboot" button
+    And I click the button "Reboot"
     And I wait for 1 seconds
-    And I click the "Yes" button
+    And I click the button "Yes"
     Then "randomly_created" machine state should be "running" within 200 seconds
 
-    When I click the "Actions" button
+    When I click the button "Actions"
     And I wait for 1 seconds
-    And I click the "Destroy" button
+    And I click the button "Destroy"
     And I wait for 1 seconds
-    And I click the "Yes" button
+    And I click the button "Yes"
     Then "randomly_created" machine state should be "terminated" within 200 seconds
