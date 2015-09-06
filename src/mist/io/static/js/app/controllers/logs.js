@@ -29,10 +29,16 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
                     info('Log channel not yet ready');
                     Ember.run.later(this, this.load, 350);
                 } else {
-                    Mist.get('logs').on('logs', this, this.handleResponse);
-                    Mist.get('logs').on('event', this, this.handleStream);
+                    if (Mist.get('logs').channel._listeners.event == undefined)
+                        Mist.get('logs').on('event', this, this.handleStream);
+                    if (Mist.get('logs').channel._listeners.logs == undefined)
+                        Mist.get('logs').on('logs', this, this.handleResponse);
                     this.search();
                 }
+            },
+
+            unload: function() {
+                this.set('model', []);
             },
 
             search: function() {

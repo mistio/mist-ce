@@ -20,7 +20,7 @@ define('app/routes/index', ['app/routes/base'],
             },
 
             exit: function() {
-                Mist.logsController.set('model', []);
+                Mist.logsController.unload();
             }
         });
     }
