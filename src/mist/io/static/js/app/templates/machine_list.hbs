@@ -76,29 +76,40 @@
         </ul>
     </div>
 
-    <div class="tri-action-footer" data-role="footer" data-theme="b">
-        <table><tbody><tr><td>
-            <a id="machines-tags-btn" class="ui-btn ui-icon-grid ui-btn-icon-left ui-shadow ui-corner-all"
-                {{action "tagsClicked" target="view"}}>Tags</a>
-        </td><td>
-            {{#if view.selectedMachine.isWindows}}
-                <a id="single-machine-shell-btn"
-                    target="_blank"
-                    {{bind-attr href="view.selectedMachine.rdpURL" class="view.selectedMachine.canConnect::ui-state-disabled
+
+    <div class="ui-footer ui-bar-b">
+        <div class="ui-grid-b">
+            <div class="ui-block-a">
+                <a id="machines-tags-btn"
+                    class="ui-btn ui-icon-grid ui-btn-icon-left ui-shadow ui-corner-all"
+                    {{action "tagsClicked" target="view"}}>Tags</a>
+            </div>
+            <div class="ui-block-b">
+                {{#if view.selectedMachine.isWindows}}
+                    <a id="machine-shell-btn"
+                        target="_blank"
+                        {{bind-attr href="view.selectedMachine.rdpURL"
+                        class="view.selectedMachine.canConnect::ui-state-disabled
+                            :ui-btn
+                            :ui-shadow
+                            :ui-corner-all
+                            :ui-btn-icon-left
+                            :ui-icon-gear"}}>Connect</a>
+                {{else}}
+                    <a id="machines-shell-btn"
+                        {{bind-attr class="view.selectedMachine.canConnect::ui-state-disabled
                         :ui-btn
+                        :ui-shadow
+                        :ui-corner-all
                         :ui-btn-icon-left
-                        :ui-icon-gear"}}>Connect</a>
-            {{else}}
-                <a id="machines-shell-btn" {{bind-attr class="view.selectedMachine.canConnect::ui-state-disabled
-                    :ui-btn
-                    :ui-btn-icon-left
-                    :ui-icon-gear"}}
-                    {{action "shellClicked" target="view"}}>Shell</a>
-            {{/if}}
-
-        </td><td>
-            <a id="machines-power-btn" data-role="button" data-icon="bars" {{action "powerClicked" target="view"}}>Actions</a>
-        </td></tr></tbody></table>
+                        :ui-icon-bars"}}
+                        {{action "shellClicked" target="view"}}>Shell</a>
+                {{/if}}
+            </div>
+            <div class="ui-block-c">
+                <a id="machines-power-btn" class="ui-btn ui-icon-power ui-btn-icon-left ui-shadow ui-corner-all"
+                    {{action "powerClicked" target="view"}}>Actions</a>
+            </div>
+        </div>
     </div>
-
 </div>

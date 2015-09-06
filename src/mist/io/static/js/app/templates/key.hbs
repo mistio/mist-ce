@@ -65,14 +65,16 @@
 
     {{view "keyEdit"}}
 
-    <div class="dual-action-footer" data-role="footer" data-theme="b">
-        <table><tbody><tr><td>
-            <a class="ui-btn ui-icon-edit ui-btn-icon-left ui-shadow ui-corner-all"
-                {{action "renameClicked" target="view"}}>Rename</a>
-        </td><td>
-            <a class="ui-btn ui-icon-delete ui-btn-icon-left ui-shadow ui-corner-all"
-                {{action "deleteClicked" target="view"}}>Delete</a>
-        </td></tr></tbody></table>
+    <div class="ui-footer ui-bar-b">
+        <div class="ui-grid-a">
+            <div class="ui-block-a">
+                <a class="ui-btn ui-icon-edit ui-btn-icon-left ui-shadow ui-corner-all"
+                    {{action "renameClicked" target="view"}}>Rename</a>
+            </div>
+            <div class="ui-block-b">
+                <a class="ui-btn ui-icon-delete ui-btn-icon-left ui-shadow ui-corner-all"
+                    {{action "deleteClicked" target="view"}}>Delete</a>
+            </div>
+        </div>
     </div>
-
 </div>
