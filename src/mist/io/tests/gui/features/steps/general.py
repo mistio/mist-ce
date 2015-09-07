@@ -21,34 +21,15 @@ def visit(context):
     page to load" rule.
     """
     context.browser.get(context.mist_config['MIST_URL'])
-    try:
-        sleep(1)
-        context.browser.find_element_by_id("splash")
-        sleep(1)
-        return
-    except NoSuchElementException:
-        pass
-    timeout = 120 if LOCAL else 160
-    end_time = time() + timeout
+    end_time = time() + 4
     while time() < end_time:
         try:
-            login_page = context.browser.find_element_by_id("signup-popup")
-            display = login_page.value_of_css_property("display")
-            width = login_page.value_of_css_property("width")
+            context.browser.find_element_by_id("splash")
+            return
+        except NoSuchElementException:
+            sleep(1)
 
-            if 'block' in display:
-                if width == '1px':
-                    return
-                else:
-                    raise NoSuchElementException
-
-            if not display or 'none' in display:
-                return
-
-        except NoSuchElementException as e:
-            sleep(5)
-
-    assert False, u'Page took longer than %s seconds to load' % str(timeout)
+    assert False, "Splash page did not load after waiting for 4 seconds"
 
 
 @then(u'I wait for the mist.io splash page to load')
