@@ -7,7 +7,7 @@
      <div class="ui-header ui-bar-b ui-caps">
          <h1 class="ui-title">Manage Tags</h1>
 
-         <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+         <a href="javascript:void(0)" class="close" {{action "backClicked" target=view}}>&#10005;</a>
      </div>
 
     <div data-role="content" data-theme="a">
@@ -28,9 +28,6 @@
         {{else}} {{#if Mist.machineTagsController.deletingTag}}
             <div class="ajax-loader"></div>
         {{/if}} {{/if}}
-
-        <a id="add-tag-back" class="ui-btn ui-shadow ui-corner-all ui-caps back"
-            {{action "backClicked" target=view}}>Back</a>
 
     </div>
 

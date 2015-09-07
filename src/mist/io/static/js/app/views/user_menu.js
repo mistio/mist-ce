@@ -18,7 +18,7 @@ define('app/views/user_menu', ['md5'],
             accountUrl: URL_PREFIX + '/account',
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +
                   encodeURIComponent('https://mist.io/resources/images/sprite-images/user.png') +'&s='+(window.devicePixelRatio > 1.5 ? 100 : 50)),
-            gravatarName: (FIRST_NAME && LAST_NAME) ? LAST_NAME + ' ' + FIRST_NAME : EMAIL,
+            gravatarName: (FIRST_NAME && LAST_NAME) ? FIRST_NAME + ' ' + LAST_NAME : EMAIL,
 
 
             /**
