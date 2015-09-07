@@ -54,7 +54,6 @@ define('app/controllers/machine_add', ['ember'],
 
 
             close: function() {
-                $('#machine-create').panel('close');
                 this._clear();
             },
 
@@ -171,22 +170,22 @@ define('app/controllers/machine_add', ['ember'],
                     this.newMachineSize.id &&
                     this.newMachineImage.id &&
                     this.newMachineProvider.id) {
-                        formReady = true;
+                    formReady = true;
                 }
 
                 // SSH key and location are optional for docker
                 if (this.newMachineProvider.provider != 'docker') {
                     if (Mist.keysController.keyExists(this.newMachineKey.id) &&
-                        this.newMachineLocation.id)
-                            formReady = true;
-                    else
+                        this.newMachineLocation.id) {
+                        formReady = true;
+                    } else {
                         formReady = false;
+                    }
                 }
 
                 if (this.newMachineImage.id &&
                     this.newMachineImage.get('isMist')) {
-                        if (!Mist.keysController.keyExists(this.newMachineKey.id))
-                            formReady=false;
+                        if (!Mist.keysController.keyExists(this.newMachineKey.id)) formReady=false;
                 }
 
                 this.set('formReady', formReady);

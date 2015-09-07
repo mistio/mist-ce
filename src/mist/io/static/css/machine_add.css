@@ -16,8 +16,12 @@
     z-index: 2;
 }
 
-#create-machine.floating-collapsible > h4.ui-collapsible-heading > a {
+#create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
     padding: 20px 91px 20px 35px !important;
+}
+
+#create-machine.floating-collapsible > h4.ui-collapsible-heading > a {
+    padding: 20px 91px 20px 50px !important;
 }
 
 #create-machine-overlay {
@@ -65,6 +69,7 @@
     color: #fff !important;
     text-transform: uppercase;
 }
+
 #machine-create .ui-collapsible .ui-listview {
     margin: 0;
 }
@@ -94,9 +99,10 @@
     font-size: 16px;
 }
 
-#machine-create .selected-key .ui-collapsible-heading-toggle {
+#machine-create .selected .ui-collapsible-heading-toggle {
     color: #000 !important;
     background-color: #FAF9F4 !important;
+    border-color: #FAF9F4 !important;
 }
 #machine-create .ok-cancel div:first-child .ui-btn {
 	border-top-right-radius: 0px;

@@ -65,6 +65,21 @@ define('app/views/machine_add', ['app/views/controlled'],
              */
 
              load: function () {
+                Ember.run.next(function(){
+                    $( "#create-machine" ).collapsible({
+                        expand: function(event, ui) {
+                            Mist.machineAddController.open(null);
+
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('ui-screen-hidden').addClass('in');
+                            }
+                            $(this).children().next().hide();
+                            $(this).children().next().slideDown(250);
+                        }
+                    });
+                });
 
                 // Add event listeners
                 Mist.scriptsController.on('onChange', this, 'renderFields');
@@ -75,6 +90,20 @@ define('app/views/machine_add', ['app/views/controlled'],
 
 
              unload: function () {
+                Ember.run.next(function(){
+                    $( "#create-machine" ).collapsible({
+                        collapse: function(event, ui) {
+                            Mist.machineAddController.close();
+
+                            $(this).children().next().slideUp(250);
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('in').addClass('ui-screen-hidden');
+                            }
+                        }
+                    });
+                });
 
                 // Remove event listeners
                 Mist.scriptsController.off('onChange', this, 'renderFields');
@@ -99,8 +128,10 @@ define('app/views/machine_add', ['app/views/controlled'],
 
 
              fieldIsReady: function (field) {
-                $('#create-machine-' + field).collapsible('option', 'collapsedIcon', 'check')
-                                             .collapsible('collapse');
+                $('#create-machine-' + field)
+                    .collapsible('option', 'collapsedIcon', 'check')
+                    .collapsible('collapse');
+                $('#create-machine-' + field).addClass('selected');
              },
 
 
@@ -163,7 +194,6 @@ define('app/views/machine_add', ['app/views/controlled'],
 
 
              updateLaunchButton: function () {
-                 console.log(Mist.machineAddController.formReady);
                 if (Mist.machineAddController.formReady) {
                     $('#create-machine-ok').removeClass('ui-state-disabled');
                 } else {
