@@ -1,3 +1,5 @@
+/src/mist/io/tests/passwordless
+/src/mist/io/tests/gce.json
 bin
 dist
 parts

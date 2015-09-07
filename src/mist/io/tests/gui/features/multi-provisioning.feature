@@ -9,8 +9,8 @@ Feature: Machines
   Scenario: Machine Actions Linode
     Given "Linode" backend added
     Then Images counter should be greater than 0 within 80 seconds
-    When I click the button that contains "Machines"
-    And I click the "Create" button
+    When I click the button "Machines"
+    And I click the button "Create"
     And I fill in a random machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
     And I click the "Linode" button inside the "Create Machine" panel
@@ -34,24 +34,24 @@ Feature: Machines
 #    And "randomly_created" machine should be probed within 400 seconds
 
     When I choose the "randomly_created" machine
-    And I click the "Actions" button
-    And I click the "Reboot" button
+    And I click the button "Actions"
+    And I click the button "Reboot"
     And I wait for 1 seconds
-    And I click the "Yes" button
+    And I click the button "Yes"
     Then "randomly_created" machine state should be "running" within 200 seconds
 
-    When I click the "Actions" button
-    And I click the "Destroy" button
+    When I click the button "Actions"
+    And I click the button "Destroy"
     And I wait for 1 seconds
-    And I click the "Yes" button
+    And I click the button "Yes"
 
 
   @machines-rackspace
   Scenario: Machine Actions Rackspace
     Given "Rackspace ORD" backend added
     Then Images counter should be greater than 0 within 80 seconds
-    When I click the button that contains "Machines"
-    And I click the "Create" button
+    When I click the button "Machines"
+    And I click the button "Create"
     And I fill in a random machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
     And I click the "Rackspace ORD" button inside the "Create Machine" panel
@@ -75,16 +75,16 @@ Feature: Machines
 #    And "randomly_created" machine should be probed within 500 seconds
 
     When I choose the "randomly_created" machine
-    And I click the "Actions" button
-    And I click the "Reboot" button
+    And I click the button "Actions"
+    And I click the button "Reboot"
     And I wait for 1 seconds
-    And I click the "Yes" button
+    And I click the button "Yes"
     Then "randomly_created" machine state should be "running" within 200 seconds
 
-    When I click the "Actions" button
-    And I click the "Destroy" button
+    When I click the button "Actions"
+    And I click the button "Destroy"
     And I wait for 1 seconds
-    And I click the "Yes" button
+    And I click the button "Yes"
     Then "randomly_created" machine state should be "terminated" within 200 seconds
 
 
@@ -92,8 +92,8 @@ Feature: Machines
   Scenario: Machine Actions SoftLayer
     Given "SoftLayer" backend added
     Then Images counter should be greater than 0 within 80 seconds
-    When I click the button that contains "Machines"
-    And I click the "Create" button
+    When I click the button "Machines"
+    And I click the button "Create"
     And I fill in a random machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
     And I click the "SoftLayer" button inside the "Create Machine" panel
@@ -117,14 +117,14 @@ Feature: Machines
 #    And "randomly_created" machine should be probed within 500 seconds
 
     When I choose the "randomly_created" machine
-    And I click the "Actions" button
-    And I click the "Reboot" button
+    And I click the button "Actions"
+    And I click the button "Reboot"
     And I wait for 1 seconds
-    And I click the "Yes" button
+    And I click the button "Yes"
     Then "randomly_created" machine state should be "running" within 200 seconds
 
-    When I click the "Actions" button
-    And I click the "Destroy" button
+    When I click the button "Actions"
+    And I click the button "Destroy"
     And I wait for 1 seconds
-    And I click the "Yes" button
+    And I click the button "Yes"
     Then "randomly_created" machine state should be "terminated" within 200 seconds

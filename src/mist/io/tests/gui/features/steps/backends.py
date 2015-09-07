@@ -1,5 +1,6 @@
 from behave import *
 from time import time, sleep
+from selenium.common.exceptions import NoSuchElementException
 
 try:
     from mist.io.tests.settings import CREDENTIALS
@@ -53,12 +54,12 @@ def given_backend(context, backend):
         assert False, u'Could not find credentials for %s' % backend
 
     context.execute_steps(u'''
-        When I click the "Add cloud" button
-        And I click the button that contains "Select provider"
-        And I click the "%s" button
+        When I click the button "Add cloud"
+        And I click the button "Select provider"
+        And I click the button "%s"
         And I wait for 1 seconds
         And I use my "%s" credentials
-        And I click the "Add" button
+        And I click the button "Add"
         Then the "%s" backend should be added within 30 seconds
     ''' % (backend, creds, backend))
 
@@ -66,7 +67,15 @@ def given_backend(context, backend):
 @when(u'I use my "{backend}" credentials')
 def backend_creds(context, backend):
     if "AZURE" in backend:
-        subscription_id = context.browser.find_element_by_id("subscription_id")
+        subscription_id = None
+        for i in range(0, 2):
+            try:
+                subscription_id = context.browser.find_element_by_id("subscription_id")
+                break
+            except NoSuchElementException as e:
+                if i == 2:
+                    raise e
+                sleep(1)
         subscription_id.send_keys(context.mist_config['CREDENTIALS']['AZURE']['subscription_id'])
         sleep(1)
         add_cert_button = context.browser.find_element_by_id("certificate")
@@ -77,6 +86,8 @@ def backend_creds(context, backend):
         file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
         file_upload_ok.click()
     elif "GCE" in backend:
+        # import ipdb
+        # ipdb.set_trace()
         title = context.browser.find_element_by_id("title")
         for i in range(1, 6):
             title.send_keys(u'\ue003')
@@ -90,7 +101,7 @@ def backend_creds(context, backend):
         upload_area.send_keys(context.mist_config['CREDENTIALS']['GCE']['private_key'])
         file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
         file_upload_ok.click()
-
+        sleep(1)
     elif "OPENSTACK" in backend:
         username = context.browser.find_element_by_id("username")
         username.send_keys(context.mist_config['CREDENTIALS']['OPENSTACK']['username'])
@@ -101,8 +112,8 @@ def backend_creds(context, backend):
         tenant_name = context.browser.find_element_by_id("tenant_name")
         tenant_name.send_keys(context.mist_config['CREDENTIALS']['OPENSTACK']['tenant_name'])
     elif "RACKSPACE" in backend:
-        context.execute_steps(u'When I click the button that contains "Select Region"')
-        context.execute_steps(u'When I click the button that contains "%s"' %
+        context.execute_steps(u'When I click the button "Select Region"')
+        context.execute_steps(u'When I click the button "%s"' %
                               context.mist_config['CREDENTIALS']['RACKSPACE']['region'])
         sleep(1)
         title = context.browser.find_element_by_id("title")
@@ -114,8 +125,8 @@ def backend_creds(context, backend):
         api_key = context.browser.find_element_by_id("api_key")
         api_key.send_keys(context.mist_config['CREDENTIALS']['RACKSPACE']['api_key'])
     elif "HP" in backend:
-        context.execute_steps(u'When I click the button that contains "Select Region"')
-        context.execute_steps(u'When I click the button that contains "%s"' % context.mist_config['CREDENTIALS']['HP']['region'])
+        context.execute_steps(u'When I click the button "Select Region"')
+        context.execute_steps(u'When I click the button "%s"' % context.mist_config['CREDENTIALS']['HP']['region'])
         sleep(1)
         title = context.browser.find_element_by_id("title")
         for i in range(20):
@@ -134,9 +145,9 @@ def backend_creds(context, backend):
         api_key.send_keys(context.mist_config['CREDENTIALS']['SOFTLAYER']['api_key'])
     elif "EC2" in backend:
         context.execute_steps(u'''
-                When I click the button that contains "Select Region"
+                When I click the button "Select Region"
                 And I wait for 1 seconds
-                When I click the button that contains "%s"
+                When I click the button "%s"
         ''' % context.mist_config['CREDENTIALS']['EC2']['region'])
         sleep(1)
         title = context.browser.find_element_by_id("title")
@@ -212,7 +223,7 @@ def backend_creds(context, backend):
         key_button.click()
         sleep(2)
         context.execute_steps(u"""
-        When I click the button that contains "Add Key"
+        When I click the button "Add Key"
         """)
         sleep(2)
         key_name = context.browser.find_element_by_id("key-add-id")
