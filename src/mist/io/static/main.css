@@ -914,6 +914,7 @@ ul.checkbox-list .ui-grid-b {
 
 #notification-popup {
     border: none;
+    box-shadow: none;
 }
 #notification-popup h1 {
     color: #fff;

@@ -5,19 +5,19 @@
     left: 10px !important;
     margin-bottom: 55px !important;
 }
-.field-wrapper .ui-input-text,
-.field-wrapper #add-tag-ok {
+#machine-tags-popup .field-wrapper .ui-input-text,
+#machine-tags-popup .field-wrapper #add-tag-ok {
     float: left;
     display: block;
     box-sizing: border-box;
 }
-.field-wrapper .ui-input-text {
+#machine-tags-popup .field-wrapper .ui-input-text {
     width: calc(100% - 59px);
 }
-.field-wrapper #add-tag-ok {
+#machine-tags-popup .field-wrapper #add-tag-ok {
     padding: 6px 10px;
 }
-.field-wrapper:after {
+#machine-tags-popup .field-wrapper:after {
     content: '';
     clear: both;
     display: table;
