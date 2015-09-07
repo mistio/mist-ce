@@ -59,7 +59,18 @@
 }
 
 #image-list-page ul li label {
-    margin-top: 10px;
+    /*margin-top: 10px !important;*/
+}
+#image-list-page .ui-checkbox label.staron:after,
+#image-list-page .ui-checkbox label.staroff:after {
+    width: 19px !important;
+    height: 19px !important;
+    margin: -9px 2px 0 2px !important;
+}
+#image-list-page .ui-checkbox label.staron:after,
+#image-list-page .ui-checkbox label.staroff:after {
+    width: 19px !important;
+    height: 19px !important;
 }
 #image-list-page .ui-checkbox label.staron:after {
     background-image: url('../images/sprite-build/icon-sprite-1432130152.png') !important;
