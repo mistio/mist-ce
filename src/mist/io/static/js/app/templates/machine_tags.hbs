@@ -12,10 +12,12 @@
 
     <div data-role="content" data-theme="a">
 
-        {{view Mist.TextField value=Mist.machineTagsController.newTag}}
+        <div class="field-wrapper">
+             {{view Mist.TextField value=Mist.machineTagsController.newTag}}
 
-        <a id="add-tag-ok" class="ui-btn ui-btn-d ui-caps"
-            {{action "addClicked" target=view}}>Add</a>
+            <a id="add-tag-ok" class="ui-btn ui-btn-d ui-caps"
+                {{action "addClicked" target=view}}>Add</a>
+        </div>       
 
         <ul data-role="listview">
             {{#each Mist.machineTagsController.machine.tags as |tag|}}
