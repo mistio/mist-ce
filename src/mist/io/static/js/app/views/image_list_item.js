@@ -16,6 +16,7 @@ define('app/views/image_list_item', ['app/views/list_item'],
 
             image: null,
             layoutName: 'image_list_item',
+            classNameBindings: ['starClass'],
 
 
             //
