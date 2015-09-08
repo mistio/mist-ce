@@ -1,46 +1,46 @@
 <table class="info-table">
     <tbody>
-    {{#if name}}
+    {{#if subnet.name}}
     <tr>
         <td class="subnet-name">Name</td>
-        <td class="subnet-name">{{name}}</td>
+        <td class="subnet-name">{{subnet.name}}</td>
     </tr>
     {{/if}}
     {{#if id}}
     <tr>
         <td>Id</td>
-        <td>{{id}}</td>
+        <td>{{subnet.id}}</td>
     </tr>
     {{/if}}
-    {{#if this.zone}}
+    {{#if subnet.zone}}
     <tr>
         <td>Zone</td>
-        <td>{{this.zone.name}}</td>
+        <td>{{subnet.zone.name}}</td>
     </tr>
     {{/if}}
-    {{#if this.cidr}}
+    {{#if subnet.cidr}}
     <tr>
         <td>Cidr</td>
-        <td>{{this.cidr}}</td>
+        <td>{{subnet.cidr}}</td>
     </tr>
     {{/if}}
-    {{#if this.enable_dhcp}}
+    {{#if subnet.enable_dhcp}}
     <tr>
         <td>DHCP Enabled</td>
-        <td>{{this.enable_dhcp}}</td>
+        <td>{{subnet.enable_dhcp}}</td>
     </tr>
     {{/if}}
-    {{#if this.gateway_ip}}
+    {{#if subnet.gateway_ip}}
     <tr>
         <td>Gateway IP</td>
-        <td>{{unbound this.gateway_ip}}</td>
+        <td>{{unbound subnet.gateway_ip}}</td>
     </tr>
     {{/if}}
-    {{#if this.dns_nameservers.length}}
+    {{#if subnet.dns_nameservers.length}}
     <tr>
         <td>DNS Nameservers</td>
         <td>
-            {{#each this.dns_nameservers as |nameserver|}}
+            {{#each subnet.dns_nameservers as |nameserver|}}
             <div class="ip">{{unbound nameserver}}</div>
             {{/each}}
         </td>
@@ -50,7 +50,7 @@
     <tr>
         <td>Allocation pools</td>
         <td>
-            {{#each this.allocation_pools as |pool|}}
+            {{#each subnet.allocation_pools as |pool|}}
             <div class="ip">{{unbound pool.start}}</div> -
             <div class="ip">{{unbound pool.end}}</div>
             {{/each}}
@@ -58,10 +58,10 @@
     </tr>
     {{/if}}
 
-    {{#if ipAddresses}}
+    {{#if subnet.ipAddresses}}
     <tr>
         <td class="usable-ips" colspan="2">
-            <h4>Usable ip addresses ({{ipAddresses.length}})</h4>
+            <h4>Usable ip addresses ({{subnet.ipAddresses.length}})</h4>
             <table>
                 <tbody>
                 {{#each ipAddresses as |ip|}}

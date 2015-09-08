@@ -1,18 +1,18 @@
-define('app/views/network_create', ['app/views/panel'],
+define('app/views/network_create', [],
     //
     //  Network Create View
     //
     //  @returns Class
     //
-    function (PanelView) {
+    function () {
 
         'use strict';
 
         var SLIDE_DOWN_DELAY = 130;
 
-        return App.NetworkCreateView = PanelView.extend({
+        return App.NetworkCreateComponent = Ember.Component.extend({
 
-            templateName: 'network_create',
+            layoutName: 'network_create',
             controllerName: 'networkCreateController',
 
             createSubnet: false,
@@ -20,11 +20,8 @@ define('app/views/network_create', ['app/views/panel'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             clear: function () {
                 $('#network-create-name-wrapper').hide();
@@ -46,7 +43,6 @@ define('app/views/network_create', ['app/views/panel'],
                 this._fieldIsReady('subnet-ipv');
             },
 
-
             renderFields: function () {
                 Ember.run.next(function () {
                     // Render collapsibles
@@ -61,11 +57,8 @@ define('app/views/network_create', ['app/views/panel'],
 
 
             //
-            //
             //  Pseudo-Private Methods
             //
-            //
-
 
             _fieldIsReady: function (field) {
                 $('#network-create-' + field)
@@ -75,14 +68,10 @@ define('app/views/network_create', ['app/views/panel'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 backendSelected: function (backend) {
                     Ember.run.later(function () {
                         $('#network-create-name-wrapper').slideDown();
@@ -91,23 +80,19 @@ define('app/views/network_create', ['app/views/panel'],
                     this._fieldIsReady('backend');
                 },
 
-
                 adminStateSelected: function (isUp) {
                     Mist.networkCreateController.selectAdminState(isUp);
                     this._fieldIsReady('admin-state')
                 },
-
 
                 ipvSelected: function (ipv) {
                     Mist.networkCreateController.selectIpv(ipv);
                     this._fieldIsReady('subnet-ipv');
                 },
 
-
                 backClicked: function () {
                     Mist.networkCreateController.close();
                 },
-
 
                 createClicked: function () {
                     Mist.networkCreateController.create();
@@ -116,11 +101,8 @@ define('app/views/network_create', ['app/views/panel'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             networkNameObserver: function () {
                 Ember.run.later(function () {
@@ -130,7 +112,6 @@ define('app/views/network_create', ['app/views/panel'],
                     }
                 }, SLIDE_DOWN_DELAY);
             }.observes('Mist.networkCreateController.network.name'),
-
 
             createSubnetObserver: function () {
                 Ember.run.later(function () {
@@ -143,7 +124,6 @@ define('app/views/network_create', ['app/views/panel'],
                 }, SLIDE_DOWN_DELAY);
             }.observes('Mist.networkCreateController.network.createSubnet'),
 
-
             subnetNameObserver: function () {
                 Ember.run.later(function () {
                     if (Mist.networkCreateController.network.subnet.name)
@@ -151,14 +131,12 @@ define('app/views/network_create', ['app/views/panel'],
                 }, SLIDE_DOWN_DELAY);
             }.observes('Mist.networkCreateController.network.subnet.name'),
 
-
             subnetAddressObserver: function () {
                 Ember.run.later(function () {
                     if (Mist.networkCreateController.network.subnet.address)
                         $('#network-create-subnet-other-wrapper').slideDown();
                 }, SLIDE_DOWN_DELAY);
             }.observes('Mist.networkCreateController.network.subnet.address'),
-
 
             subnetEnableGatewayObserver: function () {
                 Ember.run.later(function () {

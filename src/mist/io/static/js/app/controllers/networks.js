@@ -13,13 +13,9 @@ define('app/controllers/networks', [
 
 		return BaseArrayController.extend(Ember.Evented, {
 
-
-			//
 			//
 			//  Properties
 			//
-			//
-
 
 			backend: null,
 			baseModel: NetworkModel,
@@ -27,14 +23,10 @@ define('app/controllers/networks', [
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
 			associateIP: function (args) {
-
 				var machineId;
 				if (args.machine.backend.provider == 'nephoscale')
 					machineId = args.machine.extra.id;
@@ -60,9 +52,7 @@ define('app/controllers/networks', [
 				});
 			},
 
-
 			reserveIP: function (args) {
-
 				var url = '/backends/' + this.backend.id +
 				'/networks/' + args.network.id;
 
@@ -84,7 +74,6 @@ define('app/controllers/networks', [
 
 
             deleteNetwork: function (networkId, callback) {
-
                 var that = this;
                 that.set('deletingNetwork', true);
                 var url = '/backends/' + this.backend.id +

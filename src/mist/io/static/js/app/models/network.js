@@ -50,7 +50,7 @@ define('app/models/network', [
             },
 
             _updateSubnets: function (subnets) {
-                this.get('subnets').setModel(subnets);
+                this.set('subnets', subnets);
             },
         });
     }

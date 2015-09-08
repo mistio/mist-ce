@@ -10,19 +10,14 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
 
         return Ember.Controller.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             model: [],
             loading: null,
             view: null,
             prettyTimeReady: false,
-
 
             load: function() {
                 if (!Mist.logs)  {
@@ -56,19 +51,16 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
                     this.get('view').handleStream(log);
             },
 
-            //
+
             //
             //  Pseudo-Private Methods
             //
-            //
-
 
             _reload: function () {
                 Ember.run.later(this, function () {
                     this.load();
                 }, 2000);
             },
-
 
             _setModel: function (logs) {
                 Ember.run(this, function () {
@@ -81,7 +73,6 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
                 });
             },
 
-
             _prependModel: function (logs) {
                 Ember.run(this, function () {
                     var additionalModel = [];
@@ -92,7 +83,6 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
                     this.trigger('onLogListChange');
                 });
             },
-
 
             _appendModel: function (logs) {
                 Ember.run(this, function () {
