@@ -58,7 +58,7 @@
 }
 #history-control a.time:after {
     font-size: 26px;
-    color: #d4d4d4;
+    color: #7f7f7f;
     margin: 0;
 }
 #history-control a.time:hover:after {
@@ -87,8 +87,17 @@
     color: #444;
 }
 
+#time-window-control .ui-btn:after {
+    color: #7f7f7f;
+}
+
 #time-window-control .ui-btn:hover {
-    color: #000 !important;
+    color: #444 !important;
+    background-color: #FAF9F4;
+}
+
+#time-window-control .ui-btn:hover:after {
+    color: #444 !important;
 }
 
 #time-window-control.is-streaming .ui-btn {
@@ -160,8 +169,7 @@
 }
 
 #top-history {
-    margin-top: 20px;
-    clear: both;
+    margin: 30px 0 25px;
 }
 
 .graph .header *,

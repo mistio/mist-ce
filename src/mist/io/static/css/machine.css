@@ -145,11 +145,20 @@
 
 #single-machine-page #monitoring-bottom-btns a {
     margin: 7px auto;
+    display: inline-block;
 }
 
-#single-machine-page #add-rule-button,
-#single-machine-page #disable-monitor-btn {
-    width: 100px;
+#single-machine-page #monitoring-bottom-btns a.ui-icon-plus:after {
+    content: '+';
+    color: #fff !important;
+    background-color: transparent !important;
+    font-size: 32px;
+    margin: -18px 0px 0 -18px;
+}
+
+#single-machine-page #monitoring-bottom-btns a.icon-xx:after {
+    margin-top: -8px;
+    font-size: 16px;
 }
 
 #single-machine-page #machine-probe-btn {

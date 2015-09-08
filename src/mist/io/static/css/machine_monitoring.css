@@ -60,12 +60,12 @@
 
 .graph > .header{
     position: relative;
-    height: 30px;
+    height: 45px;
 }
 
 .graph > .header > .title {
     position: relative;
-    left: 10px;
+    left: 18px;
     bottom: -5px;
     color: #444444;
     display: inline-block;
@@ -77,7 +77,7 @@
     margin-top: 7px;
     float: left;
     display: inline-block;
-    margin-left: 20px;
+    margin-left: 30px;
 }
 
 .graph > .header > .ui-btn {
