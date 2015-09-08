@@ -29,9 +29,6 @@
         {{else}} {{#if Mist.keysController.disassociatingKey}}
             <div class="ajax-loader"></div>
         {{/if}} {{/if}}
-
-        <a class="ui-btn ui-btn-a ui-corner-all ui-caps" {{action "backClicked" target=view}}>Back</a>
-
     </div>
 
 </div>
@@ -45,6 +42,12 @@
     data-transition="flip"
     data-position-to="#machine-keys"
     data-theme="a">
+    <div class="ui-header ui-caps">
+        <h1 class="ui-title">Add Key</h1>
+
+        <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+    </div>
+
     <ul data-role="listview">
         <li data-icon="false"><a {{action "removeClicked" target=view}}>Remove</a></li>
         <li data-icon="false"><a {{action "probeClicked" target=view}}>Probe</a></li>
@@ -61,6 +64,8 @@
 
     <div class="ui-header ui-caps">
         <h1 class="ui-title">Add Key</h1>
+
+        <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
     </div>
 
     <ul data-role="listview">
@@ -85,6 +90,8 @@
 
     <div data-role="header">
         <h2>SSH user &amp; port</h2>
+
+        <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
     </div>
 
     <div data-role="content">
@@ -106,7 +113,7 @@
                value=Mist.machineKeysController.port}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a ui-caps"
+            <a class="ui-btn back ui-btn-a ui-caps"
                 {{action "closeSSH_Details" target=Mist.machineKeysController}}>
                 Cancel
             </a>

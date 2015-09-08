@@ -47,9 +47,19 @@
     display: none;
 }
 
-#single-key-page .machine-name {
-    left: 10px;
+#single-key-machines  .machine-name {
+    left: 15px;
     position: relative;
+}
+
+@media only screen and  (max-width: 600px) {
+    #single-key-machines .checkbox-link > a {
+        height: 50px;
+    }
+
+    #single-key-machines .machine-state {
+        left: 15px;
+    }
 }
 
 #single-key-page #public-key {

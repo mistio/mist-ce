@@ -41,7 +41,14 @@
 
 .delete-rule-container {
     float: right;
-    margin: 9px;
+}
+
+.delete-rule-container .ui-btn {
+    padding: 11px 12px 7px 8px;
+}
+
+.delete-rule-container .ui-btn:after {
+    font-size: 16px;
 }
 
 .delete-rule-container div.ui-btn span.ui-btn-inner {

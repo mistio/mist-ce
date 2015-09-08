@@ -102,6 +102,10 @@
     }
 }
 
+#single-machine-page .graph-list {
+    box-shadow: none;
+}
+
 #single-machine-page .info-table tr td:nth-child(2) {
     color: #7f7f7f;
 }
@@ -160,7 +164,7 @@
 }
 
 #single-machine-page #monitoring-bottom-btns a.icon-xx:after {
-    margin-top: -8px;
+    margin: -8px 4px 0 0;
     font-size: 16px;
 }
 

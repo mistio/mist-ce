@@ -152,15 +152,12 @@ h4 {
     margin: 0;
 }
 
-.ui-popup-container {
-    position: fixed;
-}
 .ui-popup-container .ui-header {
     border: none !important;
     background-color: #d4d4d4;
     color: #000;
     text-transform: uppercase;
-    padding: 15px 20px;
+    padding: 15px;
     text-shadow: 0 0 0 transparent;
 }
 
@@ -193,11 +190,6 @@ h4 {
 .ui-popup ul.ui-listview li a:after {
     left: .8em;
     top: 1em;
-}
-
-.ui-popup.ui-mini .ui-listview a {
-    padding-left: 20px;
-    padding-right: 20px;
 }
 
 .ui-li-count {
