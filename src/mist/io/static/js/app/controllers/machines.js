@@ -181,7 +181,6 @@ define('app/controllers/machines', ['app/models/machine'],
                 });
             },
 
-
             rebootMachine: function(machineId, callback) {
                 var that = this;
                 var machine = this.getMachine(machineId);
@@ -201,7 +200,6 @@ define('app/controllers/machines', ['app/models/machine'],
                     if (callback) callback(success);
                 });
             },
-
 
             startMachine: function(machineId, callback) {
                 var that = this;
@@ -223,30 +221,23 @@ define('app/controllers/machines', ['app/models/machine'],
                 });
             },
 
-
             getMachine: function(machineId) {
                 return this.model.findBy('id', machineId);
             },
-
 
             machineExists: function(machineId) {
                 return !!this.getMachine(machineId);
             },
 
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
-
+            //
+            //  Pseudo-Private Methods
+            //
 
             _updateModel: function(machines) {
                 var that = this;
                 Ember.run(function() {
-
                     // Replace dummy machines (newly created)
-
                     var dummyMachines = that.model.filterBy('id', -1);
 
                     dummyMachines.forEach(function(machine) {
@@ -257,7 +248,6 @@ define('app/controllers/machines', ['app/models/machine'],
                     });
 
                     // Remove deleted machines
-
                     that.model.forEach(function(machine) {
                         if (!machines.findBy('id', machine.id))
                             if (machine.id != -1)
@@ -265,7 +255,6 @@ define('app/controllers/machines', ['app/models/machine'],
                     });
 
                     // Update model
-
                     machines.forEach(function(machine) {
                         if (that.machineExists(machine.id)) {
 
@@ -297,7 +286,6 @@ define('app/controllers/machines', ['app/models/machine'],
                 });
             },
 
-
             _createMachine: function(machine, key, dummyMachine) {
                 Ember.run(this, function() {
                     machine = Machine.create(machine);
@@ -311,7 +299,6 @@ define('app/controllers/machines', ['app/models/machine'],
                 });
             },
 
-
             _updateSelectedMachines: function() {
                 Ember.run(this, function() {
                     var newSelectedMachines = [];
@@ -323,9 +310,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 });
             },
 
-
             _updateMonitoredMachines: function() {
-
                 forIn(this, Mist.monitored_machines_, function (machineDict, uuid) {
 
                     var machine = this.getMachine(machineDict.machine_id);
@@ -358,11 +343,9 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //  Observers
+            //
 
             selectedMachinesObserver: function() {
                 Ember.run.once(this, '_updateSelectedMachines');

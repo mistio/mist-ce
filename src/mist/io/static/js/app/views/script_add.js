@@ -20,7 +20,6 @@ define('app/views/script_add', ['app/views/controlled'],
 
         return App.ScriptAddComponent = ControlledComponent.extend({
 
-
             //
             //  Properties
             //
@@ -36,7 +35,6 @@ define('app/views/script_add', ['app/views/controlled'],
                 value: 'executable'
             }],
 
-
             scriptSources: [{
                 label: 'Github',
                 value: 'github'
@@ -50,11 +48,8 @@ define('app/views/script_add', ['app/views/controlled'],
 
 
             //
-            //
             //  Computed Properties
             //
-            //
-
 
             isReady: function () {
                 var script = Mist.scriptAddController.get('newScript');
@@ -74,28 +69,34 @@ define('app/views/script_add', ['app/views/controlled'],
                 'Mist.scriptAddController.newScript.script'
             ),
 
+            isInline: function(){
+                return Mist.scriptAddController.newScript.source.value == 'inline';
+            }.property('Mist.scriptAddController.newScript.source'),
 
-            //
+            isURL: function(){
+                return Mist.scriptAddController.newScript.source.value == 'url';
+            }.property('Mist.scriptAddController.newScript.source'),
+
+            isGitHub: function(){
+                return Mist.scriptAddController.newScript.source.value == 'github';
+            }.property('Mist.scriptAddController.newScript.source'),
+
+
             //
             //  Methods
             //
-            //
-
 
             clear: function () {
-                this.$('.source').hide();
-                this.$('#script-add-description').hide();
                 this.closeTypeSelect();
                 this.closeSourceSelect();
+                $('#add-script').collapsible('collapse');
             },
-
 
             selectType: function (type) {
                 this.closeTypeSelect();
                 Mist.scriptAddController.get('newScript').set('type', type);
                 this.setScript();
             },
-
 
             setScript: function () {
                 var newScript = Mist.scriptAddController.get('newScript');
@@ -105,7 +106,6 @@ define('app/views/script_add', ['app/views/controlled'],
                 if (type.value == 'executable')
                     newScript.set('script', DEFAULT_SCRIPT);
             },
-
 
             selectSource: function (source) {
                 this.closeSourceSelect();
@@ -120,30 +120,23 @@ define('app/views/script_add', ['app/views/controlled'],
                     this.setScript();
             },
 
-
             closeTypeSelect: function () {
                 this.$('#script-add-type .mist-select').collapsible('collapse');
             },
-
 
             closeSourceSelect: function () {
                 this.$('#script-add-source .mist-select').collapsible('collapse');
             },
 
-
             showSourceBundle: function (source) {
-                this.$('.source').hide();
                 this.$('.'+source.value).slideDown();
                 this.$('#script-add-description').slideDown();
             },
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
                 clickOverlay: function() {

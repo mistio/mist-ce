@@ -639,7 +639,7 @@ textarea {
 #image-list-page .images-header,
 #script-list-page .scripts-header {
     background-color: #d4d4d4;
-    margin-top: 30px;
+    margin-top: 1%;
     overflow: visible;
 }
 #machine-list-page .machines-header:after,
@@ -1471,5 +1471,13 @@ ul.checkbox-list .ui-grid-b {
     background-color: #fff !important;
 }
 .ui-slider .ui-slider-handle {
+    background-color: #0099cc !important;
+}
+
+.field-wrapper.empty.required .ui-input-text {
+    border-color: #0099cc !important;
+}
+
+.field-wrapper.empty.required .ui-icon-question {
     background-color: #0099cc !important;
 }

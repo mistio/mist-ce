@@ -54,7 +54,7 @@
                     {{/if}}
 
                     <!-- Field Wrapper -->
-                    <div class="field-wrapper">
+                    <div class="field-wrapper {{if field.value '' 'empty'}} {{if field.optional '' 'required'}}">
                         <div class="first-child {{if field.helpText '' 'last-child'}}">
                             {{#if field.isText}}
                                 {{input type="text"

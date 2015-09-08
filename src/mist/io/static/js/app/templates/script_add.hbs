@@ -16,6 +16,16 @@
         </div>
 
         <!--
+            Description
+        -->
+        <div id="script-add-description" class="form-field">
+          <label>Description (optional)</label>
+          {{view Mist.TextArea
+              data-theme="a"
+              value=Mist.scriptAddController.newScript.description}}
+        </div>
+
+        <!--
             Select script type
         -->
         <div id="script-add-type" class="form-field">
@@ -72,6 +82,7 @@
             </div>
         </div>
 
+        {{#if view.isGitHub}}
         <div class="github source">
             <div class="form-field">
                 <label for="github-script-url">Github Repo</label>
@@ -90,7 +101,9 @@
                     value=Mist.scriptAddController.newScript.entryPoint}}
             </div>
         </div>
+        {{/if}}
 
+        {{#if view.isURL}}
         <div class="url source">
             <div class="form-field">
                 <label for="url-script-url">Url</label>
@@ -108,7 +121,9 @@
                     value=Mist.scriptAddController.newScript.entryPoint}}
             </div>
         </div>
+        {{/if}}
 
+        {{#if view.isInline}}
         <div class="inline source">
             <div class="form-field">
                 <label for="url-script-script">Script</label>
@@ -118,17 +133,7 @@
                     value=Mist.scriptAddController.newScript.script}}
             </div>
         </div>
-
-        <!--
-            Description
-        -->
-
-        <div id="script-add-description" class="form-field">
-          <label>Description (optional)</label>
-          {{view Mist.TextArea
-              data-theme="a"
-              value=Mist.scriptAddController.newScript.description}}
-        </div>
+        {{/if}}
 
         {{#if Mist.scriptsController.addingScript}}
             <div class="ajax-loader"></div>

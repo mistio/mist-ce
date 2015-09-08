@@ -43,7 +43,7 @@ define('app/controllers/script_add', ['ember'],
 
             close: function () {
                 this.clear();
-                this.view.close();
+                this.view.clear();
             },
 
 

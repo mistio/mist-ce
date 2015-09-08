@@ -16,10 +16,9 @@ define('app/views/backend_add', ['app/views/controlled'],
             selectedRegion: null,
             helpHref: '',
 
-            //
+
             //
             //  Computed Properties
-            //
             //
 
             provider: function() {
@@ -38,12 +37,10 @@ define('app/views/backend_add', ['app/views/controlled'],
                 return !!this.get('providerFields').findBy('advanced');
             }.property('providerFields'),
 
-
             providerRegions: function () {
                 if (this.provider)
                     return this.provider.regions;
             }.property('provider'),
-
 
             isReady: function () {
                 var isReady = true;
@@ -64,11 +61,8 @@ define('app/views/backend_add', ['app/views/controlled'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             clear: function () {
                 $('#backend-add-fields').hide();
@@ -91,7 +85,7 @@ define('app/views/backend_add', ['app/views/controlled'],
 
                 // Autocomplete credentials only for providers
                 // with regions
-                if (!fields.findBy('type', 'region'))
+                if (!fields || !fields.findBy('type', 'region'))
                     return;
 
                 Mist.backendsController.model.some(function (backend) {
@@ -120,14 +114,10 @@ define('app/views/backend_add', ['app/views/controlled'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 clickOverlay: function() {
                     $('#add-backend').collapsible('collapse');
                 },
