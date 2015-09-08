@@ -132,8 +132,12 @@
 }
 
 #single-machine-page #monitoring-bottom-btns {
-    height: 56px;
     padding: 10px 0px;
+}
+#single-machine-page #monitoring-bottom-btns:after {
+    content: '';
+    clear: both;
+    display: table;
 }
 
 #single-machine-page #monitoring-bottom-btns .ui-block-a,
@@ -146,6 +150,7 @@
 #single-machine-page #monitoring-bottom-btns a {
     margin: 7px auto;
     display: inline-block;
+    font-weight: 400;
 }
 
 #single-machine-page #monitoring-bottom-btns a.icon-plus:after {
@@ -209,10 +214,6 @@
     #single-machine-page #monitoring-bottom-btns .ui-block-c {
         width: 100%;
     }
-
-    #single-machine-page #monitoring-bottom-btns {
-        height: 165px;
-    }
 }
 
 #metrics-container {
@@ -267,8 +268,15 @@
     margin-top: 20px !important;
 }
 
-.info-table .loadleds {
-    margin-right: 10px;
+.info-table .loadleds,
+.info-table .netleds,
+.info-table .tag {
+    left: 0;
+}
+.info-table .tag {
+    float: left;
+    padding: 0 10px 0 0;
+    color: #7f7f7f !important;
 }
 
 div.df {
