@@ -102,6 +102,11 @@
   margin-top: -13px;
   margin-left: 2px;
 }
+.icon-plus:after {
+  content: '+';
+  font-size: 32px;
+  margin-top: -22px;
+}
 .ui-checkbox-off:after{content:'\006B';}
 .icon-checkbox-off:after{content:'\006B';}
 .ui-checkbox-on:after{content:'\006C';}

@@ -29,7 +29,7 @@
 
         {{#if Mist.graphsController.config.canModify}}
             {{#unless graph.isBuiltIn}}
-                <a class="ui-btn ui-shadow icon-xx ui-btn-icon-notext"
+                <a class="ui-btn icon-xx"
                     {{action "removeClicked" graph target=view.actionProxy}}>x
                 </a>
             {{/unless}}
@@ -40,8 +40,8 @@
         -->
 
         {{#if Mist.graphsController.config.canMinimize}}
-            <a class="ui-btn ui-btn-c ui-btn-icon-notext icon-down"
-                {{action "collapseClicked" graph target=view.actionProxy}}>-
+            <a class="ui-btn icon-down"
+                {{action "collapseClicked" graph target=view.actionProxy}}>
             </a>
         {{/if}}
     </div>

@@ -148,12 +148,10 @@
     display: inline-block;
 }
 
-#single-machine-page #monitoring-bottom-btns a.ui-icon-plus:after {
-    content: '+';
+#single-machine-page #monitoring-bottom-btns a.icon-plus:after {
     color: #fff !important;
     background-color: transparent !important;
-    font-size: 32px;
-    margin: -18px 0px 0 -18px;
+    margin: -22px -4px 0 0;
 }
 
 #single-machine-page #monitoring-bottom-btns a.icon-xx:after {
