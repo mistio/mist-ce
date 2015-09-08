@@ -80,6 +80,9 @@
 .terminated .machine-state span {
     color: #AAAAAA;
 }
+.error .machine-state span {
+    color: #d96557;
+}
 .has-incident .machine-state span {
     color: #777777;
 }

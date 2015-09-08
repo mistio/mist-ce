@@ -30,6 +30,9 @@
 #single-machine-page .ui-block-b h4.ui-title.pending {
     color: #E09400;
 }
+#single-machine-page .ui-block-b h4.ui-title.error {
+    color: #D96557;
+}
 #single-machine-page .ui-block-b h4.ui-title.rebooting {
     color: #4E68BB;
 }

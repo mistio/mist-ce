@@ -11,11 +11,7 @@
                 </div>
             </div>
             <div class="ui-block-b">
-                {{#if view.log.error}}
-                    <div class="tag tag-error">{{unbound view.log.type}}</div>
-                {{else}}
-                    <div class="tag tag-{{unbound view.log.type}}">{{unbound view.log.type}}</div>
-                {{/if}}
+                <div class="tag tag-{{unbound view.log.type}}">{{unbound view.log.type}}</div>
             </div>
             <div class="ui-block-c">
                 <div class="time">{{#if Mist.logsController.prettyTimeReady}}{{view.prettyTime}}{{/if}}</div>

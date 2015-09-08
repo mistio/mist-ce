@@ -60,25 +60,14 @@
 .log-list ul.ui-listview .open a.ui-btn:after {
     content: '\0073';
 }
-.log-list ul.ui-listview a.ui-btn.error {
-    background-color: #d96557 !important;
-    color: #fff !important;
-}
 .log-list ul.ui-listview a.ui-btn.error:after {
-    color: #fff !important;
-}
-.log-list ul.ui-listview a.ui-btn.error:hover {
-    background-color: #dc7265 !important;
+    color: #d96557 !important;
 }
 .log-list ul.ui-listview a.ui-btn.error .icon-warn {
     margin-bottom: -4px;
 }
 .log-list ul.ui-listview a.ui-btn.error .icon-warn:after {
-    color: #fff !important;
-}
-.log-list ul.ui-listview a.ui-btn.error .tag,
-.log-list ul.ui-listview a.ui-btn.error .time {
-    color: #fff !important;
+    color: #d96557 !important;
 }
 .log-list .ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn {
     padding: 1.2em 1.5em .8em;
