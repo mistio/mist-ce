@@ -7,7 +7,7 @@
 }
 
 .graph-list {
-    background-color: #F9F8F3;
+    background-color: #FAF9F4;
     clear: both;
     padding: 1.25%
 }
@@ -36,35 +36,40 @@
     font-weight: normal;
 }
 
+#history-control {
+    text-align: center;
+}
 #history-control #time-window-control {
     text-align: center;
     margin: 0;
     border-width: 0px;
-    width: 100%;
-    margin-top: -40px;
     clear: both;
     min-width: 190px;
 }
 
 #history-control a.time {
     width: 65px;
-    height: 39px;
     border-radius: 0em;
-    margin: 10px -5px -6px 0px;
+    margin: 0;
     z-index: 10;
     border-width: 0px;
+    vertical-align: top;
 }
 
 #time-window-control {
     margin: 0;
     border-radius: 0;
     border-left-width: 0;
-    height: 45px;
-    overflow: hidden;
+    display: inline-block;
+    margin: 0;
 }
 
 #time-window-control .ui-btn {
-    line-height: 24px;
+    padding: 0 !important;
+    font-size: 18px;
+    display: inline-block;
+    line-height: 28px;
+    margin: 0;
     padding-left: 85px !important;
     padding-right: 80px !important;
     border-width: 0px;
@@ -76,12 +81,6 @@
 
 #time-window-control span {
     padding: 5px;
-}
-
-#history-control-forward {
-    float: right;
-    margin-bottom: -57px !important;
-    margin-right: 0px !important;
 }
 
 .graph-button {
@@ -152,4 +151,8 @@
 .graph .header *,
 .graph .legend * {
     display: inline-block;
+}
+
+#change-time-window .ui-listview a {
+    padding-left: 20px;
 }

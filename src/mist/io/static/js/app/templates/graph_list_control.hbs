@@ -14,6 +14,14 @@
                 ui-alt-icon"
             {{action "backClicked" target=view}}>
         </a>
+        
+        <div id="time-window-control" class="ui-mini {{Mist.graphsController.stream.isStreaming}}">
+            <a class="ui-btn ui-btn-icon-right ui-icon-carat-d ui-caps"
+                {{action "timeWindowClicked" target=view}}>
+                    {{view.timeWindowText}}
+            </a>
+        </div>
+
         <!--
             Forward Button
         -->
@@ -29,16 +37,15 @@
                 {{action "forwardClicked" target=view}}>
             </a>
         {{/unless}}
-        <div id="time-window-control" class="ui-mini {{Mist.graphsController.stream.isStreaming}}">
-            <a class="ui-btn ui-btn-icon-right ui-icon-carat-d"
-                {{action "timeWindowClicked" target=view}}>
-                    {{view.timeWindowText}}
-            </a>
-        </div>
 
     </div>
 
-    <div id="change-time-window" data-role="popup" data-transition="flip" data-position-to="#time-window-control">
+    <div id="change-time-window" class="very-small-popup" data-role="popup" data-transition="flip" data-position-to="#time-window-control">
+        <div class="ui-header ui-bar-b" role="banner">
+            <h1 class="ui-title">Select Range</h1>
+
+            <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+        </div>
         <ul data-role='listview'>
             <li data-icon="false">
                 <a {{action "timeWindowChanged" "minutes" "last 10 mins" target=view}}>
@@ -93,13 +100,15 @@
 
                 <div class="ui-header ui-bar-b" role="banner">
                     <h1 class="ui-title">Select Range</h1>
+
+                    <a href="javascript:void(0)" class="close" {{action "rangeBackClicked" target=view}}>&#10005;</a>
                 </div>
                 <div class="ui-content ui-body-a" role="main">
-                    <label>From:</label>
+                    <label>From</label>
                     {{view Mist.TextField
                         id="range-start"
                         placeholder="range start"}}
-                    <label>To:</label>
+                    <label>To</label>
                     {{view Mist.TextField
                         id="range-stop"
                         placeholder="range stop"}}
@@ -110,10 +119,6 @@
                         data-role="controlgroup"
                         data-type="horizontal">
 
-                        <a class="ui-btn ui-caps back"
-                            {{action "rangeBackClicked" target=view}}>
-                                Back
-                        </a>
                         <a id="key-add-ok" class="ui-btn ui-caps yes"
                             {{action "rangeOkClicked" target=view}}>
                                 OK

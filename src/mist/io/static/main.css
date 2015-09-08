@@ -451,6 +451,9 @@ textarea {
 .tiny-popup {
     min-width: 150px !important;
 }
+.very-small-popup {
+    width: 200px !important;
+}
 .small-popup {
     width: 240px !important;
 }
