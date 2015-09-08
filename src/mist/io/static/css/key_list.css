@@ -55,8 +55,6 @@
 }
 #key-list-page .tag {
     position: relative;
-    top: 6px !important;
-    right: 20px;
 }
 #key-list-page .ui-icon-check:after {
     background-color: #46d4c9;
@@ -76,7 +74,7 @@
 }
 .key-tags {
     float: right;
-    margin-top: -8px;
+    padding-right: 20px;
 }
 
 #key-list {

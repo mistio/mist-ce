@@ -71,6 +71,27 @@ define('app/views/network_list', ['app/views/page'],
                             }
                         }
                     });
+                },
+
+                selectClicked: function () {
+                    $('#select-networks-popup').popup('open').find('.ui-listview').listview('refresh');
+                },
+
+                selectionModeClicked: function (mode) {
+
+                    $('#select-networks-popup').popup('close');
+
+                    Ember.run(function () {
+                        Mist.backendsController.model.forEach(function (backend) {
+                            if (backend.enabled) {
+                                backend.networks.model.forEach(function (network) {
+                                    console.log(network);
+                                    console.log(mode);
+                                    network.set('selected', mode);
+                                });
+                            }                        
+                        });
+                    });
                 }
             }
         });

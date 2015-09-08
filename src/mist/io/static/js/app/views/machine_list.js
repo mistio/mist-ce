@@ -136,7 +136,7 @@ define('app/views/machine_list', ['app/views/page'],
 
                     Mist.backendsController.model.forEach(function (backend) {
                         backend.machines.model.forEach(function (machine) {
-                            machine.set('selected', mode == 'all' || mode == backend.title);
+                            // machine.set('selected', mode == 'all' || mode == backend.title);
                         });
                     });
                 }

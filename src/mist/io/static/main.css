@@ -583,7 +583,8 @@ textarea {
 
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable,
-#script-list-page .ui-filterable {
+#script-list-page .ui-filterable,
+#network-list-page .ui-filterable {
     position: relative;
     top: -59px;
     z-index: 1;
@@ -596,7 +597,8 @@ textarea {
 
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search,
-#script-list-page .ui-filterable .ui-input-search {
+#script-list-page .ui-filterable .ui-input-search,
+#network-list-page .ui-filterable .ui-input-search {
     margin-left: 55px;
 }
 #script-list-page .ui-filterable .ui-input-search {
@@ -606,7 +608,8 @@ textarea {
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search,
 #image-list-page .ui-filterable .ui-input-search,
-#script-list-page .ui-filterable .ui-input-search {
+#script-list-page .ui-filterable .ui-input-search,
+#network-list-page .ui-filterable .ui-input-search {
     background-color: #fff;
     border-color: #b5b5b5;
 }
@@ -629,14 +632,16 @@ textarea {
 #machine-list-page .machines-header,
 #key-list-page .keys-header,
 #image-list-page .images-header,
-#script-list-page .scripts-header {
+#script-list-page .scripts-header,
+#network-list-page .networks-header {
     background-color: #d4d4d4;
     margin-top: 1%;
     overflow: visible;
 }
 #machine-list-page .machines-header:after,
 #key-list-page .keys-header:after,
-#script-list-page .scripts-header:after {
+#script-list-page .scripts-header:after,
+#network-list-page .networks-header:after {
     content: '';
     clear: both;
     display: table;

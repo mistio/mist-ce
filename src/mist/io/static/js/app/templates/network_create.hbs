@@ -18,7 +18,7 @@
         -->
         <div id="network-create-backend-wrapper">
 
-            <label for="network-create-backend">Backend:</label>
+            <label for="network-create-backend">Backend</label>
 
             <div id="network-create-backend"
                 data-role="collapsible"
@@ -62,7 +62,7 @@
         -->
         <div id="network-create-name-wrapper">
 
-            <label for="network-create-name">Network Name:</label>
+            <label for="network-create-name">Network Name</label>
 
             {{view Mist.TextField
                 data-theme="a"
@@ -77,7 +77,7 @@
 
 
         <div id="network-create-admin-state-wrapper">
-            <label>Admin State:</label>
+            <label>Admin State</label>
             <div id="network-create-admin-state"
                 data-role="collapsible"
                 data-iconpos="right"
@@ -129,7 +129,7 @@
                     Select Subnet Name
                 -->
                 <div id="network-create-subnet-name-wrapper">
-                    <label for="network-create-subnet-name">Subnet Name:</label>
+                    <label for="network-create-subnet-name">Subnet Name</label>
                     {{view Mist.TextField
                         data-theme="a"
                         id="network-create-subnet-name"
@@ -141,7 +141,7 @@
                     Select Network Address
                 -->
                 <div id="network-create-subnet-address-wrapper">
-                    <label for="network-create-subnet-address">Network Address (CIDR):</label>
+                    <label for="network-create-subnet-address">Network Address (CIDR)</label>
                     {{view Mist.TextField
                         data-theme="a"
                         id="network-create-subnet-address"
@@ -154,7 +154,7 @@
                         Select IP Version
                     -->
                     <div id="network-create-subnet-ipv-wrapper">
-                        <label>IP Version:</label>
+                        <label>IP Version</label>
                         <div id="network-create-subnet-ipv"
                             data-role="collapsible"
                             data-iconpos="right"
@@ -188,7 +188,7 @@
                     -->
                     <div>
                         <div id="network-create-subnet-gateway-ip-wrapper">
-                            <label for="network-create-subnet-gateway-ip">Gateway IP:</label>
+                            <label for="network-create-subnet-gateway-ip">Gateway IP</label>
                             {{view Mist.TextField
                                 data-theme="a"
                                 id="network-create-subnet-gateway-ip"
@@ -220,7 +220,7 @@
                         Allocation Pools
                     -->
                     <label for="network-create-subnet-allocation-pools">
-                        Allocation Pools:
+                        Allocation Pools
                     </label>
                     {{view Mist.TextArea
                         id="network-create-subnet-allocation-pools"
@@ -235,9 +235,7 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a"
-               {{action "backClicked" target=view}}>Back</a>
-            <a class="ui-btn ui-btn-d" id="network-create-ok"
+            <a class="ui-btn ui-btn-d ui-caps" id="network-create-ok"
                 {{action "createClicked" target=view}}>Create</a>
         </div>
     </div>

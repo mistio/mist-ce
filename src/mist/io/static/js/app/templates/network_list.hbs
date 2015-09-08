@@ -24,12 +24,23 @@
         </div>
     </div>
 
-    <div class="ui-content">
-        <a id="network-create-btn"
-            class="{{if Mist.backendsController.hasOpenStack '' 'ui-disabled'}}
-                responsive-button ui-btn ui-btn-d ui-icon-plus ui-btn-icon-right
-                ui-shadow"
-            {{action "createClicked" target=view}}>Create</a>
+    <div role="main" class="ui-content" data-theme="c">
+
+        <div class="ui-grid-a networks-header ui-shadow">
+            <div class="ui-block-a">
+                {{#if Mist.backendsController.hasNetworks}}
+                    <a id="select-networks-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
+                            ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
+                {{/if}}
+            </div>
+            <div class="ui-block-b">
+                <a id="network-create-btn"
+                    class="{{if Mist.backendsController.hasOpenStack '' 'ui-disabled'}}
+                        responsive-button ui-btn ui-btn-d ui-icon-plus ui-btn-icon-right"
+                    {{action "createClicked" target=view}}>Create</a>
+            </div>
+        </div><!-- /grid-b -->
+
         <ul id="networks"
             data-role="listview"
             data-inset="true"
@@ -55,6 +66,19 @@
     {{component "dialog-popup"}}
 
     {{component "network-create"}}
+
+    <div id="select-networks-popup" class="ui-mini" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-networks-btn">
+        <div class="ui-header ui-caps">Select</div>
+
+        <ul data-role="listview">
+            <li data-icon="false">
+                <a {{action "selectionModeClicked" true target=view}}>All</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "selectionModeClicked" false target=view}}>None</a>
+            </li>
+        </ul>
+    </div>
 
     <div class="single-action-footer" data-role="footer" data-theme="b">
         <a class="ui-btn ui-caps ui-corner-all ui-btn-icon-right icon-xx"

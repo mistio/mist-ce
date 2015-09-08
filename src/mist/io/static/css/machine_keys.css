@@ -35,10 +35,6 @@
     overflow: auto;
     max-height: 16.6em;
 }
-#non-associated-keys-popup.tiny-popup a {
-	padding-left: 20px;
-	padding-right: 20px;
-}
 #non-associated-keys-popup.tiny-popup a.ui-btn-d:hover {
 	background-color: #0099cc !important;
 }
