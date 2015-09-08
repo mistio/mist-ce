@@ -39,29 +39,40 @@
 #history-control {
     text-align: center;
 }
+
+#history-control a.time {
+    padding: 0;
+    width: 65px;
+    border-radius: 0em;
+    margin: -2px 0 0 0;
+    z-index: 10;
+    border-width: 0px;
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 3px;
+    height: 32px;
+    box-sizing: border-box;
+}
+#history-control a.time:hover {
+    background-color: #FAF9F4;
+}
+#history-control a.time:after {
+    font-size: 26px;
+    color: #d4d4d4;
+    margin: 0;
+}
+#history-control a.time:hover:after {
+    color: #444;
+}
+
 #history-control #time-window-control {
     text-align: center;
     margin: 0;
     border-width: 0px;
     clear: both;
     min-width: 190px;
-}
-
-#history-control a.time {
-    width: 65px;
-    border-radius: 0em;
-    margin: 0;
-    z-index: 10;
-    border-width: 0px;
-    vertical-align: top;
-}
-
-#time-window-control {
-    margin: 0;
     border-radius: 0;
-    border-left-width: 0;
     display: inline-block;
-    margin: 0;
 }
 
 #time-window-control .ui-btn {
@@ -70,9 +81,14 @@
     display: inline-block;
     line-height: 28px;
     margin: 0;
-    padding-left: 85px !important;
-    padding-right: 80px !important;
+    padding-left: 30px !important;
+    padding-right: 40px !important;
     border-width: 0px;
+    color: #444;
+}
+
+#time-window-control .ui-btn:hover {
+    color: #000 !important;
 }
 
 #time-window-control.is-streaming .ui-btn {

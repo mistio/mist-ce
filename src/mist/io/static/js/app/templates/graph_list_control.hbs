@@ -7,16 +7,12 @@
         <a id="history-control-back"
             class="time
                 ui-btn
-                ui-mini
-                ui-btn-inline
-                ui-btn-icon-notext
-                ui-icon-carat-l
-                ui-alt-icon"
+                icon-prev"
             {{action "backClicked" target=view}}>
         </a>
         
         <div id="time-window-control" class="ui-mini {{Mist.graphsController.stream.isStreaming}}">
-            <a class="ui-btn ui-btn-icon-right ui-icon-carat-d ui-caps"
+            <a class="ui-btn ui-btn-icon-right icon-down ui-caps"
                 {{action "timeWindowClicked" target=view}}>
                     {{view.timeWindowText}}
             </a>
@@ -29,11 +25,7 @@
             <a id="history-control-forward"
                 class="time
                     ui-btn
-                    ui-mini
-                    ui-btn-inline
-                    ui-btn-icon-notext
-                    ui-icon-carat-r
-                    ui-alt-icon"
+                    icon-next"
                 {{action "forwardClicked" target=view}}>
             </a>
         {{/unless}}
