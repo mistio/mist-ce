@@ -54,20 +54,39 @@ define('app/views/machine_list', ['app/views/page'],
                     connectText = machine.get('connectText');
                     $('#machine-list-page .ui-footer').slideDown();
 
-                    this.set('selectedMachine', machine)
+                    this.set('selectedMachine', machine);
                     if (machine.can_tag) {
                         $('#machine-list-page #machines-tags-btn').removeClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
                     }
-
+                    
                     if (machine.get('canConnect') && machine.state == 'running') {
                         $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');
                     }
+
+                    if(!machine.can_start && !machine.can_reboot && !machine.can_destroy && !machine.can_shutdown && !machine.can_rename) {
+                        $('#machine-list-page #machines-power-btn').addClass('ui-state-disabled');
+                    } else {
+                        $('#machine-list-page #machines-power-btn').removeClass('ui-state-disabled');
+                    }
                     break;
                 default:
+                    var haveActions = true;
+
+                    Mist.backendsController.selectedMachines.forEach(function (machine, index) {
+                        if (!machine.can_start && !machine.can_reboot && !machine.can_destroy && !machine.can_shutdown) {
+                            haveActions = false;
+                        }
+                    });
+
+                    if (haveActions) {
+                        $('#machine-list-page #machines-power-btn').removeClass('ui-state-disabled');
+                    } else {
+                        $('#machine-list-page #machines-power-btn').addClass('ui-state-disabled');
+                    }
                     $('#machine-list-page .ui-footer').slideDown();
                     $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
                     $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');

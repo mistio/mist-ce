@@ -55,6 +55,7 @@ define('app/controllers/machine_add', ['ember'],
 
             close: function() {
                 this._clear();
+                $('#create-machine').collapsible('collapse');
             },
 
 

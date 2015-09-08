@@ -124,6 +124,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                  this.$('select').val('basic').slider('refresh');
                  this.$('.script-option').hide();
                  this.$('.basic').show();
+                 this.$('.ui-collapsible').removeClass('selected');
              },
 
 
