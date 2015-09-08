@@ -9,7 +9,8 @@ define('app/views/subnet_list_item', ['app/views/list_item'],
         'use strict';
 
         return App.SubnetListItemComponent = ListItemComponent.extend({
-            layoutName: 'subnet_list_item'
+            layoutName: 'subnet_list_item',
+            tagName: 'div'
         });
     }
 );

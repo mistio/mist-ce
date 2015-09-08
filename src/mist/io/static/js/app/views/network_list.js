@@ -59,7 +59,8 @@ define('app/views/network_list', ['app/views/page'],
                         head: 'Delete networks',
                         body: [
                             {
-                                paragraph: 'Are you sure you want to delete these networks: ' +
+                                paragraph: 'Are you sure you want to delete ' + (Mist.backendsController
+                        .selectedNetworks.length > 1 ? 'these networks: ' : 'this network: ') +
                                     networkNames + ' ?'
                             }
                         ],
@@ -83,10 +84,8 @@ define('app/views/network_list', ['app/views/page'],
 
                     Ember.run(function () {
                         Mist.backendsController.model.forEach(function (backend) {
-                            if (backend.enabled) {
+                            if (backend.get('enabled') && backend.get('isOpenStack')) {
                                 backend.networks.model.forEach(function (network) {
-                                    console.log(network);
-                                    console.log(mode);
                                     network.set('selected', mode);
                                 });
                             }                        

@@ -10,7 +10,7 @@
                     </div>
 
                     <div class="ui-block-b">
-                        <h1 class="ui-title">Networks</h1>
+                        <h1 class="ui-title">{{model.name}}</h1>
                     </div>
 
                     <div class="ui-block-c">
@@ -26,8 +26,7 @@
 
     <div data-role="content" data-theme="a">
 
-        <div id="single-network-info" data-role="collapsible" data-collapsed="false">
-
+        <div id="single-network-info" class="ui-shadow" data-role="collapsible" data-collapsed="false">
             <h4>Network Information</h4>
 
             <table class="info-table">
@@ -48,11 +47,10 @@
                 {{/if}}
                 </tbody>
             </table>
-
         </div>
 
         {{#if model.subnets}}
-        <div id="single-network-subnets" data-role="collapsible" data-collapsed="false">
+        <div id="single-network-subnets" class="ui-shadow" data-role="collapsible" data-collapsed="false">
             <h4>Subnets ({{model.subnets.length}})</h4>
 
             {{#each model.subnets as |subnet|}}
@@ -85,7 +83,7 @@
     {{component "dialog-popup"}}
 
     {{#if model.backend.isOpenStack}}
-    <div class="single-action-footer" data-role="footer" data-theme="b">
+    <div class="single-action-footer ui-footer ui-bar-b">
         <a class="ui-btn ui-caps ui-btn-icon-right icon-xx"
             {{action "deleteClicked" target=view}}>
                 Delete

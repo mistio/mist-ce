@@ -74,6 +74,10 @@ h4 {
     font-weight: 400;
 }
 
+.text-center {
+    text-align: center;
+}
+
 .ui-caps, .ui-collapsible-heading {
     text-transform: uppercase;
 }
@@ -747,6 +751,10 @@ ul.checkbox-list .ui-grid-b {
 }
 .checkbox-link .ui-checkbox label:hover:after {
     color: #444;
+}
+.checkbox-link.is-disabled .ui-checkbox label:hover:after {
+    color: #d1d1d1;
+    cursor: not-allowed;
 }
 .checkbox-link .ui-checkbox label.ui-checkbox-on:after {
     color: #444;

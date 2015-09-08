@@ -11,6 +11,15 @@ define('app/views/network_list_item', ['app/views/list_item'],
 		return App.NetworkListItemComponent = ListItemComponent.extend({
 			layoutName: 'network_list_item',
 			network: null,
+			classNameBindings: ['isDisabled'],
+
+			/**
+			 *  Computed Properties
+			 */
+
+			isDisabled: function() {
+                return !this.network.get('backend.isOpenStack');
+            }.property('network.backend.isOpenStack'),
 
 			/**
 			 *
