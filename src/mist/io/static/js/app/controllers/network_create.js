@@ -17,10 +17,7 @@ define('app/controllers/network_create', ['ember'],
             //
             //
 
-            adminStateUpToText: function () {
-                return this.network.adminStateUp ? 'UP' : 'DOWN';
-            }.property('network.adminStateUp'),
-
+            formReady: null,
             network: Ember.Object.create({
                 name: null,
                 backend: null,
@@ -61,6 +58,10 @@ define('app/controllers/network_create', ['ember'],
                 }),
             }),
 
+            adminStateUpToText: function () {
+                return this.network.adminStateUp ? 'UP' : 'DOWN';
+            }.property('network.adminStateUp'),
+
 
             //
             //
@@ -71,12 +72,11 @@ define('app/controllers/network_create', ['ember'],
 
             open: function () {
                 this._clear();
-                this.view.open();
+                this._updateFormReady();
             },
 
             close: function () {
                 this._clear();
-                this.view.close();
             },
 
             selectBackend: function (backend) {
@@ -168,7 +168,27 @@ define('app/controllers/network_create', ['ember'],
             _clear: function () {
                 this.network.clear();
                 this.view.clear();
-            }
+            },
+
+            _updateFormReady: function() {
+                var formReady = false;
+                if (this.network.name &&
+                    this.network.backend) {
+                    formReady = true;
+                }
+
+                this.set('formReady', formReady);
+            },
+
+            /**
+             *
+             *  Observers
+             *
+             */
+
+            formObserver: function() {
+                Ember.run.once(this, '_updateFormReady');
+            }.observes('network.name', 'network.backend')
         });
     }
 );

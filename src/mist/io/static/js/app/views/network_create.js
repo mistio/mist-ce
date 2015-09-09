@@ -18,29 +18,68 @@ define('app/views/network_create', ['app/views/controlled'],
             createSubnet: false,
             disableGateway: false,
 
+            /**
+             *
+             *  Initialization
+             *
+             */
+
+             load: function () {
+                Ember.run.next(function(){
+                    $( "#create-network" ).collapsible({
+                        expand: function(event, ui) {
+                            Mist.networkCreateController.open(null);
+
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('ui-screen-hidden').addClass('in');
+                            }
+                            $(this).children().next().hide();
+                            $(this).children().next().slideDown(250);
+                        }
+                    });
+                });
+             }.on('didInsertElement'),
+
+
+             unload: function () {
+                Ember.run.next(function(){
+                    $( "#create-network" ).collapsible({
+                        collapse: function(event, ui) {
+                            Mist.networkCreateController.close();
+
+                            $(this).children().next().slideUp(250);
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('in').addClass('ui-screen-hidden');
+                            }
+                        }
+                    });
+                });
+             }.on('willDestroyElement'),
+
 
             //
             //  Methods
             //
 
             clear: function () {
-                $('#network-create-name-wrapper').hide();
-                $('#network-create-admin-state-wrapper').hide();
-                $('#network-create-admin-state-wrapper').hide();
-                $('#network-create-subnet-wrapper').hide();
                 $('#network-create-subnet-form').hide();
                 $('#network-create-subnet-address-wrapper').hide();
                 $('#network-create-subnet-other-wrapper').hide();
                 $('#network-create-subnet-gateway-ip-wrapper').show();
                 $('#network-create .ui-collapsible')
-                    .collapsible('option', 'collapsedIcon', 'arrow-d')
+                    .collapsible('option', 'collapsedIcon', 'carat-d')
                     .collapsible('collapse');
                 $('#network-create .ui-checkbox > .ui-btn')
                     .removeClass('ui-checkbox-on')
                     .addClass('ui-checkbox-off');
+                this.$('.ui-collapsible').removeClass('selected');
                 this.renderFields();
                 this._fieldIsReady('admin-state');
-                this._fieldIsReady('subnet-ipv');
+                this._fieldIsReady('subnet-ipv');                
             },
 
             renderFields: function () {
@@ -61,9 +100,16 @@ define('app/views/network_create', ['app/views/controlled'],
             //
 
             _fieldIsReady: function (field) {
-                $('#network-create-' + field)
-                    .collapsible('option', 'collapsedIcon', 'check')
-                    .collapsible('collapse');
+                $('#network-create-' + field).collapsible('collapse');
+                $('#network-create-' + field).addClass('selected');
+            },
+
+            updateLaunchButton: function () {
+               if (Mist.networkCreateController.formReady) {
+                   $('#network-create-ok').removeClass('ui-state-disabled');
+               } else {
+                   $('#network-create-ok').addClass('ui-state-disabled');
+               }
             },
 
 
@@ -77,9 +123,6 @@ define('app/views/network_create', ['app/views/controlled'],
                 },
 
                 backendSelected: function (backend) {
-                    Ember.run.later(function () {
-                        $('#network-create-name-wrapper').slideDown();
-                    }, SLIDE_DOWN_DELAY);
                     Mist.networkCreateController.selectBackend(backend);
                     this._fieldIsReady('backend');
                 },
@@ -107,15 +150,6 @@ define('app/views/network_create', ['app/views/controlled'],
             //
             //  Observers
             //
-
-            networkNameObserver: function () {
-                Ember.run.later(function () {
-                    if (Mist.networkCreateController.network.name) {
-                        $('#network-create-subnet-wrapper').slideDown();
-                        $('#network-create-admin-state-wrapper').slideDown();
-                    }
-                }, SLIDE_DOWN_DELAY);
-            }.observes('Mist.networkCreateController.network.name'),
 
             createSubnetObserver: function () {
                 Ember.run.later(function () {
@@ -149,7 +183,11 @@ define('app/views/network_create', ['app/views/controlled'],
                     else
                         $('#network-create-subnet-gateway-ip-wrapper').slideDown();
                 }, SLIDE_DOWN_DELAY);
-            }.observes('Mist.networkCreateController.network.subnet.disableGateway')
+            }.observes('Mist.networkCreateController.network.subnet.disableGateway'),
+
+             formReadyObserver: function () {
+                Ember.run.once(this, 'updateLaunchButton');
+             }.observes('Mist.networkCreateController.formReady')
         });
     }
 );

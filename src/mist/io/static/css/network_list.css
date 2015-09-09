@@ -37,3 +37,7 @@
 #networks {
     margin-top: -53px;
 }
+#networks .ui-grid-b .ui-block-b {
+    text-align: center;
+    padding-right: 26px;
+}

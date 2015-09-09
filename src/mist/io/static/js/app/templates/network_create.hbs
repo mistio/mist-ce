@@ -7,6 +7,19 @@
     <div id="network-create" data-role="content" >
 
         <!--
+            Select Network Name
+        -->
+        <div id="network-create-name-wrapper">
+
+            <label for="network-create-name">Network Name</label>
+
+            {{view Mist.TextField
+                data-theme="a"
+                id="network-create-name"
+                value=Mist.networkCreateController.network.name}}
+        </div>
+
+        <!--
             Select Backend
 
             Allow only openstack backends for now
@@ -18,8 +31,8 @@
             <div id="network-create-backend"
                 data-role="collapsible"
                 data-iconpos="right"
-                data-collapsed-icon="arrow-d"
-                data-expanded-icon="arrow-u"
+                data-collapsed-icon="carat-d"
+                data-expanded-icon="carat-u"
                 data-theme="a"
                 class="mist-select">
 
@@ -53,20 +66,6 @@
 
 
         <!--
-            Select Network Name
-        -->
-        <div id="network-create-name-wrapper">
-
-            <label for="network-create-name">Network Name</label>
-
-            {{view Mist.TextField
-                data-theme="a"
-                id="network-create-name"
-                value=Mist.networkCreateController.network.name}}
-        </div>
-
-
-        <!--
             Select Admin State
         -->
 
@@ -76,8 +75,8 @@
             <div id="network-create-admin-state"
                 data-role="collapsible"
                 data-iconpos="right"
-                data-collapsed-icon="arrow-d"
-                data-expanded-icon="arrow-u"
+                data-collapsed-icon="carat-d"
+                data-expanded-icon="carat-u"
                 data-theme="a"
                 class="mist-select">
 
@@ -153,8 +152,8 @@
                         <div id="network-create-subnet-ipv"
                             data-role="collapsible"
                             data-iconpos="right"
-                            data-collapsed-icon="arrow-d"
-                            data-expanded-icon="arrow-u"
+                            data-collapsed-icon="carat-d"
+                            data-expanded-icon="carat-u"
                             data-theme="a"
                             class="mist-select">
 
