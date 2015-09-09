@@ -34,10 +34,10 @@
 #network-list-page .ui-filterable {
     margin-right: 290px;
 }
-#networks {
+#network-list {
     margin-top: -53px;
 }
-#networks .ui-grid-b .ui-block-b {
+#network-list .ui-grid-b .ui-block-b {
     text-align: center;
     padding-right: 26px;
 }

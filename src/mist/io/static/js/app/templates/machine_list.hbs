@@ -39,7 +39,7 @@
         </div>
         <!-- /grid-b -->
 
-        <ul id="machines" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter machines" data-theme="c" class="checkbox-list">
+        <ul id="machine-list" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter machines" data-theme="c" class="checkbox-list">
             {{#each Mist.backendsController.model as |backend|}}
                 {{#if backend.enabled}}
                     {{#each backend.machines.model as |machine|}}

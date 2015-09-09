@@ -62,10 +62,10 @@
     text-align: center;
 }
 
-#machines {
+#machine-list {
     margin-top: -53px;
 }
-#machines .ui-listview {
+#machine-list .ui-listview {
     box-shadow: none;
 }
 .running .machine-state span {
@@ -96,11 +96,11 @@
 
 /* Conditional for < 600px */
 @media only screen and  (max-width: 600px) {
-    #machines .checkbox-link > a {
+    #machine-list .checkbox-link > a {
         height: 50px;
     }
 
-    #machines .checkbox-link .ui-checkbox label {
+    #machine-list .checkbox-link .ui-checkbox label {
         margin-top: 0;
         height: 70px;
     }
