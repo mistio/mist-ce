@@ -10,13 +10,9 @@ define('app/controllers/base_array', ['ember'],
 
         return Ember.Controller.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             loading: true,
             passOnProperties: [],
@@ -24,11 +20,8 @@ define('app/controllers/base_array', ['ember'],
 
 
             //
-            //
             //  Computed Properties
             //
-            //
-
 
             selectedObjects: function () {
                 return this.model.filterBy('selected', true);
@@ -36,11 +29,8 @@ define('app/controllers/base_array', ['ember'],
 
 
             //
-            //
             //  Public Methods
             //
-            //
-
 
             setModel: function (model) {
                 model = !!model ? model : [];
@@ -61,11 +51,8 @@ define('app/controllers/base_array', ['ember'],
 
 
             //
-            //
             //  Private Methods
             //
-            //
-
 
             _passOnProperties: function (model) {
                 this.get('passOnProperties').forEach(function (property) {

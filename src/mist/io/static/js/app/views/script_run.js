@@ -13,20 +13,6 @@ define('app/views/script_run', ['app/views/popup'],
             controllerName: 'scriptRunController',
             popupId: '#script-run',
 
-            load: function () {
-                Mist.backendsController.on('onMachineListChange', this, 'refreshList');
-            }.on('didInsertElement'),
-
-            unload: function () {
-                Mist.backendsController.off('onMachineListChange', this, 'refreshList');
-            }.on('willDestroyElement'),
-
-            refreshList: function () {
-                Ember.run.later(this, function () {
-                    this.$('.ui-listview').listview('refresh');
-                }, 200);
-            },
-
             isReady: function () {
                 return Mist.scriptRunController.scriptToRun.machine.id;
             }.property('Mist.scriptRunController.scriptToRun.machine'),

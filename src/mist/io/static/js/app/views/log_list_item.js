@@ -10,11 +10,8 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
         return App.LogListItemComponent = ListItemComponent.extend({
 
-
-            //
             //
             //  Properties
-            //
             //
 
             layoutName: 'log_list_item',
@@ -24,11 +21,8 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
 
             //
-            //
             //  Computed Properties
             //
-            //
-
 
             details: function () {
                 var details = [];
@@ -50,21 +44,17 @@ define('app/views/log_list_item', ['app/views/list_item'],
                 });
             }.property('log'),
 
-
             collapsedClass: function () {
                 return this.get('isCollapsed') ? '' : 'open';
             }.property('isCollapsed'),
-
 
             prettyTime: function () {
                 return this.get('log').get('date').getTimeFromNow();
             }.property('log.time'),
 
-
             fullPrettyTime: function () {
                 return this.get('log').get('date').getPrettyDateTime();
             }.property('log.time'),
-
 
             formatedAction: function () {
                 return this.get('log').get('action').split('_').map(function (word) {
@@ -72,17 +62,14 @@ define('app/views/log_list_item', ['app/views/list_item'],
                 }).join(' ');
             }.property('log.action'),
 
-
             filteredEmail: function () {
                 var email = this.get('log').get('email');
                 return email !== 'None' ? email : '';
             }.property('log.email'),
 
-
             isIncident: function () {
                 return this.get('log').get('type') == 'incident';
             }.property('log.type'),
-
 
             backendTitle: function () {
                 var log = this.get('log');
@@ -91,7 +78,6 @@ define('app/views/log_list_item', ['app/views/list_item'],
                     return Mist.backendsController.getBackend(backendId).title;
                 return false;
             }.property('log.backend_id'),
-
 
             machineLink: function () {
                 var log = this.get('log');
@@ -102,14 +88,10 @@ define('app/views/log_list_item', ['app/views/list_item'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 toggleCollapse: function () {
                     this.propertyDidChange('machineLink');
                     if (this.get('isCollapsed')) {
@@ -126,7 +108,6 @@ define('app/views/log_list_item', ['app/views/list_item'],
                         });
                     }
                 },
-
 
                 userClicked: function (user) {
                     Mist.__container__.lookup('router:main').transitionTo('user',

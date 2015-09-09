@@ -35,6 +35,10 @@
                     id="script-edit-new-name"
                     value=Mist.scriptEditController.newName}}
 
+                {{view Mist.TextArea
+                    id="script-edit-new-description"
+                    value=Mist.scriptEditController.newDescription}}
+
                 {{#if Mist.scriptsController.renamingScript}}
                     <div class="ajax-loader"></div>
                 {{/if}}

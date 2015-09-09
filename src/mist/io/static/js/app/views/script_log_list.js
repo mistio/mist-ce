@@ -4,15 +4,15 @@ define('app/views/script_log_list', ['app/views/log_list'],
     //
     //  @returns Class
     //
-    function (LogListView) {
+    function (LogListComponent) {
 
         'use strict';
 
-        return App.ScriptLogListView = LogListView.extend({
+        return App.ScriptLogListComponent = LogListComponent.extend({
 
-            templateName: 'script_log_list',
+            layoutName: 'script_log_list',
 
-            filterString: Ember.computed.alias('controller.model.id'),
+            filterString: '',
 
             extraParams: Ember.Object.create({
               script_id: ''

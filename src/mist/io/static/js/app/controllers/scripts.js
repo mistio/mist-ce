@@ -13,7 +13,6 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
             baseModel: ScriptModel,
 
             addScript: function (args) {
-
                 var that = this;
                 that.set('addingScript', true);
                 Mist.ajax.POST('/scripts', {
@@ -53,9 +52,10 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 var that = this;
                 that.set('renamingScript', true);
                 Mist.ajax.PUT('/scripts/' + args.script.id, {
-                    new_name: args.newName
+                    new_name: args.newName,
+                    new_description: args.newDescription
                 }).success(function () {
-                    that._renameScript(args.script, args.newName);
+                    that._renameScript(args.script, args.newName, args.newDescription);
                 }).error(function (message) {
                     Mist.notificationController.notify(message);
                 }).complete(function (success) {
@@ -81,17 +81,17 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 });
             },
 
-
             getRequestedScript: function() {
                 if (this.scriptRequest) {
                     return this.getObject(this.scriptRequest);
                 }
             },
 
-
-            _renameScript: function (script, name) {
+            _renameScript: function (script, name, description) {
                 Ember.run(this, function () {
                     script.set('name', name);
+                    if (description)
+                        script.set('description', description);
                     this.trigger('onRename', {
                         script: script
                     });
