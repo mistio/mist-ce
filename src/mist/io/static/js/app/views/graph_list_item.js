@@ -241,11 +241,14 @@ define('app/views/graph_list_item', ['d3', 'c3'],
             }.observes('Mist.graphsController.stream.isStreaming'),*/
 
             isVisibleObserver: function () {
-                if (this.isHidden){
-                    warn('hiding', '#' + this.graph.id);
-                    $('#' + this.graph.id).parent().hide(400);
-                } else if (this.isHidden !== undefined) {
-                    $('#' + this.graph.id).parent().show(400);
+                var isHidden = this.isHidden,
+                id = '#' + this.graph.id + '-0';
+                if (isHidden) {
+                    warn('real id', this.graph.id + '-0');
+                    warn('hiding', this.graph.id);
+                    $(id).parent().hide();
+                } else if (isHidden !== undefined) {
+                    $(id).parent().show();
                     this.draw();
                 }
             }.observes('isHidden'),

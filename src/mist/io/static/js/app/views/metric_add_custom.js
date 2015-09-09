@@ -12,6 +12,8 @@ define('app/views/metric_add_custom', ['app/views/popup'],
 
             layoutName: 'metric_add_custom',
             controllerName: 'metricAddCustomController',
+            popupId: '#metric-add-custom',
+            
             //
             //
             //  Methods
