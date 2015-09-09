@@ -16,6 +16,7 @@
 }
 #machine-tags-popup .field-wrapper #add-tag-ok {
     padding: 6px 10px;
+    width: initial;
 }
 #machine-tags-popup .field-wrapper:after {
     content: '';

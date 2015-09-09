@@ -11,6 +11,18 @@ define('app/views/machine_tags', [],
             controllerName: 'machineTagsController',
 
             //
+            //  Pseudo-Private Methods
+            //
+
+            _updateLaunchButton: function () {
+               if (Mist.machineTagsController.formReady) {
+                   $('#add-tag-ok').removeClass('ui-state-disabled');
+               } else {
+                   $('#add-tag-ok').addClass('ui-state-disabled');
+               }
+            },
+
+            //
             //  Actions
             //
 
@@ -22,7 +34,15 @@ define('app/views/machine_tags', [],
                 backClicked: function () {
                     Mist.machineTagsController.close();
                 }
-            }
+            },
+
+            //
+            //  Observers
+            //
+
+            formReadyObserver: function () {
+               Ember.run.once(this, '_updateLaunchButton');
+            }.observes('Mist.machineTagsController.formReady')
         });
     }
 );
