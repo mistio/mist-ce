@@ -12,7 +12,7 @@
         </a>
         
         <div id="time-window-control" class="ui-mini {{Mist.graphsController.stream.isStreaming}}">
-            <a class="ui-btn ui-btn-icon-right icon-down ui-caps"
+            <a class="ui-btn ui-caps"
                 {{action "timeWindowClicked" target=view}}>
                     {{view.timeWindowText}}
             </a>
@@ -21,14 +21,12 @@
         <!--
             Forward Button
         -->
-        {{#unless Mist.graphsController.stream.isStreaming}}
-            <a id="history-control-forward"
-                class="time
-                    ui-btn
-                    icon-next"
-                {{action "forwardClicked" target=view}}>
-            </a>
-        {{/unless}}
+        <a id="history-control-forward"
+            class="time
+                ui-btn
+                icon-next {{if Mist.graphsController.stream.isStreaming 'ui-state-disabled' ''}}"
+            {{action "forwardClicked" target=view}}>
+        </a>
 
     </div>
 
