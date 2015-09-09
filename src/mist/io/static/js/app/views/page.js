@@ -1,10 +1,10 @@
-define('app/views/page', ['app/views/templated'],
+define('app/views/page', [],
     //
     //  Page View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
@@ -12,7 +12,7 @@ define('app/views/page', ['app/views/templated'],
             init: function () {
                 this._super();
                 Ember.run.scheduleOnce('afterRender', this, function() {
-                    $('body').enhanceWithin();
+                    this.$().enhanceWithin();
                 });
             }
         });

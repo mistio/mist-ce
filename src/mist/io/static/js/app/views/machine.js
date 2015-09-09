@@ -10,25 +10,18 @@ define('app/views/machine', ['app/views/page'],
 
         return App.MachineView = PageView.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             machine: null,
 
 
             //
-            //
             //  Initialization
-            //
             //
 
             load: function() {
-
                 Mist.backendsController.off('onMachineListChange', this, 'load');
                 Mist.backendsController.on('onMachineListChange', this, 'load');
                 var that = this;
@@ -38,21 +31,15 @@ define('app/views/machine', ['app/views/page'],
 
             }.on('didInsertElement'),
 
-
             unload: function() {
-
                 // Remove event listeners
                 Mist.backendsController.off('onMachineListChange', this, 'load');
-
             }.on('willDestroyElement'),
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             updateCurrentMachine: function() {
                 var that = this;
@@ -74,7 +61,6 @@ define('app/views/machine', ['app/views/page'],
                 });
             },
 
-
             updateMonitoringCollapsible: function() {
                 Ember.run.next(this, function() {
                     if (Mist.backendsController.checkedMonitoring && this.machine.id) {
@@ -85,10 +71,8 @@ define('app/views/machine', ['app/views/page'],
                 });
             },
 
-
             updateUptime: function() {
                 if ($('#single-machine-page').length) {
-
                     // Rescedule updateUptime
                     Ember.run.later(this, function() {
                         this.updateUptime();
@@ -103,7 +87,6 @@ define('app/views/machine', ['app/views/page'],
                 }
             },
 
-
             renderMetadata: function () {
                 Ember.run.next(function() {
                     if ($('#single-machine-metadata').collapsible)
@@ -113,43 +96,33 @@ define('app/views/machine', ['app/views/page'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 manageKeysClicked: function() {
                     Mist.machineKeysController.open(this.machine);
                 },
-
 
                 addKeyClicked: function() {
                     Mist.machineKeysController.openKeyList(this.machine);
                 },
 
-
                 tagsClicked: function () {
                     Mist.machineTagsController.open(this.machine);
                 },
-
 
                 powerClicked: function () {
                     Mist.machinePowerController.open(this.machine);
                 },
 
-
                 shellClicked: function () {
                     Mist.machineShellController.open(this.machine);
                 },
 
-
                 deleteMetric: function (metric) {
                     Mist.metricsController.deleteMetric(metric);
                 },
-
 
                 probeClicked: function() {
                     this.machine.probe(null, function(success) {
@@ -161,16 +134,12 @@ define('app/views/machine', ['app/views/page'],
 
 
             //
-            //
             //  Computed Properties
             //
-            //
-
 
             isRunning: function () {
                 return this.machine ? this.machine.state == 'running' : false;
             }.property('machine.state'),
-
 
             providerIconClass: function() {
                 if (!this.machine || !this.machine.backend || !this.machine.backend.provider)
@@ -178,9 +147,7 @@ define('app/views/machine', ['app/views/page'],
                 return 'provider-' + this.machine.backend.getSimpleProvider();
             }.property('machine.backend.provider'),
 
-
             imageIconClass: function () {
-
                 if (!this.machine || !this.machine.extra ||
                     !this.machine.backend || !this.machine.backend.provider)
                     return 'image-generic';
@@ -189,14 +156,13 @@ define('app/views/machine', ['app/views/page'],
                     this.machine.extra.imageId ||
                     this.machine.extra.image ||
                     this.machine.extra.os_type ||
+                    this.machine.extra.DISTRIBUTIONVENDOR
                     '';
 
                 // Use .toString() because digital ocean returns
                 // an number instead of a string which breaks the search
                 return 'image-' + this.machine.backend.images.getImageOS(imageId.toString());
-
-            }.property('machine.extra.[]'),
-
+            }.property('machine.extra'),
 
             upFor: function() {
                 var ret = '';
@@ -222,7 +188,6 @@ define('app/views/machine', ['app/views/page'],
                 return ret;
             }.property('machine.uptime'),
 
-
             lastProbe: function(){
                 var ret = 'never';
                 if (this.machine && this.machine.uptimeChecked > 0) {
@@ -237,7 +202,6 @@ define('app/views/machine', ['app/views/page'],
                 }
                 return ret;
             }.property('machine.uptime'),
-
 
             basicInfo: function() {
                 if (!this.machine) return;
@@ -285,9 +249,7 @@ define('app/views/machine', ['app/views/page'],
 
             }.property('machine.public_ips', 'machine.private_ips'),
 
-
             metadata: function() {
-
                 if (!this.machine || !this.machine.extra) return;
 
                 var ret = [];
@@ -304,22 +266,17 @@ define('app/views/machine', ['app/views/page'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             modelObserver: function() {
                 Ember.run.once(this, 'load');
             }.observes('controller.model'),
 
-
             checkedMonitoringObserver: function() {
                 Ember.run.once(this, 'updateMonitoringCollapsible');
             }.observes('machine', 'Mist.backendsController.checkedMonitoring'),
         });
-
 
         function sortInfo (array) {
             array.sort(function (a, b) {

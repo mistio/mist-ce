@@ -1,4 +1,4 @@
-define('app/views/machine_power', ['app/views/templated'],
+define('app/views/machine_power', [],
     /**
      *  Machine Power View
      *

@@ -7,9 +7,9 @@ define('app/controllers/machine_power', ['ember'],
     function () {
         return Ember.Object.extend(Ember.Evented, {
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
             machines: [],
             callback: null,
@@ -20,11 +20,9 @@ define('app/controllers/machine_power', ['ember'],
             canRename: null,
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //  Methods
+            //
 
             open: function (machines, callback) {
                 this._clear();
@@ -35,15 +33,12 @@ define('app/controllers/machine_power', ['ember'],
                 });
             },
 
-
             close: function () {
                 $('#machine-power-popup').popup('close');
                 this._clear();
             },
 
-
             act: function (action) {
-
                 // Close current popup
                 $('#machine-power-popup').popup('close');
 
@@ -78,11 +73,9 @@ define('app/controllers/machine_power', ['ember'],
             },
 
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
+            //
+            //  Pseudo-Private Methods
+            //
 
             _clear: function () {
                 Ember.run(this, function () {
@@ -95,7 +88,6 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canRename', null);
                 });
             },
-
 
             _updateActions: function () {
                 Ember.run(this, function () {
@@ -112,11 +104,9 @@ define('app/controllers/machine_power', ['ember'],
                 });
             },
 
-
             _giveCallback: function (success, action) {
                 if (this.callback) this.callback(success, action);
             },
-
 
             _act: function (action) {
                 this.machines.forEach(function (machine) {
@@ -133,11 +123,9 @@ define('app/controllers/machine_power', ['ember'],
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //  Observers
+            //
 
             machinesObserver: function () {
                 Ember.run.once(this, '_updateActions');

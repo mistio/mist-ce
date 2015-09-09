@@ -102,9 +102,10 @@ define('app/views/metric_node', [],
                 this.foldSiblings();
                 var that = this;
                 Ember.run.next(function () {
-                    that.element.find('.nest').eq(0).slideDown(400, function () {
-                        that.centerNode();
-                    });
+                    if (that.element)
+                        that.element.find('.nest').eq(0).slideDown(400, function () {
+                            that.centerNode();
+                        });
                 });
             },
 
