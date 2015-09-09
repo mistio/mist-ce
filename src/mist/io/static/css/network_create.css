@@ -76,19 +76,9 @@
     display: none;
 }
 
-#network-create .ui-content > div,
-#network-create-subnet-form > div,
-#network-create-subnet-other-wrapper > div {
-    padding-bottom: 15px;
-}
-
 #network-create .ajax-loader {
 	margin-top: -15px;
 	margin-bottom: 5px;
-}
-
-#network-create-subnet-wrapper > .ui-checkbox > label {
-	margin-bottom: -10px;
 }
 
 #network-create .ui-checkbox label:hover {
