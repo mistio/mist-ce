@@ -10,9 +10,14 @@
          data-transition="flip"
          data-position-to="#add-metric-btn">
 
-        <div class="ui-header ui-bar-b">
-            <h1 class="ui-title ui-caps">Add custom metric</h1>
+        <div class="ui-header ui-bar-b" role="banner">
+
+            <h1 class="ui-title">Add custom metric</h1>
+
+            <a href="javascript:void(0)" class="close" {{action "backClicked" target=view}}>&#10005;</a>
+
         </div>
+
         <div class="ui-content">
 
             <div class="ui-grid-a">
@@ -57,8 +62,6 @@
             {{/if}}
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                <a class="ui-btn ui-corner-all ui-caps"
-                    {{action "backClicked" target=view}}>Back</a>
                 <a class="ui-btn ui-corner-all ui-btn-d ui-state-disabled ui-caps"
                     id="deploy" {{action "deployClicked" target=view}}>Deploy</a>
             </div>

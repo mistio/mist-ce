@@ -40,15 +40,13 @@
 }
 
 #history-control a.time {
-    padding: 0;
-    width: 65px;
     border-radius: 0em;
-    margin: -2px 0 0 0;
+    margin: 2px 0 0 0;
     z-index: 10;
     border-width: 0px;
     display: inline-block;
     vertical-align: top;
-    padding-top: 3px;
+    padding: 3px 0 0 0;
     height: 32px;
     box-sizing: border-box;
     background-color: #FAF9F4;
@@ -56,37 +54,43 @@
 #history-control a.time:hover {
     background-color: #FAF9F4;
 }
+#history-control a.time.ui-state-disabled {
+    opacity: .5;
+    cursor: not-allowed !important;
+    pointer-events: initial;
+}
 #history-control a.time:after {
     font-size: 26px;
-    color: #7f7f7f;
+    color: #c9c8c4;
     margin: 0;
 }
 #history-control a.time:hover:after {
     color: #444;
 }
-
+#history-control a.time.ui-state-disabled:hover:after {
+    color: #c9c8c4;
+}
 #history-control #time-window-control {
     text-align: center;
     margin: 0;
     border-width: 0px;
     clear: both;
-    min-width: 190px;
+    min-width: 145px;
     border-radius: 0;
     display: inline-block;
 }
 
 #time-window-control .ui-btn {
-    padding: 0 !important;
     font-size: 18px;
     font-weight: 400;
     display: inline-block;
     line-height: 28px;
     margin: 0;
-    padding-left: 30px !important;
-    padding-right: 40px !important;
+    padding: 2px 5px !important;
     border-width: 0px;
     color: #444;
     background-color: #FAF9F4;
+    border: 1px solid #FAF9F4;
 }
 
 #time-window-control .ui-btn:after {
@@ -95,7 +99,8 @@
 
 #time-window-control .ui-btn:hover {
     color: #444 !important;
-    background-color: #FAF9F4;
+    background-color: #fff;
+    border: 1px solid #b5b5b5;
 }
 
 #time-window-control .ui-btn:hover:after {
