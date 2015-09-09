@@ -1,6 +1,6 @@
 from behave import *
 from time import time, sleep
-from selenium.common.exceptions import NoSuchElementException, WebDriverException
+from selenium.common.exceptions import NoSuchElementException, WebDriverException, StaleElementReferenceException
 from selenium.webdriver import ActionChains
 
 try:
@@ -8,6 +8,17 @@ try:
 except ImportError:
     LOCAL = True
     pass
+
+
+def i_am_in_homepage(context):
+    possible_urls = [context.mist_config['MIST_URL']]
+    if possible_urls[0].endswith('/'):
+        hashtag = '#'
+    else:
+        hashtag = '/#'
+    possible_urls.append(possible_urls[0] + hashtag)
+    possible_urls.append(possible_urls[0] + hashtag + '/')
+    return context.browser.current_url in possible_urls
 
 
 @when(u'I visit mist.io')
@@ -176,3 +187,107 @@ def assert_title_is(context, text):
 def assert_title_contains(context, text):
     assert text in context.browser.title
 
+
+@then(u'{counter_title} counter should be greater than {counter_number} within '
+      u'{seconds} seconds')
+def images_counter_loaded(context, counter_title, counter_number, seconds):
+    elements = context.browser.find_elements_by_tag_name("li")
+    counter_found = False
+    for element in elements:
+        if counter_title in element.text:
+            counter_found = True
+            break
+    assert counter_found, "Counter with name %s has not been found" % counter_title
+
+    end_time = time() + int(seconds)
+    while time() < end_time:
+        counter_span = element.find_element_by_tag_name("span")
+        counter = int(counter_span.text)
+
+        if counter > int(counter_number):
+            return
+        else:
+            sleep(2)
+
+    assert False, u'The counter did not say that more than %s images were ' \
+                  u'loaded' % counter_number
+
+
+@when(u'I visit the {title} page {timing} loading')
+def go_to_some_page(context, title, timing):
+    """
+    WIll visit one of the basic pages(Machines, Images, Keys, Scripts) and has
+    the choice of waiting for the counter to load or just go to the page
+    regardless (before | after).
+    For now the code will not be very accurate for keys page
+    """
+    if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts']:
+        raise ValueError('The page given is unknown')
+    if timing not in ['without', 'after']:
+        raise ValueError('Timing provided is not recognized. It must be one of:'
+                         ' without / after')
+    if not i_am_in_homepage(context):
+        if not str(context.browser.current_url).endswith(title.lower()):
+            context.execute_steps(u'When I click the button "Home"')
+            end_time = time() + 5
+            while time() < end_time:
+                try:
+                    filter(lambda button: button.text == title,
+                           context.browser.find_elements_by_class_name('ui-btn')
+                           )
+                    break
+                except (NoSuchElementException, StaleElementReferenceException):
+                    assert time() + 1 < end_time, "%s list page has not" \
+                                                  " appeared after 5 seconds" \
+                                                  % title
+                    sleep(1)
+    if timing == 'after':
+        context.execute_steps(u'Then %s counter should be greater than 0 '
+                              u'within 80 seconds' % title)
+    context.execute_steps(u'When I click the button "%s"' % title)
+    if title == 'Machines':
+        element_id = 'machine-list-page'
+    elif title == 'Images':
+        element_id = 'image-list-page'
+    elif title == 'Keys':
+        element_id = 'key-list-page'
+    elif title == 'Scripts':
+        element_id = 'script-list-page'
+    elif title == 'Networks':
+        element_id = 'network-list-page'
+    end_time = time() + 5
+    while time() < end_time:
+        try:
+            # context.browser.find_element_by_id('%s-list-page' % title.lower())
+            context.browser.find_element_by_id(element_id)
+            break
+        except NoSuchElementException:
+            assert time() + 1 < end_time, "%s list page has not appeared " \
+                                          "after 5 seconds" % title.lower()
+            sleep(1)
+    if timing == 'after':
+        if title == 'Machines':
+            element_id = 'machines'
+        elif title == 'Images':
+            element_id = 'image-list'
+        elif title == 'Keys':
+            sleep(5)
+            return
+        elif title == 'Scripts':
+            sleep(5)
+            return
+        elif title == 'Networks':
+            element_id = 'networks'
+        end_time = time() + 5
+        while time() < end_time:
+
+            try:
+                # item_list = context.browser.find_element_by_id("%s-list" %
+                #                                                title.lower())
+                item_list = context.browser.find_element_by_id(element_id)
+                items = item_list.find_element_by_tag_name('li')
+                return
+            except NoSuchElementException:
+                sleep(1)
+
+        assert False, "%s list has not loaded after 5 seconds" % title

@@ -2,28 +2,6 @@ from behave import *
 from time import time, sleep
 
 
-@then(u'Images counter should be greater than {counter_number} within '
-      u'{seconds} seconds')
-def images_counter_loaded(context, counter_number, seconds):
-    elements = context.browser.find_elements_by_tag_name("li")
-    for element in elements:
-        if "Images" in element.text:
-            break
-
-    end_time = time() + int(seconds)
-    while time() < end_time:
-        counter_span = element.find_element_by_tag_name("span")
-        counter = int(counter_span.text)
-
-        if counter > int(counter_number):
-            return
-        else:
-            sleep(2)
-
-    assert False, u'The counter did not say that more than %s images were ' \
-                  u'loaded' % counter_number
-
-
 @then(u'Images list should be loaded within {seconds} seconds')
 def images_loaded(context, seconds):
     end_time = time() + int(seconds)
