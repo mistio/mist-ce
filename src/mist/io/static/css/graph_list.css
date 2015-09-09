@@ -9,7 +9,8 @@
 .graph-list {
     background-color: #FAF9F4;
     clear: both;
-    padding: 1.25%
+    padding: 1.25%;
+    letter-spacing: normal;
 }
 
 #graph-list-control .align {
