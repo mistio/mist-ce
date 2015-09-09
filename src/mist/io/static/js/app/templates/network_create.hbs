@@ -1,15 +1,10 @@
-<div id="network-create"
-    data-swipe-close="false"
-    class="side-panel"
-    data-role="panel"
-    data-position="right"
-    data-display="overlay">
+<div id="create-network" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible"
+     data-role="collapsible"
+     data-collapsed="true">
 
-    <div data-role="header" data-theme="b">
-        <h1>Create Network</h1>
-    </div>
+    <h4>Add Network</h4>
 
-    <div data-role="content" data-theme="a">
+    <div id="network-create" data-role="content" >
 
         <!--
             Select Backend
@@ -240,3 +235,6 @@
         </div>
     </div>
 </div>
+
+<div id="create-network-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
+     {{action "clickOverlay" target=view}}></div>

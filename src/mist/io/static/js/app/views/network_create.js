@@ -1,16 +1,16 @@
-define('app/views/network_create', [],
+define('app/views/network_create', ['app/views/controlled'],
     //
     //  Network Create View
     //
     //  @returns Class
     //
-    function () {
+    function (ControlledComponent) {
 
         'use strict';
 
         var SLIDE_DOWN_DELAY = 130;
 
-        return App.NetworkCreateComponent = Ember.Component.extend({
+        return App.NetworkCreateComponent = ControlledComponent.extend({
 
             layoutName: 'network_create',
             controllerName: 'networkCreateController',
@@ -72,6 +72,10 @@ define('app/views/network_create', [],
             //
 
             actions: {
+                clickOverlay: function() {
+                    $('#create-network').collapsible('collapse');
+                },
+
                 backendSelected: function (backend) {
                     Ember.run.later(function () {
                         $('#network-create-name-wrapper').slideDown();

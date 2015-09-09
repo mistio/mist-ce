@@ -1,6 +1,40 @@
 /* Network Create View CSS
 ------------------------------------------------------------------------------*/
+#create-network {
+    width: 281px;
+    box-shadow: none;
+    position: relative;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+}
 
+#create-network.ui-collapsible-collapsed {
+    width: 255px;
+    position: relative;
+    z-index: 2;
+}
+
+#create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
+    padding: 20px 91px 20px 35px !important;
+}
+
+#create-network.floating-collapsible > h4.ui-collapsible-heading > a {
+    padding: 20px 75px 20px 65px !important;
+}
+
+#create-network-overlay {
+    z-index: 899;
+    min-height: 800px;
+}
+#network-create .ui-panel-inner {
+    padding: 0;
+}
+#network-create.ui-content {
+    background-color: #FAF9F4;
+    padding: 16px;
+    width: 249px;
+}
 #network-create-subnet-form {
     padding: 11px 9px 2px;
     background-color: #E7E7E7;
