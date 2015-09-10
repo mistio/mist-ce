@@ -11,7 +11,7 @@
         -->
         <div id="network-create-name-wrapper">
 
-            <label for="network-create-name">Network Name</label>
+            <label for="network-create-name">Name</label>
 
             {{view Mist.TextField
                 data-theme="a"
@@ -26,7 +26,7 @@
         -->
         <div id="network-create-backend-wrapper">
 
-            <label for="network-create-backend">Backend</label>
+            <label for="network-create-backend">Cloud</label>
 
             <div id="network-create-backend"
                 data-role="collapsible"
@@ -41,7 +41,7 @@
                         {{#if network.backend}}
                             {{network.backend.title}}
                         {{else}}
-                            Select backend
+                            Select cloud
                         {{/if}}
                     {{/with}}
                 </h4>

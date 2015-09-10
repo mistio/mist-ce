@@ -9,6 +9,25 @@
     bottom: 11px;
     left: 24px;
 }
+#backend-edit .field-wrapper .ui-input-text,
+#backend-edit .field-wrapper #edit-title-ok {
+    float: left;
+    display: block;
+    box-sizing: border-box;
+    margin: .4em 0 1em;
+}
+#backend-edit .field-wrapper .ui-input-text {
+    width: calc(100% - 48px);
+}
+#backend-edit .field-wrapper #edit-title-ok {
+    padding: 6px 10px;
+    width: initial;
+}
+#backend-edit .field-wrapper:after {
+    content: '';
+    clear: both;
+    display: table;
+}
 
 #backend-edit .ui-field-contain {
     overflow: visible;

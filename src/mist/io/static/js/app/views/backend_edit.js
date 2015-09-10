@@ -27,12 +27,25 @@ define('app/views/backend_edit', ['app/views/popup'],
                 $('#backend-toggle').val(newState).slider('refresh');
             },
 
+            updateRenameButton: function () {
+               if (Mist.backendEditController.formReady) {
+                   $('#edit-title-ok').removeClass('ui-state-disabled');
+               } else {
+                   $('#edit-title-ok').addClass('ui-state-disabled');
+               }
+            },
+
 
             //
             //  Actions
             //
 
             actions: {
+
+                renameClicked: function() {
+                    Mist.backendEditController.rename();
+                },
+
 
                 stateToggleSwitched: function () {
                     var newState = parseInt($('#backend-toggle').val());
@@ -62,7 +75,7 @@ define('app/views/backend_edit', ['app/views/popup'],
 
                 backClicked: function() {
                     Mist.backendEditController.close();
-                },
+                }
             },
 
 
@@ -75,7 +88,12 @@ define('app/views/backend_edit', ['app/views/popup'],
 
             newStateObserver: function () {
                 Ember.run.once(this, 'updateStateSlider');
-            }.observes('Mist.backendEditController.newState')
+            }.observes('Mist.backendEditController.newState'),
+
+
+            newNameObserver: function () {
+               Ember.run.once(this, 'updateRenameButton');
+            }.observes('Mist.backendEditController.formReady')
         });
     }
 );

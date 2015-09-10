@@ -17,6 +17,17 @@ define('app/views/network_create', ['app/views/controlled'],
 
             createSubnet: false,
             disableGateway: false,
+            classNameBindings: ['isDisabled:ui-disabled'],
+
+ 
+            /**
+             *  Computed Properties
+             */
+
+            isDisabled: function() {
+                return !Mist.backendsController.hasOpenStack;
+            }.property('Mist.backendsController.hasOpenStack'),
+
 
             /**
              *
@@ -185,9 +196,9 @@ define('app/views/network_create', ['app/views/controlled'],
                 }, SLIDE_DOWN_DELAY);
             }.observes('Mist.networkCreateController.network.subnet.disableGateway'),
 
-             formReadyObserver: function () {
+            formReadyObserver: function () {
                 Ember.run.once(this, 'updateLaunchButton');
-             }.observes('Mist.networkCreateController.formReady')
+            }.observes('Mist.networkCreateController.formReady')
         });
     }
 );

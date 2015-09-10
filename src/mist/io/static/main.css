@@ -1469,7 +1469,7 @@ ul.checkbox-list .ui-grid-b {
 }
 .field-wrapper:after {
     content: '';
-    display: block;
+    display: table;
     clear: both;
 }
 .field-wrapper > div.last-child:not(.first-child) a {

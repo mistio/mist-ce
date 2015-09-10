@@ -17,11 +17,10 @@ define('app/controllers/backend_edit', ['ember'],
             //
             //
 
-
+            formReady: null,
             backend: null,
             newTitle: null,
             newState: null,
-            renameLock: null,
 
 
             //
@@ -38,6 +37,7 @@ define('app/controllers/backend_edit', ['ember'],
                     newTitle: backend.title,
                     newState: backend.enabled,
                 });
+                this._updateFormReady();
                 this.view.open(position);
             },
 
@@ -50,14 +50,14 @@ define('app/controllers/backend_edit', ['ember'],
 
             rename: function () {
 
-                if (this.newTitle == this.backend.title) return;
-                if (this.newTitle == '') return;
+                if (this.formReady) {
 
-                Mist.backendsController.renameBackend({
-                    backend: this.backend,
-                    newTitle: this.newTitle,
-                    callback: this._rename
-                });
+                    Mist.backendsController.renameBackend({
+                        backend: this.backend,
+                        newTitle: this.newTitle,
+                        callback: this._rename
+                    });
+                }
             },
 
 
@@ -97,6 +97,15 @@ define('app/controllers/backend_edit', ['ember'],
                 })
             },
 
+            _updateFormReady: function() {
+                var formReady = false;
+                if (this.newTitle != this.backend.title && this.newTitle) {
+                    formReady = true;
+                }
+
+                this.set('formReady', formReady);
+            },
+
 
             _rename: function () {
                 var that = Mist.backendEditController;
@@ -133,25 +142,11 @@ define('app/controllers/backend_edit', ['ember'],
             newStateObserver: function () {
                 Ember.run.once(this, 'toggle');
             }.observes('newState'),
+            
 
-
-            titleObserver: function () {
-                Ember.run.once(this, '_rename');
-            }.observes('backend.title'),
-
-
-            newTitleObserver: function () {
-
-                // Send a rename request 1 second
-                // after the user stops typing
-                clearTimeout(this.renameLock);
-                this.renameLock = setTimeout(renameLater, 1000);
-
-                var that = this;
-                function renameLater () {
-                    that.rename();
-                }
-            }.observes('newTitle'),
+            formObserver: function() {
+                Ember.run.once(this, '_updateFormReady');
+            }.observes('newTitle')
         });
     }
 );
