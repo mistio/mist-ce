@@ -7,13 +7,10 @@
 }
 
 #machine-userPort-popup .message{
-    background-color: #FF5533;
-    border-radius: 7px !important;
-    color: #FFFFFF;
-    display: block;
-    margin-bottom: 5px;
-    margin-left: auto;
-    margin-right: auto;
+    background-color: #d96557;
+    border-radius: 0 !important;
+    color: #fff;
+    margin: 10px auto;
     padding: 5px;
     text-align: center;
 }

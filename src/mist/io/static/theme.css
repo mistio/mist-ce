@@ -804,7 +804,7 @@ html head + body .ui-btn.ui-btn-d:visited {
 	background-color: #0099cc; /*{d-bup-background-color}*/;
 	border-color: #0099cc; /*{d-bup-border}*/;
 	color: #ffffff /*{d-bup-color}*/;
-	text-shadow: 0 /*{d-bup-shadow-x}*/ 0px /*{d-bup-shadow-y}*/ 0 /*{d-bup-shadow-radius}*/ #177283; /*{d-bup-shadow-color}*/;
+	text-shadow: none; /*{d-bup-shadow-color}*/;
 }
 /* Button hover */
 .ui-page-theme-d .ui-btn:hover,

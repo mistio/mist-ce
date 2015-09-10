@@ -83,40 +83,38 @@
 <div id="machine-userPort-popup"
     class="large-popup"
     data-role="popup"
-    data-theme="c"
     data-overlay-theme="b"
-    data-position-to="#machine-keys-panel"
+    data-position-to=".creation-button"
     data-transition="flip">
 
-    <div data-role="header">
-        <h2>SSH user &amp; port</h2>
+    <div class="ui-header ui-caps">
+        <h1 class="ui-title">SSH user &amp; port</h1>
 
-        <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+        <a href="javascript:void(0)" class="close" {{action "closeSSH_Details" target=Mist.machineKeysController}}>&#10005;</a>
     </div>
 
-    <div data-role="content">
+    <div class="ui-content ui-body-a" role="main">
         <div class="message">
             Cannot connect as root on port 22
         </div>
-        <label for="user">User:</label>
-        {{view Mist.TextField
-               id="user"
-               data-theme="a"
-               placeholder="root"
-               value=Mist.machineKeysController.user}}
 
-        <label for="port">Port:</label>
-        {{view Mist.TextField
-               id="port"
-               data-theme="a"
-               placeholder="22"
-               value=Mist.machineKeysController.port}}
+        <div class="form-field">
+            <label for="user">User</label>
+            {{view Mist.TextField
+                   id="user"
+                   placeholder="root"
+                   value=Mist.machineKeysController.user}}
+        </div>
+
+        <div class="form-field">
+            <label for="port">Port</label>
+            {{view Mist.TextField
+                   id="port"
+                   placeholder="22"
+                   value=Mist.machineKeysController.port}}
+        </div>
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn back ui-btn-a ui-caps"
-                {{action "closeSSH_Details" target=Mist.machineKeysController}}>
-                Cancel
-            </a>
             <a id="tryAssociate" class="ui-btn ui-btn-d ui-caps"
                 {{action "customAssociateClicked" target=view}}>Retry</a>
         </div>

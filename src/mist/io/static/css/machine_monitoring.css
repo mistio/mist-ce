@@ -68,6 +68,7 @@
     left: 18px;
     bottom: -5px;
     color: #444444;
+    letter-spacing: 1px;
     display: inline-block;
     float: left;
     text-transform: uppercase;
@@ -86,6 +87,14 @@
     padding: 0;
     border-width: 0px;
     background-color: #FAF9F4;
+}
+
+.graph > .header > .ui-btn.icon-xx {
+    margin: 5px 20px 0 0;
+}
+
+.graph > .header > .ui-btn.icon-xx:after {
+    font-size: 14px;
 }
 
 .graph > .header > .ui-btn:hover {
