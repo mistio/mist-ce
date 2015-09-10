@@ -57,7 +57,7 @@ define('app/controllers/rule_edit', ['ember'],
                 Mist.rulesController.editRule({
                     rule      : this.rule,
                     callback  : this.callback,
-                    properties: keyValuePairs,
+                    properties: keyValuePairs
                 });
                 this.close();
             }

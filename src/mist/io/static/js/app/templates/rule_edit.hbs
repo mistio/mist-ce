@@ -75,24 +75,25 @@
      class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow ui-corner-all large-popup">
 
     <div id="rule-command"
-         class="ui-popup ui-corner-all"
+         class="ui-popup ui-body-a"
          data-role="popup"
          data-enhanced="true"
          data-transition="flip">
 
-        <div class="ui-header ui-bar-b">
+        <div class="ui-header ui-bar-b ui-caps">
             <h1 class="ui-title">Command</h1>
+
+            <a href="javascript:void(0)" class="close" {{action "backClicked" target=view}}>&#10005;</a>
         </div>
 
-        <div data-role="content">
+        <div class="ui-content">
 
             {{view Ember.TextArea
                 value=view.newCommand
                 name="rule-command-content"}}
 
             <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-                <a class="ui-btn ui-btn-a" {{action "backClicked" target=view}}>Back</a>
-                <a class="ui-btn ui-btn-d" {{action "saveClicked" target=view}}>Save</a>
+                <a class="ui-btn ui-btn-d ui-caps" {{action "saveClicked" target=view}}>Save</a>
             </div>
         </div>
     </div>

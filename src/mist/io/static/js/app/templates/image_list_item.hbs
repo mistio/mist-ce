@@ -1,10 +1,10 @@
 <label
     {{action "toggleImageStar" target=view}}>
-    {{view Mist.Checkbox checked=view.image.star}}
+    {{view Mist.Checkbox checked=image.star}}
 </label>
 
-<a {{action "launchImage" target=view}}>
-    <h3>{{unbound view.image.name}}</h3>
-    <p class="tag">{{view.image.backend.title}}</p>
-    <p class="tag title">{{unbound view.image.id}}</p>
-</a>
+{{#link-to "machines"}}
+    <h3>{{unbound image.name}}</h3>
+    <p class="tag">{{image.backend.title}}</p>
+    <p class="tag title">{{unbound image.id}}</p>
+{{/link-to}}
