@@ -79,6 +79,7 @@
 
 #key-list {
     margin-top: -53px;
+    box-shadow: none;
 }
 
 @media only screen and  (max-width: 600px) {

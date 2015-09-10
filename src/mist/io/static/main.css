@@ -623,11 +623,6 @@ textarea {
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
-#machine-list-page .machines-header {
-    background-color: #d4d4d4;
-    margin-top: 30px;
-}
-
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable,
 #script-list-page .ui-filterable,

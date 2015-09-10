@@ -82,6 +82,10 @@
     background-color: rgba(0,0,0,0) !important;
     background-repeat: no-repeat !important;
 }
+#image-list {
+    box-shadow: none;
+    margin-bottom: 0;
+}
 #image-list a:after {
     content: '\0056';
     background-color: transparent;

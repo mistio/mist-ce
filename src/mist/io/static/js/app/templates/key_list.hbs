@@ -25,32 +25,33 @@
     </div>
 
     <div data-role="content">
-        <div class="ui-grid-b keys-header ui-shadow">
-            <div class="ui-block-a">
-                {{#if Mist.keysController.model.length}}
-                    <a id="select-keys-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
-                            ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
-                {{/if}}
-            </div>
-            <div class="ui-block-b"></div>
-            <div class="ui-block-c">
-                <a id="add-key-btn"
-                   class="creation-button responsive-button ui-btn ui-btn-add ui-btn-d ui-icon-plus
-                        ui-btn-icon-right ui-caps"
-                   {{action "addClicked" target=view}}><span>Add Key</span></a>
-           </div>
-        </div><!-- /grid-b -->
+        <div id="key-list-container" class="ui-shadow">
+            <div class="ui-grid-b keys-header">
+                <div class="ui-block-a">
+                    {{#if Mist.keysController.model.length}}
+                        <a id="select-keys-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
+                                ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
+                    {{/if}}
+                </div>
+                <div class="ui-block-b"></div>
+                <div class="ui-block-c">
+                    <a id="add-key-btn"
+                       class="creation-button responsive-button ui-btn ui-btn-add ui-btn-d ui-icon-plus
+                            ui-btn-icon-right ui-caps"
+                       {{action "addClicked" target=view}}><span>Add Key</span></a>
+               </div>
+            </div><!-- /grid-b -->
 
-        <ul id="key-list" data-role="listview"
-            data-filter="true"
-            data-inset="true"
-            data-filter-placeholder="Filter keys"
-            class="checkbox-list">
-            {{#each Mist.keysController.model as |key|}}
-                {{component "key-list-item" key=key class="checkbox-link"}}
-            {{/each}}
-        </ul>
-
+            <ul id="key-list" data-role="listview"
+                data-filter="true"
+                data-inset="true"
+                data-filter-placeholder="Filter keys"
+                class="checkbox-list">
+                {{#each Mist.keysController.model as |key|}}
+                    {{component "key-list-item" key=key class="checkbox-link"}}
+                {{/each}}
+            </ul>
+        </div>
         <div class="mid-padding"></div>
 
     </div>

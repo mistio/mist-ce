@@ -36,6 +36,7 @@
 }
 #network-list {
     margin-top: -53px;
+    box-shadow: none;
 }
 #network-list .ui-grid-b .ui-block-b {
     text-align: center;

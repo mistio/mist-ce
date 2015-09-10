@@ -64,8 +64,6 @@
 
 #machine-list {
     margin-top: -53px;
-}
-#machine-list .ui-listview {
     box-shadow: none;
 }
 .running .machine-state span {

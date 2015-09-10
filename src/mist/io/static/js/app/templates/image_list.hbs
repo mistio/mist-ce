@@ -25,42 +25,43 @@
     </div>
 
     <div data-role="content" data-theme="a">
-        <div class="images-header ui-shadow"></div>
+        <div id="image-list-container" class="ui-shadow">
+            <div class="images-header"></div>
 
-        {{#if Mist.backendsController.loadingImages}}
-            <div class="ajax-loader"></div>
-        {{/if}}
+            {{#if Mist.backendsController.loadingImages}}
+                <div class="ajax-loader"></div>
+            {{/if}}
 
-        {{#if Mist.imageSearchController.isSearching}}
-            <div class="ajax-loader"></div>
-        {{/if}}
+            {{#if Mist.imageSearchController.isSearching}}
+                <div class="ajax-loader"></div>
+            {{/if}}
 
-        <ul id="image-list"
-            data-role="listview"
-            data-filter="true"
-            data-inset="true"
-            data-filter-placeholder="Filter images"
-            class="checkbox-list">
-            {{#each view.renderedImages as |image|}}
-                {{component "image-list-item" image=image class="checkbox-link"}}
-            {{/each}}
-        </ul>
+            <ul id="image-list"
+                data-role="listview"
+                data-filter="true"
+                data-inset="true"
+                data-filter-placeholder="Filter images"
+                class="checkbox-list">
+                {{#each view.renderedImages as |image|}}
+                    {{component "image-list-item" image=image class="checkbox-link"}}
+                {{/each}}
+            </ul>
 
-        {{#if view.renderingMoreImages}}
-            <div class="ajax-loader"></div>
-        {{/if}}
+            {{#if view.renderingMoreImages}}
+                <div class="ajax-loader"></div>
+            {{/if}}
 
-        <a id="images-advanced-search" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
-            {{action "searchClicked" target=view}}>
-            <span>
-                {{#if view.searchingImages}}
-                    Please wait...
-                {{else}}
-                    Continue search on server...
-                {{/if}}
-            </span>
-        </a>
-
+            <a id="images-advanced-search" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
+                {{action "searchClicked" target=view}}>
+                <span>
+                    {{#if view.searchingImages}}
+                        Please wait...
+                    {{else}}
+                        Continue search on server...
+                    {{/if}}
+                </span>
+            </a>
+        </div>
         <div class="small-padding"></div>
 
     </div>

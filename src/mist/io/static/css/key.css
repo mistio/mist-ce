@@ -28,6 +28,7 @@
 }
 #single-key-page .ui-collapsible .ui-collapsible-content .ui-listview {
     margin: 0;
+    box-shadow: none;
 }
 #single-key-page #private_key {
     max-width: 100px;

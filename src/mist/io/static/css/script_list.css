@@ -36,3 +36,6 @@
 #script-list-page .ui-icon-check:after {
     background-color: #46d4c9;
 }
+#script-list {
+    box-shadow: none;
+}
