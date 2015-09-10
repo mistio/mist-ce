@@ -566,6 +566,49 @@ textarea {
     width: 100% !important;
 }
 
+@media only screen and  (max-width: 600px) {
+    #create-machine.ui-collapsible-collapsed,
+    #create-script.ui-collapsible-collapsed,
+    #create-network.ui-collapsible-collapsed {
+        width: initial !important;
+    }
+
+    #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
+    #create-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
+    #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading {
+        width: 62px;
+        height: 62px;
+    }
+
+    #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle,
+    #create-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle,
+    #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle {
+        padding: 0 !important;
+    }
+
+    #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title,
+    #create-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title,
+    #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title {
+        display: none;
+    }
+    #machine-list-page .ui-filterable .ui-input-search,
+    #script-list-page .ui-filterable .ui-input-search,
+    #network-list-page .ui-filterable .ui-input-search,
+    #key-list-page .ui-filterable .ui-input-search {
+        margin-right: 85px !important;
+    }
+}
+
+@media only screen and  (max-width: 550px) {
+    #machine-list-page .ui-filterable .ui-input-search,
+    #script-list-page .ui-filterable .ui-input-search,
+    #network-list-page .ui-filterable .ui-input-search,
+    #key-list-page .ui-filterable .ui-input-search {
+        margin-left: 0 !important;
+        margin-right: 35px !important;
+    }
+}
+
 
 /* Always show scrollbars */
 ::-webkit-scrollbar {
@@ -597,6 +640,17 @@ textarea {
 #image-list-page .ui-filterable {
     margin-top: -57px;
     margin-bottom: 12px;
+}
+
+@media only screen and (max-width: 550px) {
+
+    #machine-list-page .ui-filterable,
+    #key-list-page .ui-filterable,
+    #script-list-page .ui-filterable,
+    #network-list-page .ui-filterable  {
+        margin-left: 50px !important;
+        margin-right: 50px !important;
+    }
 }
 
 #machine-list-page .ui-filterable .ui-input-search,
@@ -1064,14 +1118,6 @@ ul.checkbox-list .ui-grid-b {
 
 .single-machine-loader {
     z-index: 1000;
-}
-
-@media only screen and (max-width: 550px) {
-
-    #machine-list-page .ui-filterable, #key-list-page .ui-filterable  {
-        margin-left: 50px !important;
-        margin-right: 50px !important;
-    }
 }
 
 /* User menu

@@ -59,8 +59,7 @@ define('app/controllers/machine_power', ['ember'],
                         head: 'Machine action',
                         body: [
                             {
-                                paragraph: 'Are you sure you want to ' + action + ' these machines: ' +
-                                    machineNames + ' ?'
+                                paragraph: 'Are you sure you want to ' + action + ' ' + (that.machines.length > 1 ? 'these machines: ' : 'this machine: ') + machineNames + ' ?'
                             }
                         ],
                         callback: function (didConfirm) {

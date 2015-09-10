@@ -80,3 +80,25 @@
 #key-list {
     margin-top: -53px;
 }
+
+@media only screen and  (max-width: 600px) {
+    #key-list-page .creation-button {
+        width: 60px;
+        height: 60px;
+        padding: 0 !important;
+    }
+    #key-list-page .creation-button span {
+        display: none;
+    }
+
+    #key-list-page .ui-filterable .ui-input-search {
+        margin-right: 85px !important;
+    }
+}
+
+@media only screen and  (max-width: 550px) {
+    #key-list-page .ui-filterable .ui-input-search {
+        margin-left: 0 !important;
+        margin-right: 35px !important;
+    }
+}

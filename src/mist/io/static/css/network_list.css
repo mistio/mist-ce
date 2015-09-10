@@ -29,10 +29,10 @@
     z-index: 2;
 }
 #network-list-page #select-networks-btn:hover {
-        color: #444 !important;
+    color: #444 !important;
 }
-#network-list-page .ui-filterable {
-    margin-right: 290px;
+#network-list-page .ui-filterable .ui-input-search {
+    margin-right: 270px;
 }
 #network-list {
     margin-top: -53px;

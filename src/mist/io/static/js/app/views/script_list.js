@@ -86,8 +86,7 @@ define('app/views/script_list', ['app/views/page'],
                         head: 'Delete scripts',
                         body: [
                             {
-                                paragraph: 'Are you sure you want to delete these ' +
-                                    'scripts: ' + scripts.toStringByProperty('name') + ' ?'
+                                paragraph: 'Are you sure you want to delete ' + (scripts.length > 1 ? 'these scripts: ' : 'this script: ') + scripts.toStringByProperty('name') + ' ?'
                             }
                         ],
                         callback: function (didConfirm) {

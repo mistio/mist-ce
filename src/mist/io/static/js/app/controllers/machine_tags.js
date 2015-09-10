@@ -59,7 +59,10 @@ define('app/controllers/machine_tags', ['ember'],
                     }).error(function () {
                         Mist.notificationController.notify('Failed to add tag: ' + tag);
                     }).complete(function (success) {
-                        that.set('addingTag', false);
+                        that.setProperties({
+                            addingTag: false,
+                            newTag: null
+                        });
                         if (that.callback) that.callback(success, tag);
                     });
                 }
