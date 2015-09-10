@@ -57,8 +57,8 @@ define('app/views/metric_node', [],
 
                 // Change icons
                 var a = this.element.find('> a.parent-node').eq(0);
-                a.removeClass('ui-icon-minus');
-                a.addClass('ui-icon-carat-d');
+                a.removeClass('icon-up');
+                a.addClass('icon-down');
 
                 this.element.find('.nest').eq(0).slideUp();
             },
@@ -96,8 +96,8 @@ define('app/views/metric_node', [],
 
                 // Change icons
                 var a = this.element.find('> a.parent-node').eq(0);
-                a.removeClass('ui-icon-carat-d');
-                a.addClass('ui-icon-minus');
+                a.removeClass('icon-down');
+                a.addClass('icon-up');
 
                 this.foldSiblings();
                 var that = this;
