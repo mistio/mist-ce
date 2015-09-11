@@ -592,6 +592,8 @@ function parseProviderMap () {
                 field.isKey = true;
             if (field.type == 'region')
                 field.isRegion = true;
+            if (field.type == 'indonesianRegion')
+                field.isIndonesianRegion = true;
             if (field.type == 'checkbox')
                 field.isCheckbox = true;
             if (!field.placeholder)

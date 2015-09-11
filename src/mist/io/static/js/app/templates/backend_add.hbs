@@ -45,9 +45,11 @@
                         {{#unless field.isCheckbox}}
                         {{#unless field.isRegion}}
                         {{#unless field.isKey}}
+                        {{#unless field.isIndonesianRegion}}
                             <label for={{field.name}}>
                                 {{unbound field.label}}
                             </label>
+                        {{/unless}}
                         {{/unless}}
                         {{/unless}}
                         {{/unless}}
@@ -114,6 +116,29 @@
                                                 </a>
                                             </li>
                                         {{/each}}
+                                    </ul>
+                                </div>
+                            {{/if}}
+                            {{#if field.isIndonesianRegion}}
+                                <label>{{field.label}}</label>
+                                <div id={{field.name}}
+                                    class="mist-select"
+                                    data-role="collapsible"
+                                    data-iconpos="right"
+                                    data-collapsed-icon="noicon"
+                                    data-expanded-icon="noicon">
+                                    <h4>{{view.selectedIndonesianRegion}}</h4>
+                                    <ul data-role="listview">
+                                        <li data-icon="false">
+                                            <a {{action "selectIndonesianRegion" "my.idcloudonline.com" field target=view}}>
+                                                my.idcloudonline.com
+                                            </a>
+                                        </li>
+                                        <li data-icon="false">
+                                            <a {{action "selectIndonesianRegion" "compute.idcloudonline.com" field target=view}}>
+                                                compute.idcloudonline.com
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             {{/if}}

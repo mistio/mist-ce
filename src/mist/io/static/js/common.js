@@ -1074,6 +1074,13 @@ var PROVIDER_MAP = {
             type: 'text',
             helpText: 'Name of your oganization',
             helpHref: 'http://docs.mist.io/article/23-adding-indonesian-cloud'
+        },
+        {
+            name: 'indonesianRegion',
+            label: 'Region',
+            optional: true,
+            defaultValue: 'my.idcloudonline.com',
+            type: 'indonesianRegion'
         }
     ],
 

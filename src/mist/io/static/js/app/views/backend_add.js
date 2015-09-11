@@ -14,6 +14,7 @@ define('app/views/backend_add', ['app/views/controlled'],
             controllerName: 'backendAddController',
 
             selectedRegion: null,
+            selectedIndonesianRegion: 'my.idcloudonline.com',
             helpHref: '',
 
 
@@ -140,6 +141,12 @@ define('app/views/backend_add', ['app/views/controlled'],
                     var fields = this.get('providerFields');
                     var title = fields.findBy('name', 'title');
                     title.set('value', title.defaultValue + ' ' + region.location);
+                },
+
+                selectIndonesianRegion: function (region, field) {
+                    field.set('value', region);
+                    this.set('selectedIndonesianRegion', region);
+                    $('#' + field.name).collapsible('collapse');
                 },
 
                 uploadFile: function (field) {
