@@ -32,14 +32,15 @@ define('app/views/rule_edit', ['app/views/controlled'],
             //  Methods
             //
 
-            open: function (property) {
+            open: function (property, el) {
 
                 this.set('rule', Mist.ruleEditController.rule);
                 this.set('metrics', this.parentView.metrics);
 
                 // Get button on which to position the popup
-                var button = '#' + this.rule.id +
-                    ' .rule-button.rule-' + property;
+                var button = el ?
+                '#' + el + ' .rule-button.rule-' + property :
+                '#' + this.rule.id + ' .rule-button.rule-' + property;
 
                 // Reposition popup on the button
                 $('#rule-' + property)

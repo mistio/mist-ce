@@ -136,19 +136,19 @@ define('app/views/rule', [],
 
             actions: {
                 openMetricPopup: function () {
-                    Mist.ruleEditController.open(this.get('rule'), 'metric');
+                    Mist.ruleEditController.open(this.get('rule'), 'metric', null, this.elementId);
                 },
 
                 openOperatorPopup: function () {
-                    Mist.ruleEditController.open(this.get('rule'), 'operator');
+                    Mist.ruleEditController.open(this.get('rule'), 'operator', null, this.elementId);
                 },
 
                 openActionPopup: function () {
-                    Mist.ruleEditController.open(this.get('rule'), 'action');
+                    Mist.ruleEditController.open(this.get('rule'), 'action', null, this.elementId);
                 },
 
                 openAggregatePopup: function () {
-                    Mist.ruleEditController.open(this.get('rule'), 'aggregate');
+                    Mist.ruleEditController.open(this.get('rule'), 'aggregate', null, this.elementId);
                 },
 
                 deleteRuleClicked: function () {

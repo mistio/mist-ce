@@ -31,12 +31,14 @@ define('app/controllers/rule_edit', ['ember'],
             //
 
 
-            open: function (rule, property, callback) {
+            open: function (rule, property, callback, el) {
                 this.clear();
-                this.set('rule', rule)
-                    .set('property', property)
-                    .set('callback', callback);
-                this.view.open(property);
+                this.setProperties({
+                    'rule': rule,
+                    'property': property,
+                    'callback': callback
+                });
+                this.view.open(property, el);
             },
 
 
@@ -47,9 +49,11 @@ define('app/controllers/rule_edit', ['ember'],
 
 
             clear: function () {
-                this.set('rule', null)
-                    .set('property', null)
-                    .set('callback', null);
+                this.setProperties({
+                    'rule': null,
+                    'property': null,
+                    'callback': null
+                });
             },
 
 
