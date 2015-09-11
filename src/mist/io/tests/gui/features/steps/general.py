@@ -86,9 +86,19 @@ def wait_for_splash_to_load(context, timeout=60):
     assert False, u'Page took longer than %s seconds to load' % str(timeout)
 
 
+@then(u'I wait for {seconds} seconds')
+def wait(context, seconds):
+    sleep(int(seconds))
+
+
 @when(u'I wait for {seconds} seconds')
 def wait(context, seconds):
     sleep(int(seconds))
+
+
+@then(u'I click the button "{text}"')
+def then_click(context, text):
+    return click_button(context, text)
 
 
 @when(u'I click the button "{text}"')
@@ -188,6 +198,27 @@ def assert_title_contains(context, text):
     assert text in context.browser.title
 
 
+@then(u'I wait for links in homepage to appear')
+def wait_for_buttons_to_appear(context):
+    end_time = time() + 100
+    while time() < end_time:
+        try:
+            machines_button = None
+            col = context.browser.find_elements_by_class_name('ui-btn')
+            for button in col:
+                if 'Machines' in button.text:
+                    machines_button = button
+                    break
+            counter_span = machines_button.find_element_by_tag_name("span")
+            counter = int(counter_span.text)
+            break
+        except (NoSuchElementException, StaleElementReferenceException,
+                ValueError, AttributeError) as e:
+            assert time() + 1 < end_time, "Links in the home page have not" \
+                                          " appeared after 10 seconds"
+            sleep(1)
+
+
 @then(u'{counter_title} counter should be greater than {counter_number} within '
       u'{seconds} seconds')
 def images_counter_loaded(context, counter_title, counter_number, seconds):
@@ -229,18 +260,7 @@ def go_to_some_page(context, title, timing):
     if not i_am_in_homepage(context):
         if not str(context.browser.current_url).endswith(title.lower()):
             context.execute_steps(u'When I click the button "Home"')
-            end_time = time() + 5
-            while time() < end_time:
-                try:
-                    filter(lambda button: button.text == title,
-                           context.browser.find_elements_by_class_name('ui-btn')
-                           )
-                    break
-                except (NoSuchElementException, StaleElementReferenceException):
-                    assert time() + 1 < end_time, "%s list page has not" \
-                                                  " appeared after 5 seconds" \
-                                                  % title
-                    sleep(1)
+    context.execute_steps(u'Then I wait for links in homepage to appear')
     if timing == 'after':
         context.execute_steps(u'Then %s counter should be greater than 0 '
                               u'within 80 seconds' % title)

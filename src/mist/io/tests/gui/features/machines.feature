@@ -4,13 +4,11 @@ Feature: Machines
   Background:
     When I visit mist.io
     Then I wait for the mist.io splash page to load
+    Given "EC2" backend added
 
   @machines-ec2
   Scenario: Machine Actions EC2
-    Given "EC2" backend added
-    Then Images counter should be greater than 0 within 80 seconds
-    When I click the button "Machines"
-    And I wait for 1 seconds
+    When I visit the Machines page after loading
     And I click the button "Create"
     And I fill in a random machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
@@ -48,3 +46,23 @@ Feature: Machines
     And I wait for 1 seconds
     And I click the button "Yes"
     Then "randomly_created" machine state should be "terminated" within 200 seconds
+
+  @machine-probing
+  Scenario: Machine probing
+    When I visit the Machines page after loading
+    And I click the button "sshtesting"
+    And I wait for 2 seconds
+    Given ssh key with name "TESTING_MACHINE" is added
+    Then I click the button "Probe"
+    And I wait for probing to finish for 100 seconds max
+    And probing was successful
+
+  @machine-ssh
+  Scenario: Connect with ssh
+    When I visit the Machines page after loading
+    And I click the button "sshtesting"
+    And I wait for 2 seconds
+    Given ssh key with name "TESTING_MACHINE" is added
+    Then I click the button "Shell"
+    And I test the ssh connection
+    And I wait for 1 seconds
