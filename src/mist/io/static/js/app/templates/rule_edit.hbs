@@ -75,7 +75,7 @@
      class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow ui-corner-all large-popup">
 
     <div id="rule-command"
-         class="ui-popup ui-body-a"
+         class="ui-popup"
          data-role="popup"
          data-enhanced="true"
          data-transition="flip">
@@ -93,7 +93,7 @@
                 name="rule-command-content"}}
 
             <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-                <a class="ui-btn ui-btn-d ui-caps" {{action "saveClicked" target=view}}>Save</a>
+                <a id="add-command-ok" class="ui-btn ui-btn-d ui-caps" {{action "saveClicked" target=view}}>Save</a>
             </div>
         </div>
     </div>

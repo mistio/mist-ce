@@ -19,6 +19,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
             rule: null,
             metrics: [],
             newCommand: null,
+            commandFormReady: false,
 
             sortedMetrics: function () {
                 var metrics = this.get('metrics');
@@ -58,6 +59,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
             openCommandEditor: function () {
                 Mist.ruleEditController.close('action');
+                this.updateCommandFormReady();
                 Ember.run.later(this, function () {
                     Mist.ruleEditController.open(this.rule, 'command');
                     this.set('newCommand', this.rule.command);
@@ -69,6 +71,21 @@ define('app/views/rule_edit', ['app/views/controlled'],
                 Ember.run.later(this, function () {
                     Mist.ruleEditController.open(this.rule, 'action');
                 }, 500);
+            },
+
+            updateCommandFormReady: function () {
+                var commandFormReady = false;
+                if (this.newCommand && this.newCommand.trim() ) {
+                    commandFormReady = true;
+                }
+
+                this.set('commandFormReady', commandFormReady);
+
+                if (this.commandFormReady) {
+                   $('#add-command-ok').removeClass('ui-state-disabled');
+                } else {
+                   $('#add-command-ok').addClass('ui-state-disabled');
+                }
             },
 
 
@@ -105,16 +122,28 @@ define('app/views/rule_edit', ['app/views/controlled'],
                 },
 
                 saveClicked: function () {
-                    Mist.ruleEditController.edit({
-                        action: 'command',
-                        command: this.newCommand
-                    });
+                    if (this.commandFormReady) {
+                        Mist.ruleEditController.edit({
+                            action: 'command',
+                            command: this.newCommand
+                        });
+                    }                    
                 },
 
                 backClicked: function () {
                     this.closeCommandEditor();
-                },
-            }
+                }
+            },
+
+
+            //
+            //  Observers
+            //
+
+
+            commandFormReadyObserver: function () {
+               Ember.run.once(this, 'updateCommandFormReady');
+            }.observes('newCommand')
         });
     }
 );
