@@ -4,7 +4,7 @@ Feature: Machines
   Background:
     When I visit mist.io
     Then I wait for the mist.io splash page to load
-    Given "EC2" backend added
+    Given "EC2" backend has been added
 
   @machines-ec2
   Scenario: Machine Actions EC2

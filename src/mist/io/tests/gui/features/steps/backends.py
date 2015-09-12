@@ -8,7 +8,7 @@ except ImportError:
     pass
 
 
-@given(u'"{backend}" backend added')
+@given(u'"{backend}" backend has been added')
 def given_backend(context, backend):
     backend_buttons = []
     end_time = time() + 5
