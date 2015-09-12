@@ -12,12 +12,12 @@ except ImportError:
 
 def i_am_in_homepage(context):
     possible_urls = [context.mist_config['MIST_URL']]
-    if possible_urls[0].endswith('/'):
-        hashtag = '#'
-    else:
-        hashtag = '/#'
-    possible_urls.append(possible_urls[0] + hashtag)
-    possible_urls.append(possible_urls[0] + hashtag + '/')
+    if not possible_urls[0].endswith('/'):
+        temp = possible_urls[0]
+        possible_urls[0] = temp + '/'
+        possible_urls.append(temp)
+    possible_urls.append(possible_urls[0] + '#')
+    possible_urls.append(possible_urls[0] + '#' + '/')
     return context.browser.current_url in possible_urls
 
 
