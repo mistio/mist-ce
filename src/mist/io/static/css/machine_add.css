@@ -2,7 +2,7 @@
 /* Machine Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
 #create-machine {
-    width: 281px;
+    width: 310px;
     box-shadow: none;
     position: relative;
     z-index: 1000;
@@ -34,7 +34,7 @@
 #machine-create.ui-content {
     background-color: #FAF9F4;
     padding: 16px;
-    width: 249px;
+    width: 278px;
 }
 #machine-create .docker {
 	display:none;
