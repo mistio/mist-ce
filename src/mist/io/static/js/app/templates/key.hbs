@@ -49,9 +49,9 @@
             <textarea id="private-key" type="text" readonly="readonly" onclick="this.focus();this.select()" value={{view.privateKey}}></textarea>
             {{else}}
             <a id="private_key" class="ui-btn
+                    ui-shadow
                     ui-btn-d
                     icon-key
-                    ui-corner-all
                     ui-btn-icon-right
                     ui-caps" {{action "displayClicked" target=view}}>
                 Display

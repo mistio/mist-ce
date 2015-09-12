@@ -117,6 +117,26 @@
 
 .graph-button {
     display: inline-block;
+    margin: 0 5px;
+}
+
+.graph-button.graph-minimized .ui-btn {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    color: #474747;
+}
+
+.graph-button.graph-minimized .ui-btn:hover,
+.graph-button.graph-minimized .ui-btn:active {
+    color: #444 !important;
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+}
+
+.graph-button.graph-minimized .ui-btn:active {
+    color: #444 !important;
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
 }
 
 #add-metric-btn {
