@@ -7,9 +7,9 @@ define('app/controllers/machine_add', ['ember'],
     function() {
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
             callback: null,
             formReady: null,
@@ -28,11 +28,9 @@ define('app/controllers/machine_add', ['ember'],
             newMachineAzurePorts: null,
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //  Methods
+            //
 
             open: function(callback) {
                 // In case page is scrolled, opening the
@@ -52,15 +50,12 @@ define('app/controllers/machine_add', ['ember'],
                 this.set('callback', callback);
             },
 
-
             close: function() {
                 this._clear();
                 $('#create-machine').collapsible('collapse');
             },
 
-
             add: function() {
-
                 var providerName = this.newMachineProvider.title;
                 var machineSize = this.newMachineSize.name;
                 var machineImage = this.newMachineImage.name;
@@ -141,11 +136,9 @@ define('app/controllers/machine_add', ['ember'],
             },
 
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
+            //
+            //  Pseudo-Private Methods
+            //
 
              _clear: function() {
                 this.set('callback', null)
@@ -164,7 +157,6 @@ define('app/controllers/machine_add', ['ember'],
                 this.view.clear();
              },
 
-
             _updateFormReady: function() {
                 var formReady = false;
                 if (this.newMachineName &&
@@ -176,33 +168,29 @@ define('app/controllers/machine_add', ['ember'],
 
                 // SSH key and location are optional for docker
                 if (this.newMachineProvider.provider != 'docker') {
-                    if (Mist.keysController.keyExists(this.newMachineKey.id) &&
-                        this.newMachineLocation.id) {
-                        formReady = true;
-                    } else {
+                    if (!(Mist.keysController.keyExists(this.newMachineKey.id) &&
+                        this.newMachineLocation.id)) {
                         formReady = false;
                     }
                 }
 
                 if (this.newMachineImage.id &&
                     this.newMachineImage.get('isMist')) {
-                        if (!Mist.keysController.keyExists(this.newMachineKey.id)) formReady=false;
+                        if (!Mist.keysController.keyExists(this.newMachineKey.id))
+                            formReady=false;
                 }
 
                 this.set('formReady', formReady);
             },
-
 
             _giveCallback: function(success, machine) {
                 if (this.callback) this.callback(success, machine);
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //  Observers
+            //
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
