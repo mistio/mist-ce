@@ -75,7 +75,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
             },
 
 
-            disableMonitoring: function(machine, callback) {
+            disableMonitoring: function(machine, callback, noSsh) {
 
                 var that = this;
                 machine.set('disablingMonitoring', true);
@@ -86,6 +86,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
                 Mist.ajax.POST(url, {
                     'action': 'disable',
+                    'no_ssh': noSsh || false,
                     'name': machine.name || machine.id,
                     'public_ips': machine.public_ips || [],
                     'dns_name': machine.extra.dns_name || 'n/a',

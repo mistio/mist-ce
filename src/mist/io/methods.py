@@ -1311,8 +1311,10 @@ def connect_provider(backend):
     elif backend.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if backend.apisecret:
-            with get_temp_file(backend.apisecret) as tmp_key_path:
-                conn = driver(backend.apiurl, user=backend.apikey, ssh_key=tmp_key_path, ssh_port=backend.ssh_port)
+            key_temp_file = NamedTemporaryFile(delete=False)
+            key_temp_file.write(backend.apisecret)
+            key_temp_file.close()
+            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=key_temp_file.name, ssh_port=backend.ssh_port)
         else:
             conn = driver(backend.apiurl, user=backend.apikey)
     else:
@@ -3275,7 +3277,7 @@ def enable_monitoring(user, backend_id, machine_id,
         return ret_dict
 
     if not no_ssh:
-        deploy = mist.io.tasks_deploy_collectd
+        deploy = mist.io.tasks.deploy_collectd
         if deploy_async:
             deploy = deploy.delay
         deploy(user.email, backend_id, machine_id, ret_dict['extra_vars'])
@@ -3918,7 +3920,7 @@ def undeploy_collectd(user, backend_id, machine_id):
 
 def get_deploy_collectd_command_unix(uuid, password, monitor):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O - %s | $(command -v sudo) python - %s %s" % (url, uuid, password)
+    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd

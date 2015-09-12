@@ -5,6 +5,7 @@
     margin-top: 1em;
 }
 #backend-add .mist-select ul {
+    margin-top: 0;
     max-height: 165px;
     overflow-y: scroll;
 }
@@ -13,6 +14,12 @@
     width: 100%;
     margin-top: .1em;
     margin-bottom: -0.4em;
+}
+
+#backend-add .docker .first-child .ui-slider {
+    width: 100%;
+    margin-top: 8px;
+    border-radius: 5px 0 0 5px;
 }
 
 #backend-add-advanced {

@@ -17,7 +17,7 @@ eggs in the system's Python.
 
 To install the basic requirements in a Debian based distro do::
 
-    sudo aptitude install python-dev build-essential git erlang libpcre3-dev
+    sudo aptitude install python-dev build-essential git erlang
 
 If you wish to install it in a virtual environment you'll also need::
 

@@ -325,6 +325,8 @@ def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
 
     try:
         ipaddr = socket.gethostbyname(host)
+    except UnicodeEncodeError:
+        raise MistError('Please provide a valid DNS name')
     except socket.gaierror:
         raise MistError("Not a valid IP address or resolvable DNS name: '%s'."
                         % host)
