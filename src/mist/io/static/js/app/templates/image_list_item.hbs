@@ -3,8 +3,8 @@
     {{view Mist.Checkbox checked=image.star}}
 </label>
 
-{{#link-to "machines"}}
+<a {{action "launchImage" target=view}}>
     <h3>{{unbound image.name}}</h3>
     <p class="tag">{{image.backend.title}}</p>
     <p class="tag title">{{unbound image.id}}</p>
-{{/link-to}}
+</a>

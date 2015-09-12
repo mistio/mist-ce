@@ -25,7 +25,7 @@
                 <div class="ui-block-a">
                     <a id="add-rule-button"
                       class="{{if Mist.rulesController.creatingPending 'ui-state-disabled'}}
-                             ui-btn ui-btn-d ui-btn-icon-right icon-plus ui-caps"
+                             ui-btn ui-shadow ui-btn-d ui-btn-icon-right icon-plus ui-caps"
                         {{action "addRuleClicked" target=view}}>
                             Add Rule
                     </a>
@@ -34,7 +34,7 @@
             <div class="ui-block-b">
                 <a id="disable-monitor-btn"
                    class="{{if view.machine.disablingMonitoring 'ui-state-disabled'}}
-                          ui-btn no ui-btn-icon-right icon-xx ui-caps"
+                          ui-btn ui-shadow no ui-btn-icon-right icon-xx ui-caps"
                     {{action "disableMonitoringClicked" target=view}}>
                         Disable
                 </a>

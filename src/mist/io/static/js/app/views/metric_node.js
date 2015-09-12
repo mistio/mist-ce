@@ -88,10 +88,8 @@ define('app/views/metric_node', [],
                 }
             },
 
-
             unfoldChildren: function () {
                 this.preCenterNode();
-
                 this.set('unfold', true);
 
                 // Change icons
