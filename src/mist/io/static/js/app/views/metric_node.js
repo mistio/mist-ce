@@ -65,8 +65,9 @@ define('app/views/metric_node', [],
 
             foldSiblings: function () {
                 var siblings = this.element.siblings().filter('.ember-view');
+                var that = this;
                 siblings.toArray().forEach(function (sibling) {
-                    Ember.View.views[sibling.id].foldChildren();
+                    that._viewRegistry[sibling.id].foldChildren();
                 });
             },
 

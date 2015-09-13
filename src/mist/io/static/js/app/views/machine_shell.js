@@ -76,7 +76,6 @@ define('app/views/machine_shell', ['app/views/popup'],
             //
 
             actions: {
-
                 backClicked: function() {
                     Mist.machineShellController.close();
                 }
@@ -86,14 +85,12 @@ define('app/views/machine_shell', ['app/views/popup'],
 
         var resizeLock;
         function windowResizeHandler () {
-
             // Prevent shell recalibration if user hasn't stopped resizing the
             // window, which is most probably device rotation or the appearance
             // of the on screen keyboard
             clearTimeout(resizeLock);
             resizeLock = setTimeout(initShell, 1000);
         }
-
 
         function afterOpenHandler (e) {
             $(e.currentTarget).off('blur');
@@ -107,14 +104,12 @@ define('app/views/machine_shell', ['app/views/popup'],
             });
         }
 
-
         function beforeOpenHandler (e) {
             // Initialize shell before popup opens when user is on mobile.
             // Else, the shell will be resized and repositioned while visible
             // and will appear glitchy
             if (Mist.isClientMobile) initShell();
         }
-
 
         function initShell () {
             if (Mist.isClientMobile)
@@ -157,7 +152,7 @@ define('app/views/machine_shell', ['app/views/popup'],
             // value in pixels because it may vary across platforms/browsers
             var fontSize = $('#font-test')
                 .css('font-size', '1em')
-                .css('font-size');
+                .css('font-size').replace('px', '') - 0;
 
             var numOfColumns;
             var numOfRows;
@@ -165,18 +160,16 @@ define('app/views/machine_shell', ['app/views/popup'],
             // Make sure the shell is at least wide/tall enough for
             // the terminal standards
             while (true) {
-
-                fontSize = (fontSize.replace('px', '') - 0.5);
-                if (fontSize < 10)
-                    break;
-                fontSize +='px';
+                fontSize = fontSize - 0.5;
+                if (fontSize < 9.5)
+                    fontSize = 9;
 
                 numOfColumns = maxCharsInWidth(fontSize, size.width);
-                if (numOfColumns < MIN_TERM_COLUMNS)
+                if (numOfColumns < MIN_TERM_COLUMNS && fontSize > 9)
                     continue;
 
                 numOfRows = maxLinesInHeight(fontSize, size.height);
-                if (numOfRows < MIN_TERM_ROWS)
+                if (numOfRows < MIN_TERM_ROWS && fontSize > 9)
                     continue;
 
                 break;
@@ -185,11 +178,10 @@ define('app/views/machine_shell', ['app/views/popup'],
             $('#shell-return')
                 .css('font-size', fontSize);
 
-            warn('calibrating desktop at', numOfColumns, numOfRows);
+            info('calibrating desktop shell at', numOfColumns, numOfRows, fontSize);
             Mist.machineShellController.set('cols', numOfColumns);
             Mist.machineShellController.set('rows', numOfRows);
         }
-
 
         function mobileCalibration () {
             // Light (performance wise) callibration of shell
@@ -226,7 +218,7 @@ define('app/views/machine_shell', ['app/views/popup'],
             var popup = $('#machine-shell-popup');
             popup.css('left', ((window.innerWidth - popup.width()) / 2) + 'px');
 
-            warn('calibrating mobile at', numOfColumns, numOfRows);
+            info('calibrating mobile shell at', numOfColumns, numOfRows, fontSize);
             Mist.machineShellController.set('cols', MIN_TERM_COLUMNS);
             Mist.machineShellController.set('rows', MIN_TERM_ROWS);
         }
