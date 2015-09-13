@@ -11,7 +11,7 @@
                     </div>
 
                     <div class="ui-block-b">
-                        <h1 class="ui-title">{{model.id}}</h1>
+                        <h1 class="ui-title">{{model.extra.id}}</h1>
                     </div>
 
                     <div class="ui-block-c">
@@ -30,18 +30,20 @@
 
             <table class="info-table">
                 <tbody>
-                <tr>
-                    <td>Name</td>
-                    <td>{{model.name}}</td>
-                </tr>
-                <tr>
-                    <td>Id</td>
-                    <td>{{model.id}}</td>
-                </tr>
-                <tr>
-                    <td>Cloud</td>
-                    <td>{{model.backend.title}}</td>
-                </tr>
+                    <tr>
+                        <td>Name</td>
+                        <td>{{model.name}}</td>
+                    </tr>
+                    <tr>
+                        <td>Id</td>
+                        <td>{{model.id}}</td>
+                    </tr>
+                    <tr>
+                        <td>Cloud</td>
+                        <td>{{model.backend.title}}</td>
+                    </tr>
+
+                    {{for-In model.extra}}
                 </tbody>
             </table>
         </div>
