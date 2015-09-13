@@ -106,6 +106,10 @@ define('app/controllers/machine_tags', ['ember'],
                 var formReady = false;
                 if (this.newTag) {
                     formReady = true;
+
+                    if (formReady && this.addingTag) {
+                        formReady = false;
+                    }
                 }
 
                 this.set('formReady', formReady);
@@ -119,7 +123,7 @@ define('app/controllers/machine_tags', ['ember'],
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newTag')
+            }.observes('newTag', 'addingTag')
         });
     }
 );

@@ -21,6 +21,7 @@ define('app/controllers/backend_edit', ['ember'],
             backend: null,
             newTitle: null,
             newState: null,
+            editingBackend: null,
 
 
             //
@@ -51,7 +52,7 @@ define('app/controllers/backend_edit', ['ember'],
             rename: function () {
 
                 if (this.formReady) {
-
+                    this.set('editingBackend', true);
                     Mist.backendsController.renameBackend({
                         backend: this.backend,
                         newTitle: this.newTitle,
@@ -103,6 +104,10 @@ define('app/controllers/backend_edit', ['ember'],
                     formReady = true;
                 }
 
+                if (formReady && this.editingBackend) {
+                    formReady = false;
+                }
+
                 this.set('formReady', formReady);
             },
 
@@ -144,9 +149,9 @@ define('app/controllers/backend_edit', ['ember'],
             }.observes('newState'),
             
 
-            formObserver: function() {
+            newTitleObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newTitle')
+            }.observes('newTitle', 'editingBackend')
         });
     }
 );

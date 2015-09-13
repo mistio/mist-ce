@@ -84,6 +84,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                         'Failed to rename backend');
                 }).complete(function (success) {
                     that.set('renamingBackend', false);
+                    Mist.backendEditController.set('editingBackend', false);
                     if (args.callback) args.callback(success);
                 });
             },
