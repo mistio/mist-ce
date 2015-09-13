@@ -15,6 +15,7 @@ define('app/models/key', ['ember'],
             probing: null,
             machines: null,
             selected: null,
+            visible: true,
             isDefault: null,
 
 

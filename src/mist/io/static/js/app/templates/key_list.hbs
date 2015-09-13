@@ -42,18 +42,23 @@
                </div>
             </div><!-- /grid-b -->
 
+            <div class="key-search-container">
+                {{#if Mist.keysController.searchTerm}}
+                    <span {{action "clearClicked" target=view}} class="icon-xx"></span>
+                {{else}}
+                    <span class="icon-search"></span>
+                {{/if}}
+                {{input value=Mist.keysController.searchTerm placeholder="Filter keys" class="key-search"}}
+            </div>
+
             <ul id="key-list" data-role="listview"
-                data-filter="true"
                 data-inset="true"
-                data-filter-placeholder="Filter keys"
                 class="checkbox-list">
-                {{#each Mist.keysController.model as |key|}}
+                {{#each Mist.keysController.filteredKeys as |key|}}
                     {{component "key-list-item" key=key class="checkbox-link"}}
                 {{/each}}
             </ul>
         </div>
-        <div class="mid-padding"></div>
-
     </div>
 
     <div id="select-keys-popup" class="ui-mini" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-keys-btn">

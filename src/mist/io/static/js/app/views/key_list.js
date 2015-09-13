@@ -82,7 +82,7 @@ define('app/views/key_list', ['app/views/page'],
                     $('#select-keys-popup').popup('close');
 
                     Ember.run(function () {
-                        Mist.keysController.model.forEach(function (key) {
+                        Mist.keysController.filteredKeys.forEach(function (key) {
                             key.set('selected', mode);
                         });
                     });
@@ -107,6 +107,11 @@ define('app/views/key_list', ['app/views/page'],
                                 Mist.keysController.deleteKey(keyId);
                         }
                     });
+                },
+
+
+                clearClicked: function() {
+                    Mist.keysController.clearSearch();
                 }
             }
         });

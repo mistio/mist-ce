@@ -31,6 +31,9 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             disassociatingKey: false,
             settingDefaultKey: false,
 
+            searchTerm: null,
+            filteredKeys: [],
+
 
             //
             //
@@ -334,12 +337,41 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             _updateSelectedKeys: function() {
                 Ember.run(this, function() {
                     var newSelectedKeys = [];
-                    this.model.forEach(function(key) {
+                    this.filteredKeys.forEach(function(key) {
                         if (key.selected) newSelectedKeys.push(key);
                     });
                     this.set('selectedKeys', newSelectedKeys);
                     this.trigger('onSelectedKeysChange');
                 });
+            },
+
+
+            _updateFilteredKeys: function() {
+                var keys = [];
+
+                if (this.searchTerm) {
+                    var that = this;
+                    this.model.forEach(function(key) {
+                        var regex = new RegExp(that.searchTerm);
+
+                        if (regex.test(key.id)) {
+                            keys.push(key);
+                        } else {
+                            if (key.selected) {
+                                key.set('selected', false);
+                            }
+                        }
+                    });
+                } else {
+                    keys = this.model;
+                }
+
+                this.set('filteredKeys', keys);
+            },
+
+
+            clearSearch: function() {
+                this.set('searchTerm', null);
             },
 
 
@@ -352,7 +384,12 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             selectedKeysObserver: function() {
                 Ember.run.once(this, '_updateSelectedKeys');
-            }.observes('model.@each.selected')
+            }.observes('filteredKeys.@each.selected'),
+
+
+            filteredKeysObserver: function() {
+                Ember.run.once(this, '_updateFilteredKeys');
+            }.observes('model.@each.id', 'searchTerm', 'model.[]')
         });
     }
 );

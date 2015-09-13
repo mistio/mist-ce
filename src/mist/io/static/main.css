@@ -10,6 +10,7 @@
 @import url("css/home.css");
 @import url("css/rules.css");
 @import url("css/log_list.css");
+@import url("css/image.css");
 @import url("css/images.css");
 @import url("css/machine.css");
 @import url("css/key_add.css");
@@ -690,6 +691,7 @@ textarea {
     background-color: #d4d4d4;
     margin-top: 1%;
     overflow: visible;
+    height: 65px;
 }
 #machine-list-page .machines-header:after,
 #key-list-page .keys-header:after,

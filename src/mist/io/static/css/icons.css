@@ -121,6 +121,7 @@
 }
 .icon-down:after{content:'\0072';}
 .icon-up:after{content:'\0073';}
+.icon-search:after{content:'\0074';}
 .ui-footer .icon-x:after,
 .ui-footer .icon-xx:after {
   font-size: 12px;

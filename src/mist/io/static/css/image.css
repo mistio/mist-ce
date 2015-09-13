@@ -1,0 +1,55 @@
+/* Single Image Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+#single-image-page > .ui-content {
+    padding-top: 30px;
+    background-color: transparent;
+}
+#single-image-page .ui-block-b .ui-title {
+    text-align: center;
+}
+#single-image-page .ui-collapsible {
+    margin: 10px 0 20px;
+}
+#single-image-page .ui-collapsible .ajax-loader {
+    display: inline;
+    float: right;
+}
+#single-image-page .ui-collapsible .ui-collapsible-heading a {
+    background-color: #d4d4d4;
+    border: none;
+    padding: 20px 70px 16px !important;
+}
+#single-image-page .ui-collapsible .ui-collapsible-content {
+    background-color: #faf9f4;
+    padding: 0 !important;
+}
+#single-image-page .ui-collapsible .ui-collapsible-content .ui-listview {
+    margin: 0;
+    box-shadow: none;
+}
+#single-image-page .info-table {
+    width: 100%;
+}
+#single-image-page .info-table td {
+    margin: 0;
+    width: 50%;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #eeedeb;
+}
+#single-image-page .info-table tr:last-child td {
+    border-bottom: none;
+}
+#single-image-page .info-table tr td:nth-child(1) {
+    padding-left: 70px;
+}
+#single-image-page .info-table tr td:nth-child(2) {
+    color: #7f7f7f;
+}
+#single-image-page .info-table tr {
+    background-color: #faf9f4;
+    border: none;
+}
+#single-image-page .info-table tr:hover {
+    background-color: #f2f2f2;
+}

@@ -153,6 +153,7 @@ var loadFiles = function (callback) {
         'app/controllers/dialog',
         'app/controllers/file_upload',
         'app/controllers/graphs',
+        'app/controllers/images',
         'app/controllers/image_search',
         'app/controllers/key_add',
         'app/controllers/key_edit',
@@ -178,6 +179,7 @@ var loadFiles = function (callback) {
         'app/controllers/script_run',
         'app/controllers/scripts',
 
+        'app/routes/image',
         'app/routes/images',
         'app/routes/index',
         'app/routes/key',
@@ -201,6 +203,7 @@ var loadFiles = function (callback) {
         'app/views/graph_list_bar',
         'app/views/graph_list_control',
         'app/views/graph_list_item',
+        'app/views/image',
         'app/views/image_list_item',
         'app/views/image_list',
         'app/views/ip_address_list_item',

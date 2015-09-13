@@ -9,6 +9,7 @@ var loadApp = function (
     DialogController,
     FileUploadController,
     GraphsController,
+    ImagesController,
     ImageSearchController,
     KeyAddController,
     KeyEditController,
@@ -63,6 +64,9 @@ var loadApp = function (
     App.Router.map(function() {
         this.route('machines');
         this.route('images');
+        this.route('image', {
+            path: '/images/:image_id'
+        });
         this.route('networks');
         this.route('network', {
             path: '/networks/:network_id',
@@ -102,6 +106,7 @@ var loadApp = function (
     App.set('backendEditController', BackendEditController.create());
     App.set('machineTagsController', MachineTagsController.create());
     App.set('machineKeysController', MachineKeysController.create());
+    App.set('imagesController', ImagesController.create());
     App.set('imageSearchController', ImageSearchController.create());
     App.set('datasourcesController', DatasourcesController.create());
     App.set('machineShellController', MachineShellController.create());

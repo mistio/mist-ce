@@ -78,21 +78,62 @@
 }
 
 #key-list {
-    margin-top: -53px;
+    margin-top: -49px;
     box-shadow: none;
+}
+
+#key-list-page .key-search-container {
+    position: relative;
+    position: relative;
+    top: -56px;
+    margin-left: 50px;
+    margin-right: 195px;
+}
+
+#key-list-page .key-search {
+    padding-right: 35px;
+}
+
+#key-list-page .key-search-container [class*='icon-'] {
+    color: #7f7f7f;
+    display: inline-block;
+    background-color: #e8e8e8;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    padding: 0 8px 0 10px;
+    box-sizing: border-box;
+    height: 30.5px;
+    line-height: 30.5px;
+}
+#key-list-page .key-search-container [class*='icon-']:after {
+    font-size: 14px;
+    color: #444;
+}
+
+#key-list-page .key-search-container .icon-xx:after {
+    /*color: #d96557;    */
+}
+
+#key-list-page .key-search-container .icon-xx:hover {
+    cursor: pointer;
+}
+
+#key-list-page .key-search-container .icon-xx:hover:after {
+    /*color: #df7e73;*/
 }
 
 @media only screen and  (max-width: 600px) {
     #key-list-page .creation-button {
-        width: 60px;
-        height: 60px;
+        width: 63px;
+        height: 63px;
         padding: 0 !important;
     }
     #key-list-page .creation-button span {
         display: none;
     }
 
-    #key-list-page .ui-filterable .ui-input-search {
+    #key-list-page .key-search-container {
         margin-right: 85px !important;
     }
 }
