@@ -234,13 +234,22 @@ def ssh_key_is_added(context, ssh_key_name):
 
 
 def update_lines(terminal, lines, start_of_empty_lines):
+    """
+    Cleans up the terminal from empty lines and marks down the last empty line.
+    """
     new_lines = terminal.find_elements_by_tag_name('div')
+    last_empty_line = start_of_empty_lines
+    safety_counter = max_safety_count = 5
     for i in range(start_of_empty_lines, len(new_lines)):
         line = new_lines[i].text.lstrip().rstrip()
-        if not line:
-            return i
-        lines.append(line)
-    return 0
+        last_empty_line = i if not line and safety_counter == max_safety_count \
+            else last_empty_line
+        safety_counter = max_safety_count if line else safety_counter - 1
+        if line:
+            lines.append(line)
+        if safety_counter == 0:
+            break
+    return last_empty_line
 
 
 @then(u'I test the ssh connection')
