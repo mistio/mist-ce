@@ -198,7 +198,7 @@ def assert_title_contains(context, text):
     assert text in context.browser.title
 
 
-@then(u'I wait for links in homepage to appear')
+@then(u'I wait for the links in homepage to appear')
 def wait_for_buttons_to_appear(context):
     end_time = time() + 100
     while time() < end_time:
