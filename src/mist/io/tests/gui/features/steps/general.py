@@ -260,7 +260,7 @@ def go_to_some_page(context, title, timing):
     if not i_am_in_homepage(context):
         if not str(context.browser.current_url).endswith(title.lower()):
             context.execute_steps(u'When I click the button "Home"')
-    context.execute_steps(u'Then I wait for links in homepage to appear')
+    context.execute_steps(u'Then I wait for the links in homepage to appear')
     if timing == 'after':
         context.execute_steps(u'Then %s counter should be greater than 0 '
                               u'within 80 seconds' % title)

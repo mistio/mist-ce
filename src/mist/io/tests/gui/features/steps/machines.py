@@ -245,6 +245,12 @@ def update_lines(terminal, lines, start_of_empty_lines):
 
 @then(u'I test the ssh connection')
 def check_ssh_connection(context):
+    """
+    This step will prss the shell button and wait for the connection to be
+    established and then will try to execute a command in the server and
+    get some output.
+    """
+    # Disconnected from remote. WebSocket connection broken
     end_time = time() + 10
     terminal = None
     while time() < end_time:
@@ -256,7 +262,8 @@ def check_ssh_connection(context):
             sleep(1)
         except NoSuchElementException:
             sleep(1)
-    assert terminal, "Terminal has not opened after 10 seconds. Aborting!"
+    assert terminal, "Terminal has not opened 10 seconds after pressing the " \
+                     "button. Aborting!"
 
     connection_max_time = time() + 100
     start_of_empty_lines = 0
