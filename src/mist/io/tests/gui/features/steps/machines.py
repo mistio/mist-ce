@@ -246,7 +246,7 @@ def update_lines(terminal, lines, start_of_empty_lines):
 @then(u'I test the ssh connection')
 def check_ssh_connection(context):
     """
-    This step will prss the shell button and wait for the connection to be
+    This step will press the shell button and wait for the connection to be
     established and then will try to execute a command in the server and
     get some output.
     """
