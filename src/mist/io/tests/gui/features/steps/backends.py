@@ -8,7 +8,7 @@ except ImportError:
     pass
 
 
-@given(u'"{backend}" backend added')
+@given(u'"{backend}" backend has been added')
 def given_backend(context, backend):
     backend_buttons = []
     end_time = time() + 5
@@ -86,8 +86,6 @@ def backend_creds(context, backend):
         file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
         file_upload_ok.click()
     elif "GCE" in backend:
-        # import ipdb
-        # ipdb.set_trace()
         title = context.browser.find_element_by_id("title")
         for i in range(1, 6):
             title.send_keys(u'\ue003')

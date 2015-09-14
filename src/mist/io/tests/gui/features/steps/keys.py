@@ -26,26 +26,6 @@ def fill_key_name(context, text):
         textfield.send_keys(letter)
 
 
-@then(u'Keys counter should be greater than {counter_number} within {seconds} seconds')
-def keys_counter_loaded(context, counter_number, seconds):
-    elements = context.browser.find_elements_by_tag_name("li")
-    for element in elements:
-        if "Keys" in element.text:
-            break
-
-    end_time = time() + int(seconds)
-    while time() < end_time:
-        counter_span = element.find_element_by_tag_name("span")
-        counter = int(counter_span.text)
-
-        if counter > int(counter_number):
-            return
-        else:
-            sleep(2)
-
-    assert False, u'The counter did not say that more than %s keys were loaded' % counter_number
-
-
 @then(u'"{text}" key should be added within {seconds} seconds')
 def key_added(context, text, seconds):
     if "randomly_created" in text:
