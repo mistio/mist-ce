@@ -8,7 +8,7 @@ Feature: Machines
 
   @machines-ec2
   Scenario: Machine Actions EC2
-    When I visit the Machines page after loading
+    When I visit the Machines page after the counter has loaded
     And I click the button "Create"
     And I fill in a random machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
@@ -49,8 +49,8 @@ Feature: Machines
 
   @machine-probing
   Scenario: Machine probing
-    When I visit the Machines page after loading
-    And I click the button "sshtesting"
+    When I visit the Machines page after the counter has loaded
+    And I click the button "testingmachine"
     And I wait for 2 seconds
     Given ssh key with name "TESTING_MACHINE" is added
     Then I click the button "Probe"
@@ -59,8 +59,8 @@ Feature: Machines
 
   @machine-ssh
   Scenario: Connect with ssh
-    When I visit the Machines page after loading
-    And I click the button "sshtesting"
+    When I visit the Machines page after the counter has loaded
+    And I click the button "testingmachine"
     And I wait for 2 seconds
     Given ssh key with name "TESTING_MACHINE" is added
     Then I click the button "Shell"

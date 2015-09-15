@@ -259,7 +259,6 @@ def check_ssh_connection(context):
     established and then will try to execute a command in the server and
     get some output.
     """
-    # Disconnected from remote. WebSocket connection broken
     end_time = time() + 10
     terminal = None
     while time() < end_time:
