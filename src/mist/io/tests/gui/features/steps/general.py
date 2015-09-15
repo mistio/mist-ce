@@ -244,26 +244,44 @@ def images_counter_loaded(context, counter_title, counter_number, seconds):
                   u'loaded' % counter_number
 
 
-@when(u'I visit the {title} page {timing} loading')
-def go_to_some_page(context, title, timing):
+@when(u'I visit the {title} page after the counter has loaded')
+def go_to_some_page_after_loading(context, title):
     """
     WIll visit one of the basic pages(Machines, Images, Keys, Scripts) and has
-    the choice of waiting for the counter to load or just go to the page
-    regardless (before | after).
+    the choice of waiting for the counter to load.
+    For now the code will not be very accurate for keys page
+    """
+    go_to_some_page_after_counter_loading(context, title, title)
+
+
+@when(u'I visit the {title} page after the {counter_title} counter has loaded')
+def go_to_some_page_after_counter_loading(context, title, counter_title):
+    """
+    WIll visit one of the basic pages(Machines, Images, Keys, Scripts) and has
+    the choice of waiting for some of the counters to load
     For now the code will not be very accurate for keys page
     """
     if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts']:
         raise ValueError('The page given is unknown')
-    if timing not in ['without', 'after']:
-        raise ValueError('Timing provided is not recognized. It must be one of:'
-                         ' without / after')
+    if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts']:
+        raise ValueError('The page given is unknown')
+    context.execute_steps(u'Then %s counter should be greater than 0 '
+                          u'within 80 seconds' % counter_title)
+
+
+@when(u'I visit the {title} page')
+def go_to_some_page_without_waiting(context, title):
+    """
+    WIll visit one of the basic pages(Machines, Images, Keys, Scripts) without
+    waiting for the counter to load.
+    For now the code will not be very accurate for keys page
+    """
+    if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts']:
+        raise ValueError('The page given is unknown')
     if not i_am_in_homepage(context):
         if not str(context.browser.current_url).endswith(title.lower()):
             context.execute_steps(u'When I click the button "Home"')
     context.execute_steps(u'Then I wait for the links in homepage to appear')
-    if timing == 'after':
-        context.execute_steps(u'Then %s counter should be greater than 0 '
-                              u'within 80 seconds' % title)
     context.execute_steps(u'When I click the button "%s"' % title)
     if title == 'Machines':
         element_id = 'machine-list-page'
