@@ -268,7 +268,7 @@ def go_to_some_page_after_counter_loading(context, title, counter_title):
     context.execute_steps(u'Then %s counter should be greater than 0 '
                           u'within 80 seconds' % counter_title)
 
-    go_to_some_page_without_waiting(title)
+    go_to_some_page_without_waiting(context, title)
 
     if title == 'Machines':
         element_id = 'machines'
