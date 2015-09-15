@@ -33,13 +33,9 @@
                 {{Mist.dialogController.options.head}}
             </h1>
 
-            {{#if view.isOK}}
-            {{#if view.isBack}}
-            {{#if view.isOKCancel}}
+            {{#unless view.isYesNo}}
                 <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
-            {{/if}}
-            {{/if}}
-            {{/if}}
+            {{/unless}}
 
         </div>
 

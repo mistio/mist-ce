@@ -10,7 +10,7 @@ define('app/helpers/forIn', [],
 
     	return App.ForInHelper = Ember.Helper.extend({
             compute(params, hash) {
-        		var tpl = '', el, type, obj = params[0];
+        		var data = [], el, type, obj = params[0];
 
         		// check if not empty the container object
         		if (! $.isEmptyObject(obj)) {
@@ -18,29 +18,29 @@ define('app/helpers/forIn', [],
         			// loop through pairs
         			for (el in obj) {
         				if(obj[el]) {
-
         					// If the value is not object or array
     	    				if (! (obj[el] instanceof Array) && ! (obj[el] instanceof Object)) {
-    	    					tpl += "<tr><td>" + processString(el) + "</td><td>" + obj[el] + "</td></tr>";
-    	    				}
-
-    	    				// If the key is tags
-    	    				if (el == 'tags') {
-    	    					if (! $.isEmptyObject(obj[el])) {
-    		    					var tags = obj[el], result = '', tag;
-    		    					for (var i = 0, len = tags.length; i < len; i++) {
-    		    						tag = tags[i];
-    		    						result += '<span class="tag">' + tag + '</span>';
-    		    					}
-    		    					tpl += "<tr><td>Tags</td><td>" + result + "</td></tr>";
-    		    				}
+                                data.push({key: el, value: obj[el]});
     	    				}
     	    			}
         			}
+
+                    sortArr(data);                    
         		}
 
+                // Create final template
+                function createTpl (data) {
+                    var tpl = ''
+
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        tpl += "<tr><td>" + processKeys(data[i].key) + "</td><td>" + data[i].value + "</td></tr>";
+                    }
+
+                    return tpl;
+                }
+
         		// Transform this 'abc_bcd_cde' to 'Abc Bcd Cde' for keys presentation
-        		function processString(str) {
+        		function processKeys (str) {
         			var words = str.split('_'), result = '', gap, word;
         			for (var i = 0, len = words.length; i < len; i++) {
         				gap = i == 0 ? '' : ' ';
@@ -50,8 +50,16 @@ define('app/helpers/forIn', [],
         			return result;
         		}
 
+                // Sort metadata
+                function sortArr (array) {
+                    array.sort(function (a, b) {
+                        var x = a.key; var y = b.key;
+                        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+                    });
+                }
+
         		// Ensure produced html won't be escaped
-        		return Ember.String.htmlSafe(tpl);
+        		return Ember.String.htmlSafe(createTpl(data));
             }
     	});
     }

@@ -211,12 +211,7 @@
 
                 <table class="info-table">
                     <tbody>
-                    {{#each view.metadata as |row|}}
-                        <tr>
-                            <td>{{row.key}}</td>
-                            <td>{{row.value}}</td>
-                        </tr>
-                    {{/each}}
+                        {{for-In model.extra}}
                     </tbody>
                 </table>
 
