@@ -34,8 +34,7 @@ Feature: Add second-tier backends
 
   @backend-actions
   Scenario: Backend Actions
-    Given "Rackspace" backend added
-
+    Given "Rackspace" backend has been added
     When I click the button "Rackspace"
     And I rename the backend to "Renamed"
     And I wait for 1 seconds
