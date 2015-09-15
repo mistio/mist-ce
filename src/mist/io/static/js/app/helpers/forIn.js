@@ -10,7 +10,7 @@ define('app/helpers/forIn', [],
 
     	return App.ForInHelper = Ember.Helper.extend({
             compute(params, hash) {
-        		var data = [], el, type, obj = params[0];
+        		var data = [], el, obj = params[0];
 
         		// check if not empty the container object
         		if (! $.isEmptyObject(obj)) {
