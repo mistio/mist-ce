@@ -50,7 +50,7 @@ Feature: Machines
   @machine-probing
   Scenario: Machine probing
     When I visit the Machines page after loading
-    And I click the button "sshtesting"
+    And I click the button "testingmachine"
     And I wait for 2 seconds
     Given ssh key with name "TESTING_MACHINE" is added
     Then I click the button "Probe"
@@ -60,7 +60,7 @@ Feature: Machines
   @machine-ssh
   Scenario: Connect with ssh
     When I visit the Machines page after loading
-    And I click the button "sshtesting"
+    And I click the button "testingmachine"
     And I wait for 2 seconds
     Given ssh key with name "TESTING_MACHINE" is added
     Then I click the button "Shell"
