@@ -95,8 +95,6 @@
     <!-- Shell calibration element -->
     <div id="font-test"></div>
 
-    <div id="app"></div>
-
 </body>
 
 </html>

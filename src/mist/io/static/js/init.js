@@ -43,7 +43,6 @@ var loadApp = function (
 
     // Ember Application
     App.ready = callback;
-    App.rootElement = '#app';
     App = Ember.Application.create(App);
     window.Mist  = App;
 
