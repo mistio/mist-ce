@@ -249,5 +249,7 @@ var loadFiles = function (callback) {
         'app/views/script_log_list',
         'app/views/subnet_list_item',
         'app/views/user_menu',
+
+        'app/helpers/forIn'
     ], callback);
 };
