@@ -1,4 +1,4 @@
-define('app/views/login', [],
+define('app/views/login', ['ember'],
     /**
      *  Login View
      *

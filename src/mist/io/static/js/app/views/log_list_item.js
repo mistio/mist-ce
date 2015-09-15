@@ -49,11 +49,11 @@ define('app/views/log_list_item', ['app/views/list_item'],
             }.property('isCollapsed'),
 
             prettyTime: function () {
-                return this.get('log').get('date').getTimeFromNow();
+                return this.get('log').get('date') && this.get('log').get('date').getTimeFromNow();
             }.property('log.time'),
 
             fullPrettyTime: function () {
-                return this.get('log').get('date').getPrettyDateTime();
+                return this.get('log').get('date') && this.get('log').get('date').getPrettyDateTime();
             }.property('log.time'),
 
             formatedAction: function () {

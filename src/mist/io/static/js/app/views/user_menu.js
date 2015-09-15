@@ -1,4 +1,4 @@
-define('app/views/user_menu', ['md5'],
+define('app/views/user_menu', ['ember', 'md5'],
     /**
      *  User Menu View
      *
@@ -10,9 +10,9 @@ define('app/views/user_menu', ['md5'],
 
         return App.UserMenuComponent = Ember.Component.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
             layoutName: 'user_menu',
             isNotCore: !IS_CORE,
             accountUrl: '/account',

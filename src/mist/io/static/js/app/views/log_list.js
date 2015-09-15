@@ -1,4 +1,4 @@
-define('app/views/log_list', [],
+define('app/views/log_list', ['ember'],
     //
     //  Log List View
     //

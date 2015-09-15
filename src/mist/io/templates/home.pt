@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content='True' name='HandheldFriendly' />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
-    <title>${project} - cloud management in your pocket</title>
+    <title>${project} - manage the clouds</title>
     <link rel="apple-touch-icon" sizes="57x57" href="/resources/images/favicons/apple-touch-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/resources/images/favicons/apple-touch-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/resources/images/favicons/apple-touch-icon-72x72.png">
@@ -59,7 +59,7 @@
             require(["app"]);
         }else{
             require.config({
-                // not optimized js, usefull for bedugging
+                // not optimized js, usefull for debugging
                 baseUrl: 'resources/js/'
             });
             require(["dev"]);
