@@ -570,7 +570,7 @@ Date.prototype.getTimeFromNow = function () {
 
 Array.prototype.toStringByProperty = function (property) {
     return this.map(function (object) {
-        return object[property];
+        return '"' + object[property] + '"';
     }).join(', ');
 }
 

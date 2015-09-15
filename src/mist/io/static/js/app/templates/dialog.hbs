@@ -33,9 +33,13 @@
                 {{Mist.dialogController.options.head}}
             </h1>
 
-            {{#unless view.isYesNo}}
+            {{#if view.isOK}}
+            {{#if view.isBack}}
+            {{#if view.isOKCancel}}
                 <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
-            {{/unless}}
+            {{/if}}
+            {{/if}}
+            {{/if}}
 
         </div>
 
@@ -68,7 +72,7 @@
 
             {{#if view.isOK}}
 
-                <a class="ui-btn ui-btn-a ui-corner-all ui-caps yes"
+                <a class="ui-btn ui-btn-d ui-corner-all ui-caps"
                     {{action "confirm" target=view}}>OK</a>
 
             {{else}}{{#if view.isBack}}
@@ -85,7 +89,7 @@
                             {{action "reject" target=view}}>
                                 Cancel
                         </a>
-                        <a class="ui-btn ui-btn-d ui-caps yes"
+                        <a class="ui-btn ui-btn-d ui-caps"
                             {{action "confirm" target=view}}>
                                 OK
                         </a>
@@ -96,7 +100,7 @@
                             {{action "reject" target=view}}>
                                 No
                         </a>
-                        <a class="ui-btn ui-btn-d ui-caps no"
+                        <a class="ui-btn ui-caps {{if Mist.dialogController.options.danger 'no' 'ui-btn-d'}}"
                             {{action "confirm" target=view}}>
                                 Yes
                         </a>

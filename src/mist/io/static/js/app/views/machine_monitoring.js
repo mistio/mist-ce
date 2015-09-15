@@ -384,6 +384,7 @@ define('app/views/machine_monitoring',
                                 ' monitoring for this machine?'
                         }
                     ],
+                    danger: false,
                     callback: function (didConfirm) {
                         if (didConfirm)
                             Mist.monitoringController.enableMonitoring(machine);

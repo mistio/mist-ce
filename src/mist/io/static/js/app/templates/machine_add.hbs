@@ -25,8 +25,7 @@
             class="mist-select">
             <h4>{{#if Mist.machineAddController.newMachineProvider.provider}}
                    <span class="provider-icon-small">
-                        <span class="{{Mist.machineAddController.newMachineProvider.className}}">
-                        </span>
+                        <span class="{{Mist.machineAddController.newMachineProvider.className}}"></span>
                     </span>
                 {{/if}}
                 {{Mist.machineAddController.newMachineProvider.title}}
@@ -38,7 +37,7 @@
                             <li data-icon="false">
                                 <a {{action "selectProvider" backend target=view}}>
                                     <span class="provider-icon-small">
-                                        <span class={{className}}></span>
+                                        <span class={{backend.className}}></span>
                                     </span>
                                     {{backend.title}}
                                 </a>

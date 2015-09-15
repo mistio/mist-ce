@@ -686,6 +686,7 @@ textarea {
 #machine-list-page .machines-header,
 #image-list-page .images-header,
 #script-list-page .scripts-header,
+#key-list-page .keys-header,
 #network-list-page .networks-header {
     background-color: #d4d4d4;
     margin-top: 1%;
