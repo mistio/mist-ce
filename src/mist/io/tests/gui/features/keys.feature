@@ -8,7 +8,7 @@ Feature: Actions for Keys
 
   @key-addition
   Scenario: Add Key
-    When I visit the Keys page without loading
+    When I visit the Keys page
     When I click the button "Add"
     And I fill "FirstKey" as key name
     And I wait for 2 seconds
@@ -18,12 +18,12 @@ Feature: Actions for Keys
     And I wait for 1 seconds
     And I click the button "Home"
     And I wait for 2 seconds
-    And I visit the Keys page after loading
+    And I visit the Keys page after the counter has loaded
     Then "FirstKey" key should be added within 15 seconds
 
   @key-renaming
   Scenario: Rename Key
-    When I visit the Keys page after loading
+    When I visit the Keys page after the counter has loaded
     And I click the button "FirstKey"
     And I click the button "Rename"
     And I fill "RenamedFirstKey" as new key name
@@ -33,12 +33,12 @@ Feature: Actions for Keys
     And I wait for 1 seconds
     And I click the button "Home"
     And I wait for 1 seconds
-    And I visit the Keys page after loading
+    And I visit the Keys page after the counter has loaded
     Then "RenamedFirstKey" key should be added within 5 seconds
 
   @key-deletion
   Scenario: Delete Key
-    When I visit the Keys page after loading
+    When I visit the Keys page after the counter has loaded
     And I click the button "RenamedFirstKey"
     And I wait for 1 seconds
     And I click the button "Delete"
