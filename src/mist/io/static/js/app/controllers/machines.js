@@ -15,7 +15,7 @@ define('app/controllers/machines', ['app/models/machine'],
             loading: null,
             backend: null,
             failCounter: null,
-            addingMachine: null,
+            addingMachine: true,
             startingMachine: null,
             rebootingMachine: null,
             destroyingMachine: null,
@@ -33,7 +33,7 @@ define('app/controllers/machines', ['app/models/machine'],
             init: function () {
                 this._super();
                 this.set('model', []);
-                this.set('loadint', true);
+                this.set('loading', true);
             },
 
             load: function (machines) {

@@ -16,6 +16,7 @@ var loadApp = function (
     KeysController,
     LoginController,
     LogsController,
+    MachinesController,
     MachineAddController,
     MachineKeysController,
     MachinePowerController,
@@ -99,6 +100,7 @@ var loadApp = function (
     App.set('backendsController', BackendsController.create());
     App.set('metricAddController', MetricAddController.create());
     App.set('fileUploadController', FileUploadController.create());
+    App.set('machinesController', MachinesController.create());
     App.set('machineAddController', MachineAddController.create());
     App.set('backendAddController', BackendAddController.create());
     App.set('monitoringController', MonitoringController.create());

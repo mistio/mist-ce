@@ -290,6 +290,10 @@
         {{/if}}
         </div>
 
+        {{#if Mist.machinesController.addingMachine}}
+            <div class="ajax-loader"></div>
+        {{/if}}
+
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
             <a id="create-machine-ok"
                 class="ui-btn ui-btn-d ui-shadow ui-shadow ui-caps"

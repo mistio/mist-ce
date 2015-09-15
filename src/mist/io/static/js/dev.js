@@ -161,6 +161,7 @@ var loadFiles = function (callback) {
         'app/controllers/keys',
         'app/controllers/login',
         'app/controllers/logs',
+        'app/controllers/machines',
         'app/controllers/machine_add',
         'app/controllers/machine_keys',
         'app/controllers/machine_power',

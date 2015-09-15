@@ -13,6 +13,7 @@ define('app/controllers/machine_add', ['ember'],
 
             callback: null,
             formReady: null,
+            addingMachine: null,
 
             newMachineKey: null,
             newMachineName: null,

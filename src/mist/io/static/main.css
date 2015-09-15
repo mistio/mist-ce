@@ -1309,9 +1309,12 @@ ul.checkbox-list .ui-grid-b {
     float: left;
 }
 
-.ok-cancel a.ui-first-child.ui-last-child,
-.ok-cancel button.ui-first-child.ui-last-child {
+.ok-cancel .ui-btn.ui-first-child.ui-last-child,
+.ok-cancel .ui-btn.ok-only {
     width: 100% !important;
+    -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
+    -moz-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
 }
 
 .ok-cancel a.ui-first-child.ui-last-child.half,
@@ -1376,7 +1379,7 @@ ul.checkbox-list .ui-grid-b {
     background-color: #FAF9F4;
 }
 
-#no-collection-inner [class*='icon-']:after {
+#no-collection-inner .icon-cloud-check:after {
     color: #A5A4A1;
     font-size: 165px;
 }
