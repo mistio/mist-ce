@@ -1382,7 +1382,7 @@ ul.checkbox-list .ui-grid-b {
 
 #no-collection-inner .icon-cloud-check:after {
     color: #A5A4A1;
-    font-size: 165px;
+    font-size: 150px;
 }
 
 #no-collection-inner .icon-machine:after {
@@ -1403,7 +1403,7 @@ ul.checkbox-list .ui-grid-b {
     font-size: 36px;
     text-transform: uppercase;
     font-weight: bold;
-    margin: -5px auto 30px;
+    margin: -5px auto 10px;
     color: #444;
 }
 
@@ -1425,7 +1425,7 @@ ul.checkbox-list .ui-grid-b {
 
 #no-collection-inner .floating-collapsible {
     float: none;
-    margin: 20px auto !important;
+    margin: 30px auto !important;
 }
 
 /* Dialog

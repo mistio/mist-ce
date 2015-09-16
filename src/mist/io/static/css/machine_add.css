@@ -26,7 +26,7 @@
 
 #create-machine-overlay {
     z-index: 899;
-    min-height: calc(100% + 90px);
+    min-height: 1030px;
 }
 #machine-create .ui-panel-inner {
     padding: 0;

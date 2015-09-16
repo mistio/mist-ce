@@ -33,7 +33,6 @@ define('app/controllers/image_search', ['ember'],
 
 
             scheduleNewSearch: function (onServer) {
-
                 var that = this;
                 this.cancelSearch(function () {
                     that.search(onServer);
@@ -91,6 +90,11 @@ define('app/controllers/image_search', ['ember'],
                 } else {
                     this.trigger('onSearchEnd');
                 }
+            },
+
+
+            clearSearch: function () {
+                this.set('searchTerm', null);
             },
 
 

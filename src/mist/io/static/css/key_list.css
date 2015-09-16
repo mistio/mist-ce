@@ -111,16 +111,8 @@
     color: #444;
 }
 
-#key-list-page .key-search-container .icon-xx:after {
-    /*color: #d96557;    */
-}
-
 #key-list-page .key-search-container .icon-xx:hover {
     cursor: pointer;
-}
-
-#key-list-page .key-search-container .icon-xx:hover:after {
-    /*color: #df7e73;*/
 }
 
 @media only screen and  (max-width: 600px) {

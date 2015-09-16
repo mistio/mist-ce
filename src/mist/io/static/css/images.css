@@ -7,8 +7,11 @@
 #image-list-page .ui-block-b .ui-title {
     text-align: center;
 }
-#image-list-page .images-header {
-    min-height: 57px;
+#image-list-page #image-list-container {
+    background-color: #faf9f4;
+}
+#image-list-page .ajax-loader {
+    padding: 10px;
 }
 #image-list-page #image-list a {
     padding-left: 0 !important;
@@ -82,9 +85,12 @@
     background-color: rgba(0,0,0,0) !important;
     background-repeat: no-repeat !important;
 }
+#image-list-page #images-advanced-search {
+    margin: 0;
+}
 #image-list {
     box-shadow: none;
-    margin-bottom: 0;
+    margin: 0;
 }
 #image-list a:after {
     content: '\0056';
@@ -92,4 +98,34 @@
     background-image: none;
     opacity: 1;
     color: #7F7F7F;
+}
+#image-list-page .image-search-container {
+    position: relative;
+    top: 15px;
+    margin: 0 15px;
+}
+
+#image-list-page .image-search {
+    padding-right: 35px;
+}
+
+#image-list-page .image-search-container [class*='icon-'] {
+    color: #7f7f7f;
+    display: inline-block;
+    background-color: #e8e8e8;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    padding: 0 8px 0 10px;
+    box-sizing: border-box;
+    height: 30.8px;
+    line-height: 30.8px;
+}
+#image-list-page .image-search-container [class*='icon-']:after {
+    font-size: 14px;
+    color: #444;
+}
+
+#image-list-page .image-search-container .icon-xx:hover {
+    cursor: pointer;
 }

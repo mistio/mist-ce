@@ -26,7 +26,16 @@
 
     <div data-role="content" data-theme="a">
         <div id="image-list-container" class="ui-shadow">
-            <div class="images-header"></div>
+            <div class="images-header">
+                <div class="image-search-container">
+                    {{#if Mist.imageSearchController.searchTerm}}
+                        <span {{action "clearClicked" target=view}} class="icon-xx"></span>
+                    {{else}}
+                        <span class="icon-search"></span>
+                    {{/if}}
+                    {{input value=Mist.imageSearchController.searchTerm placeholder="Filter images" class="image-search"}}
+                </div>
+            </div>
 
             {{#if Mist.backendsController.loadingImages}}
                 <div id="image-load-loader" class="ajax-loader"></div>
@@ -38,29 +47,25 @@
 
             <ul id="image-list"
                 data-role="listview"
-                data-filter="true"
                 data-inset="true"
-                data-filter-placeholder="Filter images"
                 class="checkbox-list">
                 {{#each view.renderedImages as |image|}}
                     {{component "image-list-item" image=image class="checkbox-link"}}
                 {{/each}}
             </ul>
 
-            {{#if view.renderingMoreImages}}
-                <div class="ajax-loader"></div>
-            {{/if}}
-
-            <a id="images-advanced-search" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
-                {{action "searchClicked" target=view}}>
-                <span>
-                    {{#if view.searchingImages}}
-                        Please wait...
-                    {{else}}
-                        Continue search on server...
-                    {{/if}}
-                </span>
-            </a>
+            {{#if Mist.imageSearchController.searchTerm}}
+                <a id="images-advanced-search" class="ui-btn ui-btn-d ui-shadow ui-caps"
+                    {{action "searchClicked" target=view}}>
+                    <span>
+                        {{#if Mist.imageSearchController.isSearching}}
+                            Please wait
+                        {{else}}
+                            Continue search on server
+                        {{/if}}
+                    </span>
+                </a>
+            {{/if}}            
         </div>
         <div class="small-padding"></div>
 

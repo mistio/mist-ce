@@ -24,6 +24,7 @@ define('app/views/image_list', ['app/views/page'],
             defaultImages: [],
             renderedImages: [],
             renderingMoreImages: null,
+            pageYOffset: 0,
 
 
             //
@@ -143,6 +144,10 @@ define('app/views/image_list', ['app/views/page'],
 
                 searchClicked: function () {
                     Mist.imageSearchController.search(true);
+                },
+
+                clearClicked: function() {
+                    Mist.imageSearchController.clearSearch();
                 }
             },
 

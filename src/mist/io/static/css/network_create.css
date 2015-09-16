@@ -25,7 +25,7 @@
 
 #create-network-overlay {
     z-index: 899;
-    min-height: 800px;
+    min-height: 1120px;
 }
 #network-create label {
     margin-top: 1em;

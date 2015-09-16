@@ -14,20 +14,20 @@
     <!-- Page Body -->
     <div role="main" class="ui-content" data-theme="c">
 
-        {{#if Mist.backendsController.model}}
-            {{view "backendAdd"}}
-        {{else}}
+        {{#if Mist.backendsController.loading}}
             <div id="no-collection" class="ui-responsive">
                 <div id="no-collection-inner" class="ui-shadow">
                     <span class="icon-cloud-check"></span>
                     <h1>Welcome to mist.io</h1>
                     <h2>Get started by adding your clouds.</h2>
+                    {{view "backendAdd"}}
                     <p>
                         Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM & bare metal hosts.
-                    </p>
-                    {{view "backendAdd"}}
+                    </p>                    
                 </div>
             </div>
+        {{else}}
+            {{view "backendAdd"}}
         {{/if}}
 
         <!-- Backends list -->

@@ -141,6 +141,10 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 return this.networks.getObject(networkId);
             },
 
+            getImage: function (imageId) {
+                return this.images.getObject(imageId);
+            },
+
             getMonitoredMachines: function () {
                 return this.machines.getMonitoredMachines();
             },
