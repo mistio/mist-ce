@@ -61,7 +61,7 @@
     </fieldset>
 
     {{#if view.searching}}
-        <div class="ajax-loader"></div>
+        <div id="log-search-loader" class="ajax-loader"></div>
     {{/if}}
 
     <ul class="ui-listview">
@@ -71,7 +71,7 @@
     </ul>
 
     {{#if view.fetchingHistory}}
-        <div class="ajax-loader"></div>
+        <div id="log-load-loader" class="ajax-loader"></div>
     {{/if}}
 
     {{#if view.noMoreLogs}}

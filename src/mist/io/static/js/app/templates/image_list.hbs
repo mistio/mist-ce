@@ -29,11 +29,11 @@
             <div class="images-header"></div>
 
             {{#if Mist.backendsController.loadingImages}}
-                <div class="ajax-loader"></div>
+                <div id="image-load-loader" class="ajax-loader"></div>
             {{/if}}
 
             {{#if Mist.imageSearchController.isSearching}}
-                <div class="ajax-loader"></div>
+                <div id="image-search-loader" class="ajax-loader"></div>
             {{/if}}
 
             <ul id="image-list"

@@ -25,9 +25,11 @@
     width: 50px;
     position: relative;
     left: -18px;
-    transform: scale(0.4, 0.4);
-    -webkit-transform: scale(0.4,0.4);
     bottom: 15px;
+    -webkit-transform: scale(0.4,0.4);
+    -ms-transform: scale(0.4, 0.4);
+    transform: scale(0.4, 0.4);
+    background-repeat: no-repeat;
 }
 
 .single-view-icon-wrapper.generic {

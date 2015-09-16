@@ -14,26 +14,23 @@ define('app/routes/image', ['app/routes/base'],
                 Ember.run.next(this, function () {
                     var model = this.modelFor('image');
                     console.log(model);
-                    if(! model) return this.transitionTo('images');
                     var id = model._id || model.id;
-                    this.set('documentTitle', 'mist.io - ' + (model ? model.id : id));
+                    var image = Mist.backendsController.getImage(id);
+                    console.log(image);
+                    this.set('documentTitle', 'mist.io - ' + (image ? image.id : id));
                 });
             },
 
             redirect: function (image) {
-                // if(true) console.log('1');
-                // Mist.keysController.set('imageRequest', image._id);
+                Mist.backendsController.set('imageRequest', image._id);
             },
 
             model: function (args) {
                 var id = args.image_id;
-
-                if(! Mist.backendsController.model.length) return null;
-
-                return {
-                    id: id,
-                    name: 'marios'
-                };
+                if (Mist.backendsController.loading ||
+                    Mist.backendsController.loadingImages)
+                        return {_id: id, backend: {}};
+                return Mist.backendsController.getImage(id);
             }
         });
 }

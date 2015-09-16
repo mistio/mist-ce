@@ -104,23 +104,6 @@ define('app/controllers/images',
             },
 
 
-            getImages: function() {
-                var images = [];
-                console.log(Mist.backendsController.get('model')[0]);
-                Mist.backendsController.model.forEach(function(backend, index) {
-                    console.log(index);
-                    if (backend.enabled && !backend.get('isBareMetal')) {
-                        backend.images.model.forEach(function(image, index) {
-                            console.log(image);
-                            images.push(image);
-                        });
-                    }
-                });
-                console.log(images);
-                return images;
-            },
-
-
             //
             //
             //  Pseudo-Private Methods

@@ -103,7 +103,7 @@
                 <tr>
                     <td>Last probed</td>
                     <td> {{#if model.probing}}
-                             probing... <div class="ajax-loader"></div>
+                             probing... <div id="machine-probe-loader" class="ajax-loader"></div>
                          {{else}}
                              {{view.lastProbe}}
                              <a id="machine-probe-btn"

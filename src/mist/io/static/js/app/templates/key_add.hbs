@@ -53,7 +53,7 @@
             <div class="form-field">
                 <label for="key-add-private">Private Key
                     {{#if Mist.keyAddController.generatingKey}}
-                        <div class="ajax-loader key-add-loader"></div>
+                        <div id="key-generate-loader" class="ajax-loader key-add-loader"></div>
                     {{else}} {{#if Mist.keyAddController.uploadingKey}}
                         <div class="ajax-loader key-add-loader"></div>
                     {{/if}} {{/if}}
@@ -92,7 +92,7 @@
             </div>
 
             {{#if Mist.keyAddController.addingKey}}
-                <div class="ajax-loader"></div>
+                <div id="key-add-loader" class="ajax-loader"></div>
             {{/if}}
 
             <!-- Back and Add buttons -->
