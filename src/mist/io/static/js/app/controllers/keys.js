@@ -347,26 +347,28 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
 
             _updateFilteredKeys: function() {
-                var keys = [];
+                Ember.run(this, function() {
+                    var keys = [];
 
-                if (this.searchTerm) {
-                    var that = this;
-                    this.model.forEach(function(key) {
-                        var regex = new RegExp(that.searchTerm);
+                    if (this.searchTerm) {
+                        var that = this;
+                        this.model.forEach(function(key) {
+                            var regex = new RegExp(that.searchTerm);
 
-                        if (regex.test(key.id)) {
-                            keys.push(key);
-                        } else {
-                            if (key.selected) {
-                                key.set('selected', false);
+                            if (regex.test(key.id)) {
+                                keys.push(key);
+                            } else {
+                                if (key.selected) {
+                                    key.set('selected', false);
+                                }
                             }
-                        }
-                    });
-                } else {
-                    keys = this.model;
-                }
+                        });
+                    } else {
+                        keys = this.model;
+                    }
 
-                this.set('filteredKeys', keys);
+                    this.set('filteredKeys', keys);
+                });
             },
 
 

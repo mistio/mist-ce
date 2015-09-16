@@ -158,6 +158,8 @@ define('app/views/machine', ['app/views/page'],
                     this.machine.extra.os_type ||
                     this.machine.extra.DISTRIBUTIONVENDOR
                     '';
+                    
+                if (!imageId) return 'image-generic';
 
                 // Use .toString() because digital ocean returns
                 // an number instead of a string which breaks the search

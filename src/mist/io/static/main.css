@@ -1297,6 +1297,8 @@ ul.checkbox-list .ui-grid-b {
 
 /* OK - Cancel
 ------------------------------------------------------------------------------*/
+
+
 .ok-cancel {
     width: 100%;
     margin: 16px 0 0;
@@ -1441,6 +1443,12 @@ ul.checkbox-list .ui-grid-b {
 #dialog-popup .duration {
     font-family: monospace;
     font-size: 11px;
+}
+
+#dialog-popup .ui-shadow {
+    -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
+    -moz-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
 }
 
 /* Border radius override */

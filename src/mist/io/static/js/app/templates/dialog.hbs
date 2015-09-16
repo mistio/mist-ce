@@ -68,12 +68,12 @@
 
             {{#if view.isOK}}
 
-                <a class="ui-btn ui-btn-d ui-corner-all ui-caps"
+                <a class="ui-btn ui-btn-d ui-caps"
                     {{action "confirm" target=view}}>OK</a>
 
             {{else}}{{#if view.isBack}}
 
-                <a class="ui-btn ui-btn-a ui-corner-all ui-caps back"
+                <a class="ui-btn ui-btn-a ui-caps back"
                     {{action "confirm" target=view}}>Back</a>
 
             {{else}}
@@ -85,7 +85,7 @@
                             {{action "reject" target=view}}>
                                 Cancel
                         </a>
-                        <a class="ui-btn ui-btn-d ui-caps"
+                        <a class="ui-btn ui-btn-d ui-shadow ui-caps ui-shadow"
                             {{action "confirm" target=view}}>
                                 OK
                         </a>
@@ -96,7 +96,7 @@
                             {{action "reject" target=view}}>
                                 No
                         </a>
-                        <a class="ui-btn ui-caps {{if Mist.dialogController.options.danger 'no' 'ui-btn-d'}}"
+                        <a class="ui-btn ui-caps ui-shadow {{if Mist.dialogController.options.danger 'no' 'ui-btn-d'}}"
                             {{action "confirm" target=view}}>
                                 Yes
                         </a>

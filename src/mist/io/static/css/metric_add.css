@@ -29,7 +29,10 @@
 }
 
 #metric-add .nest .ui-btn {
-    border-top-color: #eeedeb;
+    border: none;
+    padding-top: .6em;
+    padding-bottom: .6em;
+    border-top: 1px solid #eeedeb;
 }
 
 #metric-add .margin {

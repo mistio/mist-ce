@@ -18,13 +18,24 @@ define('app/views/image', ['app/views/page'],
             image: null,
             extra: null,
 
+            providerIconClass: function() {
+                if (!this.image || !this.image.backend || !this.image.backend.provider)
+                    return '';
+                return 'provider-' + this.image.backend.getSimpleProvider();
+            }.property('image.backend.provider'),
+
+
+            imageIconClass: function () {
+                if (!this.image) return 'image-generic';
+                return 'image-' + this.image.backend.images.getImageOS(this.image.id);
+            }.property('image'),
+
 
             //
             //  Initialization
             //
 
             load: function() {
-                console.log(this.image);
                 Ember.run(this, function() {
                     this.updateCurrentImage();
                     if (this.image.id) {
