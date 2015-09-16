@@ -642,7 +642,6 @@ var setupMainChannel = function(socket, callback) {
         Mist.graphsController._handleSocketResponse(data);
     })
     .on('notify', function (data){
-
         if (!(data.title && data.body) && !data.machine_id) {
             var msg = data.title || data.body;
             Mist.notificationController.notify(msg);
@@ -655,7 +654,6 @@ var setupMainChannel = function(socket, callback) {
         var machineId = data.machine_id;
         var backendId = data.backend_id;
         var machine = Mist.backendsController.getMachine(machineId, backendId);
-
         if (machine && machine.id) {
             dialogBody.push({
                 link: machine.name,

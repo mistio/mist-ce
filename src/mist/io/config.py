@@ -22,6 +22,23 @@ except IOError:
     log.warning("No settings.py file found.")
 except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
+
+# If ETCD host and port are configured in the settings.py file, we'll try
+# to import the etcd client, and use the etcd information instead of the settings.py
+# In any other case we fall back to using defaults and settings.py
+ETCD_HOST = settings.get("ETCD_HOST", None)
+ETCD_PORT = settings.get("ETCD_PORT", None)
+etcd_client = None
+
+if ETCD_HOST:
+    try:
+        import etcd
+        from etcd import EtcdKeyNotFound
+        etcd_client = etcd.Client(host=ETCD_HOST, port=int(ETCD_PORT))
+    except ImportError:
+        etcd_client = None
+
+
 CORE_URI = settings.get("CORE_URI", "https://mist.io")
 SSL_VERIFY = settings.get("SSL_VERIFY", True)
 JS_BUILD = settings.get("JS_BUILD", False)
@@ -35,9 +52,32 @@ COMMAND_TIMEOUT = settings.get("COMMAND_TIMEOUT", 20)
 ALLOW_CONNECT_LOCALHOST = settings.get('ALLOW_CONNECT_LOCALHOST', True)
 ALLOW_CONNECT_PRIVATE = settings.get('ALLOW_CONNECT_PRIVATE', True)
 
+if etcd_client:
+    try:
+        result = etcd_client.get('/services/memcache/url')
+        MEMCACHED_HOST = [result.value]
+    except EtcdKeyNotFound:
+        MEMCACHED_HOST = settings.get("MEMCACHED_HOST", ["127.0.0.1:11211"])
+
+    try:
+        result = etcd_client.get('/services/rabbitmq/url')
+        RABBITMQ_URL = result.value
+    except EtcdKeyNotFound:
+        RABBITMQ_URL = settings.get("RABBITMQ_URL", 'localhost:5672')
+
+    try:
+        result = etcd_client.get('/services/amqp/url')
+        AMQP_URL = "amqp://guest:guest@%s/" % result.value
+    except EtcdKeyNotFound:
+        AMQP_URL = settings.get("AMQP_URL", "amqp://guest:guest@127.0.0.1/")
+else:
+    MEMCACHED_HOST = settings.get("MEMCACHED_HOST", ["127.0.0.1:11211"])
+    RABBITMQ_URL = settings.get("RABBITMQ_URL", 'localhost:5672')
+    AMQP_URL = settings.get("AMQP_URL", "amqp://guest:guest@127.0.0.1/")
+
 # celery settings
 CELERY_SETTINGS = {
-    'BROKER_URL': 'amqp://guest:guest@127.0.0.1/',
+    'BROKER_URL': AMQP_URL,
     'CELERY_TASK_SERIALIZER': 'json',
     'CELERYD_LOG_FORMAT': PY_LOG_FORMAT,
     'CELERYD_TASK_LOG_FORMAT': PY_LOG_FORMAT,

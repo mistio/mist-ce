@@ -1,5 +1,10 @@
 """User defined settings"""
 
+## ETCD host
+# The ETCD_HOST should be the docker0 interface ip (in most cases)
+# ETCD_HOST = "127.0.0.1"
+# ETCD_PORT = 4001
+
 ## URI of hosted mist service
 #CORE_URI = "https://mist.io"
 
@@ -21,6 +26,7 @@
 ## SSH connection timeout
 #COMMAND_TIMEOUT = 20
 
+#RABBITMQ_URL = 'localhost:5672'
 
 ## Celery backend for task results
 #CELERY_BACKEND = 'amqp://guest:guest@127.0.0.1:5671//'

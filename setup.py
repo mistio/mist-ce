@@ -28,6 +28,7 @@ requires = [
     'websocket-client',
     'sockjs-tornado',
     'pika',
+    'python-etcd'
 ]
 
 setup(name='mist.io',
