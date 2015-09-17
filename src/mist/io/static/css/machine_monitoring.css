@@ -178,11 +178,12 @@
 }
 
 .command-container {
-    overflow-x: auto;
     font-family: monospace;
     text-shadow: none;
     background: #444;
     font-size: 11px;
     color: #fff;
     padding: 6px;
+    height: auto;
+    white-space: normal !important;
 }

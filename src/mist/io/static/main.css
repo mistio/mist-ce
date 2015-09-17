@@ -126,11 +126,12 @@ h4 {
 .ui-popup .ui-header .close {
     position: absolute;
     right: 16px;
-    top: 12px;
+    top: 11px;
     color: rgba(0,0,0,0.2);
     font-size: 22px;
     text-decoration: none;
     outline: none;
+    font-size-adjust: 0.7;
 }
 .ui-popup .ui-header .close:hover {
     color: #444;
