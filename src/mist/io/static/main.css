@@ -577,8 +577,8 @@ textarea {
     #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
     #create-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
     #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading {
-        width: 62px;
-        height: 62px;
+        width: 63px;
+        height: 63px;
     }
 
     #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle,
