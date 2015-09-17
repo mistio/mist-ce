@@ -76,11 +76,6 @@
     display: none;
 }
 
-#network-create .ajax-loader {
-	margin-top: -15px;
-	margin-bottom: 5px;
-}
-
 #network-create .ui-checkbox label:hover {
     background-color: #FAF9F4;
     border-color: #FAF9F4;

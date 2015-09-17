@@ -1315,6 +1315,11 @@ ul.checkbox-list .ui-grid-b {
     float: left;
 }
 
+.ok-cancel a.full-width,
+.ok-cancel button.full-width {
+    width: 100% !important;
+}
+
 .ok-cancel .ui-btn.ui-first-child.ui-last-child,
 .ok-cancel .ui-btn.ok-only {
     width: 100% !important;

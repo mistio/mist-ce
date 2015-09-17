@@ -18,6 +18,7 @@ define('app/controllers/network_create', ['ember'],
             //
 
             formReady: null,
+            creatingNetwork: false,
             network: Ember.Object.create({
                 name: null,
                 backend: null,
