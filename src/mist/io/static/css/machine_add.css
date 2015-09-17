@@ -9,6 +9,15 @@
     top: 0;
     right: 0;
 }
+#create-machine .ui-btn {
+    box-shadow: none;
+    position: relative;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    font-size: 18px;
+    display: block;
+}
 
 #create-machine.ui-collapsible-collapsed {
     width: 255px;
@@ -21,7 +30,7 @@
 }
 
 #create-machine.floating-collapsible > h4.ui-collapsible-heading > a {
-    padding: 20px 91px 20px 50px !important;
+    padding: 20px 91px 20px 65px !important;
 }
 
 #create-machine-overlay {
@@ -37,7 +46,7 @@
     width: 278px;
 }
 #machine-create .docker {
-	display:none;
+    display:none;
 }
 #machine-create label {
     margin-top: 1em;
@@ -78,6 +87,10 @@
     padding-top: 5.5px !important;
     padding-bottom: 5.5px !important;
 }
+#machine-create .ui-collapsible .ui-listview .ui-btn {
+    font-size: 16px;
+    border: none;
+}
 #machine-create h4.select-provider a,
 #machine-create h4 a:hover,
 #machine-create ul li a:hover {
@@ -104,12 +117,12 @@
     border-color: #FAF9F4 !important;
 }
 #machine-create .ok-cancel div:first-child .ui-btn {
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
 }
 #machine-create .ok-cancel div:nth-child(2) .ui-btn {
-	border-top-left-radius: 0px;
-	border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
 }
 #create-machine-cost {
     padding: 10px;
@@ -118,16 +131,16 @@
     white-space: normal;
 }
 #create-machine-network {
-	display: none;
+    display: none;
 }
 #create-machine-network label {
-	margin-top: 0;
+    margin-top: 0;
 }
 #create-machine-network fieldset {
-	margin-top: 0;
+    margin-top: 0;
 }
 #create-machine-network .ui-collapsible-content {
-	padding: 0;
+    padding: 0;
 }
 #machine-create #script .ui-slider {
     width: 40%;

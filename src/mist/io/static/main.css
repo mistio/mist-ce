@@ -376,7 +376,7 @@ body {
 /* Ajax loader
 -----------------------------------------------------------------------------------------------------------*/
 .ajax-loader {
-    background-image: url("/resources/images/loader.gif");
+    background-image: url("/resources/images/loader@2x.gif");
     background-position: center !important;
     background-repeat: no-repeat;
     background-size: 16px;
