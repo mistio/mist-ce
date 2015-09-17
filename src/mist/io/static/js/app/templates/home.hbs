@@ -15,6 +15,11 @@
     <div role="main" class="ui-content" data-theme="c">
 
         {{#if Mist.backendsController.loading}}
+            <!-- Loader !-->
+        {{else}}
+            {{#if Mist.backendsController.model}}
+                {{view "backendAdd"}}
+            {{else}}
             <div id="no-collection" class="ui-responsive">
                 <div id="no-collection-inner" class="ui-shadow">
                     <span class="icon-cloud-check"></span>
@@ -23,11 +28,10 @@
                     {{view "backendAdd"}}
                     <p>
                         Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM & bare metal hosts.
-                    </p>                    
+                    </p>
                 </div>
             </div>
-        {{else}}
-            {{view "backendAdd"}}
+            {{/if}}            
         {{/if}}
 
         <!-- Backends list -->

@@ -13,6 +13,10 @@
     min-height: 800px;
 }
 
+#no-collection #add-backend-overlay {
+    min-height: 1200px;
+}
+
 h4.pendingSelect > a {
     background-color: #0099cc !important;
     color: #fff !important;
