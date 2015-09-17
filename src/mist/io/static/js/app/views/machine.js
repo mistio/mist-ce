@@ -47,7 +47,6 @@ define('app/views/machine', ['app/views/page'],
                     var machine = Mist.backendsController.getRequestedMachine();
                     if (machine)
                         that.get('controller').set('model', machine);
-
                     if (that.isDestroyed)
                         return;
 

@@ -43,7 +43,7 @@
     margin: 0px auto;
     max-width: 1200px;
     overflow: visible !important;
-    padding: 1.2% 1.25% 1% 1.25%;
+    padding: 15px;
 }
 
 #banner-logo {
@@ -1133,23 +1133,26 @@ ul.checkbox-list .ui-grid-b {
     box-shadow: 0 0 0 0;
 }
 
-#me-btn .name {
+#me-btn .owner {
     margin-top: 24px;
     display: inline-block;
     font-size: 12.5px;
     color: #444;
     font-weight: 400;
     text-shadow: none;
+}
+
+#me-btn .owner.name {
     text-transform: uppercase;
 }
 
 @media only screen and (max-width: 600px) {
-    #me-btn .name {
+    #me-btn .owner {
         display: none;
     }
 }
 
-#me-btn .name:hover {
+#me-btn .owner:hover {
     cursor: pointer;
 }
 

@@ -18,14 +18,17 @@ define('app/views/user_menu', ['ember', 'md5'],
             accountUrl: '/account',
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +
                   encodeURIComponent('https://mist.io/resources/images/sprite-images/user.png') +'&s='+(window.devicePixelRatio > 1.5 ? 100 : 50)),
-            gravatarName: (FIRST_NAME && LAST_NAME) ? FIRST_NAME + ' ' + LAST_NAME : EMAIL,
+            hasName: Ember.computed(function() {
+                return FIRST_NAME && LAST_NAME;
+            }),
+            gravatarName: Ember.computed('hasName', function() {
+                return this.get('hasName') ? FIRST_NAME + ' ' + LAST_NAME : EMAIL;
+            }),
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //  Actions
+            //
 
             actions: {
 

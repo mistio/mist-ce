@@ -1,6 +1,6 @@
 <a id="me-btn" {{action "meClicked" target=view}}>
 	{{#if Mist.authenticated}}
-		<span class="name">{{view.gravatarName}}</span>
+		<span class="owner {{if view.hasName 'name'}}">{{view.gravatarName}}</span>
 	{{/if}}
 
 	{{#if view.gravatarURL}}
