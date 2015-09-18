@@ -26,7 +26,9 @@ define('app/views/graph_button', [],
             //
 
             load: function () {
-                this.set('buttonId', this.graph.id + '-btn');
+                Ember.run.next(this, function(){
+                    this.set('buttonId', this.graph.id + '-btn');
+                });
             }.on('didInsertElement'),
 
 

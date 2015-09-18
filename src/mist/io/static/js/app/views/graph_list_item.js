@@ -233,13 +233,6 @@ define('app/views/graph_list_item', ['d3', 'c3'],
             //  Observers
             //
 
-            /*isStreamingObserver: function () {
-                if (Mist.graphsController.stream.isStreaming)
-                    this.enableAnimation();
-                else
-                    this.disableAnimation(true);
-            }.observes('Mist.graphsController.stream.isStreaming'),*/
-
             isVisibleObserver: function () {
                 var isHidden = this.isHidden,
                 id = '#' + this.graph.id + '-0';
