@@ -55,6 +55,7 @@ define('app/views/image', ['app/views/page'],
                     if (image) this.get('controller').set('model', image);
 
                     this.set('image', this.get('controller').get('model'));
+                    Mist.machineAddController.set('selectedImage', this.get('image'));
                     if (this.image.id) {
                         this.updateExtra();
                     }

@@ -31,20 +31,22 @@
                 {{Mist.machineAddController.newMachineProvider.title}}
             </h4>
 
+            {{#unless Mist.machineAddController.selectedImage}}
             <ul data-role="listview" >
                 {{#each Mist.backendsController.model as |backend|}}
-                        {{#if backend.canCreateMachine}}
-                            <li data-icon="false">
-                                <a {{action "selectProvider" backend target=view}}>
-                                    <span class="provider-icon-small">
-                                        <span class={{backend.className}}></span>
-                                    </span>
-                                    {{backend.title}}
-                                </a>
-                            </li>
-                        {{/if}}
+                    {{#if backend.canCreateMachine}}
+                        <li data-icon="false">
+                            <a {{action "selectProvider" backend target=view}}>
+                                <span class="provider-icon-small">
+                                    <span class={{backend.className}}></span>
+                                </span>
+                                {{backend.title}}
+                            </a>
+                        </li>
+                    {{/if}}
                 {{/each}}
             </ul>
+            {{/unless}}
         </div>
 
         <!-- Select Image -->
@@ -66,6 +68,7 @@
                 {{Mist.machineAddController.newMachineImage.name}}
             </h4>
 
+            {{#unless Mist.machineAddController.selectedImage}}
             <ul data-role="listview" >
                 {{#each Mist.machineAddController.newMachineProvider.images.model as |image|}}
                     {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
@@ -87,6 +90,7 @@
                     {{/if}} {{/unless}}
                 {{/each}}
             </ul>
+            {{/unless}}
         </div>
 
         <!-- Select Size -->

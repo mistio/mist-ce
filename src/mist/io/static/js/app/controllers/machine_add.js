@@ -14,6 +14,7 @@ define('app/controllers/machine_add', ['ember'],
             callback: null,
             formReady: null,
             addingMachine: null,
+            selectedImage: null,
 
             newMachineKey: null,
             newMachineName: null,
@@ -49,6 +50,7 @@ define('app/controllers/machine_add', ['ember'],
                 this._clear();
                 this._updateFormReady();
                 this.set('callback', callback);
+                this.view.checkImageSelected(this.get('selectedImage'));
             },
 
             close: function() {

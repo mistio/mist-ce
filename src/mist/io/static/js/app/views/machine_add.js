@@ -127,6 +127,21 @@ define('app/views/machine_add', ['app/views/controlled'],
                  this.$('.ui-collapsible').removeClass('selected');
              },
 
+             checkImageSelected: function(image) {
+                if (image) {
+                    this.triggerAction({
+                        action:'selectProvider',
+                        target: this,
+                        actionContext: image.backend
+                    });
+
+                    this.triggerAction({
+                        action:'selectImage',
+                        target: this,
+                        actionContext: image
+                    });
+                }
+             },
 
              fieldIsReady: function (field) {
                 $('#create-machine-' + field)
@@ -251,11 +266,11 @@ define('app/views/machine_add', ['app/views/controlled'],
                     if (backend.get('requiresNetworkOnCreation')) {
                         if (backend.networks.model.length > 0) {
                             $('#create-machine-network').show();
-                            $('label[for=create-machine-script]').text('Script:');
+                            $('label[for=create-machine-script]').text('Script');
                         }
                     } else {
                         $('#create-machine-network').hide();
-                        $('label[for=create-machine-script]').text('Script:');
+                        $('label[for=create-machine-script]').text('Script');
                     }
 
                     var view = Mist.machineAddController.view;
