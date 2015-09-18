@@ -13,14 +13,13 @@
             data-expanded-icon="noicon"
             data-iconpos="none"
             data-collapsed="false">
-            {{#if view.provider}}
-            <h4 class="{{if view.provider.title '' 'select-provider'}}" data-icon="false">
+            <h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed {{if view.provider '' 'select-provider'}}" data-icon="false">
                    <span class="provider-icon-small">
                         <span class={{view.provider.className}}></span>
                     </span>
                     {{view.provider.title}}
             </h4>
-            {{/if}}
+
             <ul class="mist-select" data-role="listview">
                 {{#each view.providerList as |prov|}}
                     <li data-icon="false">
