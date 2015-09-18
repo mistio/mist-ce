@@ -18,8 +18,7 @@
         class="large-popup
             ui-popup
             ui-body-inherit
-            ui-overlay-shadow
-            ui-corner-all"
+            ui-overlay-shadow"
         data-role="popup"
         data-enhanced="true"
         data-transition="flip"
@@ -68,7 +67,7 @@
 
             {{#if view.isOK}}
 
-                <a class="ui-btn ui-btn-d ui-caps"
+                <a class="ui-btn ui-shadow ui-btn-d ui-caps"
                     {{action "confirm" target=view}}>OK</a>
 
             {{else}}{{#if view.isBack}}
