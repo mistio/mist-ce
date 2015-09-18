@@ -22,40 +22,16 @@
     margin: 0;
     height: 38px;
 }
-#image-list-page .checkbox-link .image-tags:after {
-    content: '';
-    clear: both;
-    display: table;
-}
-@-moz-document url-prefix() {
-    #image-list-page .checkbox-link a {
-        height: 38px;
-    }
-
-    #image-list-page .checkbox-link h3 {
-        width: 50%;
-        position: relative;
-        top: 4px;
-    }
-
-    #image-list-page .checkbox-link .tag {
-        position: relative;
-        bottom: 33px;
-    }
-
-    @media only screen and  (max-width: 600px) {
-        #image-list-page .checkbox-link a {
-            height: 70px;
-        }
-
-        #image-list-page .checkbox-link .tag {
-            position: relative;
-            bottom: 0;
-        }
-    }
+#image-list-page .checkbox-link h3 {
+    width: 100%;
 }
 /* Conditional for < 600px */
 @media only screen and  (max-width: 600px) {
+    #image-list-page .checkbox-link .ui-grid-a>.ui-block-a,
+    #image-list-page .checkbox-link .ui-grid-a>.ui-block-b {
+        width: 100%;
+    }
+
     #image-list-page .checkbox-link h3 {
         width: 100%;
         position: relative;
