@@ -40,14 +40,15 @@ define('app/views/machine_list', ['app/views/page'],
              */
 
             updateFooter: function () {
-
                 if (Mist.machineShellController.isOpen)
                     return;
                 var connectText = 'Shell';
                 this.set('selectedMachine', null)
                 switch (Mist.backendsController.selectedMachines.length) {
                 case 0:
-                    $('#machine-list-page .ui-footer').slideUp();
+                    $('#machine-list-page .ui-footer')
+                    .slideUp()
+                    .find('.ui-btn').addClass('ui-state-disabled');
                     break;
                 case 1:
                     var machine = Mist.backendsController.selectedMachines[0];
