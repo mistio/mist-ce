@@ -19,10 +19,10 @@ define('app/views/key_edit', ['app/views/popup'],
              */
 
             updateSaveButton: function () {
-                if (Mist.keysController.renamingKey || !Mist.keyEditController.formReady) {
-                    $('#rename-key-ok').addClass('ui-state-disabled');
+                if (Mist.keyEditController.formReady) {
+                    $('#rename-key-ok').removeClass('ui-state-disabled');                    
                 } else {
-                    $('#rename-key-ok').removeClass('ui-state-disabled');
+                    $('#rename-key-ok').addClass('ui-state-disabled');
                 }
             },
 
@@ -55,7 +55,7 @@ define('app/views/key_edit', ['app/views/popup'],
 
             updateSaveButtonObserver: function () {
                 Ember.run.once(this, 'updateSaveButton');
-            }.observes('Mist.keyEditController.formReady', 'Mist.keysController.renamingKey')
+            }.observes('Mist.keyEditController.formReady')
         });
     }
 );

@@ -39,6 +39,7 @@
 
             <!-- New backend name text field -->
             <form {{action "saveClicked" on="submit" target=view}}>
+                <label for="machine-edit-new-name">New name</label>
                 {{view Mist.TextField
                     id="machine-edit-new-name"
                     value=Mist.machineEditController.newName}}
