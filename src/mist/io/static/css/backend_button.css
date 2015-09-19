@@ -2,8 +2,8 @@
 /* Backend Button CSS
 -----------------------------------------------------------------------------------------------------------*/
 #backend-buttons {
-    margin-bottom: 25px;
-    margin-top: 12px;
+    margin-bottom: 32px;
+    margin-top: 8px;
 }
 
 #backend-buttons a:after {
@@ -62,6 +62,7 @@
 #backend-buttons .ui-controlgroup-controls .ui-btn {
     border-width: 0;
     margin-top: 10px;
+    margin-bottom: 18px;
     margin-right: .5em;
     padding: 6px 0 6px !important;
     background-color: #fff;
