@@ -226,7 +226,6 @@ define('app/views/machine_monitoring',
                 },
 
                 removeClicked: function (graph) {
-
                     var machine = this.machine;
                     var message = 'Are you sure you want to remove "' +
                         graph.datasources[0].metric.name + '"';
@@ -532,7 +531,6 @@ define('app/views/machine_monitoring',
                         this.rules.removeObject(event.object);
             },
 
-
             _metricAdded: function (event) {
                 if (this.machine.equals)
                     if (this.machine.equals(event.machine))
@@ -550,10 +548,11 @@ define('app/views/machine_monitoring',
             //
 
             hasMonitoringObserver: function () {
-                if (this.machine.hasMonitoring)
-                    this.showMonitoring();
-                else
-                    this.hideMonitoring();
+                if (this.machine.hasMonitoring){
+                    Ember.run.next(this, function(){this.showMonitoring()});
+                } else {
+                    Ember.run.next(this, function(){this.hideMonitoring()});
+                }
             }.observes('machine.hasMonitoring').on('didInsertElement'),
 
             metricsObsever: function () {
