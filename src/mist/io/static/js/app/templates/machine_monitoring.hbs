@@ -20,7 +20,7 @@
 
         {{component "rule-list" rules=view.rules}}
 
-        <div id="monitoring-bottom-btns">
+        <div id="monitoring-bottom-btns" class="{{if view.pendingFirstStats 'hidden'}}">
             <div data-rule="ui-grid-a">
                 <div class="ui-block-a">
                     <a id="add-rule-button"
