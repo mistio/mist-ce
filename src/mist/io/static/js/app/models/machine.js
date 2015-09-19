@@ -53,13 +53,18 @@ define('app/models/machine', ['ember'],
                 stdout: null,
             }),
 
-            isUnknown: function () {
-                return this.get('state') == 'unknown';
-            }.property('state'),
 
             //
             //  Computed Properties
             //
+
+            isUnknown: function () {
+                return this.get('state') == 'unknown';
+            }.property('state'),
+
+            isRunning: function () {
+                return this.get('state') == 'running';
+            }.property('state'),
 
             netled1: function() {
                 if (this.latency > 0 &&  this.latency < 1000) return 'on';

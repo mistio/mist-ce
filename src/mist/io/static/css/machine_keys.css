@@ -15,6 +15,11 @@
     text-align: center;
 }
 
+#machine-keys-panel .ui-header > .ui-title {
+	min-width: 120px;
+    text-transform: uppercase;
+}
+
 #machine-keys-panel .small-list-item {
 	cursor: pointer;
 	padding: 6px 15px;

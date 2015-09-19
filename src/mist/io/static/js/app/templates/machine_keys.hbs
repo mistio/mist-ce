@@ -13,7 +13,7 @@
     <div data-role="content" data-theme="c">
 
         <a id="associate-btn"
-           class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all ui-caps"
+           class="creation-button ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all ui-caps"
            {{action "associateClicked" target=view}}>Add Key</a>
 
         {{#if Mist.machineKeysController.associatedKeys}}
@@ -43,7 +43,7 @@
     data-position-to="#machine-keys"
     data-theme="a">
     <div class="ui-header ui-caps">
-        <h1 class="ui-title">Add Key</h1>
+        <h1 class="ui-title">{{selectedKey.id}}</h1>
 
         <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
     </div>
@@ -60,7 +60,7 @@
     data-role="popup"
     data-overlay-theme="b"
     data-transition="flip"
-    data-position-to=".creation-button">
+    data-position-to=".keys-button">
 
     <div class="ui-header ui-caps">
         <h1 class="ui-title">Add Key</h1>
@@ -75,7 +75,7 @@
         </li>
         {{/each}}
         <li data-icon="false" data-theme="d">
-            <a {{action "newKeyClicked" target=view}}>New key</a>
+            <a id="new-key-btn" {{action "newKeyClicked" target=view}}>New key</a>
         </li>
     </ul>
 </div>
@@ -84,7 +84,7 @@
     class="large-popup"
     data-role="popup"
     data-overlay-theme="b"
-    data-position-to=".creation-button"
+    data-position-to=".keys-button"
     data-transition="flip">
 
     <div class="ui-header ui-caps">

@@ -136,10 +136,6 @@ define('app/views/machine', ['app/views/page'],
             //  Computed Properties
             //
 
-            isRunning: function () {
-                return this.machine ? this.machine.state == 'running' : false;
-            }.property('machine.state'),
-
             providerIconClass: function() {
                 if (!this.machine || !this.machine.backend || !this.machine.backend.provider)
                     return '';
@@ -157,7 +153,7 @@ define('app/views/machine', ['app/views/page'],
                     this.machine.extra.os_type ||
                     this.machine.extra.DISTRIBUTIONVENDOR
                     '';
-                    
+
                 if (!imageId) return 'image-generic';
 
                 // Use .toString() because digital ocean returns

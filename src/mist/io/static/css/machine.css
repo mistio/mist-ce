@@ -41,12 +41,29 @@
 #single-machine-page .ui-block-b h4.ui-title.stopped {
     color: #d96557;
 }
-#single-machine-page .creation-button {
+#single-machine-page .keys-button {
     margin: 0;
     float: right;
     padding: 20px 60px 20px 20px !important;
     font-weight: 400 !important;
     font-size: 18px;
+}
+#single-machine-page  .keys-button.icon-keys {
+    color: #444 !important;
+}
+#single-machine-page  .keys-button.icon-keys:hover {
+    background-color: #66C2E0 !important;
+    color: #fff !important;
+}
+#single-machine-page  .keys-button.icon-keys:active {
+    background-color: #0081AC !important;
+    color: #fff !important;
+}
+#single-machine-page .keys-button.icon-keys:after {
+    right: 18px !important;
+}
+#single-machine-page #associate-btn:after {
+    top: -14px;
 }
 #single-machine-page .creation-button:after {
     background-image: none;
