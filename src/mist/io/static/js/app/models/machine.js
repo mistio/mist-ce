@@ -104,7 +104,7 @@ define('app/models/machine', ['ember'],
 
             hasKeys: function () {
                 return !!Mist.keysController.getMachineKeysCount(this);
-            }.property('Mist.keysController.model.[].machines'),
+            }.property('keysCount'),
 
             hasOpenIncident: function () {
                 if (!Mist.openIncidents) {
