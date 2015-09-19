@@ -7,17 +7,17 @@ define('app/views/machine_list_item', ['app/views/list_item'],
     function (ListItemComponent) {
         return App.MachineListItemComponent = ListItemComponent.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
             layoutName: 'machine_list_item',
             machine: null,
             classNameBindings: ['machineState', 'monitoringState'],
 
 
-            /**
-             *  Computed Properties
-             */
+            //
+            //  Computed Properties
+            //
 
             machineState: function() {
                 return this.machine.get('state');
@@ -33,11 +33,9 @@ define('app/views/machine_list_item', ['app/views/list_item'],
             }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //  Methods
+            //
 
             updateCheckbox: function () {
                 var element = $('#' + this.elementId + ' input.ember-checkbox');
@@ -50,17 +48,12 @@ define('app/views/machine_list_item', ['app/views/list_item'],
             },
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //  Actions
+            //
 
             actions: {
-
-
                 disassociateGhostMachine: function () {
-
                     // This method is called ONLY from inside the
                     // single key view. That is why we get the parent
                     // view to get "keyId"
@@ -86,11 +79,9 @@ define('app/views/machine_list_item', ['app/views/list_item'],
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //  Observers
+            //
 
             machineSelectedObserver: function () {
                 Ember.run.once(this, 'updateCheckbox');

@@ -7,24 +7,20 @@ define('app/views/list_item', [],
     function () {
         return Ember.Component.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
             tagName: 'li',
 
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            //
+            //  Initialization
+            //
 
             renderListItem: function () {
-
                 // Prevent bad rendering
                 // (or at least... try to...)
-
                 var element = $('#' + this.elementId).hide();
                 Ember.run.next(this, function () {
                     try {

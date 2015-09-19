@@ -10,11 +10,10 @@ define('app/views/machine_list', ['app/views/page'],
             templateName: 'machine_list',
             selectedMachine: null,
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+
+            //
+            //  Initialization
+            //
 
             load: function () {
                 // Add event listeners
@@ -22,7 +21,6 @@ define('app/views/machine_list', ['app/views/page'],
                 Mist.backendsController.on('onSelectedMachinesChange', this, 'updateFooter');
 
             }.on('didInsertElement'),
-
 
             unload: function () {
 
@@ -33,11 +31,9 @@ define('app/views/machine_list', ['app/views/page'],
             }.on('willDestroyElement'),
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //  Methods
+            //
 
             updateFooter: function () {
                 if (Mist.machineShellController.isOpen)
@@ -61,7 +57,7 @@ define('app/views/machine_list', ['app/views/page'],
                     } else {
                         $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
                     }
-                    
+
                     if (machine.get('canConnect') && machine.state == 'running') {
                         $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
                     } else {
@@ -97,44 +93,33 @@ define('app/views/machine_list', ['app/views/page'],
             },
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //  Actions
+            //
 
             actions: {
-
-
                 createClicked: function () {
                     Mist.machineAddController.open();
                 },
-
 
                 tagsClicked: function () {
                     Mist.machineTagsController.open(Mist.backendsController.selectedMachines[0]);
                 },
 
-
                 actionsClicked: function () {
                     Mist.machinePowerController.open(Mist.backendsController.selectedMachines);
                 },
-
 
                 shellClicked: function () {
                     Mist.machineShellController.open(Mist.backendsController.selectedMachines[0]);
                 },
 
-
                 selectClicked: function () {
                     $('#select-machines-popup').popup('open').find('.ui-listview').listview('refresh');
                 },
 
-
                 selectionModeClicked: function (mode) {
-
                     $('#select-machines-popup').popup('close');
-
                     Mist.backendsController.model.forEach(function (backend) {
                         backend.machines.model.forEach(function (machine) {
                             machine.set('selected', mode == 'all' || mode == backend.title);

@@ -12,7 +12,9 @@ define('app/views/page', [],
             init: function () {
                 this._super();
                 Ember.run.scheduleOnce('afterRender', this, function() {
-                    this.$().enhanceWithin();
+                    var element = this.$();
+                    if (element)
+                        element.enhanceWithin();
                 });
             }
         });

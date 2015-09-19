@@ -1,4 +1,4 @@
-define('app/controllers/logs', ['app/models/log', 'ember'],
+define('app/controllers/logs', ['app/models/log'],
     //
     //  Logs Controller
     //

@@ -74,7 +74,7 @@ define('app/views/log_list_item', ['app/views/list_item'],
             backendTitle: function () {
                 var log = this.get('log');
                 var backendId = log.get('backend_id');
-                if (Mist.backendsController.backendExists(backendId))
+                if (Mist.backendsController && Mist.backendsController.backendExists(backendId))
                     return Mist.backendsController.getBackend(backendId).title;
                 return false;
             }.property('log.backend_id'),
@@ -83,8 +83,12 @@ define('app/views/log_list_item', ['app/views/list_item'],
                 var log = this.get('log');
                 var backendId = log.get('backend_id');
                 var machineId = log.get('machine_id');
-                return Mist.backendsController.getMachine(machineId, backendId);
+                return Mist.backendsController && Mist.backendsController.getMachine(machineId, backendId);
             }.property('log.machine_id'),
+
+            showEmail: function () {
+                return Mist.logs.namespace == 'manage_logs';
+            }.property(),
 
 
             //
