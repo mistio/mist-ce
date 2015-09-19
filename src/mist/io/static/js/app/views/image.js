@@ -36,7 +36,7 @@ define('app/views/image', ['app/views/page'],
             //
 
             load: function() {
-                Ember.run(this, function() {
+                Ember.run.next(this, function() {
                     this.updateCurrentImage();
                     if (this.image.id) {
                         this.updateExtra();

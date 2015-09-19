@@ -1141,6 +1141,7 @@ ul.checkbox-list .ui-grid-b {
     color: #444;
     font-weight: 400;
     text-shadow: none;
+    text-transform: uppercase;
 }
 
 #me-btn .owner.name {
