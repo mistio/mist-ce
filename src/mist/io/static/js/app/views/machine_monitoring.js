@@ -513,7 +513,7 @@ define('app/views/machine_monitoring',
                 Ember.run.later(this, function () {
                     forIn(this, response, function (metric, metricId) {
                         var metric = Mist.metricsController.getMetric(metricId);
-                        if (metric && !this.metrics.findBy('id', metric.id))
+                        if (metric && this.metrics && !this.metrics.findBy('id', metric.id))
                             this.metrics.pushObject(metric);
                     });
                 }, TIME_MAP.SECOND);
