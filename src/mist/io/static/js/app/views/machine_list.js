@@ -20,7 +20,6 @@ define('app/views/machine_list', ['app/views/page'],
                 Mist.machineAddController.set('selectedImage', null);
                 Mist.backendsController.on('onMachineProbe', this, 'updateFooter');
                 Mist.backendsController.on('onSelectedMachinesChange', this, 'updateFooter');
-
             }.on('didInsertElement'),
 
             unload: function () {

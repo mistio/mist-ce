@@ -38,14 +38,16 @@ define('app/controllers/machine_add', ['ember'],
                 // In case page is scrolled, opening the
                 // panel introduces an unpleasant view.
                 // Scrolling to top fixes that
+                $('#machine-create').find('[data-role="collapsible"]')
+                    .collapsible('option', 'collapsedIcon', 'carat-d')
+                    .collapsible('collapse');
                 $('#machine-create .docker').hide();
                 $('#machine-create .azure').hide();
                 $('#create-machine-location').addClass('ui-state-disabled');
                 $('#create-machine-image').addClass('ui-state-disabled');
                 $('#create-machine-size').addClass('ui-state-disabled');
                 $('#create-machine-key').addClass('ui-state-disabled');
-                $('#machine-create .ui-collapsible').collapsible('option', 'collapsedIcon', 'carat-d')
-                    .collapsible('collapse');
+                
 
                 this._clear();
                 this._updateFormReady();
