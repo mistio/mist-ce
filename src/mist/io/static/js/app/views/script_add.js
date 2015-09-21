@@ -118,6 +118,10 @@ define('app/views/script_add', ['app/views/controlled'],
                     newScript.set('url', DEFAULT_GITHUB_URL);
                 if (source.value == 'inline')
                     this.setScript();
+
+                Ember.run.next(function() {
+                    $('body').enhanceWithin();
+                });
             },
 
             closeTypeSelect: function () {
