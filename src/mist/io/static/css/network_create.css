@@ -10,17 +10,17 @@
 }
 
 #create-network.ui-collapsible-collapsed {
-    width: 240px;
+    width: 260px;
     position: relative;
     z-index: 2;
 }
 
 #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading > a {
-    padding: 20px 91px 20px 35px !important;
+    padding: 20px 91px 20px 30px !important;
 }
 
 #create-network.floating-collapsible > h4.ui-collapsible-heading > a {
-    padding: 20px 75px 20px 65px !important;
+    padding: 20px 75px 20px 50px !important;
 }
 
 #create-network-overlay {
@@ -41,9 +41,6 @@
 #network-create .ui-collapsible-content {
     max-height: 120px;
     overflow-y: auto;
-}
-#network-create .ui-collapsible-heading-toggle {
-    font-size: 16px;
 }
 #network-create .ui-collapsible-heading {
     text-transform: capitalize;
@@ -85,12 +82,13 @@
     border-color: #0099cc !important;
 }
 #network-create .ui-collapsible-content .ui-listview .ui-btn {
-    background-color: #faf9f4;
+    background-color: #fff;
     padding-left: .75em !important;
     border: none;
 }
 #network-create .ui-collapsible-content .ui-listview .ui-btn:hover {
-    background-color: #edece8;
+    background-color: #66C2E0;
+    color: #fff !important;
 }
 #network-create .ui-collapsible-content .ui-listview .ui-btn,
 #network-create .ui-collapsible-heading-toggle {

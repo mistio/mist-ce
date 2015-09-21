@@ -177,6 +177,8 @@ define('app/views/machine_add', ['app/views/controlled'],
                 $('#create-machine-monitoring').hide();
                 $('#machine-create .docker').show();
                 $('#machine-create #ports').show();
+                Mist.machineAddController.set('fullDocker', true);
+                Mist.machineAddController.set('simpleDocker', false);
             },
 
 
@@ -185,6 +187,8 @@ define('app/views/machine_add', ['app/views/controlled'],
                 $('#machine-create #location').hide();
                 $('#machine-create #size').hide();
                 $('#machine-create #ports').show();
+                Mist.machineAddController.set('fullDocker', false);
+                Mist.machineAddController.set('plainDocker', true);
             },
 
 

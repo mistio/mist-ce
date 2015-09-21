@@ -8,21 +8,21 @@
     <div id="machine-create" data-role="content" >
 
         <!-- Select Name -->
-
-        <label for="create-machine-name">Name</label>
-        {{view Mist.TextField
-               id="create-machine-name"
-               value=Mist.machineAddController.newMachineName}}
+        <div id="create-machine-name-wrapper" class="{{if Mist.machineAddController.newMachineName 'filled' 'empty'}} required">
+            <label for="create-machine-name">Name</label>
+            {{view Mist.TextField
+                   id="create-machine-name"
+                   value=Mist.machineAddController.newMachineName}}
+        </div>
 
         <!-- Select Provider -->
-
         <label>Provider</label>
         <div id="create-machine-provider"
             data-role="collapsible"
             data-iconpos="right"
             data-collapsed-icon="carat-d"
             data-expanded-icon="carat-u"
-            class="mist-select">
+            class="mist-select required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider 'filled' 'empty'}}">
             <h4>{{#if Mist.machineAddController.newMachineProvider.provider}}
                    <span class="provider-icon-small">
                         <span class="{{Mist.machineAddController.newMachineProvider.className}}"></span>
@@ -57,7 +57,8 @@
              data-iconpos="right"
              data-collapsed-icon="carat-d"
              data-expanded-icon="carat-u"
-             class="mist-select">
+
+             class="mist-select required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
             <h4>
                 {{#if Mist.machineAddController.newMachineImage.id}}
                     <span class="image-icon-small">
@@ -102,7 +103,7 @@
              data-collapsed-icon="carat-d"
              data-expanded-icon="carat-u"
 
-             class="mist-select">
+             class="mist-select {{if Mist.machineAddController.newMachineSize.id 'filled' 'empty'}} required">
             <h4>{{Mist.machineAddController.newMachineSize.name}}</h4>
 
             <ul data-role="listview" >
@@ -129,7 +130,7 @@
                  data-collapsed-icon="carat-d"
                  data-expanded-icon="carat-u"
 
-                 class="mist-select">
+                 class="mist-select {{if Mist.machineAddController.newMachineLocation.id 'filled' 'empty'}} required">
                 <h4>{{Mist.machineAddController.newMachineLocation.name}}</h4>
                 <ul data-role="listview">
                     {{#each Mist.machineAddController.newMachineProvider.locations.model as |location|}}
@@ -146,16 +147,20 @@
         <div class="docker">
 
             <!-- Environment Vars -->
-            <label for="create-machine-env">Environment Variables</label>
-            {{view Mist.TextArea
-                   id="create-machine-env"
-                   value=Mist.machineAddController.newMachineDockerEnvironment}}
+            <div id="create-machine-env" class="{{if Mist.machineAddController.fullDocker 'required'}} {{if Mist.machineAddController.newMachineDockerEnvironment 'filled' 'empty'}}">
+                <label for="create-machine-env">Environment Variables</label>
+                {{view Mist.TextArea
+                       id="create-machine-env"
+                       value=Mist.machineAddController.newMachineDockerEnvironment}}
+            </div>            
 
             <!-- Command -->
-            <label for="create-machine-command">Command</label>
-            {{view Mist.TextArea
-                   id="create-machine-command"
-                   value=Mist.machineAddController.newMachineDockerCommand}}
+            <div id="create-machine-command" class="{{if Mist.machineAddController.fullDocker 'required'}} {{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
+                <label for="create-machine-command">Command</label>
+                {{view Mist.TextArea
+                       id="create-machine-command"
+                       value=Mist.machineAddController.newMachineDockerCommand}}
+            </div>           
 
         </div>
 
@@ -169,7 +174,7 @@
              data-collapsed-icon="carat-d"
              data-expanded-icon="carat-u"
 
-             class="mist-select">
+             class="mist-select {{if Mist.machineAddController.newMachineKey.machines 'filled' 'empty'}} required">
             <h4>{{Mist.machineAddController.newMachineKey.id}}</h4>
 
             <ul data-role="listview">
@@ -194,7 +199,7 @@
                     data-collapsed-icon="carat-d"
                     data-expanded-icon="carat-u"
 
-                    class="mist-select">
+                    class="mist-select ui-state-disabled">
                 <h4>Networks</h4>
 
                 <fieldset data-role="controlgroup">
@@ -257,7 +262,7 @@
 
         <div id="ports">
             <!-- Expose Ports -->
-            <label>Ports</label>
+            <label for="create-machine-ports">Ports</label>
             {{view Mist.TextArea
                    id="create-machine-ports"
 
@@ -268,12 +273,14 @@
 
         <div class="azure">
             <!-- Expose Ports -->
-            <label>Ports</label>
-            {{view Mist.TextArea
-                   id="create-machine-azure-ports"
+            <div id="create-machine-azure-ports-wrapper" class="{{if Mist.machineAddController.newMachineKey.machines 'filled' 'empty'}} required">
+                <label for="create-machine-azure-ports">Ports</label>
+                {{view Mist.TextArea
+                       id="create-machine-azure-ports"
 
-                   placeholder="e.g. http tcp 80:80, smtp tcp 25:25, https tcp 443:443"
-                   value=Mist.machineAddController.newMachineAzurePorts}}
+                       placeholder="e.g. http tcp 80:80, smtp tcp 25:25, https tcp 443:443"
+                       value=Mist.machineAddController.newMachineAzurePorts}}
+            </div>            
         </div>
 
 
