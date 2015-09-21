@@ -1549,12 +1549,21 @@ ul.checkbox-list .ui-grid-b {
     background-color: #fff !important;
     font-weight: 400;
     border-radius: 0;
+    font-size: 14px;
+    line-height: 32px;
 }
 .ui-slider .ui-slider-handle {
+    border-radius: 0;
     background-color: #0099cc !important;
+    border-color: #0099cc !important;
+}
+.ui-slider .ui-slider-handle:hover {
+    background-color: #66C2E0 !important;
+    border-color: #66C2E0 !important;
 }
 
-.field-wrapper.empty.required .ui-input-text {
+.field-wrapper.empty.required .ui-input-text,
+.empty.required .ui-input-text {
     border-color: #0099cc !important;
 }
 

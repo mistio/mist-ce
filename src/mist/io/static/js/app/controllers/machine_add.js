@@ -183,6 +183,10 @@ define('app/controllers/machine_add', ['ember'],
                             formReady=false;
                 }
 
+                if (formReady && this.addingMachine) {
+                    formReady = false;
+                }
+
                 this.set('formReady', formReady);
             },
 

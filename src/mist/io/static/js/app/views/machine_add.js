@@ -209,15 +209,6 @@ define('app/views/machine_add', ['app/views/controlled'],
             },
 
 
-             updateLaunchButton: function () {
-                if (Mist.machineAddController.formReady) {
-                    $('#create-machine-ok').removeClass('ui-state-disabled');
-                } else {
-                    $('#create-machine-ok').addClass('ui-state-disabled');
-                }
-             },
-
-
             /**
              *
              *  Actions
@@ -414,12 +405,7 @@ define('app/views/machine_add', ['app/views/controlled'],
              }.observes('Mist.machineAddController.newMachineSize',
                         'Mist.machineAddController.newMachineImage',
                         'Mist.machineAddController.newMachineProvider',
-                        'Mist.machineAddController.newMachineLocation'),
-
-
-             formReadyObserver: function () {
-                Ember.run.once(this, 'updateLaunchButton');
-             }.observes('Mist.machineAddController.formReady')
+                        'Mist.machineAddController.newMachineLocation')
         });
     }
 );

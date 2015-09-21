@@ -9,7 +9,7 @@
         <!--
             Select Network Name
         -->
-        <div id="network-create-name-wrapper">
+        <div id="network-create-name-wrapper" class="{{if Mist.networkCreateController.network.name 'filled' 'empty'}} required">
 
             <label for="network-create-name">Name</label>
 
@@ -34,7 +34,7 @@
                 data-collapsed-icon="carat-d"
                 data-expanded-icon="carat-u"
                 data-theme="a"
-                class="mist-select">
+                class="mist-select {{if Mist.networkCreateController.network.backend 'filled' 'empty'}} required">
 
                 <h4>
                     {{#with Mist.networkCreateController.network as |network|}}
@@ -229,7 +229,7 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-d ui-shadow ui-first-child ui-last-child ui-caps {{if Mist.networkCreateController.creatingNetwork 'ui-state-disabled'}}" id="network-create-ok"
+            <a class="ui-btn ui-btn-d ui-shadow ui-first-child ui-last-child ui-caps {{if Mist.networkCreateController.formReady '' 'ui-state-disabled'}}" id="network-create-ok"
                 {{action "createClicked" target=view}}>Create</a>
         </div>
     </div>

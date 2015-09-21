@@ -299,7 +299,7 @@
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
             <a id="create-machine-ok"
-                class="ui-btn ui-btn-d ui-first-child ui-last-child ui-shadow ui-caps {{if Mist.machinesController.addingMachine 'ui-state-disabled'}}"
+                class="ui-btn ui-btn-d ui-first-child ui-last-child ui-shadow ui-caps {{if Mist.machineAddController.formReady '' 'ui-state-disabled'}} {{if Mist.machinesController.addingMachine 'ui-state-disabled'}}"
                     {{action "launchClicked" target="view"}}>Launch</a>
         </div>
     </div>

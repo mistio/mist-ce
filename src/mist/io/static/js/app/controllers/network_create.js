@@ -173,9 +173,12 @@ define('app/controllers/network_create', ['ember'],
 
             _updateFormReady: function() {
                 var formReady = false;
-                if (this.network.name &&
-                    this.network.backend) {
+                if (this.network.name && this.network.backend) {
                     formReady = true;
+                }
+
+                if (formReady && this.creatingNetwork) {
+                    formReady = false;
                 }
 
                 this.set('formReady', formReady);

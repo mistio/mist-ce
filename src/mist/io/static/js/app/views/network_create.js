@@ -115,14 +115,6 @@ define('app/views/network_create', ['app/views/controlled'],
                 $('#network-create-' + field).addClass('selected');
             },
 
-            updateLaunchButton: function () {
-               if (Mist.networkCreateController.formReady) {
-                   $('#network-create-ok').removeClass('ui-state-disabled');
-               } else {
-                   $('#network-create-ok').addClass('ui-state-disabled');
-               }
-            },
-
 
             //
             //  Actions
@@ -194,11 +186,7 @@ define('app/views/network_create', ['app/views/controlled'],
                     else
                         $('#network-create-subnet-gateway-ip-wrapper').slideDown();
                 }, SLIDE_DOWN_DELAY);
-            }.observes('Mist.networkCreateController.network.subnet.disableGateway'),
-
-            formReadyObserver: function () {
-                Ember.run.once(this, 'updateLaunchButton');
-            }.observes('Mist.networkCreateController.formReady')
+            }.observes('Mist.networkCreateController.network.subnet.disableGateway')
         });
     }
 );
