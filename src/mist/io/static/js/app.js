@@ -16,7 +16,7 @@ require.config({
     baseUrl: 'resources/js/',
     waitSeconds: 200,
     paths: {
-        jquery: '../dist/jquery/jquery.min',
+        jquery: '../dist/jquery/jquery',
         jqm: '../dist/jqm/js/jquery.mobile-1.4.5.min',
         text: '../dist/requirejs-text/text',
         ember: '../dist/ember/ember.prod',
