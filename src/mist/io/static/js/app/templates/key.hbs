@@ -46,7 +46,7 @@
                 {{/if}}
             </h4>
             {{#if view.privateKey}}
-            <textarea id="private-key" type="text" readonly="readonly" onclick="this.focus();this.select()" value={{view.privateKey}}></textarea>
+            <textarea id="private-key" class="ui-input-text ui-shadow-inset ui-body-inherit ui-corner-all ui-textinput-autogrow" type="text" readonly="readonly" onclick="this.focus();this.select()" value={{view.privateKey}}></textarea>
             {{else}}
             <a id="private_key" class="ui-btn
                     ui-shadow

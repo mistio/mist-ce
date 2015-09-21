@@ -13,10 +13,10 @@ ilb { display: inline-block; }  .provider-vultr { background-image: url('icon-sp
 .staron:after { background-image: url('icon-sprite-1432130152.png') !important; width: 19px; height: 19px; } .staron:after { background-position: -0px -535px; }
 .image-windows { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .image-windows { background-position: -0px -554px; }
 .provider-docker { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-docker { background-position: -0px -602px; }
-.provider-nephoscale { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-nephoscale { background-position: -0px -650px; }
+.provider-nephoscale { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-nephoscale { background-position: -0px -648px; }
 .provider-coreos { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-coreos { background-position: -0px -698px; }
 .provider-vcloud { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-vcloud { background-position: -0px -746px; }
-.provider-baremetal { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-baremetal { background-position: -0px -794px; }
+.provider-baremetal { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-baremetal { background-position: -0px -792px; }
 .provider-linode { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-linode { background-position: -0px -842px; }
 .image-debian { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .image-debian { background-position: -0px -890px; }
 .provider-digitalocean { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-digitalocean { background-position: -0px -938px; }

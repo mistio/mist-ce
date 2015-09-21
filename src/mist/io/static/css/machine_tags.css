@@ -12,11 +12,12 @@
     box-sizing: border-box;
 }
 #machine-tags-popup .field-wrapper .ui-input-text {
-    width: calc(100% - 59px);
+    width: calc(100% - 63px);
 }
 #machine-tags-popup .field-wrapper #add-tag-ok {
-    padding: 6px 10px;
+    padding: 5.5px 10px;
     width: initial;
+    line-height: 21px;
 }
 #machine-tags-popup .field-wrapper:after {
     content: '';

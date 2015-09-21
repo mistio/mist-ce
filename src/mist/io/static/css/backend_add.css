@@ -107,6 +107,7 @@ h4.pendingSelect > a {
     margin-bottom: 8px;
     border-color: #A4A39F;
     box-shadow: none;
+    border-radius: 0;
     box-sizing: border-box;
     height: 34px;
 }

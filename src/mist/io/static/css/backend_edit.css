@@ -17,11 +17,12 @@
     margin: .4em 0 1em;
 }
 #backend-edit .field-wrapper .ui-input-text {
-    width: calc(100% - 48px);
+    width: calc(100% - 51px);
 }
 #backend-edit .field-wrapper #edit-title-ok {
-    padding: 6px 10px;
+    padding: 5.5px 10px;
     width: initial;
+    line-height: 21px;
 }
 #backend-edit .field-wrapper:after {
     content: '';
