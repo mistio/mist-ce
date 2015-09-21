@@ -157,7 +157,7 @@ define('app/views/machine_monitoring',
                                     function (success) {
                                         if (success)
                                             Mist.graphsController.close();
-                                    }
+                                    }, !machine.probed
                                 );
                         }, 200);
                     }

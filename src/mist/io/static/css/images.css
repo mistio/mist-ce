@@ -55,6 +55,7 @@
 #image-list-page .checkbox-link h3 {
     position: relative;
     top: 4px;
+    font-weight: 400;
 }
 
 #image-list-page .checkbox-link.staron label:after {

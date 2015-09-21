@@ -39,3 +39,6 @@
 #script-list {
     box-shadow: none;
 }
+.script-name {
+    font-weight: 400;
+}

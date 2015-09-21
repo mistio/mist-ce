@@ -59,18 +59,13 @@
 #key-list-page .ui-icon-check:after {
     background-color: #46d4c9;
 }
-@-moz-document url-prefix() {
-    #key-list-page .tag {
-        bottom: 36px;
-        top: auto;
-    }
-}
 .key-name {
     width: 40% !important;
     overflow: hidden;
     text-overflow: ellipsis;
     padding-right: 16px;
     color: #444;
+    font-weight: 400;
 }
 .key-tags {
     float: right;

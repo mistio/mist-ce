@@ -90,6 +90,7 @@
     text-overflow: ellipsis;
     padding-right: 16px;
     color: #444;
+    font-weight: 400;
 }
 
 /* Conditional for < 600px */

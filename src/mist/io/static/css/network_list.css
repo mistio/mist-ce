@@ -41,4 +41,8 @@
 #network-list .ui-grid-b .ui-block-b {
     text-align: center;
     padding-right: 26px;
+    font-weight: 400;
+}
+#network-list .network-name {
+    font-weight: 400;
 }
