@@ -1,6 +1,6 @@
 define('app/models/subnet', [
-        'app/models/base',
-        'app/controllers/ip_addresses'
+       'app/models/base',
+       'app/controllers/ip_addresses'
     ],
     //
     //  Subnet Model
@@ -43,7 +43,7 @@ define('app/models/subnet', [
                 if (data.ipaddress_list_status) {
                     data.ipaddress_list_status.forEach(function (ip) {
                         ip.id = ip.ipaddress;
-                    })
+                    });
                     this.get('ipAddresses').setModel(data.ipaddress_list_status);
                 }
                 this._super(data);

@@ -21,7 +21,7 @@ define('app/models/network', [
             status: null,
             subnets: null,
             backend: null,
-            ipAddresses: null,
+            //ipAddresses: null,
 
 
             //
@@ -31,8 +31,8 @@ define('app/models/network', [
             load: function () {
                 var subnets = this.get('subnets')
                 this.setProperties({
-                    subnets: SubnetsController.create({ network: this }),
-                    ipAddresses: IPAddressesController.create({ network: this })
+                    subnets: SubnetsController.create({ network: this, model: [] }),
+                    //ipAddresses: IPAddressesController.create({ network: this, model: [] })
                 });
                 this._updateSubnets(subnets);
             }.on('init'),
@@ -50,7 +50,7 @@ define('app/models/network', [
             },
 
             _updateSubnets: function (subnets) {
-                this.set('subnets', subnets);
+                this.get('subnets').setModel(subnets);
             },
         });
     }

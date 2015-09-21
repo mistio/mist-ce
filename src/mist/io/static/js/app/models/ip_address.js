@@ -16,6 +16,7 @@ define('app/models/ip_address', ['app/models/base'],
 
             server: null,
             reserved: null,
+            ip: null,
 
 
             //
@@ -30,15 +31,6 @@ define('app/models/ip_address', ['app/models/base'],
             //
             //  Methods
             //
-
-            reserve: function (args) {
-                this.get('network').get('backend').get('networks').reserveIP({
-                    callback: args.callback,
-                    reserve: args.reserve,
-                    network: this.get('network'),
-                    ip: this,
-                });
-            },
 
             update: function (data) {
                 if (data.server) {

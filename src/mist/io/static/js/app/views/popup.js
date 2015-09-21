@@ -10,23 +10,16 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
 
         return ControlledComponent.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             popupId: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             init: function () {
                 this._super();
@@ -34,11 +27,8 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             open: function (position) {
                 var popupId = this.popupId;
@@ -50,7 +40,6 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
 
                 });
             },
-
 
             close: function () {
                 $(this.popupId).popup('close');

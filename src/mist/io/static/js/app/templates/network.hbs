@@ -25,7 +25,6 @@
     </div>
 
     <div data-role="content" data-theme="a">
-
         <div id="single-network-info" class="ui-shadow" data-role="collapsible" data-collapsed="false">
             <h4>Network Information</h4>
 
@@ -51,9 +50,9 @@
 
         {{#if model.subnets}}
         <div id="single-network-subnets" class="ui-shadow" data-role="collapsible" data-collapsed="false">
-            <h4>Subnets ({{model.subnets.length}})</h4>
+            <h4>Subnets ({{model.subnets.model.length}})</h4>
 
-            {{#each model.subnets as |subnet|}}
+            {{#each model.subnets.model as |subnet|}}
                 {{component "subnet-list-item" subnet=subnet}}
             {{/each}}
         </div>

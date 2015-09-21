@@ -11,10 +11,20 @@ define('app/controllers/ip_addresses', [
 
         'use strict';
 
-        return BaseArrayController.extend({
+        return Ember.Controller.extend({
 
             baseModel: IPAddressModel,
-            passOnProperties: ['network']
+            model: [],
+
+            setModel: function(data) {
+                var m = [], that = this;
+                data.forEach(function(ip) {
+                    var newIp = IPAddressModel.create(ip);
+                    newIp.set('network', that.get('network'));
+                    m.addObject(newIp);
+                });
+                this.set('model', m);
+            }
 
         });
     }

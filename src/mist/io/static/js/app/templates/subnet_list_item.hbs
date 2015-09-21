@@ -58,13 +58,13 @@
     </tr>
     {{/if}}
 
-    {{#if subnet.ipAddresses}}
+    {{#if subnet.ipAddresses.model}}
     <tr>
         <td class="usable-ips" colspan="2">
-            <h4>Usable ip addresses ({{subnet.ipAddresses.length}})</h4>
+            <h4>Usable ip addresses ({{subnet.ipAddresses.model.length}})</h4>
             <table>
                 <tbody>
-                {{#each ipAddresses as |ip|}}
+                {{#each subnet.ipAddresses.model as |ip|}}
                     {{component "ip-address-list-item" model=ip}}
                 {{/each}}
                 </tbody>

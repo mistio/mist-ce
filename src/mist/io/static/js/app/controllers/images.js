@@ -14,24 +14,17 @@ define('app/controllers/images',
 
         return BaseArrayController.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             baseModel: ImageModel,
             passOnProperties: ['backend'],
 
 
             //
-            //
             //  Computed Properties
             //
-            //
-
 
             hasStarred: function () {
                 return !!this.model.findBy('star', true);
@@ -39,11 +32,8 @@ define('app/controllers/images',
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             searchImages: function (filter, callback) {
                 var that = this;
@@ -64,7 +54,6 @@ define('app/controllers/images',
                 });
             },
 
-
             toggleImageStar: function (image, callback) {
                 var that = this;
                 Mist.ajax.POST('/backends/' + this.backend.id + '/images/' + image.id, {
@@ -78,7 +67,6 @@ define('app/controllers/images',
                     if (callback) callback(success, star);
                 });
             },
-
 
             getImageOS: function (imageId) {
                 // TODO (gtsop): Move this into a computed
@@ -105,11 +93,8 @@ define('app/controllers/images',
 
 
             //
-            //
             //  Pseudo-Private Methods
             //
-            //
-
 
             _toggleImageStar: function (image, star) {
                 Ember.run(this, function () {
