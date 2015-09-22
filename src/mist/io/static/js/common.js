@@ -104,6 +104,7 @@ var changeLoadProgress = function (progress) {
     }, 300, function () {
         if (progress >= 100) {
             $('body').css('overflow','auto');
+            $('body').enhanceWithin();
             $('#splash').fadeOut(300);
             if (appLoader)
               appLoader.finish();
