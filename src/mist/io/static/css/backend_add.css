@@ -33,10 +33,6 @@ h4.pendingSelect > a {
     display: block !important;
 }
 
-#backend-add-fields .mist-select.ui-collapsible {
-    margin-top: 24px;
-}
-
 #backend-add-fields .ui-listview {
     margin: 0;
 }
@@ -66,19 +62,82 @@ h4.pendingSelect > a {
     text-shadow: 0 0 0 #66C2E0;
 }
 
-#backend-add h4.ui-collapsible-heading {
+#backend-add #new-backend-provider h4.ui-collapsible-heading {
     display: none;
 }
 
-#backend-add h4.ui-collapsible-heading.ui-collapsible-heading-collapsed {
+#backend-add #new-backend-provider h4.ui-collapsible-heading.ui-collapsible-heading-collapsed {
     display: block;
 }
-
-#backend-add h4.ui-collapsible-heading.ui-collapsible-heading-collapsed > a{
+#backend-add .field-wrapper .ui-collapsible-content .ui-listview {
+    margin: 0;
+    max-height: 120px;
+    overflow-y: auto;
+}
+#backend-add #new-backend-provider h4.ui-collapsible-heading.ui-collapsible-heading-collapsed > a{
     text-align: center !important;
     padding-right: 22px;
 }
 
+#backend-add .field-wrapper .ui-collapsible-heading > a {
+    background-color: #fff !important;
+    border-color: #b5b5b5 !important;
+    color: #444 !important;
+    font-size: 14px;
+    padding-left: .75em !important;
+    text-transform: none;
+}
+#backend-add .field-wrapper .ui-collapsible-heading > a:after {
+    background-image: none;
+    font-size: 14px;
+    margin-top: -6px;
+    color: #444;
+}
+#backend-add .field-wrapper .ui-collapsible-heading.ui-collapsible-heading-collapsed > a:after {
+    content: '\0072';
+}
+#backend-add .field-wrapper .ui-collapsible-heading > a:after {
+    content: '\0073';
+}
+#backend-add .field-wrapper .filled .ui-collapsible-heading-toggle {
+    color: #444 !important;
+    background-color: #fff !important;
+    border-color: #b5b5b5 !important;
+}
+#backend-add .field-wrapper .ui-collapsible-content .ui-listview {
+    margin: 0;
+    border: 1px solid #b5b5b5;
+    margin: -1px 0 0 !important;
+}
+#backend-add .field-wrapper.empty.required .ui-collapsible-heading > a {
+    text-transform: titlecase;
+    text-align: left !important;
+    color: #7f7f7f !important;
+}
+#backend-add .field-wrapper.empty.required .ui-collapsible-heading > a,
+#backend-add .field-wrapper.empty.required .ui-collapsible-content > .ui-listview {
+    border-color: #0099cc !important;
+}
+#backend-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn {
+    background-color: #fff;
+    padding-left: .75em !important;
+    border: none;
+}
+#backend-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn.ui-btn-d {
+    background-color: #0099cc;
+    color: #fff !important;
+}
+#backend-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn:hover {
+    background-color: #66C2E0;
+    color: #fff !important;
+}
+#backend-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn,
+#backend-add .field-wrapper .ui-collapsible-heading-toggle {
+    line-height: 21px;
+    padding-top: 5.5px !important;
+    padding-bottom: 5.5px !important;
+    font-size: 14px;
+}
 #backend-add ul {
     border-top-width: 0px;
 }
@@ -115,7 +174,6 @@ h4.pendingSelect > a {
 #backend-add .docker .first-child .ui-slider {
     width: 100%;
     margin-top: 8px;
-    border-radius: 5px 0 0 5px;
 }
 
 #backend-add-advanced {
@@ -198,26 +256,8 @@ h4.pendingSelect > a {
     font-size: 16px;
 }
 
-#backend-add-fields .selected-key .ui-collapsible-heading-toggle {
-    color: #000;
-    background-color: #FAF9F4;
-}
-
 #backend-add-fields .ui-collapsible-heading-toggle:hover {
     border-color: #0099cc;
-}
-
-#backend-add-fields .selected-key .ui-collapsible-heading-toggle:hover {
-    border-color: #FAF9F4;
-    color: #000 !important;
-}
-
-#machine_key .selected-key .ui-icon-plus:after {
-    color: #000 !important;
-}
-
-#machine_key_help {
-    margin-top: 24px;
 }
 
 #certificate,

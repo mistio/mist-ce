@@ -42,20 +42,14 @@
                     <!-- Field Label -->
                     {{#if field.label}}
                         {{#unless field.isCheckbox}}
-                        {{#unless field.isRegion}}
-                        {{#unless field.isKey}}
-                        {{#unless field.isIndonesianRegion}}
                             <label for={{field.name}}>
                                 {{unbound field.label}}
                             </label>
                         {{/unless}}
-                        {{/unless}}
-                        {{/unless}}
-                        {{/unless}}
                     {{/if}}
 
                     <!-- Field Wrapper -->
-                    <div class="field-wrapper {{if field.value '' 'empty'}} {{if field.optional '' 'required'}}">
+                    <div class="field-wrapper {{if field.value 'filled' 'empty'}} {{if field.optional '' 'required'}}">
                         <div class="first-child {{if field.helpText '' 'last-child'}}">
                             {{#if field.isText}}
                                 {{input type="text"
@@ -82,8 +76,10 @@
                                 <div id={{field.name}}
                                     class="mist-select"
                                     data-role="collapsible"
+                                    data-collapsed-icon="noicon"
+                                    data-expanded-icon="noicon"
                                     data-iconpos="right">
-                                    <h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed {{if field.value 'selected-key' 'pendingSelect'}}">{{#if field.value}}{{field.value}}{{else}}SELECT SSH KEY{{/if}}</h4>
+                                    <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
                                     <ul data-role="listview">
                                         <li data-icon="false">
                                             <a {{action "selectKey" "" field target=view}}>-- None --</a>
@@ -106,7 +102,7 @@
                                     data-iconpos="right"
                                     data-collapsed-icon="noicon"
                                     data-expanded-icon="noicon">
-                                    <h4 class="{{if field.value '' 'pendingSelect'}}">{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
+                                    <h4>{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
                                     <ul data-role="listview">
                                         {{#each view.provider.regions as |region|}}
                                             <li data-icon="false">
@@ -119,7 +115,6 @@
                                 </div>
                             {{/if}}
                             {{#if field.isIndonesianRegion}}
-                                <label>{{field.label}}</label>
                                 <div id={{field.name}}
                                     class="mist-select"
                                     data-role="collapsible"

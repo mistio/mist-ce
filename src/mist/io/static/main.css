@@ -1574,4 +1574,5 @@ ul.checkbox-list .ui-grid-b {
 
 .field-wrapper.empty.required .ui-icon-question {
     background-color: #0099cc !important;
+    border-color: #0099cc !important;
 }

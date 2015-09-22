@@ -842,6 +842,7 @@ var PROVIDER_MAP = {
         {
             name: 'region',
             type: 'region',
+            label: 'Region'
         },
         {
             name: 'title',
