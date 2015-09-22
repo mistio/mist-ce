@@ -108,21 +108,33 @@ def click_button(context, text):
     the text given. If it doesn't find any button like that then it will try
     to find a button that contains the text given.
     """
-    buttons = context.browser.find_elements_by_class_name("ui-btn")
-    click_button_from_collection(context, text, buttons,
-                                 u'Could not find button that contains %s'
-                                 % text)
+    click_button_from_collection(context, text,
+                                 error_message='Could not find button that contains %s'
+                                               % text)
 
 
 @when(u'I click the "{text}" button inside the "{popup}" popup')
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
-        if popup in pop.text:
-            buttons = pop.find_elements_by_class_name("ui-btn")
-            click_button_from_collection(context, text, buttons,
-                                         u'Could not find %s button in %s popup'
-                                         % (text, popup))
+        if popup.lower() in pop.text.lower():
+            if text == '_x_':
+                buttons = pop.find_elements_by_class_name("close")
+                assert len(buttons) > 0, "Could not find the close button"
+                for i in range(0, 2):
+                    try:
+                        clicketi_click(context, buttons[0])
+                        return
+                    except WebDriverException:
+                        sleep(1)
+                assert False, u'Could not click the close button'
+            else:
+                buttons = pop.find_elements_by_class_name("ui-btn")
+                click_button_from_collection(context, text, buttons,
+                                             'Could not find %s button in %s popup'
+                                             % (text, popup))
+                return
+    assert False, "Could not find popup with title %s" % popup
 
 
 @when(u'I click the "{text}" button inside the "{panel_title}" panel')
@@ -146,31 +158,46 @@ def click_button_within_panel(context, text, panel_title):
 
     buttons = found_panel.find_elements_by_class_name("ui-btn")
     click_button_from_collection(context, text, buttons,
-                                 u'Could not find %s button inside %s panel' %
-                                 (text, panel_title))
+                                 error_message='Could not find %s button'
+                                               ' inside %s panel' %
+                                               (text, panel_title))
 
 
-def click_button_from_collection(context, text, button_collection, error_message):
+def click_button_from_collection(context, text, button_collection=None,
+                                 error_message="Could not find button"):
+    button = search_for_button(context, text, button_collection)
+    assert button, error_message
+    for i in range(0, 2):
+        try:
+            clicketi_click(context, button)
+            return
+        except WebDriverException:
+            sleep(1)
+        assert False, u'Could not click button that says %s' % button.text
+
+
+def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
+    if not button_collection:
+        button_collection = context.browser.find_elements_by_class_name(btn_cls)
+    # search for button with exactly the same text. sometimes the driver returns
+    # the same element more than once and that's why we return the first
+    # element of the list
+    # also doing some cleaning if the text attribute also sends back texts
+    # of sub elements
+    button = filter(lambda b: b.text.split('\n')[0].lower() == text.lower()
+                    and b.value_of_css_property('display') == 'block',
+                    button_collection)
+    if len(button) > 0:
+        return button[0]
+
+    # if we haven't found the exact text then we search for something that
+    # looks like it
     for button in button_collection:
-        if text == button.text:
-            for i in range(0, 2):
-                try:
-                    clicketi_click(context, button)
-                    return
-                except WebDriverException:
-                    sleep(1)
-            assert False, u'Could not click button that says %s' % button.text
+        button_text = button.text.split('\n')[0]
+        if text.lower() in button_text.lower():
+            return button
 
-    for button in button_collection:
-        if text in button.text:
-            for i in range(0, 2):
-                try:
-                    clicketi_click(context, button)
-                    return
-                except WebDriverException:
-                    sleep(1)
-            assert False, u'Could not click button that says %s' % button.text
-    assert False, error_message
+    return None
 
 
 def clicketi_click(context, button):
