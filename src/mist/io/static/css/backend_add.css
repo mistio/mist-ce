@@ -77,6 +77,7 @@ h4.pendingSelect > a {
 #backend-add #new-backend-provider h4.ui-collapsible-heading.ui-collapsible-heading-collapsed > a{
     text-align: center !important;
     padding-right: 22px;
+    padding-left: 42px;
 }
 
 #backend-add .field-wrapper .ui-collapsible-heading > a {
