@@ -37,12 +37,14 @@
 
         <div role="main" class="ui-content" data-theme="a">
 
-            <!-- New backend name text field -->
+            <!-- New machine name text field -->
             <form {{action "saveClicked" on="submit" target=view}}>
-                <label for="machine-edit-new-name">New name</label>
-                {{view Mist.TextField
-                    id="machine-edit-new-name"
-                    value=Mist.machineEditController.newName}}
+                <div id="machine-edit-new-name-wrapper" class="required {{if Mist.machineEditController.newName 'filled' 'empty'}}">
+                    <label for="machine-edit-new-name">New name</label>
+                    {{view Mist.TextField
+                        id="machine-edit-new-name"
+                        value=Mist.machineEditController.newName}}
+                </div>                
 
                 {{#if Mist.machineEditController.renamingMachine}}
                     <div class="ajax-loader"></div>

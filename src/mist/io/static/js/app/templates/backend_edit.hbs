@@ -42,7 +42,7 @@
 
             <label for=newTitle>Title</label>
             <form {{action "renameClicked" on="submit" target=view}}>
-                <div class="field-wrapper">
+                <div class="field-wrapper {{if Mist.backendEditController.newTitle 'filled' 'empty'}} required">
                     {{view Mist.TextField value=Mist.backendEditController.newTitle}}
 
                     <button type="submit" id="edit-title-ok" class="ui-btn ui-btn-d ui-caps">Ok</button>

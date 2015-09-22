@@ -919,7 +919,7 @@ ul.checkbox-list .ui-grid-b {
     padding: 0 6px;
     background: #ddd;
     margin-bottom: 5px;
-    border-radius: .1em;
+    border-radius: 0;
     display: inline-block;
     border: 1px solid #c4c4c4;
 }
