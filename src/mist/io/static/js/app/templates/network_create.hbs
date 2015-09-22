@@ -39,6 +39,9 @@
                 <h4>
                     {{#with Mist.networkCreateController.network as |network|}}
                         {{#if network.backend}}
+                            <span class="provider-icon-small">
+                                 <span class="{{network.backend.className}}"></span>
+                             </span>
                             {{network.backend.title}}
                         {{else}}
                             Select cloud
@@ -53,6 +56,9 @@
                             {{#if backend.isOpenStack}}
                                 <li data-icon="false">
                                     <a {{action "backendSelected" backend target=view}}>
+                                        <span class="provider-icon-small">
+                                             <span class="{{backend.className}}"></span>
+                                         </span>
                                         {{backend.title}}
                                     </a>
                                 </li>
