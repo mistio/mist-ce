@@ -23,7 +23,7 @@
 
         <div data-role="content" data-theme="a">
 
-            <div class="form-field">
+            <div class="form-field {{if Mist.scriptRunController.scriptToRun.machine.name 'filled' 'empty'}} required">
                 <label>Machine</label>
                 <div id="script-run-machine"
                     data-role="collapsible"

@@ -17,6 +17,7 @@ define('app/controllers/script_edit', ['ember'],
             script: null,
             newName: '',
             newDescription: '',
+            formReady: null,
 
 
             //
@@ -29,6 +30,7 @@ define('app/controllers/script_edit', ['ember'],
                     newName: script.name,
                     newDescription: script.description
                 });
+                this._updateFormReady();
                 this.view.open();
             },
 
@@ -37,17 +39,36 @@ define('app/controllers/script_edit', ['ember'],
             },
 
             save: function () {
-                var that = this;
-                Mist.scriptsController.renameScript({
-                    script: this.get('script'),
-                    newName: this.get('newName'),
-                    newDescription: this.get('newDescription'),
-                    callback: function (success) {
-                        if (success)
-                            that.close();
-                    }
-                });
-            }
+                if (this.formReady) {
+                    var that = this;
+                    Mist.scriptsController.renameScript({
+                        script: this.get('script'),
+                        newName: this.get('newName'),
+                        newDescription: this.get('newDescription'),
+                        callback: function (success) {
+                            if (success)
+                                that.close();
+                        }
+                    });
+                }
+            },
+
+            _updateFormReady: function () {
+                var formReady = false;
+                if (this.newName && this.newName != this.script.name) {
+                    formReady = true;
+                }
+                console.log(formReady);
+                this.set('formReady', formReady);
+            },
+
+            //
+            //  Observers
+            //
+
+            formObserver: function () {
+                Ember.run.once(this, '_updateFormReady');
+            }.observes('newName')
         });
     }
 );

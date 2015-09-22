@@ -6,15 +6,11 @@
     data-display="overlay"
     data-theme="c">
 
-    <div data-role="header">
-        <h1>Manage Keys</h1>
+    <div class="ui-header ui-bar-b" role="banner">
+        <h1 class="ui-title">Manage Keys</h1>
     </div>
 
     <div data-role="content" data-theme="c">
-
-        <a id="associate-btn"
-           class="creation-button ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all ui-caps"
-           {{action "associateClicked" target=view}}>Add Key</a>
 
         {{#if Mist.machineKeysController.associatedKeys}}
         <ul id="machine-keys">
@@ -29,6 +25,10 @@
         {{else}} {{#if Mist.keysController.disassociatingKey}}
             <div class="ajax-loader"></div>
         {{/if}} {{/if}}
+
+        <a id="associate-btn"
+           class="creation-button ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-shadow ui-caps"
+           {{action "associateClicked" target=view}}>Add Key</a>
     </div>
 
 </div>

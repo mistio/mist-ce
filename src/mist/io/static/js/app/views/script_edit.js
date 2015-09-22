@@ -16,6 +16,20 @@ define('app/views/script_edit', ['app/views/popup'],
 
 
             //
+            //  Methods
+            //
+
+
+            updateSaveButton: function () {
+                if (Mist.scriptEditController.formReady) {
+                    $('#script-edit-ok').removeClass('ui-state-disabled');
+                } else {
+                    $('#script-edit-ok').addClass('ui-state-disabled');
+                }
+            },
+
+
+            //
             //  Actions
             //
 
@@ -28,7 +42,17 @@ define('app/views/script_edit', ['app/views/popup'],
                 saveClicked: function () {
                     Mist.scriptEditController.save();
                 }
-            }
+            },
+
+
+            //
+            // Observers
+            //
+
+
+            updateSaveButtonObserver: function () {
+                Ember.run.once(this, 'updateSaveButton');
+            }.observes('Mist.scriptEditController.formReady')
         });
     }
 );

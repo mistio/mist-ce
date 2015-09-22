@@ -31,13 +31,19 @@
 
             <!-- New backend name text field -->
             <form {{action "saveClicked" on="submit" target=view}}>
-                {{view Mist.TextField
-                    id="script-edit-new-name"
-                    value=Mist.scriptEditController.newName}}
+                <div class="form-field {{if Mist.scriptEditController.newName 'filled' 'empty'}} required">
+                    <label for="script-edit-new-name">Name</label>
+                    {{view Mist.TextField
+                        id="script-edit-new-name"
+                        value=Mist.scriptEditController.newName}}
+                </div>
 
-                {{view Mist.TextArea
-                    id="script-edit-new-description"
-                    value=Mist.scriptEditController.newDescription}}
+                <div class="form-field">
+                    <label for="script-edit-new-description">Description (optional)</label>
+                    {{view Mist.TextArea
+                        id="script-edit-new-description"
+                        value=Mist.scriptEditController.newDescription}}
+                </div>
 
                 {{#if Mist.scriptsController.renamingScript}}
                     <div class="ajax-loader"></div>
