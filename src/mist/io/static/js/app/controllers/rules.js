@@ -62,7 +62,6 @@ define('app/controllers/rules',
             },
 
             newRule: function (machine, callback) {
-
                 var that = this;
                 this.set('creationPending', true);
                 Mist.ajax.POST('/rules', {
@@ -83,6 +82,13 @@ define('app/controllers/rules',
                 });
             },
 
+            _addObject: function (object) {
+                var newObject = RuleModel.create(object).create(object);
+                this.model.pushObject(newObject);
+                this.trigger('onAdd', {
+                    object: newObject
+                });
+            },
 
             deleteRule: function (rule) {
                 var that = this;

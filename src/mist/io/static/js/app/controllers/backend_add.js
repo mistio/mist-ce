@@ -10,13 +10,9 @@ define('app/controllers/backend_add', ['app/models/backend'],
 
         return Ember.Object.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             callback: null,
             provider: null,
@@ -44,12 +40,10 @@ define('app/controllers/backend_add', ['app/models/backend'],
                 });
             }.property(),
 
-            //
+
             //
             //  Methods
             //
-            //
-
 
             open: function (callback) {
                 this._clear();
@@ -57,12 +51,10 @@ define('app/controllers/backend_add', ['app/models/backend'],
                 this.set('callback', callback);
             },
 
-
             close: function () {
                 this._clear();
                 this.view.close();
             },
-
 
             add: function () {
                 var provider = this.get('provider');
@@ -92,11 +84,8 @@ define('app/controllers/backend_add', ['app/models/backend'],
 
 
             //
-            //
             //  Pseudo-Private Methods
             //
-            //
-
 
             _showMonitoringPopup: function (backend, payload) {
                 if (payload.windows)
@@ -145,14 +134,12 @@ define('app/controllers/backend_add', ['app/models/backend'],
                 }
             },
 
-
             _clear: function () {
                 this.setProperties({
                     callback: null,
                     provider: null,
                 });
             },
-
 
             _giveCallback: function (success, backend) {
                 if (this.callback) this.callback(success, backend);

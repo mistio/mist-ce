@@ -39,11 +39,9 @@ define('app/controllers/base_array', ['ember'],
                 this.set('loading', false);
             },
 
-
             getObject: function (id) {
                 return this.model.findBy('id', id);
             },
-
 
             objectExists: function (id) {
                 return !!this.getObject(id);
@@ -59,7 +57,6 @@ define('app/controllers/base_array', ['ember'],
                     model.setEach(property, this.get(property));
                 }, this);
             },
-
 
             _updateModel: function (model) {
                 Ember.run(this, function () {
@@ -84,7 +81,6 @@ define('app/controllers/base_array', ['ember'],
                 });
             },
 
-
             _addObject: function (object) {
                 Ember.run(this, function () {
                     if (!this.objectExists(object.id)) {
@@ -96,7 +92,6 @@ define('app/controllers/base_array', ['ember'],
                     }
                 });
             },
-
 
             _deleteObject: function (object) {
                 Ember.run(this, function () {
