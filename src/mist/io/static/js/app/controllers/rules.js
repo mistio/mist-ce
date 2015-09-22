@@ -12,17 +12,15 @@ define('app/controllers/rules',
 
         'use strict';
 
-        return BaseArrayController.extend({
+        return Ember.Controller.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
-            //
             //
 
             baseModel: RuleModel,
             creationPending: false,
+            model: [],
 
             aggregateList: [{
                 'title': 'any',
@@ -52,11 +50,8 @@ define('app/controllers/rules',
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             setModel: function (model) {
                 var modelToArray = [];
@@ -65,7 +60,6 @@ define('app/controllers/rules',
                 });
                 this._super(modelToArray);
             },
-
 
             newRule: function (machine, callback) {
 
