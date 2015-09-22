@@ -7,7 +7,7 @@
 
     <div id="script-add" class="ui-content">
 
-        <div class="form-field">
+        <div class="form-field {{if Mist.scriptAddController.newScript.name 'filled' 'empty'}} required">
             <label for="script-name">Name</label>
             {{view Mist.TextField
                 data-theme="a"
@@ -28,7 +28,8 @@
         <!--
             Select script type
         -->
-        <div id="script-add-type" class="form-field">
+        <div id="script-add-type" class="form-field {{if Mist.scriptAddController.newScript.type.label 'filled' 'empty'}} required">
+            <label>Type</label>
             <div class="mist-select"
                  data-role="collapsible"
                  data-collapsed-icon="carat-d"
@@ -57,7 +58,8 @@
             Select script source
         -->
 
-        <div id="script-add-source" class="form-field">
+        <div id="script-add-source" class="form-field {{if Mist.scriptAddController.newScript.source.label 'filled' 'empty'}} required">
+            <label>Source</label>
             <div  class="mist-select"
                 data-role="collapsible"
                 data-iconpos="right"

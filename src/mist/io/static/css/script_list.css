@@ -38,6 +38,14 @@
 }
 #script-list {
     box-shadow: none;
+    margin-top: -52px;
+}
+#script-list .script-tags {
+    text-align: center;
+    padding-right: 26px;
+}
+#script-list .script-tags .tag {
+    float: none;
 }
 .script-name {
     font-weight: 400;

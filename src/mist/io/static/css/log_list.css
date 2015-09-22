@@ -42,6 +42,9 @@
     padding-right: 40px;
     padding-left: 20px;
 }
+.log-list ul.ui-listview a.ui-btn:active {
+    background-color: #edece8;
+}
 .log-list ul.ui-listview a.ui-btn:after {
     font-family: 'MistIcons';
     font-size: 16px;

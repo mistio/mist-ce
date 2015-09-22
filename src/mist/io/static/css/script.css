@@ -10,7 +10,7 @@
     clear: both;
 }
 #single-script-page .creation-button {
-    margin: 0;
+    margin: 0 0 5px 0;
     float: right;
     padding: 20px 60px 20px 20px !important;
     font-weight: 400 !important;
@@ -59,12 +59,7 @@
     border-bottom: none;
 }
 #single-script-page .info-table tr td:nth-child(1) {
-    padding-left: 70px;
-}
-@media only screen and  (max-width: 500px) {
-    #single-script-page .info-table tr td:nth-child(1) {
-        padding-left: 30px;
-    }
+    padding-left: 20px;
 }
 #single-script-page .info-table tr td:nth-child(2) {
     color: #7f7f7f;
@@ -77,7 +72,7 @@
     background-color: #f2f2f2;
 }
 #single-script-page .log-list ul {
-    margin-top: 1em;
+    margin: 0;
 }
 #single-script-page .log-list ul li {
     padding: 0;
@@ -86,22 +81,66 @@
 #single-script-page .log-list ul li a {
     margin: 0;
 }
-#script-run .ui-collapsible .ui-collapsible-heading-toggle {
-    font-size: 16px;
+#run-script .ui-collapsible-content {
+    max-height: 120px;
+    overflow-y: auto;
 }
-#script-run .ui-collapsible .ui-collapsible-heading > a {
-    background-color: #0099cc !important;
-    border-color: #0099cc !important;
-    color: #fff !important;
-    text-transform: uppercase;
+#run-script .ui-collapsible-heading {
+    text-transform: capitalize;
 }
-#script-run .ui-collapsible .ui-listview {
+
+#single-script-page #run-script .ui-collapsible-heading > a {
+    background-color: #fff !important;
+    border: 1px solid #b5b5b5;
+    color: #444 !important;
+    font-size: 14px;
+    padding-left: .75em !important;
+}
+#run-script .ui-collapsible-heading > a:after {
+    background-image: none;
+    font-size: 14px;
+    margin-top: -6px;
+    color: #444;
+}
+#run-script .ui-collapsible-heading.ui-collapsible-heading-collapsed > a:after {
+    content: '\0072';
+}
+#run-script .ui-collapsible-heading > a:after {
+    content: '\0073';
+}
+#run-script .filled .ui-collapsible-heading-toggle {
+    color: #444 !important;
+    background-color: #fff !important;
+    border-color: #b5b5b5 !important;
+}
+#run-script .ui-collapsible-content .ui-listview {
     margin: 0;
+    border: 1px solid #b5b5b5;
+    margin: -1px 0 0 !important;
 }
-#script-run .ui-collapsible .ui-listview .ui-btn,
-#script-run .ui-collapsible .ui-collapsible-heading a {
+#run-script .empty.required .ui-collapsible-heading > a {
+    color: #7f7f7f !important;
+}
+#run-script .empty.required .ui-collapsible-heading > a,
+#run-script .empty.required .ui-collapsible-content > .ui-listview {
+    border-color: #0099cc !important;
+}
+#run-script .ui-collapsible-content .ui-listview .ui-btn {
+    background-color: #fff;
+    padding-left: .75em !important;
+    border: none;
+}
+#run-script .ui-collapsible-content .ui-listview .ui-btn:hover {
+    background-color: #66C2E0;
+    color: #fff !important;
+}
+#single-script-page #run-script .ui-collapsible .ui-collapsible-heading a,
+#single-script-page #run-script .ui-collapsible-content .ui-listview .ui-btn {
     line-height: 21px;
     padding-top: 5.5px !important;
     padding-bottom: 5.5px !important;
-    padding-left: 17.6px !important;
+    font-size: 14px;
+}
+#single-script-page .command-container {
+    white-space: pre !important;
 }
