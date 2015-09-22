@@ -43,11 +43,11 @@ define('app/controllers/machine_add', ['ember'],
                     .collapsible('collapse');
                 $('#machine-create .docker').hide();
                 $('#machine-create .azure').hide();
-                $('#create-machine-location').addClass('ui-state-disabled');
-                $('#create-machine-image').addClass('ui-state-disabled');
-                $('#create-machine-size').addClass('ui-state-disabled');
-                $('#create-machine-key').addClass('ui-state-disabled');
-                
+                $('#create-machine-location').hide();
+                $('#create-machine-image').hide();
+                $('#create-machine-size').hide();
+                $('#create-machine-key').hide();
+                $('#create-machine-network').hide();               
 
                 this._clear();
                 this._updateFormReady();

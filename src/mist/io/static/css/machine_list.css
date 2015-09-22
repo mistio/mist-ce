@@ -63,7 +63,7 @@
 }
 
 #machine-list {
-    margin-top: -52px;
+    margin: -52px auto 0;
     box-shadow: none;
 }
 .running .machine-state span {

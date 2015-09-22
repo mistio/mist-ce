@@ -16,129 +16,132 @@
         </div>
 
         <!-- Select Provider -->
-        <label>Provider</label>
-        <div id="create-machine-provider"
-            data-role="collapsible"
-            data-iconpos="right"
-            data-collapsed-icon="carat-d"
-            data-expanded-icon="carat-u"
-            class="mist-select required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider 'filled' 'empty'}}">
-            <h4>{{#if Mist.machineAddController.newMachineProvider.provider}}
-                   <span class="provider-icon-small">
-                        <span class="{{Mist.machineAddController.newMachineProvider.className}}"></span>
-                    </span>
-                {{/if}}
-                {{Mist.machineAddController.newMachineProvider.title}}
-            </h4>
-
-            {{#unless Mist.machineAddController.selectedImage}}
-            <ul data-role="listview" >
-                {{#each Mist.backendsController.model as |backend|}}
-                    {{#if backend.canCreateMachine}}
-                        <li data-icon="false">
-                            <a {{action "selectProvider" backend target=view}}>
-                                <span class="provider-icon-small">
-                                    <span class={{backend.className}}></span>
-                                </span>
-                                {{backend.title}}
-                            </a>
-                        </li>
+        <div id="create-machine-provider" class="required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider 'filled' 'empty'}}">
+            <label>Provider</label>
+            <div data-role="collapsible"
+                data-iconpos="right"
+                data-collapsed-icon="carat-d"
+                data-expanded-icon="carat-u"
+                class="mist-select">
+                <h4>{{#if Mist.machineAddController.newMachineProvider.provider}}
+                       <span class="provider-icon-small">
+                            <span class="{{Mist.machineAddController.newMachineProvider.className}}"></span>
+                        </span>
                     {{/if}}
-                {{/each}}
-            </ul>
-            {{/unless}}
+                    {{Mist.machineAddController.newMachineProvider.title}}
+                </h4>
+
+                {{#unless Mist.machineAddController.selectedImage}}
+                <ul data-role="listview" >
+                    {{#each Mist.backendsController.model as |backend|}}
+                        {{#if backend.canCreateMachine}}
+                            <li data-icon="false">
+                                <a {{action "selectProvider" backend target=view}}>
+                                    <span class="provider-icon-small">
+                                        <span class={{backend.className}}></span>
+                                    </span>
+                                    {{backend.title}}
+                                </a>
+                            </li>
+                        {{/if}}
+                    {{/each}}
+                </ul>
+                {{/unless}}
+            </div>
         </div>
 
         <!-- Select Image -->
+        <div id="create-machine-image" class="required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
+            <label>Image</label>
+            <div data-role="collapsible"
+                 data-iconpos="right"
+                 data-collapsed-icon="carat-d"
+                 data-expanded-icon="carat-u"
 
-        <label>Image</label>
-        <div id="create-machine-image"
-             data-role="collapsible"
-             data-iconpos="right"
-             data-collapsed-icon="carat-d"
-             data-expanded-icon="carat-u"
-
-             class="mist-select required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
-            <h4>
-                {{#if Mist.machineAddController.newMachineImage.id}}
-                    <span class="image-icon-small">
-                        <span class={{Mist.machineAddController.newMachineImage.className}}>
-                        </span>
-                    </span>
-                {{/if}}
-                {{Mist.machineAddController.newMachineImage.name}}
-            </h4>
-
-            {{#unless Mist.machineAddController.selectedImage}}
-            <ul data-role="listview" >
-                {{#each Mist.machineAddController.newMachineProvider.images.model as |image|}}
-                    {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
-                        <li data-icon="false">
-                            <span class="image-icon-small">
-                                <span class={{image.className}}></span>
+                 class="mist-select">
+                <h4>
+                    {{#if Mist.machineAddController.newMachineImage.id}}
+                        <span class="image-icon-small">
+                            <span class={{Mist.machineAddController.newMachineImage.className}}>
                             </span>
-                            <a {{action "selectImage" image target=view}}>{{image.name}}</a>
-                        </li>
-                    {{else}} {{#if image.star}}
-                        <li data-icon="false">
-                            <a {{action "selectImage" image target=view}}>
+                        </span>
+                    {{/if}}
+                    {{Mist.machineAddController.newMachineImage.name}}
+                </h4>
+
+                {{#unless Mist.machineAddController.selectedImage}}
+                <ul data-role="listview" >
+                    {{#each Mist.machineAddController.newMachineProvider.images.model as |image|}}
+                        {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
+                            <li data-icon="false">
                                 <span class="image-icon-small">
                                     <span class={{image.className}}></span>
                                 </span>
-                                {{image.name}}
+                                <a {{action "selectImage" image target=view}}>{{image.name}}</a>
+                            </li>
+                        {{else}} {{#if image.star}}
+                            <li data-icon="false">
+                                <a {{action "selectImage" image target=view}}>
+                                    <span class="image-icon-small">
+                                        <span class={{image.className}}></span>
+                                    </span>
+                                    {{image.name}}
+                                </a>
+                            </li>
+                        {{/if}} {{/unless}}
+                    {{/each}}
+                </ul>
+                {{/unless}}
+            </div>
+        </div>
+
+        <div id="size">
+            <div id="create-machine-size" class="{{if Mist.machineAddController.newMachineSize.id 'filled' 'empty'}} required">
+                <!-- Select Size -->        
+                <label>Size</label>
+                <div data-role="collapsible"
+                     data-iconpos="right"
+                     data-collapsed-icon="carat-d"
+                     data-expanded-icon="carat-u"
+
+                     class="mist-select">
+                    <h4>{{Mist.machineAddController.newMachineSize.name}}</h4>
+
+                    <ul data-role="listview" >
+                        {{#each Mist.machineAddController.newMachineProvider.sizes.model as |size|}}
+                        <li data-icon="false">
+                            <a {{action "selectSize" size target=view}}>{{size.name}}
+                                <span class="size-decription">
+                                 - disk:{{size.disk}}, ram:{{size.ram}}
+                                </span>
                             </a>
                         </li>
-                    {{/if}} {{/unless}}
-                {{/each}}
-            </ul>
-            {{/unless}}
-        </div>
-
-        <!-- Select Size -->
-        <div id="size">
-        <label>Size</label>
-        <div id="create-machine-size"
-             data-role="collapsible"
-             data-iconpos="right"
-             data-collapsed-icon="carat-d"
-             data-expanded-icon="carat-u"
-
-             class="mist-select {{if Mist.machineAddController.newMachineSize.id 'filled' 'empty'}} required">
-            <h4>{{Mist.machineAddController.newMachineSize.name}}</h4>
-
-            <ul data-role="listview" >
-                {{#each Mist.machineAddController.newMachineProvider.sizes.model as |size|}}
-                <li data-icon="false">
-                    <a {{action "selectSize" size target=view}}>{{size.name}}
-                        <span class="size-decription">
-                         - disk:{{size.disk}}, ram:{{size.ram}}
-                        </span>
-                    </a>
-                </li>
-                {{/each}}
-            </ul>
-        </div>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <!-- Select Location -->
 
         <div id="location">
-            <label>Location</label>
-            <div id="create-machine-location"
-                 data-role="collapsible"
-                 data-iconpos="right"
-                 data-collapsed-icon="carat-d"
-                 data-expanded-icon="carat-u"
+            <div id="create-machine-location" class="{{if Mist.machineAddController.newMachineLocation.id 'filled' 'empty'}} required">
+                <label>Location</label>
+                <div data-role="collapsible"
+                     data-iconpos="right"
+                     data-collapsed-icon="carat-d"
+                     data-expanded-icon="carat-u"
 
-                 class="mist-select {{if Mist.machineAddController.newMachineLocation.id 'filled' 'empty'}} required">
-                <h4>{{Mist.machineAddController.newMachineLocation.name}}</h4>
-                <ul data-role="listview">
-                    {{#each Mist.machineAddController.newMachineProvider.locations.model as |location|}}
-                    <li data-icon="false">
-                        <a {{action "selectLocation" location target=view}}>{{location.name}}</a>
-                    </li>
-                    {{/each}}
-                </ul>
+                     class="mist-select">
+                    <h4>{{Mist.machineAddController.newMachineLocation.name}}</h4>
+                    <ul data-role="listview">
+                        {{#each Mist.machineAddController.newMachineProvider.locations.model as |location|}}
+                        <li data-icon="false">
+                            <a {{action "selectLocation" location target=view}}>{{location.name}}</a>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -166,28 +169,30 @@
 
         <!-- Select Key -->
 
-        <div id="key">
-        <label>Key</label>
-        <div id="create-machine-key"
-             data-role="collapsible"
-             data-iconpos="right"
-             data-collapsed-icon="carat-d"
-             data-expanded-icon="carat-u"
+        <div id="key" class="{{if Mist.machineAddController.newMachineKey.machines 'filled' 'empty'}} required">
+            <div id="create-machine-key" >
+                <label>Key</label>
+                <div 
+                     data-role="collapsible"
+                     data-iconpos="right"
+                     data-collapsed-icon="carat-d"
+                     data-expanded-icon="carat-u"
 
-             class="mist-select {{if Mist.machineAddController.newMachineKey.machines 'filled' 'empty'}} required">
-            <h4>{{Mist.machineAddController.newMachineKey.id}}</h4>
+                     class="mist-select">
+                    <h4>{{Mist.machineAddController.newMachineKey.id}}</h4>
 
-            <ul data-role="listview">
-                {{#each Mist.keysController.model as |key|}}
-                    <li data-icon="false">
-                        <a {{action "selectKey" key target=view}}>{{key.id}}</a>
-                    </li>
-                {{/each}}
-                <li data-icon="false" data-theme="d">
-                    <a {{action "createKeyClicked" target=view}}>Add Key</a>
-                </li>
-            </ul>
-        </div>
+                    <ul data-role="listview">
+                        {{#each Mist.keysController.model as |key|}}
+                            <li data-icon="false">
+                                <a {{action "selectKey" key target=view}}>{{key.id}}</a>
+                            </li>
+                        {{/each}}
+                        <li data-icon="false" data-theme="d">
+                            <a {{action "createKeyClicked" target=view}}>Add Key</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <!-- Select Networks -->
@@ -199,7 +204,7 @@
                     data-collapsed-icon="carat-d"
                     data-expanded-icon="carat-u"
 
-                    class="mist-select ui-state-disabled">
+                    class="mist-select">
                 <h4>Networks</h4>
 
                 <fieldset data-role="controlgroup">
@@ -285,7 +290,7 @@
 
 
         <!-- Enable monitoring -->
-        <div id="create-machine-monitoring" class="ui-state-disabled">
+        <div id="create-machine-monitoring">
             <label>
             {{view Mist.Checkbox
                 checked=Mist.machineAddController.newMachineMonitoring}}
