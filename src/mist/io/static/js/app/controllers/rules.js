@@ -83,7 +83,7 @@ define('app/controllers/rules',
             },
 
             _addObject: function (object) {
-                var newObject = RuleModel.create(object).create(object);
+                var newObject = RuleModel.create(object);
                 this.model.pushObject(newObject);
                 this.trigger('onAdd', {
                     object: newObject
