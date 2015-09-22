@@ -20,7 +20,7 @@ class ShellHubClient(HubClient):
         print msg
 
     def resize(self, columns, rows):
-        self.send_to_worker('rezize', {'columns': columns, 'rows': rows})
+        self.send_to_worker('resize', {'columns': columns, 'rows': rows})
 
     def stop(self):
         self.send_to_worker('close')

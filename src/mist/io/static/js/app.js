@@ -81,6 +81,7 @@ var LOADER_STEPS = {
         before: [],
         exec: function () {
             require(['socket'], function () {
+                SockJS.websocket.roundTrips = 5;
                 appLoader.complete('load socket');
             });
         }

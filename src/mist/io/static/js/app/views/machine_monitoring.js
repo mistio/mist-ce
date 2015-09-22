@@ -151,6 +151,7 @@ define('app/views/machine_monitoring',
 
                         // Disable monitoring after a while to enalbe
                         // smoothScroll to scroll to top
+
                         Ember.run.later(function () {
                             Mist.monitoringController
                                 .disableMonitoring(machine,

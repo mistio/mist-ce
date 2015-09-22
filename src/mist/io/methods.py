@@ -1313,8 +1313,10 @@ def connect_provider(backend):
     elif backend.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if backend.apisecret:
-            with get_temp_file(backend.apisecret) as tmp_key_path:
-                conn = driver(backend.apiurl, user=backend.apikey, ssh_key=tmp_key_path, ssh_port=backend.ssh_port)
+            key_temp_file = NamedTemporaryFile(delete=False)
+            key_temp_file.write(backend.apisecret)
+            key_temp_file.close()
+            conn = driver(backend.apiurl, user=backend.apikey, ssh_key=key_temp_file.name, ssh_port=backend.ssh_port)
         else:
             conn = driver(backend.apiurl, user=backend.apikey)
     else:
@@ -1544,8 +1546,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22,
-                   script_id='', script_params='', job_id=None, docker_port_bindings={},
-                   docker_exposed_ports={}, azure_port_bindings='', hostname='', plugins=None):
+                   script_id='', script_params='', job_id=None,
+                   docker_port_bindings={}, docker_exposed_ports={},
+                   azure_port_bindings='', hostname='', plugins=None,
+                   post_script_id='', post_script_params=''):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1685,6 +1689,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
         )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1694,13 +1700,17 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins
+            hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
         )
     elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
         )
 
 
@@ -3229,7 +3239,7 @@ def check_monitoring(user):
 
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
-                      no_ssh=False, dry=False, **kwargs):
+                      no_ssh=False, dry=False, deploy_async=True, **kwargs):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
@@ -3269,8 +3279,10 @@ def enable_monitoring(user, backend_id, machine_id,
         return ret_dict
 
     if not no_ssh:
-        mist.io.tasks.deploy_collectd.delay(user.email, backend_id, machine_id,
-                                            ret_dict['extra_vars'])
+        deploy = mist.io.tasks.deploy_collectd
+        if deploy_async:
+            deploy = deploy.delay
+        deploy(user.email, backend_id, machine_id, ret_dict['extra_vars'])
 
     trigger_session_update(user.email, ['monitoring'])
 
@@ -3910,7 +3922,7 @@ def undeploy_collectd(user, backend_id, machine_id):
 
 def get_deploy_collectd_command_unix(uuid, password, monitor):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O - %s | $(command -v sudo) python - %s %s" % (url, uuid, password)
+    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd

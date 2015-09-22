@@ -1488,6 +1488,11 @@ ul.checkbox-list .ui-grid-b {
     width: 100%;
     margin-top: -0.5em;
 }
+.field-wrapper:after {
+    content:'';
+    display:block;
+    clear: both;
+}
 .field-wrapper > div {
     display: block;
     vertical-align: top;

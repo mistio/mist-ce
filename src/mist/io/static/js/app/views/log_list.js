@@ -45,7 +45,12 @@ define('app/views/log_list', ['ember'],
             //
 
             load: function () {
-                this._initializeController();
+                if (!Mist.logs)  {
+                    Ember.run.later(this, this.load, 300);
+                    return;
+                }
+                Mist.logsController.clear();
+                Mist.logsController.set('view', this);
                 this._initializeScrolling();
                 this._updateLogTime();
                 this.set('firstRequest', true);

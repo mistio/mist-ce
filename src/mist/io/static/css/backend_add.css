@@ -112,6 +112,12 @@ h4.pendingSelect > a {
     height: 34px;
 }
 
+#backend-add .docker .first-child .ui-slider {
+    width: 100%;
+    margin-top: 8px;
+    border-radius: 5px 0 0 5px;
+}
+
 #backend-add-advanced {
 	display: none;
 }
