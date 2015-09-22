@@ -23,6 +23,7 @@ except IOError:
 except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
 CORE_URI = settings.get("CORE_URI", "https://mist.io")
+AMQP_URI = settings.get("AMQP_URI", "localhost:5672")
 SSL_VERIFY = settings.get("SSL_VERIFY", True)
 JS_BUILD = settings.get("JS_BUILD", False)
 CSS_BUILD = settings.get("CSS_BUILD", False)
