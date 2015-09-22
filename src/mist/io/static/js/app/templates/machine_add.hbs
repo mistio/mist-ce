@@ -36,7 +36,7 @@
                     {{#each Mist.backendsController.model as |backend|}}
                         {{#if backend.canCreateMachine}}
                             <li data-icon="false">
-                                <a {{action "selectProvider" backend target=view}}>
+                                <a {{action "selectProvider" backend target=view}} title="{{backend.title}}">
                                     <span class="provider-icon-small">
                                         <span class={{backend.className}}></span>
                                     </span>
@@ -77,11 +77,11 @@
                                 <span class="image-icon-small">
                                     <span class={{image.className}}></span>
                                 </span>
-                                <a {{action "selectImage" image target=view}}>{{image.name}}</a>
+                                <a {{action "selectImage" image target=view}} title="{{image.name}}">{{image.name}}</a>
                             </li>
                         {{else}} {{#if image.star}}
                             <li data-icon="false">
-                                <a {{action "selectImage" image target=view}}>
+                                <a {{action "selectImage" image target=view}} title="{{image.name}}">
                                     <span class="image-icon-small">
                                         <span class={{image.className}}></span>
                                     </span>
@@ -110,7 +110,7 @@
                     <ul data-role="listview" >
                         {{#each Mist.machineAddController.newMachineProvider.sizes.model as |size|}}
                         <li data-icon="false">
-                            <a {{action "selectSize" size target=view}}>{{size.name}}
+                            <a {{action "selectSize" size target=view}} title="{{size.name}} - disk:{{size.disk}}, ram:{{size.ram}}">{{size.name}}
                                 <span class="size-decription">
                                  - disk:{{size.disk}}, ram:{{size.ram}}
                                 </span>
@@ -199,24 +199,15 @@
 
         <div id="create-machine-network">
             <label>Networks</label>
-            <div data-role="collapsible"
-                    data-iconpos="right"
-                    data-collapsed-icon="carat-d"
-                    data-expanded-icon="carat-u"
-
-                    class="mist-select">
-                <h4>Networks</h4>
-
-                <fieldset data-role="controlgroup">
-                    {{#each Mist.machineAddController.newMachineProvider.networks.model as |network|}}
-                        <input id={{network.id}} name={{network.id}} checked={{network.selected}}
-                            type="checkbox" {{action "toggleNetworkSelection" network on="change" target=view}}>
-                        <label for={{network.id}} data-corners="false">
-                            {{network.name}}
-                        </label>
-                    {{/each}}
-                </fieldset>
-            </div>
+            <fieldset data-role="controlgroup">
+                {{#each Mist.machineAddController.newMachineProvider.networks.model as |network|}}
+                    <input id={{network.id}} name={{network.id}} checked={{network.selected}}
+                        type="checkbox" {{action "toggleNetworkSelection" network on="change" target=view}}>
+                    <label for={{network.id}} data-corners="false">
+                        {{network.name}}
+                    </label>
+                {{/each}}
+            </fieldset>
         </div>
 
         <!-- Select Script -->
@@ -298,12 +289,12 @@
             </label>
         </div>
 
-        <div id="create-machine-cost">
         {{#if view.price}}
+        <div id="create-machine-cost">      
             Estimated price
-            <span>{{view.price}}</span>
-        {{/if}}
+            <span>{{view.price}}</span>        
         </div>
+        {{/if}}
 
         {{#if Mist.machinesController.addingMachine}}
             <div id="machine-add-loader" class="ajax-loader"></div>
