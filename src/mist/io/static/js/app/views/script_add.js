@@ -87,6 +87,7 @@ define('app/views/script_add', ['app/views/controlled'],
             //
 
             clear: function () {
+                console.log('i run');
                 this.closeTypeSelect();
                 this.closeSourceSelect();
                 $('#add-script').collapsible('collapse');

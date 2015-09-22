@@ -90,11 +90,13 @@
 }
 
 #single-script-page #run-script .ui-collapsible-heading > a {
-    background-color: #fff !important;
     border: 1px solid #b5b5b5;
+    padding-left: .75em !important;
+}
+#run-script .ui-collapsible-heading > a {
+    background-color: #fff !important;
     color: #444 !important;
     font-size: 14px;
-    padding-left: .75em !important;
 }
 #run-script .ui-collapsible-heading > a:after {
     background-image: none;
