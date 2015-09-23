@@ -221,9 +221,7 @@ def backend_creds(context, backend):
         key_button = context.browser.find_element_by_id("machine_key")
         key_button.click()
         sleep(2)
-        context.execute_steps(u"""
-        When I click the button "Add Key"
-        """)
+        context.execute_steps(u'When I click the button "Add Key"')
         sleep(2)
         key_name = context.browser.find_element_by_id("key-add-id")
         key_name.send_keys("libvirt")

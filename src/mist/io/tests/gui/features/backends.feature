@@ -8,6 +8,7 @@ Feature: Add second-tier backends
   @all-backends
   Scenario Outline:
     When I click the button "Add cloud"
+    And I wait for 1 seconds
     And I click the button "<provider>"
     And I wait for 1 seconds
     And I use my "<credentials>" credentials
