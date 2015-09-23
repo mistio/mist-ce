@@ -81,16 +81,50 @@ define('app/views/script_add', ['app/views/controlled'],
                 return Mist.scriptAddController.newScript.source.value == 'github';
             }.property('Mist.scriptAddController.newScript.source'),
 
+            load: function () {
+               Ember.run.next(function(){
+                   $( "#add-script" ).collapsible({
+                       expand: function(event, ui) {
+                           Mist.scriptAddController.open();
+
+                           var id = $(this).attr('id'),
+                           overlay = id ? $('#' + id+'-overlay') : false;
+                           if (overlay) {
+                               overlay.removeClass('ui-screen-hidden').addClass('in');
+                           }
+                           $(this).children().next().hide();
+                           $(this).children().next().slideDown(250);
+                       }
+                   });
+               });
+            }.on('didInsertElement'),
+
+
+            unload: function () {
+               Ember.run.next(function(){
+                   $( "#add-script" ).collapsible({
+                       collapse: function(event, ui) {
+                           Mist.scriptAddController.close();
+
+                           $(this).children().next().slideUp(250);
+                           var id = $(this).attr('id'),
+                           overlay = id ? $('#' + id+'-overlay') : false;
+                           if (overlay) {
+                               overlay.removeClass('in').addClass('ui-screen-hidden');
+                           }
+                       }
+                   });
+               });
+            }.on('willDestroyElement'),
+
 
             //
             //  Methods
             //
 
             clear: function () {
-                console.log('i run');
                 this.closeTypeSelect();
                 this.closeSourceSelect();
-                $('#add-script').collapsible('collapse');
             },
 
             selectType: function (type) {

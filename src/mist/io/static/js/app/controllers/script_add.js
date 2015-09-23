@@ -35,7 +35,7 @@ define('app/controllers/script_add', ['ember'],
                     script: that.get('newScript'),
                     callback: function (success) {
                         if (success)
-                            that.close();
+                            $('#add-script').collapsible('collapse');
                     }
                 })
             },

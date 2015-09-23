@@ -36,13 +36,11 @@
                  data-expanded-icon="carat-u"
                  data-iconpos="right">
                     <h4>
-                        {{#with Mist.scriptAddController.newScript.type as |type|}}
-                                {{#if type.label}}
-                                    {{type.label}}
-                                {{else}}
-                                    Select type
-                                {{/if}}
-                        {{/with}}
+                        {{#if Mist.scriptAddController.newScript.type}}
+                            {{Mist.scriptAddController.newScript.type.label}}
+                        {{else}}
+                            Select type
+                        {{/if}}
                     </h4>
                     <ul data-role="listview">
                         {{#each view.scriptTypes as |scriptType|}}
@@ -66,13 +64,11 @@
                 data-collapsed-icon="carat-d"
                 data-expanded-icon="carat-u">
                     <h4>
-                        {{#with Mist.scriptAddController.newScript.source as |source|}}
-                                {{#if source.label}}
-                                    {{source.label}}
-                                {{else}}
-                                    Select source
-                                {{/if}}
-                        {{/with}}
+                        {{#if Mist.scriptAddController.newScript.source}}
+                            {{Mist.scriptAddController.newScript.source.label}}
+                        {{else}}
+                            Select source
+                        {{/if}}
                     </h4>
                     <ul data-role="listview">
                         {{#each view.scriptSources as |scriptSource|}}

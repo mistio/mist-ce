@@ -31,7 +31,7 @@ define('app/views/controlled', [],
                 var that = this;
                 Ember.run.next(function(){
                     $('body').enhanceWithin();
-                    
+
                     $("[data-role='collapsible']").collapsible({
                         collapse: function(event) {
                             $(this).children().next().slideUp(250);
