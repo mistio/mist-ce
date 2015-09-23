@@ -574,26 +574,26 @@ textarea {
 
 @media only screen and  (max-width: 600px) {
     #create-machine.ui-collapsible-collapsed,
-    #create-script.ui-collapsible-collapsed,
+    #add-script.ui-collapsible-collapsed,
     #create-network.ui-collapsible-collapsed {
         width: initial !important;
     }
 
     #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
-    #create-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
+    #add-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
     #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading {
         width: 63px;
         height: 63px;
     }
 
     #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle,
-    #create-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle,
+    #add-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle,
     #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle {
         padding: 0 !important;
     }
 
     #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title,
-    #create-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title,
+    #add-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title,
     #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title {
         display: none;
     }
