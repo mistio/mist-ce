@@ -127,7 +127,7 @@ h4.pendingSelect > a {
 }
 #backend-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
     margin-left: -10px;
-    color: #444;
+    color: #b5b5b5;
 }
 #backend-add .field-wrapper .filled .ui-collapsible-heading-toggle {
     color: #444 !important;
