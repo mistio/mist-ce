@@ -100,14 +100,34 @@ h4.pendingSelect > a {
 #backend-add .field-wrapper .ui-collapsible-heading > a:after {
     content: '\0073';
 }
-#backend-add .field-wrapper.filled .ui-btn.icon-check:after {
+#backend-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn,
+#backend-add .field-wrapper.is-file.filled .first-child .ui-btn {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    color: #444;
+}
+#backend-add .field-wrapper.is-file.filled .last-child .ui-btn {
+    text-indent: initial;
+}
+#backend-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn:hover,
+#backend-add .field-wrapper.is-file.filled .first-child .ui-btn:hover {
+    color: #444 !important;
+}
+#backend-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn:after,
+#backend-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
+    font-family: 'MistIcons';
+    content: '\0047';
     right: 7px;
     top: 17px;
+    font-size: 19px;
+    margin-top: -10px;
     position: absolute;
+    text-transform: none;
+    background-image: none;
 }
-#backend-add .field-wrapper.filled .ui-btn.icon-check {
-    background-color: #b5b5b5;
-    border-color: #b5b5b5;
+#backend-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
+    margin-left: -10px;
+    color: #fff;
 }
 #backend-add .field-wrapper .filled .ui-collapsible-heading-toggle {
     color: #444 !important;

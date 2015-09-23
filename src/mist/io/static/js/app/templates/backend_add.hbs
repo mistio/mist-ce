@@ -49,7 +49,7 @@
                     {{/if}}
 
                     <!-- Field Wrapper -->
-                    <div class="field-wrapper {{if field.value 'filled' 'empty'}} {{if field.optional '' 'required'}}">
+                    <div class="field-wrapper {{if field.isFile 'is-file'}} {{if field.value 'filled' 'empty'}} {{if field.optional '' 'required'}}">
                         <div class="first-child {{if field.helpText '' 'last-child'}}">
                             {{#if field.isText}}
                                 {{input type="text"
@@ -59,7 +59,7 @@
                                     value=field.value}}
                             {{/if}}
                             {{#if field.isFile}}
-                                <a class="ui-btn ui-btn-d is-file {{if field.value 'icon-check'}}"
+                                <a class="ui-btn ui-btn-d ui-shadow"
                                     id={{field.name}}
                                     {{action "uploadFile" field target=view}}>
                                     {{#if field.value}}
