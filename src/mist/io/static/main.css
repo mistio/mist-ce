@@ -1528,17 +1528,16 @@ ul.checkbox-list .ui-grid-b {
 .field-wrapper > div > .ui-input-text {
     border-width: 1px;
 }
-.field-wrapper .first-child > .ui-btn {
-    line-height: .7em;
-}
-.field-wrapper #certificate,
-.field-wrapper #private_key,
+.field-wrapper .is-file,
 .field-wrapper .ui-input-text input,
 .field-wrapper .ui-collapsible-heading-toggle,
 .field-wrapper .ui-listview .ui-btn {
-    line-height: 21px;
+    line-height: 21px !important;
     padding-top: 5.5px !important;
     padding-bottom: 5.5px !important;
+}
+.field-wrapper .is-file {
+    margin: 8px 0 !important;
 }
 .field-wrapper .ui-icon-question {
     height: 32px;

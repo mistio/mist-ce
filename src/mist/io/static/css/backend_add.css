@@ -100,6 +100,11 @@ h4.pendingSelect > a {
 #backend-add .field-wrapper .ui-collapsible-heading > a:after {
     content: '\0073';
 }
+#backend-add .field-wrapper.filled .ui-btn.icon-check:after {
+    right: 7px;
+    top: 17px;
+    position: absolute;
+}
 #backend-add .field-wrapper .filled .ui-collapsible-heading-toggle {
     color: #444 !important;
     background-color: #fff !important;
@@ -263,5 +268,5 @@ h4.pendingSelect > a {
 
 #certificate,
 #private_key {
-    text-transform: uppercase;
+    text-transform: capitalize;
 }

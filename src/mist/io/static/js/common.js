@@ -616,6 +616,7 @@ var PROVIDER_MAP = {
             type: 'file',
             label: ' ',
             buttonText: 'Add Certificate',
+            buttonFilledText: 'Edit Certificate',
             helpText: 'Your Azure certificate PEM file',
             helpHref: 'http://docs.mist.io/article/18-adding-microsoft-azure'
         }
@@ -802,21 +803,24 @@ var PROVIDER_MAP = {
                     name: 'key_file',
                     type: 'file',
                     label: 'PEM Key',
-                    buttonText: 'Add key',
+                    buttonText: 'Add Key',
+                    buttonFilledText: 'Edit Key',
                     optional: true
                 },
                 {
                     name: 'cert_file',
                     type: 'file',
                     label: 'PEM Certificate',
-                    buttonText: 'Add certificate',
+                    buttonText: 'Add Certificate',
+                    buttonFilledText: 'Edit Certificate',
                     optional: true
                 },
                 {
                     name: 'ca_cert_file',
                     type: 'file',
                     label: 'CA Certificate',
-                    buttonText: 'Add CA certificate',
+                    buttonText: 'Add CA Certificate',
+                    buttonFilledText: 'Edit CA Certificate',
                     optional: true
                 }
             ],
@@ -880,7 +884,8 @@ var PROVIDER_MAP = {
             name: 'private_key',
             label: ' ',
             type: 'file',
-            buttonText: 'Add JSON key',
+            buttonText: 'Add JSON Key',
+            buttonFilledText: 'Edit JSON Key',
             helpText: 'You can create a new key on your GCE portal',
             helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
         }

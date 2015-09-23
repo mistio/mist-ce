@@ -59,10 +59,14 @@
                                     value=field.value}}
                             {{/if}}
                             {{#if field.isFile}}
-                                <a class="ui-btn ui-btn-d"
+                                <a class="ui-btn ui-btn-d is-file {{if field.value 'icon-check'}}"
                                     id={{field.name}}
                                     {{action "uploadFile" field target=view}}>
-                                        {{unbound field.buttonText}}
+                                    {{#if field.value}}
+                                        {{field.buttonFilledText}}
+                                    {{else}}
+                                        {{field.buttonText}}                                        
+                                    {{/if}}
                                 </a>
                             {{/if}}
                             {{#if field.isCheckbox}}
