@@ -97,7 +97,7 @@ def assert_machine_probed(context, name, seconds):
 
 def get_machine(context, name):
     try:
-        placeholder = context.browser.find_element_by_id("machines")
+        placeholder = context.browser.find_element_by_id("machine-list-page")
         machines = placeholder.find_elements_by_tag_name("li")
 
         for machine in machines:
@@ -195,7 +195,7 @@ def ssh_key_is_added(context, ssh_key_name):
     # first we have to find the keys button
     buttons = context.browser.find_elements_by_class_name('ui-btn')
     for button in buttons:
-        if 'Add key' in button.text:
+        if 'add key' in button.text.lower():
             # if there no keys then it will be called "Add key"
             context.execute_steps(u"""
                 Then I click the button "Add key"
@@ -204,7 +204,7 @@ def ssh_key_is_added(context, ssh_key_name):
                 And I wait for 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
                 Then If the key addition was successful
-                And I click the button "Back"
+                Then I click the button "Enable Monitoring"
             """)
             return
         elif re.search("\d{1,2}\skeys?", button.text):
