@@ -316,7 +316,9 @@ def go_to_some_page_without_waiting(context, title):
                                           "after 5 seconds" % title.lower()
             sleep(1)
 
-    end_time = time() + 5
+    # this code will stop waiting after 3 seconds if nothing appears otherwise
+    # it will stop as soon as a list is loaded
+    end_time = time() + 3
     while time() < end_time:
         try:
             list_of_things = context.browser.find_element_by_id('%s-list' % title.lower().rpartition(title[-1])[0])
@@ -325,6 +327,4 @@ def go_to_some_page_without_waiting(context, title):
                 break
         except NoSuchElementException:
             pass
-        assert time() + 1 < end_time, "%s list page has not appeared " \
-                                      "after 5 seconds" % title.lower()
         sleep(1)

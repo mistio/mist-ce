@@ -207,18 +207,22 @@ def ssh_key_is_added(context, ssh_key_name):
                 Then I click the button "Enable Monitoring"
             """)
             return
-        elif re.search("\d{1,2}\skeys?", button.text):
+        elif 'keys' in button.text.lower():
             # otherwise it will be called "? keys" where ? is the number of
             # saved keys. before adding the key we need to check if it's already
             # saved
-            context.execute_steps(u"""
-                Then I click the button "%s"
-            """ % button.text)
+            context.execute_steps(u'Then I click the button "keys"')
             try:
-                machine_keys_list = context.browser.find_element_by_id("machine-keys")
-                machines_keys = context.browser.find_elements_by_class_name("small-list-item")
+                machine_keys_list = context.browser.find_element_by_id(
+                    "machine-keys")
+                machines_keys = context.browser.find_elements_by_class_name(
+                    "probed")
                 for machines_key in machines_keys:
-                    if machines_key.text == context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']:
+                    if machines_key.text == \
+                            context.mist_config['CREDENTIALS'][ssh_key_name][
+                                'key_name']:
+                        context.execute_steps(u'Then I click the button '
+                                              u'"Enable Monitoring"')
                         return
             except NoSuchElementException:
                 pass
@@ -229,7 +233,7 @@ def ssh_key_is_added(context, ssh_key_name):
                 And I wait for 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
                 And If the key addition was successful
-                Then I click the button "Back"
+                Then I click the button "Enable Monitoring"
             """ % (button.text, ssh_key_name))
 
 
