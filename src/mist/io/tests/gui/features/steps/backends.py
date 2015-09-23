@@ -250,8 +250,6 @@ def rename_backend(context, new_name):
 @then(u'the "{backend}" backend should be added within {seconds} seconds')
 def backend_added(context, backend, seconds):
     end_time = time() + int(seconds)
-    # import ipdb
-    # ipdb.set_trace()
     while time() < end_time:
         button = search_for_button(context, backend, btn_cls='cloud-btn')
         if button:
