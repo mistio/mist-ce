@@ -20,11 +20,12 @@
 
         {{component "rule-list" rules=view.rules}}
 
-        <div id="monitoring-bottom-btns" class="{{if view.pendingFirstStats 'hidden'}}">
+        <div id="monitoring-bottom-btns">
             <div data-rule="ui-grid-a">
                 <div class="ui-block-a">
                     <a id="add-rule-button"
                       class="{{if Mist.rulesController.creatingPending 'ui-state-disabled'}}
+                             {{if view.pendingFirstStats 'hidden'}}
                              ui-btn ui-shadow ui-btn-d ui-btn-icon-right icon-plus ui-caps"
                         {{action "addRuleClicked" target=view}}>
                             Add Rule
