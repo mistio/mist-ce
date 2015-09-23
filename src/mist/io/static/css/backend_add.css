@@ -100,11 +100,11 @@ h4.pendingSelect > a {
 #backend-add .field-wrapper .ui-collapsible-heading > a:after {
     content: '\0073';
 }
-#backend-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn,
-#backend-add .field-wrapper.is-file.filled .first-child .ui-btn {
+#backend-add .field-wrapper.is-file.filled .ui-btn {
     background-color: #FAF9F4;
     border-color: #FAF9F4;
     color: #444;
+    font-size: 16px;
 }
 #backend-add .field-wrapper.is-file.filled .last-child .ui-btn {
     text-indent: initial;
@@ -127,7 +127,7 @@ h4.pendingSelect > a {
 }
 #backend-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
     margin-left: -10px;
-    color: #fff;
+    color: #444;
 }
 #backend-add .field-wrapper .filled .ui-collapsible-heading-toggle {
     color: #444 !important;
