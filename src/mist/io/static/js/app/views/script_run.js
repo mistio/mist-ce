@@ -24,7 +24,7 @@ define('app/views/script_run', ['app/views/popup'],
             actions: {
                 machineClicked: function (machine) {
                     Mist.scriptRunController.get('scriptToRun').set('machine', machine);
-                    this.$('#script-run-machine').collapsible('collapse');
+                    $('#script-run-machine').collapsible('collapse');
                 },
                 backClicked: function () {
                     Mist.scriptRunController.close();

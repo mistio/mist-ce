@@ -81,10 +81,6 @@
 #single-script-page .log-list ul li a {
     margin: 0;
 }
-#run-script .ui-collapsible-content {
-    max-height: 120px;
-    overflow-y: auto;
-}
 #run-script .ui-collapsible-heading {
     text-transform: capitalize;
 }
@@ -119,6 +115,8 @@
     margin: 0;
     border: 1px solid #b5b5b5;
     margin: -1px 0 0 !important;
+    max-height: 120px;
+    overflow-y: auto;
 }
 #run-script .empty.required .ui-collapsible-heading > a {
     color: #7f7f7f !important;
@@ -133,7 +131,7 @@
     border: none;
 }
 #run-script .ui-collapsible-content .ui-listview .ui-btn:hover {
-    background-color: #66C2E0;
+    background-color: #66C2E0 !important;
     color: #fff !important;
 }
 #single-script-page #run-script .ui-collapsible .ui-collapsible-heading a,
@@ -142,6 +140,7 @@
     padding-top: 5.5px !important;
     padding-bottom: 5.5px !important;
     font-size: 14px;
+    text-transform: initial;
 }
 #single-script-page .command-container {
     white-space: pre !important;

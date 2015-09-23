@@ -33,6 +33,17 @@ define('app/views/popup', ['app/views/controlled', 'ember'],
             open: function (position) {
                 var popupId = this.popupId;
                 Ember.run.next(function(){
+
+                    // Render collapsibles
+                    if ($(popupId + ' .ui-collapsible').length) {
+                        $(popupId + ' .ui-collapsible').collapsible().enhanceWithin();
+                    }
+
+                    // Render listviews
+                    if ($(popupId + ' .ui-listview').length) {
+                        $(popupId + ' .ui-listview').listview().listview('refresh');
+                    }
+
                     $('body').enhanceWithin();
                     if (position)
                         $(popupId).popup('option', 'positionTo', position);

@@ -58,7 +58,6 @@ define('app/controllers/script_edit', ['ember'],
                 if (this.newName && this.newName != this.script.name) {
                     formReady = true;
                 }
-                console.log(formReady);
                 this.set('formReady', formReady);
             },
 

@@ -6,7 +6,7 @@ ilb { display: inline-block; }  .provider-vultr { background-image: url('icon-sp
 .provider-hpcloud { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-hpcloud { background-position: -0px -240px; }
 .provider-indonesian { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-indonesian { background-position: -0px -288px; }
 .image-redhat { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .image-redhat { background-position: -0px -336px; }
-.provider-openstack { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-openstack { background-position: -0px -384px; }
+.provider-openstack { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-openstack { background-position: -0px -382px; }
 .user { background-image: url('icon-sprite-1432130152.png') !important; width: 36px; height: 36px; } .user { background-position: -0px -432px; }
 .image-canonical { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .image-canonical { background-position: -0px -468px; }
 .staroff:after { background-image: url('icon-sprite-1432130152.png') !important; width: 19px; height: 19px; } .staroff:after { background-position: -0px -516px; }
