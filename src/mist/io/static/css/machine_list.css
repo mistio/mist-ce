@@ -150,8 +150,8 @@
 .machine-state {
     width: 21.6% !important;
     text-align: center;
-    margin-left: -18px;
-    font-weight: bold;
+    margin-left: -22px;
+    font-weight: 400;
 }
 
 .machine-state .ajax-loader {
