@@ -184,7 +184,7 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # element of the list
     # also doing some cleaning if the text attribute also sends back texts
     # of sub elements
-    button = filter(lambda b: b.text.split('\n')[0].lower() == text.lower()
+    button = filter(lambda b: b.text.rstrip().lstrip().split('\n')[0].lower() == text.lower()
                     and b.value_of_css_property('display') == 'block',
                     button_collection)
     if len(button) > 0:
@@ -193,8 +193,8 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # if we haven't found the exact text then we search for something that
     # looks like it
     for button in button_collection:
-        button_text = button.text.split('\n')[0]
-        if text.lower() in button_text.lower():
+        button_text = button.text.split('\n')
+        if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
             return button
 
     return None
@@ -230,13 +230,8 @@ def wait_for_buttons_to_appear(context):
     end_time = time() + 100
     while time() < end_time:
         try:
-            machines_button = None
-            col = context.browser.find_elements_by_class_name('ui-btn')
-            for button in col:
-                if 'Machines' in button.text:
-                    machines_button = button
-                    break
-            counter_span = machines_button.find_element_by_tag_name("span")
+            images_button = search_for_button(context, 'Images')
+            counter_span = images_button.find_element_by_class_name("ui-li-count")
             counter = int(counter_span.text)
             break
         except (NoSuchElementException, StaleElementReferenceException,
@@ -248,18 +243,13 @@ def wait_for_buttons_to_appear(context):
 
 @then(u'{counter_title} counter should be greater than {counter_number} within '
       u'{seconds} seconds')
-def images_counter_loaded(context, counter_title, counter_number, seconds):
-    elements = context.browser.find_elements_by_tag_name("li")
-    counter_found = False
-    for element in elements:
-        if counter_title in element.text:
-            counter_found = True
-            break
+def some_counter_loaded(context, counter_title, counter_number, seconds):
+    counter_found = search_for_button(context, counter_title)
     assert counter_found, "Counter with name %s has not been found" % counter_title
 
     end_time = time() + int(seconds)
     while time() < end_time:
-        counter_span = element.find_element_by_tag_name("span")
+        counter_span = counter_found.find_element_by_class_name("ui-li-count")
         counter = int(counter_span.text)
 
         if counter > int(counter_number):

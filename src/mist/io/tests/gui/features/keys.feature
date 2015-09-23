@@ -44,4 +44,5 @@ Feature: Actions for Keys
     And I click the button "Delete"
     And I wait for 1 seconds
     And I click the button "Yes"
+    And I wait for 1 seconds
     Then "RenamedFirstKey" key should be deleted
