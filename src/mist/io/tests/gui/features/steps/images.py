@@ -45,7 +45,11 @@ def assert_starred_image(context, text):
 
 @when(u'I search for a "{text}" Image')
 def search_image(context, text):
-    search_bar = context.browser.find_element_by_id("search-term-input")
+    search_bar = context.browser.find_elements_by_class_name("image-search")
+    assert len(search_bar) > 0, "Could not find the image search input"
+    assert len(search_bar) == 1, "Found more than one image search input " \
+                                 "elements"
+    search_bar = search_bar[0]
     for letter in text:
         search_bar.send_keys(letter)
     sleep(2)
