@@ -9,7 +9,8 @@ Feature: Machines
   @machines-ec2
   Scenario: Machine Actions EC2
     When I visit the Machines page after the counter has loaded
-    And I click the button "Create"
+    And I click the button "Create Machine"
+    And I wait for 1 seconds
     And I fill in a random machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
     And I click the "EC2" button inside the "Create Machine" panel

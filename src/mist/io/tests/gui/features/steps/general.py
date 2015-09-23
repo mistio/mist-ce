@@ -139,22 +139,24 @@ def click_button_within_popup(context, text, popup):
 
 @when(u'I click the "{text}" button inside the "{panel_title}" panel')
 def click_button_within_panel(context, text, panel_title):
-    panels = context.browser.find_elements_by_class_name("ui-panel-open")
-    if not panels:
-        assert False, u'No open panels found. Maybe the driver got refocused ' \
-                      u'or the panel failed to open'
+    panels = filter(lambda panel: 'ui-collapsible-collapsed' not in
+                                  panel.get_attribute('class'),
+                    context.browser.find_elements_by_class_name(
+                        "ui-collapsible"))
+    assert panels, u'No open panels found. Maybe the driver got refocused ' \
+                   u'or the panel failed to open'
 
     found_panel = None
     for panel in panels:
-        header = panel.find_element_by_tag_name("h1")
-        if panel_title in header.text:
+        header = panel.find_element_by_class_name("ui-collapsible-heading")
+        header = header.find_element_by_class_name("title")
+        if panel_title.lower() in header.text.lower():
             found_panel = panel
             break
 
-    if not found_panel:
-        assert False, u'Panel with Title %s could not be found. Maybe the ' \
-                      u'driver got refocused or the panel failed to open or ' \
-                      u'there is no panel with that title' % panel_title
+    assert found_panel, u'Panel with Title %s could not be found. Maybe the ' \
+                        u'driver got refocused or the panel failed to open or ' \
+                        u'there is no panel with that title' % panel_title
 
     buttons = found_panel.find_elements_by_class_name("ui-btn")
     click_button_from_collection(context, text, buttons,
@@ -288,31 +290,6 @@ def go_to_some_page_after_counter_loading(context, title, counter_title):
 
     go_to_some_page_without_waiting(context, title)
 
-    if title == 'Machines':
-        element_id = 'machines'
-    elif title == 'Images':
-        element_id = 'image-list'
-    elif title == 'Keys':
-        sleep(5)
-        return
-    elif title == 'Scripts':
-        sleep(5)
-        return
-    elif title == 'Networks':
-        element_id = 'networks'
-    end_time = time() + 5
-    while time() < end_time:
-        try:
-            # item_list = context.browser.find_element_by_id("%s-list" %
-            #                                                title.lower())
-            item_list = context.browser.find_element_by_id(element_id)
-            items = item_list.find_element_by_tag_name('li')
-            return
-        except NoSuchElementException:
-            sleep(1)
-
-    assert False, "%s list has not loaded after 5 seconds" % title
-
 
 @when(u'I visit the {title} page')
 def go_to_some_page_without_waiting(context, title):
@@ -328,21 +305,11 @@ def go_to_some_page_without_waiting(context, title):
             context.execute_steps(u'When I click the button "Home"')
     context.execute_steps(u'Then I wait for the links in homepage to appear')
     context.execute_steps(u'When I click the button "%s"' % title)
-    if title == 'Machines':
-        element_id = 'machine-list-page'
-    elif title == 'Images':
-        element_id = 'image-list-page'
-    elif title == 'Keys':
-        element_id = 'key-list-page'
-    elif title == 'Scripts':
-        element_id = 'script-list-page'
-    elif title == 'Networks':
-        element_id = 'network-list-page'
+
     end_time = time() + 5
     while time() < end_time:
         try:
-            # context.browser.find_element_by_id('%s-list-page' % title.lower())
-            context.browser.find_element_by_id(element_id)
+            context.browser.find_element_by_id('%s-list-page' % title.lower().rpartition(title[-1])[0])
             break
         except NoSuchElementException:
             assert time() + 1 < end_time, "%s list page has not appeared " \
