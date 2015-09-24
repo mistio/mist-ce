@@ -216,7 +216,6 @@ define('app/views/machine_monitoring',
 
                     Mist.graphsController.model.removeObject(graph);
                     graph.set('isHidden', true);
-                    warn('collapsed', graph);
                     Ember.run.next(function(){
                         Mist.graphsController.model.pushObject(graph);
                     });
@@ -407,13 +406,6 @@ define('app/views/machine_monitoring',
                         canMinimize: true,
                     }
                 });
-
-                Ember.run.next(function () {
-                    return;
-                    $('#time-window-control select')
-                        .val(cookie.timeWindow)
-                        .trigger('change');
-                });
             },
 
             _hideGraphs: function () {
@@ -525,7 +517,6 @@ define('app/views/machine_monitoring',
             _ruleUpdated: function (event) {
                 if (this.machine.equals)
                     if (this.machine.equals(event.object.machine)){
-                        warn('updating', event.object);
                         this.rules.findBy('id', event.object.id).update(event.object);
                     }
             },

@@ -102,7 +102,6 @@ define('app/controllers/rules',
             },
 
             _updateObject: function (object) {
-                warn('update rule');
                 Ember.run.next(this, function(){
                     this.getObject(object.id).update(object);
                     this.trigger('onUpdate', {
