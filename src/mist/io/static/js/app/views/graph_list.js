@@ -15,7 +15,7 @@ define('app/views/graph_list', [],
             //
 
             layoutName: "graph_list",
-            actionProxy: null,
+            actionProxy: null
         });
     }
 );

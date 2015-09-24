@@ -62,7 +62,6 @@ define('app/views/rule', [],
             //
 
             update: function () {
-
                 // Prevent multiple requests
                 if (this.isUpdating)
                     return;
@@ -74,7 +73,6 @@ define('app/views/rule', [],
 
                 this.set('isUpdating', true);
                 Ember.run.later(this, function () {
-                    this.set('isUpdating', false);
                     var that = this;
                     Mist.rulesController.editRule({
                         rule: this.get('rule'),
@@ -85,11 +83,11 @@ define('app/views/rule', [],
                         callback: function (success) {
                             if (!success)
                                 that.updateTextValues();
+                            that.set('isUpdating', false);
                         }
                     });
                 }, 500);
             },
-
 
             updateTextValues: function () {
                 this.setProperties({
@@ -98,9 +96,7 @@ define('app/views/rule', [],
                 });
             },
 
-
             showAdvancedCondition: function (userClicked) {
-
                 var el = '#' + this.elementId;
 
                 // If user clicked the button to show the advanced condition,

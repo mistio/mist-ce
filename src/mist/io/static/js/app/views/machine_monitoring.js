@@ -59,6 +59,7 @@ define('app/views/machine_monitoring',
                 Mist.set('ma', this);
                 // Add event handlers
                 Mist.rulesController.on('onAdd', this, '_ruleAdded');
+                Mist.rulesController.on('onUpdate', this, '_ruleUpdated');
                 Mist.rulesController.on('onDelete', this, '_ruleDeleted');
                 Mist.metricsController.on('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.on('onMetricDelte', this, '_metricDeleted');
@@ -69,6 +70,7 @@ define('app/views/machine_monitoring',
             unload: function () {
                 // Remove event handlers
                 Mist.rulesController.off('onAdd', this, '_ruleAdded');
+                Mist.rulesController.off('onUpdate', this, '_ruleUpdated');
                 Mist.rulesController.off('onDelete', this, '_ruleDeleted');
                 Mist.metricsController.off('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.off('onMetricDelte', this, '_metricDeleted');
@@ -178,19 +180,14 @@ define('app/views/machine_monitoring',
                 },
 
                 graphButtonClicked: function (graph) {
-                    graph.view.set('isHidden', false);
+                    Mist.graphsController.model.removeObject(graph);
+                    graph.set('isHidden', false);
+                    Mist.graphsController.model.pushObject(graph);
 
                     // Update cookie
                     var entry = Mist.cookiesController.getSingleMachineGraphEntry(
                         this.machine, graph).hidden = false;
                     Mist.cookiesController.save();
-
-                    // Manipulate DOM
-
-                    moveGraphToEnd(graph.id);
-                    Ember.run.later(function () {
-                        moveGraphButtonToEnd(graph.id);
-                    }, 400);
                 },
 
 
@@ -199,8 +196,6 @@ define('app/views/machine_monitoring',
                 //
 
                 collapseClicked: function (graph) {
-                    graph.view.set('isHidden', true);
-
                     // Update cookie
                     // shift indexes and set this collapsed graph to be
                     // the last one
@@ -219,11 +214,12 @@ define('app/views/machine_monitoring',
                     graph.set('index', lastIndex);
                     Mist.cookiesController.save();
 
-                    // Manipulate DOM
-                    moveGraphButtonToEnd(graph.id);
-                    Ember.run.later(function () {
-                        moveGraphToEnd(graph.id);
-                    }, 400);
+                    Mist.graphsController.model.removeObject(graph);
+                    graph.set('isHidden', true);
+                    warn('collapsed', graph);
+                    Ember.run.next(function(){
+                        Mist.graphsController.model.pushObject(graph);
+                    });
                 },
 
                 removeClicked: function (graph) {
@@ -526,6 +522,14 @@ define('app/views/machine_monitoring',
                         this.rules.pushObject(event.object);
             },
 
+            _ruleUpdated: function (event) {
+                if (this.machine.equals)
+                    if (this.machine.equals(event.object.machine)){
+                        warn('updating', event.object);
+                        this.rules.findBy('id', event.object.id).update(event.object);
+                    }
+            },
+
             _ruleDeleted: function (event) {
                 if (this.machine.equals)
                     if (this.machine.equals(event.object.machine))
@@ -560,27 +564,5 @@ define('app/views/machine_monitoring',
                 Ember.run.once(this, '_updateGraphs');
             }.observes('metrics.[]'),
         });
-
-        function moveGraphToEnd(graphId) {
-            var parent = $("#" + graphId).parent();
-            var prev = parent.prev();
-            var next = parent.next();
-
-            // Move to end
-            parent.detach().appendTo('#graphs');
-            prev.detach().appendTo('#graphs');
-            next.detach().appendTo('#graphs');
-        };
-
-        function moveGraphButtonToEnd(graphId) {
-            var parent = $("#" + graphId + '-btn').parent();
-            var prev = parent.prev();
-            var next = parent.next();
-
-            // Move to end
-            parent.detach().insertBefore($('#add-metric-btn'));
-            prev.detach().insertBefore($('#add-metric-btn'));
-            next.detach().insertBefore($('#add-metric-btn'));
-        };
     }
 );
