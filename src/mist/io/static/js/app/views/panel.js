@@ -4,42 +4,31 @@ define('app/views/panel', ['app/views/controlled'],
     //
     //  @returns Class
     //
-    function (ControlledView) {
+    function (ControlledComponent) {
 
         'use strict';
 
-        return ControlledView.extend({
+        return ControlledComponent.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             panelId: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             init: function () {
                 this._super();
-                this.set('panelId', this.getWidgetID());
             },
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             open: function () {
                 this.animateToTop();
@@ -48,11 +37,9 @@ define('app/views/panel', ['app/views/controlled'],
                 this.handlePageHeight();
             },
 
-
             close: function () {
                 $(this.panelId).panel('close');
             },
-
 
             animateToTop: function () {
                 $('.ui-page-active').animate({
@@ -63,13 +50,11 @@ define('app/views/panel', ['app/views/controlled'],
                 }, 'slow');
             },
 
-
             handlePanelWidth: function () {
                 $('.ui-panel-dismiss-position-right').css('right',
                     $('.ui-panel-position-right.ui-panel-open').width()
                 );
             },
-
 
             handlePageHeight: function () {
                 Ember.run.next(function () {

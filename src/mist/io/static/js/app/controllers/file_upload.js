@@ -39,7 +39,11 @@ define('app/controllers/file_upload', ['ember'],
                     .set('file', defaultText)
                     .set('callback', callback);
 
-                $('#file-upload').popup('open');
+                Ember.run.next(function(){
+                    $('#file-upload').popup({afteropen: function() {
+                        $('#file-upload-screen').height(screen.height);
+                    }}).popup('open');
+                })
             },
 
 
@@ -74,7 +78,7 @@ define('app/controllers/file_upload', ['ember'],
                         that.set('file', e.target.result);
                         success = true;
                     } else {
-                        Mist.notificationsController.notify('Failed to upload file');
+                        Mist.notificationController.notify('Failed to upload file');
                         success = false
                     }
                     that.set('uploadingFile', false);

@@ -108,69 +108,98 @@ def click_button(context, text):
     the text given. If it doesn't find any button like that then it will try
     to find a button that contains the text given.
     """
-    buttons = context.browser.find_elements_by_class_name("ui-btn")
-    click_button_from_collection(context, text, buttons,
-                                 u'Could not find button that contains %s'
-                                 % text)
+    click_button_from_collection(context, text,
+                                 error_message='Could not find button that contains %s'
+                                               % text)
 
 
 @when(u'I click the "{text}" button inside the "{popup}" popup')
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
-        if popup in pop.text:
-            buttons = pop.find_elements_by_class_name("ui-btn")
-            click_button_from_collection(context, text, buttons,
-                                         u'Could not find %s button in %s popup'
-                                         % (text, popup))
+        if popup.lower() in pop.text.lower():
+            if text == '_x_':
+                buttons = pop.find_elements_by_class_name("close")
+                assert len(buttons) > 0, "Could not find the close button"
+                for i in range(0, 2):
+                    try:
+                        clicketi_click(context, buttons[0])
+                        return
+                    except WebDriverException:
+                        sleep(1)
+                assert False, u'Could not click the close button'
+            else:
+                buttons = pop.find_elements_by_class_name("ui-btn")
+                click_button_from_collection(context, text, buttons,
+                                             'Could not find %s button in %s popup'
+                                             % (text, popup))
+                return
+    assert False, "Could not find popup with title %s" % popup
 
 
 @when(u'I click the "{text}" button inside the "{panel_title}" panel')
 def click_button_within_panel(context, text, panel_title):
-    panels = context.browser.find_elements_by_class_name("ui-panel-open")
-    if not panels:
-        assert False, u'No open panels found. Maybe the driver got refocused ' \
-                      u'or the panel failed to open'
+    panels = filter(lambda panel: 'ui-collapsible-collapsed' not in
+                                  panel.get_attribute('class'),
+                    context.browser.find_elements_by_class_name(
+                        "ui-collapsible"))
+    assert panels, u'No open panels found. Maybe the driver got refocused ' \
+                   u'or the panel failed to open'
 
     found_panel = None
     for panel in panels:
-        header = panel.find_element_by_tag_name("h1")
-        if panel_title in header.text:
+        header = panel.find_element_by_class_name("ui-collapsible-heading")
+        header = header.find_element_by_class_name("title")
+        if panel_title.lower() in header.text.lower():
             found_panel = panel
             break
 
-    if not found_panel:
-        assert False, u'Panel with Title %s could not be found. Maybe the ' \
-                      u'driver got refocused or the panel failed to open or ' \
-                      u'there is no panel with that title' % panel_title
+    assert found_panel, u'Panel with Title %s could not be found. Maybe the ' \
+                        u'driver got refocused or the panel failed to open or ' \
+                        u'there is no panel with that title' % panel_title
 
     buttons = found_panel.find_elements_by_class_name("ui-btn")
     click_button_from_collection(context, text, buttons,
-                                 u'Could not find %s button inside %s panel' %
-                                 (text, panel_title))
+                                 error_message='Could not find %s button'
+                                               ' inside %s panel' %
+                                               (text, panel_title))
 
 
-def click_button_from_collection(context, text, button_collection, error_message):
+def click_button_from_collection(context, text, button_collection=None,
+                                 error_message="Could not find button"):
+    button = search_for_button(context, text, button_collection)
+    assert button, error_message
+    for i in range(0, 2):
+        try:
+            clicketi_click(context, button)
+            return
+        except WebDriverException:
+            sleep(1)
+        assert False, u'Could not click button that says %s' % button.text
+
+
+def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
+    if not button_collection:
+        button_collection = context.browser.find_elements_by_class_name(btn_cls)
+    # search for button with exactly the same text. sometimes the driver returns
+    # the same element more than once and that's why we return the first
+    # element of the list
+    # also doing some cleaning if the text attribute also sends back texts
+    # of sub elements
+    button = filter(lambda b: b.text.rstrip().lstrip().split('\n')[0].lower() == text.lower()
+                    and b.value_of_css_property('display') == 'block',
+                    button_collection)
+    if len(button) > 0:
+        return button[0]
+
+    # if we haven't found the exact text then we search for something that
+    # looks like it
     for button in button_collection:
-        if text == button.text:
-            for i in range(0, 2):
-                try:
-                    clicketi_click(context, button)
-                    return
-                except WebDriverException:
-                    sleep(1)
-            assert False, u'Could not click button that says %s' % button.text
+        button_text = button.text.split('\n')
+        if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
+            return button
 
-    for button in button_collection:
-        if text in button.text:
-            for i in range(0, 2):
-                try:
-                    clicketi_click(context, button)
-                    return
-                except WebDriverException:
-                    sleep(1)
-            assert False, u'Could not click button that says %s' % button.text
-    assert False, error_message
+    return None
 
 
 def clicketi_click(context, button):
@@ -203,13 +232,8 @@ def wait_for_buttons_to_appear(context):
     end_time = time() + 100
     while time() < end_time:
         try:
-            machines_button = None
-            col = context.browser.find_elements_by_class_name('ui-btn')
-            for button in col:
-                if 'Machines' in button.text:
-                    machines_button = button
-                    break
-            counter_span = machines_button.find_element_by_tag_name("span")
+            images_button = search_for_button(context, 'Images')
+            counter_span = images_button.find_element_by_class_name("ui-li-count")
             counter = int(counter_span.text)
             break
         except (NoSuchElementException, StaleElementReferenceException,
@@ -221,18 +245,13 @@ def wait_for_buttons_to_appear(context):
 
 @then(u'{counter_title} counter should be greater than {counter_number} within '
       u'{seconds} seconds')
-def images_counter_loaded(context, counter_title, counter_number, seconds):
-    elements = context.browser.find_elements_by_tag_name("li")
-    counter_found = False
-    for element in elements:
-        if counter_title in element.text:
-            counter_found = True
-            break
+def some_counter_loaded(context, counter_title, counter_number, seconds):
+    counter_found = search_for_button(context, counter_title)
     assert counter_found, "Counter with name %s has not been found" % counter_title
 
     end_time = time() + int(seconds)
     while time() < end_time:
-        counter_span = element.find_element_by_tag_name("span")
+        counter_span = counter_found.find_element_by_class_name("ui-li-count")
         counter = int(counter_span.text)
 
         if counter > int(counter_number):
@@ -271,31 +290,6 @@ def go_to_some_page_after_counter_loading(context, title, counter_title):
 
     go_to_some_page_without_waiting(context, title)
 
-    if title == 'Machines':
-        element_id = 'machines'
-    elif title == 'Images':
-        element_id = 'image-list'
-    elif title == 'Keys':
-        sleep(5)
-        return
-    elif title == 'Scripts':
-        sleep(5)
-        return
-    elif title == 'Networks':
-        element_id = 'networks'
-    end_time = time() + 5
-    while time() < end_time:
-        try:
-            # item_list = context.browser.find_element_by_id("%s-list" %
-            #                                                title.lower())
-            item_list = context.browser.find_element_by_id(element_id)
-            items = item_list.find_element_by_tag_name('li')
-            return
-        except NoSuchElementException:
-            sleep(1)
-
-    assert False, "%s list has not loaded after 5 seconds" % title
-
 
 @when(u'I visit the {title} page')
 def go_to_some_page_without_waiting(context, title):
@@ -311,23 +305,26 @@ def go_to_some_page_without_waiting(context, title):
             context.execute_steps(u'When I click the button "Home"')
     context.execute_steps(u'Then I wait for the links in homepage to appear')
     context.execute_steps(u'When I click the button "%s"' % title)
-    if title == 'Machines':
-        element_id = 'machine-list-page'
-    elif title == 'Images':
-        element_id = 'image-list-page'
-    elif title == 'Keys':
-        element_id = 'key-list-page'
-    elif title == 'Scripts':
-        element_id = 'script-list-page'
-    elif title == 'Networks':
-        element_id = 'network-list-page'
+
     end_time = time() + 5
     while time() < end_time:
         try:
-            # context.browser.find_element_by_id('%s-list-page' % title.lower())
-            context.browser.find_element_by_id(element_id)
+            context.browser.find_element_by_id('%s-list-page' % title.lower().rpartition(title[-1])[0])
             break
         except NoSuchElementException:
             assert time() + 1 < end_time, "%s list page has not appeared " \
                                           "after 5 seconds" % title.lower()
             sleep(1)
+
+    # this code will stop waiting after 3 seconds if nothing appears otherwise
+    # it will stop as soon as a list is loaded
+    end_time = time() + 3
+    while time() < end_time:
+        try:
+            list_of_things = context.browser.find_element_by_id('%s-list' % title.lower().rpartition(title[-1])[0])
+            lis = list_of_things.find_elements_by_tag_name('li')
+            if len(lis) > 0:
+                break
+        except NoSuchElementException:
+            pass
+        sleep(1)

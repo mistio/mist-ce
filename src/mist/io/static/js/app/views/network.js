@@ -10,13 +10,11 @@ define('app/views/network', ['app/views/page'],
 
         return App.NetworkView = PageView.extend({
 
+            templateName: 'network',
 
-            //
             //
             //  Properties
             //
-            //
-
 
             network: null,
             extra: null,
@@ -24,11 +22,8 @@ define('app/views/network', ['app/views/page'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function() {
 
@@ -41,8 +36,7 @@ define('app/views/network', ['app/views/page'],
                         this.updateExtra();
                     }
                     Ember.run.next(function(){
-                        $('#single-network-subnets').trigger('create');
-                        $('#single-network-subnets').collapsible();
+                        $('#single-network-subnets').collapsible().enhanceWithin();
                     });
                 });
             }.on('didInsertElement'),
@@ -57,11 +51,8 @@ define('app/views/network', ['app/views/page'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             updateCurrentNetwork: function() {
                 Ember.run(this, function() {
@@ -74,16 +65,13 @@ define('app/views/network', ['app/views/page'],
                         this.updateExtra();
                     }
                 });
-                $('#single-network-subnets').trigger('create');
+                $('#single-network-subnets').enhanceWithin();
             },
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
 
@@ -103,7 +91,7 @@ define('app/views/network', ['app/views/page'],
                             if (didConfirm) {
                                 that.network.backend.networks.deleteNetwork(networkId, function (success) {
                                     if (success)
-                                        Mist.Router.router.transitionTo('networks');
+                                    Mist.__container__.lookup('router:main').transitionTo('networks');
                                 });
                             }
                         }
@@ -127,11 +115,8 @@ define('app/views/network', ['app/views/page'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             updateExtra: function () {
                 var newExtra = [];
@@ -146,7 +131,7 @@ define('app/views/network', ['app/views/page'],
                 Ember.run.next(function () {
                     $('#single-network-extra').collapsible();
                 });
-            }.observes('network.extra.@each'),
+            }.observes('network.extra.[]'),
         });
     }
 );

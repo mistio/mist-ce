@@ -7,11 +7,11 @@ define('app/views/key_list', ['app/views/page'],
     function (PageView) {
         return App.KeyListView = PageView.extend({
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            templateName: 'key_list',
+
+            //
+            //  Initialization
+            //
 
             load: function () {
 
@@ -31,32 +31,34 @@ define('app/views/key_list', ['app/views/page'],
             }.on('willDestroyElement'),
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+             //
+             //  Methods
+             //
 
             updateFooter: function () {
                 switch (Mist.keysController.selectedKeys.length) {
-                case 0:
-                    $('#key-list-page .ui-footer').slideUp();
-                    break;
-                case 1:
-                    $('#key-list-page .ui-footer').slideDown().find('a').removeClass('ui-state-disabled');
-                    break;
-                default:
-                    $('#key-list-page .ui-footer').slideDown().find('a').addClass('ui-state-disabled');
-                    break;
+                    case 0:
+                        $('#key-list-page .ui-footer')
+                        .slideUp()
+                        .find('a').addClass('ui-state-disabled');
+                        break;
+                    case 1:
+                        $('#key-list-page .ui-footer')
+                        .slideDown()
+                        .find('a').removeClass('ui-state-disabled');
+                        break;
+                    default:
+                        $('#key-list-page .ui-footer')
+                        .slideDown()
+                        .find('#keys-rename-btn').addClass('ui-state-disabled').end()
+                        .find('#keys-default-btn').addClass('ui-state-disabled');
                 }
             },
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //  Actions
+            //
 
             actions: {
 
@@ -82,11 +84,10 @@ define('app/views/key_list', ['app/views/page'],
 
 
                 selectionModeClicked: function (mode) {
-
                     $('#select-keys-popup').popup('close');
 
                     Ember.run(function () {
-                        Mist.keysController.content.forEach(function (key) {
+                        Mist.keysController.filteredKeys.forEach(function (key) {
                             key.set('selected', mode);
                         });
                     });
@@ -94,23 +95,30 @@ define('app/views/key_list', ['app/views/page'],
 
 
                 deleteClicked: function () {
-
-                    var keyId = Mist.keysController.selectedKeys[0].id;
-
+                    var keyNames = Mist.keysController.selectedKeys.toStringByProperty('id');
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.YES_NO,
                         head: 'Delete key',
                         body: [
                             {
-                                paragraph: 'Are you sure you want to delete "' +
-                                    keyId + '" ?'
+                                paragraph: 'Are you sure you want to delete ' +
+                                (Mist.keysController.selectedKeys.length > 1 ? 'these keys: ' : 'this key: ') +
+                                    keyNames + ' ?'
                             }
                         ],
                         callback: function (didConfirm) {
-                            if (didConfirm)
-                                Mist.keysController.deleteKey(keyId);
+                            if (didConfirm) {
+                                Mist.keysController.selectedKeys.forEach(function (key) {
+                                    Mist.keysController.deleteKey(key.id);
+                                });
+                            }
                         }
                     });
+                },
+
+
+                clearClicked: function() {
+                    Mist.keysController.clearSearch();
                 }
             }
         });

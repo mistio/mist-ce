@@ -1,33 +1,34 @@
-define('app/views/key_edit', ['app/views/templated'],
+define('app/views/key_edit', ['app/views/popup'],
     /**
      *  Key Edit View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
+    function (PopupComponent) {
 
-        return App.KeyEditView = TemplatedView.extend({
+        return App.KeyEditComponent = PopupComponent.extend({
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            layoutName: 'key_edit',
+            controllerName: 'keyEditController',
+            popupId: '#rename-key-popup',
+
+            //
+            // Methods
+            //
+
 
             updateSaveButton: function () {
-                if (Mist.keysController.renamingKey || !Mist.keyEditController.formReady) {
-                    $('#rename-key-ok').addClass('ui-state-disabled');
-                } else {
+                if (Mist.keyEditController.formReady) {
                     $('#rename-key-ok').removeClass('ui-state-disabled');
+                } else {
+                    $('#rename-key-ok').addClass('ui-state-disabled');
                 }
             },
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            // Actions
+            //
 
             actions: {
 
@@ -43,15 +44,14 @@ define('app/views/key_edit', ['app/views/templated'],
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            // Observers
+            //
+            
 
             updateSaveButtonObserver: function () {
                 Ember.run.once(this, 'updateSaveButton');
-            }.observes('Mist.keyEditController.formReady', 'Mist.keysController.renamingKey')
+            }.observes('Mist.keyEditController.formReady')
         });
     }
 );

@@ -7,7 +7,6 @@
 
 #custom-plugin-advanced {
     display: none;
-    margin-bottom: 25px;
 }
 
 #metric-add-custom .ui-slider {
@@ -47,4 +46,33 @@
 }
 #metric-add-custom-popup .ui-block-b {
     padding-left: 5px
+}
+
+#metric-add-custom-popup .ui-checkbox label {
+    font-size: 16px;
+}
+#metric-add-custom-popup .ui-checkbox label:hover {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    color: #000000 !important;
+}
+
+#metric-add-custom-popup .ui-checkbox label:after {
+    background-image: none !important;
+    background-color: transparent !important;
+    opacity: 1;
+    -webkit-transition: color .2s linear;
+    transition: color .2s linear;
+}
+
+#metric-add-custom-popup .ui-checkbox label.ui-checkbox-on:after {
+    color: #000;
+}
+
+#metric-add-custom-popup .ui-checkbox label.ui-checkbox-off:after {
+    color: #d1d1d1;
+}
+
+#metric-add-custom-popup .ui-checkbox label.ui-checkbox-off:hover:after {
+    color: #444444 !important;
 }

@@ -1,32 +1,26 @@
-define('app/views/messagebox', ['app/views/templated'],
+define('app/views/messagebox', [],
     //
     //  Message Box View
     //
     // @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return App.MessageBoxView = TemplatedView.extend({
+        return App.MessageBoxComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-
+            layoutName: 'messagebox',
             popup: '#message-box',
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 this.set('popup', $(this.popup));
@@ -40,11 +34,8 @@ define('app/views/messagebox', ['app/views/templated'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             open: function () {
                 Ember.run.later(this, function () {
@@ -55,21 +46,16 @@ define('app/views/messagebox', ['app/views/templated'],
                 }, 400);
             },
 
-
             close: function () {
                 this.popup.popup('close');
             },
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 okClicked: function() {
                     Mist.notificationController.messageBox.close();
                 },

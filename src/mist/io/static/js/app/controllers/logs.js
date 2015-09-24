@@ -1,4 +1,4 @@
-define('app/controllers/logs', ['app/models/log', 'ember'],
+define('app/controllers/logs', ['app/models/log'],
     //
     //  Logs Controller
     //
@@ -8,30 +8,32 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
 
         'use strict';
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Controller.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
             //
-            //
 
-
-            content: [],
+            model: [],
             loading: null,
             view: null,
-
+            prettyTimeReady: false,
 
             load: function() {
                 if (!Mist.logs)  {
                     info('Log channel not yet ready');
                     Ember.run.later(this, this.load, 350);
                 } else {
-                    Mist.get('logs').on('logs', this, this.handleResponse);
-                    Mist.get('logs').on('event', this, this.handleStream);
+                    if (Mist.get('logs').channel._listeners.event == undefined)
+                        Mist.get('logs').on('event', this, this.handleStream);
+                    if (Mist.get('logs').channel._listeners.logs == undefined)
+                        Mist.get('logs').on('logs', this, this.handleResponse);
                     this.search();
                 }
+            },
+
+            unload: function() {
+                this.set('model', []);
             },
 
             search: function() {
@@ -51,11 +53,8 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
 
 
             //
-            //
             //  Pseudo-Private Methods
             //
-            //
-
 
             _reload: function () {
                 Ember.run.later(this, function () {
@@ -63,38 +62,35 @@ define('app/controllers/logs', ['app/models/log', 'ember'],
                 }, 2000);
             },
 
-
-            _setContent: function (logs) {
+            _setModel: function (logs) {
                 Ember.run(this, function () {
-                    var newContent = [];
+                    var newModel = [];
                     logs.forEach(function (log) {
-                        newContent.push(Log.create(log));
+                        newModel.push(Log.create(log));
                     });
-                    this.set('content', newContent);
+                    this.set('model', newModel);
                     this.trigger('onLogListChange');
                 });
             },
 
-
-            _prependContent: function (logs) {
+            _prependModel: function (logs) {
                 Ember.run(this, function () {
-                    var additionalContent = [];
+                    var additionalModel = [];
                     logs.forEach(function (log) {
-                        additionalContent.push(Log.create(log));
+                        additionalModel.push(Log.create(log));
                     });
-                    this.get('content').unshiftObjects(additionalContent);
+                    this.get('model').unshiftObjects(additionalModel);
                     this.trigger('onLogListChange');
                 });
             },
 
-
-            _appendContent: function (logs) {
+            _appendModel: function (logs) {
                 Ember.run(this, function () {
-                    var additionalContent = [];
+                    var additionalModel = [];
                     logs.forEach(function (log) {
-                        additionalContent.push(Log.create(log));
+                        additionalModel.push(Log.create(log));
                     });
-                    this.get('content').pushObjects(additionalContent);
+                    this.get('model').pushObjects(additionalModel);
                     this.trigger('onLogListChange');
                 });
             }

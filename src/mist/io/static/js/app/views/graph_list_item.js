@@ -1,55 +1,48 @@
-define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
+define('app/views/graph_list_item', ['d3', 'c3'],
     //
     //  Graph View
     //
     //  @returns Class
     //
-    function (TemplatedView, d3, c3) {
+    function (d3, c3) {
 
         'use strict';
 
-        return App.GraphListItemView = TemplatedView.extend({
+        return App.GraphListItemComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-
+            layoutName: 'graph_list_item',
             graph: null,
-
             unit: null,
             isHidden: null,
             actionProxy: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
-
                 Ember.run.next(this, function () {
                     this.graph.set('view', this);
                 });
-
             }.on('didInsertElement'),
 
-
             unload: function () {
-
+                var charts = this.get('charts') || [];
+                charts.forEach(function(chart) { chart.destroy(); });
+                Ember.run.next(this, function () {
+                    if (this.graph)
+                        this.graph.set('view', null);
+                });
             }.on('willDestroyElement'),
 
 
             //
-            //
             //  Methods
-            //
             //
 
             draw: function (reload) {
@@ -79,9 +72,13 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                     lastpoint = source0.datapoints[source0.datapoints.length-1];
 
                 // prepare x axis column
-                var x = ['x'].pushObjects(source0.datapoints.map(
+                var x = source0.datapoints.map(
                     function(point) { return point.time }
-                ));
+                );
+
+                if (x[0] != 'x') {
+                    x = ['x'].pushObjects(x);
+                }
 
                 var tickFormat = '%b %Y', timedelta = x[x.length-1]-x[1];
 
@@ -162,6 +159,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                     } else { // generate new chart
                         charts.push(c3.generate({
                             bindto: '#' + batch.id,
+                            padding: {
+                                right: 20
+                            },
                             data: {
                                 x: 'x',
                                 columns: cols,
@@ -191,7 +191,7 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                                     },
                                     min: 0,
                                     padding: {
-                                        bottom: 0
+                                        bottom: 10
                                     }
                                 }
                             },
@@ -213,6 +213,9 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                                         return graph.valueText(value) + unit;
                                     }
                                 }
+                            },
+                            color: {
+                                pattern: ['#0099CC', '#8c76d1', '#D46355', '#FFC65D', '#64B247', '#FF1B00', '#000000', '#C87600']
                             }
                         }));
                         that.set('charts', charts);
@@ -220,13 +223,11 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                 });
             },
 
-
             clearData: function () {
                 this.graph.datasources.forEach(function (datasource) {
                     datasource.clear();
                 });
             },
-
 
             enableAnimation: function () {
                 this.set('animationEnabled', true);
@@ -234,31 +235,21 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
-
-            isStreamingObserver: function () {
-                return; // TODO: fixme
-                if (Mist.graphsController.stream.isStreaming)
-                    this.enableAnimation();
-                else
-                    this.disableAnimation(true);
-            }.observes('Mist.graphsController.stream.isStreaming'),
-
 
             isVisibleObserver: function () {
-                if (this.isHidden){
-                    warn('hiding', '#' + this.graph.id);
-                    $('#' + this.graph.id).parent().hide(400);
-                } else if (this.isHidden !== undefined) {
-                    $('#' + this.graph.id).parent().show(400);
+                var isHidden = this.isHidden,
+                id = '#' + this.graph.id + '-0';
+                if (isHidden) {
+                    warn('real id', this.graph.id + '-0');
+                    warn('hiding', this.graph.id);
+                    $(id).parent().hide();
+                } else if (isHidden !== undefined) {
+                    $(id).parent().show();
                     this.draw();
                 }
             }.observes('isHidden'),
-
 
             isEmptyObserver: function () {
                 if (this.graph.isEmpty)
@@ -266,7 +257,6 @@ define('app/views/graph_list_item', ['app/views/templated', 'd3', 'c3'],
                 else
                     $('#' + this.id).parent().show(500);
             }.observes('graph.isEmpty'),
-
 
             fetchingStatsObserver: function () {
                 return; //TODO fixme

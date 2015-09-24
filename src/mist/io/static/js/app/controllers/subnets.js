@@ -13,7 +13,7 @@ define('app/controllers/subnets', [
 
         return BaseArrayController.extend({
 
-            model: SubnetModel,
+            baseModel: SubnetModel,
             passOnProperties: ['network']
 
         });

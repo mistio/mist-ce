@@ -4,17 +4,18 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
     //
     //  @returns Class
     //
-    function (ListItemView) {
+    function (ListItemComponent) {
 
         'use strict'
 
-        return App.IpAddressListItemView = ListItemView.extend({
+        return App.IpAddressListItemComponent = ListItemComponent.extend({
 
+            layoutName: 'ip_address_list_item',
             tagName: 'tr',
             pendingToggle: null,
             domID: function () {
-                return '_' + this.get('model').get('id').replace(/\./g, '');
-            }.property('controller.model.id'),
+                return this.get('model') && '_' + this.get('model').ipaddress.replace(/\./g, '');
+            }.property(),
 
             updateReservedToggle: function (reserved) {
                 this.set('pendingToggle', true);
@@ -23,8 +24,8 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
                 ).slider('refresh');
             },
 
-            actions: {
 
+            actions: {
                 reservedToggled: function () {
                     if (this.get('pendingToggle')) {
                         this.set('pendingToggle', false);
@@ -32,12 +33,14 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
                     }
                     var ip = this.get('model');
                     var that = this;
-                    ip.reserve({
+                    ip.get('network').get('backend').get('networks').reserveIP({
                         reserve: !ip.reserved,
                         callback: function (success) {
                             if (!success)
                                 that.updateReservedToggle();
-                        }
+                        },
+                        network: ip.get('network'),
+                        ip: ip
                     });
                 },
 
@@ -52,6 +55,7 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
                     });
                 }
             },
+
 
             reservedObserver: function () {
                 Ember.run.once(this, 'updateReservedToggle');

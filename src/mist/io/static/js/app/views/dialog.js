@@ -4,12 +4,16 @@ define('app/views/dialog', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.DialogView = PopupView.extend({
+        return App.DialogPopupComponent = PopupComponent.extend({
 
+
+            layoutName: 'dialog',
+            controllerName: 'dialogController',
+            popupId: "#dialog",
 
             //
             //
@@ -48,7 +52,7 @@ define('app/views/dialog', ['app/views/popup'],
             open: function () {
                 Ember.run.later(this, function () {
                     $(this.popupId)
-                        .trigger('create')
+                        .popup()
                         .popup('reposition', {positionTo: 'window'})
                         .popup('open');
                 }, 300);

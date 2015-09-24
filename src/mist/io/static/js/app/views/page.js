@@ -1,26 +1,21 @@
-define('app/views/page', ['app/views/templated'],
+define('app/views/page', [],
     //
     //  Page View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return TemplatedView.extend({
-
-
-            //
-            //
-            //  Initialization
-            //
-            //
-
-
-            didInsertElement: function () {
+        return Ember.View.extend({
+            init: function () {
                 this._super();
-                $('.ui-page-active').parent().trigger('create');
+                Ember.run.scheduleOnce('afterRender', this, function() {
+                    var element = this.$();
+                    if (element)
+                        element.enhanceWithin();
+                });
             }
         });
     }

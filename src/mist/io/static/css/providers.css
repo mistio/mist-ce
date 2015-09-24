@@ -11,9 +11,13 @@
 
 .provider-icon-small,
 .image-icon-small {
-    float:left;
-    width: 24px;
-    height: 24px;
+    float:right;
+    width: 20px;
+    height: 20px;
+    margin-left: 20px !important;
+    margin-right: -6px !important;
+    position: relative;
+    top: 1px;
 }
 
 .provider-icon-small span,
@@ -22,10 +26,12 @@
     height: 50px;
     width: 50px;
     position: relative;
-    left: -19px;
-    transform: scale(0.4, 0.4);
-    -webkit-transform: scale(0.4,0.4);
+    left: -18px;
     bottom: 15px;
+    -webkit-transform: scale(0.4,0.4);
+    -ms-transform: scale(0.4, 0.4);
+    transform: scale(0.4, 0.4);
+    background-repeat: no-repeat;
 }
 
 .single-view-icon-wrapper.generic {

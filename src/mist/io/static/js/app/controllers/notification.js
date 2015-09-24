@@ -10,23 +10,16 @@ define('app/controllers/notification', ['ember'],
 
         return Ember.Object.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             timeout: null,
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             notify: function (message) {
                 $('#notification-popup h1').text(message);
@@ -35,7 +28,6 @@ define('app/controllers/notification', ['ember'],
                     $('#notification-popup').hide();
                 }, this.timeout ? this.timeout : 5000);
             },
-
 
             timeNotify: function (message, miliseconds) {
                 $('#notification-popup h1').text(message);
@@ -57,21 +49,15 @@ define('app/controllers/notification', ['ember'],
 
 
             //
-            //
             //  Message Box Object
-            //
             //
 
 
             messageBox: Ember.Object.create({
 
-
-                //
                 //
                 //  Properties
                 //
-                //
-
 
                 view: null,
                 options: Ember.Object.create({
@@ -84,11 +70,8 @@ define('app/controllers/notification', ['ember'],
 
 
                 //
-                //
                 //  Methods
                 //
-                //
-
 
                 open: function (args) {
                     this._clear();
@@ -97,7 +80,6 @@ define('app/controllers/notification', ['ember'],
                     });
                     this.view.open();
                 },
-
 
                 close: function () {
                     this.view.close();
@@ -108,11 +90,8 @@ define('app/controllers/notification', ['ember'],
 
 
                 //
-                //
                 //  Pseudo-Private Methods
                 //
-                //
-
 
                 _clear: function () {
                     this.options.setProperties({

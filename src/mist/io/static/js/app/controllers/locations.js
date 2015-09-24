@@ -14,7 +14,7 @@ define('app/controllers/locations',
 
         return BaseArrayController.extend({
 
-            model: LocationModel
+            baseModel: LocationModel
 
         });
     }

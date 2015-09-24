@@ -1,18 +1,16 @@
 <div id="graphBar">
-
-    {{#each Mist.graphsController.content}}
-        {{view "graphButton"
-            graphBinding="this"
-            actionProxyBinding="view.actionProxy"}}
+    {{#each Mist.graphsController.model as |graph|}}
+        {{component "graph-button"
+            graph=graph
+            actionProxy=view.actionProxy}}
     {{/each}}
 
     {{#if Mist.graphsController.config.canModify}}
         <div class="graph-button" id="add-metric-btn">
-            <a class="ui-btn ui-btn-icon-left ui-icon-plus ui-corner-all ui-btn-d"
-                {{action "addGraphClicked" target="view.actionProxy"}}>
+            <a class="ui-btn ui-shadow ui-btn-icon-right ui-caps icon-plus ui-btn-d"
+                {{action "addGraphClicked" target=view.actionProxy}}>
                     Add Graph
             </a>
         </div>
     {{/if}}
-
 </div>

@@ -10,23 +10,16 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
         return Ember.Object.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             checkingMonitoring: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function(callback) {
                 if (!Mist.authenticated) {
@@ -37,14 +30,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             enableMonitoring: function(machine, callback, noSsh) {
-
                 var that = this;
                 machine.set('enablingMonitoring', true);
 
@@ -61,13 +50,11 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     Mist.set('authenticated', true);
                     that._enableMonitoring(machine);
                 }).error(function(message, statusCode) {
-
                     if (statusCode == 402)
                         Mist.notificationController.timeNotify(message, 5000);
                     else
                         Mist.notificationController.notify(
                             'Error when changing monitoring to ' + machine.name);
-
                 }).complete(function(success, data) {
                     machine.set('enablingMonitoring', false);
                     if (callback) callback(success, data);
@@ -108,14 +95,12 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 });
             },
 
-
             changeMonitoring: function(machine, callback) {
                 if (machine.hasMonitoring)
                     this.disableMonitoring(machine, callback);
                 else
                     this.enableMonitoring(machine, callback);
             },
-
 
             _enableMonitoring: function (machine) {
                 Ember.run(this, function () {
@@ -124,7 +109,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     this.trigger('onMonitoringEnable', machine);
                 });
             },
-
 
             _disableMonitoring: function (machine) {
                 Ember.run(this, function () {
@@ -137,25 +121,21 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 });
             },
 
-
             _updateMonitoringData: function(data) {
-
                 Mist.set('current_plan', data.current_plan);
                 Mist.set('monitored_machines', data.machines);
                 Mist.set('monitored_machines_', data.monitored_machines);
 
                 Mist.metricsController.setCustomMetrics(data.custom_metrics);
                 Mist.metricsController.setBuiltInMetrics(data.builtin_metrics);
-                Mist.rulesController.setContent(data.rules);
+                Mist.rulesController.setModel(data.rules);
 
-                Mist.backendsController.content.forEach(function (backend) {
+                Mist.backendsController.model.forEach(function (backend) {
                    backend.machines._updateMonitoredMachines();
                 });
             },
 
-
             getMonitoringCommand: function (machine, callback) {
-
                 var url = '/backends/' + machine.backend.id +
                     '/machines/' + machine.id + '/monitoring';
 
@@ -181,21 +161,14 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
 
             //
-            //
             //  Cookies
             //
-            //
-
 
             cookies: {
-
-
                 timeWindow: null,
                 collapsedGraphs: null,
 
-
                 load: function () {
-
                     this.disableOldCookie();
 
                     if (document.cookie.indexOf('mistio-monitoring') == -1)
@@ -218,9 +191,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     this.collapsedGraphs = info.collapsedGraphs || [];
                 },
 
-
                 save: function (metrics) {
-
                     var cookieExpire = new Date();
                     cookieExpire.setFullYear(cookieExpire.getFullYear() + 2);
 
@@ -233,7 +204,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
                     document.cookie = cookie;
                 },
-
 
                 disableOldCookie: function () {
                     if (document.cookie.indexOf('collapsedGraphs') > -1)

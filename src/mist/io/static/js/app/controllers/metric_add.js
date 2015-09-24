@@ -38,7 +38,6 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
                 this.clear();
                 this.set('machine', machine)
                     .set('callback', callback);
-
                 this.view.open();
                 this.loadMetrics();
             },

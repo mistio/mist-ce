@@ -4,29 +4,24 @@ define('app/views/image_list_item', ['app/views/list_item'],
     //
     //  @returns Class
     //
-    function (ListItemView) {
+    function (ListItemComponent) {
 
         'use strict';
 
-        return App.ImageListItemView = ListItemView.extend({
+        return App.ImageListItemComponent = ListItemComponent.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             image: null,
+            layoutName: 'image_list_item',
+            classNameBindings: ['starClass'],
 
 
-            //
             //
             //  Computed Properties
             //
-            //
-
 
             starClass: function () {
                 return this.image.star ? 'staron' : 'staroff';
@@ -34,15 +29,10 @@ define('app/views/image_list_item', ['app/views/list_item'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
-
                 toggleImageStar: function () {
                     var that = this;
                     this.image.toggle(function (success, star) {
@@ -52,14 +42,8 @@ define('app/views/image_list_item', ['app/views/list_item'],
                     });
                 },
 
-
                 launchImage: function () {
-                    this.image.backend.images.content.addObject(this.image);
-                    Mist.machineAddController.open();
-                    Ember.run.next(this, function () {
-                        Mist.machineAddController.view._actions.selectProvider(this.image.backend);
-                        Mist.machineAddController.view._actions.selectImage(this.image);
-                    });
+                    info(this.image);
                 }
             }
         });

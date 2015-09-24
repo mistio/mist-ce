@@ -5,21 +5,54 @@
     left: 10px !important;
     margin-bottom: 55px !important;
 }
-#machine-tags-popup .ui-input-text {
+#machine-tags-popup .field-wrapper .ui-input-text,
+#machine-tags-popup .field-wrapper #add-tag-ok {
     float: left;
-    width: 145px;
-    display: inline-block;
-}
-#machine-tags-popup #add-tag-ok {
-    float: right;
-    bottom: 5px;
-    display: inline-block;
-}
-#machine-tags-popup #add-tag-back {
     display: block;
+    box-sizing: border-box;
+}
+#machine-tags-popup .field-wrapper .ui-input-text {
+    width: calc(100% - 63px);
+}
+#machine-tags-popup .field-wrapper #add-tag-ok {
+    padding: 5.5px 10px;
+    width: initial;
+    line-height: 21px;
+}
+#machine-tags-popup .field-wrapper:after {
+    content: '';
     clear: both;
+    display: table;
 }
 #machine-tags-popup .ui-listview {
-    clear: both;
-    margin: 20px auto;
+    margin: 10px auto 0;
+}
+#machine-tags-popup .small-list-item {
+    padding: 5px 10px;
+    border-radius: 0;
+}
+#machine-tags-popup .ui-listview p {
+    display: inline-block;
+    margin: 5px 0;
+    top: 0;
+}
+#machine-tags-popup .ui-listview .ui-btn {
+    margin: 0 0 0 10px;
+    padding: 0;
+    text-decoration: none;
+    outline: none;
+    color: rgba(0,0,0,0.2);
+    background-color: transparent;
+    width: auto;
+    border: none;
+}
+#machine-tags-popup .ui-listview .ui-btn:after {
+    font-size: 12px;
+}
+#machine-tags-popup .ui-listview .ui-btn:hover {
+    color: #444 !important;
+}
+
+#machine-tags-popup .ui-listview .ui-btn:active {
+    color: #fff !important;
 }

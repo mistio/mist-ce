@@ -12,13 +12,9 @@ define('app/models/stats_request', ['ember'],
 
         return Ember.Object.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             id: null,
             url: null,
@@ -30,11 +26,8 @@ define('app/models/stats_request', ['ember'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 var machine = this.datasources[0].machine;
@@ -48,11 +41,8 @@ define('app/models/stats_request', ['ember'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             canMerge: function (statsRequest) {
                 if (this.url == statsRequest.url)
@@ -62,7 +52,6 @@ define('app/models/stats_request', ['ember'],
                 return false;
             },
 
-
             merge: function (statsRequest) {
                 this.datasources.pushObjects(statsRequest.datasources);
                 this._updateMetrics();
@@ -70,11 +59,8 @@ define('app/models/stats_request', ['ember'],
 
 
             //
-            //
             //  Pseudo-Private Methods
             //
-            //
-
 
             _updateMetrics: function () {
                 this.datasources.forEach(function (datasource) {

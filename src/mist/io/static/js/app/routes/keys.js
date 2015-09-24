@@ -13,7 +13,7 @@ define('app/routes/keys', ['app/routes/base'],
             documentTitle: 'mist.io - keys',
 
             exit: function () {
-                Mist.keysController.content.setEach('selected', false);
+                Mist.keysController.model.setEach('selected', false);
             }
         });
     }
