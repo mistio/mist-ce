@@ -5,15 +5,33 @@
     <meta charset="utf-8">
     <meta content='True' name='HandheldFriendly' />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
-    <title>${project} - cloud management in your pocket</title>
-    <link rel="icon" href="resources/favicon.ico" />
-    <link rel="stylesheet" media="all" href=""/>
+    <title>${project} - manage the clouds</title>
+    <link rel="apple-touch-icon" sizes="57x57" href="/resources/images/favicons/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/resources/images/favicons/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/resources/images/favicons/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/resources/images/favicons/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/resources/images/favicons/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/resources/images/favicons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/resources/images/favicons/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/resources/images/favicons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/resources/images/favicons/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/resources/images/favicons/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/resources/images/favicons/favicon-194x194.png" sizes="194x194">
+    <link rel="icon" type="image/png" href="/resources/images/favicons/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/resources/images/favicons/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/resources/images/favicons/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="/resources/images/favicons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/resources/images/favicons/mstile-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" type="text/css">
 
     <link rel="stylesheet" type='text/css' href="resources/main.css"
           tal:condition="not:css_build"/>
 
-    <link rel="stylesheet" href="resources/mist-1440683361.css"
-          tal:condition="css_build" />
+    <link rel="stylesheet" href="resources/dist/mist${last_build}.css"
+        tal:condition="css_build"/>
 
     <script tal:content="string: var IS_CORE=${is_core}" />
     <script tal:content="string: var URL_PREFIX=${core_uri}" />
@@ -22,10 +40,12 @@
     <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script tal:content="string: var EMAIL=${email}" />
+    <script tal:content="string: var FIRST_NAME=${first_name}" />
+    <script tal:content="string: var LAST_NAME=${last_name}" />
     <script tal:content="string: var CSRF_TOKEN=${csrf_token}" />
     <script tal:content="string: var BETA_FEATURES=${beta_features}" />
 
-    <script src="resources/js/lib/require/require.js"></script>
+    <script src="resources/dist/requirejs/require.js"></script>
 
     <script>
         if (JS_BUILD) {
@@ -33,16 +53,16 @@
                 baseUrl: 'resources/js/',
                 paths: {
                     //the optimized mist.js source file.
-                    "app": "../build/mist-1440683361"
+                    "app": "../dist/mist${last_build}"
                 }
             });
             require(["app"]);
         }else{
             require.config({
-                // not optimized js, usefull for bedugging
+                // not optimized js, usefull for debugging
                 baseUrl: 'resources/js/'
             });
-            require(["app"]);
+            require(["dev"]);
         }
     </script>
 
@@ -75,34 +95,6 @@
     <!-- Shell calibration element -->
     <div id="font-test"></div>
 
-    <!-- Notification widget -->
-    <div id="notification-popup" class="ui-loader ui-corner-all ui-body-b ui-loader-verbose ui-loader-textonly">
-        <span class="ui-icon-loading"></span>
-        <h1>Failed to get monitoring data</h1>
-    </div>
-
-    <!-- Ember Views -->
-    <script type="text/x-handlebars" data-template-name="application">
-        {{outlet}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="index">
-        {{view "home"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="machines">
-        {{view "machineList"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="images">
-        {{view "imageList"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="networks">
-        {{view "networkList"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="keys">
-        {{view "keyList"}}
-    </script>
-    <script type="text/x-handlebars" data-template-name="scripts">
-        {{view "scriptList"}}
-    </script>
 </body>
 
 </html>

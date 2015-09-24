@@ -2,6 +2,17 @@
 /* Graph List View
 -----------------------------------------------------------------------------------------------------------*/
 
+.graph-body .c3-axis {
+    stroke-width: 0;
+}
+
+.graph-list {
+    background-color: #FAF9F4;
+    clear: both;
+    padding: 1.25%;
+    letter-spacing: normal;
+}
+
 #graph-list-control .align {
     width: 49%;
     display: inline-block;
@@ -12,10 +23,8 @@
     width: 100%;
 }
 
-#single-machine-page #history-control {
-    float: right;
-    margin-top: -70px;
-    margin-right: -5px;
+#single-machine-page #top-history {
+    margin: 20px auto 40px;
 }
 
 #home-page .graphValue {
@@ -26,38 +35,76 @@
     font-weight: normal;
 }
 
+#history-control {
+    text-align: center;
+}
+
+#history-control a.time {
+    border-radius: 0em;
+    margin: 2px 0 0 0;
+    z-index: 10;
+    border-width: 0px;
+    display: inline-block;
+    vertical-align: top;
+    padding: 3px 0 0 0;
+    height: 32px;
+    box-sizing: border-box;
+    background-color: #FAF9F4;
+}
+#history-control a.time:hover {
+    background-color: #FAF9F4;
+}
+#history-control a.time.ui-state-disabled {
+    opacity: .5;
+    cursor: not-allowed !important;
+    pointer-events: initial;
+}
+#history-control a.time:after {
+    font-size: 26px;
+    color: #CAC9C5;
+    margin: 0;
+}
+#history-control a.time:hover:after {
+    color: #444;
+}
+#history-control a.time.ui-state-disabled:hover:after {
+    color: #c9c8c4;
+}
 #history-control #time-window-control {
     text-align: center;
     margin: 0;
     border-width: 0px;
-    width: 100%;
-    margin-top: -40px;
     clear: both;
-    min-width: 190px;
-}
-
-#history-control a.time {
-    width: 65px;
-    height: 39px;
-    border-radius: 0em;
-    margin: 10px -5px -6px 0px;
-    z-index: 10;
-    border-width: 0px;
-}
-
-#time-window-control {
-    margin: 0;
+    min-width: 145px;
     border-radius: 0;
-    border-left-width: 0;
-    height: 45px;
-    overflow: hidden;
+    display: inline-block;
 }
 
 #time-window-control .ui-btn {
-    line-height: 24px;
-    padding-left: 85px !important;
-    padding-right: 80px !important;
+    font-size: 18px;
+    font-weight: 400;
+    display: inline-block;
+    line-height: 28px;
+    margin: 0;
+    padding: 2px 5px !important;
     border-width: 0px;
+    color: #444;
+    background-color: #FAF9F4;
+    border: 1px solid #FAF9F4;
+}
+
+#time-window-control .ui-btn:after {
+    color: #7f7f7f;
+}
+
+#time-window-control .ui-btn:hover {
+    color: #444 !important;
+    background-color: #fff;
+    border: 1px solid #b5b5b5;
+}
+
+#time-window-control .ui-btn:hover:after {
+    color: #444 !important;
 }
 
 #time-window-control.is-streaming .ui-btn {
@@ -68,23 +115,36 @@
     padding: 5px;
 }
 
-#history-control-forward {
-    float: right;
-    margin-bottom: -57px !important;
-    margin-right: 0px !important;
-}
-
-#monitoring-collapsible h4.ui-collapsible-heading a {
-    height: 20px;
-}
-
 .graph-button {
     display: inline-block;
-    width: 150px;
+    margin: 0 5px;
+}
+
+.graph-button.graph-minimized .ui-btn {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    color: #474747;
+}
+
+.graph-button.graph-minimized .ui-btn:hover,
+.graph-button.graph-minimized .ui-btn:active {
+    color: #444 !important;
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+}
+
+.graph-button.graph-minimized .ui-btn:active {
+    color: #444 !important;
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
 }
 
 #add-metric-btn {
     display: inline-block;
+}
+
+#add-metric-btn .ui-btn {
+    font-weight: 400;
 }
 
 /* Conditional for > 800px */
@@ -99,6 +159,7 @@
     }
     #home-page .graph {
         width: 100%;
+        float: none;
     }
 }
 
@@ -138,11 +199,14 @@
 }
 
 #top-history {
-    margin-top: 20px;
-    clear: both;
+    margin: 30px 0 25px;
 }
 
 .graph .header *,
 .graph .legend * {
     display: inline-block;
+}
+
+#change-time-window .ui-listview a {
+    padding-left: 20px;
 }

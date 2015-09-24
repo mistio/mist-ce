@@ -9,6 +9,30 @@
 
 #metric-add .ui-btn {
 	margin: 0;
+    text-align: center;
+    padding-left: 19.8px !important;
+    font-size: 16px;
+}
+#metric-add .nest .ui-btn,
+#metric-add .nest .ui-btn:after {
+    color: #7f7f7f;
+}
+#metric-add .nest .ui-btn:hover,
+#metric-add .nest .ui-btn:hover:after {
+    color: #444 !important;
+}
+#metric-add .nest .ui-btn:hover {
+    background-color: #f2f2f2 !important;
+}
+#metric-add .nest .ui-btn.icon-up {
+    background-color: #e8e8e8;
+}
+
+#metric-add .nest .ui-btn {
+    border: none;
+    padding-top: .6em;
+    padding-bottom: .6em;
+    border-top: 1px solid #eeedeb;
 }
 
 #metric-add .margin {

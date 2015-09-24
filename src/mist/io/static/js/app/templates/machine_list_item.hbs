@@ -1,18 +1,18 @@
 {{#unless view.machine.isGhost}}
-    <label>{{view Mist.Checkbox checkedBinding="view.machine.selected"}}</label>
-    {{#link-to "machine" view.machine classBinding="view.monitoringIcon"}}
+    <label>{{view Mist.Checkbox checked=machine.selected}}</label>
+    {{#link-to "machine" machine}}
 
         <div class="ui-grid-b">
-            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
+            <div class="ui-block-a machine-name">{{machine.name}}</div>
 
             <span class="ui-block-b machine-state">
-                {{#unless view.machine.isUnknown}}
-                <span {{bind-attr class="view.machine.state"}}>
-                {{view.machine.state}}
+                {{#unless machine.isUnknown}}
+                <span class={{view.machine.state}}>
+                {{machine.state}}
 
-                {{#if pendingCreation}}
+                {{#if machine.pendingCreation}}
                     <div class='ajax-loader'></div>
-                {{else}} {{#if waitState}}
+                {{else}} {{#if machine.waitState}}
                     <div class='ajax-loader'></div>
                 {{/if}} {{/if}}
                 </span>
@@ -20,41 +20,39 @@
             </span>
 
             <div class="ui-block-c machine-leds">
-                <span>
-                    {{#if view.machine.hasMonitoring}}
-                        <span></span>
-                    {{/if}}
-                </span>
-                {{#unless pendingCreation}}
-                    <div {{bind-attr class="probing probed"}}>
+
+                {{#unless machine.pendingCreation}}
+                    <span class="icon-dummy monitoring-state"></span>
+
+                    <div class="{{machine.probing}} {{machine.probed}}">
                         <div class="loadleds">
-                            <div {{bind-attr class="loadavg15 :led"}}>
+                            <div class="{{machine.loadavg15}} led">
                             </div>
-                            <div {{bind-attr class="loadavg5 :led"}}>
+                            <div class="{{machine.loadavg5}} led">
                             </div>
-                            <div {{bind-attr class="loadavg1 :led"}}>
-                            </div>
-                        </div>
-                        <div {{bind-attr class=":netleds"}}>
-                            <div {{bind-attr class="netled4 :netled1"}}>
-                            </div>
-                            <div {{bind-attr class="netled3 :netled2"}}>
-                            </div>
-                            <div {{bind-attr class="netled2 :netled3"}}>
-                            </div>
-                            <div {{bind-attr class="netled1 :netled4"}}>
+                            <div class="{{machine.loadavg1}} led">
                             </div>
                         </div>
 
+                        <div class="netleds">
+                            <div class="{{machine.netled4}} netled1">
+                            </div>
+                            <div class="{{machine.netled3}} netled2">
+                            </div>
+                            <div class="{{machine.netled2}} netled3">
+                            </div>
+                            <div class="{{machine.netled1}} netled4">
+                            </div>
+                        </div>
                     </div>
                 {{/unless}}
 
             </div>
 
             <div class="ui-block-c machine-tags">
-                <span class="tag">{{view.machine.backend.title}}</span>
-                {{#each view.machine.tags}}
-                <span class="tag">{{this}}</span>
+                <span class="tag">{{machine.backend.title}}</span>
+                {{#each machine.tags as |tag|}}
+                <span class="tag">{{tag}}</span>
                 {{/each}}
             </div>
 
@@ -62,15 +60,13 @@
     {{/link-to}}
 {{else}}
 
-    <a class="ui-icon-delete" {{action disassociateGhostMachine target="view"}}>
+    <a class="ui-icon-delete" {{action "disassociateGhostMachine" target=view}}>
 
         <div class="ui-grid-b">
-            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
+            <div class="ui-block-a machine-name">{{machine.name}}</div>
 
             <span class="ui-block-b machine-state">
-                <span {{bind-attr class="view.machine.state"}}>
-                    {{view.machine.state}}
-                </span>
+                <span>{{machine.state}}</span>
             </span>
 
         </div>

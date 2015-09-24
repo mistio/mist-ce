@@ -4,19 +4,34 @@ define('app/views/script_edit', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.ScriptEditView = PopupView.extend({
+        return App.ScriptEditComponent = PopupComponent.extend({
+
+            layoutName: 'script_edit',
+            controllerName: 'scriptEditController',
+            popupId: '#script-edit-popup',
 
 
             //
+            //  Methods
+            //
+
+
+            updateSaveButton: function () {
+                if (Mist.scriptEditController.formReady) {
+                    $('#script-edit-ok').removeClass('ui-state-disabled');
+                } else {
+                    $('#script-edit-ok').addClass('ui-state-disabled');
+                }
+            },
+
+
             //
             //  Actions
             //
-            //
-
 
             actions: {
 
@@ -27,7 +42,17 @@ define('app/views/script_edit', ['app/views/popup'],
                 saveClicked: function () {
                     Mist.scriptEditController.save();
                 }
-            }
+            },
+
+
+            //
+            // Observers
+            //
+
+
+            updateSaveButtonObserver: function () {
+                Ember.run.once(this, 'updateSaveButton');
+            }.observes('Mist.scriptEditController.formReady')
         });
     }
 );

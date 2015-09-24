@@ -8,9 +8,9 @@ define('app/models/machine', ['ember'],
     function() {
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
             id: null,
             name: null,
@@ -53,13 +53,18 @@ define('app/models/machine', ['ember'],
                 stdout: null,
             }),
 
+
+            //
+            //  Computed Properties
+            //
+
             isUnknown: function () {
                 return this.get('state') == 'unknown';
             }.property('state'),
 
-            /**
-             *  Computed Properties
-             */
+            isRunning: function () {
+                return this.get('state') == 'running';
+            }.property('state'),
 
             netled1: function() {
                 if (this.latency > 0 &&  this.latency < 1000) return 'on';
@@ -93,16 +98,13 @@ define('app/models/machine', ['ember'],
                 return this.get('backend').get('images').getObject(this.imageId);
             }.property('imageId'),
 
-
             hasShell: function () {
                 return this.get('hasKeys') || this.get('backend').get('isDocker');
             }.property('hasKeys', 'backend.isDocker'),
 
-
             hasKeys: function () {
                 return !!Mist.keysController.getMachineKeysCount(this);
-            }.property('Mist.keysController.content.@each.machines'),
-
+            }.property('keysCount'),
 
             hasOpenIncident: function () {
                 if (!Mist.openIncidents) {
@@ -112,28 +114,23 @@ define('app/models/machine', ['ember'],
                 if (!incident)
                     return false;
                 return !incident.get('isClosed');
-            }.property('Mist.openIncidents.@each.machine'),
-
+            }.property('Mist.openIncidents.[].machine'),
 
             isWindows: function () {
                 return this.get('extra') && this.get('extra').os_type == 'windows';
             }.property('extra'),
 
-
             isCoreos: function () {
                 return this.get('extra') && this.get('extra').os_type == 'coreos';
             }.property('extra'),
-
 
             canConnect: function () {
                 return this.get('isWindows') || this.get('hasShell');
             }.property('isWindows', 'hasShell'),
 
-
             connectText: function () {
                 return this.get('isWindows') ? 'Connect' : 'Shell';
             }.property('isWindows'),
-
 
             host: function () {
                 var ips_v4 = [];
@@ -165,26 +162,21 @@ define('app/models/machine', ['ember'],
             }.property('isWindows', 'host', 'extra'),
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //  Methods
+            //
 
             shutdown: function(callback) {
                 this.backend.shutdownMachine(this.id, callback);
             },
 
-
             destroy: function(callback) {
                 this.backend.destroyMachine(this.id, callback);
             },
 
-
             reboot: function(callback) {
                 this.backend.rebootMachine(this.id, callback);
             },
-
 
             start: function(callback) {
                 this.backend.startMachine(this.id, callback);
@@ -194,11 +186,9 @@ define('app/models/machine', ['ember'],
                 this.backend.renameMachine(this.id,callback);
             },
 
-
             waitFor: function(state) {
                 this.set('waitState', state);
             },
-
 
             lockOn: function(state) {
                 this.set('prevState', this.state);
@@ -206,12 +196,10 @@ define('app/models/machine', ['ember'],
                 this.set('state', state);
             },
 
-
             restoreState: function() {
                 this.set('waitState', null);
                 this.set('state', this.prevState);
             },
-
 
             equals: function (machine) {
                 if (typeof machine == 'string')
@@ -227,9 +215,7 @@ define('app/models/machine', ['ember'],
                 return false;
             },
 
-
             getHost: function() {
-
                 if (this.extra && this.extra.dns_name) {
                     // it is an ec2 machine so it has dns_name
                     return this.extra.dns_name;
@@ -264,7 +250,6 @@ define('app/models/machine', ['ember'],
             },
 
             probeSuccess: function(data) {
-
                 function loadToColor(load, cores) {
                     var weightedLoad = load / cores;
                     if (weightedLoad > 1.2) {
@@ -313,11 +298,11 @@ define('app/models/machine', ['ember'],
                 this.set('df', data.df || this.df);
                 Mist.backendsController.trigger('onMachineProbe', this);
             },
-            /**
-             *
-             *  Observers
-             *
-             */
+
+
+            //
+            //  Observers
+            //
 
             stateObserver: function() {
                 if (this.waitState) {

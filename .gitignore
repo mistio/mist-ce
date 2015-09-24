@@ -1,10 +1,13 @@
 /src/mist/io/tests/passwordless
 /src/mist/io/tests/gce.json
 bin
+cloudpy
 dist
 parts
 develop-eggs
 eggs
+bower_components
+node_modules
 include
 /lib
 var
@@ -29,3 +32,5 @@ local/
 share/
 # vim files
 .*.sw[op]
+bower_components
+node_modules

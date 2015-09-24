@@ -1,48 +1,76 @@
-define('app/views/controlled', ['app/views/templated'],
+define('app/views/controlled', [],
     //
     //  Controlled View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return TemplatedView.extend({
+        return Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             controllerName: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             init: function () {
                 this._super();
-                this.set('controllerName', this.getControllerName());
-            },
+                if (!this.get('controllerName')){
+                    this.set('controllerName', this.getControllerName());
+                    //this.set('controller', Mist.get(this.controllerName));
+                }
 
+                var that = this;
+                Ember.run.next(function(){
+                    $('body').enhanceWithin();
+
+                    $("[data-role='collapsible']").collapsible({
+                        collapse: function(event) {
+                            $(this).children().next().slideUp(250);
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('in').addClass('ui-screen-hidden');
+                                overlay.height($())
+                            }
+                        },
+                        expand: function(event, ui) {
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('ui-screen-hidden').addClass('in');
+                            }
+                            $(this).children().next().hide();
+                            $(this).children().next().slideDown(250);
+                        }
+                    });
+                });
+            },
 
             didInsertElement: function () {
                 this._super();
-                Mist.get(this.controllerName).set('view', this);
+                var controller = Mist.get(this.controllerName);
+                if (!controller)
+                    warn('cannot find ', this.controllerName);
+                if (controller) {
+                    controller.set('view', this);
+                }
             },
 
 
             willDestroyElement: function () {
                 this._super();
-                Mist.get(this.controllerName).set('view', null);
+                var controller = Mist.get(this.controllerName);
+                if (controller)
+                    controller.set('view', null);
             }
         });
     }

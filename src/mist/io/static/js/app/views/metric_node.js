@@ -1,22 +1,21 @@
-define('app/views/metric_node', ['app/views/templated'],
+define('app/views/metric_node', [],
     //
     //  Metric Node View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return App.MetricNodeView = TemplatedView.extend({
+        return App.MetricNodeComponent = Ember.Component.extend({
+
+            layoutName: 'metric_node',
 
 
-            //
             //
             //  Properties
             //
-            //
-
 
             node: null,
             metric: null,
@@ -25,14 +24,10 @@ define('app/views/metric_node', ['app/views/templated'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
-
                 this.set('element', $('#'+this.elementId));
                 this.indentNode();
 
@@ -43,16 +38,12 @@ define('app/views/metric_node', ['app/views/templated'],
                     this.set('metric',
                         Mist.metricAddController.getMetric(
                             this.node.target));
-
             }.on('didInsertElement'),
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             indentNode: function () {
                 // Loop starts from 1 because 0 nested items
@@ -61,36 +52,31 @@ define('app/views/metric_node', ['app/views/templated'],
                     $('<div class="margin"></div>').insertBefore(this.element);
             },
 
-
             foldChildren: function () {
-
                 this.set('unfold', false);
 
                 // Change icons
                 var a = this.element.find('> a.parent-node').eq(0);
-                a.removeClass('ui-icon-minus');
-                a.addClass('ui-icon-carat-d');
+                a.removeClass('icon-up');
+                a.addClass('icon-down');
 
                 this.element.find('.nest').eq(0).slideUp();
             },
 
-
             foldSiblings: function () {
                 var siblings = this.element.siblings().filter('.ember-view');
+                var that = this;
                 siblings.toArray().forEach(function (sibling) {
-                    Ember.View.views[sibling.id].foldChildren();
+                    that._viewRegistry[sibling.id].foldChildren();
                 });
             },
-
 
             preCenterNode: function () {
                 this.set('prevOffsetTop', this.element.offset().top);
                 this.set('prevWinScrollTop', $(window).scrollTop());
             },
 
-
             centerNode: function () {
-
                 if (!this.element) return;
                 var afterOffsetTop = this.element.offset().top;
                 var afterWinScrollTop = $(window).scrollTop();
@@ -103,44 +89,37 @@ define('app/views/metric_node', ['app/views/templated'],
                 }
             },
 
-
             unfoldChildren: function () {
-
                 this.preCenterNode();
-
                 this.set('unfold', true);
 
                 // Change icons
                 var a = this.element.find('> a.parent-node').eq(0);
-                a.removeClass('ui-icon-carat-d');
-                a.addClass('ui-icon-minus');
+                a.removeClass('icon-down');
+                a.addClass('icon-up');
 
                 this.foldSiblings();
                 var that = this;
                 Ember.run.next(function () {
-                    that.element.find('.nest').eq(0).slideDown(400, function () {
-                        that.centerNode();
-                    });
+                    if (that.element)
+                        that.element.find('.nest').eq(0).slideDown(400, function () {
+                            that.centerNode();
+                        });
                 });
             },
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 toggleUnfold: function () {
                     if (this.unfold)
                         this.foldChildren();
                     else
                         this.unfoldChildren();
                 },
-
 
                 selectMetric: function () {
                     var that = this;

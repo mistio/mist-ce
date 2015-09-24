@@ -1,33 +1,32 @@
 {{#if Mist.graphsController.isOpen}}
-
+<div class="graph-list ui-shadow">
     <!--
         Control Widget
     -->
     {{#if Mist.graphsController.config.canControl}}
         <div id="top-history">
-            {{view "graphListControl"
-                actionProxyBinding="view.actionProxy"}}
+            {{component "graph-list-control"
+                actionProxy=view.actionProxy}}
         </div>
     {{/if}}
 
     <!--
         Graphs
     -->
-
     <div id="graphs">
-        {{#each Mist.graphsController.content}}
-            {{view "graphListItem"
-                graphBinding="this"
-                actionProxyBinding="view.actionProxy"}}
+        {{#each Mist.graphsController.model as |graph|}}
+            {{component "graph-list-item"
+                graph=graph
+                actionProxy=view.actionProxy}}
         {{/each}}
     </div>
 
     <!--
         Minimized graph buttons
     -->
-
     {{#if Mist.graphsController.config.canMinimize}}
-        {{view "graphListBar"
-            actionProxyBinding="view.actionProxy"}}
+        {{component "graph-list-bar"
+            actionProxy=view.actionProxy}}
     {{/if}}
+</div>
 {{/if}}

@@ -10,37 +10,28 @@ define('app/views/network_list', ['app/views/page'],
 
         return App.NetworkListView = PageView.extend({
 
+            templateName: 'network_list',
 
-            //
+
             //
             //  Initialization
             //
-            //
-
 
             load: function () {
-
                 // Add event listeners
                 Mist.backendsController.on('onSelectedNetworksChange', this, 'updateFooter');
                 this.updateFooter();
-
             }.on('didInsertElement'),
 
-
             unload: function () {
-
                 // Remove event listeners
                 Mist.keysController.off('onSelectedNetworksChange', this, 'updateFooter');
-
             }.on('willDestroyElement'),
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             updateFooter: function () {
                 if (Mist.backendsController.selectedNetworks.length)
@@ -51,21 +42,15 @@ define('app/views/network_list', ['app/views/page'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 createClicked: function () {
                     Mist.networkCreateController.open();
                 },
 
-
                 deleteClicked: function () {
-
                     var networkNames = Mist.backendsController
                         .selectedNetworks.toStringByProperty('name');
 
@@ -74,7 +59,8 @@ define('app/views/network_list', ['app/views/page'],
                         head: 'Delete networks',
                         body: [
                             {
-                                paragraph: 'Are you sure you want to delete these networks: ' +
+                                paragraph: 'Are you sure you want to delete ' + (Mist.backendsController
+                        .selectedNetworks.length > 1 ? 'these networks: ' : 'this network: ') +
                                     networkNames + ' ?'
                             }
                         ],
@@ -85,6 +71,25 @@ define('app/views/network_list', ['app/views/page'],
                                 });
                             }
                         }
+                    });
+                },
+
+                selectClicked: function () {
+                    $('#select-networks-popup').popup('open').find('.ui-listview').listview('refresh');
+                },
+
+                selectionModeClicked: function (mode) {
+
+                    $('#select-networks-popup').popup('close');
+
+                    Ember.run(function () {
+                        Mist.backendsController.model.forEach(function (backend) {
+                            if (backend.get('enabled') && backend.get('isOpenStack')) {
+                                backend.networks.model.forEach(function (network) {
+                                    network.set('selected', mode);
+                                });
+                            }                        
+                        });
                     });
                 }
             }

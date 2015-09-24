@@ -10,8 +10,18 @@ define('app/routes/index', ['app/routes/base'],
 
         return App.IndexRoute = BaseRoute.extend({
 
-            documentTitle: 'mist.io - home'
+            documentTitle: 'mist.io - home',
 
+            activate: function() {
+                this._super();
+                Ember.run.later(function(){
+                    Mist.logsController.load();
+                }, 200);
+            },
+
+            exit: function() {
+                Mist.logsController.unload();
+            }
         });
     }
 );

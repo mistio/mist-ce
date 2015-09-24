@@ -1,108 +1,100 @@
 <div id="single-machine-page" data-role="page" class="ui-page-active" data-theme="a">
 
-    <div data-role="header" data-theme="b">
+    <div data-role="header" data-theme="a">
+        <!-- Page header -->
+        <div class="ui-header ui-bar-a">
+            <div class="header-grid">
+                <div class="ui-grid-b">
+                    <div class="ui-block-a">
+                        {{#link-to 'machines' class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
+                        ui-btn-icon-left ui-corner-all nav-back"}}<span>Machines</span>{{/link-to}}
+                    </div>
 
-        <a class="ui-btn
-                ui-btn-icon-left
-                ui-icon-arrow-l
-                responsive-button"
-            href="#/machines">Machines</a>
+                    <div class="ui-block-b">
+                        <h1 class="ui-title">{{model.name}}</h1>
+                        {{#unless model.isUnknown}}
+                            <h4 class="ui-title {{model.state}}">{{model.state}}</h4>
+                        {{/unless}}
+                    </div>
 
-        <h1>{{name}}</h1>
-
-        {{view "userMenu"}}
-
+                    <div class="ui-block-c">
+                        <div class="user-menu">
+                            {{component "user-menu"}}
+                        </div>
+                    </div>
+                </div><!-- /grid-b -->
+            </div>
+        </div>
     </div>
 
-    <div data-role="header" data-theme="a" class="single-machine-header">
+    <div data-role="header" data-theme="c" class="single-machine-header">
+        <div class="header-grid">
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                    <!-- Provider Icon -->
+                    <span class="single-view-icon-wrapper">
+                        <span id="single-view-provider-icon"
+                            class={{view.providerIconClass}}>
+                        </span>
+                    </span>
 
-        <!-- Provider Icon -->
-        <span class="single-view-icon-wrapper">
-            <span id="single-view-provider-icon"
-                {{bind-attr class="view.providerIconClass"}}>
-            </span>
-        </span>
+                    <!-- OS Icon -->
+                    <span class="single-view-icon-wrapper">
+                        <span id="single-view-image-icon"
+                            class={{view.imageIconClass}}>
+                        </span>
+                    </span>
+                </div>
 
-        <!-- OS Icon -->
-        <span class="single-view-icon-wrapper">
-            <span id="single-view-image-icon"
-                {{bind-attr class="view.imageIconClass"}}>
-            </span>
-        </span>
-
-        <!-- State label -->
-        <h1 {{bind-attr class="state"}}>
-            {{#unless isUnknown}}
-                {{state}}
-            {{/unless}}
-        </h1>
-
-        <!-- Show spinner if machines are being loaded -->
-        {{#unless id}}
-            {{#if Mist.backendsController.loadingMachines}}
-                <div class="ajax-loader"></div>
-            {{/if}}
-        {{/unless}}
+                <div class="ui-block-b">
+                    <!-- Show spinner if machines are being loaded -->
+                    {{#unless model.id}}
+                        {{#if Mist.backendsController.loadingMachines}}
+                            <div class="ajax-loader"></div>
+                        {{/if}}
+                    {{/unless}}
 
 
-        <!-- If machine is not running created, disable keys UI -->
-        {{#unless isWindows}}
-        <span id="mist-manage-keys"
-            {{bind-attr
-                class="view.isRunning::ui-state-disabled
-                :ui-btn-right"}}>
+                    <!-- If machine is not running created, disable keys UI -->
+                    {{#unless model.isWindows}}
+                    <span id="mist-manage-keys"
+                        class="{{if model.isRunning '' 'ui-state-disabled'}}">
 
-            <!-- If machine is beging created, hide keys UI -->
-            {{#unless pendingCreation}}
-                {{#if keysCount}}
-                    <a class="ui-btn
-                            ui-shadow
-                            ui-corner-all"
-                        {{action "manageKeysClicked" target="view"}}>
-                        {{keysCount}} keys
-                    </a>
-                {{else}}
-                    <a class="ui-btn
-                            ui-btn-d
-                            ui-btn-icon-right
-                            ui-icon-plus
-                            ui-corner-all"
-                        {{action "addKeyClicked" target="view"}}>
-                        Add key
-                    </a>
-                {{/if}}
-            {{/unless}}
-        </span>
-        {{/unless}}
+                        <!-- If machine is beging created, hide keys UI -->
+                        {{#unless model.pendingCreation}}
+                            {{#if model.keysCount}}
+                                <a class="keys-button ui-shadow ui-btn ui-btn-a ui-caps ui-btn-icon-right icon-keys"
+                                   {{action "manageKeysClicked" target=view}}>{{model.keysCount}} keys</a>
+                            {{else}}
+                                <a class="keys-button creation-button ui-shadow ui-btn ui-btn-d ui-caps ui-btn-icon-right ui-icon-plus"
+                                   {{action "addKeyClicked" target=view}}>Add key</a>
+                            {{/if}}
+                        {{/unless}}
+                    </span>
+                    {{/unless}}
+                </div>
+            </div><!-- /grid-b -->
+        </div>
     </div>
 
-    <div data-role="content" data-theme="a">
+    <div data-role="content">
 
 
         <!--
-
              Monitoring collapsible
-
         -->
-
-
-        <div id="monitoring-collapsible" data-role="collapsible" data-collapsed="false">
-
+        <div id="monitoring-collapsible" data-role="collapsible" data-collapsed="false" class="ui-shadow">
             <h4>Monitoring</h4>
-
-            {{view "machineMonitoring" machineBinding="view.machine"}}
-
+            {{#if view.machine}}
+            {{component "machine-monitoring" machine=view.machine}}
+            {{/if}}
         </div>
 
 
         <!--
-
              Information collapsibles
-
         -->
-
-
-        <div data-role="collapsible" data-collapsed="false">
+        <div id="single-machine-info" data-role="collapsible" data-collapsed="false" class="ui-shadow">
 
             <h4>Basic Info</h4>
 
@@ -110,102 +102,102 @@
                 <tbody>
                 <tr>
                     <td>Last probed</td>
-                    <td> {{#if probing}}
-                             probing... <div class="ajax-loader"></div>
+                    <td> {{#if model.probing}}
+                             probing... <div id="machine-probe-loader" class="ajax-loader"></div>
                          {{else}}
                              {{view.lastProbe}}
                              <a id="machine-probe-btn"
-                                class="ui-btn ui-shadow ui-corner-all"
-                                {{action "probeClicked" target="view"}}>
+                                class="ui-btn ui-shadow ui-btn-d ui-btn-icon-right ui-caps icon-graph-2"
+                                {{action "probeClicked" target=view}}>
                                     Probe
                             </a>
                          {{/if}}
                     </td>
                 </tr>
-                {{#if probed}}
+                {{#if model.probed}}
                     <tr>
                         <td>Up and running for</td>
                         <td>{{view.upFor}}</td>
                     </tr>
                 {{/if}}
-                {{#if loadavg}}
+                {{#if model.loadavg}}
                     <tr>
                         <td>Load</td>
                         <td>
                             <div class="loadleds">
-                                <div {{bind-attr class="loadavg15 :led"}}>
+                                <div class="{{model.loadavg15}} led">
                                 </div>
-                                <div {{bind-attr class="loadavg5 :led"}}>
+                                <div class="{{model.loadavg5}} led">
                                 </div>
-                                <div {{bind-attr class="loadavg1 :led"}}>
+                                <div class="{{model.loadavg1}} led">
                                 </div>
                             </div>
-                            {{loadavg}} {{#if cores}}- {{cores}} cores {{/if}}- {{loadavg5}}
+                            {{model.loadavg}} {{#if model.cores}}- {{model.cores}} cores {{/if}}- {{model.loadavg5}}
                         </td>
                     </tr>
                 {{/if}}
-                {{#if latency}}
+                {{#if model.latency}}
                     <tr>
                         <td>Latency</td>
                         <td>
-                            <div {{bind-attr class=":netleds"}}>
-                                <div {{bind-attr class="netled4 :netled1"}}>
+                            <div class="netleds">
+                                <div class="{{model.netled4}} netled1">
                                 </div>
-                                <div {{bind-attr class="netled3 :netled2"}}>
+                                <div class="{{model.netled3}} netled2">
                                 </div>
-                                <div {{bind-attr class="netled2 :netled3"}}>
+                                <div class="{{model.netled2}} netled3">
                                 </div>
-                                <div {{bind-attr class="netled1 :netled4"}}>
+                                <div class="{{model.netled1}} netled4">
                                 </div>
                             </div>
-                            {{latency}}ms</td>
+                            {{model.latency}}ms</td>
                     </tr>
                 {{/if}}
-                {{#if loss}}
+                {{#if model.loss}}
                     <tr>
                         <td>Packet loss</td>
-                        <td>{{loss}}</td>
+                        <td>{{model.loss}}</td>
                     </tr>
                 {{/if}}
-                {{#if tags}}
+                {{#if model.tags}}
                     <tr>
                         <td>Tags</td>
                         <td>
-                            {{#each tags}}
-                            <span class="tag">{{this}}</span>
+                            {{#each model.tags as |tag|}}
+                            <span class="tag">{{tag}}</span>
                             {{/each}}
                         </td>
                     </tr>
                 {{/if}}
-                {{#if view.public_ips}}
+                {{#if model.public_ips}}
                     <tr>
                         <td>Public IPs</td>
                         <td>
-                            {{#each view.public_ips}}
-                                <div class="ip">{{this}}</div>
+                            {{#each model.public_ips as |ip|}}
+                                <div class="ip">{{ip}}</div>
                             {{/each}}
                         </td>
                     </tr>
                 {{/if}}
-                {{#if view.private_ips}}
+                {{#if model.private_ips}}
                     <tr>
                         <td>Private IPs</td>
                         <td>
-                            {{#each view.private_ips}}
-                                <div class="ip">{{this}}</div>
+                            {{#each model.private_ips as |ip|}}
+                                <div class="ip">{{ip}}</div>
                             {{/each}}
                         </td>
                     </tr>
                 {{/if}}
-                {{#if view.machine.df}}
+                {{#if model.df}}
                     <tr>
-                        <td colspan="2"><div class="df">{{view.machine.df}}</div></td>
+                        <td colspan="2"><div class="df">{{model.df}}</div></td>
                     </tr>
                 {{/if}}
-                {{#each view.basicInfo}}
+                {{#each view.basicInfo as |row|}}
                     <tr>
-                        <td>{{key}}</td>
-                        <td>{{value}}</td>
+                        <td>{{row.key}}</td>
+                        <td>{{row.value}}</td>
                     </tr>
                 {{/each}}
             </tbody>
@@ -213,73 +205,61 @@
         </div>
 
         {{#if view.metadata}}
-            <div id="single-machine-metadata" data-role="collapsible">
+            <div id="single-machine-metadata" data-role="collapsible" class="ui-shadow">
 
                 <h4>Full metadata list</h4>
 
                 <table class="info-table">
                     <tbody>
-                    {{#each view.metadata}}
-                        <tr>
-                            <td>{{key}}</td>
-                            <td>{{value}}</td>
-                        </tr>
-                    {{/each}}
+                        {{for-In model.extra}}
                     </tbody>
                 </table>
 
             </div>
         {{/if}}
 
-        <div class="mid-padding"></div>
-
     </div>
 
-    {{view "dialog"}}
+    {{component "dialog-popup"}}
 
-    {{view "metricAdd"}}
+    {{component "metric-add"}}
 
-    {{view "machineKeys"}}
+    {{component "machine-keys"}}
 
-    {{view "machineTags"}}
+    {{component "machine-tags"}}
 
-    {{view "machineShell"}}
+    {{component "machine-shell"}}
 
-    {{view "machinePower" position="#single-machine-power-btn"}}
+    {{component "machine-power" position="#single-machine-power-btn"}}
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
-        <table><tbody><tr><td>
-            <a id="single-machine-tags-btn"
-                {{bind-attr class="id::ui-state-disabled
-                    can_tag::ui-state-disabled
-                    :ui-btn
-                    :ui-btn-icon-left
-                    :ui-icon-grid"}}
-                {{action "tagsClicked" target="view"}}>Tags</a>
-        </td><td>
-            {{#if isWindows}}
+        <div class="ui-grid-b">
+            <div class="ui-block-a">
+                <a id="single-machine-tags-btn"
+                    class="{{if model.id '' 'ui-state-disabled'}}
+                        {{if model.can_tag '' 'ui-state-disabled'}}
+                        ui-btn ui-btn-icon-right ui-caps icon-tag"
+                    {{action "tagsClicked" target=view}}>Tags</a>
+            </div>
+            <div class="ui-block-b">
+                {{#if model.isWindows}}
                 <a id="single-machine-shell-btn"
                     target="_blank"
-                    {{bind-attr href="rdpURL" class="canConnect::ui-state-disabled
-                        :ui-btn
-                        :ui-btn-icon-left
-                        :ui-icon-gear"}}>Connect</a>
-            {{else}}
+                    href={{rdpURL}} class="{{if model.canConnect '' 'ui-state-disabled'}}
+                        ui-btn ui-btn-icon-left ui-icon-gear ui-caps">Connect</a>
+                {{else}}
                 <a id="single-machine-shell-btn"
-                    {{bind-attr class="canConnect::ui-state-disabled
-                        :ui-btn
-                        :ui-btn-icon-left
-                        :ui-icon-gear"}}
-                    {{action "shellClicked" target="view"}}>Shell</a>
-            {{/if}}
-        </td><td>
-            <a id="single-machine-power-btn"
-                {{bind-attr class="id::ui-state-disabled
-                    :ui-btn
-                    :ui-btn-icon-left
-                    :ui-icon-bars"}}
-                {{action "powerClicked" target="view"}}>Actions</a>
-        </td></tr></tbody></table>
+                    class="{{if model.canConnect '' 'ui-state-disabled'}}
+                        ui-btn ui-btn-icon-right icon-terminal ui-caps"
+                    {{action "shellClicked" target=view}}>Shell</a>
+                {{/if}}
+            </div>
+            <div class="ui-block-c">
+                <a id="single-machine-power-btn"
+                    class="{{if model.id '' 'ui-state-disabled'}}
+                        ui-btn ui-btn-icon-right icon-cog ui-caps"
+                    {{action "powerClicked" target=view}}>Actions</a>
+            </div>
+        </div>
     </div>
-
 </div>

@@ -1,90 +1,78 @@
 define('app/controllers/networks', [
-		'app/controllers/base_array',
-		'app/models/network'
-	],
-	//
-	//  Networks Controller
-	//
-	//	@returns Class
-	//
-	function (BaseArrayController, NetworkModel) {
+        'app/controllers/base_array',
+        'app/models/network'
+    ],
+    //
+    //  Networks Controller
+    //
+    //    @returns Class
+    //
+    function (BaseArrayController, NetworkModel) {
 
-		'use strict';
+        'use strict';
 
-		return BaseArrayController.extend(Ember.Evented, {
-
-
-			//
-			//
-			//  Properties
-			//
-			//
-
-
-			backend: null,
-			model: NetworkModel,
-			passOnProperties: ['backend'],
-
+        return BaseArrayController.extend(Ember.Evented, {
 
             //
+            //  Properties
+            //
+
+            backend: null,
+            baseModel: NetworkModel,
+            passOnProperties: ['backend'],
+
+
             //
             //  Methods
             //
-            //
 
+            associateIP: function (args) {
+                var machineId;
+                if (args.machine.backend.provider == 'nephoscale')
+                    machineId = args.machine.extra.id;
+                else
+                    machineId = args.machine.id;
 
-			associateIP: function (args) {
+                var url = '/backends/' + this.backend.id +
+                    '/networks/' + args.network.id;
 
-				var machineId;
-				if (args.machine.backend.provider == 'nephoscale')
-					machineId = args.machine.extra.id;
-				else
-					machineId = args.machine.id;
+                var that = this;
+                that.set('associatingIP',  true);
+                args.ip.set('isAssociating', true);
+                Mist.ajax.POST(url, {
+                    machine: machineId,
+                    ip: args.ip.ipaddress,
+                }).error(function () {
+                    Mist.notificationController.notify('Failed to associate ip ' +
+                        args.ip.ipaddress);
+                }).complete(function (success, data) {
+                    that.set('associatingIP',  false);
+                    args.ip.set('isAssociating', false);
+                    if (args.callback) args.callback(success, data);
+                });
+            },
 
-				var url = '/backends/' + this.backend.id +
-					'/networks/' + args.network.id;
+            reserveIP: function (args) {
+                var url = '/backends/' + this.backend.id +
+                '/networks/' + args.network.id;
 
-				var that = this;
-				that.set('associatingIP',  true);
-				args.ip.set('isAssociating', true);
-				Mist.ajax.POST(url, {
-					machine: machineId,
-					ip: args.ip.ipaddress,
-				}).error(function () {
-					Mist.notificationController.notify('Failed to associate ip ' +
-						args.ip.ipaddress);
-				}).complete(function (success, data) {
-					that.set('associatingIP',  false);
-					args.ip.set('isAssociating', false);
-					if (args.callback) args.callback(success, data);
-				});
-			},
-
-
-			reserveIP: function (args) {
-
-				var url = '/backends/' + this.backend.id +
-				'/networks/' + args.network.id;
-
-				var that = this;
-				that.set('reservingIP',  true);
-				args.ip.set('isTogglingReserve', true);
-				Mist.ajax.POST(url, {
-					ip: args.ip.ipaddress,
-					assign: args.reserve
-				}).error(function () {
-					Mist.notificationController.notify('Failed to reserve ip ' +
-						args.ip.ipaddress);
-				}).complete(function (success, data) {
-					that.set('reservingIP',  false);
-					args.ip.set('isTogglingReserve', false);
-					if (args.callback) args.callback(success, data);
-				});
-			},
-
+                var that = this;
+                that.set('reservingIP',  true);
+                args.ip.set('isTogglingReserve', true);
+                Mist.ajax.POST(url, {
+                    ip: args.ip.ipaddress,
+                    assign: args.reserve
+                }).error(function () {
+                    Mist.notificationController.notify('Failed to reserve ip ' +
+                        args.ip.ipaddress);
+                }).complete(function (success, data) {
+                    that.set('reservingIP',  false);
+                    args.ip.set('isTogglingReserve', false);
+                    if (args.callback) args.callback(success, data);
+                });
+            },
 
             deleteNetwork: function (networkId, callback) {
-
                 var that = this;
                 that.set('deletingNetwork', true);
                 var url = '/backends/' + this.backend.id +
@@ -99,6 +87,6 @@ define('app/controllers/networks', [
                     if (callback) callback(success, message);
                 });
             },
-		});
-	}
+        });
+    }
 );

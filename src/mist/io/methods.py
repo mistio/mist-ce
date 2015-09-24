@@ -500,7 +500,9 @@ def _add_backend_vcloud(title, provider, params):
             raise RequiredParameterMissingError('host')
         host = sanitize_host(host)
     elif provider == 'indonesian_vcloud':
-        host = 'compute.idcloudonline.com'
+        host = params.get('indonesianRegion','my.idcloudonline.com')
+        if host not in ['my.idcloudonline.com', 'compute.idcloudonline.com']:
+            host = 'my.idcloudonline.com'
 
     backend = model.Backend()
     backend.title = title
@@ -1399,7 +1401,7 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_start = False
 
     if conn.type in (Provider.LINODE, Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
-                     Provider.DOCKER, Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in config.EC2_PROVIDERS:
+                     Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in config.EC2_PROVIDERS:
         can_rename = True
     else:
         can_rename = False

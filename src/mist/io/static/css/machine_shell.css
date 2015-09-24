@@ -3,7 +3,6 @@
 -----------------------------------------------------------------------------------------------------------*/
 
 #machine-shell-popup #shell-return {
-
     color: #efeff1;
     background-color: #0A0A0A;
 
@@ -58,13 +57,19 @@ span.terminal-cursor {
     right: 2px;
     bottom: 2px;
     position: absolute;
+    border-radius: 0;
+    border: none;
+}
+#machine-shell-popup.desktop .ui-btn:hover {
+    background-color: #FAF9F4 !important;
+    text-decoration: underline !important;
 }
 
 #machine-shell-popup.desktop,
 #machine-shell-popup.desktop .ui-content,
 #machine-shell-popup.desktop #shell-return,
 #machine-shell-popup.desktop #machine-shell {
-    top: 0;
+    top: 0 !important;
     left: 0;
     right: 0;
     bottom: 0;

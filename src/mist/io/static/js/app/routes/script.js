@@ -11,12 +11,17 @@ define('app/routes/script', ['app/routes/base'],
         return App.ScriptRoute = BaseRoute.extend({
 
             activate: function () {
+                this._super();
                 Ember.run.next(this, function () {
                     var model = this.modelFor('script');
                     var id = model._id || model.id;
                     var script = Mist.scriptsController.getObject(id);
+                    Mist.logsController.view.set('filterString', id);
                     this.set('documentTitle', 'mist.io - ' + (script ? script.name : id));
                 });
+                Ember.run.later(function(){
+                    Mist.logsController.load();
+                }, 200);
             },
 
             redirect: function (script) {
@@ -28,6 +33,10 @@ define('app/routes/script', ['app/routes/base'],
                 if (Mist.scriptsController.loading)
                     return {_id: id};
                 return Mist.scriptsController.getObject(id);
+            },
+
+            exit: function() {
+                Mist.logsController.unload();
             }
         });
     }

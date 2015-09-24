@@ -18,21 +18,23 @@
         class="large-popup
             ui-popup
             ui-body-inherit
-            ui-overlay-shadow
-            ui-corner-all"
+            ui-overlay-shadow"
         data-role="popup"
         data-enhanced="true"
         data-transition="flip"
         data-dismissible="false">
 
-
         <!-- Header -->
 
         <div class="ui-header ui-bar-b" role="banner">
 
-            <h1 class="ui-title">
+            <h1 class="ui-title ui-caps">
                 {{Mist.dialogController.options.head}}
             </h1>
+
+            {{#unless view.isYesNo}}
+                <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+            {{/unless}}
 
         </div>
 
@@ -40,23 +42,22 @@
 
         <div class="ui-content ui-body-a" role="main">
 
+            {{#each Mist.dialogController.options.body as |optionBody|}}
 
-            {{#each Mist.dialogController.options.body}}
-
-                {{#if this.paragraph}}
-                    <p {{bind-attr class="this.class"}}>{{this.paragraph}}</p>
+                {{#if optionBody.paragraph}}
+                    <p class={{this.class}}>{{optionBody.paragraph}}</p>
                 {{/if}}
 
-                {{#if this.link}}
-                    <a {{bind-attr href="this.href" class="this.class" target="this.target"}}
-                        {{action "linkClicked" this target="view"}}>
-                            {{this.link}}
+                {{#if optionBody.link}}
+                    <a href={{optionBody.href}} class={{optionBody.class}} target={{optionBody.target}}
+                        {{action "linkClicked" optionBody target=view}}>
+                            {{optionBody.link}}
                     </a>
                 {{/if}}
 
-                {{#if this.command}}
+                {{#if optionBody.command}}
                     <pre class="command-container"
-                        {{action "commandClicked" this on="click" target="view"}}>{{this.command}}</pre>
+                        {{action "commandClicked" optionBody on="click" target=view}}>{{optionBody.command}}</pre>
                 {{/if}}
 
             {{/each}}
@@ -66,42 +67,36 @@
 
             {{#if view.isOK}}
 
-                <a class="ui-btn ui-btn-a ui-corner-all"
-                    {{action "confirm" target="view"}}>OK</a>
+                <a class="ui-btn ui-shadow ui-btn-d ui-caps"
+                    {{action "confirm" target=view}}>OK</a>
 
             {{else}}{{#if view.isBack}}
 
-                <a class="ui-btn ui-btn-a ui-corner-all"
-                    {{action "confirm" target="view"}}>Back</a>
+                <a class="ui-btn ui-btn-a ui-caps back"
+                    {{action "confirm" target=view}}>Back</a>
 
             {{else}}
 
-                <div class="ok-cancel
-                        ui-controlgroup
-                        ui-controlgroup-horizontal
-                        ui-group-theme-a
-                        ui-corner-all"
-                    data-role="controlgroup"
-                    data-type="horizontal">
+                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
 
                     {{#if view.isOKCancel}}
-                        <a class="ui-btn"
-                            {{action "reject" target="view"}}>
+                        <a class="ui-btn ui-caps back"
+                            {{action "reject" target=view}}>
                                 Cancel
                         </a>
-                        <a class="ui-btn ui-btn-d"
-                            {{action "confirm" target="view"}}>
+                        <a class="ui-btn ui-btn-d ui-shadow ui-caps ui-shadow"
+                            {{action "confirm" target=view}}>
                                 OK
                         </a>
                     {{/if}}
 
                     {{#if view.isYesNo}}
-                        <a class="ui-btn ui-btn-d"
-                            {{action "reject" target="view"}}>
+                        <a class="ui-btn ui-caps back"
+                            {{action "reject" target=view}}>
                                 No
                         </a>
-                        <a class="ui-btn"
-                            {{action "confirm" target="view"}}>
+                        <a class="ui-btn ui-caps ui-shadow {{if Mist.dialogController.options.danger 'no' 'ui-btn-d'}}"
+                            {{action "confirm" target=view}}>
                                 Yes
                         </a>
                     {{/if}}

@@ -1,29 +1,31 @@
 <div id="file-upload" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
 
-    <div data-role="header" data-theme="b">
-        <h1>{{Mist.fileUploadController.title}}</h1>
+    <div class="ui-header ui-bar-b">
+        <h1 class="ui-title">{{Mist.fileUploadController.title}}</h1>
+
+        <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
     </div>
 
-    <div data-role="content" data-theme="a">
+    <div class="ui-content">
 
-        <label for="textarea-private-key">{{Mist.fileUploadController.label}}:
+        <label for="textarea-private-key">{{Mist.fileUploadController.label}}
             {{#if Mist.fileUploadController.uploadingFile}}
                 <div class="ajax-loader add-key-loader"></div>
             {{/if}}
         </label>
+        
         {{view Ember.TextArea
                id="upload-area"
-               valueBinding="Mist.fileUploadController.file"}}
+               value=Mist.fileUploadController.file}}
 
-        <a class="ui-btn ui-corner-all ui-btn-a ui-btn-icon-right ui-icon-arrow-u"
-            {{action "uploadClicked" target="view"}}>Upload</a>
+        <a class="ui-btn back ui-caps"
+            {{action "uploadClicked" target=view}}>Upload</a>
 
-        <input id="file-upload-input" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
+        <input id="file-upload-input" type="file" name="file" {{action "uploadInputChanged" on="change" target=view}}/>
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-corner-all ui-btn-a" {{action "backClicked" target="view"}}>Back</a>
-            <a id="file-upload-ok" class="ui-btn ui-corner-all ui-btn-d ui-state-disabled"
-                {{action "doneClicked" target="view"}}>Done</a>
+            <a id="file-upload-ok" class="ui-btn ui-btn-d ui-state-disabled ui-caps"
+                {{action "doneClicked" target=view}}>Done</a>
         </div>
     </div>
 </div>

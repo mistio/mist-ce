@@ -4,26 +4,84 @@
 #machine-list-page .ui-filterable {
     clear: both;
 }
-#machine-list-page #create-machine-btn {
+#machine-list-page .creation-button {
+    margin: 0;
     float: right;
+    padding: 20px 60px 20px 25px !important;
+    font-weight: 400 !important;
+    font-size: 18px;
+    position: relative;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+}
+#machine-list-page .creation-button:after {
+    background-image: none;
+    margin: 0;
+    content: '+';
+    color: #fff !important;
+    position: absolute;
+    right: 1px;
+    top: -6px;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 34px;
+    line-height: 60px;
 }
 #machine-list-page #select-machines-btn {
     float: left;
     font-weight: normal;
+    background-color: transparent;
+    color: #b5b5b5;
+    border-width: 0;
+    padding: .4em .75em !important;
+    text-align: left;
+    width: 14px;
+    height: 22px;
+    margin: 18px 5px 10px 11px;
+    font-size: 14px;
+    line-height: 1.6em;
+    z-index: 2;
 }
-.running {
-    color: #13B754;
+#machine-list-page #select-machines-btn:hover {
+        color: #444 !important;
 }
-.pending {
+#machine-list-page .ui-filterable .ui-input-search {
+    margin-right: 280px;
+}
+#machine-list-page ul.checkbox-list li.has-incident {
+    background-color: #d96557 !important;
+    color: #fff !important;
+}
+#machine-list-page ul.checkbox-list li.has-incident:hover {
+    background-color: #dc7265 !important;
+}
+
+#machine-list-page .ui-block-b .ui-title {
+    text-align: center;
+}
+
+#machine-list {
+    margin: -52px auto 0;
+    box-shadow: none;
+}
+.running .machine-state span {
+    color: #64b247;
+}
+.pending .machine-state span {
     color: #E09400;
 }
-.rebooting {
+.rebooting .machine-state span {
     color: #4E68BB;
 }
-.terminated {
+.terminated .machine-state span {
     color: #AAAAAA;
 }
-.stopped {
+.error .machine-state span {
+    color: #d96557;
+}
+.has-incident .machine-state span {
     color: #777777;
 }
 .machine-name {
@@ -31,10 +89,20 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding-right: 16px;
+    color: #444;
+    font-weight: 400;
 }
 
-/* Conditional for < 550px */
-@media only screen and  (max-width: 550px) {
+/* Conditional for < 600px */
+@media only screen and  (max-width: 600px) {
+    #machine-list .checkbox-link > a {
+        height: 50px;
+    }
+
+    #machine-list .checkbox-link .ui-checkbox label {
+        margin-top: 0;
+        height: 70px;
+    }
 
     .machine-state span {
         float: left;
@@ -43,22 +111,22 @@
     .machine-state {
         position: absolute;
         left: 0px;
-        top: 35px;
+        top: 45px;
         font-size: 0.9em;
         margin-left: 0 !important;
     }
 
     .machine-name {
         position: relative;
-        bottom: 6px;
-        font-size: 0.9em;
-        margin-left: -17px;
-        width: 50% !important;
+        bottom: -2px;
+        font-size: 1em;
+        margin-left: -15px;
+        width: 80% !important;
     }
 
     .machine-tags {
-        right: 96px !important;
-        top: 20px !important;
+        right: 50px !important;
+        top: 46px !important;
         max-width: 49% !important;
     }
 
@@ -66,22 +134,15 @@
         font-size: 10px !important;
         margin-bottom: 3px !important;
     }
-}
-
-@media only screen and  (max-width: 430px) {
 
     .machine-leds {
         position: relative;
-        bottom: 26px !important;
+        bottom: 12px !important;
     }
 
-    .machine-tags {
-        right: 38px !important;
-        top: 33px !important;
-    }
-
-    .machine-name {
-        width: 80% !important;
+    .machine-leds {
+        position: relative;
+        bottom: 12px !important;
     }
 }
 
@@ -89,8 +150,8 @@
 .machine-state {
     width: 21.6% !important;
     text-align: center;
-    margin-left: -18px;
-    font-weight: normal;
+    margin-left: -22px;
+    font-weight: 400;
 }
 
 .machine-state .ajax-loader {
@@ -107,11 +168,45 @@
 .machine-tags {
     float: right;
     position: absolute;
-    right: 116px;
+    right: 150px;
     width: auto !important;
-    top: 19px;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 29%;
-    height: 21px;
+    height: 18px;
+}
+
+.has-incident label:after {
+    color: #fff !important;
+}
+
+.has-incident .machine-state span,
+.has-incident .machine-name,
+.has-incident .machine-tags .tag,
+.has-incident a:after {
+    color: #fff !important;
+}
+.has-incident .machine-leds .netleds div {
+    background-color: #fff;
+}
+
+.monitoring-state {
+    float: right;
+    height: 16px;
+    margin-right: 15px;
+}
+
+.no-monitoring .monitoring-state:after {
+    content:'\0048';
+    color: #A5A4A1;
+}
+
+.has-monitoring .monitoring-state:after {
+    content:'\0047';
+    color: #64b247 !important;
+}
+
+.has-incident .monitoring-state:after {
+    content:'\006D';
+    color: #fff !important;
 }
