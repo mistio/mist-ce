@@ -158,9 +158,13 @@
 #create-machine-network .ui-collapsible-content {
     padding: 0;
 }
+#machine-create #script {
+    margin-top: 40px;
+}
 #machine-create #script .ui-slider {
     width: 40%;
     float: right;
+    margin-top: -35px;
 }
 #machine-create #script textarea {
     height: auto !important;
