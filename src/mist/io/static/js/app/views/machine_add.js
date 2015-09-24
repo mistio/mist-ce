@@ -345,7 +345,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                  Ember.run.once(this, function(){
                     if (this.changeProviderFlag) Mist.machineAddController.resetProvider();
                  });
-             }.observes('changeProviderFlag'),
+             }.observes('Mist.machineAddController.newMachineProvider'),
         });
     }
 );

@@ -190,6 +190,7 @@ define('app/controllers/machine_add', ['ember'],
             },
 
             resetProvider: function() {
+                console.log('i run');
                 this.set('callback', null)
                     .set('newMachineName', '')
                     .set('newMachineScript', '')
@@ -202,6 +203,13 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineScriptParams', '')
                     .set('newMachineDockerPorts', '')
                     .set('newMachineAzurePorts', '');
+                this.selectLocation();
+            },
+
+            selectLocation: function() {
+                if (this.newMachineProvider.locations.model.length == 1) {
+                    this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                }
             },
 
             //
