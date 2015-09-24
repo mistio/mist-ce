@@ -1,46 +1,40 @@
-define('app/views/graph_button', ['app/views/templated'],
+define('app/views/graph_button', [],
     //
     //  Graph Button View
     //
     //  @returns Class
     //
-    function(TemplatedView) {
+    function() {
 
         'use strict';
 
-        return App.GraphButtonView = TemplatedView.extend({
+        return App.GraphButtonComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-
+            layoutName: 'graph_button',
             graph: null,
             buttonId: null,
             tagName: 'span',
             actionProxy: null,
 
-            //
+
             //
             //  Methods
             //
-            //
-
 
             load: function () {
-                this.set('buttonId', this.graph.id + '-btn');
+                Ember.run.next(this, function(){
+                    this.set('buttonId', this.graph.id + '-btn');
+                });
             }.on('didInsertElement'),
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             isHiddenObserver: function () {
                 if (this.graph.view.isHidden)

@@ -24,9 +24,11 @@ except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
 CORE_URI = settings.get("CORE_URI", "https://mist.io")
 AMQP_URI = settings.get("AMQP_URI", "localhost:5672")
+BROKER_URL = settings.get("BROKER_URL", "amqp://guest:guest@127.0.0.1/")
 SSL_VERIFY = settings.get("SSL_VERIFY", True)
 JS_BUILD = settings.get("JS_BUILD", False)
 CSS_BUILD = settings.get("CSS_BUILD", False)
+LAST_BUILD = settings.get("LAST_BUILD", '')
 JS_LOG_LEVEL = settings.get("JS_LOG_LEVEL", 3)
 PY_LOG_LEVEL = settings.get("PY_LOG_LEVEL", logging.INFO)
 PY_LOG_FORMAT = settings.get("PY_LOG_FORMAT", '%(asctime)s %(levelname)s %(threadName)s %(module)s - %(funcName)s: %(message)s')
@@ -38,7 +40,7 @@ ALLOW_CONNECT_PRIVATE = settings.get('ALLOW_CONNECT_PRIVATE', True)
 
 # celery settings
 CELERY_SETTINGS = {
-    'BROKER_URL': 'amqp://guest:guest@127.0.0.1/',
+    'BROKER_URL': BROKER_URL,
     'CELERY_TASK_SERIALIZER': 'json',
     'CELERYD_LOG_FORMAT': PY_LOG_FORMAT,
     'CELERYD_TASK_LOG_FORMAT': PY_LOG_FORMAT,
@@ -157,7 +159,7 @@ SUPPORTED_PROVIDERS_V_2 = [
     },
     # GCE
     {
-        'title': 'Google Compute Engine',
+        'title': 'GCE',
         'provider': Provider.GCE,
         'regions': []
     },

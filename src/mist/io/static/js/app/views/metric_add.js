@@ -4,19 +4,19 @@ define('app/views/metric_add', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.MetricAddView = PopupView.extend({
+        return App.MetricAddComponent = PopupComponent.extend({
 
+            layoutName: 'metric_add',
+            controllerName: 'metricAddController',
+            popupId: '#metric-add',
 
-            //
             //
             //  Methods
             //
-            //
-
 
             open: function () {
                 this._super();
@@ -27,11 +27,9 @@ define('app/views/metric_add', ['app/views/popup'],
                 }, 200);
             },
 
-
             clear: function () {
 
             },
-
 
             addCustomMetric: function () {
                 this.close();
@@ -50,7 +48,6 @@ define('app/views/metric_add', ['app/views/popup'],
                     );
                 }, 400);
             },
-
 
             showSSHError: function () {
                 this.close();
@@ -73,14 +70,10 @@ define('app/views/metric_add', ['app/views/popup'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 customClicked: function () {
                     if (Mist.metricAddController.machine.probed)
                         this.addCustomMetric();

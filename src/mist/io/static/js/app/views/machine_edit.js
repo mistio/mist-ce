@@ -4,38 +4,41 @@ define('app/views/machine_edit', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.MachineEditView = PopupView.extend({
+        return App.MachineEditComponent = PopupComponent.extend({
+
+            //
+            // Properties
+            //
+
+            layoutName: 'machine_edit',
+            controllerName: 'machineEditController',
+            popupId: '#machine-edit',
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //  Methods
+            //
 
             updateRenameButton: function () {
-                if (Mist.machineEditController.renamingMachine) {
+                if (Mist.machineEditController.formReady) {
+                    $('#rename-machine-option').removeClass('ui-state-disabled');
+                    $('#machine-edit-ok').removeClass('ui-state-disabled');                    
+                } else {
                     $('#rename-machine-option').addClass('ui-state-disabled');
                     $('#machine-edit-ok').addClass('ui-state-disabled');
-                } else {
-                    $('#rename-machine-option').removeClass('ui-state-disabled');
-                    $('#machine-edit-ok').removeClass('ui-state-disabled');
                 }
             },
 
-            //
+
             //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 backClicked: function () {
                     Mist.machineEditController.close();
                 },
@@ -45,15 +48,14 @@ define('app/views/machine_edit', ['app/views/popup'],
                 }
             },
 
-            /**
-             *
-             *  Observers
-             *
-             */
+
+            //
+            //  Observers
+            //
 
             updateRenameButtonObserver: function () {
                 Ember.run.once(this, 'updateRenameButton');
-            }.observes('Mist.machineEditController.renamingMachine')
+            }.observes('Mist.machineEditController.formReady')
         });
     }
 );

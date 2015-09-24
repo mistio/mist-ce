@@ -1,6 +1,7 @@
 from behave import *
 from time import time, sleep
 from selenium.common.exceptions import NoSuchElementException
+from mist.io.tests.gui.features.steps.general import search_for_button
 
 try:
     from mist.io.tests.settings import CREDENTIALS
@@ -8,7 +9,7 @@ except ImportError:
     pass
 
 
-@given(u'"{backend}" backend added')
+@given(u'"{backend}" backend has been added')
 def given_backend(context, backend):
     backend_buttons = []
     end_time = time() + 5
@@ -25,7 +26,7 @@ def given_backend(context, backend):
 
     if backend_buttons:
         for button in backend_buttons:
-            if backend in button.text:
+            if backend.lower() in button.text.lower():
                 return
 
     if "openstack" in backend.lower():
@@ -55,7 +56,6 @@ def given_backend(context, backend):
 
     context.execute_steps(u'''
         When I click the button "Add cloud"
-        And I click the button "Select provider"
         And I click the button "%s"
         And I wait for 1 seconds
         And I use my "%s" credentials
@@ -85,13 +85,12 @@ def backend_creds(context, backend):
         upload_area.send_keys(context.mist_config['CREDENTIALS']['AZURE']['certificate'])
         file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
         file_upload_ok.click()
+        context.execute_steps(u'Then I wait for 1 seconds')
     elif "GCE" in backend:
-        # import ipdb
-        # ipdb.set_trace()
         title = context.browser.find_element_by_id("title")
         for i in range(1, 6):
             title.send_keys(u'\ue003')
-        title.send_keys("Google Compute Engine")
+        title.send_keys("GCE")
         project_id = context.browser.find_element_by_id("project_id")
         project_id.send_keys(context.mist_config['CREDENTIALS']['GCE']['project_id'])
         add_key = context.browser.find_element_by_id("private_key")
@@ -222,9 +221,7 @@ def backend_creds(context, backend):
         key_button = context.browser.find_element_by_id("machine_key")
         key_button.click()
         sleep(2)
-        context.execute_steps(u"""
-        When I click the button "Add Key"
-        """)
+        context.execute_steps(u'When I click the button "Add Key"')
         sleep(2)
         key_name = context.browser.find_element_by_id("key-add-id")
         key_name.send_keys("libvirt")
@@ -252,26 +249,15 @@ def rename_backend(context, new_name):
 def backend_added(context, backend, seconds):
     end_time = time() + int(seconds)
     while time() < end_time:
-        try:
-            backends = context.browser.find_element_by_id("backend-buttons")
-            backend_buttons = backends.find_elements_by_class_name("ui-btn")
-            for button in backend_buttons:
-                if backend in button.text:
-                    return
-            sleep(2)
-        except:
-            sleep(2)
+        button = search_for_button(context, backend, btn_cls='cloud-btn')
+        if button:
+            return
+        sleep(2)
 
     assert False, u'%s is not added within %s seconds' %(backend, seconds)
 
 
 @then(u'the "{backend}" backend should be deleted')
 def backend_deleted(context, backend):
-    sleep(1)
-    backends = context.browser.find_element_by_id("backend-buttons")
-    backend_buttons = backends.find_elements_by_class_name("ui-btn")
-
-    for button in backend_buttons:
-        if backend in button.text:
-            assert False, u'%s backend is not deleted' % backend
-    return
+    button = search_for_button(context, backend, btn_cls='cloud-btn')
+    assert not button, ""

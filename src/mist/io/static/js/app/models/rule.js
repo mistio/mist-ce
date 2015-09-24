@@ -10,13 +10,9 @@ define('app/models/rule', ['app/models/base'],
 
         return BaseModel.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             unit: null,
             value: null,
@@ -53,11 +49,8 @@ define('app/models/rule', ['app/models/base'],
 
 
             //
-            //
             //  Computed Properties
             //
-            //
-
 
             timeWindowToMins: function () {
                 return (1 + parseInt(this.get('timeWindow') / 60)).toString();

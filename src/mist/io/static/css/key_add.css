@@ -17,11 +17,11 @@
     top: 0;
 }
 
-#key-add-popup .generate-upload a {
-    width: 69px !important;
-    overflow: visible;
+#key-add-popup .generate-upload {
+    margin-bottom: 10px;
 }
 
 #key-add-popup textarea {
     height: 75px !important;
+    background-color: #fff;
 }

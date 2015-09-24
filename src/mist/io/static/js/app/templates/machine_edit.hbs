@@ -28,32 +28,33 @@
          <!-- Header -->
 
         <div class="ui-header ui-bar-b">
-
             <h1 class="ui-title">Rename machine</h1>
 
+            <a href="javascript:void(0)" class="close" {{action "backClicked" target=view}}>&#10005;</a>
         </div>
 
         <!-- Body -->
 
         <div role="main" class="ui-content" data-theme="a">
 
-            <!-- New backend name text field -->
+            <!-- New machine name text field -->
+            <form {{action "saveClicked" on="submit" target=view}}>
+                <div id="machine-edit-new-name-wrapper" class="required {{if Mist.machineEditController.newName 'filled' 'empty'}}">
+                    <label for="machine-edit-new-name">New name</label>
+                    {{view Mist.TextField
+                        id="machine-edit-new-name"
+                        value=Mist.machineEditController.newName}}
+                </div>                
 
-            {{view Mist.TextField
-                id="machine-edit-new-name"
-                valueBinding="Mist.machineEditController.newName"}}
+                {{#if Mist.machineEditController.renamingMachine}}
+                    <div class="ajax-loader"></div>
+                {{/if}}
 
-            {{#if Mist.machineEditController.renamingMachine}}
-                <div class="ajax-loader"></div>
-            {{/if}}
-
-            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
-                    <a class="ui-btn ui-btn-a ui-corner-all ui-shadow"
-                       {{action "backClicked" target="view"}}>Back</a>
-                    <a id="machine-edit-ok"
-                        class="ui-btn ui-btn-d ui-corner-all ui-shadow"
-                        {{action "saveClicked" target="view"}}>Save</a>
-            </div>
+                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
+                    <button type="submit" id="machine-edit-ok"
+                        class="ui-btn ui-btn-d ui-caps">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

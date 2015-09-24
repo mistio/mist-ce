@@ -14,7 +14,7 @@ define('app/controllers/sizes',
 
         return BaseArrayController.extend({
 
-            model: SizeModel
+            baseModel: SizeModel
 
         });
     }

@@ -43,8 +43,8 @@
             -->
 
 
-            {{#each Mist.notificationController.messageBox.options.paragraphs}}
-                <p>{{this}}</p>
+            {{#each Mist.notificationController.messageBox.options.paragraphs as |p|}}
+                <p>{{p}}</p>
             {{/each}}
 
 
@@ -76,7 +76,7 @@
 
 
             <a class="ui-btn ui-btn-a ui-corner-all"
-                {{action "okClicked" target="view"}}>OK</a>
+                {{action "okClicked" target=view}}>OK</a>
         </div>
     </div>
 </div>

@@ -7,9 +7,9 @@ define('app/controllers/machine_power', ['ember'],
     function () {
         return Ember.Object.extend(Ember.Evented, {
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
             machines: [],
             callback: null,
@@ -20,30 +20,25 @@ define('app/controllers/machine_power', ['ember'],
             canRename: null,
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //  Methods
+            //
 
             open: function (machines, callback) {
                 this._clear();
                 this.set('callback', callback);
                 this.set('machines', machines instanceof Array ? machines : [machines]);
-                Ember.run.next(function () {
-                    $('#machine-power-popup').popup('open');
+                Ember.run.next(this, function () {
+                    $('#machine-power-popup').popup().popup('open');
                 });
             },
-
 
             close: function () {
                 $('#machine-power-popup').popup('close');
                 this._clear();
             },
 
-
             act: function (action) {
-
                 // Close current popup
                 $('#machine-power-popup').popup('close');
 
@@ -55,7 +50,7 @@ define('app/controllers/machine_power', ['ember'],
                     this.close();
                     Ember.run.later(function(){
                         Mist.machineEditController.open(machine);
-                    },350)
+                    }, 350)
                     return;
                 }
                 Ember.run.later(function () {
@@ -64,8 +59,7 @@ define('app/controllers/machine_power', ['ember'],
                         head: 'Machine action',
                         body: [
                             {
-                                paragraph: 'Are you sure you want to ' + action + ' these machines: ' +
-                                    machineNames + ' ?'
+                                paragraph: 'Are you sure you want to ' + action + ' ' + (that.machines.length > 1 ? 'these machines: ' : 'this machine: ') + machineNames + ' ?'
                             }
                         ],
                         callback: function (didConfirm) {
@@ -78,11 +72,9 @@ define('app/controllers/machine_power', ['ember'],
             },
 
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
+            //
+            //  Pseudo-Private Methods
+            //
 
             _clear: function () {
                 Ember.run(this, function () {
@@ -95,7 +87,6 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canRename', null);
                 });
             },
-
 
             _updateActions: function () {
                 Ember.run(this, function () {
@@ -112,11 +103,9 @@ define('app/controllers/machine_power', ['ember'],
                 });
             },
 
-
             _giveCallback: function (success, action) {
                 if (this.callback) this.callback(success, action);
             },
-
 
             _act: function (action) {
                 this.machines.forEach(function (machine) {
@@ -133,11 +122,9 @@ define('app/controllers/machine_power', ['ember'],
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //  Observers
+            //
 
             machinesObserver: function () {
                 Ember.run.once(this, '_updateActions');

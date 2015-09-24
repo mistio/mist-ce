@@ -26,7 +26,6 @@ define('app/controllers/script_add', ['ember'],
             open: function () {
                 this.clear();
                 this.view.clear();
-                this.view.open();
             },
 
 
@@ -35,8 +34,12 @@ define('app/controllers/script_add', ['ember'],
                 Mist.scriptsController.addScript({
                     script: that.get('newScript'),
                     callback: function (success) {
-                        if (success)
-                            that.close();
+                        if (success) {
+                            $('#add-script').collapsible('collapse');
+                            Ember.run.next(function() {
+                                $('body').enhanceWithin();
+                            })
+                        }
                     }
                 })
             },
@@ -44,7 +47,7 @@ define('app/controllers/script_add', ['ember'],
 
             close: function () {
                 this.clear();
-                this.view.close();
+                this.view.clear();
             },
 
 

@@ -1,7 +1,52 @@
-#script-list-page .list-wrapper .tag {
-  float: none;
-  margin: 0 auto;
+#script-list-page .ui-block-b .ui-title {
+    text-align: center;
+}
+#script-list-page #select-scripts-btn {
+    float: left !important;
+    font-weight: normal;
+    background-color: transparent;
+    color: #b5b5b5;
+    border-width: 0;
+    padding: .4em .75em !important;
+    text-align: left;
+    width: 14px;
+    height: 22px;
+    margin: 18px 5px 10px 11px !important;
+    font-size: 14px;
+    line-height: 1.6em;
+    z-index: 2;
+}
+#script-list-page #select-scripts-btn:hover {
+    color: #444 !important;
+}
+#script-list-page .ui-filterable .ui-input-search {
+    margin-right: 230px !important;
+}
+#script-list-page #run-script-btn {
+    float: right;
+    margin: 0;
+}
+#script-list-page #add-script-btn {
+    float: right;
+    margin: 0;
 }
 #script-list-page .list-wrapper .ui-block-b {
   text-align: center;
+}
+#script-list-page .ui-icon-check:after {
+    background-color: #46d4c9;
+}
+#script-list {
+    box-shadow: none;
+    margin-top: -52px;
+}
+#script-list .script-tags {
+    text-align: center;
+    padding-right: 26px;
+}
+#script-list .script-tags .tag {
+    float: none;
+}
+.script-name {
+    font-weight: 400;
 }

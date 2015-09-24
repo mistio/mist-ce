@@ -1,15 +1,13 @@
-<label>{{view Mist.Checkbox checkedBinding="view.key.selected"}}</label>
+<label>{{view Mist.Checkbox checked=key.selected}}</label>
 
-{{#link-to "key" view.key}}
-
+{{#link-to "key" key}}
     <div class="ui-grid-b">
-        <div class="ui-block-a key-name">{{view.key.id}}</div>
+        <div class="ui-block-a key-name">{{key.id}}</div>
         <div class="ui-block-b"></div>
         <div class="ui-block-c key-tags">
-            {{#if view.key.isDefault}}
+            {{#if key.isDefault}}
              <span class="tag">default</span>
             {{/if}}
         </div>
     </div>
-
 {{/link-to}}

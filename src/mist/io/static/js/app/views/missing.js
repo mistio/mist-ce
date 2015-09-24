@@ -1,14 +1,16 @@
-define('app/views/missing', ['app/views/templated'],
+define('app/views/missing', ['app/views/page'],
     //
     //  Missing View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function (PageView) {
 
         'use strict';
 
-        return App.MissingView =  TemplatedView.extend({});
+        return App.MissingView =  PageView.extend({
+            templateName: 'missing'
+        });
 
     }
 );

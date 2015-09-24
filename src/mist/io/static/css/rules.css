@@ -5,7 +5,7 @@
 .rules-container {
     padding: 0;
     margin: 0 !important;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #eeedeb;
 }
 
 .rule-box, .key-box {
@@ -41,7 +41,28 @@
 
 .delete-rule-container {
     float: right;
-    margin: 9px;
+}
+
+.delete-rule-container .ui-btn {
+    padding: 11px 12px 7px 8px;
+    color: #d96557;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.delete-rule-container .ui-btn:hover {
+    background-color: transparent;
+    border-color: transparent;
+    color: #df7e73 !important;
+}
+.delete-rule-container .ui-btn:active {
+    background-color: transparent;
+    border-color: transparent;
+    color: #d34c3b !important;
+}
+
+.delete-rule-container .ui-btn:after {
+    font-size: 16px;
 }
 
 .delete-rule-container div.ui-btn span.ui-btn-inner {
