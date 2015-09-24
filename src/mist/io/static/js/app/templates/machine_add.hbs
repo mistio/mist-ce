@@ -147,7 +147,7 @@
         {{/if}}
 
         <!-- Select Key -->
-        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.machines 'filled' 'empty'}} {{if view.hasDocker '' 'required'}}">
+        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.hasDocker '' 'required'}}">
             <div id="create-machine-key" >
                 <label>Key</label>
                 <div 
@@ -157,7 +157,13 @@
                      data-expanded-icon="carat-u"
 
                      class="mist-select">
-                    <h4>{{Mist.machineAddController.newMachineKey.id}}</h4>
+                    <h4>
+                        {{#if Mist.machineAddController.newMachineKey.id}}
+                        {{Mist.machineAddController.newMachineKey.id}}
+                        {{else}}
+                        {{Mist.machineAddController.newMachineKey.title}}
+                        {{/if}}
+                    </h4>
 
                     <ul data-role="listview">
                         {{#each Mist.keysController.model as |key|}}
@@ -178,7 +184,7 @@
         <div class="docker">
 
             <!-- Environment Vars -->
-            <div id="create-machine-env" class="{{if Mist.machineAddController.fullDocker 'required'}} {{if Mist.machineAddController.newMachineDockerEnvironment 'filled' 'empty'}}">
+            <div id="create-machine-env" class="{{if Mist.machineAddController.newMachineDockerEnvironment 'filled' 'empty'}}">
                 <label for="create-machine-env">Environment Variables</label>
                 {{view Mist.TextArea
                        id="create-machine-env"
@@ -187,7 +193,7 @@
             
             {{#unless view.dockerNeedScript}}
             <!-- Command -->
-            <div id="create-machine-command" class="{{if Mist.machineAddController.fullDocker 'required'}} {{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
+            <div id="create-machine-command" class="required {{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
                 <label for="create-machine-command">Command</label>
                 {{view Mist.TextArea
                        id="create-machine-command"
@@ -283,7 +289,7 @@
         {{#if view.hasAzure}}
         <div class="azure">
             <!-- Expose Ports -->
-            <div id="create-machine-azure-ports-wrapper" class="{{if Mist.machineAddController.newMachineKey.machines 'filled' 'empty'}} required">
+            <div id="create-machine-azure-ports-wrapper" class="{{if Mist.machineAddController.newMachineAzurePorts 'filled' 'empty'}} required">
                 <label for="create-machine-azure-ports">Ports</label>
                 {{view Mist.TextArea
                        id="create-machine-azure-ports"
