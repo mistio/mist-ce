@@ -4,26 +4,23 @@ define('app/views/machine_tags_list_item', ['app/views/list_item'],
      *
      *  @returns Class
      */
-    function (ListItemView) {
-        return App.MachineTagsListItemView = ListItemView.extend({
+    function (ListItemComponent) {
+        return App.MachineTagsListItemComponent = ListItemComponent.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
+            layoutName: 'machine_tags_list_item',
             tag: null,
             tagName: 'span',
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //  Actions
+            //
 
             actions: {
-
-
                 deleteClicked: function () {
                     Mist.machineTagsController.deleteTag(this.tag);
                 }

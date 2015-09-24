@@ -1,34 +1,30 @@
-define('app/views/list_item', ['app/views/templated', 'ember'],
+define('app/views/list_item', [],
     /**
      *  List Item View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
-        return TemplatedView.extend({
+    function () {
+        return Ember.Component.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
             tagName: 'li',
 
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            //
+            //  Initialization
+            //
 
             renderListItem: function () {
-
                 // Prevent bad rendering
                 // (or at least... try to...)
-
                 var element = $('#' + this.elementId).hide();
                 Ember.run.next(this, function () {
                     try {
-                        element.trigger('create')
+                        element.enhanceWithin()
                             .show()
                             .parent()
                             .listview('refresh');

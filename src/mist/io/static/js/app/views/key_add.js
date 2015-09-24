@@ -4,30 +4,27 @@ define('app/views/key_add', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.KeyAddView = PopupView.extend({
+        return App.KeyAddComponent = PopupComponent.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
+            layoutName: 'key_add',
+            controllerName: 'keyAddController',
+            popupId: '#key-add',
 
             addButton: '#key-add-ok',
             fileInput: '#key-add-upload',
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 this.setProperties({

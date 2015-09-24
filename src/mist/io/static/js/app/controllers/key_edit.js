@@ -14,7 +14,7 @@ define('app/controllers/key_edit', ['ember'],
             keyId: null,
             newKeyId: null,
             callback: null,
-            formReady: false,
+            formReady: null,
 
 
             /**
@@ -24,43 +24,40 @@ define('app/controllers/key_edit', ['ember'],
              */
 
             open: function (keyId, callback) {
-                $('#rename-key-popup').popup('open');
                 this._clear();
-                this.set('keyId', keyId)
-                    .set('newKeyId', keyId)
-                    .set('callback', callback);
+                this.setProperties({
+                    keyId: keyId,
+                    newKeyId: keyId,
+                    callback: callback,
+                });
+                this._updateFormReady();
+
+                this.view.open();
             },
 
 
             close: function () {
-                $('#rename-key-popup').popup('close');
+                this.view.close();
                 this._clear();
             },
 
 
             save: function () {
+                if (this.formReady) {
+                    if (Mist.keysController.keyExists(this.newKeyId)) {
+                        Mist.notificationController.notify('Key name exists already');
+                        this._giveCallback(false);
+                        return;
+                    }
 
-                // If new id is same as old id,
-                // act as if it is saved
-                if (this.keyId == this.newKeyId) {
-                    this._giveCallback(true, this.newKeyId);
-                    this.close();
-                    return;
+                    var that = this;
+                    Mist.keysController.renameKey(this.keyId, this.newKeyId,
+                        function (success, newKeyId) {
+                            that._giveCallback(success, newKeyId);
+                            if (success)
+                                that.close();
+                        });
                 }
-
-                if (Mist.keysController.keyExists(this.newKeyId)) {
-                    Mist.notificationController.notify('Key name exists already');
-                    this._giveCallback(false);
-                    return;
-                }
-
-                var that = this;
-                Mist.keysController.renameKey(this.keyId, this.newKeyId,
-                    function (success, newKeyId) {
-                        that._giveCallback(success, newKeyId);
-                        if (success)
-                            that.close();
-                    });
             },
 
 
@@ -71,18 +68,26 @@ define('app/controllers/key_edit', ['ember'],
              */
 
             _clear: function () {
-                this.set('keyId', null)
-                    .set('newKeyId', null)
-                    .set('callback', null);
+                this.setProperties({
+                    keyId: null,
+                    newKeyId: null,
+                    callback: null,
+                });
             },
 
 
             _updateFormReady: function () {
-                if (this.newKeyId) {
+                var formReady = false;
+                if (this.newKeyId && this.newKeyId != this.keyId) {
+                    formReady = true;
                     // Remove non alphanumeric chars from key id
                     this.set('newKeyId', this.newKeyId.replace(/\W/g, ''));
+
+                    if (formReady && Mist.keysController.renamingKey) {
+                        formReady = false;
+                    }
                 }
-                this.set('formReady', !! this.newKeyId);
+                this.set('formReady', formReady);
             },
 
 

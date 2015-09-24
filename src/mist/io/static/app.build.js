@@ -1,6 +1,6 @@
 ({
-    baseUrl: 'js', 
-    out : 'build/mist.js',
+    baseUrl: 'js',
+    out : 'dist/mist.js',
     name : 'app',
     mainConfigFile: 'js/app.js'
 })

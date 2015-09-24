@@ -1,36 +1,29 @@
-define('app/views/graph_list_bar', ['app/views/templated'],
+define('app/views/graph_list_bar', [],
     //
     //  Graph List Bar View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return App.GraphListBarView = TemplatedView.extend({
+        return App.GraphListBarComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-
+            layoutName: 'graph_list_bar',
             machine: null,
             actionProxy: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
-
                 // This is a hack to get the machine model.
                 // It's a hack because graphs are now generic
                 // and are not supposed to present data for
@@ -38,9 +31,8 @@ define('app/views/graph_list_bar', ['app/views/templated'],
                 // machine view.
 
                 try {
-                this.set('machine', this.actionProxy.get('machine'));
+                    this.set('machine', this.actionProxy.get('machine'));
                 } catch (e) {}
-
             }.on('didInsertElement')
         });
     }

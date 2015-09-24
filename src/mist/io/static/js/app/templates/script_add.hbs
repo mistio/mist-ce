@@ -1,50 +1,51 @@
-<div id="script-add"
-    data-swipe-close="false"
-    class="side-panel"
-    data-role="panel"
-    data-position="right"
-    data-display="overlay"
-    data-theme="c">
+<!-- Add script button -->
+<div id="add-script" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible"
+     data-role="collapsible"
+     data-collapsed="true">
 
-    <div data-role="header">
-        <h1>Add script</h1>
-    </div>
+   <h4><span class="title">Add script</span></h4>
 
-    <div data-role="content" data-theme="a">
+    <div id="script-add" class="ui-content">
 
-        <div class="form-field">
-            <label for="script-name">Name:</label>
+        <div class="form-field {{if Mist.scriptAddController.newScript.name 'filled' 'empty'}} required">
+            <label for="script-name">Name</label>
             {{view Mist.TextField
                 data-theme="a"
                 id="script-name"
-                valueBinding=Mist.scriptAddController.newScript.name}}
+                value=Mist.scriptAddController.newScript.name}}
+        </div>
+
+        <!--
+            Description
+        -->
+        <div id="script-add-description" class="form-field">
+          <label>Description (optional)</label>
+          {{view Mist.TextArea
+              data-theme="a"
+              value=Mist.scriptAddController.newScript.description}}
         </div>
 
         <!--
             Select script type
         -->
-
-        <div id="script-add-type" class="form-field">
-            <label >Type:</label>
+        <div id="script-add-type" class="form-field {{if Mist.scriptAddController.newScript.type.label 'filled' 'empty'}} required">
+            <label>Type</label>
             <div class="mist-select"
-                data-role="collapsible"
-                data-iconpos="right"
-                data-collapsed-icon="carat-d"
-                data-expanded-icon="carat-u"
-                data-theme="a">
+                 data-role="collapsible"
+                 data-collapsed-icon="carat-d"
+                 data-expanded-icon="carat-u"
+                 data-iconpos="right">
                     <h4>
-                        {{#with Mist.scriptAddController.newScript.type as type}}
-                                {{#if type}}
-                                    {{type.label}}
-                                {{else}}
-                                    Select
-                                {{/if}}
-                        {{/with}}
+                        {{#if Mist.scriptAddController.newScript.type}}
+                            {{Mist.scriptAddController.newScript.type.label}}
+                        {{else}}
+                            Select type
+                        {{/if}}
                     </h4>
                     <ul data-role="listview">
-                        {{#each view.scriptTypes}}
+                        {{#each view.scriptTypes as |scriptType|}}
                             <li data-icon="false" data-theme="a">
-                                <a {{action "selectType" this target="view"}}>{{this.label}}</a>
+                                <a {{action "selectType" scriptType target=view}}>{{scriptType.label}}</a>
                             </li>
                         {{/each}}
                     </ul>
@@ -55,101 +56,95 @@
             Select script source
         -->
 
-        <div id="script-add-source" class="form-field">
-            <label>Source:</label>
+        <div id="script-add-source" class="form-field {{if Mist.scriptAddController.newScript.source.label 'filled' 'empty'}} required">
+            <label>Source</label>
             <div  class="mist-select"
                 data-role="collapsible"
                 data-iconpos="right"
                 data-collapsed-icon="carat-d"
-                data-expanded-icon="carat-u"
-                data-theme="a">
+                data-expanded-icon="carat-u">
                     <h4>
-                        {{#with Mist.scriptAddController.newScript.source as source}}
-                                {{#if source}}
-                                    {{source.label}}
-                                {{else}}
-                                    Select
-                                {{/if}}
-                        {{/with}}
+                        {{#if Mist.scriptAddController.newScript.source}}
+                            {{Mist.scriptAddController.newScript.source.label}}
+                        {{else}}
+                            Select source
+                        {{/if}}
                     </h4>
                     <ul data-role="listview">
-                        {{#each view.scriptSources}}
+                        {{#each view.scriptSources as |scriptSource|}}
                             <li data-icon="false" data-theme="a">
-                                <a {{action "selectSource" this target="view"}}>{{this.label}}</a>
+                                <a {{action "selectSource" scriptSource target=view}}>{{scriptSource.label}}</a>
                             </li>
                         {{/each}}
                     </ul>
             </div>
         </div>
 
+        {{#if view.isGitHub}}
         <div class="github source">
             <div class="form-field">
-                <label for="github-script-url">Github Repo:</label>
+                <label for="github-script-url">Github Repo</label>
                 {{#view Mist.TextField
                     data-theme="a"
                     id="github-script-url"
-                    valueBinding=Mist.scriptAddController.newScript.url}}
+                    value=Mist.scriptAddController.newScript.url}}
                 {{/view}}
             </div>
 
             <div class="form-field">
-                <label for="github-script-entry-point">Entry point (optional):</label>
+                <label for="github-script-entry-point">Entry point (optional)</label>
                 {{view Mist.TextField
                     data-theme="a"
                     id="github-script-entry-point"
-                    valueBinding=Mist.scriptAddController.newScript.entryPoint}}
+                    value=Mist.scriptAddController.newScript.entryPoint}}
             </div>
         </div>
+        {{/if}}
 
+        {{#if view.isURL}}
         <div class="url source">
             <div class="form-field">
-                <label for="url-script-url">Url:</label>
+                <label for="url-script-url">Url</label>
                 {{view Mist.TextField
                     data-theme="a"
                     id="url-script-url"
-                    valueBinding=Mist.scriptAddController.newScript.url}}
+                    value=Mist.scriptAddController.newScript.url}}
             </div>
 
             <div class="form-field">
-                <label for="url-script-entry-point">Entry point (optional):</label>
+                <label for="url-script-entry-point">Entry point (optional)</label>
                 {{view Mist.TextField
                     data-theme="a"
                     id="url-script-entry-point"
-                    valueBinding=Mist.scriptAddController.newScript.entryPoint}}
+                    value=Mist.scriptAddController.newScript.entryPoint}}
             </div>
         </div>
+        {{/if}}
 
+        {{#if view.isInline}}
         <div class="inline source">
             <div class="form-field">
-                <label for="url-script-script">Script:</label>
+                <label for="url-script-script">Script</label>
                 {{view Mist.TextArea
                     data-theme="a"
                     id="url-script-script"
-                    valueBinding=Mist.scriptAddController.newScript.script}}
+                    value=Mist.scriptAddController.newScript.script}}
             </div>
         </div>
-
-        <!--
-            Description
-        -->
-
-        <div id="script-add-description" class="form-field">
-          <label>Description (optional):</label>
-          {{view Mist.TextArea
-              data-theme="a"
-              valueBinding=Mist.scriptAddController.newScript.description}}
-        </div>
+        {{/if}}
 
         {{#if Mist.scriptsController.addingScript}}
             <div class="ajax-loader"></div>
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a ui-shadow ui-corner-all" 
-                {{action "backClicked" target="view"}}>Back</a>
-            <a id="new-script-ok" data-theme="d"
-                {{bind-attr class="view.isReady::ui-state-disabled :ui-btn :ui-btn-d"}}
-                {{action "addClicked" target="view"}}>Add</a>
+            <a id="new-script-ok"
+                class="{{if view.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d ui-shadow ui-caps ok-only"
+                {{action "addClicked" target=view}}>Add</a>
         </div>
     </div>
 </div>
+
+
+<div id="add-script-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
+     {{action "clickOverlay" target=view}}></div>

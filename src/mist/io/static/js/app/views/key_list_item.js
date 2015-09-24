@@ -4,13 +4,13 @@ define('app/views/key_list_item', ['app/views/list_item'],
      *
      *  @returns Class
      */
-    function (ListItemView) {
-        return App.KeyListItemView = ListItemView.extend({
+    function (ListItemComponent) {
+        return App.KeyListItemComponent = ListItemComponent.extend({
 
             /**
              *  Properties
              */
-
+            layoutName: 'key_list_item',
             key: null,
 
 

@@ -10,6 +10,8 @@ define('app/views/script_list', ['app/views/page'],
 
         return App.ScriptListView = PageView.extend({
 
+            templateName: 'script_list',
+            controllerName: 'scriptsController',
 
             load: function () {
 
@@ -30,11 +32,11 @@ define('app/views/script_list', ['app/views/page'],
 
             canRename: function () {
                 return Mist.scriptsController.get('selectedObjects').length == 1;
-            }.property('Mist.scriptsController.@each.selected'),
+            }.property('Mist.scriptsController.model.@each.selected'),
 
             canDelete: function () {
                 return Mist.scriptsController.get('selectedObjects').length;
-            }.property('Mist.scriptsController.@each.selected'),
+            }.property('Mist.scriptsController.model.@each.selected'),
 
             updateFooter: function () {
                 if (Mist.scriptsController.get('selectedObjects').length) {
@@ -69,7 +71,7 @@ define('app/views/script_list', ['app/views/page'],
                 selectionModeClicked: function (mode) {
                     $('#select-scripts-popup').popup('close');
                     Ember.run(function () {
-                        Mist.scriptsController.forEach(function (script) {
+                        Mist.scriptsController.model.forEach(function (script) {
                             script.set('selected', mode);
                         });
                     });
@@ -84,8 +86,7 @@ define('app/views/script_list', ['app/views/page'],
                         head: 'Delete scripts',
                         body: [
                             {
-                                paragraph: 'Are you sure you want to delete these ' +
-                                    'scripts: ' + scripts.toStringByProperty('name') + ' ?'
+                                paragraph: 'Are you sure you want to delete ' + (scripts.length > 1 ? 'these scripts: ' : 'this script: ') + scripts.toStringByProperty('name') + ' ?'
                             }
                         ],
                         callback: function (didConfirm) {

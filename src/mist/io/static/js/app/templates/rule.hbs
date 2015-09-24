@@ -4,23 +4,23 @@
         <div class="rule-if rule-text">if</div>
 
         <a class="rule-button rule-metric ui-btn ui-btn-inline ui-shadow ui-corner-all"
-            {{action "openMetricPopup" target="view"}}>
-                {{metric.name}}
+            {{action "openMetricPopup" target=view}}>
+                {{rule.metric.name}}
         </a>
 
         <a class="rule-button rule-operator ui-btn ui-btn-inline ui-shadow ui-corner-all"
-            {{action "openOperatorPopup" target="view"}}>
-                {{operator.symbol}}
+            {{action "openOperatorPopup" target=view}}>
+                {{rule.operator.symbol}}
         </a>
 
         {{view Mist.TextField class="rule-value" type="number"
-            valueBinding="view.newRuleValue"}}
+            value=view.newRuleValue}}
 
-        <div class="rule-unit rule-text">{{metric.unit}}</div>
+        <div class="rule-unit rule-text">{{rule.metric.unit}}</div>
     </div>
 
     <a class="rule-button rule-more ui-btn ui-btn-inline ui-shadow ui-corner-all"
-        {{action "openAdvancedCondition" target="view"}}>
+        {{action "openAdvancedCondition" target=view}}>
         ...
     </a>
 
@@ -29,8 +29,8 @@
         <div class="rule-for rule-text">for</div>
 
         <a class="rule-button rule-aggregate ui-btn ui-btn-inline ui-shadow ui-corner-all"
-            {{action "openAggregatePopup" target="view"}}>
-                {{aggregate.title}}
+            {{action "openAggregatePopup" target=view}}>
+                {{rule.aggregate.title}}
         </a>
 
         <div class="rule-for rule-text">value</div>
@@ -40,7 +40,7 @@
             <div class="rule-within rule-text">within</div>
 
             {{view Mist.TextField class="rule-time-window" type="number"
-                valueBinding="view.newRuleTimeWindow"}}
+                value=view.newRuleTimeWindow}}
 
             <div class="rule-mins rule-text">min(s)</div>
 
@@ -51,16 +51,16 @@
     <div class="rule-then rule-text">then</div>
 
     <a class="rule-button rule-action ui-btn ui-btn-inline ui-shadow ui-corner-all"
-        {{action "openActionPopup" target="view"}}>
-            {{actionToTake}}
+        {{action "openActionPopup" target=view}}>
+            {{rule.actionToTake}}
     </a>
 
-    {{#if pendingAction}}
+    {{#if rule.pendingAction}}
         <div class="ajax-loader"></div>
     {{else}}
         <div class="delete-rule-container">
-            <a class="delete-rule-button ui-btn ui-btn-icon-notext ui-icon-delete ui-corner-all"
-                    {{action deleteRuleClicked target="view"}}>&nbsp;</a>
+            <a class="delete-rule-button ui-btn icon-xx"
+                    {{action "deleteRuleClicked" target=view}}>&nbsp;</a>
         </div>
     {{/if}}
 

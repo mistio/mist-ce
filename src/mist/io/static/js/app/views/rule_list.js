@@ -1,25 +1,20 @@
-define('app/views/rule_list', ['app/views/templated'],
-	//
-	//  Rule List View
-	//
-	//  @returns Class
-	//
-	function (TemplatedView) {
+define('app/views/rule_list', [],
+    //
+    //  Rule List View
+    //
+    //  @returns Class
+    //
+    function () {
 
-		'use strict';
+        'use strict';
 
-		return App.RuleListView = TemplatedView.extend({
+        return App.RuleListComponent = Ember.Component.extend({
 
+            //
+            //  Properties
+            //
 
-			//
-			//
-			//  Properties
-			//
-			//
-
-
-			rules: null,
-
-		});
-	}
+            layoutName: 'rule_list'
+        });
+    }
 );

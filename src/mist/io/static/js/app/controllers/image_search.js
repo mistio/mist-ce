@@ -8,7 +8,7 @@ define('app/controllers/image_search', ['ember'],
 
         'use strict';
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Controller.extend(Ember.Evented, {
 
 
             //
@@ -33,7 +33,6 @@ define('app/controllers/image_search', ['ember'],
 
 
             scheduleNewSearch: function (onServer) {
-
                 var that = this;
                 this.cancelSearch(function () {
                     that.search(onServer);
@@ -94,6 +93,11 @@ define('app/controllers/image_search', ['ember'],
             },
 
 
+            clearSearch: function () {
+                this.set('searchTerm', null);
+            },
+
+
             recursiveChunkSearch: function (term, startIndex, chunkSize) {
 
                 Ember.run.later(this, function () {
@@ -126,7 +130,7 @@ define('app/controllers/image_search', ['ember'],
 
                 var that = this;
                 var searchingBackends = [];
-                Mist.backendsController.content.forEach(function(backend, index) {
+                Mist.backendsController.model.forEach(function(backend, index) {
 
                     if (!backend.enabled)
                         return;

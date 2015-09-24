@@ -1,6 +1,8 @@
-<div class="graph-button" {{bind-attr id="view.buttonId"}}>
-    <a class="ui-btn ui-btn-icon-left ui-icon-arrow-u ui-corner-all"
-        {{action "graphButtonClicked" view.graph target="view.actionProxy"}}>
+{{#if view.graph.isHidden}}
+<div class="graph-button graph-minimized" id={{view.buttonId}} draggable="true">
+    <a class="ui-btn ui-caps ui-shadow ui-btn-icon-right icon-graph-1"
+        {{action "graphButtonClicked" graph target=actionProxy}}>
             {{unbound view.graph.title}}
     </a>
 </div>
+{{/if}}

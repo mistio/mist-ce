@@ -1,16 +1,27 @@
 <div id="single-key-page" data-role="page" class="ui-page-active">
 
-    <div data-role="header" data-theme="b">
+    <div data-role="header" data-theme="a">
+        <!-- Page header -->
+        <div class="ui-header ui-bar-a">
+            <div class="header-grid">
+                <div class="ui-grid-b">
+                    <div class="ui-block-a">
+                        {{#link-to 'keys' class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
+                        ui-btn-icon-left ui-corner-all nav-back"}}<span>Keys</span>{{/link-to}}
+                    </div>
 
-        <a href="#/keys" class="responsive-button ui-btn-left ui-btn ui-icon-arrow-l
-            ui-btn-icon-left ui-shadow ui-corner-all">
-            Keys
-        </a>
+                    <div class="ui-block-b">
+                        <h1 class="ui-title">{{view.key.id}}</h1>
+                    </div>
 
-        <h1>{{id}}</h1>
-
-        {{view "userMenu"}}
-
+                    <div class="ui-block-c">
+                        <div class="user-menu">
+                            {{component "user-menu"}}
+                        </div>
+                    </div>
+                </div><!-- /grid-b -->
+            </div>
+        </div>
     </div>
 
     <div data-role="content" data-theme="a">
@@ -19,28 +30,37 @@
         <div class="ajax-loader"></div>
         {{/if}}
 
-         <div data-role="collapsible" data-collapsed="false">
+         <div class="ui-shadow" data-role="collapsible" data-collapsed="false">
             <h4>Public Key
                 {{#if Mist.keysController.gettingPublicKey}}
                 <div class="ajax-loader"></div>
                 {{/if}}
             </h4>
-            <input id="public-key" type="text" readonly="readonly" onclick="this.focus();this.select()"/>
+            <textarea id="public-key" type="text" readonly="readonly" onclick="this.focus();this.select()" value={{view.publicKey}}></textarea>
         </div>
 
-        <div data-role="collapsible">
+        <div class="ui-shadow" data-role="collapsible">
             <h4>Private key
                 {{#if Mist.keysController.gettingPrivateKey}}
                 <div class="ajax-loader"></div>
                 {{/if}}
             </h4>
-            <a class="ui-btn ui-shadow ui-corner-all" {{action "displayClicked" target="view"}}>
+            {{#if view.privateKey}}
+            <textarea id="private-key" class="ui-input-text ui-shadow-inset ui-body-inherit ui-corner-all ui-textinput-autogrow" type="text" readonly="readonly" onclick="this.focus();this.select()" value={{view.privateKey}}></textarea>
+            {{else}}
+            <a id="private_key" class="ui-btn
+                    ui-shadow
+                    ui-btn-d
+                    icon-key
+                    ui-btn-icon-right
+                    ui-caps" {{action "displayClicked" target=view}}>
                 Display
             </a>
+            {{/if}}
         </div>
 
-        {{#if machines}}
-        <div id="single-key-machines" data-role="collapsible">
+        {{#if model.machines}}
+        <div class="ui-shadow" id="single-key-machines" data-role="collapsible">
 
             <h4>Machines
                 {{#if Mist.backendsController.loadingMachines}}
@@ -48,9 +68,9 @@
                 {{/if}}
             </h4>
             <ul data-role="listview" class="checkbox-list" data-inset="true">
-                {{#each view.machines}}
-                    {{view "machineListItem"
-                           machineBinding="this"
+                {{#each view.machines as |machine|}}
+                    {{component "machine-list-item"
+                           machine=machine
                            class="checkbox-link"}}
                 {{/each}}
             </ul>
@@ -61,18 +81,21 @@
 
     </div>
 
-    {{view "dialog"}}
+    {{component "dialog-popup"}}
 
-    {{view "keyEdit"}}
+    {{component "key-edit"}}
 
     <div class="dual-action-footer" data-role="footer" data-theme="b">
-        <table><tbody><tr><td>
-            <a class="ui-btn ui-icon-edit ui-btn-icon-left ui-shadow ui-corner-all"
-                {{action "renameClicked" target="view"}}>Rename</a>
-        </td><td>
-            <a class="ui-btn ui-icon-delete ui-btn-icon-left ui-shadow ui-corner-all"
-                {{action "deleteClicked" target="view"}}>Delete</a>
-        </td></tr></tbody></table>
+        <div class="ui-grid-a">
+            <div class="ui-block-a">
+                <a class="ui-btn ui-btn-icon-right ui-caps icon-edit"
+                    {{action "renameClicked" target=view}}>Rename</a>
+            </div>
+            <div class="ui-block-b">
+                <a class="ui-btn ui-btn-icon-right ui-caps icon-xx"
+                    {{action "deleteClicked" target=view}}>Delete</a>
+            </div>
+        </div>
     </div>
 
 </div>

@@ -1,6 +1,6 @@
 <div id="metric-add-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-a"></div>
 <div id="metric-add-popup"
-     class="ui-popup-container mid-popup ui-popup-hidden ui-body-inherit ui-corner-all">
+     class="ui-popup-container mid-popup ui-popup-hidden ui-body-inherit">
 
     <div id="metric-add"
          class="ui-popup ui-corner-all ui-overlay-shadow"
@@ -9,22 +9,23 @@
          data-transition="flip"
          data-position-to="#add-metric-btn">
 
-        <div class="ui-header ui-bar-b">
+        <div class="ui-header ui-bar-b" role="banner">
+
             <h1 class="ui-title">Select Metric</h1>
+
+            <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+
         </div>
 
-        <div {{bind-attr class="
-                Mist.metricAddController.metrics.length::no-metrics
-                :ui-content
-                :ui-body-a"}}
-            role="main">
+        <div class="{{if Mist.metricAddController.metrics.length '' 'no-metrics'}} ui-content ui-body-a"
+             role="main">
 
-            <a class="ui-btn ui-btn-d ui-corner-all ui-btn-icon-left ui-icon-plus"
-                {{action "customClicked" target="view"}}>custom</a>
+            <a class="ui-btn ui-btn-d ui-caps"
+                {{action "customClicked" target=view}}>custom</a>
 
             {{#if Mist.metricAddController.metrics.length}}
-                {{view "metricNode"
-                    nodeBinding="Mist.metricAddController.metricsTree"}}
+                {{component "metric-node"
+                    node=Mist.metricAddController.metricsTree}}
             {{else}}
                 <div class="ui-body-a">
                     <p>Checking available metrics on your server</p>
@@ -40,4 +41,4 @@
     </div>
 </div>
 
-{{view "metricAddCustom"}}
+{{component "metric-add-custom"}}

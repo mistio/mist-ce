@@ -4,41 +4,48 @@ define('app/views/backend_edit', ['app/views/popup'],
     //
     //  @returns Class
     //
-    function (PopupView) {
+    function (PopupComponent) {
 
         'use strict';
 
-        return App.BackendEditView = PopupView.extend({
+        return App.BackendEditComponent = PopupComponent.extend({
 
+            layoutName: 'backend_edit',
+            controllerName: 'backendEditController',
+            popupId: '#backend-edit',
 
-            //
             //
             //  Methods
             //
-            //
 
-
-            open: function () {
-                this._super();
-                $('#monitoring-message').hide();
-                $('#backend-delete-confirm').hide();
+            open: function (position) {
+                this._super(position);
             },
-
 
             updateStateSlider: function () {
                 var newState = Mist.backendEditController.newState ? '1' : '0';
                 $('#backend-toggle').val(newState).slider('refresh');
             },
 
+            updateRenameButton: function () {
+               if (Mist.backendEditController.formReady) {
+                   $('#edit-title-ok').removeClass('ui-state-disabled');
+               } else {
+                   $('#edit-title-ok').addClass('ui-state-disabled');
+               }
+            },
 
-            //
+
             //
             //  Actions
             //
-            //
-
 
             actions: {
+
+                renameClicked: function() {
+                    Mist.backendEditController.rename();
+                },
+
 
                 stateToggleSwitched: function () {
                     var newState = parseInt($('#backend-toggle').val());
@@ -57,6 +64,7 @@ define('app/views/backend_edit', ['app/views/popup'],
 
                 yesClicked: function () {
                     Mist.backendEditController.delete();
+                    $('#backend-delete-confirm').slideUp();
                 },
 
 
@@ -67,7 +75,7 @@ define('app/views/backend_edit', ['app/views/popup'],
 
                 backClicked: function() {
                     Mist.backendEditController.close();
-                },
+                }
             },
 
 
@@ -80,7 +88,12 @@ define('app/views/backend_edit', ['app/views/popup'],
 
             newStateObserver: function () {
                 Ember.run.once(this, 'updateStateSlider');
-            }.observes('Mist.backendEditController.newState')
+            }.observes('Mist.backendEditController.newState'),
+
+
+            newNameObserver: function () {
+               Ember.run.once(this, 'updateRenameButton');
+            }.observes('Mist.backendEditController.formReady')
         });
     }
 );

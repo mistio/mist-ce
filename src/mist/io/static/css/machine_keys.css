@@ -7,15 +7,17 @@
 }
 
 #machine-userPort-popup .message{
-    background-color: #FF5533;
-    border-radius: 7px !important;
-    color: #FFFFFF;
-    display: block;
-    margin-bottom: 5px;
-    margin-left: auto;
-    margin-right: auto;
+    background-color: #d96557;
+    border-radius: 0 !important;
+    color: #fff;
+    margin: 10px auto;
     padding: 5px;
     text-align: center;
+}
+
+#machine-keys-panel .ui-header > .ui-title {
+	min-width: 120px;
+    text-transform: uppercase;
 }
 
 #machine-keys-panel .small-list-item {
@@ -30,8 +32,11 @@
 	padding: 0;
 }
 
-#non-associated-keys-popup.tiny-popup{
+#non-associated-keys-popup.tiny-popup ul.ui-listview {
 	/* only for machine keys*/
     overflow: auto;
-    max-height: 16.6em;
+    max-height: 15.8em;
+}
+#non-associated-keys-popup.tiny-popup a.ui-btn-d:hover {
+	background-color: #0099cc !important;
 }

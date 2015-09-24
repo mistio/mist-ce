@@ -19,17 +19,18 @@
          class="mid-popup
             ui-popup
             ui-body-a
-            ui-overlay-shadow
-            ui-corner-all"
+            ui-overlay-shadow"
          data-role="popup"
          data-enhanced="true"
          data-transition="flip">
 
          <!-- Header -->
 
-        <div class="ui-header ui-bar-b">
+        <div class="ui-header ui-bar-b ui-caps">
 
             <h1 class="ui-title">Edit cloud</h1>
+
+            <a {{action "backClicked" target=view}} class="close">&#10005;</a>
 
         </div>
 
@@ -39,49 +40,54 @@
 
             <!-- New backend title text field -->
 
-            {{view Mist.TextField valueBinding="Mist.backendEditController.newTitle"}}
+            <label for=newTitle>Title</label>
+            <form {{action "renameClicked" on="submit" target=view}}>
+                <div class="field-wrapper {{if Mist.backendEditController.newTitle 'filled' 'empty'}} required">
+                    {{view Mist.TextField value=Mist.backendEditController.newTitle}}
+
+                    <button type="submit" id="edit-title-ok" class="ui-btn ui-btn-d ui-caps">Ok</button>
+                </div>
+            </form>      
 
             <!-- Backend state toggle switch -->
 
-            <div data-role="fieldcontain">
+            <label for=newTitle>State</label>
+            <div class="ui-field-contain">
                 <select id="backend-toggle" data-role="slider"
-                    {{action "stateToggleSwitched" target="view" on="change"}}>
+                    {{action "stateToggleSwitched" target=view on="change"}}>
                         <option value="0">Disabled</option>
                         <option value="1">Enabled</option>
                 </select>
                 <span class="state">{{Mist.backendEditController.backend.state}}</span>
             </div>
 
-            <!-- Delete button -->
-
-            <a class="ui-btn ui-shadow ui-corner-all"
-                {{action "deleteClicked" target="view" on="click"}}>
-                Delete
-            </a>
-
-            <!-- Delete confirmation -->
-
-            <div id="backend-delete-confirm">
-                <label>Confirm backend removal?</label>
-                <label id="monitoring-message">There are monitored machines.
-                    <br />Monitoring for these will be disabled
-                </label>
-                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <a class="ui-btn ui-shadow ui-corner-all" id="button-confirm-disable"
-                        {{action "yesClicked" target="view"}}>Yes</a>
-                    <a class="ui-btn ui-btn-d ui-shadow ui-corner-all"
-                        {{action "noClicked" target="view"}}>No</a>
-                </div>
-            </div>
-
             {{#if Mist.backendsController.deletingBackend}}
                 <div class="ajax-loader"></div>
             {{/if}}
 
-            <!-- Back button -->
+            <!-- Delete button - Back button -->
 
-            <a class="ui-btn ui-shadow ui-corner-all button-back"
-                {{action "backClicked" target="view"}}>Back</a>
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <a class="ui-btn ui-caps ui-shadow ui-corner-all half no"
+                    {{action "deleteClicked" target=view}}>
+                    Delete
+                </a>
+            </div>
+
+            <!-- Delete confirmation -->
+
+            <div id="backend-delete-confirm" style="display:none">
+                <label>Confirm cloud removal?</label>
+                <label id="monitoring-message" style="display:none">There are monitored machines.
+                    <br />Monitoring for these will be disabled
+                </label>
+                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                    <a class="ui-btn ui-btn-d ui-shadow ui-caps back"
+                        {{action "noClicked" target=view}}>No</a>
+                    <a class="ui-btn ui-shadow ui-caps no" id="button-confirm-disable"
+                        {{action "yesClicked" target=view}}>Yes</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

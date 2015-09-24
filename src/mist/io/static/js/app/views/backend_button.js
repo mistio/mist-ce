@@ -1,38 +1,30 @@
-define('app/views/backend_button', ['app/views/templated'],
+define('app/views/backend_button', [],
     //
     //  Backend Button View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict';
 
-        return App.BackendButtonView = TemplatedView.extend({
+        return App.BackendButtonComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-
+            layoutName: 'backend_button',
             backend: null,
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 this.renderBackends();
-                this.stateObserver();
             }.on('didInsertElement'),
-
 
             unload: function () {
                 this.renderBackends();
@@ -40,11 +32,8 @@ define('app/views/backend_button', ['app/views/templated'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             renderBackends: function () {
                 Ember.run.next(function () {
@@ -55,46 +44,14 @@ define('app/views/backend_button', ['app/views/templated'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 buttonClicked: function () {
-                    $('#backend-edit').popup('option',
-                        'positionTo', '#' + this.elementId);
-                    Mist.backendEditController.open(this.backend);
+                    Mist.backendEditController.open(this.backend, '#' + this.elementId);
                 }
-            },
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
-
-            stateObserver: function () {
-
-                var btn = $('#' + this.elementId + ' a');
-                btn.addClass('ui-btn-icon-left')
-                    .removeClass('ui-icon-check')
-                    .removeClass('ui-icon-offline')
-                    .removeClass('ui-icon-waiting');
-
-                if (this.backend.state == 'online')
-                    btn.addClass('ui-icon-check')
-                else if (this.backend.state == 'offline')
-                    btn.addClass('ui-icon-offline')
-                else if (this.backend.state == 'waiting')
-                    btn.addClass('ui-icon-waiting')
-                        .removeClass('ui-btn-icon-left');
-
-            }.observes('backend.state')
+            }
         });
     }
 );

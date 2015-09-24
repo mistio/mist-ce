@@ -4,27 +4,28 @@
      data-overlay-theme="b"
      data-transition="slideup">
 
-    <div data-role="header" data-theme="b">
-        <h1>Rename key</h1>
+    <div class="ui-header ui-bar-b ui-caps">
+        <h1 class="ui-title">Rename key</h1>
+
+        <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
     </div>
 
     <div data-role="content">
 
-        <label for="new-key-name">New name:</label>
-        {{view Mist.TextField
-               id="new-key-name"
-               valueBinding="Mist.keyEditController.newKeyId"}}
+        <form {{action "saveClicked" on="submit" target=view}}>
+            <div id="new-key-name-wrapper" class="required {{if Mist.keyEditController.newKeyId 'filled' 'empty'}}">
+                <label for="new-key-name">New name</label>
+                {{view Mist.TextField id="new-key-name" value=Mist.keyEditController.newKeyId}}
+            </div>
 
-        {{#if Mist.keysController.renamingKey}}
-        <div class="ajax-loader"></div>
-        {{/if}}
+            {{#if Mist.keysController.renamingKey}}
+                <div class="ajax-loader"></div>
+            {{/if}}      
 
-        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a ui-shadow ui-corner-all"
-                {{action "backClicked" target="view"}}>Back</a>
-            <a id="rename-key-ok" class="ui-btn ui-btn-d ui-shadow ui-corner-all"
-                {{action "saveClicked" target="view"}}>Save</a>
-        </div>
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <button type="submit" id="rename-key-ok" class="ui-btn ui-btn-d ui-caps">Save</button>
+            </div>
+        </form>
 
     </div>
 

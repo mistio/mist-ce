@@ -1,6 +1,5 @@
 define('app/views/machine_monitoring',
     [
-        'app/views/templated',
         'app/models/graph',
         'app/models/datasource',
         'app/models/stats_request'
@@ -10,20 +9,17 @@ define('app/views/machine_monitoring',
     //
     //  @returns Class
     //
-    function (TemplatedView, Graph, Datasource, StatsRequest) {
+    function (Graph, Datasource, StatsRequest) {
 
         'use strict';
 
-        return App.MachineMonitoringView = TemplatedView.extend({
+        return App.MachineMonitoringComponent = Ember.Component.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-
+            layoutName: 'machine_monitoring',
             rules: [],
             graphs: [],
             metrics: [],
@@ -31,16 +27,11 @@ define('app/views/machine_monitoring',
             gettingCommand: null,
 
 
-
-            //
             //
             //  Computed Properties
             //
-            //
-
 
             monitoringMessage: function () {
-
                 var finishedAt = this.machine.installationStatus.finished_at;
                 var activatedAt = this.machine.installationStatus.activated_at;
                 var manual = this.machine.installationStatus.manual;
@@ -56,36 +47,30 @@ define('app/views/machine_monitoring',
                     return "Waiting for monitoring data";
 
                 return "Installing collectd monitoring agent";
-
             }.property('machine.installationStatus.finished_at',
                 'machine.installationStatus.activated_at'),
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
-
                 Mist.set('ma', this);
                 // Add event handlers
                 Mist.rulesController.on('onAdd', this, '_ruleAdded');
+                Mist.rulesController.on('onUpdate', this, '_ruleUpdated');
                 Mist.rulesController.on('onDelete', this, '_ruleDeleted');
                 Mist.metricsController.on('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.on('onMetricDelte', this, '_metricDeleted');
                 Mist.metricsController.on('onMetricDisassociate', this, '_metricDeleted');
                 Mist.graphsController.on('onFetchStats', this, '_analyzeStatsResponse');
-
             }.on('didInsertElement'),
 
-
             unload: function () {
-
                 // Remove event handlers
                 Mist.rulesController.off('onAdd', this, '_ruleAdded');
+                Mist.rulesController.off('onUpdate', this, '_ruleUpdated');
                 Mist.rulesController.off('onDelete', this, '_ruleDeleted');
                 Mist.metricsController.off('onMetricAdd', this, '_metricAdded');
                 Mist.metricsController.off('onMetricDelte', this, '_metricDeleted');
@@ -95,8 +80,6 @@ define('app/views/machine_monitoring',
                 this._clear();
                 this._hideGraphs();
             }.on('willDestroyElement'),
-
-
 
             showMonitoring: function () {
                 this._clear();
@@ -108,7 +91,6 @@ define('app/views/machine_monitoring',
                 });
             },
 
-
             hideMonitoring: function () {
                 this._hideGraphs();
                 this._clear();
@@ -116,11 +98,8 @@ define('app/views/machine_monitoring',
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             addGraphClicked: function () {
                 Mist.metricAddController.open(this.machine);
@@ -128,16 +107,11 @@ define('app/views/machine_monitoring',
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 enableMonitoringClicked: function () {
-
                     // Make sure user is logged in
                     if (!Mist.authenticated)
                         Mist.loginController.open();
@@ -154,7 +128,6 @@ define('app/views/machine_monitoring',
                         this._showEnableMonitoringConfirmation();
                 },
 
-
                 disableMonitoringClicked: function () {
                     var machine = this.machine;
                     Mist.dialogController.open({
@@ -170,7 +143,6 @@ define('app/views/machine_monitoring',
                     });
 
                     function disableMonitoring (didConfirm) {
-
                         if (!didConfirm) return;
 
                         // Removing a bunch of graphs from the user's face
@@ -194,7 +166,6 @@ define('app/views/machine_monitoring',
                     }
                 },
 
-
                 addRuleClicked: function() {
                     Mist.rulesController.newRule(this.machine);
                 },
@@ -204,26 +175,19 @@ define('app/views/machine_monitoring',
                 //  Proxy actions for graph list bar
                 //
 
-
                 addGraphClicked: function () {
                     this.addGraphClicked();
                 },
 
-
                 graphButtonClicked: function (graph) {
-                    graph.view.set('isHidden', false);
+                    Mist.graphsController.model.removeObject(graph);
+                    graph.set('isHidden', false);
+                    Mist.graphsController.model.pushObject(graph);
 
                     // Update cookie
                     var entry = Mist.cookiesController.getSingleMachineGraphEntry(
                         this.machine, graph).hidden = false;
                     Mist.cookiesController.save();
-
-                    // Manipulate DOM
-
-                    moveGraphToEnd(graph.id);
-                    Ember.run.later(function () {
-                        moveGraphButtonToEnd(graph.id);
-                    }, 400);
                 },
 
 
@@ -231,10 +195,7 @@ define('app/views/machine_monitoring',
                 //  Proxy actions for graph list item
                 //
 
-
                 collapseClicked: function (graph) {
-                    graph.view.set('isHidden', true);
-
                     // Update cookie
                     // shift indexes and set this collapsed graph to be
                     // the last one
@@ -253,16 +214,14 @@ define('app/views/machine_monitoring',
                     graph.set('index', lastIndex);
                     Mist.cookiesController.save();
 
-                    // Manipulate DOM
-                    moveGraphButtonToEnd(graph.id);
-                    Ember.run.later(function () {
-                        moveGraphToEnd(graph.id);
-                    }, 400);
+                    Mist.graphsController.model.removeObject(graph);
+                    graph.set('isHidden', true);
+                    Ember.run.next(function(){
+                        Mist.graphsController.model.pushObject(graph);
+                    });
                 },
 
-
                 removeClicked: function (graph) {
-
                     var machine = this.machine;
                     var message = 'Are you sure you want to remove "' +
                         graph.datasources[0].metric.name + '"';
@@ -279,7 +238,7 @@ define('app/views/machine_monitoring',
                                 machine,
                                 function (success) {
                                     if (success)
-                                        Mist.graphsController.content.removeObject(graph);
+                                        Mist.graphsController.model.removeObject(graph);
                                 }
                             );
                         else
@@ -310,11 +269,8 @@ define('app/views/machine_monitoring',
 
 
             //
-            //
             //  Pseudo-Private Methods
             //
-            //
-
 
             _clear: function () {
                 this.setProperties({
@@ -348,9 +304,7 @@ define('app/views/machine_monitoring',
                 });
             },
 
-
             _showManualMonitoringCommand: function () {
-
                 var that = this;
                 this.set('gettingCommand', true);
                 Mist.monitoringController.getMonitoringCommand(
@@ -414,7 +368,6 @@ define('app/views/machine_monitoring',
                 }
             },
 
-
             _showEnableMonitoringConfirmation: function () {
                 var machine = this.machine;
                 Mist.dialogController.open({
@@ -426,6 +379,7 @@ define('app/views/machine_monitoring',
                                 ' monitoring for this machine?'
                         }
                     ],
+                    danger: false,
                     callback: function (didConfirm) {
                         if (didConfirm)
                             Mist.monitoringController.enableMonitoring(machine);
@@ -433,9 +387,7 @@ define('app/views/machine_monitoring',
                 });
             },
 
-
             _showGraphs: function () {
-
                 if (!this.$())
                     return;
 
@@ -454,15 +406,7 @@ define('app/views/machine_monitoring',
                         canMinimize: true,
                     }
                 });
-
-                Ember.run.next(function () {
-                    return;
-                    $('#time-window-control select')
-                        .val(cookie.timeWindow)
-                        .trigger('change');
-                });
             },
-
 
             _hideGraphs: function () {
                 if (!Mist.graphsController.isOpen)
@@ -470,15 +414,13 @@ define('app/views/machine_monitoring',
                 Mist.graphsController.close();
             },
 
-
             _updateRules: function () {
-                Mist.rulesController.forEach(function (rule) {
+                Mist.rulesController.model.forEach(function (rule) {
                     if (this.machine.equals(rule.machine))
                         if (!this.rules.findBy('id', rule.id))
                             this.rules.pushObject(rule);
                 }, this);
             },
-
 
             _updateMetrics: function (callback) {
                 this.set('pendingFirstStats', true);
@@ -521,7 +463,6 @@ define('app/views/machine_monitoring',
                 getStats();
             },
 
-
             _updateGraphs: function () {
                 var that = this;
                 var ctlWasStreaming = Mist.graphsController.stream.isStreaming;
@@ -557,17 +498,15 @@ define('app/views/machine_monitoring',
                 }
             },
 
-
             _analyzeStatsResponse: function (response) {
                 Ember.run.later(this, function () {
                     forIn(this, response, function (metric, metricId) {
                         var metric = Mist.metricsController.getMetric(metricId);
-                        if (metric && !this.metrics.findBy('id', metric.id))
+                        if (metric && this.metrics && !this.metrics.findBy('id', metric.id))
                             this.metrics.pushObject(metric);
                     });
                 }, TIME_MAP.SECOND);
             },
-
 
             _ruleAdded: function (event) {
                 if (this.machine.equals)
@@ -575,6 +514,12 @@ define('app/views/machine_monitoring',
                         this.rules.pushObject(event.object);
             },
 
+            _ruleUpdated: function (event) {
+                if (this.machine.equals)
+                    if (this.machine.equals(event.object.machine)){
+                        this.rules.findBy('id', event.object.id).update(event.object);
+                    }
+            },
 
             _ruleDeleted: function (event) {
                 if (this.machine.equals)
@@ -582,13 +527,11 @@ define('app/views/machine_monitoring',
                         this.rules.removeObject(event.object);
             },
 
-
             _metricAdded: function (event) {
                 if (this.machine.equals)
                     if (this.machine.equals(event.machine))
                         this.metrics.pushObject(event.metric);
             },
-
 
             _metricDeleted: function (event) {
                 if (this.metrics.findBy('id', event.metric.id))
@@ -597,49 +540,20 @@ define('app/views/machine_monitoring',
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             hasMonitoringObserver: function () {
-                if (this.machine.hasMonitoring)
-                    this.showMonitoring();
-                else
-                    this.hideMonitoring();
+                if (this.machine.hasMonitoring){
+                    Ember.run.next(this, function(){this.showMonitoring()});
+                } else {
+                    Ember.run.next(this, function(){this.hideMonitoring()});
+                }
             }.observes('machine.hasMonitoring').on('didInsertElement'),
-
 
             metricsObsever: function () {
                 Ember.run.once(this, '_updateGraphs');
-            }.observes('metrics.@each'),
+            }.observes('metrics.[]'),
         });
-
-
-        function moveGraphToEnd(graphId) {
-
-            var parent = $("#" + graphId).parent();
-            var prev = parent.prev();
-            var next = parent.next();
-
-            // Move to end
-            parent.detach().appendTo('#graphs');
-            prev.detach().appendTo('#graphs');
-            next.detach().appendTo('#graphs');
-        };
-
-
-        function moveGraphButtonToEnd(graphId) {
-
-            var parent = $("#" + graphId + '-btn').parent();
-            var prev = parent.prev();
-            var next = parent.next();
-
-            // Move to end
-            parent.detach().insertBefore($('#add-metric-btn'));
-            prev.detach().insertBefore($('#add-metric-btn'));
-            next.detach().insertBefore($('#add-metric-btn'));
-        };
     }
 );

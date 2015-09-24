@@ -1,60 +1,49 @@
-define('app/views/machine_power', ['app/views/templated'],
+define('app/views/machine_power', [],
     /**
      *  Machine Power View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
-        return App.MachinePowerView = TemplatedView.extend({
+    function () {
+        return App.MachinePowerComponent = Ember.Component.extend({
 
-            /**
-             *
-             *  Initialization
-             *
-             */
+            layoutName: 'machine_power',
+            controllerName: 'machinePowerController',
+
+            //
+            //  Initialization
+            //
 
             load: function () {
-
                 // Add event listeners
                 Mist.machinePowerController.on('onActionsChange', this, 'renderActions');
-
             }.on('didInsertElement'),
 
-
             unload: function () {
-
                 // Remove event listeners
                 Mist.machinePowerController.off('onActionsChange', this, 'renderActions');
-
             }.on('willDestroyElement'),
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //  Methods
+            //
 
             renderActions: function () {
                 Ember.run.next(function () {
-                    $('#machine-power-popup').trigger('create');
+                    $('#machine-power-popup').enhanceWithin();
                 });
             },
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            //
+            //  Actions
+            //
 
             actions: {
-
-
                 actionClicked: function (action) {
                     Mist.machinePowerController.act(action);
                 },
-
 
                 backClicked: function () {
                     Mist.machinePowerController.close();
