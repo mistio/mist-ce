@@ -145,6 +145,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 }).success(function (data) {
                     machine.probeSuccess(data);
                 }).error(function(message) {
+                    console.log(message);
                     if (!machine.backend || !machine.backend.enabled) return;
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success, data) {

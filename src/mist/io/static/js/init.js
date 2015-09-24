@@ -392,14 +392,14 @@ var setupMainChannel = function(socket, callback) {
         if (machine && machine.id) {
             dialogBody.push({
                 link: machine.name,
-                class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
+                class: 'ui-btn ui-btn-d ui-shadow',
                 href: '#/machines/' + machineId,
                 closeDialog: true,
             });
         } else {
             warn('Machine not found', machineId, backendId);
             dialogBody.push({
-                class: 'ui-btn ui-btn-icon-right ui-mini ui-corner-all',
+                class: 'ui-btn ui-btn-d ui-shadow',
                 closeDialog: true,
             });
         }
