@@ -159,8 +159,7 @@
     padding: 0;
 }
 #machine-create #script .ui-slider {
-    width: 40%;
-    float: right;
+    width: 100%;
 }
 #machine-create #script textarea {
     height: auto !important;

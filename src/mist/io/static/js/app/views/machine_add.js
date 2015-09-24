@@ -36,7 +36,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
                 return this.get('hasKey') == true || this.get('dockerNeedScript');
-            }),            
+            }),
 
             hasLocation: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
@@ -230,6 +230,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                     Mist.machineAddController.set('newMachineScriptParams', '');
                     Mist.machineAddController.set('hasScript', value == 'advanced');
                     this.set('hasAdvancedScript', value == 'advanced');
+                    this.renderFields();
                 },
 
 
@@ -287,7 +288,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                 selectScript: function (script) {
                     Mist.machineAddController.set('newMachineScript', script);
-                    $('#create-machine-script-select').collapsible('collapse');
+                    $('#create-machine-script-select').collapsible().collapsible('collapse');
                 },
 
                 toggleNetworkSelection: function (network) {
