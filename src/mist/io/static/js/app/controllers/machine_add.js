@@ -197,7 +197,6 @@ define('app/controllers/machine_add', ['ember'],
 
             resetProvider: function() {
                 this.set('callback', null)
-                    .set('newMachineName', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
