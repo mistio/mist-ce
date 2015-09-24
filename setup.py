@@ -6,29 +6,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = [
-    'python-memcached',
-    'pyramid',
-    'apache-libcloud',
-    'PasteScript',
-    'paramiko',
-    'pyyaml',
-    'pycrypto',
-    'requests',
-    'nose',
-    'behaving',
-    'sphinxcontrib-httpdomain',
-    'sphinx-bootstrap-theme',
-    'celery',
-    'gevent',
-    'gevent-subprocess',
-    'amqp',
-    'netaddr',
-    'amqp',
-    'websocket-client',
-    'sockjs-tornado',
-    'pika',
-]
+requires = []
 
 setup(name='mist.io',
       version='0.9.9',
