@@ -147,7 +147,7 @@
         {{/if}}
 
         <!-- Select Key -->
-        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.hasDocker '' 'required'}}">
+        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.hasKey 'required'}}">
             <div id="create-machine-key" >
                 <label>Key</label>
                 <div 

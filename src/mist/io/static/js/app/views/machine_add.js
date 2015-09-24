@@ -31,8 +31,8 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             hasKey: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
-                return provider ? (provider.provider ? (provider.provider == 'docker' ? false : true) : false) : false;
-            }.property('hasDocker', 'Mist.machineAddController.newMachineProvider'),
+                return provider ? (provider.provider ? (provider.provider != 'docker' || (provider.provider == 'docker' && this.get('dockerNeedScript')) ? true : false) : false) : false;
+            }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
 
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
                 return this.get('hasKey') == true || this.get('dockerNeedScript');
@@ -262,11 +262,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineImage', image);
 
-                    if (image.get('isMist')) {
-                        this.set('dockerNeedScript', true);
-                    } else {
-                        this.set('dockerNeedScript', false);
-                    }
+                    this.set('dockerNeedScript', image.get('isMist'));
                 },
 
 

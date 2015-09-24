@@ -172,6 +172,12 @@ define('app/controllers/machine_add', ['ember'],
                     }
                 }
 
+                if (this.newMachineProvider.provider == 'docker' && !this.view.dockerNeedScript) {
+                    if(! this.newMachineDockerCommand) {
+                        formReady = false;
+                    }
+                }
+
                 if (this.newMachineImage.id &&
                     this.newMachineImage.get('isMist')) {
                         if (!Mist.keysController.keyExists(this.newMachineKey.id))
@@ -190,7 +196,6 @@ define('app/controllers/machine_add', ['ember'],
             },
 
             resetProvider: function() {
-                console.log('i run');
                 this.set('callback', null)
                     .set('newMachineName', '')
                     .set('newMachineScript', '')
