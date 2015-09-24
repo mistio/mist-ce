@@ -212,9 +212,11 @@ define('app/controllers/machine_add', ['ember'],
             },
 
             selectLocation: function() {
-                if (this.newMachineProvider.locations.model.length == 1) {
-                    this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
-                }
+                // if (this.newMachineProvider){
+                //         if(this.newMachineProvider.locations.model.length == 1) {
+                //         this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                //     }
+                // }
             },
 
             //
