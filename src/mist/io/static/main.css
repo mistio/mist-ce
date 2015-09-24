@@ -76,7 +76,7 @@ h4 {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .text-center {
