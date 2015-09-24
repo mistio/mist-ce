@@ -199,7 +199,9 @@ def ssh_key_is_added(context, ssh_key_name):
             # if there no keys then it will be called "Add key"
             context.execute_steps(u"""
                 Then I click the button "Add key"
+                And I wait for 1 seconds
                 And I click the button "New key"
+                And I wait for 1 seconds
                 Then I upload the ssh key with name "TESTING_MACHINE"
                 And I wait for 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
@@ -228,7 +230,9 @@ def ssh_key_is_added(context, ssh_key_name):
                 pass
             context.execute_steps(u"""
                 Then I click the button "%s"
+                And I wait for 1 seconds
                 And I click the button "New key"
+                And I wait for 1 seconds
                 Then I upload the ssh key with name "%s"
                 And I wait for 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
