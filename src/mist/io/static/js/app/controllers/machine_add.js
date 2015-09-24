@@ -41,13 +41,13 @@ define('app/controllers/machine_add', ['ember'],
                 $('#machine-create').find('[data-role="collapsible"]')
                     .collapsible('option', 'collapsedIcon', 'carat-d')
                     .collapsible('collapse');
-                $('#machine-create .docker').hide();
-                $('#machine-create .azure').hide();
-                $('#create-machine-location').hide();
-                $('#create-machine-image').hide();
-                $('#create-machine-size').hide();
-                $('#create-machine-key').hide();
-                $('#create-machine-network').hide();               
+                // $('#machine-create .docker').hide();
+                // $('#machine-create .azure').hide();
+                // $('#create-machine-location').hide();
+                // $('#create-machine-image').hide();
+                // $('#create-machine-size').hide();
+                // $('#create-machine-key').hide();
+                // $('#create-machine-network').hide();           
 
                 this._clear();
                 this._updateFormReady();
@@ -200,6 +200,26 @@ define('app/controllers/machine_add', ['ember'],
             //
             //  Observers
             //
+
+            providerObserver: function() {
+                Ember.run.once(this, function(){
+                    if (this.view.changeProviderFlag) {
+                        this.set('callback', null)
+                            .set('newMachineName', '')
+                            .set('newMachineScript', '')
+                            .set('newMachineKey', {'id' : 'Select Key'})
+                            .set('newMachineSize', {'name' : 'Select Size'})
+                            .set('newMachineImage', {'name' : 'Select Image'})
+                            .set('newMachineLocation', {'name' : 'Select Location'})
+                            .set('newMachineDockerEnvironment', '')
+                            .set('newMachineDockerCommand', '')
+                            .set('newMachineScriptParams', '')
+                            .set('newMachineDockerPorts', '')
+                            .set('newMachineAzurePorts', '');
+                        this.view.clear();
+                    }
+                });
+            }.observes('this.view.changeProviderFlag'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');

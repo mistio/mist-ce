@@ -51,7 +51,7 @@
         </div>
 
         <!-- Select Image -->
-        <div id="create-machine-image" class="required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
+        <div id="create-machine-image" class="required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
             <label>Image</label>
             <div data-role="collapsible"
                  data-iconpos="right"
@@ -96,7 +96,7 @@
         </div>
 
         <div id="size">
-            <div id="create-machine-size" class="{{if Mist.machineAddController.newMachineSize.id 'filled' 'empty'}} required">
+            <div id="create-machine-size" class="{{if Mist.machineAddController.newMachineSize.id 'filled' 'empty'}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} required">
                 <!-- Select Size -->        
                 <label>Size</label>
                 <div data-role="collapsible"
@@ -123,7 +123,7 @@
         </div>
 
         <!-- Select Location -->
-
+        {{#if view.hasLocation}}
         <div id="location">
             <div id="create-machine-location" class="{{if Mist.machineAddController.newMachineLocation.id 'filled' 'empty'}} required">
                 <label>Location</label>
@@ -144,32 +144,10 @@
                 </div>
             </div>
         </div>
-
-        <!-- Docker Specific -->
-
-        <div class="docker">
-
-            <!-- Environment Vars -->
-            <div id="create-machine-env" class="{{if Mist.machineAddController.fullDocker 'required'}} {{if Mist.machineAddController.newMachineDockerEnvironment 'filled' 'empty'}}">
-                <label for="create-machine-env">Environment Variables</label>
-                {{view Mist.TextArea
-                       id="create-machine-env"
-                       value=Mist.machineAddController.newMachineDockerEnvironment}}
-            </div>            
-
-            <!-- Command -->
-            <div id="create-machine-command" class="{{if Mist.machineAddController.fullDocker 'required'}} {{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
-                <label for="create-machine-command">Command</label>
-                {{view Mist.TextArea
-                       id="create-machine-command"
-                       value=Mist.machineAddController.newMachineDockerCommand}}
-            </div>           
-
-        </div>
+        {{/if}}
 
         <!-- Select Key -->
-
-        <div id="key" class="{{if Mist.machineAddController.newMachineKey.machines 'filled' 'empty'}} required">
+        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.machines 'filled' 'empty'}} {{if view.hasDocker '' 'required'}}">
             <div id="create-machine-key" >
                 <label>Key</label>
                 <div 
@@ -195,8 +173,33 @@
             </div>
         </div>
 
-        <!-- Select Networks -->
+        <!-- Docker Specific -->
+        {{#if view.hasDocker}}
+        <div class="docker">
 
+            <!-- Environment Vars -->
+            <div id="create-machine-env" class="{{if Mist.machineAddController.fullDocker 'required'}} {{if Mist.machineAddController.newMachineDockerEnvironment 'filled' 'empty'}}">
+                <label for="create-machine-env">Environment Variables</label>
+                {{view Mist.TextArea
+                       id="create-machine-env"
+                       value=Mist.machineAddController.newMachineDockerEnvironment}}
+            </div>            
+            
+            {{#unless view.dockerNeedScript}}
+            <!-- Command -->
+            <div id="create-machine-command" class="{{if Mist.machineAddController.fullDocker 'required'}} {{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
+                <label for="create-machine-command">Command</label>
+                {{view Mist.TextArea
+                       id="create-machine-command"
+                       value=Mist.machineAddController.newMachineDockerCommand}}
+            </div>
+            {{/unless}}         
+
+        </div>
+        {{/if}}
+
+        <!-- Select Networks -->
+        {{#if view.hasNetworks}}
         <div id="create-machine-network">
             <label>Networks</label>
             <fieldset data-role="controlgroup">
@@ -209,8 +212,10 @@
                 {{/each}}
             </fieldset>
         </div>
+        {{/if}}
 
         <!-- Select Script -->
+        {{#if view.hasScript}}
         <div id="script">
             {{#if Mist.isCore}}
             {{#if Mist.scriptsController.length}}
@@ -220,15 +225,12 @@
                     <option value="advanced">advanced</option>
                 </select>
             {{/if}}
-            {{/if}}
+            {{/if}}                        
+            
             <label for="create-machine-script">Script</label>
-
-            <div class="script-option basic">
-                {{view Mist.TextArea
-                       id="create-machine-script"
-                       value=Mist.machineAddController.newMachineScript}}
-            </div>
+            {{#if view.hasAdvancedScript}}
             <div class="script-option advanced">
+                <label>Select Script</label>
                 <div id="create-machine-script-select"
                      data-role="collapsible"
                      data-iconpos="right"
@@ -241,21 +243,32 @@
                         {{else}} Select {{/if}}
                     </h4>
                     <ul data-role="listview">
-                        {{#each Mist.scriptsController as |script|}}
+                        {{#each Mist.scriptsController.model as |script|}}
                             <li data-icon="false">
                                 <a {{action "selectScript" script target=view}}>{{script.name}}</a>
                             </li>
                         {{/each}}
                     </ul>
                 </div>
+                
+                <label>Script Parameters (optional)</label>
                 {{view Mist.TextArea
                        id="create-machine-script-params"
 
-                       placeholder="optional parameters"
+                       placeholder="Optional script parameters"
                        value=Mist.machineAddController.newMachineScriptParams}}
             </div>
+            {{else}}
+            <div class="script-option basic">
+                {{view Mist.TextArea
+                       id="create-machine-script"
+                       value=Mist.machineAddController.newMachineScript}}
+            </div>
+            {{/if}}
         </div>
+        {{/if}}
 
+        {{#if view.hasDocker}}
         <div id="ports">
             <!-- Expose Ports -->
             <label for="create-machine-ports">Ports</label>
@@ -265,8 +278,9 @@
                    placeholder="e.g. 80:80"
                    value=Mist.machineAddController.newMachineDockerPorts}}
         </div>
+        {{/if}}
 
-
+        {{#if view.hasAzure}}
         <div class="azure">
             <!-- Expose Ports -->
             <div id="create-machine-azure-ports-wrapper" class="{{if Mist.machineAddController.newMachineKey.machines 'filled' 'empty'}} required">
@@ -278,9 +292,11 @@
                        value=Mist.machineAddController.newMachineAzurePorts}}
             </div>            
         </div>
+        {{/if}}
 
 
         <!-- Enable monitoring -->
+        {{#if view.hasMonitoring}}
         <div id="create-machine-monitoring">
             <label>
             {{view Mist.Checkbox
@@ -288,6 +304,7 @@
             Enable monitoring
             </label>
         </div>
+        {{/if}}
 
         {{#if view.price}}
         <div id="create-machine-cost">      

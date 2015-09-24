@@ -10,6 +10,51 @@ define('app/views/machine_add', ['app/views/controlled'],
             layoutName: 'machine_add',
             controllerName: 'machineAddController',
 
+            changeProviderFlag: false,
+            dockerNeedScript: false,
+            hasAdvancedScript: false,
+
+            hasDocker: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider ? (provider.provider == 'docker' ? true : false) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasOpenstack: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider ? (provider.provider == 'openstack' ? true : false) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasAzure: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider ? (provider.provider == 'azure' ? true : false) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasKey: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider ? (provider.provider == 'docker' ? false : true) : false) : false;
+            }.property('hasDocker', 'Mist.machineAddController.newMachineProvider'),
+
+            hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
+                return this.get('hasKey') == true || this.get('dockerNeedScript');
+            }),            
+
+            hasLocation: function() {
+                var provider = Mist.machineAddController.newMachineProvider,
+                valids = ['docker', 'indonesiancloud', 'vcloud'];
+                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? false : true) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasNetworks: function() {
+                var provider = Mist.machineAddController.newMachineProvider,
+                valids = ['openstack', 'vcloud'];
+                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? true : false) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasMonitoring: Ember.computed(function() {
+                return Mist.email ? true : false;
+            }),
+
+
             /**
              *  Properties
              */
@@ -122,8 +167,8 @@ define('app/views/machine_add', ['app/views/controlled'],
 
              clear: function () {
                  this.$('select').val('basic').slider('refresh');
-                 this.$('.script-option').hide();
-                 this.$('.basic').show();
+                 // this.$('.script-option').hide();
+                 // this.$('.basic').show();
                  this.$('.ui-collapsible').removeClass('selected');
              },
 
@@ -228,11 +273,10 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                 switchToggled: function () {
                     var value = this.$('#script select').val();
-                    this.$('.script-option').hide();
-                    this.$('.'+value).show();
                     Mist.machineAddController.set('newMachineScript', '');
                     Mist.machineAddController.set('newMachineScriptParams', '');
                     Mist.machineAddController.set('hasScript', value == 'advanced');
+                    this.set('hasAdvancedScript', value == 'advanced');
                 },
 
 
@@ -250,37 +294,38 @@ define('app/views/machine_add', ['app/views/controlled'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineProvider', backend);
 
-                    $('#create-machine-image').slideDown();
-                    $('#create-machine-location').slideUp();
-                    $('#create-machine-size').slideUp();
-                    $('#create-machine-key').slideUp();
-                    $('#machine-create .docker textarea').slideUp();
-                    $('#machine-create .docker .ui-checkbox').slideUp();
-                    $('#create-machine-network').slideUp();
-                    $('#machine-create #ports').slideUp();
+                    this.set('changeProviderFlag', true);
+                    // $('#create-machine-image').slideDown();
+                    // $('#create-machine-location').slideUp();
+                    // $('#create-machine-size').slideUp();
+                    // $('#create-machine-key').slideUp();
+                    // $('#machine-create .docker textarea').slideUp();
+                    // $('#machine-create .docker .ui-checkbox').slideUp();
+                    // $('#create-machine-network').slideUp();
+                    // $('#machine-create #ports').slideUp();
 
-                    if (backend.get('requiresNetworkOnCreation')) {
-                        if (backend.networks.model.length > 0) {
-                            $('#create-machine-network').slideDown();
-                            $('label[for=create-machine-script]').text('Script');
-                        }
-                    } else {
-                        $('#create-machine-network').slideUp();
-                        $('label[for=create-machine-script]').text('Script');
-                    }
+                    // if (backend.get('requiresNetworkOnCreation')) {
+                    //     if (backend.networks.model.length > 0) {
+                    //         $('#create-machine-network').slideDown();
+                    //         $('label[for=create-machine-script]').text('Script');
+                    //     }
+                    // } else {
+                    //     $('#create-machine-network').slideUp();
+                    //     $('label[for=create-machine-script]').text('Script');
+                    // }
 
                     var view = Mist.machineAddController.view;
-                    if (backend.get('isDocker')) {
-                        view.showDockerMenu();
-                    } else {
-                        view.hideDockerMenu();
-                    }
+                    // if (backend.get('isDocker')) {
+                    //     view.showDockerMenu();
+                    // } else {
+                    //     view.hideDockerMenu();
+                    // }
 
-                    if (backend.get('isAzure')) {
-                        view.showAzureMenu();
-                    } else {
-                        view.hideAzureMenu();
-                    }
+                    // if (backend.get('isAzure')) {
+                    //     view.showAzureMenu();
+                    // } else {
+                    //     view.hideAzureMenu();
+                    // }
 
                 },
 
@@ -295,23 +340,29 @@ define('app/views/machine_add', ['app/views/controlled'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineImage', image);
 
-                    $('#create-machine-size').slideDown();
-                    $('#create-machine-location').slideUp();
-                    $('#create-machine-key').slideUp();
+                    if (image.get('isMist')) {
+                        this.set('dockerNeedScript', true);
+                    } else {
+                        this.set('dockerNeedScript', false);
+                    }
 
-                   var view = Mist.machineAddController.view;
-                   if (image.get('isDocker')) {
-                       Mist.machineAddController.set('newMachineSize',
-                            Mist.machineAddController.newMachineProvider.sizes.model[0]);
-                       if (image.get('isMist')) {
-                           view.showMistDockerMenu();
-                           $('#create-machine-key').slideDown();
-                       } else {
-                           view.showDockerMenu();
-                           $('#machine-create .docker textarea').slideDown();
-                       }
-                       $('#machine-create #ports').slideDown();
-                   }
+                    // $('#create-machine-size').slideDown();
+                    // $('#create-machine-location').slideUp();
+                    // $('#create-machine-key').slideUp();
+
+                   // var view = Mist.machineAddController.view;
+                   // if (image.get('isDocker')) {
+                   //     Mist.machineAddController.set('newMachineSize',
+                   //          Mist.machineAddController.newMachineProvider.sizes.model[0]);
+                   //     if (image.get('isMist')) {
+                   //         view.showMistDockerMenu();
+                   //         $('#create-machine-key').slideDown();
+                   //     } else {
+                   //         view.showDockerMenu();
+                   //         $('#machine-create .docker textarea').slideDown();
+                   //     }
+                   //     $('#machine-create #ports').slideDown();
+                   // }
                 },
 
 
@@ -322,15 +373,15 @@ define('app/views/machine_add', ['app/views/controlled'],
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineSize', size);
 
-                    $('#create-machine-location').slideDown();
-                    $('#machine-create .docker textarea').slideDown();
-                    $('#machine-create .docker .ui-checkbox').slideDown();
-                    $('#create-machine-key').slideUp();
+                    // $('#create-machine-location').slideDown();
+                    // $('#machine-create .docker textarea').slideDown();
+                    // $('#machine-create .docker .ui-checkbox').slideDown();
+                    // $('#create-machine-key').slideUp();
 
                     // Docker specific
-                    if (Mist.machineAddController.newMachineProvider.provider == 'docker')
+                    // if (Mist.machineAddController.newMachineProvider.provider == 'docker')
                         // Because SSH key is optional for docker, so is location
-                        $('#create-machine-key').slideDown();
+                        // $('#create-machine-key').slideDown();
                 },
 
 
@@ -339,7 +390,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                     this.fieldIsReady('location');
 
                     Mist.machineAddController.set('newMachineLocation', location);
-                    $('#create-machine-key').slideDown();
+                    // $('#create-machine-key').slideDown();
                 },
 
 
@@ -384,8 +435,8 @@ define('app/views/machine_add', ['app/views/controlled'],
                 this.fieldIsReady('key');
 
                 Mist.machineAddController.set('newMachineKey', key);
-                $('#script').slideDown();
-                $('#create-machine-monitoring').slideDown();
+                // $('#script').slideDown();
+                // $('#create-machine-monitoring').slideDown();
             },
 
 

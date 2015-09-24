@@ -45,9 +45,6 @@
     padding: 16px;
     width: 278px;
 }
-#machine-create .docker {
-    display:none;
-}
 #machine-create label {
     margin-top: 1em;
 }
@@ -152,10 +149,10 @@
     text-align: center;
     white-space: normal;
 }
-#create-machine-network {
-    display: none;
-}
 #create-machine-network fieldset {
+    margin-top: 0;
+}
+#create-machine-network fieldset label {
     margin-top: 0;
 }
 #create-machine-network .ui-collapsible-content {
