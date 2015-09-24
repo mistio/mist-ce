@@ -32,7 +32,12 @@ define('app/views/graph_list_item', ['d3', 'c3'],
             }.on('didInsertElement'),
 
             unload: function () {
-
+                var charts = this.get('charts') || [];
+                charts.forEach(function(chart) { chart.destroy(); });
+                Ember.run.next(this, function () {
+                    if (this.graph)
+                        this.graph.set('view', null);
+                });
             }.on('willDestroyElement'),
 
 

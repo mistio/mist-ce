@@ -127,7 +127,7 @@ define('app/views/rule_edit', ['app/views/controlled'],
                             action: 'command',
                             command: this.newCommand
                         });
-                    }                    
+                    }
                 },
 
                 backClicked: function () {
@@ -139,7 +139,6 @@ define('app/views/rule_edit', ['app/views/controlled'],
             //
             //  Observers
             //
-
 
             commandFormReadyObserver: function () {
                Ember.run.once(this, 'updateCommandFormReady');

@@ -13,7 +13,6 @@
     <!--
         Graphs
     -->
-
     <div id="graphs">
         {{#each Mist.graphsController.model as |graph|}}
             {{component "graph-list-item"
@@ -25,7 +24,6 @@
     <!--
         Minimized graph buttons
     -->
-
     {{#if Mist.graphsController.config.canMinimize}}
         {{component "graph-list-bar"
             actionProxy=view.actionProxy}}

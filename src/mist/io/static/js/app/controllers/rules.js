@@ -56,9 +56,13 @@ define('app/controllers/rules',
             setModel: function (model) {
                 var modelToArray = [];
                 forIn(model, function (rule) {
-                    modelToArray.push(rule);
+                    modelToArray.push(RuleModel.create(rule));
                 });
-                this._super(modelToArray);
+                this.set('model', modelToArray);
+            },
+
+            getObject: function (id) {
+                return this.model.findBy('id', id);
             },
 
             newRule: function (machine, callback) {
@@ -90,6 +94,22 @@ define('app/controllers/rules',
                 });
             },
 
+            _deleteObject: function (object) {
+                this.model.removeObject(object);
+                this.trigger('onDelete', {
+                    object: object
+                });
+            },
+
+            _updateObject: function (object) {
+                Ember.run.next(this, function(){
+                    this.getObject(object.id).update(object);
+                    this.trigger('onUpdate', {
+                        object: object
+                    });
+                });
+            },
+
             deleteRule: function (rule) {
                 var that = this;
                 rule.set('pendingAction', true);
@@ -105,7 +125,6 @@ define('app/controllers/rules',
 
 
             editRule: function (args) {
-
                 var payload = {
                     id: args.rule.id
                 };

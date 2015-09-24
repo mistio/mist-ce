@@ -34,8 +34,12 @@ define('app/controllers/script_add', ['ember'],
                 Mist.scriptsController.addScript({
                     script: that.get('newScript'),
                     callback: function (success) {
-                        if (success)
+                        if (success) {
                             $('#add-script').collapsible('collapse');
+                            Ember.run.next(function() {
+                                $('body').enhanceWithin();
+                            })
+                        }
                     }
                 })
             },

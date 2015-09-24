@@ -10,13 +10,9 @@ define('app/controllers/rule_edit', ['ember'],
 
         return Ember.Object.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             rule: null,
             metrics: null,
@@ -25,11 +21,8 @@ define('app/controllers/rule_edit', ['ember'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             open: function (rule, property, callback, el) {
                 this.clear();
@@ -41,12 +34,10 @@ define('app/controllers/rule_edit', ['ember'],
                 this.view.open(property, el);
             },
 
-
             close: function () {
                 this.view.close(this.property);
                 this.clear();
             },
-
 
             clear: function () {
                 this.setProperties({
@@ -55,7 +46,6 @@ define('app/controllers/rule_edit', ['ember'],
                     'callback': null
                 });
             },
-
 
             edit: function (keyValuePairs) {
                 Mist.rulesController.editRule({
