@@ -30,38 +30,40 @@
 
     </div>
 
-    <div id="change-time-window" class="very-small-popup ui-popup-hidden" data-role="popup" data-transition="flip" data-position-to="#time-window-control">
-        <div class="ui-header ui-bar-b" role="banner">
-            <h1 class="ui-title">Select Range</h1>
+    <div id="change-time-window-container" class="flip ui-popup-container ui-popup-hidden ui-popup-truncate">
+        <div id="change-time-window" class="very-small-popup" data-role="popup" data-transition="flip" data-position-to="#time-window-control">
+            <div class="ui-header ui-bar-b" role="banner">
+                <h1 class="ui-title">Select Range</h1>
 
-            <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+                <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+            </div>
+            <ul data-role='listview'>
+                <li data-icon="false">
+                    <a {{action "timeWindowChanged" "minutes" "last 10 mins" target=view}}>
+                        last 10 mins</a>
+                </li>
+                <li data-icon="false">
+                    <a {{action "timeWindowChanged" "hour" "last hour" target=view}}>
+                        last hour</a>
+                </li>
+                <li data-icon="false">
+                    <a {{action "timeWindowChanged" "day" "last day" target=view}}>
+                        last day</a>
+                </li>
+                <li data-icon="false">
+                    <a {{action "timeWindowChanged" "week" "last week" target=view}}>
+                        last week</a>
+                </li>
+                <li data-icon="false">
+                    <a {{action "timeWindowChanged" "month" "last month" target=view}}>
+                        last month</a>
+                </li>
+                <li data-icon="false">
+                    <a {{action "timeWindowChanged" "range" "range" target=view}}>
+                        custom range</a>
+                </li>
+            </ul>
         </div>
-        <ul data-role='listview'>
-            <li data-icon="false">
-                <a {{action "timeWindowChanged" "minutes" "last 10 mins" target=view}}>
-                    last 10 mins</a>
-            </li>
-            <li data-icon="false">
-                <a {{action "timeWindowChanged" "hour" "last hour" target=view}}>
-                    last hour</a>
-            </li>
-            <li data-icon="false">
-                <a {{action "timeWindowChanged" "day" "last day" target=view}}>
-                    last day</a>
-            </li>
-            <li data-icon="false">
-                <a {{action "timeWindowChanged" "week" "last week" target=view}}>
-                    last week</a>
-            </li>
-            <li data-icon="false">
-                <a {{action "timeWindowChanged" "month" "last month" target=view}}>
-                    last month</a>
-            </li>
-            <li data-icon="false">
-                <a {{action "timeWindowChanged" "range" "range" target=view}}>
-                    custom range</a>
-            </li>
-        </ul>
     </div>
 
 
