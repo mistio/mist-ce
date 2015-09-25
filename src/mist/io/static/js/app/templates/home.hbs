@@ -119,13 +119,13 @@
                                 </li>
                                 {{/unless}}
                                 {{#each Mist.openIncidents as |incident|}}
-                                    {{#if this.isClosed}}
+                                    {{#if incident.isClosed}}
                                         <li class="incident">
                                             <a class="icon-check ui-btn ui-btn-icon-right"
                                                 {{action "incidentClicked" incident target=view}}>
                                                 <span class="time">{{incident.closed}} ago </span>
                                                 <span class="machine">
-                                                    {{this.machineName}}:
+                                                    {{incident.machineName}}:
                                                 </span>
                                                 <span class="rule-condition">
                                                     {{incident.ruleText}}
