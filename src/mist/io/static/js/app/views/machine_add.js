@@ -340,7 +340,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
              providerObserver: function() {
                  Ember.run.once(this, function(){
-                    if (this.changeProviderFlag) Mist.machineAddController.resetProvider();
+                    if (this.changeProviderFlag) Mist.machineAddController._resetProvider();
                  });
              }.observes('Mist.machineAddController.newMachineProvider'),
         });

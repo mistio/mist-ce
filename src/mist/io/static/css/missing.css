@@ -40,3 +40,13 @@
     padding: 100px;
     background-color: #FAF9F4;
 }
+
+@media only screen and  (max-width: 600px) {
+    #error-inner img {
+        width: 100px;
+    }
+
+    #error-inner {
+        padding: 40px;
+    }
+}
