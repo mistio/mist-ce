@@ -10,7 +10,7 @@
 }
 
 #single-network-page .usable-ips h4{
-    margin-top: 0px;
+    margin: 0px;
 }
 
 #single-network-page .usable-ips table {
@@ -72,6 +72,7 @@
 
 #single-network-page .reserved {
     float: right;
+    padding-top: 10px;
 }
 
 #single-network-page .reserved .ui-slider {
