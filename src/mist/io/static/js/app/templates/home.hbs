@@ -112,7 +112,7 @@
                     <div class="incidents {{if view.hasIncidents '' 'no-incidents'}} {{if Mist.isCore 'is-core' '' }} {{if Mist.backendsController.hasNetworks 'has-networks' ''}}">
                         <h4 class="ui-caps">Incidents</h4>
                         {{#if view.hasIncidents}}
-                            <ul class="ui-listview ui-listview-inset ui-corner-all ui-shadow incident-list">
+                            <ul class="ui-listview ui-listview-inset incident-list">
                                 {{#unless Mist.openIncidents}}
                                 <li class="no incident">
                                     <a href="javascript:void(0)" class="icon-check ui-btn ui-btn-icon-right ui-btn">No recent incidents</a>
@@ -123,6 +123,7 @@
                                         <li class="incident">
                                             <a class="icon-check ui-btn ui-btn-icon-right"
                                                 {{action "incidentClicked" incident target=view}}>
+                                                <span class="time">{{incident.closed}} ago </span>
                                                 <span class="machine">
                                                     {{this.machineName}}:
                                                 </span>
@@ -131,8 +132,7 @@
                                                 </span>
                                                 <span class="duration">
                                                     for {{incident.duration}}
-                                                </span>
-                                                <span class="time">{{incident.closed}} ago </span>
+                                                </span>                                                
                                             </a>
                                         </li>
                                     {{else}}
