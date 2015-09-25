@@ -209,9 +209,15 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineAzurePorts', '');
             },
 
-            _selectLocation: function() {
+            _selectUnique: function() {
+                // Locations Check
                 if (this.newMachineProvider.locations) {
                     if (this.newMachineProvider.locations.model.length == 1) this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                }
+
+                // Sizes Check
+                if (this.newMachineProvider.sizes) {
+                    if (this.newMachineProvider.sizes.model.length == 1) this.set('newMachineSize', this.newMachineProvider.sizes.model[0]);
                 }
             },
 
@@ -220,8 +226,8 @@ define('app/controllers/machine_add', ['ember'],
             //
 
             providerObserver: function() {
-                Ember.run.once(this, '_selectLocation');
-            }.observes('newMachineProvider'),
+                Ember.run.once(this, '_selectUnique');
+            }.observes('newMachineProvider', 'newMachineImage'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
