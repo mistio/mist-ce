@@ -227,7 +227,7 @@ define('app/controllers/machine_add', ['ember'],
 
             providerObserver: function() {
                 Ember.run.once(this, '_selectUnique');
-            }.observes('newMachineProvider', 'newMachineImage'),
+            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
