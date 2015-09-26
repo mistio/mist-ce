@@ -16,17 +16,17 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             hasDocker: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
-                return provider ? (provider.provider ? (provider.provider == 'docker' ? true : false) : false) : false;
+                return provider ? (provider.provider && provider.provider == 'docker' ? true : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasOpenstack: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
-                return provider ? (provider.provider ? (provider.provider == 'openstack' ? true : false) : false) : false;
+                return provider ? (provider.provider && provider.provider == 'openstack' ? true : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasAzure: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
-                return provider ? (provider.provider ? (provider.provider == 'azure' ? true : false) : false) : false;
+                return provider ? (provider.provider && provider.provider == 'azure' ? true : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasKey: function() {
@@ -168,6 +168,11 @@ define('app/views/machine_add', ['app/views/controlled'],
              clear: function () {
                  this.$('select').val('basic').slider('refresh');
                  this.$('.ui-collapsible').removeClass('selected');
+                 this.setProperties({
+                    changeProviderFlag: false,
+                    dockerNeedScript: false,
+                    hasAdvancedScript: false
+                });
              },
 
              checkImageSelected: function(image) {
@@ -340,7 +345,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
              providerObserver: function() {
                  Ember.run.once(this, function(){
-                    if (this.changeProviderFlag) Mist.machineAddController.resetProvider();
+                    if (this.changeProviderFlag) Mist.machineAddController._resetProvider();
                  });
              }.observes('Mist.machineAddController.newMachineProvider'),
         });

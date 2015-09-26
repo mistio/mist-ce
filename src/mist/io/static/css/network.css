@@ -10,7 +10,7 @@
 }
 
 #single-network-page .usable-ips h4{
-    margin-top: 0px;
+    margin: 0px;
 }
 
 #single-network-page .usable-ips table {
@@ -70,8 +70,22 @@
     background-color: #f2f2f2;
 }
 
+#single-network-page .associate .ui-btn {
+    color: #444;
+}
+
+#single-network-page .associate .ui-btn:hover {
+    color: #444 !important;
+}
+
+#single-network-page .associate .ui-btn:after {
+    font-size: 16px;
+    top: 26px;
+}
+
 #single-network-page .reserved {
     float: right;
+    padding-top: 10px;
 }
 
 #single-network-page .reserved .ui-slider {

@@ -110,7 +110,7 @@
     border: none;
 }
 #single-image-page #machine-create .ui-collapsible-heading {
-    text-transform: capitalize;
+    text-transform: initial;
 }
 #single-image-page #machine-create .ui-collapsible-heading > a {
     background-color: #fff !important;
