@@ -405,7 +405,7 @@ class UserTask(Task):
     @property
     def memcache(self):
         if self._ut_cache is None:
-            self._ut_cache = MemcacheClient(["127.0.0.1:11211"])
+            self._ut_cache = MemcacheClient(config.MEMCACHED_HOST)
         return self._ut_cache
 
     def smart_delay(self, *args,  **kwargs):
@@ -758,4 +758,3 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
     pool.map(create_machine_wrapper, specs)
     pool.close()
     pool.join()
-

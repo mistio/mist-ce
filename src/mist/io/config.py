@@ -24,6 +24,7 @@ except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
 CORE_URI = settings.get("CORE_URI", "https://mist.io")
 AMQP_URI = settings.get("AMQP_URI", "localhost:5672")
+MEMCACHED_HOST = settings.get("MEMCACHED_HOST", ["127.0.0.1:11211"])
 BROKER_URL = settings.get("BROKER_URL", "amqp://guest:guest@127.0.0.1/")
 SSL_VERIFY = settings.get("SSL_VERIFY", True)
 JS_BUILD = settings.get("JS_BUILD", False)
@@ -278,7 +279,7 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider' : Provider.HOSTVIRTUAL,
         'regions': []
     },
-	# Vultr
+    # Vultr
     {
         'title': 'Vultr',
         'provider' : Provider.VULTR,

@@ -7,6 +7,7 @@ import tornado.ioloop
 
 import mist.io.amqp_tornado
 import mist.io.hub.main
+import mist.io.config
 
 
 log = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ class _HubTornadoConsumer(mist.io.amqp_tornado.Consumer):
         self.ready_callback = ready_callback
         self.lbl = lbl or ('%s (%s)' % (self.__class__.__name__, self.uuid))
         super(_HubTornadoConsumer, self).__init__(
-            amqp_url='amqp://localhost',
+            amqp_url='amqp://rabbitmq',
             exchange=exchange,
             queue=self.uuid,
             exchange_type='topic',
