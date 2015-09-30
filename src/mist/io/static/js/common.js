@@ -796,6 +796,7 @@ var PROVIDER_MAP = {
         {
             type: 'slider',
             label: 'Authentication',
+            optional: true,
             onLabel: 'TLS',
             offLabel: 'Basic',
             on: [

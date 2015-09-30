@@ -103,7 +103,7 @@
     text-align: center;
     background-color: #FAF9F4;
     padding: 0;
-    height: 89px;
+    height: 89.4px;
     box-sizing: border-box;
 }
 
@@ -135,13 +135,13 @@
 }
 
 .incidents.no-incidents.is-core.has-networks .no-incident {
-    height: 180px;
+    height: 180.594px;
     padding: 40px 0;
 }
 
 .incidents .incident a {
     color: #7f7f7f;
-    font-size: 16px;
+    font-size: 15px;
     text-shadow: none;
 }
 
@@ -163,6 +163,17 @@
 
 .incidents .ui-listview {
     margin-top: 0;
+    max-height: 89.4px;
+    overflow-y: scroll;
+}
+
+.incidents.is-core .ui-listview,
+.incidents.has-networks .ui-listview {
+    max-height: 135px;
+}
+
+.incidents.is-core.has-networks .ui-listview {
+    max-height: 180.594px;
 }
 
 .incidents .time {
@@ -170,7 +181,7 @@
 }
 
 .incidents .machine {
-    font-weight: bold;
+    font-weight: 400;
     color: #000;
 }
 

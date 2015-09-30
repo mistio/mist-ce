@@ -43,6 +43,16 @@
                 </td>
             </tr>
             {{/if}}
+            {{#if view.scriptLink}}
+            <tr>
+                <td>Script</td>
+                <td>
+                    {{#link-to "script" view.scriptLink}}
+                        {{unbound view.scriptLink.name}}
+                    {{/link-to}}
+                </td>
+            </tr>
+            {{/if}}
             {{#each view.details as |row|}}
                 <tr>
                     <td>{{unbound row.key}}</td>

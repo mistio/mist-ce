@@ -14,8 +14,8 @@
     </div>
     <div class="associate">
         <span class="{{if model.isAssociating 'ui-state-disabled'}}">
-            <a id={{view.domID}} class="{{if model.isAssociating 'associating ui-state-disabled' 'ui-icon-carat-d'}}
-                    assign-network-btn ui-btn-icon-right ui-mini ui-btn"
+            <a id={{view.domID}} class="{{if model.isAssociating 'associating ui-state-disabled' 'icon-down'}}
+                    assign-network-btn ui-btn-icon-right ui-mini ui-btn ui-btn-a ui-shadow"
                 {{action "assignClicked" target=view}}>
                     {{#if (unbound model.server.name)}}
                         {{unbound model.server.name}}

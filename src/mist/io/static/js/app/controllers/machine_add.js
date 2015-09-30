@@ -195,7 +195,7 @@ define('app/controllers/machine_add', ['ember'],
                 if (this.callback) this.callback(success, machine);
             },
 
-            resetProvider: function() {
+            _resetProvider: function() {
                 this.set('callback', null)
                     .set('newMachineScript', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
@@ -207,20 +207,27 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineScriptParams', '')
                     .set('newMachineDockerPorts', '')
                     .set('newMachineAzurePorts', '');
-                this.selectLocation();
             },
 
-            selectLocation: function() {
-                // if (this.newMachineProvider){
-                //         if(this.newMachineProvider.locations.model.length == 1) {
-                //         this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
-                //     }
-                // }
+            _selectUnique: function() {
+                // Locations Check
+                if (this.newMachineProvider.locations) {
+                    if (this.newMachineProvider.locations.model.length == 1) this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                }
+
+                // Sizes Check
+                if (this.newMachineProvider.sizes) {
+                    if (this.newMachineProvider.sizes.model.length == 1) this.set('newMachineSize', this.newMachineProvider.sizes.model[0]);
+                }
             },
 
             //
             //  Observers
             //
+
+            providerObserver: function() {
+                Ember.run.once(this, '_selectUnique');
+            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');

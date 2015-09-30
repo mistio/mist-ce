@@ -90,6 +90,14 @@ define('app/views/log_list_item', ['app/views/list_item'],
                 return Mist.logs.namespace == 'manage_logs';
             }.property(),
 
+            scriptLink: function () {
+                var log = this.get('log');
+                var scriptId = log.get('script_id');
+                return Mist.scriptsController && Mist.scriptsController.getScript(scriptId);
+            }.property('log.script_id'),
+
+
+
 
             //
             //  Actions

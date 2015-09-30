@@ -77,7 +77,7 @@
     border: none;
 }
 #machine-create .ui-collapsible-heading {
-    text-transform: capitalize;
+    text-transform: initial;
 }
 #machine-create .ui-collapsible-heading > a {
     background-color: #fff !important;
