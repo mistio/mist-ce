@@ -82,7 +82,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
             },
 
             getScript: function(scriptId) {
-                return this.content.findBy('id', scriptId);
+                return this.model.findBy('id', scriptId);
             },
 
             getRequestedScript: function() {
