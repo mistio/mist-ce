@@ -583,9 +583,9 @@ def machine_rdp(request):
                     body=rdp_content)
 
 
-@view_config(route_name='machine_metadata', request_method='POST',
+@view_config(route_name='machine_tags', request_method='POST',
              renderer='json')
-def set_machine_metadata(request):
+def set_machine_tag(request):
     """Sets metadata for a machine, given the backend and machine id."""
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -594,25 +594,23 @@ def set_machine_metadata(request):
     except:
         raise RequiredParameterMissingError('tag')
     user = user_from_request(request)
-    methods.set_machine_metadata(user, backend_id, machine_id, tag)
+    methods.set_machine_tag(user, backend_id, machine_id, tag)
     return OK
 
 
-@view_config(route_name='machine_metadata', request_method='DELETE',
+@view_config(route_name='machine_tags', request_method='DELETE',
              renderer='json')
-def delete_machine_metadata(request):
-    """Deletes metadata for a machine, given the machine id and the tag to be
+def delete_machine_tag(request):
+    """Deletes tag for a machine, given the machine id and the tag to be
     deleted.
 
     """
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    try:
-        tag = request.json_body['tag']
-    except:
-        raise RequiredParameterMissingError('tag')
+    tag = request.matchdict['tag']
+
     user = user_from_request(request)
-    methods.delete_machine_metadata(user, backend_id, machine_id, tag)
+    methods.delete_machine_tag(user, backend_id, machine_id, tag)
     return OK
 
 

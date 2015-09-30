@@ -3086,7 +3086,7 @@ def delete_network(user, backend_id, network_id):
         pass
 
 
-def set_machine_metadata(user, backend_id, machine_id, tag):
+def set_machine_tag(user, backend_id, machine_id, tag):
     """Sets metadata for a machine, given the backend and machine id.
 
     Libcloud handles this differently for each provider. Linode and Rackspace,
@@ -3143,7 +3143,7 @@ def set_machine_metadata(user, backend_id, machine_id, tag):
                 raise InternalServerError("error creating tag", exc)
 
 
-def delete_machine_metadata(user, backend_id, machine_id, tag):
+def delete_machine_tag(user, backend_id, machine_id, tag):
     """Deletes metadata for a machine, given the machine id and the tag to be
     deleted.
 

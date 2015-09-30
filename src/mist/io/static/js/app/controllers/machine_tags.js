@@ -74,7 +74,7 @@ define('app/controllers/machine_tags', ['ember'],
                 var machine = this.machine;
 
                 this.set('deletingTag', true);
-                Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
+                Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag, {
                     'tag': tag
                 }).success(function () {
                     // TODO: move to seperate function and trigger event
