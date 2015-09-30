@@ -2,7 +2,7 @@ mist.io
 =======
 
 Mist.io helps you manage and monitor your virtual machines, across different
-clouds, using any device that can access the web. It is provided under the 
+clouds, using any device that can access the web. It is provided under the
 GNU AGPL v3.0 License. Check out the freemium service at https://mist.io
 
 Installation
@@ -17,7 +17,7 @@ eggs in the system's Python.
 
 To install the basic requirements in a Debian based distro do::
 
-    sudo aptitude install python-dev build-essential git erlang libpcre3-dev
+    sudo aptitude install python-dev build-essential git erlang erlang-nox
 
 If you wish to install it in a virtual environment you'll also need::
 
@@ -33,7 +33,7 @@ For vSphere support, you should install pyvmomi library::
     ./bin/pip install pyvmomi
 
 In Red Hat based systems the following packages need to be installed::
-   
+
     sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel
 
 For openSUSE distibution, you'll have to additionally install::
@@ -55,7 +55,7 @@ create a virtualenv and run buildout::
     ./bin/python bootstrap.py
     ./bin/buildout -v
 
-In case you are using an older version of setuptools, bootstrap will fail. To 
+In case you are using an older version of setuptools, bootstrap will fail. To
 solve this you need to::
 
    ./bin/pip install setuptools --upgrade

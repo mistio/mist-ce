@@ -1,17 +1,18 @@
-define('app/views/login', ['app/views/templated'],
+define('app/views/login', ['ember'],
     /**
      *  Login View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
-        return App.LoginView = TemplatedView.extend({
+    function () {
+        return App.LoginPopupComponent = Ember.Component.extend({
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            layoutName: 'login',
+
+
+            //
+            //  Methods
+            //
 
             updateLoginButton: function () {
                 if (Mist.loginController.loggingIn || !Mist.loginController.formReady) {
@@ -21,13 +22,6 @@ define('app/views/login', ['app/views/templated'],
                 }
             },
 
-
-            /**
-             *
-             *  Actions
-             *
-             */
-
             keyUp: function(e) {
                 if (e.keyCode == 13) {
                     if (Mist.loginController.formReady) {
@@ -36,9 +30,12 @@ define('app/views/login', ['app/views/templated'],
                 }
             },
 
+
+            //
+            //  Actions
+            //
+
             actions: {
-
-
                 backClicked: function() {
                     Mist.loginController.close();
                 },
@@ -49,11 +46,9 @@ define('app/views/login', ['app/views/templated'],
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //  Observers
+            //
 
             updateLoginButtonObserver: function () {
                 Ember.run.once(this, 'updateLoginButton');

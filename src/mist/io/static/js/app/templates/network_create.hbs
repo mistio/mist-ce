@@ -1,15 +1,23 @@
-<div id="network-create"
-    data-swipe-close="false"
-    class="side-panel"
-    data-role="panel"
-    data-position="right"
-    data-display="overlay">
+<div id="create-network" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible"
+     data-role="collapsible"
+     data-collapsed="true">
 
-    <div data-role="header" data-theme="b">
-        <h1>Create Network</h1>
-    </div>
+    <h4><span class="title">Create Network</span></h4>
 
-    <div data-role="content" data-theme="a">
+    <div id="network-create" data-role="content" >
+
+        <!--
+            Select Network Name
+        -->
+        <div id="network-create-name-wrapper" class="{{if Mist.networkCreateController.network.name 'filled' 'empty'}} required">
+
+            <label for="network-create-name">Name</label>
+
+            {{view Mist.TextField
+                data-theme="a"
+                id="network-create-name"
+                value=Mist.networkCreateController.network.name}}
+        </div>
 
         <!--
             Select Backend
@@ -18,34 +26,40 @@
         -->
         <div id="network-create-backend-wrapper">
 
-            <label for="network-create-backend">Backend:</label>
+            <label for="network-create-backend">Cloud</label>
 
             <div id="network-create-backend"
                 data-role="collapsible"
                 data-iconpos="right"
-                data-collapsed-icon="arrow-d"
-                data-expanded-icon="arrow-u"
+                data-collapsed-icon="carat-d"
+                data-expanded-icon="carat-u"
                 data-theme="a"
-                class="mist-select">
+                class="mist-select {{if Mist.networkCreateController.network.backend 'filled' 'empty'}} required">
 
                 <h4>
-                    {{#with Mist.networkCreateController.network}}
-                        {{#if backend}}
-                            {{backend.title}}
+                    {{#with Mist.networkCreateController.network as |network|}}
+                        {{#if network.backend}}
+                            <span class="provider-icon-small">
+                                 <span class="{{network.backend.className}}"></span>
+                             </span>
+                            {{network.backend.title}}
                         {{else}}
-                            Select backend
+                            Select cloud
                         {{/if}}
                     {{/with}}
                 </h4>
 
                 <ul data-role="listview" data-theme="a">
 
-                    {{#each Mist.backendsController.content}}
-                        {{#if this.enabled}}
-                            {{#if this.isOpenStack}}
+                    {{#each Mist.backendsController.model as |backend|}}
+                        {{#if backend.enabled}}
+                            {{#if backend.isOpenStack}}
                                 <li data-icon="false">
-                                    <a {{action "backendSelected" this target="view"}}>
-                                        {{this.title}}
+                                    <a {{action "backendSelected" backend target=view}}>
+                                        <span class="provider-icon-small">
+                                             <span class="{{backend.className}}"></span>
+                                         </span>
+                                        {{backend.title}}
                                     </a>
                                 </li>
                             {{/if}}
@@ -58,31 +72,17 @@
 
 
         <!--
-            Select Network Name
-        -->
-        <div id="network-create-name-wrapper">
-
-            <label for="network-create-name">Network Name:</label>
-
-            {{view Mist.TextField
-                data-theme="a"
-                id="network-create-name"
-                valueBinding="Mist.networkCreateController.network.name"}}
-        </div>
-
-
-        <!--
             Select Admin State
         -->
 
 
         <div id="network-create-admin-state-wrapper">
-            <label>Admin State:</label>
+            <label>Admin State</label>
             <div id="network-create-admin-state"
                 data-role="collapsible"
                 data-iconpos="right"
-                data-collapsed-icon="arrow-d"
-                data-expanded-icon="arrow-u"
+                data-collapsed-icon="carat-d"
+                data-expanded-icon="carat-u"
                 data-theme="a"
                 class="mist-select">
 
@@ -92,12 +92,12 @@
 
                 <ul data-role="listview" data-theme="a">
                     <li data-icon="false">
-                        <a {{action "adminStateSelected" true target="view"}}>
+                        <a {{action "adminStateSelected" true target=view}}>
                             UP
                         </a>
                     </li>
                     <li data-icon="false">
-                        <a {{action "adminStateSelected" false target="view"}}>
+                        <a {{action "adminStateSelected" false target=view}}>
                             DOWN
                         </a>
                     </li>
@@ -116,7 +116,7 @@
             {{view Mist.Checkbox
                 data-theme="a"
                 id="network-create-subnet-create"
-                checkedBinding="Mist.networkCreateController.network.createSubnet"}}
+                checked=Mist.networkCreateController.network.createSubnet}}
             <label for="network-create-subnet-create">
                 Create Subnet
             </label>
@@ -129,11 +129,11 @@
                     Select Subnet Name
                 -->
                 <div id="network-create-subnet-name-wrapper">
-                    <label for="network-create-subnet-name">Subnet Name:</label>
+                    <label for="network-create-subnet-name">Subnet Name</label>
                     {{view Mist.TextField
                         data-theme="a"
                         id="network-create-subnet-name"
-                        valueBinding="Mist.networkCreateController.network.subnet.name"}}
+                        value=Mist.networkCreateController.network.subnet.name}}
                 </div>
 
 
@@ -141,11 +141,11 @@
                     Select Network Address
                 -->
                 <div id="network-create-subnet-address-wrapper">
-                    <label for="network-create-subnet-address">Network Address (CIDR):</label>
+                    <label for="network-create-subnet-address">Network Address (CIDR)</label>
                     {{view Mist.TextField
                         data-theme="a"
                         id="network-create-subnet-address"
-                        valueBinding="Mist.networkCreateController.network.subnet.address"}}
+                        value=Mist.networkCreateController.network.subnet.address}}
                 </div>
 
 
@@ -154,12 +154,12 @@
                         Select IP Version
                     -->
                     <div id="network-create-subnet-ipv-wrapper">
-                        <label>IP Version:</label>
+                        <label>IP Version</label>
                         <div id="network-create-subnet-ipv"
                             data-role="collapsible"
                             data-iconpos="right"
-                            data-collapsed-icon="arrow-d"
-                            data-expanded-icon="arrow-u"
+                            data-collapsed-icon="carat-d"
+                            data-expanded-icon="carat-u"
                             data-theme="a"
                             class="mist-select">
 
@@ -169,12 +169,12 @@
 
                             <ul data-role="listview" data-theme="a">
                                 <li data-icon="false">
-                                    <a {{action "ipvSelected" "IPv4" target="view"}}>
+                                    <a {{action "ipvSelected" "IPv4" target=view}}>
                                         IPv4
                                     </a>
                                 </li>
                                 <li data-icon="false">
-                                    <a {{action "ipvSelected" "IPv6" target="view"}}>
+                                    <a {{action "ipvSelected" "IPv6" target=view}}>
                                         IPv6
                                     </a>
                                 </li>
@@ -188,16 +188,16 @@
                     -->
                     <div>
                         <div id="network-create-subnet-gateway-ip-wrapper">
-                            <label for="network-create-subnet-gateway-ip">Gateway IP:</label>
+                            <label for="network-create-subnet-gateway-ip">Gateway IP</label>
                             {{view Mist.TextField
                                 data-theme="a"
                                 id="network-create-subnet-gateway-ip"
-                                valueBinding="Mist.networkCreateController.network.subnet.gatewayIP"}}
+                                value=Mist.networkCreateController.network.subnet.gatewayIP}}
                         </div>
                         {{view Mist.Checkbox
                             data-theme="a"
                             id="network-create-subnet-gateway"
-                            checkedBinding="Mist.networkCreateController.network.subnet.disableGateway"}}
+                            checked=Mist.networkCreateController.network.subnet.disableGateway}}
                         <label for="network-create-subnet-gateway">
                             Disable Gateway
                         </label>
@@ -210,7 +210,7 @@
                     {{view Mist.Checkbox
                         data-theme="a"
                         id="network-create-subnet-dhcp"
-                        checkedBinding="Mist.networkCreateController.network.subnet.enableDHCP"}}
+                        checked=Mist.networkCreateController.network.subnet.enableDHCP}}
                     <label for="network-create-subnet-dhcp">
                         Enable DHCP
                     </label>
@@ -220,12 +220,12 @@
                         Allocation Pools
                     -->
                     <label for="network-create-subnet-allocation-pools">
-                        Allocation Pools:
+                        Allocation Pools
                     </label>
                     {{view Mist.TextArea
                         id="network-create-subnet-allocation-pools"
                         data-theme="a"
-                        valueBinding="Mist.networkCreateController.network.subnet.allocationPools"}}
+                        value=Mist.networkCreateController.network.subnet.allocationPools}}
                 </div>
             </div>
         </div>
@@ -235,10 +235,11 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a class="ui-btn ui-btn-a"
-               {{action "backClicked" target="view"}}>Back</a>
-            <a class="ui-btn ui-btn-d" id="network-create-ok"
-                {{action "createClicked" target="view"}}>Create</a>
+            <a class="ui-btn ui-btn-d ui-shadow ui-first-child ui-last-child ui-caps {{if Mist.networkCreateController.formReady '' 'ui-state-disabled'}}" id="network-create-ok"
+                {{action "createClicked" target=view}}>Create</a>
         </div>
     </div>
 </div>
+
+<div id="create-network-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
+     {{action "clickOverlay" target=view}}></div>

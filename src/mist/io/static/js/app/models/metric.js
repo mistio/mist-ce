@@ -10,13 +10,9 @@ define('app/models/metric', ['ember'],
 
         return Ember.Object.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             id: null,
             name: null,
@@ -31,18 +27,14 @@ define('app/models/metric', ['ember'],
             datapoints: null,
 
 
-
             lowerName: function () {
                 return this.get('name').toLowerCase();
             }.property('name'),
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             init: function () {
                 this._super();
@@ -62,11 +54,8 @@ define('app/models/metric', ['ember'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             hasMachine: function (machine) {
                 var hasMachine = false;

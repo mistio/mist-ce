@@ -10,42 +10,53 @@ define('app/controllers/backend_add', ['app/models/backend'],
 
         return Ember.Object.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             callback: null,
             provider: null,
 
+            providerList: function() {
+                return SUPPORTED_PROVIDERS.map(function (provider) {
+                    provider.className = 'provider-';
+                    if (provider.provider == 'bare_metal')
+                        provider.className += 'baremetal';
+                    else if (provider.provider == 'indonesian_vcloud')
+                        provider.className += 'indonesian';
+                    else
+                        provider.className += provider.provider;
+                    return provider;
+                }).sort(function (a, b) {
+                    if (a.provider == 'bare_metal')
+                        return 1;
+                    if (b.provider == 'bare_metal')
+                        return -1;
+                    if (a.title > b.title)
+                        return 1;
+                    if (a.title < b.title)
+                        return -1
+                    return 0;
+                });
+            }.property(),
 
-            //
+
             //
             //  Methods
             //
-            //
-
 
             open: function (callback) {
                 this._clear();
                 this.view.clear();
-                this.view.open();
                 this.set('callback', callback);
             },
-
 
             close: function () {
                 this._clear();
                 this.view.close();
-                this.view.clear();
             },
 
-
             add: function () {
-
                 var provider = this.get('provider');
                 var fields = getProviderFields(provider).rejectBy('name', undefined);
 
@@ -73,11 +84,8 @@ define('app/controllers/backend_add', ['app/models/backend'],
 
 
             //
-            //
             //  Pseudo-Private Methods
             //
-            //
-
 
             _showMonitoringPopup: function (backend, payload) {
                 if (payload.windows)
@@ -126,14 +134,12 @@ define('app/controllers/backend_add', ['app/models/backend'],
                 }
             },
 
-
             _clear: function () {
                 this.setProperties({
                     callback: null,
                     provider: null,
                 });
             },
-
 
             _giveCallback: function (success, backend) {
                 if (this.callback) this.callback(success, backend);

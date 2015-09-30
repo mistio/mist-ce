@@ -4,24 +4,22 @@ define('app/views/rule_edit', ['app/views/controlled'],
     //
     //  @returns Class
     //
-    function (ControlledView) {
+    function (ControlledComponent) {
 
         'use strict';
 
-        return App.RuleEditView = ControlledView.extend({
+        return App.RuleEditComponent = ControlledComponent.extend({
 
-
-            //
             //
             //  Properties
             //
-            //
 
-
+            layoutName: 'rule_edit',
+            controllerName: 'ruleEditController',
             rule: null,
             metrics: [],
             newCommand: null,
-
+            commandFormReady: false,
 
             sortedMetrics: function () {
                 var metrics = this.get('metrics');
@@ -32,20 +30,18 @@ define('app/views/rule_edit', ['app/views/controlled'],
 
 
             //
-            //
             //  Methods
             //
-            //
 
-
-            open: function (property) {
+            open: function (property, el) {
 
                 this.set('rule', Mist.ruleEditController.rule);
-                this.set('metrics', this._parentView.metrics);
+                this.set('metrics', this.parentView.metrics);
 
                 // Get button on which to position the popup
-                var button = '#' + this.rule.id +
-                    ' .rule-button.rule-' + property;
+                var button = el ?
+                '#' + el + ' .rule-button.rule-' + property :
+                '#' + this.rule.id + ' .rule-button.rule-' + property;
 
                 // Reposition popup on the button
                 $('#rule-' + property)
@@ -57,20 +53,18 @@ define('app/views/rule_edit', ['app/views/controlled'],
                 });
             },
 
-
             close: function (property) {
                 $('#rule-' + property).popup('close');
             },
 
-
             openCommandEditor: function () {
                 Mist.ruleEditController.close('action');
+                this.updateCommandFormReady();
                 Ember.run.later(this, function () {
                     Mist.ruleEditController.open(this.rule, 'command');
                     this.set('newCommand', this.rule.command);
                 }, 500);
             },
-
 
             closeCommandEditor: function () {
                 Mist.ruleEditController.close('command');
@@ -79,22 +73,32 @@ define('app/views/rule_edit', ['app/views/controlled'],
                 }, 500);
             },
 
+            updateCommandFormReady: function () {
+                var commandFormReady = false;
+                if (this.newCommand && this.newCommand.trim() ) {
+                    commandFormReady = true;
+                }
 
-            //
+                this.set('commandFormReady', commandFormReady);
+
+                if (this.commandFormReady) {
+                   $('#add-command-ok').removeClass('ui-state-disabled');
+                } else {
+                   $('#add-command-ok').addClass('ui-state-disabled');
+                }
+            },
+
+
             //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 metricClicked: function (metric) {
                     Mist.ruleEditController.edit({
                         metric: metric
                     });
                 },
-
 
                 operatorClicked: function (operator) {
                     Mist.ruleEditController.edit({
@@ -102,13 +106,11 @@ define('app/views/rule_edit', ['app/views/controlled'],
                     });
                 },
 
-
                 aggregateClicked: function (aggregate) {
                     Mist.ruleEditController.edit({
                         aggregate: aggregate
                     });
                 },
-
 
                 actionClicked: function (action) {
                     if (action == 'command')
@@ -119,19 +121,28 @@ define('app/views/rule_edit', ['app/views/controlled'],
                         });
                 },
 
-
                 saveClicked: function () {
-                    Mist.ruleEditController.edit({
-                        action: 'command',
-                        command: this.newCommand
-                    });
+                    if (this.commandFormReady) {
+                        Mist.ruleEditController.edit({
+                            action: 'command',
+                            command: this.newCommand
+                        });
+                    }
                 },
-
 
                 backClicked: function () {
                     this.closeCommandEditor();
-                },
-            }
+                }
+            },
+
+
+            //
+            //  Observers
+            //
+
+            commandFormReadyObserver: function () {
+               Ember.run.once(this, 'updateCommandFormReady');
+            }.observes('newCommand')
         });
     }
 );

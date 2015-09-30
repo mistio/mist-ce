@@ -10,13 +10,9 @@ define('app/models/base', ['ember'],
 
         return Ember.Object.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
             //
-            //
-
 
             id: null,
             name: null,
@@ -26,11 +22,8 @@ define('app/models/base', ['ember'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 this.update(this);
@@ -38,11 +31,8 @@ define('app/models/base', ['ember'],
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             update: function (data) {
                 Ember.run(this, function () {
@@ -56,11 +46,8 @@ define('app/models/base', ['ember'],
 
 
             //
-            //
             //  Pseudo-Private methods
             //
-            //
-
 
             _convertProperties: function () {
                 var properties = this.get('convertProperties');
@@ -74,7 +61,6 @@ define('app/models/base', ['ember'],
                     delete this[before];
                 });
             },
-
 
             _processProperties: function () {
                 var processors = this.get('processProperties');

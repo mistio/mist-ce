@@ -500,7 +500,9 @@ def _add_backend_vcloud(title, provider, params):
             raise RequiredParameterMissingError('host')
         host = sanitize_host(host)
     elif provider == 'indonesian_vcloud':
-        host = 'compute.idcloudonline.com'
+        host = params.get('indonesianRegion','my.idcloudonline.com')
+        if host not in ['my.idcloudonline.com', 'compute.idcloudonline.com']:
+            host = 'my.idcloudonline.com'
 
     backend = model.Backend()
     backend.title = title
@@ -1399,7 +1401,7 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_start = False
 
     if conn.type in (Provider.LINODE, Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
-                     Provider.DOCKER, Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in config.EC2_PROVIDERS:
+                     Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in config.EC2_PROVIDERS:
         can_rename = True
     else:
         can_rename = False
@@ -3446,7 +3448,7 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
     if 'command' in kwargs:
         output = '%s\n' % kwargs['command']
         if 'output' in kwargs:
-            output += '%s\n' % kwargs['output']
+            output += '%s\n' % kwargs['output'].decode('utf-8', 'ignore')
         if 'retval' in kwargs:
             output += 'returned with exit code %s.\n' % kwargs['retval']
         payload['output'] = output
@@ -3484,12 +3486,12 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
     if 'duration' in kwargs:
         body += "Duration: %.2f secs\n" % kwargs['duration']
     if 'output' in kwargs:
-        body += "Output: %s\n" % kwargs['output']
+        body += "Output: %s\n" % kwargs['output'].decode('utf-8', 'ignore')
 
     try: # Send email in multi-user env
         if email_notify:
             from mist.core.helpers import send_email
-            send_email("[mist.io] %s" % title, body, user.email)
+            send_email("[mist.io] %s" % title, body.encode('utf-8', 'ignore'), user.email)
     except ImportError:
         pass
 

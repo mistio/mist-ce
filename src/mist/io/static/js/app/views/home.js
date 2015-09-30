@@ -10,19 +10,24 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
         return App.HomeView = PageView.extend({
 
+            //
+            //  Properties
+            //
+
+            templateName: 'home',
 
             hasIncidents: function () {
                 if (Mist.openIncidents)
                     return !!Mist.openIncidents.length;
             }.property('Mist.openIncidents'),
 
+            machineCount: function () {
+                return Mist.backendsController.machineCount;
+            }.property('Mist.backendsController.machineCount'),
 
-            //
             //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 Ember.run.next(this, function () {
@@ -41,17 +46,10 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
-                addBackend: function () {
-                    Mist.backendAddController.open();
-                },
 
                 incidentClicked: function (incident) {
                     var machine = incident.get('machine');
@@ -59,18 +57,15 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                         Mist.notificationController.timeNotify(
                             'Machine not found', 2000);
                     else
-                        Mist.Router.router.transitionTo('machine',
+                        Mist.__container__.lookup('router:main').transitionTo('machine',
                             incident.get('machine'));
                 }
             },
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             showGraphs: function () {
 
@@ -96,7 +91,7 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
                 if (Mist.graphsController.isOpen) {
                     var listChanged = false;
-                    var existingDatasources = Mist.graphsController.content[0].datasources;
+                    var existingDatasources = Mist.graphsController.model[0].datasources;
                     datasources.some(function (datasource) {
                         var exists = existingDatasources.findBy('id', datasource.id);
                         if (!exists) {
@@ -131,11 +126,8 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             checkedMonitoringObserver: function () {
                 Ember.run.later(this, function () {

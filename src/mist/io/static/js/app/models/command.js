@@ -7,15 +7,14 @@ define('app/models/command', ['ember'],
     function() {
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            //  Properties
+            //
 
             id: null,
             command: null,
             response: null,
             pendingResponse: null
-
         });
     }
 );

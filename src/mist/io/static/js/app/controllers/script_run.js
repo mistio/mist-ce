@@ -19,6 +19,7 @@ define('app/controllers/script_run', ['ember'],
             open: function (script) {
                 this.clear();
                 this.get('scriptToRun').set('script', script);
+                
                 this.view.open();
             },
 

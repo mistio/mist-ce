@@ -1,86 +1,95 @@
-define('app/views/backend_add', ['app/views/panel'],
+define('app/views/backend_add', ['app/views/controlled'],
     //
     //  Backend Add View
     //
     //  @returns Class
     //
-    function (PanelView) {
+    function (ControlledComponent) {
 
         'use strict';
 
-        return App.BackendAddView = PanelView.extend({
+        return App.BackendAddView = ControlledComponent.extend({
 
+            layoutName: 'backend_add',
+            controllerName: 'backendAddController',
 
             selectedRegion: null,
+            selectedIndonesianRegion: 'my.idcloudonline.com',
             helpHref: '',
 
 
             //
-            //
             //  Computed Properties
             //
-            //
 
-
-            providerFields: function () {
-                return getProviderFields(Mist.backendAddController.provider);
+            provider: function() {
+                return Mist.backendAddController.get('provider');
             }.property('Mist.backendAddController.provider'),
 
+            providerFields: function () {
+                return getProviderFields(this.get('provider'));
+            }.property('provider'),
+
+            providerList: function() {
+                return Mist.backendAddController.get('providerList');
+            }.property(),
 
             hasAdvanced: function () {
                 return !!this.get('providerFields').findBy('advanced');
             }.property('providerFields'),
 
-
             providerRegions: function () {
-                if (Mist.backendAddController.provider)
-                    return Mist.backendAddController.provider.regions;
-            }.property('Mist.backendAddController.provider'),
-
+                if (this.provider)
+                    return this.provider.regions;
+            }.property('provider'),
 
             isReady: function () {
-                var isReady = true
-                this.get('providerFields').some(function (field) {
-                    if (field.optional) return;
-                    if (field.isSlider && !field.name) return;
-                    if (field.value === undefined ||
-                        field.value === null ||
-                        field.value === '')
-                            return isReady = false;
-                });
+                var isReady = true;
+                if (this.provider){
+                    this.get('providerFields').some(function (field) {
+                        if (field.optional) return;
+                        if (field.isSlider && !field.name) return;
+                        if (field.value === undefined ||
+                            field.value === null ||
+                            field.value === '')
+                                return isReady = false;
+                    });
+                } else {
+                    return isReady = false;
+                }
                 return isReady;
             }.property('providerFields.@each.value'),
 
 
             //
-            //
             //  Methods
             //
-            //
-
 
             clear: function () {
-                $('#new-backend-provider').collapsible('collapse');
                 $('#backend-add-fields').hide();
                 Ember.run.next(this, function () {
-                    $(this.panelId).trigger('create');
-                    Ember.run.later(this, function () {
-                        if (Mist.backendAddController.provider)
-                            $('#backend-add-fields').fadeIn();
-                    }, 100);
+                    $('body').enhanceWithin();
+                    $('#new-backend-provider').collapsible('collapse');
+                    $('#add-backend').collapsible('expand');
+                    $('#backend-add-fields').fadeIn();
+                    $('#add-backend-overlay').removeClass('ui-screen-hidden').addClass('in');
                 });
             },
 
+            close: function () {
+                $('#add-backend').collapsible('collapse');
+                $('#new-backend-provider').collapsible('expand');
+            },
 
             autocompleteCredentials: function (provider) {
                 var fields = this.get('providerFields');
 
                 // Autocomplete credentials only for providers
                 // with regions
-                if (!fields.findBy('type', 'region'))
+                if (!fields || !fields.findBy('type', 'region'))
                     return;
 
-                Mist.backendsController.content.some(function (backend) {
+                Mist.backendsController.model.some(function (backend) {
 
                     // backend.provider == provider.provider won't work
                     // because we still save backends in the database using
@@ -106,22 +115,22 @@ define('app/views/backend_add', ['app/views/panel'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
-                selectProvider: function (provider, field) {
-                    this.clear();
-                    clearProviderFields(provider);
-                    Mist.backendAddController.set('provider', provider);
-                    $('#new-backend-provider').collapsible('collapse');
-                    this.autocompleteCredentials(provider);
+                clickOverlay: function() {
+                    $('#add-backend').collapsible('collapse');
                 },
 
+                selectProvider: function (provider, field) {
+                    clearProviderFields(provider);
+                    Ember.run.next(this, function(){
+                        Mist.backendAddController.set('provider', provider);
+                        this.clear();
+                        this.autocompleteCredentials(provider);
+                    })
+                },
 
                 selectRegion: function (region, field) {
                     field.set('value', region.id);
@@ -134,6 +143,11 @@ define('app/views/backend_add', ['app/views/panel'],
                     title.set('value', title.defaultValue + ' ' + region.location);
                 },
 
+                selectIndonesianRegion: function (region, field) {
+                    field.set('value', region);
+                    this.set('selectedIndonesianRegion', region);
+                    $('#' + field.name).collapsible('collapse');
+                },
 
                 uploadFile: function (field) {
                     Mist.fileUploadController.open('Upload ' + field.label, field.label,
@@ -149,15 +163,13 @@ define('app/views/backend_add', ['app/views/panel'],
                     );
                 },
 
-
                 selectKey: function (key, field) {
                     $('#' + field.name).collapsible('collapse');
                     field.set('value', key.id || key);
                     Ember.run.next(this, function () {
-                        this.$().trigger('create');
+                        this.$().enhanceWithin();
                     });
                 },
-
 
                 createKeyClicked: function (field) {
                     Mist.keyAddController.open( function (success, key) {
@@ -169,26 +181,21 @@ define('app/views/backend_add', ['app/views/panel'],
                     });
                 },
 
-
                 backClicked: function() {
                     Mist.backendAddController.close();
                 },
-
 
                 addClicked: function() {
                     Mist.backendAddController.add();
                 },
 
                 helpClicked: function (field) {
-                    this.setProperties({
+                    Mist.backendAddController.setProperties({
                         helpText: field.helpText,
                         helpHref: field.helpHref,
                     });
-                    $('#help-tooltip').popup('option', 'positionTo', '#' + field.helpId)
+                    $('#help-tooltip').popup().popup('option', 'positionTo', '#' + field.helpId)
                     Ember.run.later(function () {
-                    //    $('#help-tooltip').css('top', function(i, v) {
-                    //        return (parseFloat(v) + 10) + 'px';
-                    //    });
                         $('#help-tooltip').popup('open');
                     }, 50);
                 },

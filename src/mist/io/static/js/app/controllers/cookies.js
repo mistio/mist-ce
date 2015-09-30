@@ -158,7 +158,7 @@ define('app/controllers/cookies', ['ember'],
                 var machine_uuid = uuidFromMachine(machine);
                 this.cookie.smm[machine_uuid].graphs[graph.id] = {
                     index: graph.index || 0,
-                    hidden: graph.view ? grpah.view.isHidden : false,
+                    hidden: graph.view ? graph.view.isHidden : false,
                 };
                 this._save();
                 return this.cookie.smm[machine_uuid].graphs[graph.id];

@@ -1,22 +1,21 @@
-define('app/views/rule', ['app/views/templated', 'ember'],
+define('app/views/rule', [],
     //
     //  Rule View
     //
     //  @returns Class
     //
-    function (TemplatedView) {
+    function () {
 
         'use strict'
 
-        return App.RuleView = TemplatedView.extend({
+        return App.RuleItemComponent = Ember.Component.extend({
+
+            layoutName: 'rule',
 
 
-            //
             //
             //  Properties
             //
-            //
-
 
             isUpdating: null,
             newRuleValue: null,
@@ -24,11 +23,8 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             //
-            //
             //  Computed Properties
             //
-            //
-
 
             rule: function () {
                 return this.get('model');
@@ -41,7 +37,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                     if (!isAny)
                         Ember.run.next(this, function () {
                             $('#' + this.get('rule').id + ' .rule-time-window')
-                                .parent().trigger('create');
+                                .parent().enhanceWithin();
                         });
                     return isAny;
                 }
@@ -49,30 +45,23 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             //
-            //
             //  Initialization
             //
-            //
-
 
             load: function () {
                 Ember.run.next(this, function () {
                     this.showAdvancedCondition();
                     this.updateTextValues();
-                    $('#'+this.elementId).trigger('create');
+                    $('.ui-page-active').enhanceWithin();
                 })
             }.on('didInsertElement'),
 
 
             //
-            //
             // Methods
             //
-            //
-
 
             update: function () {
-
                 // Prevent multiple requests
                 if (this.isUpdating)
                     return;
@@ -84,7 +73,6 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
                 this.set('isUpdating', true);
                 Ember.run.later(this, function () {
-                    this.set('isUpdating', false);
                     var that = this;
                     Mist.rulesController.editRule({
                         rule: this.get('rule'),
@@ -95,11 +83,11 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                         callback: function (success) {
                             if (!success)
                                 that.updateTextValues();
+                            that.set('isUpdating', false);
                         }
                     });
                 }, 500);
             },
-
 
             updateTextValues: function () {
                 this.setProperties({
@@ -108,9 +96,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
                 });
             },
 
-
             showAdvancedCondition: function (userClicked) {
-
                 var el = '#' + this.elementId;
 
                 // If user clicked the button to show the advanced condition,
@@ -141,38 +127,29 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             //
-            //
             //  Actions
             //
-            //
-
 
             actions: {
-
                 openMetricPopup: function () {
-                    Mist.ruleEditController.open(this.get('rule'), 'metric');
+                    Mist.ruleEditController.open(this.get('rule'), 'metric', null, this.elementId);
                 },
-
 
                 openOperatorPopup: function () {
-                    Mist.ruleEditController.open(this.get('rule'), 'operator');
+                    Mist.ruleEditController.open(this.get('rule'), 'operator', null, this.elementId);
                 },
-
 
                 openActionPopup: function () {
-                    Mist.ruleEditController.open(this.get('rule'), 'action');
+                    Mist.ruleEditController.open(this.get('rule'), 'action', null, this.elementId);
                 },
-
 
                 openAggregatePopup: function () {
-                    Mist.ruleEditController.open(this.get('rule'), 'aggregate');
+                    Mist.ruleEditController.open(this.get('rule'), 'aggregate', null, this.elementId);
                 },
-
 
                 deleteRuleClicked: function () {
                     Mist.rulesController.deleteRule(this.get('rule'));
                 },
-
 
                 openAdvancedCondition: function () {
                     this.showAdvancedCondition(true);
@@ -181,16 +158,12 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
             //
-            //
             //  Observers
             //
-            //
-
 
             textValuesObserver: function () {
                 Ember.run.once(this, 'update');
             }.observes('newRuleValue', 'newRuleTimeWindow'),
-
 
             timeWindowObserver: function () {
                 Ember.run.once(this, 'updateTextValues');

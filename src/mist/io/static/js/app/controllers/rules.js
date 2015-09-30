@@ -12,17 +12,15 @@ define('app/controllers/rules',
 
         'use strict';
 
-        return BaseArrayController.extend({
+        return Ember.Controller.extend(Ember.Evented, {
 
-
-            //
             //
             //  Properties
             //
-            //
 
-            model: RuleModel,
+            baseModel: RuleModel,
             creationPending: false,
+            model: [],
 
             aggregateList: [{
                 'title': 'any',
@@ -52,23 +50,22 @@ define('app/controllers/rules',
 
 
             //
-            //
             //  Methods
             //
-            //
 
-
-            setContent: function (content) {
-                var contentToArray = [];
-                forIn(content, function (rule) {
-                    contentToArray.push(rule);
+            setModel: function (model) {
+                var modelToArray = [];
+                forIn(model, function (rule) {
+                    modelToArray.push(RuleModel.create(rule));
                 });
-                this._super(contentToArray);
+                this.set('model', modelToArray);
             },
 
+            getObject: function (id) {
+                return this.model.findBy('id', id);
+            },
 
             newRule: function (machine, callback) {
-
                 var that = this;
                 this.set('creationPending', true);
                 Mist.ajax.POST('/rules', {
@@ -89,6 +86,29 @@ define('app/controllers/rules',
                 });
             },
 
+            _addObject: function (object) {
+                var newObject = RuleModel.create(object);
+                this.model.pushObject(newObject);
+                this.trigger('onAdd', {
+                    object: newObject
+                });
+            },
+
+            _deleteObject: function (object) {
+                this.model.removeObject(object);
+                this.trigger('onDelete', {
+                    object: object
+                });
+            },
+
+            _updateObject: function (object) {
+                Ember.run.next(this, function(){
+                    this.getObject(object.id).update(object);
+                    this.trigger('onUpdate', {
+                        object: object
+                    });
+                });
+            },
 
             deleteRule: function (rule) {
                 var that = this;
@@ -105,7 +125,6 @@ define('app/controllers/rules',
 
 
             editRule: function (args) {
-
                 var payload = {
                     id: args.rule.id
                 };

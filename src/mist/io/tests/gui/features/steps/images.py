@@ -2,32 +2,11 @@ from behave import *
 from time import time, sleep
 
 
-@then(u'Images counter should be greater than {counter_number} within {seconds} seconds')
-def images_counter_loaded(context, counter_number, seconds):
-    elements = context.browser.find_elements_by_tag_name("li")
-    for element in elements:
-        if "Images" in element.text:
-            break
-
-    end_time = time() + int(seconds)
-    while time() < end_time:
-        counter_span = element.find_element_by_tag_name("span")
-        counter = int(counter_span.text)
-
-        if counter > int(counter_number):
-            return
-        else:
-            sleep(2)
-
-    assert False, u'The counter did not say that more than %s images were loaded' % counter_number
-
-
 @then(u'Images list should be loaded within {seconds} seconds')
 def images_loaded(context, seconds):
     end_time = time() + int(seconds)
     while time() < end_time:
-        images_list = context.browser.find_element_by_id("image-list")
-        images = images_list.find_elements_by_tag_name("li")
+        images = context.browser.find_elements_by_class_name("checkbox-link")
         if len(images) > 0:
             return
         sleep(2)
@@ -66,7 +45,11 @@ def assert_starred_image(context, text):
 
 @when(u'I search for a "{text}" Image')
 def search_image(context, text):
-    search_bar = context.browser.find_element_by_id("search-term-input")
+    search_bar = context.browser.find_elements_by_class_name("image-search")
+    assert len(search_bar) > 0, "Could not find the image search input"
+    assert len(search_bar) == 1, "Found more than one image search input " \
+                                 "elements"
+    search_bar = search_bar[0]
     for letter in text:
         search_bar.send_keys(letter)
     sleep(2)

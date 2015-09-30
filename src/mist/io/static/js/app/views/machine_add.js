@@ -1,11 +1,59 @@
-define('app/views/machine_add', ['app/views/templated'],
+define('app/views/machine_add', ['app/views/controlled'],
     /**
      *  Machine Add View
      *
      *  @returns Class
      */
-    function (TemplatedView) {
-        return App.MachineAddView = TemplatedView.extend({
+    function (ControlledComponent) {
+        return App.MachineAddComponent = ControlledComponent.extend({
+
+            layoutName: 'machine_add',
+            controllerName: 'machineAddController',
+
+            changeProviderFlag: false,
+            dockerNeedScript: false,
+            hasAdvancedScript: false,
+
+            hasDocker: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider ? (provider.provider == 'docker' ? true : false) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasOpenstack: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider ? (provider.provider == 'openstack' ? true : false) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasAzure: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider ? (provider.provider == 'azure' ? true : false) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasKey: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider ? (provider.provider != 'docker' || (provider.provider == 'docker' && this.get('dockerNeedScript')) ? true : false) : false) : false;
+            }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
+
+            hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
+                return this.get('hasKey') == true || this.get('dockerNeedScript');
+            }),
+
+            hasLocation: function() {
+                var provider = Mist.machineAddController.newMachineProvider,
+                valids = ['docker', 'indonesiancloud', 'vcloud'];
+                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? false : true) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasNetworks: function() {
+                var provider = Mist.machineAddController.newMachineProvider,
+                valids = ['openstack', 'vcloud'];
+                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? true : false) : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasMonitoring: Ember.computed(function() {
+                return Mist.email ? true : false;
+            }),
+
 
             /**
              *  Properties
@@ -62,20 +110,45 @@ define('app/views/machine_add', ['app/views/templated'],
              */
 
              load: function () {
+                Ember.run.next(function(){
+                    $( "#create-machine" ).collapsible({
+                        expand: function(event, ui) {
+                            Mist.machineAddController.open(null);
+
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('ui-screen-hidden').addClass('in');
+                            }
+                            $(this).children().next().hide();
+                            $(this).children().next().slideDown(250);
+                        }
+                    });
+                });
 
                 // Add event listeners
                 Mist.scriptsController.on('onChange', this, 'renderFields');
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
                 Mist.backendsController.on('onImagesChange', this, 'renderFields');
 
-                // Connect view with machineAddController
-                var viewId = $('#create-machine-panel').parent().attr('id');
-                Mist.machineAddController.set('view', Ember.View.views[viewId]);
-
              }.on('didInsertElement'),
 
 
              unload: function () {
+                Ember.run.next(function(){
+                    $( "#create-machine" ).collapsible({
+                        collapse: function(event, ui) {
+                            Mist.machineAddController.close();
+
+                            $(this).children().next().slideUp(250);
+                            var id = $(this).attr('id'),
+                            overlay = id ? $('#' + id+'-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('in').addClass('ui-screen-hidden');
+                            }
+                        }
+                    });
+                });
 
                 // Remove event listeners
                 Mist.scriptsController.off('onChange', this, 'renderFields');
@@ -94,14 +167,31 @@ define('app/views/machine_add', ['app/views/templated'],
 
              clear: function () {
                  this.$('select').val('basic').slider('refresh');
-                 this.$('.script-option').hide();
-                 this.$('.basic').show();
+                 this.$('.ui-collapsible').removeClass('selected');
              },
 
+             checkImageSelected: function(image) {
+                if (image) {
+                    this.triggerAction({
+                        action:'selectProvider',
+                        target: this,
+                        actionContext: image.backend
+                    });
+
+                    this.triggerAction({
+                        action:'selectImage',
+                        target: this,
+                        actionContext: image
+                    });
+                }
+             },
 
              fieldIsReady: function (field) {
-                $('#create-machine-' + field).collapsible('option', 'collapsedIcon', 'check')
-                                             .collapsible('collapse');
+                $('#create-machine')
+                    .find('.ui-collapsible')
+                    .collapsible()
+                    .collapsible('collapse');
+                $('#create-machine-' + field).addClass('selected');
              },
 
 
@@ -110,7 +200,7 @@ define('app/views/machine_add', ['app/views/templated'],
 
                     // Render collapsibles
                     if ($('.ui-collapsible').collapsible) {
-                        $('.ui-collapsible').collapsible();
+                        $('.ui-collapsible').collapsible().enhanceWithin();
                     }
 
                     // Render listviews
@@ -122,56 +212,6 @@ define('app/views/machine_add', ['app/views/templated'],
              },
 
 
-            showDockerMenu: function () {
-                this.hideDockerMenu();
-                $('#create-machine-panel #location').hide();
-                $('#create-machine-panel #script').hide();
-                $('#create-machine-panel #size').hide();
-                $('#create-machine-panel #key').hide();
-                $('#create-machine-monitoring').hide();
-                $('#create-machine-panel .docker').show();
-                $('#create-machine-panel #ports').show();
-            },
-
-
-            showMistDockerMenu: function () {
-                this.hideDockerMenu();
-                $('#create-machine-panel #location').hide();
-                $('#create-machine-panel #size').hide();
-                $('#create-machine-panel #ports').show();
-            },
-
-
-            hideDockerMenu: function () {
-                $('#create-machine-panel #location').show();
-                $('#create-machine-panel #script').show();
-                $('#create-machine-panel #size').show();
-                $('#create-machine-panel #key').show();
-                $('#create-machine-monitoring').show();
-                $('#create-machine-panel .docker').hide();
-                $('#create-machine-panel #ports').hide();
-            },
-
-
-            showAzureMenu: function () {
-                $('#create-machine-panel .azure').show();
-            },
-
-
-            hideAzureMenu: function () {
-                $('#create-machine-panel .azure').hide();
-            },
-
-
-             updateLaunchButton: function () {
-                if (Mist.machineAddController.formReady) {
-                    $('#create-machine-ok').removeClass('ui-state-disabled');
-                } else {
-                    $('#create-machine-ok').addClass('ui-state-disabled');
-                }
-             },
-
-
             /**
              *
              *  Actions
@@ -180,13 +220,17 @@ define('app/views/machine_add', ['app/views/templated'],
 
             actions: {
 
+                clickOverlay: function() {
+                    $('#create-machine').collapsible('collapse');
+                },
+
                 switchToggled: function () {
                     var value = this.$('#script select').val();
-                    this.$('.script-option').hide();
-                    this.$('.'+value).show();
                     Mist.machineAddController.set('newMachineScript', '');
                     Mist.machineAddController.set('newMachineScriptParams', '');
                     Mist.machineAddController.set('hasScript', value == 'advanced');
+                    this.set('hasAdvancedScript', value == 'advanced');
+                    this.renderFields();
                 },
 
 
@@ -196,7 +240,7 @@ define('app/views/machine_add', ['app/views/templated'],
                         this.fieldIsReady('provider');
                     }
 
-                    backend.networks.content.forEach(function (network, index) {
+                    backend.networks.model.forEach(function (network, index) {
                         network.set('selected', false);
                     });
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
@@ -204,38 +248,8 @@ define('app/views/machine_add', ['app/views/templated'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineProvider', backend);
 
-                    $('#create-machine-image').removeClass('ui-state-disabled');
-                    $('#create-machine-location').addClass('ui-state-disabled');
-                    $('#create-machine-size').addClass('ui-state-disabled');
-                    $('#create-machine-key').addClass('ui-state-disabled');
-                    $('#create-machine-panel .docker textarea').addClass('ui-state-disabled');
-                    $('#create-machine-panel .docker .ui-checkbox').addClass('ui-state-disabled');
-                    $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
-                    $('#create-machine-panel #ports').addClass('ui-state-disabled');
-
-                    if (backend.get('requiresNetworkOnCreation')) {
-                        if (backend.networks.content.length > 0) {
-                            $('#create-machine-network').show();
-                            $('label[for=create-machine-script]').text('Script:');
-                        }
-                    } else {
-                        $('#create-machine-network').hide();
-                        $('label[for=create-machine-script]').text('Script:');
-                    }
-
-                    var view = Mist.machineAddController.view;
-                    if (backend.get('isDocker')) {
-                        view.showDockerMenu();
-                    } else {
-                        view.hideDockerMenu();
-                    }
-
-                    if (backend.get('isAzure')) {
-                        view.showAzureMenu();
-                    } else {
-                        view.hideAzureMenu();
-                    }
-
+                    // Check we are not on single image page
+                    if(! Mist.machineAddController.get('selectedImage')) this.set('changeProviderFlag', true);
                 },
 
 
@@ -249,55 +263,22 @@ define('app/views/machine_add', ['app/views/templated'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineImage', image);
 
-                   $('#create-machine-location').addClass('ui-state-disabled');
-                   $('#create-machine-size').removeClass('ui-state-disabled');
-                   $('#create-machine-key').addClass('ui-state-disabled');
-                   $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
-
-                   var view = Mist.machineAddController.view;
-                   if (image.get('isDocker')) {
-                       Mist.machineAddController.set('newMachineSize',
-                            Mist.machineAddController.newMachineProvider.sizes.content[0]);
-                       if (image.get('isMist')) {
-                           view.showMistDockerMenu();
-                           $('#create-machine-key').removeClass('ui-state-disabled');
-                       } else {
-                           view.showDockerMenu();
-                           $('#create-machine-panel .docker textarea')
-                                .removeClass('ui-state-disabled');
-                       }
-                       $('#create-machine-panel #ports').removeClass('ui-state-disabled');
-                   }
+                    this.set('dockerNeedScript', image.get('isMist'));
                 },
 
 
                 selectSize: function (size) {
-
                     this.fieldIsReady('size');
 
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineSize', size);
-
-                    $('#create-machine-location').removeClass('ui-state-disabled');
-                    $('#create-machine-panel .docker textarea').removeClass('ui-state-disabled');
-                    $('#create-machine-panel .docker .ui-checkbox').removeClass('ui-state-disabled');
-                    $('#create-machine-key').addClass('ui-state-disabled');
-                    $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
-
-                    // Docker specific
-                    if (Mist.machineAddController.newMachineProvider.provider == 'docker')
-                        // Because SSH key is optional for docker, so is location
-                        $('#create-machine-key').removeClass('ui-state-disabled');
                 },
 
 
                 selectLocation: function (location) {
-
                     this.fieldIsReady('location');
 
                     Mist.machineAddController.set('newMachineLocation', location);
-                    $('#create-machine-key').removeClass('ui-state-disabled');
-                    $('#create-machine-network .ui-collapsible').addClass('ui-state-disabled');
                 },
 
 
@@ -307,7 +288,7 @@ define('app/views/machine_add', ['app/views/templated'],
 
                 selectScript: function (script) {
                     Mist.machineAddController.set('newMachineScript', script);
-                    $('#create-machine-script-select').collapsible('collapse');
+                    $('#create-machine-script-select').collapsible().collapsible('collapse');
                 },
 
                 toggleNetworkSelection: function (network) {
@@ -338,18 +319,9 @@ define('app/views/machine_add', ['app/views/templated'],
 
 
             _selectKey: function (key) {
-
                 this.fieldIsReady('key');
 
                 Mist.machineAddController.set('newMachineKey', key);
-                $('#script').show();
-                $('#create-machine-monitoring').removeClass('ui-state-disabled');
-                $('#create-machine-network .ui-collapsible')
-                    .removeClass('ui-state-disabled')
-                    .parent()
-                    .trigger('create')
-                    .find('label')
-                    .removeClass('ui-corner-all');
             },
 
 
@@ -366,10 +338,11 @@ define('app/views/machine_add', ['app/views/templated'],
                         'Mist.machineAddController.newMachineProvider',
                         'Mist.machineAddController.newMachineLocation'),
 
-
-             formReadyObserver: function () {
-                Ember.run.once(this, 'updateLaunchButton');
-             }.observes('Mist.machineAddController.formReady')
+             providerObserver: function() {
+                 Ember.run.once(this, function(){
+                    if (this.changeProviderFlag) Mist.machineAddController.resetProvider();
+                 });
+             }.observes('Mist.machineAddController.newMachineProvider'),
         });
     }
 );
