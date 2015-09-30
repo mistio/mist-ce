@@ -101,6 +101,13 @@ define('app/views/log_list_item', ['app/views/list_item'],
             }.property('log.machine_id'),
 
 
+            scriptLink: function () {
+                var log = this.get('log');
+                var scriptId = log.get('script_id');
+                return Mist.scriptsController.getScript(scriptId);
+            }.property('log.script_id'),
+
+
             //
             //
             //  Initialization
