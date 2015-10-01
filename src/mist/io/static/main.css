@@ -828,6 +828,7 @@ ul.checkbox-list .ui-grid-b {
     font-weight: normal;
     display: inline-block;
     float: right;
+    max-width: 250px;
 }
 
 @media only screen and  (max-width: 600px) {
@@ -1550,6 +1551,9 @@ ul.checkbox-list .ui-grid-b {
 }
 .ui-slider {
     border-color: #b5b5b5 !important;
+}
+.ui-slider.ui-mini .ui-slider-label {
+    line-height: 29px;
 }
 .ui-slider .ui-slider-label {
     background-color: #fff !important;
