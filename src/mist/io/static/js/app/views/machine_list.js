@@ -10,6 +10,14 @@ define('app/views/machine_list', ['app/views/page'],
             templateName: 'machine_list',
             selectedMachine: null,
 
+            sortByState: function () {
+                return Mist.backendsController.get('sortBy') == 'state';
+            }.property('Mist.backendsController.sortBy'),
+
+            sortByName: function () {
+                return Mist.backendsController.get('sortBy') == 'name';
+            }.property('Mist.backendsController.sortBy'),
+
 
             //
             //  Initialization
@@ -112,6 +120,10 @@ define('app/views/machine_list', ['app/views/page'],
 
                 shellClicked: function () {
                     Mist.machineShellController.open(Mist.backendsController.selectedMachines[0]);
+                },
+
+                sortBy: function (criteria) {
+                    Mist.backendsController.set('sortBy', criteria);
                 },
 
                 selectClicked: function () {
