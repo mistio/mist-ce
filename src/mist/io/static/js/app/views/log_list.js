@@ -55,6 +55,7 @@ define('app/views/log_list', ['ember'],
             unload: function () {
                 Mist.logsController.set('view', null);
                 Mist.logsController.set('prettyTimeReady', false);
+                $(window).off('scroll');
             }.on('willDestroyElement'),
 
 
