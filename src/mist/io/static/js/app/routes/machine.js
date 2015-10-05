@@ -11,12 +11,27 @@ define('app/routes/machine', ['app/routes/base'],
         return App.MachineRoute = BaseRoute.extend({
 
             activate: function () {
+                Mist.logsController.unload();
                 Ember.run.next(this, function () {
                     var model = this.modelFor('machine');
                     var id = model._id || model.id;
                     var machine = Mist.backendsController.getMachine(id);
                     this.set('documentTitle', 'mist.io - ' + (machine ? machine.name : id));
+                    Ember.run.later(function(){
+                        var machine = Mist.backendsController.getMachine(id);
+                        var backend_id="";
+                        if (machine){
+                            backend_id = machine.backend.id
+                        }
+                        Mist.logsController.load();
+                        Mist.logsController.view.set('preFilterString', backend_id + ' ' + id );
+                        
+                    }, 1000);
                 });
+            },
+
+            exit: function() {
+                Mist.logsController.unload();
             },
 
             redirect: function (machine) {
