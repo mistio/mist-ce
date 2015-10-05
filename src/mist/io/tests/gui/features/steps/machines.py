@@ -321,3 +321,23 @@ def check_ssh_connection(context):
         assert time() + 1 < command_end_time, "Command output took too long"
         sleep(1)
     context.browser.find_element_by_id('shell-back').click()
+
+
+@then(u'I search for the "{text}" Machine')
+def search_image(context, text):
+    search_bar = context.browser.find_elements_by_class_name("ui-input-search")
+    assert len(search_bar) > 0, "Could not find the ui-input-search element"
+    assert len(search_bar) == 1, "Found more than one ui-input-search " \
+                                 "elements"
+    search_bar = search_bar[0]
+    search_bar = search_bar.find_elements_by_tag_name('input')
+    assert len(search_bar) > 0, "Could not find the machine search input"
+    assert len(search_bar) == 1, "Found more than one machine search input " \
+                                 "elements"
+    search_bar = search_bar[0]
+    if text == 'randomly_created':
+        text = context.random_name
+    for letter in text:
+        search_bar.send_keys(letter)
+    sleep(2)
+

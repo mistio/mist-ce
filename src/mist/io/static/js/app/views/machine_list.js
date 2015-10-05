@@ -10,6 +10,18 @@ define('app/views/machine_list', ['app/views/page'],
             templateName: 'machine_list',
             selectedMachine: null,
 
+            machines: function () {
+                return Mist.backendsController.get('sortedMachines').slice(0, Mist.backendsController.get('displayCount'));
+            }.property('Mist.backendsController.sortedMachines', 'Mist.backendsController.displayCount'),
+
+            sortByState: function () {
+                return Mist.backendsController.get('sortBy') == 'state';
+            }.property('Mist.backendsController.sortBy'),
+
+            sortByName: function () {
+                return Mist.backendsController.get('sortBy') == 'name';
+            }.property('Mist.backendsController.sortBy'),
+
 
             //
             //  Initialization
@@ -20,15 +32,25 @@ define('app/views/machine_list', ['app/views/page'],
                 Mist.machineAddController.set('selectedImage', null);
                 Mist.backendsController.on('onMachineProbe', this, 'updateFooter');
                 Mist.backendsController.on('onSelectedMachinesChange', this, 'updateFooter');
+                Mist.backendsController.set('displayCount', 30);
+                this._initializeScrolling();
             }.on('didInsertElement'),
 
             unload: function () {
-
                 // Remove event listeners
                 Mist.backendsController.off('onMachineProbe', this, 'updateFooter');
                 Mist.backendsController.off('onSelectedMachinesChange', this, 'updateFooter');
-
+                $(window).off('scroll');
             }.on('willDestroyElement'),
+
+            _initializeScrolling: function () {
+                $(window).on('scroll', function (e) {
+                    if (Mist.isScrolledToBottom() &&
+                        Mist.backendsController.get('machines').length > Mist.backendsController.get('displayCount')) {
+                            Mist.backendsController.set('displayCount', Mist.backendsController.get('displayCount') + 30);
+                    }
+                });
+            },
 
 
             //
@@ -112,6 +134,10 @@ define('app/views/machine_list', ['app/views/page'],
 
                 shellClicked: function () {
                     Mist.machineShellController.open(Mist.backendsController.selectedMachines[0]);
+                },
+
+                sortBy: function (criteria) {
+                    Mist.backendsController.set('sortBy', criteria);
                 },
 
                 selectClicked: function () {

@@ -256,21 +256,7 @@ define('app/views/graph_list_item', ['d3', 'c3'],
                     $('#' + this.id).parent().hide(500);
                 else
                     $('#' + this.id).parent().show(500);
-            }.observes('graph.isEmpty'),
-
-            fetchingStatsObserver: function () {
-                return; //TODO fixme
-                Ember.run.once(this, function () {
-                    if (Mist.graphsController.fetchingStats &&
-                        (!Mist.graphsController.stream.isStreaming ||
-                        Mist.graphsController.stream.firstStreamingCall))
-                            this.showFetchingStats();
-                    else
-                        this.hideFetchingStats();
-                });
-            }.observes('Mist.graphsController.fetchingStats',
-                'Mist.graphsController.stream.isStreaming',
-                'Mist.graphsController.stream.firstStreamingCall'),
+            }.observes('graph.isEmpty')
         });
     }
 );

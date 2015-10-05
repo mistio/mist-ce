@@ -21,11 +21,6 @@ define('app/controllers/machines', ['app/models/machine'],
             destroyingMachine: null,
             shutingdownMachine: null,
 
-            /* Let's disable sorting for now
-            sortAscending: true,
-            sortProperties: ['hasMonitoring', 'probed'],
-            */
-
             //
             //  Initialization
             //
@@ -281,7 +276,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     });
 
                     that._updateMonitoredMachines();
-
+                    Mist.backendsController._updateMachines();
                     that.trigger('onMachineListChange');
                 });
             },
