@@ -10,6 +10,7 @@ Feature: Actions for Images
     When I visit the Images page after the counter has loaded
     Then there should be starred Images
     When I search for a "django" Image
+    And I wait for 2 seconds
     And I click the button "Continue search on server"
     Then Images list should be loaded within 60 seconds
 #    When I star an Image that contains "django"
