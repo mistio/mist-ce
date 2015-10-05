@@ -47,6 +47,11 @@
 #machine-list-page #select-machines-btn:hover {
         color: #444 !important;
 }
+#select-machines-popup .icon-check:after {
+    font-size: 14px;
+    top: 1.3em;
+    color: #d4d4d4;
+}
 #machine-list-page .ui-filterable .ui-input-search {
     margin-right: 280px;
 }

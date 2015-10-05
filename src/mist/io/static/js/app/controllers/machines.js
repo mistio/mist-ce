@@ -21,11 +21,6 @@ define('app/controllers/machines', ['app/models/machine'],
             destroyingMachine: null,
             shutingdownMachine: null,
 
-            /* Let's disable sorting for now
-            sortAscending: true,
-            sortProperties: ['hasMonitoring', 'probed'],
-            */
-
             //
             //  Initialization
             //
