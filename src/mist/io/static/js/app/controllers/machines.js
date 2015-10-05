@@ -276,7 +276,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     });
 
                     that._updateMonitoredMachines();
-
+                    Mist.backendsController._updateMachines();
                     that.trigger('onMachineListChange');
                 });
             },
