@@ -53,6 +53,14 @@ define('app/controllers/machine_power', ['ember'],
                     }, 350)
                     return;
                 }
+                if (action == 'script'){
+                    var machine = this.machines[0];
+                    console.log(machine)
+                     Ember.run.later(function(){
+                        Mist.machineRunScriptController.open(machine);
+                    }, 350)
+                    return;
+                }
                 Ember.run.later(function () {
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.YES_NO,

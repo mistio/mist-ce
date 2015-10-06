@@ -28,6 +28,10 @@
         <a id="reboot-machine-option" class="ui-btn ui-btn-d ui-caps ui-shadow"
             {{action "actionClicked" "reboot" target=view}}>Reboot</a>
         {{/if}}
+        {{#if Mist.machinePowerController.canReboot}}
+        <a id="reboot-machine-option" class="ui-btn ui-btn-d ui-caps ui-shadow"
+            {{action "actionClicked" "script" target=view}}>Run Script</a>
+        {{/if}}
         {{#if Mist.machinePowerController.canDestroy}}
         <a id="destroy-machine-option" class="ui-btn ui-btn-d ui-caps ui-shadow"
             {{action "actionClicked" "destroy" target=view}}>Destroy</a>
