@@ -1345,11 +1345,11 @@ def get_machine_actions(machine_from_api, conn, extra):
     can_reboot = True
     can_tag = True
 
-    if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
-                     Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                     Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR):
-        can_tag = False
+    #if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
+    #                 Provider.NEPHOSCALE, Provider.SOFTLAYER,
+    #                 Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
+    #                 Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR):
+    #    can_tag = False
 
     # for other states
     if machine_from_api.state in (NodeState.REBOOTING, NodeState.PENDING):
@@ -1366,14 +1366,12 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_destroy = False
         can_stop = False
         can_reboot = False
-        can_tag = False
 
     if conn.type in ['bare_metal', 'coreos']:
         can_start = False
         can_destroy = False
         can_stop = False
         can_reboot = False
-        can_tag = False
 
         if extra.get('can_reboot', False):
         # allow reboot action for bare metal with key associated
@@ -3104,9 +3102,6 @@ def set_machine_tag(user, backend_id, machine_id, tag):
         raise RequiredParameterMissingError("tag")
     conn = connect_provider(backend)
 
-    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
-        raise MethodNotAllowedError("Adding metadata is not supported in %s"
-                                    % conn.type)
 
     unique_key = 'mist.io_tag-' + datetime.now().isoformat()
     pair = {unique_key: tag}
