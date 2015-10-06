@@ -25,23 +25,38 @@ define('app/views/log_list_item', ['app/views/list_item'],
             //
 
             details: function () {
+                var pinnedDetails = [ "params" , "stdout" , "extra_output" ]
+                var pinned = []
+                // TODO fix incoming data for script actions not to 
+                // include wrapper unneeded properties
+                var rejectProps = []
+                if ( !DEBUG_LOGS ){
+                    var rejectProps = ["command","wrapper_stdout"]
+                }
                 var details = [];
                 forIn(this.log, function (value, property) {
-                    if (property == 'time')
+                    if (property == 'time' || (rejectProps.indexOf(property) != -1))
                         return;
                     if (value !== undefined && value !== null)
-                        details.push({
-                            key: property,
-                            value: value instanceof Object ? JSON.stringify(value) : value
-                        });
+                      if(pinnedDetails.indexOf(property)!=-1){
+                            pinned[pinnedDetails.indexOf(property)]={
+                                key: property,
+                                value: value instanceof Object ? JSON.stringify(value) : value
+                            }
+                        }else{
+                            details.push({
+                                key: property,
+                                value: value instanceof Object ? JSON.stringify(value) : value
+                            });
+                        }
                 })
-                return details.sort(function (a, b) {
+                return pinned.concat(details.sort(function (a, b) {
                     if (a.key > b.key)
                         return 1;
                     if (a.key < b.key)
                         return -1;
                     return 0;
-                });
+                }));
             }.property('log'),
 
             collapsedClass: function () {

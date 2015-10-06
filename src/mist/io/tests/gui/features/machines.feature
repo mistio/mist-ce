@@ -29,6 +29,8 @@ Feature: Machines
     And I click the "Add" button inside the "Add key" popup
     And I wait for 2 seconds
     And I click the "Launch" button inside the "Create Machine" panel
+    And I wait for 2 seconds
+    Then I search for the "randomly_created" Machine
     Then I should see the "randomly_created" machine added within 10 seconds
     And "randomly_created" machine state should be "running" within 400 seconds
     When I wait for 5 seconds
