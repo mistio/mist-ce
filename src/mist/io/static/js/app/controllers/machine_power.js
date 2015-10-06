@@ -55,8 +55,7 @@ define('app/controllers/machine_power', ['ember'],
                 }
                 if (action == 'script'){
                     var machine = this.machines[0];
-                    console.log(machine)
-                     Ember.run.later(function(){
+                    Ember.run.later(function(){
                         Mist.machineRunScriptController.open(machine);
                     }, 350)
                     return;
