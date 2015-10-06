@@ -290,6 +290,19 @@ def go_to_some_page_after_counter_loading(context, title, counter_title):
 
     go_to_some_page_without_waiting(context, title)
 
+    end_time = time() + 5
+    list_of_things = context.browser.find_element_by_id('%s-list' % title.lower().rpartition(title[-1])[0])
+    while time() < end_time:
+        try:
+            items_loaded = list_of_things.find_elements_by_tag_name('li')
+            if len(items_loaded) > 0:
+                return
+        except NoSuchElementException:
+            pass
+        assert time() + 1 < end_time, "No elements where loaded after 5" \
+                                      " seconds"
+        sleep(1)
+
 
 @when(u'I visit the {title} page')
 def go_to_some_page_without_waiting(context, title):
@@ -298,8 +311,12 @@ def go_to_some_page_without_waiting(context, title):
     waiting for the counter or the list on the page to load.
     For now the code will not be very accurate for keys page
     """
-    if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts']:
+    if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts',
+                     'Account']:
         raise ValueError('The page given is unknown')
+    if title == 'Account':
+        context.browser.get(context.mist_config['MIST_URL'] + '/account')
+        return
     if not i_am_in_homepage(context):
         if not str(context.browser.current_url).endswith(title.lower()):
             context.execute_steps(u'When I click the button "Home"')

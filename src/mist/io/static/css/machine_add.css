@@ -45,9 +45,6 @@
     padding: 16px;
     width: 278px;
 }
-#machine-create .docker {
-    display:none;
-}
 #machine-create label {
     margin-top: 1em;
 }
@@ -80,7 +77,7 @@
     border: none;
 }
 #machine-create .ui-collapsible-heading {
-    text-transform: capitalize;
+    text-transform: initial;
 }
 #machine-create .ui-collapsible-heading > a {
     background-color: #fff !important;
@@ -152,18 +149,22 @@
     text-align: center;
     white-space: normal;
 }
-#create-machine-network {
-    display: none;
-}
 #create-machine-network fieldset {
+    margin-top: 0;
+}
+#create-machine-network fieldset label {
     margin-top: 0;
 }
 #create-machine-network .ui-collapsible-content {
     padding: 0;
 }
+#machine-create #script {
+    margin-top: 20px;
+}
 #machine-create #script .ui-slider {
     width: 40%;
     float: right;
+    margin-top: -35px;
 }
 #machine-create #script textarea {
     height: auto !important;

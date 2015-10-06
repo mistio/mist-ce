@@ -40,14 +40,7 @@ define('app/controllers/machine_add', ['ember'],
                 // Scrolling to top fixes that
                 $('#machine-create').find('[data-role="collapsible"]')
                     .collapsible('option', 'collapsedIcon', 'carat-d')
-                    .collapsible('collapse');
-                $('#machine-create .docker').hide();
-                $('#machine-create .azure').hide();
-                $('#create-machine-location').hide();
-                $('#create-machine-image').hide();
-                $('#create-machine-size').hide();
-                $('#create-machine-key').hide();
-                $('#create-machine-network').hide();               
+                    .collapsible('collapse');          
 
                 this._clear();
                 this._updateFormReady();
@@ -149,7 +142,7 @@ define('app/controllers/machine_add', ['ember'],
                 this.set('callback', null)
                     .set('newMachineName', '')
                     .set('newMachineScript', '')
-                    .set('newMachineKey', {'id' : 'Select Key'})
+                    .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
@@ -179,10 +172,16 @@ define('app/controllers/machine_add', ['ember'],
                     }
                 }
 
+                if (this.newMachineProvider.provider == 'docker' && !this.view.dockerNeedScript) {
+                    if(! this.newMachineDockerCommand) {
+                        formReady = false;
+                    }
+                }
+
                 if (this.newMachineImage.id &&
                     this.newMachineImage.get('isMist')) {
                         if (!Mist.keysController.keyExists(this.newMachineKey.id))
-                            formReady=false;
+                            formReady = false;
                 }
 
                 if (formReady && this.addingMachine) {
@@ -196,10 +195,39 @@ define('app/controllers/machine_add', ['ember'],
                 if (this.callback) this.callback(success, machine);
             },
 
+            _resetProvider: function() {
+                this.set('callback', null)
+                    .set('newMachineScript', '')
+                    .set('newMachineKey', {'title' : 'Select Key'})
+                    .set('newMachineSize', {'name' : 'Select Size'})
+                    .set('newMachineImage', {'name' : 'Select Image'})
+                    .set('newMachineLocation', {'name' : 'Select Location'})
+                    .set('newMachineDockerEnvironment', '')
+                    .set('newMachineDockerCommand', '')
+                    .set('newMachineScriptParams', '')
+                    .set('newMachineDockerPorts', '')
+                    .set('newMachineAzurePorts', '');
+            },
+
+            _selectUnique: function() {
+                // Locations Check
+                if (this.newMachineProvider.locations) {
+                    if (this.newMachineProvider.locations.model.length == 1) this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                }
+
+                // Sizes Check
+                if (this.newMachineProvider.sizes) {
+                    if (this.newMachineProvider.sizes.model.length == 1) this.set('newMachineSize', this.newMachineProvider.sizes.model[0]);
+                }
+            },
 
             //
             //  Observers
             //
+
+            providerObserver: function() {
+                Ember.run.once(this, '_selectUnique');
+            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
