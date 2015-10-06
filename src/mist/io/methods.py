@@ -3084,7 +3084,7 @@ def delete_network(user, backend_id, network_id):
         pass
 
 
-def set_machine_tag(user, backend_id, machine_id, tag):
+def set_machine_tag(user, backend_id, machine_id, tag_key, tag_value):
     """Sets metadata for a machine, given the backend and machine id.
 
     Libcloud handles this differently for each provider. Linode and Rackspace,
@@ -3098,13 +3098,15 @@ def set_machine_tag(user, backend_id, machine_id, tag):
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     backend = user.backends[backend_id]
-    if not tag:
-        raise RequiredParameterMissingError("tag")
+    if not tag_key:
+        raise RequiredParameterMissingError("tag_key")
+    if not tag_value:
+        raise RequiredParameterMissingError("tag_value")
+
     conn = connect_provider(backend)
 
 
-    unique_key = 'mist.io_tag-' + datetime.now().isoformat()
-    pair = {unique_key: tag}
+    pair = {tag_key: tag_value}
 
     if conn.type in config.EC2_PROVIDERS:
         try:
@@ -3126,7 +3128,7 @@ def set_machine_tag(user, backend_id, machine_id, tag):
             raise MachineNotFoundError(machine_id)
         if conn.type == 'gce':
             try:
-                machine.extra['tags'].append(tag)
+                machine.extra['tags'].append(tag_value)
                 conn.ex_set_node_tags(machine, machine.extra['tags'])
             except Exception as exc:
                 raise InternalServerError("error creating tag", exc)

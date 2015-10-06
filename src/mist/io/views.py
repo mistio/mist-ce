@@ -590,11 +590,19 @@ def set_machine_tag(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     try:
-        tag = request.json_body['tag']
+        tag = request.json_body['tags']
     except:
-        raise RequiredParameterMissingError('tag')
+        raise BadRequestError('tags should be list of tags')
+    if type(tags) != list:
+        raise BadRequestError('tags should be list of tags')
+
     user = user_from_request(request)
-    methods.set_machine_tag(user, backend_id, machine_id, tag)
+    for tag in tags:
+        try:
+            for tag_key, tag_value in tag.items():
+                methods.set_machine_tag(user, backend_id, machine_id, tag_key, tag_value)
+        except:
+            continue
     return OK
 
 
