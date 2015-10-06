@@ -28,7 +28,7 @@ class _HubTornadoConsumer(mist.io.amqp_tornado.Consumer):
         self.ready_callback = ready_callback
         self.lbl = lbl or ('%s (%s)' % (self.__class__.__name__, self.uuid))
         super(_HubTornadoConsumer, self).__init__(
-            amqp_url='amqp://rabbitmq',
+            amqp_url='amqp://' + mist.io.config.AMQP_URI,
             exchange=exchange,
             queue=self.uuid,
             exchange_type='topic',
