@@ -37,27 +37,31 @@
         <!-- Body -->
 
         <div role="main" class="ui-content" data-theme="a">
+            {{#if Mist.scriptsController.model.length}}
             <form {{action "runScript" on="submit" target=view}}>
-                {{#if Mist.scriptsController.model.length}}
-                 <div class="script-option ">
-                    <label>Select Script</label>
+
+
                     {{view "select" content=Mist.scriptsController.model
                         optionValuePath="content"
-                     optionLabelPath="content.name"
-                     value=Mist.machineRunScriptController.scriptToRun.script
-                     prompt="Select script"
+                        optionLabelPath="content.name"
+                        value=Mist.machineRunScriptController.scriptToRun.script
+                        prompt="Select script"
                      }}
                     {{view Mist.TextArea
-                           id="machine-run-script-params"
-                           placeholder="Optional script parameters"
-                           value=Mist.machineRunScriptController.scriptToRun.parameters}}
-                </div>
-                {{/if}}
+                        id="machine-run-script-params"
+                        placeholder="Optional script parameters"
+                        value=Mist.machineRunScriptController.scriptToRun.parameters
+                    }}
+
+
                 <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
                     <button type="submit" id="machine-run-script-ok"
                         class="ui-btn ui-btn-d ui-caps">RUN</button>
                 </div>
             </form>
+            {{else}}
+                <label> No scripts added.</label>
+            {{/if}}
         </div>
     </div>
 </div>

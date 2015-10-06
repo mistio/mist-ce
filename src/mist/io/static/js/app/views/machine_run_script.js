@@ -32,8 +32,11 @@ define('app/views/machine_run_script', ['app/views/popup'],
                     Mist.scriptsController.runScript({
                         script: Mist.machineRunScriptController.get('scriptToRun'),
                         callback: function(success) {
-                            if (success)
+                            if (success) {
                                 that.close();
+                                Mist.machineRunScriptController.get('scriptToRun').set('script', {})
+                                Mist.machineRunScriptController.get('scriptToRun').set('parameters', '')
+                            }
                         }
                     });
                 }
