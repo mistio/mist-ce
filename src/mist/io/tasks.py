@@ -607,6 +607,17 @@ class ListMachines(UserTask):
         from mist.io import methods
         user = user_from_email(email)
         machines = methods.list_machines(user, backend_id)
+        if multi_user:
+            for machine in machines:
+                kwargs = {}
+                kwargs['backend_id'] = backend_id
+                kwargs['machine_id'] = machine.get('id')
+                from mist.core.methods import list_tags
+                mistio_tags = list_tags(user, resource_type='machine', **kwargs)
+                mistio_tags = [json.dumps(tag) for tag in mistio_tags]
+                for tag in mistio_tags:
+                    machine['tags'].append(tag)
+                # FIXME: improve
         log.warn('Returning list machines for user %s backend %s' % (email, backend_id))
         return {'backend_id': backend_id, 'machines': machines}
 
