@@ -1,63 +1,44 @@
 
 /* Machine Tags View CSS
 -----------------------------------------------------------------------------------------------------------*/
-#machine-tags-popup-popup {
-    left: 10px !important;
-    margin-bottom: 55px !important;
+#machine-tags-popup .field-wrapper {
+    margin: 0;
 }
 #machine-tags-popup .field-wrapper .ui-input-text,
-#machine-tags-popup .field-wrapper .divider,
 #machine-tags-popup .field-wrapper .ui-btn {
     float: left;
     display: block;
     box-sizing: border-box;
 }
-#machine-tags-popup .field-wrapper .divider {
-    margin: 8px auto;
-    background-color: #d4d4d4;
-    color: #444;
-    line-height: 21px;
-    padding: 5.5px 2px;
-    border-top: 1px solid #b5b5b5;
-    border-bottom: 1px solid #b5b5b5;
-}
 #machine-tags-popup .field-wrapper .ui-input-text {
-    width: calc(100% - 63px);
-}
-#machine-tags-popup .field-wrapper.pair .ui-input-text {
-    width: 95px;
+    width: 41%;
+    margin-right: 5%;
 }
 #machine-tags-popup .field-wrapper .ui-btn {
-    padding: 5.5px 10px;
+    padding: 5.5px 8px;
+    margin-left: 3px;
     width: initial;
     line-height: 21px;
+    text-indent: initial;
+    color: #d96557;
+    background-color: transparent;
+    border: none;
+}
+#machine-tags-popup .field-wrapper .ui-btn:after {
+    font-size: 14px;
+    margin-top: -5px;
+}
+#machine-tags-popup .field-wrapper .ui-btn:hover {
+    color: #d96557 !important;
+}
+
+#machine-tags-popup .field-wrapper .ui-btn:active {
+    color: #d96557 !important;
 }
 #machine-tags-popup .field-wrapper:after {
     content: '';
     clear: both;
     display: table;
-}
-#machine-tags-popup .ui-listview {
-    margin: 10px auto 0;
-}
-#machine-tags-popup .small-list-item {
-    padding: 5px 10px;
-    border-radius: 0;
-}
-#machine-tags-popup .ui-listview p {
-    display: inline-block;
-    margin: 5px 0;
-    top: 0;
-}
-#machine-tags-popup .ui-listview .ui-btn {
-    margin: 0 0 0 10px;
-    padding: 0;
-    text-decoration: none;
-    outline: none;
-    color: rgba(0,0,0,0.2);
-    background-color: transparent;
-    width: auto;
-    border: none;
 }
 #machine-tags-popup .ui-listview .ui-btn:after {
     font-size: 12px;
