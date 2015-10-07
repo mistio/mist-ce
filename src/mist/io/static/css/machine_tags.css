@@ -6,15 +6,28 @@
     margin-bottom: 55px !important;
 }
 #machine-tags-popup .field-wrapper .ui-input-text,
-#machine-tags-popup .field-wrapper #add-tag-ok {
+#machine-tags-popup .field-wrapper .divider,
+#machine-tags-popup .field-wrapper .ui-btn {
     float: left;
     display: block;
     box-sizing: border-box;
 }
+#machine-tags-popup .field-wrapper .divider {
+    margin: 8px auto;
+    background-color: #d4d4d4;
+    color: #444;
+    line-height: 21px;
+    padding: 5.5px 2px;
+    border-top: 1px solid #b5b5b5;
+    border-bottom: 1px solid #b5b5b5;
+}
 #machine-tags-popup .field-wrapper .ui-input-text {
     width: calc(100% - 63px);
 }
-#machine-tags-popup .field-wrapper #add-tag-ok {
+#machine-tags-popup .field-wrapper.pair .ui-input-text {
+    width: 95px;
+}
+#machine-tags-popup .field-wrapper .ui-btn {
     padding: 5.5px 10px;
     width: initial;
     line-height: 21px;

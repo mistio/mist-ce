@@ -12,13 +12,20 @@
 
     <div data-role="content" data-theme="a">
 
-        <form {{action "addClicked" on="submit" target=view}}>
+{{!--         <form {{action "addClicked" on="submit" target=view}}>
             <div class="field-wrapper">
                 {{view Mist.TextField value=Mist.machineTagsController.newTag}}
 
                 <button type="submit" id="add-tag-ok" class="ui-btn ui-btn-d ui-caps">Add</button>
             </div>
-        </form>
+        </form> --}}
+
+        <div class="field-wrapper pair">
+            {{input placeholder="key"}}
+            <span class="divider">:</span>
+            {{input placeholder="value"}}
+            <a class="ui-btn ui-btn-d ui-caps">Add</a>
+        </div>
 
         {{#if Mist.machineTagsController.addingTag}}
             <div class="ajax-loader"></div>
