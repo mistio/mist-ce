@@ -11,12 +11,12 @@ define('app/controllers/machine_tags', ['ember'],
              *  Properties
              */
 
-            formReady: null,
-            newTags: null,
-            machine: null,
-            callback: null,
-            addingTag: null,
-            deletingTag: null,
+             formReady: null,
+             newTags: null,
+             machine: null,
+             callback: null,
+             addingTag: null,
+             deletingTag: null,
 
 
             /**
@@ -60,49 +60,49 @@ define('app/controllers/machine_tags', ['ember'],
                     machine = this.machine,
                     tags = [];
 
+                    // create the final array with non-empty key-value pairs
                     this.newTags.forEach(function(tag) {
                         if (tag.key) tags.push(tag);
                     });
 
-                    console.log(tags);
-
-                    //     this.set('addingTag', true);
-                    //     Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
-                    //         'tag': tag
-                    //     }).success(function () {
-                    //         // TODO: move to seperate function and trigger event
-                    //         machine.tags.pushObject(tag);
-                    //     }).error(function () {
-                    //         Mist.notificationController.notify('Failed to add tag: ' + tag);
-                    //     }).complete(function (success) {
-                    //         that.setProperties({
-                    //             addingTag: false,
-                    //             newTag: null
-                    //         });
-                    //         if (that.callback) that.callback(success, tag);
-                    //     });
+                    if (tags.length) {
+                        this.set('addingTag', true);
+                        Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
+                            'tags': tags
+                        })
+                        .success(function () {
+                            // perhaps a success message here
+                        })
+                        .error(function (message) {
+                            Mist.notificationController.notify('Failed to add tags: ' + message);
+                        })
+                        .complete(function (success) {
+                            that.setProperties({
+                                addingTag: false
+                            });
+                            if (that.callback) that.callback(success, tag);
+                        });
+                    }
                 }
             },
 
 
             deleteTag: function (tag) {
                 var that = this,
-                machine = this.machine;
+                machine = this.machine;                
 
-                this.newTags.removeObject(tag);
-
-                // this.set('deletingTag', true);
-                // Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag, {
-                //     'tag': tag
-                // }).success(function () {
-                //     // TODO: move to seperate function and trigger event
-                //     machine.tags.removeObject(tag);
-                // }).error(function () {
-                //     Mist.notificationController.notify('Failed to delete tag :' + tag);
-                // }).complete(function (success) {
-                //     that.set('deletingTag', false);
-                //     if (that.callback) that.callback(success, tag);
-                // });
+                this.set('deletingTag', true);
+                Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.id)
+                .success(function () {
+                    this.newTags.removeObject(tag);
+                })
+                .error(function () {
+                    Mist.notificationController.notify('Failed to delete tag :' + tag.key);
+                })
+                .complete(function (success) {
+                    that.set('deletingTag', false);
+                    if (that.callback) that.callback(success, tag);
+                });
             },
 
 
@@ -122,7 +122,7 @@ define('app/controllers/machine_tags', ['ember'],
 
             _updateTags: function() {
                 if (this.machine) {
-                    console.log(this.machine.tags);
+                    // logic to handle socket data
                 }
             },
 
@@ -147,7 +147,7 @@ define('app/controllers/machine_tags', ['ember'],
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newTags.[]'),
+            }.observes('newTags.[]', 'addingTag'),
 
             tagsObserver: function() {
                 Ember.run.once(this, '_updateTags');
