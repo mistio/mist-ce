@@ -41,7 +41,7 @@
         <div class="ui-content ui-body-a" role="main">
 
             <!-- Key Name Field -->
-            <div class="form-field">
+            <div id="key-add-id-container" class="form-field required {{if Mist.keyAddController.keyId 'filled' 'empty'}}">
                 <label for="key-add-id">Name</label>
 
                 {{view Mist.TextField id="key-add-id"
@@ -50,7 +50,7 @@
 
 
             <!-- Key Private Field -->
-            <div class="form-field">
+            <div id="key-add-private-container" class="form-field required {{if Mist.keyAddController.keyPrivate 'filled' 'empty'}}">
                 <label for="key-add-private">Private Key
                     {{#if Mist.keyAddController.generatingKey}}
                         <div id="key-generate-loader" class="ajax-loader key-add-loader"></div>

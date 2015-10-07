@@ -18,6 +18,9 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             imageCount: 0,
             machineCount: 0,
             networkCount: 0,
+            machines: [],
+            sortBy: 'state',
+            displayCount: 30,
             selectedMachines: [],
             selectedNetworks: [],
             machineRequest: false,
@@ -41,6 +44,13 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             hasNetworks: function () {
                 return !!this.model.findBy('hasNetworks', true);
             }.property('model.[].hasNetworks'),
+
+            sortedMachines: Ember.computed.sort('machines', function(a, b){
+                if (Mist.backendsController.sortBy == 'name')
+                    return a.name.localeCompare(b.name)
+                else
+                    return b.get('stateWeight') - a.get('stateWeight');
+            }).property('machines', 'sortBy', 'machines.@each.stateWeight', 'machines.@each.name'),
 
 
             //
@@ -404,10 +414,23 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 });
             },
 
+            _updateMachines: function () {
+                var backends = Mist.backendsController.model;
+                var machineList = [];
+                backends.forEach(function (backend) {
+                    machineList.pushObjects(backend.machines.model);
+                });
+                this.set('machines', machineList);
+            },
+
 
             //
             //  Observers
             //
+
+            machineObserver: function () {
+                Ember.run.next(this, '_updateMachines');
+            }.observes('model.@each.machines'),
 
             imageCountObserver: function() {
                 Ember.run.once(this, '_updateImageCount');

@@ -58,6 +58,36 @@ define('app/models/machine', ['ember'],
             //  Computed Properties
             //
 
+            incidents: function () {
+                return incidents = Mist.openIncidents.filterBy('machineId', this.get('id'));
+            }.property('Mist.openIncidents.@each.machine'),
+
+            stateWeight: function () {
+                var weight = 0,
+                    states = {
+                        error: 6,
+                        pending: 5,
+                        rebooting: 4,
+                        unknown: 3,
+                        running: 2,
+                        terminated: 1,
+                        stopped: 0
+                    };
+
+                weight = 100000 * states[this.get('state')];
+
+                if(this.get('hasMonitoring'))
+                    weight += 10000 * (1 + this.get('incidents').length/100);
+
+                if(this.get('probed')) {
+                    if(this.get('loadavg1')>0)
+                        weight += 1000 * (1 + (this.get('cores')/this.get('loadavg1')/100));
+                    weight += 100 * (1 + this.get('loss')/100) + 10 * (1 + this.get('latency')/10000);
+                }
+
+                return weight;
+            }.property('state', 'hasMonitoring', 'incidents', 'loadavg1', 'loss', 'latency'),
+
             isUnknown: function () {
                 return this.get('state') == 'unknown';
             }.property('state'),
