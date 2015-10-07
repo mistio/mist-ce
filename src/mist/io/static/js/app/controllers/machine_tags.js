@@ -65,10 +65,12 @@ define('app/controllers/machine_tags', ['ember'],
                         if (tag.key) tags.push(tag);
                     });
 
-                    if (tags.length) {
-                        this.set('addingTag', true);
+                    if (tags.length) {                        
                         Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
                             'tags': tags
+                        })
+                        .beforeSend(function() {
+                            that.set('addingTag', true);
                         })
                         .success(function () {
                             // perhaps a success message here
@@ -91,8 +93,10 @@ define('app/controllers/machine_tags', ['ember'],
                 var that = this,
                 machine = this.machine;                
 
-                this.set('deletingTag', true);
                 Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.id)
+                .beforeSend(function() {
+                    that.set('deletingTag', true);
+                })
                 .success(function () {
                     this.newTags.removeObject(tag);
                 })
