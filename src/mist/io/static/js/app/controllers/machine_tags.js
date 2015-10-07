@@ -101,7 +101,7 @@ define('app/controllers/machine_tags', ['ember'],
                     this.newTags.removeObject(tag);
                 })
                 .error(function () {
-                    Mist.notificationController.notify('Failed to delete tag :' + tag.key);
+                    Mist.notificationController.notify('Failed to delete tag: ' + tag.key);
                 })
                 .complete(function (success) {
                     that.set('deletingTag', false);
