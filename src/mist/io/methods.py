@@ -1441,16 +1441,16 @@ def list_machines(user, backend_id):
         if type(tags) == list:
             tags = [{'key': key, 'value': ''} for tag in tags]
 
-        if m.extra.get('availability', None):
-            # for EC2
-            tags.append({'key': 'availability', 'value': m.extra['availability']})
-        elif m.extra.get('DATACENTERID', None):
-            # for Linode
-            dc = config.LINODE_DATACENTERS[m.extra['DATACENTERID']]
-            tags.append({'key': 'DATACENTERID', 'value':dc})
-        elif m.extra.get('vdc', None):
-            # for vCloud
-            tags.append({'key': 'vdc', 'value': m.extra['vdc']})
+        #if m.extra.get('availability', None):
+        #    # for EC2
+        #    tags.append({'key': 'availability', 'value': m.extra['availability']})
+        #elif m.extra.get('DATACENTERID', None):
+        #    # for Linode
+        #    dc = config.LINODE_DATACENTERS[m.extra['DATACENTERID']]
+        #    tags.append({'key': 'DATACENTERID', 'value':dc})
+        #elif m.extra.get('vdc', None):
+        #    # for vCloud
+        #    tags.append({'key': 'vdc', 'value': m.extra['vdc']})
 
         image_id = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
