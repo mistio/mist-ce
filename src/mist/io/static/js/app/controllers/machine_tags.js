@@ -65,13 +65,14 @@ define('app/controllers/machine_tags', ['ember'],
                         if (tag.key) {
                             tags.push(tag);
 
-                            var key = tag.key,
-                            value = tag.value;
-                            payload.push({key : value});
+                            var newTag = {};
+                            newTag[tag.key] = tag.value;
+                            payload.push(newTag);
                         }
                     });
 
                     console.log(tags);
+                    console.log(payload);
 
                     if (tags.length) {
                         Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
