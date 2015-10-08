@@ -1842,6 +1842,17 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
     #FIXME: Neutron API not currently supported by libcloud
     #need to pass the network on create node - can only omitted if one network only exists
 
+    # select the right OpenStack network object
+    available_networks = conn.ex_list_networks()
+    try:
+        chosen_networks = []
+        for net in available_networks:
+            if net.id in networks:
+                chosen_networks.append(net)
+    except:
+        chosen_networks = []
+
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(name=machine_name,
@@ -1851,7 +1862,8 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
-                ex_keyname=server_key)
+                ex_keyname=server_key,
+                networks=chosen_networks)
         except Exception as e:
             raise MachineCreationError("HP Cloud, got exception %s" % e, e)
     return node
@@ -2901,7 +2913,7 @@ def list_networks(user, backend_id):
                 'name': network.name,
                 'extra': network.extra,
             })
-    elif conn.type in [Provider.OPENSTACK]:
+    elif conn.type in [Provider.OPENSTACK, Provider.HPCLOUD]:
         networks = conn.ex_list_neutron_networks()
         for network in networks:
             ret.append(openstack_network_to_dict(network))
