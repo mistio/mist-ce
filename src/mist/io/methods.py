@@ -1438,7 +1438,7 @@ def list_machines(user, backend_id):
         # optimize for js
         if type(tags) == dict:
             tags = [{'key': key, 'value': value} for key, value in tags.iteritems() if key != 'Name']
-        if type(tags) == list:
+        elif type(tags) == list:
             tags = [{'key': key, 'value': ''} for tag in tags]
 
         #if m.extra.get('availability', None):
