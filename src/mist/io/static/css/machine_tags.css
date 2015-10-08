@@ -3,7 +3,6 @@
 -----------------------------------------------------------------------------------------------------------*/
 #machine-tags-popup {
     width: 500px !important;
-    max-width: 100%;
 }
 #machine-tags-popup .field-wrapper {
     margin: 0;
@@ -19,8 +18,8 @@
     margin-right: 2%;
 }
 #machine-tags-popup .field-wrapper .ui-btn {
+    float: right;
     padding: 5.5px 8px;
-    margin-left: 2%;
     width: initial;
     line-height: 21px;
     text-indent: initial;
@@ -29,6 +28,9 @@
     border: none;
 }
 @media only screen and  (max-width: 500px) {
+    #machine-tags-popup {
+        width: 100% !important;
+    }
     #machine-tags-popup .field-wrapper .ui-input-text {
         width: 43%;
         margin-right: 2%;

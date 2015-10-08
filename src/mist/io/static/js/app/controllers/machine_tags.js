@@ -91,22 +91,26 @@ define('app/controllers/machine_tags', ['ember'],
 
             deleteTag: function (tag) {
                 var that = this,
-                machine = this.machine;                
+                machine = this.machine;
 
-                Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.key)
-                .beforeSend(function() {
-                    that.set('deletingTag', true);
-                })
-                .success(function () {
+                if (tag.key) {   
+                    Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.key)
+                    .beforeSend(function() {
+                        that.set('deletingTag', true);
+                    })
+                    .success(function () {
+                        this.newTags.removeObject(tag);
+                    })
+                    .error(function () {
+                        Mist.notificationController.notify('Failed to delete tag: ' + tag.key);
+                    })
+                    .complete(function (success) {
+                        that.set('deletingTag', false);
+                        if (that.callback) that.callback(success, tag);
+                    });
+                } else {
                     this.newTags.removeObject(tag);
-                })
-                .error(function () {
-                    Mist.notificationController.notify('Failed to delete tag: ' + tag.key);
-                })
-                .complete(function (success) {
-                    that.set('deletingTag', false);
-                    if (that.callback) that.callback(success, tag);
-                });
+                }
             },
 
 
