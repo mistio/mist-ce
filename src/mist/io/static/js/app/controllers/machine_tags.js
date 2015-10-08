@@ -64,6 +64,7 @@ define('app/controllers/machine_tags', ['ember'],
                     this.newTags.forEach(function(tag) {
                         if (tag.key) tags.push(tag);
                     });
+                    console.log(tags);                   
 
                     if (tags.length) {                        
                         Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
@@ -73,7 +74,7 @@ define('app/controllers/machine_tags', ['ember'],
                             that.set('addingTag', true);
                         })
                         .success(function () {
-                            // perhaps a success message here
+                            that.close();
                         })
                         .error(function (message) {
                             Mist.notificationController.notify('Failed to add tags: ' + message);
@@ -90,27 +91,7 @@ define('app/controllers/machine_tags', ['ember'],
 
 
             deleteTag: function (tag) {
-                var that = this,
-                machine = this.machine;
-
-                if (tag.key) {   
-                    Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.key)
-                    .beforeSend(function() {
-                        that.set('deletingTag', true);
-                    })
-                    .success(function () {
-                        this.newTags.removeObject(tag);
-                    })
-                    .error(function () {
-                        Mist.notificationController.notify('Failed to delete tag: ' + tag.key);
-                    })
-                    .complete(function (success) {
-                        that.set('deletingTag', false);
-                        if (that.callback) that.callback(success, tag);
-                    });
-                } else {
-                    this.newTags.removeObject(tag);
-                }
+                this.newTags.removeObject(tag);
             },
 
 
