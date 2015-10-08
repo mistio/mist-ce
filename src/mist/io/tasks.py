@@ -614,7 +614,6 @@ class ListMachines(UserTask):
                 kwargs['machine_id'] = machine.get('id')
                 from mist.core.methods import list_tags
                 mistio_tags = list_tags(user, resource_type='machine', **kwargs)
-                mistio_tags = [json.dumps(tag) for tag in mistio_tags]
                 for tag in mistio_tags:
                     machine['tags'].append(tag)
                 # FIXME: improve
