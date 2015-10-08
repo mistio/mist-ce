@@ -94,7 +94,7 @@ define('app/views/machine_shell', ['app/views/popup'],
 
         function afterOpenHandler (e) {
             $(e.currentTarget).off('blur');
-            // $(document).off('focusin');
+            $(document).off('focusin');
 
             // Initialize shell after popup opens when user is on desktop
             // because dekstop calibration is performance intensive and will
