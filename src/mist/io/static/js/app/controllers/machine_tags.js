@@ -58,17 +58,24 @@ define('app/controllers/machine_tags', ['ember'],
                 if (this.formReady) {
                     var that = this,
                     machine = this.machine,
-                    tags = [];
+                    tags = [], payload = [];
 
                     // create the final array with non-empty key-value pairs
                     this.newTags.forEach(function(tag) {
-                        if (tag.key) tags.push(tag);
-                    });
-                    console.log(tags);                   
+                        if (tag.key) {
+                            tags.push(tag);
 
-                    if (tags.length) {                        
+                            var key = tag.key,
+                            value = tag.value;
+                            payload.push({key : value});
+                        }
+                    });
+
+                    console.log(tags);
+
+                    if (tags.length) {
                         Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
-                            'tags': tags
+                            'tags': payload
                         })
                         .beforeSend(function() {
                             that.set('addingTag', true);
