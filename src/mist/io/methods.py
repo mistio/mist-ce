@@ -1436,7 +1436,7 @@ def list_machines(user, backend_id):
         else:
             tags = m.extra.get('tags') or m.extra.get('metadata') or {}
         if type(tags) == dict:
-            tags = [value for key, value in tags.iteritems() if key != 'Name']
+            tags = [{value:key} for key, value in tags.iteritems() if key != 'Name']
 
         if m.extra.get('availability', None):
             # for EC2
