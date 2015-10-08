@@ -1,6 +1,10 @@
 
 /* Machine Tags View CSS
 -----------------------------------------------------------------------------------------------------------*/
+#machine-tags-popup {
+    width: 500px !important;
+    max-width: 100%;
+}
 #machine-tags-popup .field-wrapper {
     margin: 0;
 }
@@ -11,18 +15,24 @@
     box-sizing: border-box;
 }
 #machine-tags-popup .field-wrapper .ui-input-text {
-    width: 41%;
-    margin-right: 5%;
+    width: 45%;
+    margin-right: 2%;
 }
 #machine-tags-popup .field-wrapper .ui-btn {
     padding: 5.5px 8px;
-    margin-left: 3px;
+    margin-left: 2%;
     width: initial;
     line-height: 21px;
     text-indent: initial;
     color: #d96557;
     background-color: transparent;
     border: none;
+}
+@media only screen and  (max-width: 500px) {
+    #machine-tags-popup .field-wrapper .ui-input-text {
+        width: 43%;
+        margin-right: 2%;
+    }
 }
 #machine-tags-popup .field-wrapper .ui-btn:after {
     font-size: 14px;

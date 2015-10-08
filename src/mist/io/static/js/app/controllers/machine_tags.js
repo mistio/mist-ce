@@ -93,7 +93,7 @@ define('app/controllers/machine_tags', ['ember'],
                 var that = this,
                 machine = this.machine;                
 
-                Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.id)
+                Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.key)
                 .beforeSend(function() {
                     that.set('deletingTag', true);
                 })
