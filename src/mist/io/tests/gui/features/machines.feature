@@ -66,7 +66,7 @@ Feature: Machines
   Scenario: Connect with ssh
     When I visit the Machines page after the counter has loaded
     And I click the button "sshtesting"
-    And I wait for 2 seconds
+    And I expect for "single-machine-page" page to appear within max 2 seconds
     Given ssh key with name "TESTING_MACHINE" is added
     Then I click the button "Shell"
     And I test the ssh connection

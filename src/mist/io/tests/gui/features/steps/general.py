@@ -93,8 +93,7 @@ def wait_for_splash_to_load(context, timeout=60):
 def wait(context, seconds):
     sleep(int(seconds))
     
-    					#driver=context.browser
-    					#driver.implicitly_wait(int(seconds))
+    					
 
 @when(u'I wait for {seconds} seconds')
 def wait(context, seconds):
@@ -141,8 +140,7 @@ def wait_for_panel_to_disappear(context,popup_name,seconds=2):
             panel = context.browser.find_element_by_id(panel_title)
             
             if 'ui-collapsible-collapsed' in panel.get_attribute('class'):
-             #import ipdb
-             #ipdb.set_trace()
+            
              return
         except NoSuchElementException:
             sleep(1)
@@ -240,8 +238,31 @@ def wait_for_page_to_appear(context, page_title, seconds=2):
 
         except NoSuchElementException:
             sleep(1)
-    assert False, u'Page %s did not appear after %s seconds' %(page_title, seconds)
+    assert False, u'Page %s did not appear after %s seconds' %(page_title, seconds) 
     
+    
+   
+@when(u'I expect for "{loader_name}" loader to finish within max {seconds} seconds')
+def loader_name_waiting_with_timeout(context, loader_name, seconds):
+    """Function that wait for loader_name to finish for a maximum amount of time
+    """
+
+    wait_for_loader_to_finish(context,loader_name, seconds)
+
+
+def wait_for_loader_to_finish(context,loader_name, seconds):
+    end = time() + int(seconds)
+    while time() < end:
+        try:
+            loader = context.browser.find_element_by_id(loader_name)
+            if loader:
+            
+             return
+        except NoSuchElementException:
+            sleep(1)
+    assert False, u'Loader %s did not finish after %s seconds' %(loader_name,seconds)
+    
+
     
       
 @then(u'I click the button "{text}"')
