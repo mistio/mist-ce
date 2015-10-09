@@ -29,7 +29,7 @@ define('app/controllers/machine_tags', ['ember'],
                 this._clear();
                 this.setProperties({
                     machine: machine,
-                    newTags: machine.tags,
+                    newTags: machine.tags.length ? machine.tags : [{key: null, value: null}],
                     callback: callback
                 });
                 this._updateFormReady();
@@ -50,7 +50,7 @@ define('app/controllers/machine_tags', ['ember'],
                         key: null,
                         value: null
                     });
-                });                    
+                });
             },
 
 
@@ -65,13 +65,14 @@ define('app/controllers/machine_tags', ['ember'],
                         if (tag.key) {
                             tags.push(tag);
 
-                            var key = tag.key,
-                            value = tag.value;
-                            payload.push({key : value});
+                            var newTag = {};
+                            newTag[tag.key] = tag.value;
+                            payload.push(newTag);
                         }
                     });
 
                     console.log(tags);
+                    console.log(payload);
 
                     if (tags.length) {
                         Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
