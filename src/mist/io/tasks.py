@@ -614,9 +614,11 @@ class ListMachines(UserTask):
                 kwargs['machine_id'] = machine.get('id')
                 from mist.core.methods import list_tags
                 mistio_tags = list_tags(user, resource_type='machine', **kwargs)
+                # optimized for js
                 for tag in mistio_tags:
-                    machine['tags'].append(tag)
-                # FIXME: improve
+                    for key, value in tag.items():
+                        machine['tags'].append({'key': key, 'value': value})
+                # FIXME: optimize!
         log.warn('Returning list machines for user %s backend %s' % (email, backend_id))
         return {'backend_id': backend_id, 'machines': machines}
 
