@@ -27,6 +27,7 @@ define('app/controllers/machine_tags', ['ember'],
 
              open: function (machine, callback) {
                 this._clear();
+                console.log(machine.tags.length);
                 this.setProperties({
                     machine: machine,
                     newTags: machine.tags.length ? machine.tags : [{key: null, value: null}],
@@ -82,6 +83,7 @@ define('app/controllers/machine_tags', ['ember'],
                             that.set('addingTag', true);
                         })
                         .success(function () {
+                            that._updateTags(tags);
                             that.close();
                         })
                         .error(function (message) {
@@ -117,16 +119,30 @@ define('app/controllers/machine_tags', ['ember'],
                 });
             },
 
-            _updateTags: function() {
-                if (this.machine) {
-                    // logic to handle socket data
-                }
+            _updateTags: function (tags) {
+                Ember.run(this, function () {
+                    this.get('machine').set('tags', tags);
+                    this.set('newTags', tags);
+                });
             },
 
             _updateFormReady: function() {
-                var formReady = false;
+                var formReady = false, tagsKeys = [], duplicate = false;
                 if (this.newTags && this.newTags.length) {
-                    formReady = true;
+                    this.newTags.forEach(function(tag) {
+                        if (tag.key) {
+                            // create an array with keys and check for duplicates
+                            if (tagsKeys.indexOf(tag.key) == -1) {
+                                tagsKeys.push(tag.key);
+                            } else {
+                                duplicate = true;
+                            }
+                        }
+                    });
+
+                    if (!duplicate) {
+                        formReady = true;
+                    }
 
                     if (formReady && this.addingTag) {
                         formReady = false;
@@ -144,11 +160,7 @@ define('app/controllers/machine_tags', ['ember'],
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newTags.[]', 'addingTag'),
-
-            tagsObserver: function() {
-                Ember.run.once(this, '_updateTags');
-            }.observes('machine.tags.[]')
+            }.observes('newTags.@each.key', 'addingTag')
         });
 }
 );
