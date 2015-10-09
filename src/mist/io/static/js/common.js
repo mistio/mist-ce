@@ -189,10 +189,6 @@ function Ajax (csrfToken) {
                 ret.error = callback;
                 return call;
             };
-            call.beforeSend = function(callback) {
-                ret.beforeSend = callback;
-                return call;
-            };
             call.complete = function(callback) {
                 ret.complete = callback;
                 return call;

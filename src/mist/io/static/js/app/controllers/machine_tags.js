@@ -7,33 +7,30 @@ define('app/controllers/machine_tags', ['ember'],
      function () {
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            // Properties
+            //
 
              formReady: null,
-             newTags: null,
+             newTags: [],
              machine: null,
              callback: null,
              addingTag: null,
              deletingTag: null,
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            // Methods
+            //
 
-             open: function (machine, callback) {
+            open: function (machine, callback) {
                 this._clear();
-                console.log(machine.tags.length);
                 this.setProperties({
                     machine: machine,
                     newTags: machine.tags.length ? machine.tags : [{key: null, value: null}],
                     callback: callback
                 });
-                this._updateFormReady();
+                this.newTags.removeArrayObserver(this.machine.tags);
                 Ember.run.next(function () {
                     $('#machine-tags-popup').popup('open');
                 });
@@ -45,12 +42,11 @@ define('app/controllers/machine_tags', ['ember'],
                 this._clear();
             },
 
+
             addItem: function() {
-                Ember.run(this, function() {
-                    this.newTags.pushObject({
-                        key: null,
-                        value: null
-                    });
+                this.newTags.pushObject({
+                    key: null,
+                    value: null
                 });
             },
 
@@ -66,50 +62,68 @@ define('app/controllers/machine_tags', ['ember'],
                         if (tag.key) {
                             tags.push(tag);
 
+                            // change format for API
                             var newTag = {};
                             newTag[tag.key] = tag.value;
                             payload.push(newTag);
                         }
                     });
 
-                    console.log(tags);
-                    console.log(payload);
+                    that.set('addingTag', true);
+                    Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
+                        'tags': payload
+                    })
+                    .success(function () {
+                        that._updateTags(tags);
+                        that.close();
+                    })
+                    .error(function (message) {
+                        Mist.notificationController.notify('Failed to add tags: ' + message);
+                    })
+                    .complete(function (success) {
+                        that.set('addingTag', false);
+                        if (that.callback) that.callback(success, tag);
+                    });
+                }
+            },
 
-                    if (tags.length) {
-                        Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
-                            'tags': payload
-                        })
-                        .beforeSend(function() {
-                            that.set('addingTag', true);
-                        })
-                        .success(function () {
-                            that._updateTags(tags);
-                            that.close();
-                        })
-                        .error(function (message) {
-                            Mist.notificationController.notify('Failed to add tags: ' + message);
-                        })
-                        .complete(function (success) {
-                            that.setProperties({
-                                addingTag: false
-                            });
-                            if (that.callback) that.callback(success, tag);
-                        });
-                    }
+            // Delete tag's line for core
+            deleteTagLine: function (tag) {
+                console.log(this.newTags);
+                console.log(this.newTags.contains(tag));
+                console.log(this.machine.tags);
+                console.log(this.machine.tags.contains(tag));
+                this.newTags.removeObject(tag);
+            },
+
+            // Delete tag on server for io
+            deleteTag: function (tag) {
+                var that = this;
+
+                if (this.machine.tags.contains(tag)) {
+                    this.set('deletingTag', true);
+                    Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags'/ + tag.key)
+                    .success(function () {
+                        that.machine.tags.removeObject(tag);
+                    })
+                    .error(function (message) {
+                        Mist.notificationController.notify('Failed to delete tag: ' + message);
+                    })
+                    .complete(function (success) {
+                        that.set('deletingTag', false);
+                        if (that.callback) that.callback(success, tag);
+                    });
+                }
+
+                if (this.newTags.contains(tag)) {
+                    this.newTags.removeObject(tag);
                 }
             },
 
 
-            deleteTag: function (tag) {
-                this.newTags.removeObject(tag);
-            },
-
-
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
+            //
+            // Pseudo-Private Methods
+            //
 
              _clear: function () {
                 this.setProperties({
@@ -127,20 +141,32 @@ define('app/controllers/machine_tags', ['ember'],
             },
 
             _updateFormReady: function() {
-                var formReady = false, tagsKeys = [], duplicate = false;
-                if (this.newTags && this.newTags.length) {
-                    this.newTags.forEach(function(tag) {
+                var formReady = false, tagsKeys = [], error = false;
+                if (this.newTags) {
+                    for (var i = 0, len = this.newTags.length; i < len; i++) {
+                        var tag = this.newTags[i];
                         if (tag.key) {
                             // create an array with keys and check for duplicates
                             if (tagsKeys.indexOf(tag.key) == -1) {
                                 tagsKeys.push(tag.key);
                             } else {
-                                duplicate = true;
+                                error = true;
+                                Mist.notificationController.notify('You cannot add tags with the same key!');
+                                break;
                             }
                         }
-                    });
 
-                    if (!duplicate) {
+                        // check if pair with just value and without key exists
+                        if (!tag.key && tag.value) {
+                            error = true;
+                            Mist.notificationController.notify('You cannot add tags without key!');
+                            break;
+                        }
+                    }
+
+                    if (error) {
+                        formReady = false;
+                    } else {
                         formReady = true;
                     }
 
@@ -152,15 +178,13 @@ define('app/controllers/machine_tags', ['ember'],
                 this.set('formReady', formReady);
             },
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            // Observers
+            //
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newTags.@each.key', 'addingTag')
+            }.observes('newTags.@each.key', 'newTags.@each.value', 'addingTag')
         });
 }
 );

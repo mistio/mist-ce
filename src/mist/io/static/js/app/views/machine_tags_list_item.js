@@ -22,7 +22,12 @@ define('app/views/machine_tags_list_item', ['app/views/list_item'],
 
             actions: {
                 deleteClicked: function () {
-                    Mist.machineTagsController.deleteTag(this.tag);
+                    if (Mist.isCore) {
+                        Mist.machineTagsController.deleteTagLine(this.tag);
+                    } else {
+                        Mist.machineTagsController.deleteTag(this.tag);
+                    }
+
                 }
             }
         });

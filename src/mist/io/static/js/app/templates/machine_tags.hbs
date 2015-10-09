@@ -12,14 +12,6 @@
 
     <div data-role="content" data-theme="a">
 
-{{!--         <form {{action "addClicked" on="submit" target=view}}>
-            <div class="field-wrapper">
-                {{view Mist.TextField value=Mist.machineTagsController.newTag}}
-
-                <button type="submit" id="add-tag-ok" class="ui-btn ui-btn-d ui-caps">Add</button>
-            </div>
-        </form> --}}
-
         <form {{action "addClicked" on="submit" target=view}}>
             {{#each Mist.machineTagsController.newTags as |tag|}}
                 {{component "machine-tags-list-item" tag=tag}}
@@ -27,12 +19,15 @@
 
             {{#if Mist.machineTagsController.addingTag}}
                 <div class="ajax-loader"></div>
-            {{else}} {{#if Mist.machineTagsController.deletingTag}}
+            {{/if}}
+
+            {{#if Mist.machineTagsController.deletingTag}}
                 <div class="ajax-loader"></div>
-            {{/if}} {{/if}}
+            {{/if}}
+
             <a class="ui-btn ui-caps back" {{action "addItem" target=view}}>Add Item</a>
             <button type="submit" id="add-tag-ok" class="ui-btn ui-btn-d ui-shadow ui-caps">Save Tags</button>
-        </form>        
+        </form>
 
     </div>
 
