@@ -94,7 +94,8 @@ define('app/controllers/machine_tags', ['ember'],
 
             // Delete tag on server for io
             deleteTag: function (tag) {
-                var that = this;
+                var that = this,
+                machine = this.machine;
 
                 if (this._containsKey(this.machine.tags, tag.key)) {
                     this.set('deletingTag', true);
