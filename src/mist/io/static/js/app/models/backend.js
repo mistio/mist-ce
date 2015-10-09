@@ -52,12 +52,12 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             }.property('provider'),
 
             hasNetworks: function () {
-                return  ['openstack', 'nephoscale', 'azure', 'vcloud', 'ec2', 'gce', 'indonesian_vcloud']
+                return  ['openstack', 'nephoscale', 'azure', 'vcloud', 'ec2', 'gce', 'indonesian_vcloud', 'hpcloud']
                     .indexOf(this.provider) > -1;
             }.property('provider'),
 
             requiresNetworkOnCreation: function () {
-                return  ['openstack', 'vcloud', 'indonesian_vcloud']
+                return  ['openstack', 'vcloud', 'indonesian_vcloud', 'hpcloud']
                     .indexOf(this.provider) > -1;
             }.property('provider'),
 

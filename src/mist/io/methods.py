@@ -1625,7 +1625,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                          machine_name, image, size, location, networks)
     elif conn.type is Provider.HPCLOUD:
         node = _create_machine_hpcloud(conn, private_key, public_key,
-                                       machine_name, image, size, location)
+                                       machine_name, image, size, location, networks)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
         for loc in locations:
@@ -1816,7 +1816,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
 
 
 def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
-                             image, size, location):
+                             image, size, location, networks):
     """Create a machine in HP Cloud.
 
     Here there is no checking done, all parameters are expected to be
@@ -1850,8 +1850,7 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
             if net.id in networks:
                 chosen_networks.append(net)
     except:
-        chosen_networks = []
-
+            chosen_networks = []
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -2907,7 +2906,7 @@ def list_networks(user, backend_id):
             ret.append(nephoscale_network_to_dict(network))
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         networks = conn.ex_list_networks()
-        
+
         for network in networks:
             ret.append({
                 'id': network.id,
@@ -2920,7 +2919,6 @@ def list_networks(user, backend_id):
             ret.append(openstack_network_to_dict(network))
     elif conn.type in [Provider.HPCLOUD]:
         networks = conn.ex_list_networks()
-        print networks
         for network in networks:
             ret.append(openstack_network_to_dict(network))
     elif conn.type in [Provider.GCE]:
