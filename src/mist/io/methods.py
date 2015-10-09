@@ -1345,11 +1345,16 @@ def get_machine_actions(machine_from_api, conn, extra):
     can_reboot = True
     can_tag = True
 
-    #if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
-    #                 Provider.NEPHOSCALE, Provider.SOFTLAYER,
-    #                 Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-    #                 Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR):
-    #    can_tag = False
+    # tag allowed on mist.core only for all providers, mist.io
+    # supports only EC2, RackSpace, GCE, OpenStack
+    try:
+        from mist.core.views import set_machine_tags
+    except ImportError:
+        if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
+                         Provider.NEPHOSCALE, Provider.SOFTLAYER,
+                         Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
+                         Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR):
+            can_tag = False
 
     # for other states
     if machine_from_api.state in (NodeState.REBOOTING, NodeState.PENDING):
