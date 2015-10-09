@@ -590,7 +590,7 @@ def set_machine_tag(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     try:
-        tag = request.json_body['tags']
+        tags = request.json_body['tags']
     except:
         raise BadRequestError('tags should be list of tags')
     if type(tags) != list:
