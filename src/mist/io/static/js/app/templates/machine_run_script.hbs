@@ -39,28 +39,54 @@
         <div role="main" class="ui-content" data-theme="a">
             {{#if Mist.scriptsController.model.length}}
             <form {{action "runScript" on="submit" target=view}}>
+                <div class="form-field {{if Mist.machineRunScriptController.scriptToRun.script.name 'filled' 'empty'}} required">
+                    <label>Script</label>
+                    <div id="machine-run-script-script"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u"
+                        data-theme="d"
+                        class="mist-select">
+                        <h4>
+                            {{#if Mist.machineRunScriptController.scriptToRun.script.name}}
+                                {{Mist.machineRunScriptController.scriptToRun.script.name}}
+                            {{else}}
+                                Select script
+                            {{/if}}
+                        </h4>
+                        <ul data-role="listview" data-theme="a">
+                            {{#each Mist.scriptsController.model as |script|}}
+                                <li data-icon="false">
+                                    <a {{action "scriptClicked" script target=view}}>
+                                        {{script.name}}
+                                    </a>
+                                </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
 
-
-                    {{view "select" content=Mist.scriptsController.model
-                        optionValuePath="content"
-                        optionLabelPath="content.name"
-                        value=Mist.machineRunScriptController.scriptToRun.script
-                        prompt="Select script"
-                     }}
+                <div class="form-field">
+                    <label for="machine-run-script-params">Parameters (optional)</label>
                     {{view Mist.TextArea
                         id="machine-run-script-params"
                         placeholder="Optional script parameters"
                         value=Mist.machineRunScriptController.scriptToRun.parameters
                     }}
+                </div>
 
+                {{#if Mist.machineRunScriptController.runningScript}}
+                    <div class="ajax-loader"></div>
+                {{/if}}
 
                 <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
                     <button type="submit" id="machine-run-script-ok"
-                        class="ui-btn ui-btn-d ui-caps">RUN</button>
+                        class="{{if Mist.machineRunScriptController.isReady '' 'ui-state-disabled'}} ui-btn ui-btn-d ui-shadow ui-caps ok-only">Run</button>
                 </div>
             </form>
             {{else}}
-                <label> No scripts added.</label>
+                <label>No scripts added.</label>
             {{/if}}
         </div>
     </div>

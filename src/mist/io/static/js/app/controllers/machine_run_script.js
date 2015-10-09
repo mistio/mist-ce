@@ -1,6 +1,6 @@
 define('app/controllers/machine_run_script', ['ember'],
     //
-    //  Machine Edit Controller
+    //  Machine Run Script Controller
     //
     //  @returns Class
     //
@@ -19,6 +19,10 @@ define('app/controllers/machine_run_script', ['ember'],
                 machine: '',
                 parameters: ''
             }),
+            runningScript: null,
+            isReady: Ember.computed('scriptToRun.script', 'runningScript', function () {
+                return this.get('scriptToRun.script.id') && !this.get('runningScript');
+            }),
 
             //
             //  Methods
@@ -30,13 +34,30 @@ define('app/controllers/machine_run_script', ['ember'],
                     machine: machine,
                     parameters: '',
                 });
-                // Mist.scriptRunController.get('scriptToRun').set('machine', machine);
                 this.view.open();
             },
 
             close: function () {
                 this.view.close();
             },
+
+            runScript: function() {
+                if (this.isReady) {
+                    this.set('runningScript', true);
+                    var that = this;
+                    Mist.scriptsController.runScript({
+                        script: that.get('scriptToRun'),
+                        callback: function(success) {
+                            that.set('runningScript', false);
+                            if (success) {
+                                that.close();
+                                that.get('scriptToRun').set('script', {})
+                                that.get('scriptToRun').set('parameters', '')
+                            }
+                        }
+                    });
+                }
+            }
 
         });
     }

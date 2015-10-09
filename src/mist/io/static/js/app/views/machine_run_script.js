@@ -1,6 +1,6 @@
 define('app/views/machine_run_script', ['app/views/popup'],
     //
-    //  Machine Edit View
+    //  Machine Run Script View
     //
     //  @returns Class
     //
@@ -18,32 +18,22 @@ define('app/views/machine_run_script', ['app/views/popup'],
             controllerName: 'machineRunScriptController',
             popupId: '#machine-run-script',
 
-
             //
             //  Actions
             //
 
             actions: {
+                scriptClicked: function (script) {
+                    Mist.machineRunScriptController.get('scriptToRun').set('script', script);
+                    $('#machine-run-script-script').collapsible('collapse');
+                },
                 backClicked: function() {
                     Mist.machineRunScriptController.close();
                 },
                 runScript: function() {
-                    var that = this;
-                    Mist.scriptsController.runScript({
-                        script: Mist.machineRunScriptController.get('scriptToRun'),
-                        callback: function(success) {
-                            if (success) {
-                                that.close();
-                                Mist.machineRunScriptController.get('scriptToRun').set('script', {})
-                                Mist.machineRunScriptController.get('scriptToRun').set('parameters', '')
-                            }
-                        }
-                    });
+                    Mist.machineRunScriptController.runScript();
                 }
             }
-
-
-
         });
     }
 );

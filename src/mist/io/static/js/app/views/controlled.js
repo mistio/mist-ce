@@ -25,12 +25,13 @@ define('app/views/controlled', [],
                 this._super();
                 if (!this.get('controllerName')){
                     this.set('controllerName', this.getControllerName());
-                    //this.set('controller', Mist.get(this.controllerName));
                 }
 
                 var that = this;
-                Ember.run.next(function(){
-                    $('body').enhanceWithin();
+                Ember.run.scheduleOnce('afterRender', this, function() {
+                    var element = this.$();
+                    if (element)
+                        element.enhanceWithin();
 
                     $("[data-role='collapsible']").collapsible({
                         collapse: function(event) {
