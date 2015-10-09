@@ -1,3 +1,5 @@
+
+
 import re
 from behave import *
 from time import time, sleep
@@ -199,9 +201,9 @@ def ssh_key_is_added(context, ssh_key_name):
             # if there no keys then it will be called "Add key"
             context.execute_steps(u"""
                 Then I click the button "Add key"
-                And I wait for 1 seconds
+                And I expect for "non-associated-keys-popup-popup" popup to appear within max 2 seconds
                 And I click the button "New key"
-                And I wait for 1 seconds
+                And I expect for "key-add-popup" popup to appear within max 2 seconds
                 Then I upload the ssh key with name "TESTING_MACHINE"
                 And I wait for 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
@@ -217,12 +219,13 @@ def ssh_key_is_added(context, ssh_key_name):
             try:
                 machine_keys_list = context.browser.find_element_by_id(
                     "machine-keys")
-                machines_keys = context.browser.find_elements_by_class_name(
+                machines_keys = machine_keys_list.find_elements_by_class_name(
                     "probed")
+                #import ipdb
+                #ipdb.set_trace()
                 for machines_key in machines_keys:
                     if machines_key.text == \
-                            context.mist_config['CREDENTIALS'][ssh_key_name][
-                                'key_name']:
+                            context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']:
                         context.execute_steps(u'Then I click the button '
                                               u'"Enable Monitoring"')
                         return
@@ -230,14 +233,15 @@ def ssh_key_is_added(context, ssh_key_name):
                 pass
             context.execute_steps(u"""
                 Then I click the button "%s"
-                And I wait for 1 seconds
+                And I expect for "non-associated-keys-popup-popup" popup to appear within max 2 seconds
                 And I click the button "New key"
-                And I wait for 1 seconds
+                And I expect for "key-add-popup" popup to appear within max 1 seconds
                 Then I upload the ssh key with name "%s"
                 And I wait for 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
                 And If the key addition was successful
                 Then I click the button "Enable Monitoring"
+                And I expect for "machine-keys-panel" panel to disappear within max 2 seconds
             """ % (button.text, ssh_key_name))
 
 

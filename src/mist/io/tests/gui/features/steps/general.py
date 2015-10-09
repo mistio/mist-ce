@@ -1,7 +1,10 @@
 from behave import *
 from time import time, sleep
-from selenium.common.exceptions import NoSuchElementException, WebDriverException, StaleElementReferenceException
+from selenium.common.exceptions import (NoSuchElementException,
+    WebDriverException, StaleElementReferenceException)
 from selenium.webdriver import ActionChains
+from selenium import webdriver
+
 
 try:
     from mist.io.tests.settings import LOCAL
@@ -96,6 +99,158 @@ def wait(context, seconds):
     sleep(int(seconds))
 
 
+@when(u'I expect for "{panel_title}" panel to appear within max {seconds} seconds')
+def panel_waiting_with_timeout(context, panel_title, seconds):
+    """
+    Function that wait for panel to appear but for a maximum amount of time
+    """
+    wait_for_panel_to_appear(context, panel_title, seconds)
+
+
+def wait_for_panel_to_appear(context, panel_title, seconds=1):
+    end = time() + int(seconds)
+
+    while time() < end:
+        try:
+            panel = context.browser.find_element_by_id(panel_title)
+            if 'ui-collapsible-collapsed' not in panel.get_attribute('class'):
+                return
+
+        except NoSuchElementException:
+            sleep(1)
+    assert False, u'Panel %s did not appear after %s seconds' %(panel_title, seconds)
+
+
+@when(u'I expect for "{panel_title}" panel to disappear within max {seconds} seconds')
+def panel_waiting_with_timeout(context, panel_title, seconds):
+    """
+    Function that wait for panel_title to disappear but for a maximum amount of time
+    we use method polling
+    """
+    wait_for_panel_to_disappear(context, popup_name, seconds)
+
+
+def wait_for_panel_to_disappear(context, popup_name, seconds=2):
+    end = time() + int(seconds)
+    while time() < end:
+        try:                                                  
+            panel = context.browser.find_element_by_id(panel_title)
+            
+            if 'ui-collapsible-collapsed' in panel.get_attribute('class'):
+            
+               return
+        except NoSuchElementException:
+            sleep(1)
+    assert False, u'popup %s did not disappear after %s seconds' %(popup_name, seconds)  
+
+
+@when(u'I expect for "{popup_name}" popup to appear within max {seconds} seconds')
+def popup_waiting_with_timeout(context, popup_name,seconds):
+    """
+    Function that wait for keyadd-popup to appear but for a maximum amount of time
+    we use method polling
+    """
+    wait_for_popup_to_appear(context,popup_name,seconds)
+
+
+def wait_for_popup_to_appear(context,popup_name,seconds=1):
+    end = time() + int(seconds)
+    while time() < end:
+        try:                                                  
+            popup = context.browser.find_element_by_id(popup_name)
+            if 'ui-popup-active' in popup.get_attribute('class'):
+
+             return
+        except NoSuchElementException:
+            sleep(1)
+    assert False, u'popup %s did not appear after %s seconds' %(popup_name,seconds)
+    
+ 
+@then(u'I expect for "{popup_name}" popup to appear within max {seconds} seconds')
+def popup_waiting_with_timeout(context, popup_name,seconds):
+    """
+    Function that wait for keyadd-popup to appear but for a maximum amount of time
+    we use method polling
+    """
+    wait_for_popup_to_appear(context,popup_name,seconds)
+
+
+def wait_for_popup_to_appear(context,popup_name,seconds=1):
+    end = time() + int(seconds)
+    while time() < end:
+        try:                                                  
+            popup = context.browser.find_element_by_id(popup_name)
+            if 'ui-popup-active' in popup.get_attribute('class'):
+
+             return
+        except NoSuchElementException:
+            sleep(1)
+    assert False, u'popup %s did not appear after %s seconds' %(popup_name,seconds)
+    
+    
+@when(u'I expect for "{popup_name}" popup to disappear within max {seconds} seconds')
+def popup_waiting_with_timeout(context, popup_name,seconds):
+    """
+    Function that wait for keyadd-popup to disappear but for a maximum amount of time
+    we use method polling
+    """
+    wait_for_popup_to_disappear(context,popup_name,seconds)
+
+
+def wait_for_popup_to_disappear(context,popup_name,seconds=2):
+    end = time() + int(seconds)
+    while time() < end:
+        try:                                                  
+            popup = context.browser.find_element_by_id(popup_name)
+            
+            if 'ui-popup-hidden' in popup.get_attribute('class'):
+           
+             return
+        except NoSuchElementException:
+            sleep(1)
+    assert False, u'popup %s did not disappear after %s seconds' %(popup_name,seconds)
+   
+    
+@when(u'I expect for "{page_title}" page to appear within max {seconds} seconds')
+def page_waiting_with_timeout(context, page_title, seconds):
+    """
+    Function that wait for page to appear but for a maximum amount of time
+    """
+    wait_for_page_to_appear(context, page_title, seconds)
+
+def wait_for_page_to_appear(context, page_title, seconds=2):
+    end = time() + int(seconds)
+    while time() < end:
+        try:
+            page = context.browser.find_element_by_id(page_title)
+            if 'ui-page-active' in page.get_attribute('class'):
+             return
+
+        except NoSuchElementException:
+            sleep(1)
+    assert False, u'Page %s did not appear after %s seconds' %(page_title, seconds) 
+    
+    
+@when(u'I expect for "{loader_name}" loader to finish within max {seconds} seconds')
+def loader_name_waiting_with_timeout(context, loader_name, seconds):
+    """
+    Function that wait for loader_name to finish for a maximum amount of time
+    """
+    wait_for_loader_to_finish(context,loader_name, seconds)
+
+def wait_for_loader_to_finish(context,loader_name, seconds):
+    end = time() + int(seconds)
+    while time() < end:
+        try:
+            loader = context.browser.find_element_by_id(loader_name)
+            if loader:
+            
+             return
+        except NoSuchElementException:
+            sleep(1)
+    assert False, u'Loader %s did not finish after %s seconds' %(loader_name,seconds)
+    
+  
 @then(u'I click the button "{text}"')
 def then_click(context, text):
     return click_button(context, text)
