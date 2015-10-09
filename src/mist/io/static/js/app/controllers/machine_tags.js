@@ -12,7 +12,7 @@ define('app/controllers/machine_tags', ['ember'],
             //
 
              formReady: null,
-             newTags: [],
+             newTags: null,
              machine: null,
              callback: null,
              addingTag: null,
@@ -89,10 +89,6 @@ define('app/controllers/machine_tags', ['ember'],
 
             // Delete tag's line for core
             deleteTagLine: function (tag) {
-                console.log(this.newTags);
-                console.log(this.newTags.contains(tag));
-                console.log(this.machine.tags);
-                console.log(this.machine.tags.contains(tag));
                 this.newTags.removeObject(tag);
             },
 
@@ -100,11 +96,11 @@ define('app/controllers/machine_tags', ['ember'],
             deleteTag: function (tag) {
                 var that = this;
 
-                if (this.machine.tags.contains(tag)) {
+                if (this._containsKey(this.machine.tags, tag.key)) {
                     this.set('deletingTag', true);
-                    Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags'/ + tag.key)
+                    Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.key)
                     .success(function () {
-                        that.machine.tags.removeObject(tag);
+                        this._removeDeletedTag(tag);
                     })
                     .error(function (message) {
                         Mist.notificationController.notify('Failed to delete tag: ' + message);
@@ -113,10 +109,8 @@ define('app/controllers/machine_tags', ['ember'],
                         that.set('deletingTag', false);
                         if (that.callback) that.callback(success, tag);
                     });
-                }
-
-                if (this.newTags.contains(tag)) {
-                    this.newTags.removeObject(tag);
+                } else {
+                    this.deleteTagLine(tag);
                 }
             },
 
@@ -133,10 +127,27 @@ define('app/controllers/machine_tags', ['ember'],
                 });
             },
 
+            _containsKey: function (collection, key) {
+                var exists = false;
+                collection.forEach(function(tag) {
+                    if(tag.key == key) {
+                        exists = true;
+                    }
+                });
+                return exists;
+            },
+
             _updateTags: function (tags) {
                 Ember.run(this, function () {
                     this.get('machine').set('tags', tags);
                     this.set('newTags', tags);
+                });
+            },
+
+            _removeDeletedTag: function (tag) {
+                Ember.run(this, function () {
+                    this.deleteTagLine(tag);
+                    this.get('machine').set('tags', this.newTags);
                 });
             },
 
