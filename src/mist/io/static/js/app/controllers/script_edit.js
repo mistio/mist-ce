@@ -55,7 +55,8 @@ define('app/controllers/script_edit', ['ember'],
 
             _updateFormReady: function () {
                 var formReady = false;
-                if (this.newName && this.newName != this.script.name) {
+                if ((this.newName && this.newName != this.script.name) ||
+                (this.newDescription && this.newDescription != this.script.description)) {
                     formReady = true;
                 }
                 this.set('formReady', formReady);
@@ -67,7 +68,7 @@ define('app/controllers/script_edit', ['ember'],
 
             formObserver: function () {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newName')
+            }.observes('newName', 'newDescription')
         });
     }
 );
