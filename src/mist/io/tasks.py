@@ -617,7 +617,9 @@ class ListMachines(UserTask):
                 # optimized for js
                 for tag in mistio_tags:
                     for key, value in tag.items():
-                        machine['tags'].append({'key': key, 'value': value})
+                        tag_dict = {'key': key, 'value': value}
+                        if tag_dict not in machine['tags']:
+                            machine['tags'].append(tag_dict)
                 # FIXME: optimize!
         log.warn('Returning list machines for user %s backend %s' % (email, backend_id))
         return {'backend_id': backend_id, 'machines': machines}
