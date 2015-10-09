@@ -86,6 +86,15 @@ define('app/views/machine', ['app/views/page'],
                 }
             },
 
+            updateActions: function() {
+                var machine = this.machine;
+                if(!machine.can_start && !machine.can_reboot && !machine.can_destroy && !machine.can_shutdown && !machine.can_rename) {
+                    $('#single-machine-page #single-machine-power-btn').addClass('ui-state-disabled');
+                } else {
+                    $('#single-machine-page #single-machine-power-btn').removeClass('ui-state-disabled');
+                }
+            },
+
             renderMetadata: function () {
                 Ember.run.next(function() {
                     if ($('#single-machine-metadata').collapsible)
@@ -269,6 +278,10 @@ define('app/views/machine', ['app/views/page'],
             modelObserver: function() {
                 Ember.run.once(this, 'load');
             }.observes('controller.model'),
+
+            machineActionsObserver: function() {
+                Ember.run.next(this, 'updateActions');
+            }.observes('machine'),
 
             checkedMonitoringObserver: function() {
                 Ember.run.once(this, 'updateMonitoringCollapsible');
