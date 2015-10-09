@@ -1,9 +1,7 @@
 from behave import *
 from time import time, sleep
-from selenium.common.exceptions import (NoSuchElementException,
-    WebDriverException, StaleElementReferenceException)
+from selenium.common.exceptions import NoSuchElementException, WebDriverException, StaleElementReferenceException
 from selenium.webdriver import ActionChains
-from selenium import webdriver
 
 
 try:
@@ -99,7 +97,8 @@ def wait(context, seconds):
     sleep(int(seconds))
 
 
-@when(u'I expect for "{panel_title}" panel to appear within max {seconds} seconds')
+@when(u'I expect for "{panel_title}" panel to appear within max {seconds} '
+      u'seconds')
 def panel_waiting_with_timeout(context, panel_title, seconds):
     """
     Function that wait for panel to appear but for a maximum amount of time
@@ -121,7 +120,8 @@ def wait_for_panel_to_appear(context, panel_title, seconds=1):
     assert False, u'Panel %s did not appear after %s seconds' %(panel_title, seconds)
 
 
-@when(u'I expect for "{panel_title}" panel to disappear within max {seconds} seconds')
+@when(u'I expect for "{panel_title}" panel to disappear within max {seconds} '
+      u'seconds')
 def panel_waiting_with_timeout(context, panel_title, seconds):
     """
     Function that wait for panel_title to disappear but for a maximum amount of time
@@ -144,7 +144,8 @@ def wait_for_panel_to_disappear(context, popup_name, seconds=2):
     assert False, u'popup %s did not disappear after %s seconds' %(popup_name, seconds)  
 
 
-@when(u'I expect for "{popup_name}" popup to appear within max {seconds} seconds')
+@when(u'I expect for "{popup_name}" popup to appear within max {seconds} '
+      u'seconds')
 def popup_waiting_with_timeout(context, popup_name,seconds):
     """
     Function that wait for keyadd-popup to appear but for a maximum amount of time
@@ -163,10 +164,12 @@ def wait_for_popup_to_appear(context,popup_name,seconds=1):
              return
         except NoSuchElementException:
             sleep(1)
-    assert False, u'popup %s did not appear after %s seconds' %(popup_name,seconds)
+    assert False, u'popup %s did not appear after %s seconds' % (popup_name,
+                                                                 seconds)
     
  
-@then(u'I expect for "{popup_name}" popup to appear within max {seconds} seconds')
+@then(u'I expect for "{popup_name}" popup to appear within max {seconds} '
+      u'seconds')
 def popup_waiting_with_timeout(context, popup_name,seconds):
     """
     Function that wait for keyadd-popup to appear but for a maximum amount of time
@@ -185,10 +188,12 @@ def wait_for_popup_to_appear(context,popup_name,seconds=1):
              return
         except NoSuchElementException:
             sleep(1)
-    assert False, u'popup %s did not appear after %s seconds' %(popup_name,seconds)
+    assert False, u'popup %s did not appear after %s seconds' % (popup_name,
+                                                                 seconds)
     
     
-@when(u'I expect for "{popup_name}" popup to disappear within max {seconds} seconds')
+@when(u'I expect for "{popup_name}" popup to disappear within max {seconds} '
+      u'seconds')
 def popup_waiting_with_timeout(context, popup_name,seconds):
     """
     Function that wait for keyadd-popup to disappear but for a maximum amount of time
@@ -208,7 +213,8 @@ def wait_for_popup_to_disappear(context,popup_name,seconds=2):
              return
         except NoSuchElementException:
             sleep(1)
-    assert False, u'popup %s did not disappear after %s seconds' %(popup_name,seconds)
+    assert False, u'popup %s did not disappear after %s seconds' % (popup_name,
+                                                                    seconds)
    
     
 @when(u'I expect for "{page_title}" page to appear within max {seconds} seconds')
@@ -217,6 +223,7 @@ def page_waiting_with_timeout(context, page_title, seconds):
     Function that wait for page to appear but for a maximum amount of time
     """
     wait_for_page_to_appear(context, page_title, seconds)
+
 
 def wait_for_page_to_appear(context, page_title, seconds=2):
     end = time() + int(seconds)
@@ -228,15 +235,18 @@ def wait_for_page_to_appear(context, page_title, seconds=2):
 
         except NoSuchElementException:
             sleep(1)
-    assert False, u'Page %s did not appear after %s seconds' %(page_title, seconds) 
+    assert False, u'Page %s did not appear after %s seconds' % (page_title,
+                                                                seconds)
     
     
-@when(u'I expect for "{loader_name}" loader to finish within max {seconds} seconds')
+@when(u'I expect for "{loader_name}" loader to finish within max {seconds} '
+      u'seconds')
 def loader_name_waiting_with_timeout(context, loader_name, seconds):
     """
     Function that wait for loader_name to finish for a maximum amount of time
     """
     wait_for_loader_to_finish(context,loader_name, seconds)
+
 
 def wait_for_loader_to_finish(context,loader_name, seconds):
     end = time() + int(seconds)
@@ -248,7 +258,8 @@ def wait_for_loader_to_finish(context,loader_name, seconds):
              return
         except NoSuchElementException:
             sleep(1)
-    assert False, u'Loader %s did not finish after %s seconds' %(loader_name,seconds)
+    assert False, u'Loader %s did not finish after %s seconds' % (loader_name,
+                                                                  seconds)
     
   
 @then(u'I click the button "{text}"')
@@ -264,8 +275,8 @@ def click_button(context, text):
     to find a button that contains the text given.
     """
     click_button_from_collection(context, text,
-                                 error_message='Could not find button that contains %s'
-                                               % text)
+                                 error_message='Could not find button that '
+                                               'contains %s' % text)
 
 
 @when(u'I click the "{text}" button inside the "{popup}" popup')
@@ -286,8 +297,8 @@ def click_button_within_popup(context, text, popup):
             else:
                 buttons = pop.find_elements_by_class_name("ui-btn")
                 click_button_from_collection(context, text, buttons,
-                                             'Could not find %s button in %s popup'
-                                             % (text, popup))
+                                             'Could not find %s button in %s '
+                                             'popup' % (text, popup))
                 return
     assert False, "Could not find popup with title %s" % popup
 
@@ -310,7 +321,7 @@ def click_button_within_panel(context, text, panel_title):
             break
 
     assert found_panel, u'Panel with Title %s could not be found. Maybe the ' \
-                        u'driver got refocused or the panel failed to open or ' \
+                        u'driver got refocused or the panel failed to open or '\
                         u'there is no panel with that title' % panel_title
 
     buttons = found_panel.find_elements_by_class_name("ui-btn")
