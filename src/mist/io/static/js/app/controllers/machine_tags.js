@@ -101,7 +101,7 @@ define('app/controllers/machine_tags', ['ember'],
                     this.set('deletingTag', true);
                     Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.key)
                     .success(function () {
-                        this._removeDeletedTag(tag);
+                        that._removeDeletedTag(tag);
                     })
                     .error(function (message) {
                         Mist.notificationController.notify('Failed to delete tag: ' + message);
