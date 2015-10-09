@@ -29,7 +29,7 @@ define('app/controllers/machine_tags', ['ember'],
                 this._clear();
                 this.setProperties({
                     machine: machine,
-                    newTags: machine.tags,
+                    newTags: machine.tags.length ? machine.tags : [{key: null, value: null}],
                     callback: callback
                 });
                 this._updateFormReady();
@@ -50,7 +50,7 @@ define('app/controllers/machine_tags', ['ember'],
                         key: null,
                         value: null
                     });
-                });                    
+                });
             },
 
 
