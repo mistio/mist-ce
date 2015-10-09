@@ -105,6 +105,8 @@ def add_routes(configurator):
                            '/backends/{backend}/machines/{machine}/rdp')
     configurator.add_route('machine_tags',
                            '/backends/{backend}/machines/{machine}/tags')
+    configurator.add_route('machine_tag',
+                     '/backends/{backend}/machines/{machine}/tags/{tag}')
     configurator.add_route('probe',
                            '/backends/{backend}/machines/{machine}/probe')
 

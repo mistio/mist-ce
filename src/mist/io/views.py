@@ -589,6 +589,7 @@ def set_machine_tag(request):
     """Sets metadata for a machine, given the backend and machine id."""
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
+
     try:
         tags = request.json_body['tags']
     except:
@@ -606,7 +607,7 @@ def set_machine_tag(request):
     return OK
 
 
-@view_config(route_name='machine_tags', request_method='DELETE',
+@view_config(route_name='machine_tag', request_method='DELETE',
              renderer='json')
 def delete_machine_tag(request):
     """Deletes tag for a machine, given the machine id and the tag to be
@@ -616,7 +617,6 @@ def delete_machine_tag(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     tag = request.matchdict['tag']
-
     user = user_from_request(request)
     methods.delete_machine_tag(user, backend_id, machine_id, tag)
     return OK

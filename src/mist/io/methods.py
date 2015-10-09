@@ -3192,8 +3192,8 @@ def delete_machine_tag(user, backend_id, machine_id, tag):
         tags = machine.extra.get('tags', None)
         pair = None
         for mkey, mdata in tags.iteritems():
-            if tag == mdata:
-                pair = {mkey: tag}
+            if tag == mkey:
+                pair = {mkey: mdata}
                 break
         if not pair:
             raise NotFoundError("tag not found")
