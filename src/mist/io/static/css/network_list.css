@@ -34,10 +34,6 @@
 #network-list-page .ui-filterable .ui-input-search {
     margin-right: 290px;
 }
-#network-list {
-    margin-top: -52px;
-    box-shadow: none;
-}
 #network-list .ui-grid-b .ui-block-b {
     text-align: center;
     padding-right: 26px;
@@ -45,4 +41,53 @@
 }
 #network-list .network-name {
     font-weight: 400;
+}
+#network-list {
+    margin-top: -48px;
+    box-shadow: none;
+}
+#network-list-page .network-search-container {
+    position: relative;
+    top: -56px;
+    margin-left: 50px;
+    margin-right: 285px;
+}
+
+#network-list-page .network-search {
+    padding-right: 35px;
+}
+
+#network-list-page .network-search-container [class*='icon-'] {
+    color: #7f7f7f;
+    display: inline-block;
+    background-color: #e8e8e8;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    padding: 0 8px 0 10px;
+    box-sizing: border-box;
+    height: 30.8px;
+    line-height: 30.8px;
+}
+#network-list-page .network-search-container [class*='icon-']:after {
+    font-size: 14px;
+    color: #444;
+}
+
+#network-list-page .network-search-container .icon-xx:hover {
+    cursor: pointer;
+}
+@media only screen and  (max-width: 600px) {
+    #network-list-page .creation-button {
+        width: 63px;
+        height: 63px;
+        padding: 0 !important;
+    }
+    #network-list-page .creation-button span {
+        display: none;
+    }
+
+    #network-list-page .network-search-container {
+        margin-right: 85px !important;
+    }
 }

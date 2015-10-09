@@ -39,21 +39,24 @@
                 </div>
             </div><!-- /grid-b -->
 
+            <div class="network-search-container">
+                {{#if view.searchTerm}}
+                    <span {{action "clearClicked" target=view}} class="icon-xx"></span>
+                {{else}}
+                    <span class="icon-search"></span>
+                {{/if}}
+                {{input value=view.searchTerm placeholder="Filter networks" class="network-search"}}
+            </div>
+
             <ul id="network-list"
                 data-role="listview"
                 data-inset="true"
-                data-filter="true"
-                data-filter-placeholder="Filter networks"
                 data-theme="c"
                 class="checkbox-list">
-                {{#each Mist.backendsController.model as |backend|}}
-                    {{#if backend.enabled}}
-                      {{#each backend.networks.model as |network|}}
-                            {{component "network-list-item"
-                                network=network
-                                class="checkbox-link"}}
-                      {{/each}}
-                    {{/if}}
+                {{#each view.filteredNetworks as |network|}}
+                    {{component "network-list-item"
+                        network=network
+                        class="checkbox-link"}}
                 {{/each}}
             </ul>
         </div>
