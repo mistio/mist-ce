@@ -8,13 +8,14 @@ Feature: Add second-tier backends
   @all-backends
   Scenario Outline:
     When I click the button "Add cloud"
-    And I expect for "add-backend" panel to appear within max 2 seconds
+    Then I expect for "new-backend-provider" panel to appear within max 2 seconds
     And I click the button "<provider>"
-    And I wait for 1 seconds
-    And I use my "<credentials>" credentials
+    And I expect for "new-backend-provider" panel to disappear within max 2 seconds
+    Then I expect for "add-backend" panel to appear within max 2 seconds
+    When I use my "<credentials>" credentials
     And I click the button "Add"
     Then the "<provider>" backend should be added within 30 seconds
-    And I wait for 3 seconds
+#    And I wait for 3 seconds
 
     Examples: Providers
     | provider              | credentials  |
@@ -33,19 +34,23 @@ Feature: Add second-tier backends
 #    | OpenStack             | OPENSTACK    |
 #    | Docker                | DOCKER       |
 
-  @backend-actions
+  @backend-rename
   Scenario: Backend Actions
     Given "Rackspace" backend has been added
     When I click the button "Rackspace"
-    And I rename the backend to "Renamed"
+    Then I expect for "backend-edit-popup" popup to appear within max 2 seconds
+    When I rename the backend to "Renamed"
     And I click the "OK" button inside the "Edit cloud" popup
-    And I expect for "backend-edit-popup" popup to appear within max 2 seconds
-    And I click the "_x_" button inside the "Edit cloud" popup
-    And I expect for "backend-edit-popup" popup to disappear within max 2 seconds
-    Then the "Renamed" backend should be added within 3 seconds
-    When I wait for 1 seconds
-    When I click the button "Renamed"
+    When I click the "_x_" button inside the "Edit cloud" popup
+    Then I expect for "backend-edit-popup" popup to disappear within max 2 seconds
+    And the "Renamed" backend should be added within 3 seconds
+
+  @backend-delete
+  Scenario: Backend Actions
+    Given "EC2" backend has been added
+    When I click the button "EC2"
+    Then I expect for "backend-edit-popup" popup to appear within max 2 seconds
     And I click the button "Delete"
     And I click the button "Yes"
-    And I wait for 1 seconds
-    Then the "Renamed" backend should be deleted
+    Then I expect for "backend-edit-popup" popup to disappear within max 2 seconds
+    Then the "EC2" backend should be deleted
