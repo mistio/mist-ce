@@ -585,11 +585,10 @@ def machine_rdp(request):
 
 @view_config(route_name='machine_tags', request_method='POST',
              renderer='json')
-def set_machine_tag(request):
+def set_machine_tags(request):
     """Sets metadata for a machine, given the backend and machine id."""
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-
     try:
         tags = request.json_body['tags']
     except:
@@ -598,12 +597,7 @@ def set_machine_tag(request):
         raise BadRequestError('tags should be list of tags')
 
     user = user_from_request(request)
-    for tag in tags:
-        try:
-            for tag_key, tag_value in tag.items():
-                methods.set_machine_tag(user, backend_id, machine_id, tag_key, tag_value)
-        except:
-            continue
+    methods.set_machine_tags(user, backend_id, machine_id, tags)
     return OK
 
 

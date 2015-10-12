@@ -3093,7 +3093,7 @@ def delete_network(user, backend_id, network_id):
         pass
 
 
-def set_machine_tag(user, backend_id, machine_id, tag_key, tag_value):
+def set_machine_tags(user, backend_id, machine_id, tags):
     """Sets metadata for a machine, given the backend and machine id.
 
     Libcloud handles this differently for each provider. Linode and Rackspace,
@@ -3102,51 +3102,44 @@ def set_machine_tag(user, backend_id, machine_id, tag_key, tag_value):
     machine_id comes as u'...' but the rest are plain strings so use == when
     comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
 
+    Tags is expected to be a list of key-value dicts
     """
 
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     backend = user.backends[backend_id]
-    if not tag_key:
-        raise RequiredParameterMissingError("tag_key")
-    if not tag_value:
-        raise RequiredParameterMissingError("tag_value")
+    if not tags:
+        raise BadRequestError('tags should be list of tags')
 
     conn = connect_provider(backend)
 
-
-    pair = {tag_key: tag_value}
+    machine = Node(machine_id, name='', state=0, public_ips=[],
+                   private_ips=[], driver=conn)
 
     if conn.type in config.EC2_PROVIDERS:
+        tags_dict = {}
+        for tag in tags:
+            for tag_key, tag_value in tag.items():
+                if type(tag_key) ==  unicode:
+                    tag_key = tag_key.encode('utf-8')
+                if type(tag_value) ==  unicode:
+                    tag_value = tag_value.encode('utf-8')
+                tags_dict[tag_key] = tag_value
         try:
-            machine = Node(machine_id, name='', state=0, public_ips=[],
-                           private_ips=[], driver=conn)
-            conn.ex_create_tags(machine, pair)
+            conn.ex_create_tags(machine, tags_dict)
         except Exception as exc:
             raise BackendUnavailableError(backend_id, exc)
     else:
-        machine = None
-        try:
-            for node in conn.list_nodes():
-                if node.id == machine_id:
-                    machine = node
-                    break
-        except Exception as exc:
-            raise BackendUnavailableError(backend_id, exc)
-        if not machine:
-            raise MachineNotFoundError(machine_id)
         if conn.type == 'gce':
             try:
-                machine.extra['tags'].append(tag_value)
-                conn.ex_set_node_tags(machine, machine.extra['tags'])
+                conn.ex_set_node_tags(machine, tags)
             except Exception as exc:
-                raise InternalServerError("error creating tag", exc)
+                raise InternalServerError("error setting tags", exc)
         else:
             try:
-                machine.extra['metadata'].update(pair)
-                conn.ex_set_metadata(machine, machine.extra['metadata'])
+                conn.ex_set_metadata(machine, tags)
             except Exception as exc:
-                raise InternalServerError("error creating tag", exc)
+                raise InternalServerError("error creating tags", exc)
 
 
 def delete_machine_tag(user, backend_id, machine_id, tag):
@@ -3173,6 +3166,9 @@ def delete_machine_tag(user, backend_id, machine_id, tag):
         raise RequiredParameterMissingError("tag")
     conn = connect_provider(backend)
 
+    if type(tag) ==  unicode:
+        tag = tag.encode('utf-8')
+
     if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
         raise MethodNotAllowedError("Deleting metadata is not supported in %s"
                                     % conn.type)
@@ -3187,11 +3183,14 @@ def delete_machine_tag(user, backend_id, machine_id, tag):
         raise BackendUnavailableError(backend_id, exc)
     if not machine:
         raise MachineNotFoundError(machine_id)
-
     if conn.type in config.EC2_PROVIDERS:
         tags = machine.extra.get('tags', None)
         pair = None
         for mkey, mdata in tags.iteritems():
+            if type(mkey) ==  unicode:
+                mkey = mkey.encode('utf-8')
+            if type(mdata) ==  unicode:
+                mdata = mdata.encode('utf-8')
             if tag == mkey:
                 pair = {mkey: mdata}
                 break
