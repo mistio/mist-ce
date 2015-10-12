@@ -1437,15 +1437,12 @@ def list_machines(user, backend_id):
     for m in machines:
         if m.driver.type == 'gce':
             #tags and metadata exist in GCE
-            tags = m.extra.get('tags')
+            tags = m.extra.get('metadata', {}).get('items')
         else:
             tags = m.extra.get('tags') or m.extra.get('metadata') or {}
         # optimize for js
         if type(tags) == dict:
             tags = [{'key': key, 'value': value} for key, value in tags.iteritems() if key != 'Name']
-        elif type(tags) == list:
-            tags = [{'key': key, 'value': ''} for tag in tags]
-
         #if m.extra.get('availability', None):
         #    # for EC2
         #    tags.append({'key': 'availability', 'value': m.extra['availability']})
@@ -3116,15 +3113,16 @@ def set_machine_tags(user, backend_id, machine_id, tags):
     machine = Node(machine_id, name='', state=0, public_ips=[],
                    private_ips=[], driver=conn)
 
+    tags_dict = {}
+    for tag in tags:
+        for tag_key, tag_value in tag.items():
+            if type(tag_key) ==  unicode:
+                tag_key = tag_key.encode('utf-8')
+            if type(tag_value) ==  unicode:
+                tag_value = tag_value.encode('utf-8')
+            tags_dict[tag_key] = tag_value
+
     if conn.type in config.EC2_PROVIDERS:
-        tags_dict = {}
-        for tag in tags:
-            for tag_key, tag_value in tag.items():
-                if type(tag_key) ==  unicode:
-                    tag_key = tag_key.encode('utf-8')
-                if type(tag_value) ==  unicode:
-                    tag_value = tag_value.encode('utf-8')
-                tags_dict[tag_key] = tag_value
         try:
             conn.ex_create_tags(machine, tags_dict)
         except Exception as exc:
@@ -3132,12 +3130,21 @@ def set_machine_tags(user, backend_id, machine_id, tags):
     else:
         if conn.type == 'gce':
             try:
-                conn.ex_set_node_tags(machine, tags)
+                for node in conn.list_nodes():
+                    if node.id == machine_id:
+                        machine = node
+                        break
+            except Exception as exc:
+                raise BackendUnavailableError(backend_id, exc)
+            if not machine:
+                raise MachineNotFoundError(machine_id)
+            try:
+                conn.ex_set_node_metadata(machine, tags)
             except Exception as exc:
                 raise InternalServerError("error setting tags", exc)
         else:
             try:
-                conn.ex_set_metadata(machine, tags)
+                conn.ex_set_metadata(machine, tags_dict)
             except Exception as exc:
                 raise InternalServerError("error creating tags", exc)
 
@@ -3205,18 +3212,27 @@ def delete_machine_tag(user, backend_id, machine_id, tag):
     else:
         if conn.type == 'gce':
             try:
-                machine.extra['tags'].remove(tag)
-                conn.ex_set_node_tags(machine, machine.extra['tags'])
+                metadata = machine.extra['metadata']['items']
+                for tag_data in metadata:
+                    mkey = tag_data.get('key')
+                    mdata = tag_data.get('value')
+                    if tag == mkey:
+                        metadata.remove({u'value':mdata, u'key':mkey})
+                conn.ex_set_node_metadata(machine, metadata)
             except Exception as exc:
                 raise InternalServerError("Error while updating metadata", exc)
         else:
             tags = machine.extra.get('metadata', None)
             key = None
             for mkey, mdata in tags.iteritems():
-                if tag == mdata:
+                if type(mkey) ==  unicode:
+                    mkey = mkey.encode('utf-8')
+                if type(mdata) ==  unicode:
+                    mdata = mdata.encode('utf-8')
+                if tag == mkey:
                     key = mkey
             if key:
-                tags.pop(key)
+                tags.pop(key.decode('utf-8'))
             else:
                 raise NotFoundError("tag not found")
 
