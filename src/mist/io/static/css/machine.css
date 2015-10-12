@@ -1,340 +1,375 @@
 /* Single Machine Page CSS
 -----------------------------------------------------------------------------------------------------------*/
 #single-machine-page.ui-page-active {
-    overflow: hidden;
+	overflow: hidden;
 }
+
 #single-machine-page {
-    padding-bottom: 50px;
+	padding-bottom: 50px;
 }
+
 #single-machine-page .ui-content.ui-body-c {
-    background-color: transparent;
-    border: none;
-    padding-top: 0;
+	background-color: transparent;
+	border: none;
+	padding-top: 0;
 }
+
 #single-machine-page .ui-block-b .ui-title {
-    text-align: center;
+	text-align: center;
 }
+
 #single-machine-page .ui-block-b h1.ui-title {
-    margin: 2px auto 2px;
+	margin: 2px auto 2px;
 }
+
 #single-machine-page .ui-block-b h4.ui-title {
-    font-weight: 700;
-    padding: 0;
-    margin-top: 5px;
-    text-transform: uppercase;
+	font-weight: 700;
+	padding: 0;
+	margin-top: 5px;
+	text-transform: uppercase;
 }
+
 #single-machine-page .ui-block-b h4.ui-title.running {
-    color: #64b247;
+	color: #64b247;
 }
+
 #single-machine-page .ui-block-b h4.ui-title.pending {
-    color: #E09400;
+	color: #E09400;
 }
+
 #single-machine-page .ui-block-b h4.ui-title.error {
-    color: #D96557;
+	color: #D96557;
 }
+
 #single-machine-page .ui-block-b h4.ui-title.rebooting {
-    color: #4E68BB;
+	color: #4E68BB;
 }
+
 #single-machine-page .ui-block-b h4.ui-title.terminated {
-    color: #AAAAAA;
+	color: #AAAAAA;
 }
+
 #single-machine-page .ui-block-b h4.ui-title.stopped {
-    color: #d96557;
+	color: #d96557;
 }
+
 #single-machine-page .keys-button {
-    margin: 0;
-    float: right;
-    padding: 20px 60px 20px 20px !important;
-    font-weight: 400 !important;
-    font-size: 18px;
+	margin: 0;
+	float: right;
+	padding: 20px 60px 20px 20px !important;
+	font-weight: 400 !important;
+	font-size: 18px;
 }
-#single-machine-page  .keys-button.icon-keys {
-    color: #444 !important;
+
+#single-machine-page .keys-button.icon-keys {
+	color: #444444 !important;
 }
-#single-machine-page  .keys-button.icon-keys:hover {
-    background-color: #faf9f4 !important;
-    color: #444 !important;
+
+#single-machine-page .keys-button.icon-keys:hover {
+	background-color: #faf9f4 !important;
+	color: #444444 !important;
 }
-#single-machine-page  .keys-button.icon-keys:active {
-    background-color: #faf9f4 !important;
-    color: #444 !important;
+
+#single-machine-page .keys-button.icon-keys:active {
+	background-color: #faf9f4 !important;
+	color: #444444 !important;
 }
+
 #single-machine-page .keys-button.icon-keys:after {
-    right: 18px !important;
+	right: 18px !important;
 }
+
 #single-machine-page #associate-btn:after {
-    top: -14px;
+	top: -14px;
 }
+
 #single-machine-page .creation-button:after {
-    background-image: none;
-    margin: 0;
-    content: '+';
-    color: #fff !important;
-    position: absolute;
-    right: 1px;
-    top: -6px;
-    width: 60px;
-    height: 60px;
-    text-align: center;
-    font-size: 34px;
-    line-height: 60px;
+	background-image: none;
+	margin: 0;
+	content: '+';
+	color: #ffffff !important;
+	position: absolute;
+	right: 1px;
+	top: -6px;
+	width: 60px;
+	height: 60px;
+	text-align: center;
+	font-size: 34px;
+	line-height: 60px;
 }
+
 #single-machine-page .single-machine-header .ui-block-b {
-    text-align: right;
+	text-align: right;
 }
+
 #single-machine-page .ui-footer {
-    display: block;
+	display: block;
 }
+
 #single-machine-page .ui-collapsible .ui-collapsible-heading a {
-    background-color: #d4d4d4;
-    border: none;
-    padding: 20px 70px 16px !important;
-    font-weight: 400;
+	background-color: #d4d4d4;
+	border: none;
+	padding: 20px 70px 16px !important;
+	font-weight: 400;
 }
+
 #single-machine-page .ui-collapsible .ui-collapsible-content {
-    background-color: #faf9f4;
+	background-color: #faf9f4;
 }
+
 #single-machine-page .info-table {
-    width: 100%;
+	width: 100%;
 }
+
 #single-machine-page .info-table td {
-    margin: 0;
-    width: 50%;
-    font-size: 14px;
-    padding: 10px 12px;
-    border-bottom: 1px solid #eeedeb;
+	margin: 0;
+	width: 50%;
+	font-size: 14px;
+	padding: 10px 12px;
+	border-bottom: 1px solid #eeedeb;
 }
+
 #single-machine-page .info-table tr:last-child td {
-    border-bottom: none;
+	border-bottom: none;
 }
+
 #single-machine-page .info-table tr td:nth-child(1) {
-    padding-left: 70px;
+	padding-left: 70px;
 }
 
 /* Conditional for < 500px */
 @media only screen and  (max-width: 500px) {
-    #single-machine-page .info-table tr td:nth-child(1) {
-        padding-left: 30px;
-    }
+	#single-machine-page .info-table tr td:nth-child(1) {
+		padding-left: 30px;
+	}
 }
 
 #single-machine-page .graph-list {
-    box-shadow: none;
+	box-shadow: none;
 }
 
 #single-machine-page .info-table tr td:nth-child(2) {
-    color: #7f7f7f;
+	color: #7f7f7f;
 }
+
 #single-machine-page .info-table tr {
-    background-color: #faf9f4;
-    border: none;
+	background-color: #faf9f4;
+	border: none;
 }
+
 #single-machine-page .info-table tr:hover {
-    background-color: #f2f2f2;
+	background-color: #f2f2f2;
 }
+
 #single-machine-page .info-table .ip {
-    display: inline-block;
+	display: inline-block;
 }
+
 #single-machine-page .ui-collapsible {
-    margin: 10px 0 20px;
-    clear: both;
+	margin: 10px 0 20px;
+	clear: both;
 }
+
 #single-machine-page #monitoring-collapsible {
-    margin-top: 0;
+	margin-top: 0;
 }
+
 #single-machine-page #monitoring-disabled p {
-    text-align: center;
+	text-align: center;
 }
+
 #single-machine-page #monitoring-disabled a {
-    width: 165px;
-    margin: 0 auto;
+	width: 165px;
+	margin: 0 auto;
 }
+
 #single-machine-page #mist-manage-keys a {
-    margin-top: 15px;
+	margin-top: 15px;
 }
 
 #single-machine-page #monitoring-bottom-btns {
-    padding: 10px 0px;
+	padding: 10px 0px;
 }
+
 #single-machine-page #monitoring-bottom-btns:after {
-    content: '';
-    clear: both;
-    display: table;
+	content: '';
+	clear: both;
+	display: table;
 }
 
 #single-machine-page #monitoring-bottom-btns .ui-block-a,
 #single-machine-page #monitoring-bottom-btns .ui-block-b,
 #single-machine-page #monitoring-bottom-btns .ui-block-c {
-    /*width: 33.33%;*/
-    width: 49%;
+	/*width: 33.33%;*/
+	width: 49%;
 }
 
 #single-machine-page #monitoring-bottom-btns a {
-    margin: 7px auto;
-    display: inline-block;
-    font-weight: 400;
+	margin: 7px auto;
+	display: inline-block;
+	font-weight: 400;
 }
 
 #single-machine-page #monitoring-bottom-btns a.icon-plus:after {
-    color: #fff !important;
-    background-color: transparent !important;
-    margin: -22px -4px 0 0;
+	color: #ffffff !important;
+	background-color: transparent !important;
+	margin: -22px -4px 0 0;
 }
 
 #single-machine-page #monitoring-bottom-btns a.icon-xx:after {
-    margin: -8px 4px 0 0;
-    font-size: 16px;
+	margin: -8px 4px 0 0;
+	font-size: 16px;
 }
 
 #single-machine-page #machine-probe-btn {
-    float: right;
-    width: auto;
-    font-size: 12px;
-    padding-right: 35px !important;
-    margin-top: -6px;
-    margin-bottom: -5px;
-    text-align: left;
+	float: right;
+	width: auto;
+	font-size: 12px;
+	padding-right: 35px !important;
+	margin-top: -6px;
+	margin-bottom: -5px;
+	text-align: left;
 }
+
 #single-machine-page #machine-probe-btn:after {
-    text-align: right;
+	text-align: right;
 }
 
 @media only screen and  (max-width: 570px) {
-    #single-machine-page #machine-probe-btn {
-        float: none;
-        width: auto;
-        font-size: 12px;
-        padding-right: 1.1em !important;
-        margin: 6px 1px;
-        max-width: 60px;
-        text-align: left;
-    }
+	#single-machine-page #machine-probe-btn {
+		float: none;
+		width: auto;
+		font-size: 12px;
+		padding-right: 1.1em !important;
+		margin: 6px 1px;
+		max-width: 60px;
+		text-align: left;
+	}
 }
+
 #single-machine-page #machine-probe-btn:after {
-    margin-top: -8px;
-    font-size: 14px;
+	margin-top: -8px;
+	font-size: 14px;
 }
 
 #single-machine-page .info-table .ajax-loader {
-    display: inline-block;
-    position: relative;
-    top: 3px;
-    left: 6px;
+	display: inline-block;
+	position: relative;
+	top: 3px;
+	left: 6px;
 }
 
 #single-machine-page #machine-keys-panel .ui-panel-inner {
-    padding: 0;
+	padding: 0;
 }
 
 #single-machine-page #machine-keys-panel .ui-title {
-    font-size: 18px;
-    color: #000;
-    text-align: left;
-    padding: 0;
-    margin: 0;
+	font-size: 18px;
+	color: #000000;
+	text-align: left;
+	padding: 0;
+	margin: 0;
 }
 
 #single-machine-page #machine-keys-panel .ui-header {
-    padding: 15px;
+	padding: 15px;
 }
 
 #enable-monitoring-bundle .ajax-loader {
-    position: relative;
-    top: 8px;
+	position: relative;
+	top: 8px;
 }
-
 
 @media only screen and  (max-width: 570px) {
 
-
-    #single-machine-page #monitoring-bottom-btns .ui-block-a,
-    #single-machine-page #monitoring-bottom-btns .ui-block-b,
-    #single-machine-page #monitoring-bottom-btns .ui-block-c {
-        width: 100%;
-    }
+	#single-machine-page #monitoring-bottom-btns .ui-block-a,
+	#single-machine-page #monitoring-bottom-btns .ui-block-b,
+	#single-machine-page #monitoring-bottom-btns .ui-block-c {
+		width: 100%;
+	}
 }
 
 #metrics-container {
-    margin: 0;
+	margin: 0;
 }
 
 @-moz-document url-prefix() {
-    #machine-metric-add  .ajax-loader {
-        margin-top: -19px;
-    }
+	#machine-metric-add .ajax-loader {
+		margin-top: -19px;
+	}
 }
 
-
 .single-machine-header {
-    background-color: transparent;
+	background-color: transparent;
 }
 
 .single-machine-header .ui-block-b {
-    text-align: center;
+	text-align: center;
 }
 
 .single-machine-header .ui-block-c {
-    text-align: right;
+	text-align: right;
 }
 
 .single-machine-header .header-grid {
-    padding-top: 0;
-    padding-bottom: 0;
-    overflow: visible;
+	padding-top: 0;
+	padding-bottom: 0;
+	overflow: visible;
 }
 
 .single-machine-header .header-grid:after {
-    content: '';
-    clear: both;
-    display: table;
+	content: '';
+	clear: both;
+	display: table;
 }
 
 .single-machine-header .header-grid .ui-grid-a {
-    overflow: visible;
+	overflow: visible;
 }
 
 .single-machine-header .header-grid .ui-btn {
-    font-size: 18px;
-    display: block;
+	font-size: 18px;
+	display: block;
 }
 
 .single-machine-header h1 {
-    padding: 30px 60px;
-    background-color: #fff;
-    margin: 0;
-    display: inline-block;
-    text-transform: uppercase;
-    font-weight: bold;
+	padding: 30px 60px;
+	background-color: #ffffff;
+	margin: 0;
+	display: inline-block;
+	text-transform: uppercase;
+	font-weight: bold;
 }
 
 @-moz-document url-prefix() {
-    .single-machine-header .ui-title {
-        padding-left: 0px;
-    }
+	.single-machine-header .ui-title {
+		padding-left: 0px;
+	}
 }
 
 .single-machine-header .ajax-loader {
-    position: relative;
-    bottom: 30px;
+	position: relative;
+	bottom: 30px;
 }
 
 .single-machine-header span {
-    margin-top: 20px !important;
+	margin-top: 20px !important;
 }
 
 .info-table .loadleds,
 .info-table .netleds,
 .info-table .tag {
-    left: 0;
+	left: 0;
 }
+
 .info-table .tag {
-    float: none;
-    display: block;
-    padding: 0;
-    color: #7f7f7f !important;
-    max-width: 100%;
+	float: none;
+	display: block;
+	padding: 0;
+	color: #7f7f7f !important;
+	max-width: 100%;
 }
 
 div.df {
-    font-family: monospace;
+	font-family: monospace;
 }
