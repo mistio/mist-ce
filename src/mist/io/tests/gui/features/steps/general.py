@@ -102,7 +102,7 @@ def wait(context, seconds):
     sleep(int(seconds))
 
 
-@when(u'I expect for "{panel_title}" panel to {action} within max {seconds} '
+@then(u'I expect for "{panel_title}" panel to {action} within max {seconds} '
       u'seconds')
 def panel_waiting_with_timeout(context, panel_title, action, seconds):
     """
@@ -122,15 +122,15 @@ def panel_waiting_with_timeout(context, panel_title, action, seconds):
                                % (panel_title, action, seconds))
 
 
-@when(u'I expect for "{popup_name}" popup to {action} within max {seconds} '
+@then(u'I expect for "{popup_name}" popup to {action} within max {seconds} '
       u'seconds')
 def popup_waiting_with_timeout(context, popup_name, action, seconds):
     """
-    Function that wait for keyadd-popup to appear but for a maximum amount of time
-    we use method polling
+    Function that wait for keyadd-popup to appear but for a maximum
+    amount of time
     """
     if action == 'appear':
-        css_selector = '#%s:[class*="ui-popup-active"]' % popup_name
+        css_selector = '#%s[class*="ui-popup-active"]' % popup_name
     elif action == 'disappear':
         css_selector = '#%s[class*="ui-popup-hidden"]' % popup_name
     else:
@@ -143,46 +143,48 @@ def popup_waiting_with_timeout(context, popup_name, action, seconds):
                                % (popup_name, action, seconds))
 
 
-@when(u'I expect for "{page_title}" page to appear within max {seconds} seconds')
+@then(u'I expect for "{page_title}" page to appear within max {seconds} seconds')
 def page_waiting_with_timeout(context, page_title, seconds):
     """
     Function that wait for page to appear but for a maximum amount of time
     """
-    wait_for_page_to_appear(context, page_title, seconds)
+    try:
+        WebDriverWait(context.browser, int(seconds)).until(
+            EC.presence_of_element_located((By.ID, page_title)))
+    except TimeoutException:
+        raise TimeoutException("Page %s did not appear after %s seconds"
+                               % (page_title, seconds))
 
-
-def wait_for_page_to_appear(context, page_title, seconds=2):
-    end = time() + int(seconds)
-    while time() < end:
-        try:
-            page = context.browser.find_element_by_id(page_title)
-            if 'ui-page-active' in page.get_attribute('class'):
-                return
-        except NoSuchElementException:
-            sleep(1)
-    assert False, u'Page %s did not appear after %s seconds' % (page_title,
-                                                                seconds)
     
-    
-@when(u'I expect for "{loader_name}" loader to finish within max {seconds} '
+@then(u'I expect for "{loader_name}" loader to finish within max {seconds} '
       u'seconds')
 def loader_name_waiting_with_timeout(context, loader_name, seconds):
     """
-    Function that wait for loader_name to finish for a maximum amount of time
+    Function that wait for loader_name to finish for a maximum amount of time.
+    First it will wait for up to 2 seconds for loader to appear and then will
+    wait for {seconds} seconds for the loader to disappear.
+    If the loader name is key-generate-loader then as an extra precaution
+    it will check if the loader has already finished by checking the parent
+    container.
     """
-    wait_for_loader_to_finish(context,loader_name, seconds)
+    if loader_name == 'key-generate-loader':
+        container = context.browser.find_element_by_id("key-add-private-container")
+        if 'filled' in container.get_attribute('class'):
+            return
 
+    try:
+        WebDriverWait(context.browser, 2).until(EC.presence_of_element_located((By.ID, loader_name)))
+    except TimeoutException:
+        raise TimeoutException("loader %s did not appear after 2 seconds"
+                               % loader_name)
 
-def wait_for_loader_to_finish(context,loader_name, seconds):
     end = time() + int(seconds)
     while time() < end:
         try:
             loader = context.browser.find_element_by_id(loader_name)
-            if loader:
-            
-             return
-        except NoSuchElementException:
             sleep(1)
+        except NoSuchElementException:
+            return
     assert False, u'Loader %s did not finish after %s seconds' % (loader_name,
                                                                   seconds)
     
