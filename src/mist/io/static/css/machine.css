@@ -328,9 +328,11 @@
     left: 0;
 }
 .info-table .tag {
-    float: left;
-    padding: 0 10px 0 0;
+    float: none;
+    display: block;
+    padding: 0;
     color: #7f7f7f !important;
+    max-width: 100%;
 }
 
 div.df {
