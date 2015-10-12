@@ -22,7 +22,7 @@ Feature: Machines
     And I click the "ap-northeast-1a" button inside the "Create Machine" panel
     And I click the "Select Key" button inside the "Create Machine" panel
     And I click the "Add Key" button inside the "Create Machine" panel
-    And I expect for "key-add-popup" popup to appear within max 1 seconds
+    And I expect for "key-add-popup" popup to appear within max 2 seconds
     And I fill "randomly_created" as key name
     And I click the "Generate" button inside the "Add key" popup
     And I wait for 5 seconds 
@@ -37,7 +37,7 @@ Feature: Machines
 
     When I choose the "randomly_created" machine
     And I click the button "Actions"
-    And I expect for "machine-power-popup-popup" popup to appear within max 1 seconds
+    And I expect for "machine-power-popup-popup" popup to appear within max 2 seconds
     And I click the button "Reboot"
     And I expect for "dialog-popup" popup to appear within max 2 seconds
     And I click the button "Yes"

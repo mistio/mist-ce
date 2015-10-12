@@ -235,7 +235,7 @@ def ssh_key_is_added(context, ssh_key_name):
                 Then I click the button "%s"
                 And I expect for "non-associated-keys-popup-popup" popup to appear within max 2 seconds
                 And I click the button "New key"
-                And I expect for "key-add-popup" popup to appear within max 1 seconds
+                And I expect for "key-add-popup" popup to appear within max 2 seconds
                 Then I upload the ssh key with name "%s"
                 And I wait for 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"

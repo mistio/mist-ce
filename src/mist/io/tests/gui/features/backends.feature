@@ -8,7 +8,7 @@ Feature: Add second-tier backends
   @all-backends
   Scenario Outline:
     When I click the button "Add cloud"
-    And I expect for "add-backend" panel to appear within max 1 seconds
+    And I expect for "add-backend" panel to appear within max 2 seconds
     And I click the button "<provider>"
     And I wait for 1 seconds
     And I use my "<credentials>" credentials
@@ -39,9 +39,9 @@ Feature: Add second-tier backends
     When I click the button "Rackspace"
     And I rename the backend to "Renamed"
     And I click the "OK" button inside the "Edit cloud" popup
-    And I expect for "backend-edit-popup" popup to appear within max 1 seconds
+    And I expect for "backend-edit-popup" popup to appear within max 2 seconds
     And I click the "_x_" button inside the "Edit cloud" popup
-    And I expect for "backend-edit-popup" popup to disappear within max 1 seconds
+    And I expect for "backend-edit-popup" popup to disappear within max 2 seconds
     Then the "Renamed" backend should be added within 3 seconds
     When I wait for 1 seconds
     When I click the button "Renamed"
