@@ -45,8 +45,8 @@ you simply run::
 
     sudo easy_install virtualenv
 
-Supposing you have all the above, the steps are simple. Clone the repository,
-create a virtualenv and run buildout::
+Supposing you have all the above, the steps are simple. Login as user, clone the repository,
+create a virtualenv and run buildout. This will fail if you run it as root or with sudo, so make sure you run it as user ::
 
     git clone https://github.com/mistio/mist.io.git
     cd mist.io

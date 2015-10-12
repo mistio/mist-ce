@@ -217,7 +217,12 @@
 
             </div>
         {{/if}}
-
+        {{#if Mist.isCore}}
+            <div class="logs ui-shadow" data-role="collapsible" data-collapsed="false">
+               <h4>Activity log</h4>
+               {{component "log-list"}}
+            </div>
+        {{/if}}
     </div>
 
     {{component "dialog-popup"}}

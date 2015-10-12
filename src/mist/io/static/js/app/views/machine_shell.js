@@ -29,7 +29,7 @@ define('app/views/machine_shell', ['app/views/popup'],
                         .on('popupbeforeposition', beforeOpenHandler)
                         .parent()
                         .addClass(Mist.isClientMobile ? 'mobile' : 'desktop')
-                        .addClass(Mist.isClientMoblie ? 'huge-popup' : '');
+                        .addClass(Mist.isClientMobile ? 'huge-popup' : '');
                 });
             }.on('didInsertElement'),
 
@@ -218,7 +218,6 @@ define('app/views/machine_shell', ['app/views/popup'],
             var popup = $('#machine-shell-popup');
             popup.css('left', ((window.innerWidth - popup.width()) / 2) + 'px');
 
-            info('calibrating mobile shell at', numOfColumns, numOfRows, fontSize);
             Mist.machineShellController.set('cols', MIN_TERM_COLUMNS);
             Mist.machineShellController.set('rows', MIN_TERM_ROWS);
         }

@@ -23,6 +23,9 @@ except IOError:
 except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
 CORE_URI = settings.get("CORE_URI", "https://mist.io")
+AMQP_URI = settings.get("AMQP_URI", "localhost:5672")
+MEMCACHED_HOST = settings.get("MEMCACHED_HOST", ["127.0.0.1:11211"])
+BROKER_URL = settings.get("BROKER_URL", "amqp://guest:guest@127.0.0.1/")
 SSL_VERIFY = settings.get("SSL_VERIFY", True)
 JS_BUILD = settings.get("JS_BUILD", False)
 CSS_BUILD = settings.get("CSS_BUILD", False)
@@ -38,7 +41,7 @@ ALLOW_CONNECT_PRIVATE = settings.get('ALLOW_CONNECT_PRIVATE', True)
 
 # celery settings
 CELERY_SETTINGS = {
-    'BROKER_URL': 'amqp://guest:guest@127.0.0.1/',
+    'BROKER_URL': BROKER_URL,
     'CELERY_TASK_SERIALIZER': 'json',
     'CELERYD_LOG_FORMAT': PY_LOG_FORMAT,
     'CELERYD_TASK_LOG_FORMAT': PY_LOG_FORMAT,
@@ -276,7 +279,7 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider' : Provider.HOSTVIRTUAL,
         'regions': []
     },
-	# Vultr
+    # Vultr
     {
         'title': 'Vultr',
         'provider' : Provider.VULTR,

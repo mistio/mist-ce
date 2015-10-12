@@ -24,6 +24,7 @@ define('app/views/log_list', ['ember'],
             firstRequest: true,
             forceFlag: 'all',
             filterString: '',
+            preFilterString: '',
             noMoreLogs: false,
             lastLogTimestamp: null,
 
@@ -55,6 +56,7 @@ define('app/views/log_list', ['ember'],
             unload: function () {
                 Mist.logsController.set('view', null);
                 Mist.logsController.set('prettyTimeReady', false);
+                $(window).off('scroll');
             }.on('willDestroyElement'),
 
 
@@ -172,7 +174,9 @@ define('app/views/log_list', ['ember'],
 
             _processFilterString: function () {
                 // Prepare filter
-                var filterString = this.get('filterString') || '';
+                var preFilterString = this.get('preFilterString') || ''
+                var filterString = preFilterString + ' ' + (this.get('filterString') || '');
+                console.log(filterString)
                 var filter = filterString.trim().toLowerCase().split(' ').map(
                     function (term) {
                         return term.trim();
@@ -392,7 +396,11 @@ define('app/views/log_list', ['ember'],
 
             filterStringObserver: function () {
                 Ember.run.once(this, 'newSearch');
-            }.observes('filterString')
+            }.observes('filterString'),
+
+            preFilterStringObserver: function () {
+                Ember.run.once(this, 'newSearch');
+            }.observes('preFilterString')
         });
 
         function textInString (text, str) {

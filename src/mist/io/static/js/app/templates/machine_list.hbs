@@ -41,14 +41,12 @@
             <!-- /grid-b -->
 
             <ul id="machine-list" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter machines" data-theme="c" class="checkbox-list">
-                {{#each Mist.backendsController.model as |backend|}}
-                    {{#if backend.enabled}}
-                        {{#each backend.machines.model as |machine|}}
-                            {{component "machine-list-item" machine=machine class="checkbox-link"}}
-                        {{/each}}
+                {{#each view.machines as |machine|}}
+                    {{#if machine.backend.enabled}}
+                        {{component "machine-list-item" machine=machine class="checkbox-link"}}
                     {{/if}}
                 {{/each}}
-            </ul>            
+            </ul>
         </div>
 
         <div class="mid-padding"></div>
@@ -63,8 +61,17 @@
     {{component "machine-power" position="#machines-power-btn"}}
 
     <div id="select-machines-popup" class="ui-mini" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
-        <div class="ui-header ui-caps">Select</div>
+        <div class="ui-header ui-caps">Sort by</div>
+        <ul data-role="listview">
+            <li>
+                <a class="ui-btn ui-btn-icon-left {{if view.sortByName 'icon-check'}}" {{action "sortBy" "name" target=view}}>Name</a>
+            </li>
+            <li>
+                <a class="ui-btn ui-btn-icon-left {{if view.sortByState 'icon-check'}}" {{action "sortBy" "state" target=view}}>State</a>
+            </li>
+        </ul>
 
+        <div class="ui-header ui-caps">Select</div>
         <ul data-role="listview">
             <li data-icon="false">
                 <a {{action "selectionModeClicked" "all" target=view}}>All</a>
