@@ -18,20 +18,20 @@ Feature: Add second-tier backends
 
     Examples: Providers
     | provider              | credentials  |
-#   | Azure                 | AZURE        |
-#   | DigitalOcean          | DIGITALOCEAN |
-#   | GCE                   | GCE          |
-#   | HP Helion Cloud       | HP           |
-#   | Linode                | LINODE       |
-#   | NephoScale            | NEPHOSCALE   |
-#   | Rackspace             | RACKSPACE    |
-#   | SoftLayer             | SOFTLAYER    |
-#   | VMware vCloud         | VMWARE       |
-#   | Indonesian Cloud      | INDONESIAN   |
-#   | KVM (via libvirt)     | LIBVIRT      |
-#   | OpenStack             | OPENSTACK    |
+    | Azure                 | AZURE        |
+    | DigitalOcean          | DIGITALOCEAN |
+    | GCE                   | GCE          |
+    | HP Helion Cloud       | HP           |
+    | Linode                | LINODE       |
+    | NephoScale            | NEPHOSCALE   |
+    | Rackspace             | RACKSPACE    |
+    | SoftLayer             | SOFTLAYER    |
     | EC2                   | EC2          |
-#   | Docker                | DOCKER       |
+#    | VMware vCloud         | VMWARE       |
+#    | Indonesian Cloud      | INDONESIAN   |
+#    | KVM (via libvirt)     | LIBVIRT      |
+#    | OpenStack             | OPENSTACK    |
+#    | Docker                | DOCKER       |
 
   @backend-actions
   Scenario: Backend Actions
