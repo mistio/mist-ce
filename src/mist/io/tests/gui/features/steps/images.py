@@ -16,11 +16,8 @@ def images_loaded(context, seconds):
 
 @then(u'there should be starred Images')
 def starred_images_loaded(context):
-    starred_images = context.browser.find_elements_by_class_name("ui-checkbox-on")
-    if len(starred_images) > 0:
-        return
-    else:
-        assert False, u'No starred images found'
+    starred_images = context.browser.find_elements_by_class_name("staron")
+    assert len(starred_images) > 0, u'No starred images found'
 
 
 @then(u'an Image that contains "{text}" should be starred')
