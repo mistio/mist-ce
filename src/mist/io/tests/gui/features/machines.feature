@@ -10,8 +10,8 @@ Feature: Machines
   Scenario: Machine Actions EC2
     When I visit the Machines page after the counter has loaded
     And I click the button "Create Machine"
-    And I expect for "create-machine" panel to appear within max 2 seconds
-    And I fill in a random machine name
+    Then I expect for "create-machine" panel to appear within max 2 seconds
+    When I fill in a random machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
     And I click the "EC2" button inside the "Create Machine" panel
     And I click the "Select Image" button inside the "Create Machine" panel
@@ -22,41 +22,41 @@ Feature: Machines
     And I click the "ap-northeast-1a" button inside the "Create Machine" panel
     And I click the "Select Key" button inside the "Create Machine" panel
     And I click the "Add Key" button inside the "Create Machine" panel
-    And I expect for "key-add-popup" popup to appear within max 2 seconds
-    And I fill "randomly_created" as key name
+    Then I expect for "key-add-popup" popup to appear within max 2 seconds
+    When I fill "randomly_created" as key name
     And I click the "Generate" button inside the "Add key" popup
-    And I wait for 5 seconds 
-    And I click the "Add" button inside the "Add key" popup
-    And I expect for "key-add-popup" popup to disappear within max 2 seconds
-    And I click the "Launch" button inside the "Create Machine" panel
-    And I wait for 2 seconds
-    Then I search for the "randomly_created" Machine
-    Then I should see the "randomly_created" machine added within 10 seconds
+    Then I expect for "key-generate-loader" loader to finish within max 5 seconds
+    When I click the "Add" button inside the "Add key" popup
+    Then I expect for "key-add-popup" popup to disappear within max 2 seconds
+    When I click the "Launch" button inside the "Create Machine" panel
+    Then I expect for "create-machine" panel to disappear within max 2 seconds
+    And I search for the "randomly_created" Machine
+    Then I should see the "randomly_created" machine added within 20 seconds
     And "randomly_created" machine state should be "running" within 400 seconds
     When I wait for 5 seconds
 
     When I choose the "randomly_created" machine
     And I click the button "Actions"
-    And I expect for "machine-power-popup-popup" popup to appear within max 2 seconds
-    And I click the button "Reboot"
-    And I expect for "dialog-popup" popup to appear within max 2 seconds
-    And I click the button "Yes"
-    And I expect for "dialog-popup" popup to disappear within max 1 seconds
-    Then "randomly_created" machine state should be "running" within 200 seconds
+    Then I expect for "machine-power-popup-popup" popup to appear within max 2 seconds
+    When I click the button "Reboot"
+    Then I expect for "dialog-popup" popup to appear within max 2 seconds
+    When I click the button "Yes"
+    Then I expect for "dialog-popup" popup to disappear within max 2 seconds
+    And "randomly_created" machine state should be "running" within 200 seconds
 
     When I click the button "Actions"
-    And I expect for "machine-power-popup-popup" popup to appear within max 1 seconds
-    And I click the button "Destroy"
-    And I expect for "dialog-popup" popup to appear within max 2 seconds
-    And I click the button "Yes"
-    And I expect for "dialog-popup" popup to disappear within max 1 seconds
+    Then I expect for "machine-power-popup-popup" popup to appear within max 2 seconds
+    When I click the button "Destroy"
+    Then I expect for "dialog-popup" popup to appear within max 2 seconds
+    When I click the button "Yes"
+    Then I expect for "dialog-popup" popup to disappear within max 2 seconds
     Then "randomly_created" machine state should be "terminated" within 200 seconds
 
   @machine-probing
   Scenario: Machine probing
     When I visit the Machines page after the counter has loaded
     And I click the button "sshtesting"
-    And I expect for "single-machine-page" page to appear within max 2 seconds
+    Then I expect for "single-machine-page" page to appear within max 2 seconds
     Given ssh key with name "TESTING_MACHINE" is added
     Then I click the button "Probe"
     And I wait for probing to finish for 100 seconds max
@@ -66,7 +66,7 @@ Feature: Machines
   Scenario: Connect with ssh
     When I visit the Machines page after the counter has loaded
     And I click the button "sshtesting"
-    And I expect for "single-machine-page" page to appear within max 2 seconds
+    Then I expect for "single-machine-page" page to appear within max 2 seconds
     Given ssh key with name "TESTING_MACHINE" is added
     Then I click the button "Shell"
     And I test the ssh connection
