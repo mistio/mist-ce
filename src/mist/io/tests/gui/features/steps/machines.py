@@ -205,7 +205,7 @@ def ssh_key_is_added(context, ssh_key_name):
                 And I click the button "New key"
                 And I expect for "key-add-popup" popup to appear within max 2 seconds
                 Then I upload the ssh key with name "TESTING_MACHINE"
-                And I wait for 5 seconds
+                Then I expect for "key-generate-loader" loader to finish within max 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
                 Then If the key addition was successful
                 Then I click the button "Enable Monitoring"
@@ -220,12 +220,10 @@ def ssh_key_is_added(context, ssh_key_name):
                 machine_keys_list = context.browser.find_element_by_id(
                     "machine-keys")
                 machines_keys = machine_keys_list.find_elements_by_class_name(
-                    "probed")
-                #import ipdb
-                #ipdb.set_trace()
+                    "small-list-item")
                 for machines_key in machines_keys:
-                    if machines_key.text == \
-                            context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']:
+                    if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']\
+                            in machines_key.text:
                         context.execute_steps(u'Then I click the button '
                                               u'"Enable Monitoring"')
                         return
@@ -237,7 +235,7 @@ def ssh_key_is_added(context, ssh_key_name):
                 And I click the button "New key"
                 And I expect for "key-add-popup" popup to appear within max 2 seconds
                 Then I upload the ssh key with name "%s"
-                And I wait for 5 seconds
+                Then I expect for "key-generate-loader" loader to finish within max 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
                 And If the key addition was successful
                 Then I click the button "Enable Monitoring"
