@@ -14,7 +14,7 @@ Feature: Add second-tier backends
     Then I expect for "add-backend" panel to appear within max 2 seconds
     When I use my "<credentials>" credentials
     And I click the button "Add"
-    Then the "<provider>" backend should be added within 30 seconds
+    Then the "<provider>" backend should be added within 60 seconds
 #    And I wait for 3 seconds
 
     Examples: Providers
