@@ -1,3 +1,5 @@
+
+
 import re
 from behave import *
 from time import time, sleep
@@ -199,11 +201,26 @@ def ssh_key_is_added(context, ssh_key_name):
             # if there no keys then it will be called "Add key"
             context.execute_steps(u"""
                 Then I click the button "Add key"
-                And I wait for 1 seconds
+                And I expect for "non-associated-keys-popup" popup to appear within max 2 seconds
                 And I click the button "New key"
-                And I wait for 1 seconds
-                Then I upload the ssh key with name "TESTING_MACHINE"
-                And I wait for 5 seconds
+            """)
+            # check if the key is already uploaded but not associated
+            key_already_associated = False
+            non_associated_keys = context.browser.find_element_by_id('non-associated-keys-popup').find_elements_by_tag_name('li')
+            for non_associated_key in non_associated_keys:
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in non_associated_key.text.lower():
+                    non_associated_key.click()
+                    key_already_associated = True
+                    break
+
+            if not key_already_associated:
+                context.execute_steps(u"""
+                    And I expect for "key-add-popup" popup to appear within max 2 seconds
+                    Then I upload the ssh key with name "TESTING_MACHINE"
+                """)
+
+            context.execute_steps(u"""
+                Then I expect for "key-generate-loader" loader to finish within max 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
                 Then If the key addition was successful
                 Then I click the button "Enable Monitoring"
@@ -213,16 +230,15 @@ def ssh_key_is_added(context, ssh_key_name):
             # otherwise it will be called "? keys" where ? is the number of
             # saved keys. before adding the key we need to check if it's already
             # saved
-            context.execute_steps(u'Then I click the button "keys"')
+            context.execute_steps(u'Then I click the button "%s"' % button.text)
             try:
                 machine_keys_list = context.browser.find_element_by_id(
                     "machine-keys")
-                machines_keys = context.browser.find_elements_by_class_name(
-                    "probed")
+                machines_keys = machine_keys_list.find_elements_by_class_name(
+                    "small-list-item")
                 for machines_key in machines_keys:
-                    if machines_key.text == \
-                            context.mist_config['CREDENTIALS'][ssh_key_name][
-                                'key_name']:
+                    if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']\
+                            in machines_key.text:
                         context.execute_steps(u'Then I click the button '
                                               u'"Enable Monitoring"')
                         return
@@ -230,14 +246,15 @@ def ssh_key_is_added(context, ssh_key_name):
                 pass
             context.execute_steps(u"""
                 Then I click the button "%s"
-                And I wait for 1 seconds
+                And I expect for "non-associated-keys-popup" popup to appear within max 2 seconds
                 And I click the button "New key"
-                And I wait for 1 seconds
+                And I expect for "key-add-popup" popup to appear within max 2 seconds
                 Then I upload the ssh key with name "%s"
-                And I wait for 5 seconds
+                Then I expect for "key-generate-loader" loader to finish within max 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
                 And If the key addition was successful
                 Then I click the button "Enable Monitoring"
+                And I expect for "machine-keys-panel" panel to disappear within max 2 seconds
             """ % (button.text, ssh_key_name))
 
 
