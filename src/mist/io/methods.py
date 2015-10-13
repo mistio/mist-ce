@@ -1443,10 +1443,10 @@ def list_machines(user, backend_id):
         # optimize for js
         if type(tags) == dict:
             tags = [{'key': key, 'value': value} for key, value in tags.iteritems() if key != 'Name']
-        if m.extra.get('availability', None):
-            # for EC2
-            tags.append({'key': 'availability', 'value': m.extra['availability']})
-        elif m.extra.get('DATACENTERID', None):
+        #if m.extra.get('availability', None):
+        #    # for EC2
+        #    tags.append({'key': 'availability', 'value': m.extra['availability']})
+        if m.extra.get('DATACENTERID', None):
             # for Linode
             dc = config.LINODE_DATACENTERS.get(m.extra['DATACENTERID'])
             tags.append({'key': 'DATACENTERID', 'value':dc})
