@@ -115,10 +115,9 @@ def backend_creds(context, backend):
         tenant_name = context.browser.find_element_by_id("tenant_name")
         tenant_name.send_keys(context.mist_config['CREDENTIALS']['OPENSTACK']['tenant_name'])
     elif "RACKSPACE" in backend:
-        context.execute_steps(u'When I click the button "Select Region"')
-        context.execute_steps(u'When I click the button "%s"' %
-                              context.mist_config['CREDENTIALS']['RACKSPACE']['region'])
-        sleep(1)
+        context.execute_steps(u'''
+        When I click the button "Select Region"
+        And I click the button "%s"''' % context.mist_config['CREDENTIALS']['RACKSPACE']['region'])
         title = context.browser.find_element_by_id("title")
         for i in range(20):
             title.send_keys(u'\ue003')
