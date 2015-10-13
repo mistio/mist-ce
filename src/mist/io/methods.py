@@ -1528,6 +1528,10 @@ def list_machines(user, backend_id):
             # this is windows for windows servers and None for Linux
             m.extra['os_type'] = m.extra.get('platform', 'linux')
 
+        # tags should be a list
+        if not tags:
+            tags = []
+
         machine = {'id': m.id,
                    'uuid': m.get_uuid(),
                    'name': m.name,
