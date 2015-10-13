@@ -77,15 +77,16 @@ def backend_creds(context, backend):
                     raise e
                 sleep(1)
         subscription_id.send_keys(context.mist_config['CREDENTIALS']['AZURE']['subscription_id'])
-        sleep(1)
-        add_cert_button = context.browser.find_element_by_id("certificate")
-        add_cert_button.click()
-        sleep(1)
+        context.execute_steps(u'''
+        When I click the "Add Certificate" button inside the "Add Cloud" panel
+        Then I expect for "file-upload-popup" popup to appear within max 2 seconds
+        ''')
         upload_area = context.browser.find_element_by_id("upload-area")
         upload_area.send_keys(context.mist_config['CREDENTIALS']['AZURE']['certificate'])
-        file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
-        file_upload_ok.click()
-        context.execute_steps(u'Then I wait for 1 seconds')
+        context.execute_steps(u'''
+        When I click the "Done" button inside the "Upload" popup
+        Then I expect for "file-upload-popup" popup to disappear within max 2 seconds
+        ''')
     elif "GCE" in backend:
         title = context.browser.find_element_by_id("title")
         for i in range(1, 6):
