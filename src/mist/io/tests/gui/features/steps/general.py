@@ -187,8 +187,18 @@ def loader_name_waiting_with_timeout(context, loader_name, seconds):
             return
     assert False, u'Loader %s did not finish after %s seconds' % (loader_name,
                                                                   seconds)
-    
-  
+
+
+@then(u'I expect for "{element_id}" to be visible within max {seconds} '
+      u'seconds')
+def become_visible_waiting_with_timeout(context, element_id, seconds):
+    try:
+        WebDriverWait(context.browser, 2).until(EC.visibility_of_element_located((By.ID, element_id)))
+    except TimeoutException:
+        raise TimeoutException("element with id %s did not become visible "
+                               "after %s seconds" % (element_id, seconds))
+
+
 @then(u'I click the button "{text}"')
 def then_click(context, text):
     return click_button(context, text)
@@ -242,7 +252,7 @@ def click_button_within_panel(context, text, panel_title):
     found_panel = None
     for panel in panels:
         header = panel.find_element_by_class_name("ui-collapsible-heading")
-        header = header.find_element_by_class_name("title")
+        # header = header.find_element_by_class_name("title")
         if panel_title.lower() in header.text.lower():
             found_panel = panel
             break
