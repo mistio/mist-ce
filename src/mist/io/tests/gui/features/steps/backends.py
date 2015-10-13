@@ -147,11 +147,8 @@ def backend_creds(context, backend):
         api_key.send_keys(context.mist_config['CREDENTIALS']['SOFTLAYER']['api_key'])
     elif "EC2" in backend:
         context.execute_steps(u'''
-                When I click the button "Select Region"
-                And I wait for 1 seconds
-                When I click the button "%s"
-        ''' % context.mist_config['CREDENTIALS']['EC2']['region'])
-        sleep(1)
+        When I click the button "Select Region"
+        And I click the button "%s"''' % context.mist_config['CREDENTIALS']['EC2']['region'])
         title = context.browser.find_element_by_id("title")
         for i in range(20):
             title.send_keys(u'\ue003')
