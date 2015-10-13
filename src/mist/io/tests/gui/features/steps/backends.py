@@ -56,11 +56,13 @@ def given_backend(context, backend):
 
     context.execute_steps(u'''
         When I click the button "Add cloud"
+        Then I expect for "new-backend-provider" panel to appear within max 2 seconds
         And I click the button "%s"
-        And I wait for 1 seconds
-        And I use my "%s" credentials
+        And I expect for "new-backend-provider" panel to disappear within max 2 seconds
+        Then I expect for "backend-add-fields" to be visible within max 2 seconds
+        When I use my "%s" credentials
         And I click the button "Add"
-        Then the "%s" backend should be added within 30 seconds
+        Then the "%s" backend should be added within 60 seconds
     ''' % (backend, creds, backend))
 
 

@@ -19,22 +19,15 @@ Feature: Add second-tier backends
 
     Examples: Providers
     | provider              | credentials  |
+    | Azure                 | AZURE        |
     | GCE                   | GCE          |
-
-
-#    | Azure                 | AZURE        |
-
-#    | DigitalOcean          | DIGITALOCEAN |
-
-
-#    | HP Helion Cloud       | HP           |
-#    | Linode                | LINODE       |
-#    | NephoScale            | NEPHOSCALE   |
-#    | Rackspace             | RACKSPACE    |
-#    | SoftLayer             | SOFTLAYER    |
-#    | EC2                   | EC2          |
-
-
+    | DigitalOcean          | DIGITALOCEAN |
+    | Rackspace             | RACKSPACE    |
+    | HP Helion Cloud       | HP           |
+    | SoftLayer             | SOFTLAYER    |
+    | EC2                   | EC2          |
+    | NephoScale            | NEPHOSCALE   |
+    | Linode                | LINODE       |
 #    | VMware vCloud         | VMWARE       |
 #    | Indonesian Cloud      | INDONESIAN   |
 #    | KVM (via libvirt)     | LIBVIRT      |
