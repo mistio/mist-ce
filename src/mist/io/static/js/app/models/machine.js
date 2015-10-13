@@ -58,6 +58,11 @@ define('app/models/machine', ['ember'],
             //  Computed Properties
             //
 
+            cannotHaveMonitoring: Ember.computed('state', function() {
+                var invalids = ['error', 'stopped', 'terminated', 'pending', 'rebooting'];
+                return invalids.indexOf(this.get('state')) > -1;
+            }),
+
             incidents: function () {
                 return incidents = Mist.openIncidents.filterBy('machineId', this.get('id'));
             }.property('Mist.openIncidents.@each.machine'),
