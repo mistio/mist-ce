@@ -94,14 +94,17 @@ def backend_creds(context, backend):
         title.send_keys("GCE")
         project_id = context.browser.find_element_by_id("project_id")
         project_id.send_keys(context.mist_config['CREDENTIALS']['GCE']['project_id'])
-        add_key = context.browser.find_element_by_id("private_key")
-        add_key.click()
-        sleep(1)
+        context.execute_steps(u'''
+        When I click the "Add JSON Key" button inside the "Add Cloud" panel
+        Then I expect for "file-upload-popup" popup to appear within max 2 seconds
+        ''')
         upload_area = context.browser.find_element_by_id("file-upload-input")
         upload_area.send_keys(context.mist_config['CREDENTIALS']['GCE']['private_key'])
-        file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
-        file_upload_ok.click()
-        sleep(1)
+        context.execute_steps(u'''
+        Then I expect for "file-upload-ok" to be clickable within max 2 seconds
+        When I click the "Done" button inside the "Upload" popup
+        Then I expect for "file-upload-popup" popup to disappear within max 4 seconds
+        ''')
     elif "OPENSTACK" in backend:
         username = context.browser.find_element_by_id("username")
         username.send_keys(context.mist_config['CREDENTIALS']['OPENSTACK']['username'])

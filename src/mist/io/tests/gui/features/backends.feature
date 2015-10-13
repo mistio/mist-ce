@@ -11,7 +11,7 @@ Feature: Add second-tier backends
     Then I expect for "new-backend-provider" panel to appear within max 2 seconds
     And I click the button "<provider>"
     And I expect for "new-backend-provider" panel to disappear within max 2 seconds
-    Then I expect for "add-backend" panel to appear within max 2 seconds
+    Then I expect for "backend-add-fields" to be visible within max 2 seconds
     When I use my "<credentials>" credentials
     And I click the button "Add"
     Then the "<provider>" backend should be added within 60 seconds
@@ -19,15 +19,22 @@ Feature: Add second-tier backends
 
     Examples: Providers
     | provider              | credentials  |
-    | Azure                 | AZURE        |
-    | DigitalOcean          | DIGITALOCEAN |
     | GCE                   | GCE          |
-    | HP Helion Cloud       | HP           |
-    | Linode                | LINODE       |
-    | NephoScale            | NEPHOSCALE   |
-    | Rackspace             | RACKSPACE    |
-    | SoftLayer             | SOFTLAYER    |
-    | EC2                   | EC2          |
+
+
+#    | Azure                 | AZURE        |
+
+#    | DigitalOcean          | DIGITALOCEAN |
+
+
+#    | HP Helion Cloud       | HP           |
+#    | Linode                | LINODE       |
+#    | NephoScale            | NEPHOSCALE   |
+#    | Rackspace             | RACKSPACE    |
+#    | SoftLayer             | SOFTLAYER    |
+#    | EC2                   | EC2          |
+
+
 #    | VMware vCloud         | VMWARE       |
 #    | Indonesian Cloud      | INDONESIAN   |
 #    | KVM (via libvirt)     | LIBVIRT      |
