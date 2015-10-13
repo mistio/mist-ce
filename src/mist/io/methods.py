@@ -1353,7 +1353,7 @@ def get_machine_actions(machine_from_api, conn, extra):
         if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                          Provider.NEPHOSCALE, Provider.SOFTLAYER,
                          Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                         Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR):
+                         Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR, 'bare_metal', 'coreos'):
             can_tag = False
 
     # for other states
