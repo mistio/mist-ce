@@ -52,7 +52,7 @@
             <div class="ui-block-c machine-tags">
                 <span class="tag">{{machine.backend.title}}</span>
                 {{#each machine.tags as |tag|}}
-                <span class="tag">{{tag.key}}={{tag.value}}</span>
+					<span class="tag pairs">{{tag.key}}{{#if tag.value}}={{tag.value}}{{/if}}</span>
                 {{/each}}
             </div>
 

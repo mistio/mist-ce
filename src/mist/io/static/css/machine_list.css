@@ -181,10 +181,16 @@
     height: 18px;
 }
 
-.machine-tags .tag {
+@media only screen and  (max-width: 600px) {
+    .machine-tags {
+        height: 16px;
+    }
+}
+
+.machine-tags .tag.pairs {
     background-color: #b5b5b5;
     color: #fff !important;
-    padding: 0 3px;
+    padding: 0 5px;
     border-radius: 1px;
 }
 

@@ -164,7 +164,7 @@
                         <td>Tags</td>
                         <td>
                             {{#each model.tags as |tag|}}
-                            <div class="tag">{{tag.key}}={{tag.value}}</div><br>
+                            <div class="tag pairs">{{tag.key}}{{#if tag.value}}={{tag.value}}{{/if}}</div><br>
                             {{/each}}
                         </td>
                     </tr>
