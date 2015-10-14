@@ -364,10 +364,13 @@
 
 .info-table .tag {
 	float: none;
-	display: block;
-	padding: 0;
-	color: #7f7f7f !important;
+	display: inline-block;
 	max-width: 100%;
+	background-color: #b5b5b5;
+	color: #fff !important;
+	padding: 0 3px;
+	border-radius: 1px;
+	margin: 3px 0;
 }
 
 div.df {

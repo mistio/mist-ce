@@ -181,6 +181,13 @@
     height: 18px;
 }
 
+.machine-tags .tag {
+    background-color: #b5b5b5;
+    color: #fff !important;
+    padding: 0 3px;
+    border-radius: 1px;
+}
+
 .has-incident label:after {
     color: #fff !important;
 }
