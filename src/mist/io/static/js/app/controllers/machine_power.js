@@ -18,6 +18,7 @@ define('app/controllers/machine_power', ['ember'],
             canDestroy: null,
             canShutdown: null,
             canRename: null,
+            canRunScript: null,
 
 
             //
@@ -53,6 +54,13 @@ define('app/controllers/machine_power', ['ember'],
                     }, 350)
                     return;
                 }
+                if (action == 'script'){
+                    var machine = this.machines[0];
+                    Ember.run.later(function(){
+                        Mist.machineRunScriptController.open(machine);
+                    }, 350)
+                    return;
+                }
                 Ember.run.later(function () {
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.YES_NO,
@@ -85,6 +93,7 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canDestroy', null);
                     this.set('canShutdown', null);
                     this.set('canRename', null);
+                    this.set('canRunScript', null);
                 });
             },
 
@@ -94,10 +103,16 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canReboot', !this.machines.findBy('can_reboot', false));
                     this.set('canDestroy', !this.machines.findBy('can_destroy', false));
                     this.set('canShutdown', !this.machines.findBy('can_stop', false));
-                    if(this.machines.length == 1 && this.machines[0].get('can_rename')){
+                    if(this.machines.length == 1 && this.machines[0].get('can_rename')) {
                         this.set('canRename', true);
-                    }else{
+                    } else {
                         this.set('canRename', false);
+                    }
+
+                    if(this.machines.length == 1 && this.machines[0].get('hasKeys')) {
+                        this.set('canRunScript', true);
+                    } else {
+                        this.set('canRunScript', false);
                     }
                     this.trigger('onActionsChange');
                 });

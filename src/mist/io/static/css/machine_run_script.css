@@ -1,0 +1,61 @@
+#machine-run-script .ui-collapsible-heading {
+    text-transform: capitalize;
+}
+
+#single-machine-page #machine-run-script .ui-collapsible-heading > a,
+#machine-list-page #machine-run-script .ui-collapsible-heading > a {
+    border: 1px solid #b5b5b5;
+    padding-left: .75em !important;
+}
+#machine-run-script .ui-collapsible-heading > a {
+    background-color: #fff !important;
+    color: #444 !important;
+    font-size: 14px;
+}
+#machine-run-script .ui-collapsible-heading > a:after {
+    background-image: none;
+    font-size: 14px;
+    margin-top: -6px;
+    color: #444;
+}
+#machine-run-script .ui-collapsible-heading.ui-collapsible-heading-collapsed > a:after {
+    content: '\0072';
+}
+#machine-run-script .ui-collapsible-heading > a:after {
+    content: '\0073';
+}
+#machine-run-script .filled .ui-collapsible-heading-toggle {
+    color: #444 !important;
+    background-color: #fff !important;
+    border-color: #b5b5b5 !important;
+}
+#machine-run-script .ui-collapsible-content .ui-listview {
+    margin: 0;
+    border: 1px solid #b5b5b5;
+    margin: -1px 0 0 !important;
+    max-height: 120px;
+    overflow-y: auto;
+}
+#machine-run-script .empty.required .ui-collapsible-heading > a {
+    color: #7f7f7f !important;
+}
+#machine-run-script .empty.required .ui-collapsible-heading > a,
+#machine-run-script .empty.required .ui-collapsible-content > .ui-listview {
+    border-color: #0099cc !important;
+}
+#machine-run-script .ui-collapsible-content .ui-listview .ui-btn {
+    background-color: #fff;
+    padding-left: .75em !important;
+    border: none;
+}
+#machine-run-script .ui-collapsible-content .ui-listview .ui-btn:hover {
+    background-color: #66C2E0 !important;
+    color: #fff !important;
+}
+#machine-run-script .ui-collapsible .ui-collapsible-heading a,
+#machine-run-script .ui-collapsible-content .ui-listview .ui-btn {
+    line-height: 21px;
+    padding: 5.5px 10.5px !important;
+    font-size: 14px;
+    text-transform: initial;
+}

@@ -11,6 +11,8 @@ define('app/views/network_list', ['app/views/page'],
         return App.NetworkListView = PageView.extend({
 
             templateName: 'network_list',
+            filteredNetworks: null,
+            searchTerm: null,
 
 
             //
@@ -20,12 +22,14 @@ define('app/views/network_list', ['app/views/page'],
             load: function () {
                 // Add event listeners
                 Mist.backendsController.on('onSelectedNetworksChange', this, 'updateFooter');
+                Mist.backendsController.on('onNetworkListChange', this, 'updateFilteredNetworks');
                 this.updateFooter();
             }.on('didInsertElement'),
 
             unload: function () {
                 // Remove event listeners
-                Mist.keysController.off('onSelectedNetworksChange', this, 'updateFooter');
+                Mist.backendsController.off('onSelectedNetworksChange', this, 'updateFooter');
+                Mist.backendsController.off('onNetworkListChange', this, 'updateFilteredNetworks');
             }.on('willDestroyElement'),
 
 
@@ -79,7 +83,6 @@ define('app/views/network_list', ['app/views/page'],
                 },
 
                 selectionModeClicked: function (mode) {
-
                     $('#select-networks-popup').popup('close');
 
                     Ember.run(function () {
@@ -88,11 +91,54 @@ define('app/views/network_list', ['app/views/page'],
                                 backend.networks.model.forEach(function (network) {
                                     network.set('selected', mode);
                                 });
-                            }                        
+                            }
                         });
                     });
+                },
+
+                clearClicked: function() {
+                    this.set('searchTerm', null);
+                },
+            },
+
+            updateFilteredNetworks: function() {
+                var networks = [], filteredNetworks = [];
+
+                Mist.backendsController.model.forEach(function (backend) {
+                    if (backend.get('enabled')) {
+                        networks.pushObjects(backend.networks.model);
+                    }
+                });
+
+                if (this.searchTerm) {
+                    var that = this;
+                    networks.forEach(function(network) {
+                        var regex = new RegExp(that.searchTerm, 'i');
+
+                        if (regex.test(network.name)) {
+                            filteredNetworks.push(network);
+                        } else {
+                            if (network.selected) {
+                                network.set('selected', false);
+                            }
+                        }
+                    });
+                } else {
+                    var filteredNetworks = networks;
                 }
-            }
+
+                this.set('filteredNetworks', filteredNetworks);
+            },
+
+
+            //
+            // Observers
+            //
+
+
+            filteredNetworksObserver: function() {
+                Ember.run.once(this, 'updateFilteredNetworks');
+            }.observes('searchTerm')
         });
     }
 );

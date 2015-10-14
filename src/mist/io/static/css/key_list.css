@@ -4,6 +4,7 @@
 #key-list-page .ui-content {
     background-color: transparent;
 }
+
 #key-list-page #select-keys-btn {
     float: left;
     font-weight: normal;
@@ -78,7 +79,6 @@
 }
 
 #key-list-page .key-search-container {
-    position: relative;
     position: relative;
     top: -56px;
     margin-left: 50px;
