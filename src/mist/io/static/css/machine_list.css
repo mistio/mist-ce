@@ -188,10 +188,11 @@
 }
 
 .machine-tags .tag.pairs {
-    background-color: #b5b5b5;
+    background-color: #888;
     color: #fff !important;
-    padding: 0 5px;
-    border-radius: 1px;
+    font-size: 0.9em;
+    padding: 1px 5px;
+    border-radius: 2px !important;
 }
 
 .has-incident label:after {
