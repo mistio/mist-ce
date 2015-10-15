@@ -23,6 +23,8 @@ define('app/views/network_list', ['app/views/page'],
                 // Add event listeners
                 Mist.backendsController.on('onSelectedNetworksChange', this, 'updateFooter');
                 Mist.backendsController.on('onNetworkListChange', this, 'updateFilteredNetworks');
+
+                this.updateFilteredNetworks();
                 this.updateFooter();
             }.on('didInsertElement'),
 
@@ -98,7 +100,7 @@ define('app/views/network_list', ['app/views/page'],
 
                 clearClicked: function() {
                     this.set('searchTerm', null);
-                },
+                }
             },
 
             updateFilteredNetworks: function() {
@@ -124,7 +126,7 @@ define('app/views/network_list', ['app/views/page'],
                         }
                     });
                 } else {
-                    var filteredNetworks = networks;
+                    filteredNetworks = networks;
                 }
 
                 this.set('filteredNetworks', filteredNetworks);
