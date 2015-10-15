@@ -23,12 +23,14 @@ define('app/controllers/network_create', ['ember'],
                 name: null,
                 backend: null,
                 adminStateUp: true,
+				createRouter: null,
                 createSubnet: null,
                 clear: function () {
                     this.setProperties({
                         name: null,
                         backend: null,
                         adminStateUp: true,
+						createRouter: null,
                         createSubnet: null
                     });
                     this.subnet.clear();
@@ -40,7 +42,7 @@ define('app/controllers/network_create', ['ember'],
                     clear: function () {
                         this.setProperties({
                             name: null,
-                            publicGateway: null,
+                            publicGateway: true,
 							createRouter: null
                         })
                     }
@@ -111,6 +113,7 @@ define('app/controllers/network_create', ['ember'],
 
                 var payload = {};
                 var network = this.network;
+                var router = network.router;
                 var subnet = network.subnet;
 
                 // Construct network params
@@ -122,6 +125,16 @@ define('app/controllers/network_create', ['ember'],
                 if (network.adminStateUp !== null)
                     payload.network.admin_state_up = network.adminStateUp;
 
+				// Construct router params
+				if (network.createRouter) {
+					payload.router = {};
+
+					if (router.name) {
+						payload.router.name = router.name;
+					}
+
+					payload.router.publicGateway = router.publicGateway;
+				}
 
                 // Construct subnet params
                 if (network.createSubnet) {
@@ -186,7 +199,11 @@ define('app/controllers/network_create', ['ember'],
             _updateFormReady: function() {
                 var formReady = false;
                 if (this.network.name && this.network.backend) {
-                    formReady = true;
+					formReady = true;
+
+					if (this.network.createRouter) {
+						formReady = this.network.router.name ? true : false;
+					}
                 }
 
                 if (formReady && this.creatingNetwork) {
@@ -204,7 +221,7 @@ define('app/controllers/network_create', ['ember'],
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('network.name', 'network.backend')
+            }.observes('network.name', 'network.backend', 'network.createRouter', 'network.router.name')
         });
     }
 );

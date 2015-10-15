@@ -114,7 +114,7 @@
 			{{view Mist.Checkbox
 			data-theme="a"
 			id="network-create-router-create"
-			checked=Mist.networkCreateController.router.createRouter}}
+			checked=Mist.networkCreateController.network.createRouter}}
 			<label for="network-create-router-create">
 				Create Router
 			</label>
@@ -125,7 +125,7 @@
 				<!--
                     Enter Router Name
                 -->
-				<div id="network-create-router-name-wrapper">
+				<div id="network-create-router-name-wrapper" class="required {{if Mist.networkCreateController.network.router.name 'filled' 'empty'}}">
 					<label for="network-create-router-name">Router Name</label>
 					{{view Mist.TextField
 					data-theme="a"
@@ -140,7 +140,7 @@
 					{{view Mist.Checkbox
 					data-theme="a"
 					id="network-create-router-gateway"
-					checked=Mist.networkCreateController.network.router.createRouter}}
+					checked=Mist.networkCreateController.network.router.publicGateway}}
 					<label for="network-create-router-gateway">
 						Set Public Gateway
 					</label>

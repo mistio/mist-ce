@@ -88,6 +88,9 @@ define('app/views/network_create', ['app/views/controlled'],
                 $('#network-create .ui-checkbox > .ui-btn')
                     .removeClass('ui-checkbox-on')
                     .addClass('ui-checkbox-off');
+				$('#network-create-router-gateway-wrapper .ui-checkbox > .ui-btn')
+					.removeClass('ui-checkbox-off')
+					.addClass('ui-checkbox-on');
                 this.$('.ui-collapsible').removeClass('selected');
                 this.renderFields();
                 this._fieldIsReady('admin-state');
@@ -157,13 +160,13 @@ define('app/views/network_create', ['app/views/controlled'],
 
             createRouterObserver: function () {
                 Ember.run.later(function () {
-                    if (Mist.networkCreateController.network.router.createRouter) {
+                    if (Mist.networkCreateController.network.createRouter) {
                         $('#network-create-router-form').slideDown();
                     } else {
                         $('#network-create-router-form').slideUp();
                     }
                 }, SLIDE_DOWN_DELAY);
-            }.observes('Mist.networkCreateController.network.router.createRouter'),
+            }.observes('Mist.networkCreateController.network.createRouter'),
 
             createSubnetObserver: function () {
                 Ember.run.later(function () {
