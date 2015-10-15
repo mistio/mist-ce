@@ -86,7 +86,7 @@ define('app/views/machine_list', ['app/views/page'],
                         $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');
                     }
 
-                    if(!machine.can_start && !machine.can_reboot && !machine.can_destroy && !machine.can_shutdown && !machine.can_rename) {
+                    if (machine.get('hasNotActions')) {
                         $('#machine-list-page #machines-power-btn').addClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-power-btn').removeClass('ui-state-disabled');

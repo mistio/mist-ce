@@ -264,6 +264,7 @@
             <div class="ui-block-c">
                 <a id="single-machine-power-btn"
                     class="{{if model.id '' 'ui-state-disabled'}}
+                    	{{if model.hasNotActions 'ui-state-disabled'}}
                         ui-btn ui-btn-icon-right icon-cog ui-caps"
                     {{action "powerClicked" target=view}}>Actions</a>
             </div>
