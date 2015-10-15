@@ -3070,7 +3070,7 @@ def create_network(user, backend_id, network, subnet):
     backend = user.backends[backend_id]
 
     conn = connect_provider(backend)
-    if conn.type is not Provider.OPENSTACK:
+    if conn.type not in (Provider.OPENSTACK, Provider.HPCLOUD):
         raise NetworkActionNotSupported()
 
     try:
@@ -3081,6 +3081,18 @@ def create_network(user, backend_id, network, subnet):
     admin_state_up = network.get('admin_state_up', True)
     shared = network.get('shared', False)
 
+    ret = _create_network_openstack(conn, network_name, subnet, admin_state_up, shared)
+
+    task = mist.io.tasks.ListNetworks()
+    task.clear_cache(user.email, backend_id)
+    trigger_session_update(user.email, ['backends'])
+    return ret
+
+
+def _create_network_openstack(conn, network_name, subnet, admin_state_up, shared):
+    """
+    Create openstack specific network
+    """
     # First we create the network
     try:
         new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
@@ -3116,9 +3128,6 @@ def create_network(user, backend_id, network, subnet):
     else:
         ret = openstack_network_to_dict(new_network)
 
-    task = mist.io.tasks.ListNetworks()
-    task.clear_cache(user.email, backend_id)
-    trigger_session_update(user.email, ['backends'])
     return ret
 
 
