@@ -1852,6 +1852,9 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
     except:
             chosen_networks = []
 
+    _prepare_networks_hpcloud(conn, available_networks, chosen_networks)
+
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(name=machine_name,
@@ -1866,6 +1869,14 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
         except Exception as e:
             raise MachineCreationError("HP Cloud, got exception %s" % e, e)
     return node
+
+
+def _prepare_networks_hpcloud(conn, available_networks, chosen_networks):
+    """
+    Take care of subnets, routers, ports and floating ips
+    """
+    return
+
 
 
 def _create_machine_ec2(conn, key_name, private_key, public_key,
