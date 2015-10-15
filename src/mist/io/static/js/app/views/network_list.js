@@ -13,6 +13,39 @@ define('app/views/network_list', ['app/views/page'],
             templateName: 'network_list',
             filteredNetworks: null,
             searchTerm: null,
+            sortByTerm: 'name',
+
+            sortByName: Ember.computed('sortByTerm', function () {
+                return this.get('sortByTerm') == 'name';
+            }),
+
+            sortByProvider: Ember.computed('sortByTerm', function () {
+                return this.get('sortByTerm') == 'provider';
+            }),
+
+            sortByStatus: Ember.computed('sortByTerm', function () {
+                return this.get('sortByTerm') == 'status';
+            }),
+
+            sortedNetworks: Ember.computed('filteredNetworks', 'filteredNetworks.@each.name', 'sortByTerm', function() {
+                if(this.get('filteredNetworks'))
+                {
+                    if (this.get('sortByName'))
+                    {
+                        return this.get('filteredNetworks').sortBy('name');
+                    }
+
+                    if (this.get('sortByProvider'))
+                    {
+                        return this.get('filteredNetworks').sortBy('provider.title').reverse();
+                    }
+
+                    if (this.get('sortByStatus'))
+                    {
+                        return this.get('filteredNetworks').sortBy('status').reverse();
+                    }
+                }
+            }),
 
 
             //
@@ -87,12 +120,10 @@ define('app/views/network_list', ['app/views/page'],
                 selectionModeClicked: function (mode) {
                     $('#select-networks-popup').popup('close');
 
-                    Ember.run(function () {
-                        Mist.backendsController.model.forEach(function (backend) {
-                            if (backend.get('enabled') && backend.get('isOpenStack')) {
-                                backend.networks.model.forEach(function (network) {
-                                    network.set('selected', mode);
-                                });
+                    Ember.run(this, function () {
+                        this.get('filteredNetworks').forEach(function (network) {
+                            if(network.backend.enabled && network.backend.get('isOpenStack')) {
+                                network.set('selected', mode);
                             }
                         });
                     });
@@ -100,6 +131,10 @@ define('app/views/network_list', ['app/views/page'],
 
                 clearClicked: function() {
                     this.set('searchTerm', null);
+                },
+
+                sortBy: function (criteria) {
+                    this.set('sortByTerm', criteria);
                 }
             },
 
