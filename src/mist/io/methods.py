@@ -1852,7 +1852,7 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
     except:
             chosen_networks = []
 
-    _prepare_networks_hpcloud(conn, available_networks, chosen_networks)
+    prepare_networks = _prepare_networks_hpcloud(conn, available_networks, chosen_networks)
 
 
     with get_temp_file(private_key) as tmp_key_path:
@@ -1875,7 +1875,42 @@ def _prepare_networks_hpcloud(conn, available_networks, chosen_networks):
     """
     Take care of subnets, routers, ports and floating ips
     """
-    return
+    # List routers
+    routers = conn.ex_list_routers()
+
+    # Find subnets from chosen_networks
+    chosen_subnets = []
+    for network in chosen_networks:
+        for subnet in network.subnets:
+            chosen_subnets.append(subnet.id)
+
+    # Find external networks
+    external_networks = [net for net in available_networks if net.router_external]
+    if external_networks:
+        ext_net = external_networks[0]
+    else:
+        log.warning("HPCloud Networks: No external network found")
+        return False
+
+    # If no routers, create one
+    if not routers:
+        router = conn.ex_create_router(name="mistio-router", external_gateway=True, ext_net_id=ext_net.id)
+        log.info("HPCLoud Routers: Created new router")
+    else:
+        router = routers[0]
+        # If router has no external gateway, create one
+        if not router.external_gateway:
+            conn.ex_set_gateway_router(router.id, ext_net.id)
+
+    # Try to attach router to chosen_subnets
+    try:
+        for subnet in chosen_subnets:
+            conn.ex_add_router_interface(router.id, subnet)
+            log.info("HPCloud Routers: Attached interface of router: %s to subnet: %s" % (router.id, subnet))
+    except Exception as e:
+        log.error("HPCloud Routers: %s" % str(e))
+
+    return True
 
 
 
