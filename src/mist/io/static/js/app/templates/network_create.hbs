@@ -53,7 +53,7 @@
 
                     {{#each Mist.backendsController.model as |backend|}}
                         {{#if backend.enabled}}
-                            {{#if backend.isOpenStack}}
+                            {{#if backend.canHaveNetworks}}
                                 <li data-icon="false">
                                     <a {{action "backendSelected" backend target=view}}>
                                         <span class="provider-icon-small">

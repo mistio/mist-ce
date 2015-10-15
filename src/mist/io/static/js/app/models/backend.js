@@ -56,6 +56,10 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     .indexOf(this.provider) > -1;
             }.property('provider'),
 
+            canHaveNetworks: Ember.computed('provider', function() {
+                return  ['openstack', 'hpcloud'].indexOf(this.get('provider')) > -1;
+            }),
+
             requiresNetworkOnCreation: function () {
                 return  ['openstack', 'vcloud', 'indonesian_vcloud', 'hpcloud']
                     .indexOf(this.provider) > -1;
