@@ -29,10 +29,22 @@ define('app/controllers/network_create', ['ember'],
                         name: null,
                         backend: null,
                         adminStateUp: true,
-                        createSubnet: null,
+                        createSubnet: null
                     });
                     this.subnet.clear();
                 },
+                router: Ember.Object.create({
+                    name: null,
+                    publicGateway: true,
+					createRouter: null,
+                    clear: function () {
+                        this.setProperties({
+                            name: null,
+                            publicGateway: null,
+							createRouter: null
+                        })
+                    }
+                }),
                 subnet: Ember.Object.create({
                     ipv: null,
                     name: null,
@@ -53,10 +65,10 @@ define('app/controllers/network_create', ['ember'],
                             allocationPools: null,
                             hostRoutes: null,
                             enableDHCP: null,
-                            DNS: null,
+                            DNS: null
                         })
                     }
-                }),
+                })
             }),
 
             adminStateUpToText: function () {
