@@ -96,6 +96,10 @@ define('app/models/machine', ['ember'],
                 return this.get('state') == 'running';
             }.property('state'),
 
+            hasNotActions: Ember.computed('can_start', 'can_reboot', 'can_destroy', 'can_shutdown', 'can_rename', function() {
+                return !this.get('can_start') && !this.get('can_reboot') && !this.get('can_destroy') && !this.get('can_shutdown') && !this.get('can_rename');
+            }),
+
             netled1: function() {
                 if (this.latency > 0 &&  this.latency < 1000) return 'on';
             }.property('latency'),
