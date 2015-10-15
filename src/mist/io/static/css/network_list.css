@@ -31,6 +31,11 @@
 #network-list-page #select-networks-btn:hover {
     color: #444 !important;
 }
+#select-networks-popup .icon-check:after {
+    font-size: 14px;
+    top: 1.3em;
+    color: #d4d4d4;
+}
 #network-list-page .ui-filterable .ui-input-search {
     margin-right: 290px;
 }

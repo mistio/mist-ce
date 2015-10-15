@@ -29,7 +29,7 @@ define('app/controllers/network_create', ['ember'],
                         name: null,
                         backend: null,
                         adminStateUp: true,
-                        createSubnet: null,
+                        createSubnet: null
                     });
                     this.subnet.clear();
                 },
@@ -53,10 +53,10 @@ define('app/controllers/network_create', ['ember'],
                             allocationPools: null,
                             hostRoutes: null,
                             enableDHCP: null,
-                            DNS: null,
+                            DNS: null
                         })
                     }
-                }),
+                })
             }),
 
             adminStateUpToText: function () {
