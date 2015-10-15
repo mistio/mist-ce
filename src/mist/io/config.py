@@ -95,7 +95,7 @@ LINODE_DATACENTERS = {
     7: 'London, UK',
     8: 'Tokyo, JP',
     9: 'Singapore, SG',
-    10: 'Frankfurt, DE',
+    10: 'Frankfurt, DE'
 }
 
 SUPPORTED_PROVIDERS_V_2 = [
