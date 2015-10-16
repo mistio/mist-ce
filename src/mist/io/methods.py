@@ -3097,7 +3097,7 @@ def _create_network_openstack(conn, network_name, subnet, admin_state_up, shared
     try:
         new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
     except Exception as e:
-        raise NetworkCreationError("Got error r%" % e, e)
+        raise NetworkCreationError("Got error %s" % str(e))
 
     ret = dict()
     if subnet:
