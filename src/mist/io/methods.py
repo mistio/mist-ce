@@ -3175,13 +3175,18 @@ def delete_network(user, backend_id, network_id):
     backend = user.backends[backend_id]
 
     conn = connect_provider(backend)
-    if conn.type is not Provider.OPENSTACK:
+    if conn.type is Provider.OPENSTACK:
+        try:
+            conn.ex_delete_neutron_network(network_id)
+        except Exception as e:
+            raise NetworkError(e)
+    elif conn.type is Provider.HPCLOUD:
+        try:
+            conn.ex_delete_network(network_id)
+        except Exception as e:
+            raise NetworkError(e)
+    else:
         raise NetworkActionNotSupported()
-
-    try:
-        conn.ex_delete_neutron_network(network_id)
-    except Exception as e:
-        raise NetworkError(e)
 
     try:
         task = mist.io.tasks.ListNetworks()
