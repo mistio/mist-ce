@@ -685,8 +685,9 @@ def create_network(request):
         raise RequiredParameterMissingError(e)
 
     subnet = request.json_body.get('subnet', None)
+    router = request.json_body.get('router', None)
     user = user_from_request(request)
-    return methods.create_network(user, backend_id, network, subnet)
+    return methods.create_network(user, backend_id, network, subnet, router)
 
 
 @view_config(route_name='network', request_method='DELETE')

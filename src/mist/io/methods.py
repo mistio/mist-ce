@@ -3059,7 +3059,7 @@ def associate_ip(user, backend_id, network_id, ip, machine_id=None, assign=True)
     return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
 
 
-def create_network(user, backend_id, network, subnet):
+def create_network(user, backend_id, network, subnet, router):
     """
     Creates a new network. If subnet dict is specified, after creating the network
     it will use the new network's id to create a subnet
@@ -3073,6 +3073,21 @@ def create_network(user, backend_id, network, subnet):
     if conn.type not in (Provider.OPENSTACK, Provider.HPCLOUD):
         raise NetworkActionNotSupported()
 
+    if conn.type is Provider.OPENSTACK:
+        ret = _create_network_openstack(conn, network, subnet, router)
+    elif conn.type is Provider.HPCLOUD:
+        ret = _create_network_hpcloud(conn, network, subnet, router)
+
+    task = mist.io.tasks.ListNetworks()
+    task.clear_cache(user.email, backend_id)
+    trigger_session_update(user.email, ['backends'])
+    return ret
+
+
+def _create_network_hpcloud(conn, network, subnet, router):
+    """
+    Create hpcloud network
+    """
     try:
         network_name = network.get('name')
     except Exception as e:
@@ -3081,18 +3096,83 @@ def create_network(user, backend_id, network, subnet):
     admin_state_up = network.get('admin_state_up', True)
     shared = network.get('shared', False)
 
-    ret = _create_network_openstack(conn, network_name, subnet, admin_state_up, shared)
+    # First we create the network
 
-    task = mist.io.tasks.ListNetworks()
-    task.clear_cache(user.email, backend_id)
-    trigger_session_update(user.email, ['backends'])
+    try:
+        new_network = conn.ex_create_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+    except Exception as e:
+        raise NetworkCreationError("Got error %s" % str(e))
+
+    ret = dict()
+    if subnet:
+        network_id = new_network.id
+
+        try:
+            subnet_name = subnet.get('name')
+            cidr = subnet.get('cidr')
+        except Exception as e:
+            raise RequiredParameterMissingError(e)
+
+        allocation_pools = subnet.get('allocation_pools', [])
+        gateway_ip = subnet.get('gateway_ip', None)
+        ip_version = subnet.get('ip_version', '4')
+        enable_dhcp = subnet.get('enable_dhcp', True)
+
+        try:
+            subnet = conn.ex_create_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
+                                           allocation_pools=allocation_pools, gateway_ip=gateway_ip,
+                                           ip_version=ip_version, enable_dhcp=enable_dhcp)
+        except Exception as e:
+            conn.ex_delete_network(network_id)
+            raise NetworkError(e)
+
+        ret['network'] = openstack_network_to_dict(new_network)
+        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
+
+        if router:
+            try:
+                router_name = router.get('name')
+            except Exception as e:
+                raise RequiredParameterMissingError(e)
+
+            subnet_id = ret['network']['subnets'][0]['id']
+            external_gateway = router.get('publicGateway', False)
+
+            # If external gateway, find the ext-net
+            if external_gateway:
+                available_networks = conn.ex_list_networks()
+                external_networks = [net for net in available_networks if net.router_external]
+                if external_networks:
+                    ext_net_id = external_networks[0].id
+                else:
+                    external_gateway = False
+                    ext_net_id = ""
+
+            # First we create the router
+            router_obj = conn.ex_create_router(name=router_name, external_gateway=external_gateway,
+                                               ext_net_id=ext_net_id)
+
+            # Then we attach the router to the subnet
+            router_obj = conn.ex_add_router_interface(router_obj['router']['id'], subnet_id)
+
+    else:
+        ret = openstack_network_to_dict(new_network)
+
     return ret
 
 
-def _create_network_openstack(conn, network_name, subnet, admin_state_up, shared):
+def _create_network_openstack(conn, network, subnet, router):
     """
     Create openstack specific network
     """
+    try:
+        network_name = network.get('name')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    admin_state_up = network.get('admin_state_up', True)
+    shared = network.get('shared', False)
+
     # First we create the network
     try:
         new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
