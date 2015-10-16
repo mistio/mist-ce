@@ -1692,6 +1692,15 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             post_script_id=post_script_id,
             post_script_params=post_script_params,
         )
+    elif conn.type == Provider.HPCLOUD:
+        mist.io.tasks.hpcloud_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('username'), node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params, job_id = job_id,
+            hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
+        )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key
@@ -2879,25 +2888,6 @@ def list_networks(user, backend_id):
     conn = connect_provider(backend)
 
     ret = []
-
-    ## Get the ip addreses of running machines to begin with, use cached
-    ## list_machines response if there's a fresh one
-    #task = mist.io.tasks.ListMachines()
-    #task_result = task.smart_delay(user.email, backend_id, blocking=True)
-    #machines = task_result.get('machines', [])
-
-    ## Separate public & private ips, create ip2machine map
-    #public_ips = IPSet()
-    #private_ips = IPSet()
-    #ips = []
-    #ip2machine = {}
-    #for machine in machines:
-    #    for i in machine['public_ips']:
-    #        public_ips.add(i)
-    #    for i in machine['private_ips']:
-    #        private_ips.add(i)
-    #    #for i in machine['public_ips'] + machine['private_ips']:
-    #    #    ip2machine[i] = machine['id']
 
     # Get the actual networks
     if conn.type in [Provider.NEPHOSCALE]:
