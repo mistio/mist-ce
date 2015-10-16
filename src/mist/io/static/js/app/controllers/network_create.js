@@ -29,7 +29,7 @@ define('app/controllers/network_create', ['ember'],
                         name: null,
                         backend: null,
                         adminStateUp: true,
-                        createSubnet: null,
+                        createSubnet: null
                     });
                     this.subnet.clear();
                 },
@@ -53,10 +53,10 @@ define('app/controllers/network_create', ['ember'],
                             allocationPools: null,
                             hostRoutes: null,
                             enableDHCP: null,
-                            DNS: null,
+                            DNS: null
                         })
                     }
-                }),
+                })
             }),
 
             adminStateUpToText: function () {
@@ -150,7 +150,7 @@ define('app/controllers/network_create', ['ember'],
                 var that = this;
                 that.set('creatingNetwork', true);
                 Mist.ajax.POST(url, payload).success(function (network) {
-                    that.close();
+                    that.view.close();
                 }).error(function (message) {
                     Mist.notificationController.notify(message);
                 }).complete(function (success, network) {

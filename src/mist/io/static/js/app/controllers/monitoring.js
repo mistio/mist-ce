@@ -61,9 +61,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 });
             },
 
-
             disableMonitoring: function(machine, callback, noSsh) {
-
                 var that = this;
                 machine.set('disablingMonitoring', true);
                 machine.set('hasMonitoring', false);

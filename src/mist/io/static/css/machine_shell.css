@@ -2,14 +2,13 @@
 /* Shell View CSS
 -----------------------------------------------------------------------------------------------------------*/
 
+#machine-shell-popup .ui-content {
+    border: 1px solid #FAF9F4;
+}
+
 #machine-shell-popup #shell-return {
     color: #efeff1;
     background-color: #0A0A0A;
-
-    border: 1px solid #AAA;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
 
     text-shadow: none;
     font-family: "Courier New", Courier, monospace;
@@ -37,6 +36,11 @@ span.terminal-cursor {
     left: 200%;
     position: absolute;
     overflow: visible;
+}
+
+#machine-shell-popup #shell-back {
+    border: none;
+    border-radius: 0;
 }
 
 
@@ -85,20 +89,21 @@ span.terminal-cursor {
     margin-bottom: 0;
 }
 
+#machine-shell-popup.mobile .ui-content {
+    padding: 0;
+}
+
 #machine-shell-popup.mobile {
     top: 1% !important;
     max-height: 98% !important;
     position: fixed;
+    border: 1px solid #AAA;
 }
 
 #machine-shell-popup.mobile #shell-return {
-    background: #444 !important;
-    border: 1px solid #AAA;
+    background: #444 !important;    
     font-family: monospace;
     font-size: 150%;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
     margin-bottom: 0px;
     background: #dfe1e2;
     overflow-y: auto;

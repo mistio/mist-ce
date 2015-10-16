@@ -353,7 +353,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                     if (this.searchTerm) {
                         var that = this;
                         this.model.forEach(function(key) {
-                            var regex = new RegExp(that.searchTerm);
+                            var regex = new RegExp(that.searchTerm, 'i');
 
                             if (regex.test(key.id)) {
                                 keys.push(key);

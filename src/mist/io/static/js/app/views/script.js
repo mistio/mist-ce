@@ -82,7 +82,7 @@ define('app/views/script', ['app/views/page'],
                 },
 
 
-                renameClicked: function () {
+                editClicked: function () {
                     Mist.scriptEditController.open(this.get('model'));
                 },
 

@@ -20,12 +20,12 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             isOpen: null,
             machine: null,
 
+
             //
             //  Methods
             //
 
             open: function (machine) {
-
                 this._clear();
                 this.setProperties({
                     machine: machine,
@@ -42,9 +42,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                     this.view.open();
                 else
                     this.close();
-
             },
-
 
             connect: function () {
                 var that = this;

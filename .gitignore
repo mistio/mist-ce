@@ -34,3 +34,7 @@ share/
 .*.sw[op]
 bower_components
 node_modules
+erl_crash.dump
+test.png
+*~
+pip-selfcheck.json

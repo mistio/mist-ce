@@ -19,7 +19,7 @@ define('app/views/network_create', ['app/views/controlled'],
             disableGateway: false,
             classNameBindings: ['isDisabled:ui-disabled'],
 
- 
+
             /**
              *  Computed Properties
              */
@@ -76,6 +76,10 @@ define('app/views/network_create', ['app/views/controlled'],
             //  Methods
             //
 
+            close: function() {
+                $('#create-network').collapsible('collapse');
+            },
+
             clear: function () {
                 $('#network-create-subnet-form').hide();
                 $('#network-create-subnet-address-wrapper').hide();
@@ -90,7 +94,7 @@ define('app/views/network_create', ['app/views/controlled'],
                 this.$('.ui-collapsible').removeClass('selected');
                 this.renderFields();
                 this._fieldIsReady('admin-state');
-                this._fieldIsReady('subnet-ipv');                
+                this._fieldIsReady('subnet-ipv');
             },
 
             renderFields: function () {
@@ -122,7 +126,7 @@ define('app/views/network_create', ['app/views/controlled'],
 
             actions: {
                 clickOverlay: function() {
-                    $('#create-network').collapsible('collapse');
+                    this.close();
                 },
 
                 backendSelected: function (backend) {

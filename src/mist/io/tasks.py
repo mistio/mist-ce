@@ -607,6 +607,20 @@ class ListMachines(UserTask):
         from mist.io import methods
         user = user_from_email(email)
         machines = methods.list_machines(user, backend_id)
+        if multi_user:
+            for machine in machines:
+                kwargs = {}
+                kwargs['backend_id'] = backend_id
+                kwargs['machine_id'] = machine.get('id')
+                from mist.core.methods import list_tags
+                mistio_tags = list_tags(user, resource_type='machine', **kwargs)
+                # optimized for js
+                for tag in mistio_tags:
+                    for key, value in tag.items():
+                        tag_dict = {'key': key, 'value': value}
+                        if tag_dict not in machine['tags']:
+                            machine['tags'].append(tag_dict)
+                # FIXME: optimize!
         log.warn('Returning list machines for user %s backend %s' % (email, backend_id))
         return {'backend_id': backend_id, 'machines': machines}
 
