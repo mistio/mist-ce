@@ -60,7 +60,7 @@ define('app/views/script_list', ['app/views/page'],
                     Mist.scriptAddController.open();
                 },
 
-                renameClicked: function () {
+                editClicked: function () {
                     Mist.scriptEditController.open(Mist.scriptsController.get('selectedObjects')[0]);
                 },
 

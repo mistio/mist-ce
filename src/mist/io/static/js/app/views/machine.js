@@ -16,7 +16,6 @@ define('app/views/machine', ['app/views/page'],
 
             machine: null,
 
-
             //
             //  Initialization
             //

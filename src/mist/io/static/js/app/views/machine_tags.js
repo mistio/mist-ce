@@ -33,6 +33,10 @@ define('app/views/machine_tags', [],
 
                 backClicked: function () {
                     Mist.machineTagsController.close();
+                },
+
+                addItem: function() {
+                    Mist.machineTagsController.addItem();                 
                 }
             },
 

@@ -23,6 +23,7 @@ var loadApp = function (
     MachineEditController,
     MachineShellController,
     MachineTagsController,
+    MachineRunScriptController,
     MetricAddController,
     MetricAddCustomController,
     MetricsController,
@@ -121,6 +122,7 @@ var loadApp = function (
     App.set('scriptAddController', ScriptAddController.create());
     App.set('scriptRunController', ScriptRunController.create());
     App.set('scriptEditController', ScriptEditController.create());
+    App.set('machineRunScriptController', MachineRunScriptController.create());
 
 
     // Ember custom widgets
