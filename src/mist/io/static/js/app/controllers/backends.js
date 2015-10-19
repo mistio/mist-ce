@@ -56,7 +56,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                         var regex = new RegExp(that.searchMachinesTerm, 'i');
 
                         if (regex.test(machine.name)) {
-                            machines.push(machine);
+                            filteredMachines.push(machine);
                         } else {
                             if (machine.selected) {
                                 machine.set('selected', false);
