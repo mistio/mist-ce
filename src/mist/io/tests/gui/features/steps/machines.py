@@ -201,7 +201,7 @@ def ssh_key_is_added(context, ssh_key_name):
             # if there no keys then it will be called "Add key"
             context.execute_steps(u"""
                 Then I click the button "Add key"
-                And I expect for "non-associated-keys-popup" popup to appear within max 2 seconds
+                And I expect for "non-associated-keys-popup-popup" popup to appear within max 4 seconds
                 And I click the button "New key"
             """)
             # check if the key is already uploaded but not associated
@@ -215,9 +215,9 @@ def ssh_key_is_added(context, ssh_key_name):
 
             if not key_already_associated:
                 context.execute_steps(u"""
-                    And I expect for "key-add-popup" popup to appear within max 2 seconds
-                    Then I upload the ssh key with name "TESTING_MACHINE"
-                """)
+                    Then I expect for "key-add-popup" popup to appear within max 2 seconds
+                    And I upload the ssh key with name "%s"
+                """ % ssh_key_name)
 
             context.execute_steps(u"""
                 Then I expect for "key-generate-loader" loader to finish within max 5 seconds
@@ -246,15 +246,15 @@ def ssh_key_is_added(context, ssh_key_name):
                 pass
             context.execute_steps(u"""
                 Then I click the button "%s"
-                And I expect for "non-associated-keys-popup" popup to appear within max 2 seconds
+                And I expect for "non-associated-keys-popup" popup to appear within max 4 seconds
                 And I click the button "New key"
-                And I expect for "key-add-popup" popup to appear within max 2 seconds
+                And I expect for "key-add-popup" popup to appear within max 4 seconds
                 Then I upload the ssh key with name "%s"
                 Then I expect for "key-generate-loader" loader to finish within max 5 seconds
                 And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
                 And If the key addition was successful
                 Then I click the button "Enable Monitoring"
-                And I expect for "machine-keys-panel" panel to disappear within max 2 seconds
+                And I expect for "machine-keys-panel" panel to disappear within max 4 seconds
             """ % (button.text, ssh_key_name))
 
 
