@@ -202,7 +202,7 @@ def ssh_key_is_added(context, ssh_key_name):
             context.execute_steps(u"""
                 Then I click the button "Add key"
                 And I expect for "non-associated-keys-popup-popup" popup to appear within max 4 seconds
-                And I click the button "New key"
+                When I click the "New key" button inside the "Add key" popup
             """)
             # check if the key is already uploaded but not associated
             key_already_associated = False
@@ -247,7 +247,7 @@ def ssh_key_is_added(context, ssh_key_name):
             context.execute_steps(u"""
                 Then I click the button "%s"
                 And I expect for "non-associated-keys-popup" popup to appear within max 4 seconds
-                And I click the button "New key"
+                When I click the "New key" button inside the "Add key" popup
                 And I expect for "key-add-popup" popup to appear within max 4 seconds
                 Then I upload the ssh key with name "%s"
                 Then I expect for "key-generate-loader" loader to finish within max 5 seconds
