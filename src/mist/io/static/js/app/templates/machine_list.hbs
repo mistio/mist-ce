@@ -40,8 +40,17 @@
             </div>
             <!-- /grid-b -->
 
-            <ul id="machine-list" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter machines" data-theme="c" class="checkbox-list">
-                {{#each view.machines as |machine|}}
+            <div class="machine-search-container">
+                {{#if Mist.backendsController.searchMachinesTerm}}
+                    <span {{action "clearClicked" target=view}} class="icon-xx"></span>
+                {{else}}
+                    <span class="icon-search"></span>
+                {{/if}}
+                {{input value=Mist.backendsController.searchMachinesTerm placeholder="Filter machines" class="machine-search"}}
+            </div>
+
+            <ul id="machine-list" data-role="listview" data-inset="true" data-theme="c" class="checkbox-list">
+                {{#each Mist.backendsController.sortedMachines as |machine|}}
                     {{#if machine.backend.enabled}}
                         {{component "machine-list-item" machine=machine class="checkbox-link"}}
                     {{/if}}
