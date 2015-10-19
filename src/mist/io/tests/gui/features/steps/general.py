@@ -89,7 +89,7 @@ def wait_for_splash_to_load(context, timeout=60):
 
         if 'none' in display:
             return
-    assert False, u'Page took longer than %s seconds to load' % str(timeout)
+    assert False, 'Page took longer than %s seconds to load' % str(timeout)
 
 
 @then(u'I wait for {seconds} seconds')
@@ -185,7 +185,7 @@ def loader_name_waiting_with_timeout(context, loader_name, seconds):
             sleep(1)
         except NoSuchElementException:
             return
-    assert False, u'Loader %s did not finish after %s seconds' % (loader_name,
+    assert False, 'Loader %s did not finish after %s seconds' % (loader_name,
                                                                   seconds)
 
 
@@ -267,9 +267,9 @@ def click_button_within_panel(context, text, panel_title):
             found_panel = panel
             break
 
-    assert found_panel, u'Panel with Title %s could not be found. Maybe the ' \
-                        u'driver got refocused or the panel failed to open or '\
-                        u'there is no panel with that title' % panel_title
+    assert found_panel, 'Panel with Title %s could not be found. Maybe the ' \
+                        'driver got refocused or the panel failed to open or '\
+                        'there is no panel with that title' % panel_title
 
     buttons = found_panel.find_elements_by_class_name("ui-btn")
     click_button_from_collection(context, text, buttons,
@@ -372,8 +372,8 @@ def some_counter_loaded(context, counter_title, counter_number, seconds):
         else:
             sleep(2)
 
-    assert False, u'The counter did not say that more than %s images were ' \
-                  u'loaded' % counter_number
+    assert False, 'The counter did not say that more than %s images were ' \
+                  'loaded' % counter_number
 
 
 @when(u'I visit the {title} page after the counter has loaded')
