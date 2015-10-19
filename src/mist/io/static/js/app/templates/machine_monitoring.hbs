@@ -52,7 +52,7 @@
                     Enabling monitoring, please wait...
                 </label>
 
-                <div class="ajax-loader"></div>
+                <div class="ajax-loader" id="machine-enable-monitoring-loader"></div>
 
             {{else}} {{#if machine.disablingMonitoring}}
 
@@ -60,7 +60,7 @@
                     Disabling monitoring...
                 </label>
 
-                <div class="ajax-loader"></div>
+                <div class="ajax-loader" id="machine-enable-monitoring-loader"></div>
 
             {{else}}
                 {{#if view.machine.cannotHaveMonitoring}}
@@ -75,7 +75,7 @@
                     </label>
 
                    {{#if view.gettingCommand}}
-                        <div class="ajax-loader"></div>
+                        <div class="ajax-loader" id="machine-enable-monitoring-loader"></div>
                    {{/if}}
                {{/if}}
 
