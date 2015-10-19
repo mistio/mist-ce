@@ -139,7 +139,7 @@ def popup_waiting_with_timeout(context, popup_name, action, seconds):
         WebDriverWait(context.browser, int(seconds)).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
     except TimeoutException:
-        raise TimeoutException("Panel %s did not %s after %s seconds"
+        raise TimeoutException("Popup %s did not %s after %s seconds"
                                % (popup_name, action, seconds))
 
 
