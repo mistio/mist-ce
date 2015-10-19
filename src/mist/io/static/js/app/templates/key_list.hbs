@@ -54,7 +54,7 @@
             <ul id="key-list" data-role="listview"
                 data-inset="true"
                 class="checkbox-list">
-                {{#each Mist.keysController.filteredKeys as |key|}}
+                {{#each Mist.keysController.sortedKeys as |key|}}
                     {{component "key-list-item" key=key class="checkbox-link"}}
                 {{/each}}
             </ul>
@@ -64,6 +64,16 @@
     </div>
 
     <div id="select-keys-popup" class="ui-mini" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-keys-btn">
+        <div class="ui-header ui-caps">Sort by</div>
+        <ul data-role="listview">
+            <li>
+                <a class="ui-btn ui-btn-icon-left {{if Mist.keysController.sortByDefault 'icon-check'}}" {{action "sortBy" "default" target=view}}>Default</a>
+            </li>
+            <li>
+                <a class="ui-btn ui-btn-icon-left {{if Mist.keysController.sortById 'icon-check'}}" {{action "sortBy" "id" target=view}}>Name</a>
+            </li>
+        </ul>
+
         <div class="ui-header ui-caps">Select</div>
         <ul data-role='listview'>
             <li data-icon="false">
