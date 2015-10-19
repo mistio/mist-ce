@@ -160,13 +160,13 @@ define('app/views/network_create', ['app/views/controlled'],
 
             createRouterObserver: function () {
                 Ember.run.later(function () {
-                    if (Mist.networkCreateController.network.createRouter) {
+                    if (Mist.networkCreateController.network.subnet.createRouter) {
                         $('#network-create-router-form').slideDown();
                     } else {
                         $('#network-create-router-form').slideUp();
                     }
                 }, SLIDE_DOWN_DELAY);
-            }.observes('Mist.networkCreateController.network.createRouter'),
+            }.observes('Mist.networkCreateController.network.subnet.createRouter'),
 
             createSubnetObserver: function () {
                 Ember.run.later(function () {

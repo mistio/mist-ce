@@ -23,7 +23,6 @@ define('app/controllers/network_create', ['ember'],
                 name: null,
                 backend: null,
                 adminStateUp: true,
-				createRouter: null,
                 createSubnet: null,
                 clear: function () {
                     this.setProperties({
@@ -35,18 +34,6 @@ define('app/controllers/network_create', ['ember'],
                     });
                     this.subnet.clear();
                 },
-                router: Ember.Object.create({
-                    name: null,
-                    publicGateway: true,
-					createRouter: null,
-                    clear: function () {
-                        this.setProperties({
-                            name: null,
-                            publicGateway: true,
-							createRouter: null
-                        })
-                    }
-                }),
                 subnet: Ember.Object.create({
                     ipv: null,
                     name: null,
@@ -57,6 +44,9 @@ define('app/controllers/network_create', ['ember'],
                     hostRoutes: null,
                     enableDHCP: null,
                     DNS: null,
+                    routerName: null,
+                    routerPublicGateway: true,
+                    createRouter: null,
                     clear: function () {
                         this.setProperties({
                             ipv: 'IPv4',
@@ -67,7 +57,10 @@ define('app/controllers/network_create', ['ember'],
                             allocationPools: null,
                             hostRoutes: null,
                             enableDHCP: null,
-                            DNS: null
+                            DNS: null,
+                            routerName: null,
+                            routerPublicGateway: true,
+                            createRouter: null
                         })
                     }
                 })
@@ -113,7 +106,6 @@ define('app/controllers/network_create', ['ember'],
 
                 var payload = {};
                 var network = this.network;
-                var router = network.router;
                 var subnet = network.subnet;
 
                 // Construct network params
@@ -124,17 +116,6 @@ define('app/controllers/network_create', ['ember'],
 
                 if (network.adminStateUp !== null)
                     payload.network.admin_state_up = network.adminStateUp;
-
-				// Construct router params
-				if (network.createRouter) {
-					payload.router = {};
-
-					if (router.name) {
-						payload.router.name = router.name;
-					}
-
-					payload.router.publicGateway = router.publicGateway;
-				}
 
                 // Construct subnet params
                 if (network.createSubnet) {
@@ -169,6 +150,17 @@ define('app/controllers/network_create', ['ember'],
                                     };
                                 return {start: '', end: ''};
                             });
+
+                    // Construct router params
+                    if (subnet.createRouter) {
+                        payload.subnet.router = {};
+
+                        if (subnet.routerName) {
+                            payload.subnet.router.name = subnet.routerName;
+                        }
+
+                        payload.subnet.router.publicGateway = subnet.routerPublicGateway;
+                    }
                 }
 
                 var url = '/backends/' + this.network.backend.id +
@@ -202,8 +194,12 @@ define('app/controllers/network_create', ['ember'],
                 if (this.network.name && this.network.backend) {
 					formReady = true;
 
-					if (this.network.createRouter) {
-						formReady = this.network.router.name ? true : false;
+                    if (this.network.createSubnet) {
+                        formReady = this.network.subnet.name ? true : false;
+                    }
+
+					if (this.network.subnet.createRouter) {
+						formReady = this.network.subnet.routerName ? true : false;
 					}
                 }
 

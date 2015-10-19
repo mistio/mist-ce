@@ -105,49 +105,6 @@
             </div><!-- collapsible -->
         </div><!-- wrapper -->
 
-		<!--
-    		Create Router
-		-->
-
-		<div id="network-create-router-wrapper">
-
-			{{view Mist.Checkbox
-			data-theme="a"
-			id="network-create-router-create"
-			checked=Mist.networkCreateController.network.createRouter}}
-			<label for="network-create-router-create">
-				Create Router
-			</label>
-
-
-			<div id="network-create-router-form">
-
-				<!--
-                    Enter Router Name
-                -->
-				<div id="network-create-router-name-wrapper" class="required {{if Mist.networkCreateController.network.router.name 'filled' 'empty'}}">
-					<label for="network-create-router-name">Router Name</label>
-					{{view Mist.TextField
-					data-theme="a"
-					id="network-create-router-name"
-					value=Mist.networkCreateController.network.router.name}}
-				</div>
-
-				<!--
-                    Select Public Gateway Router Name
-                -->
-				<div id="network-create-router-gateway-wrapper">
-					{{view Mist.Checkbox
-					data-theme="a"
-					id="network-create-router-gateway"
-					checked=Mist.networkCreateController.network.router.publicGateway}}
-					<label for="network-create-router-gateway">
-						Set Public Gateway
-					</label>
-				</div>
-			</div>
-		</div>
-
 
         <!--
             Create Subnet
@@ -247,16 +204,61 @@
                     </div>
 
 
-                    <!--
-                        Enable DHCP
-                    -->
-                    {{view Mist.Checkbox
-                        data-theme="a"
-                        id="network-create-subnet-dhcp"
-                        checked=Mist.networkCreateController.network.subnet.enableDHCP}}
-                    <label for="network-create-subnet-dhcp">
-                        Enable DHCP
-                    </label>
+					<!--
+						Enable DHCP
+					-->
+
+					{{view Mist.Checkbox
+					data-theme="a"
+					id="network-create-subnet-dhcp"
+					checked=Mist.networkCreateController.network.subnet.enableDHCP}}
+					<label for="network-create-subnet-dhcp">
+						Enable DHCP
+					</label>
+
+
+					<!--
+						Create Router
+					-->
+
+					<div id="network-create-router-wrapper">
+
+						{{view Mist.Checkbox
+						data-theme="a"
+						id="network-create-router-create"
+						checked=Mist.networkCreateController.network.subnet.createRouter}}
+						<label for="network-create-router-create">
+							Create Router
+						</label>
+
+
+						<div id="network-create-router-form">
+
+							<!--
+                                Enter Router Name
+                            -->
+							<div id="network-create-router-name-wrapper" class="required {{if Mist.networkCreateController.network.subnet.routerName 'filled' 'empty'}}">
+								<label for="network-create-router-name">Router Name</label>
+								{{view Mist.TextField
+								data-theme="a"
+								id="network-create-router-name"
+								value=Mist.networkCreateController.network.subnet.routerName}}
+							</div>
+
+							<!--
+                                Select Public Gateway Router Name
+                            -->
+							<div id="network-create-router-gateway-wrapper">
+								{{view Mist.Checkbox
+								data-theme="a"
+								id="network-create-router-gateway"
+								checked=Mist.networkCreateController.network.subnet.routerPublicGateway}}
+								<label for="network-create-router-gateway">
+									Set Public Gateway
+								</label>
+							</div>
+						</div>
+					</div>
 
 
                     <!--
