@@ -65,6 +65,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/subnet_list_item.hbs',
         'text!app/templates/user_menu.hbs',
         'text!app/templates/image.hbs',
+        'text!app/templates/machine_run_script.hbs',
       ], function () {
         Ember.TEMPLATES['application'] = Ember.Handlebars.compile(arguments[0]);
         Ember.TEMPLATES['backend_add'] = Ember.Handlebars.compile(arguments[1]);
@@ -129,6 +130,7 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['subnet_list_item'] = Ember.Handlebars.compile(arguments[60]);
         Ember.TEMPLATES['user_menu'] = Ember.Handlebars.compile(arguments[61]);
         Ember.TEMPLATES['image'] = Ember.Handlebars.compile(arguments[62]);
+        Ember.TEMPLATES['machine_run_script'] = Ember.Handlebars.compile(arguments[63]);
         callback();
         info('loaded raw templates');
       });

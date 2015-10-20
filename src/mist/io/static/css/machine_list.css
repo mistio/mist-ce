@@ -181,6 +181,20 @@
     height: 18px;
 }
 
+@media only screen and  (max-width: 600px) {
+    .machine-tags {
+        height: 16px;
+    }
+}
+
+.machine-tags .tag.pairs {
+    background-color: #888;
+    color: #fff !important;
+    font-size: 0.9em;
+    padding: 1px 5px;
+    border-radius: 2px !important;
+}
+
 .has-incident label:after {
     color: #fff !important;
 }

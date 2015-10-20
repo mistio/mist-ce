@@ -47,7 +47,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
 
             sortedMachines: Ember.computed.sort('machines', function(a, b){
                 if (Mist.backendsController.sortBy == 'name')
-                    return a.name.localeCompare(b.name)
+                    return a.name.localeCompare(b.name);
                 else
                     return b.get('stateWeight') - a.get('stateWeight');
             }).property('machines', 'sortBy', 'machines.@each.stateWeight', 'machines.@each.name'),

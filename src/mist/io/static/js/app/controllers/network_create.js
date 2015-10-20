@@ -168,7 +168,7 @@ define('app/controllers/network_create', ['ember'],
                 var that = this;
                 that.set('creatingNetwork', true);
                 Mist.ajax.POST(url, payload).success(function (network) {
-                    that.close();
+                    that.view.close();
                 }).error(function (message) {
                     Mist.notificationController.notify(message);
                 }).complete(function (success, network) {

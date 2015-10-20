@@ -164,7 +164,7 @@
                         <td>Tags</td>
                         <td>
                             {{#each model.tags as |tag|}}
-                            <span class="tag">{{tag}}</span>
+                            <div class="tag pairs">{{tag.key}}{{#if tag.value}}={{tag.value}}{{/if}}</div><br>
                             {{/each}}
                         </td>
                     </tr>
@@ -235,6 +235,8 @@
 
     {{component "machine-shell"}}
 
+    {{component "machine-run-script"}}
+
     {{component "machine-power" position="#single-machine-power-btn"}}
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
@@ -262,6 +264,7 @@
             <div class="ui-block-c">
                 <a id="single-machine-power-btn"
                     class="{{if model.id '' 'ui-state-disabled'}}
+                    	{{if model.hasNotActions 'ui-state-disabled'}}
                         ui-btn ui-btn-icon-right icon-cog ui-caps"
                     {{action "powerClicked" target=view}}>Actions</a>
             </div>

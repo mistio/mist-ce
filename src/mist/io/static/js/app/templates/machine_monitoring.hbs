@@ -52,7 +52,7 @@
                     Enabling monitoring, please wait...
                 </label>
 
-                <div class="ajax-loader"></div>
+                <div class="ajax-loader" id="machine-enable-monitoring-loader"></div>
 
             {{else}} {{#if machine.disablingMonitoring}}
 
@@ -60,27 +60,33 @@
                     Disabling monitoring...
                 </label>
 
-                <div class="ajax-loader"></div>
+                <div class="ajax-loader" id="machine-enable-monitoring-loader"></div>
 
             {{else}}
+                {{#if view.machine.cannotHaveMonitoring}}
+                    <label id="enable-monitoring-label">
+                        This machine cannot have monitoring since it is "<span class="ui-caps">{{view.machine.state}}</span>".
+                    </label>
 
-                <label id="enable-monitoring-label">
-                    View real time server analytics, get alerts
-                    and set up automated actions.
-                </label>
+                {{else}}
+                    <label id="enable-monitoring-label">
+                        View real time server analytics, get alerts
+                        and set up automated actions.
+                    </label>
 
-                <a id="enable-monitoring-btn"
-                    class="{{if view.machine.enablingMonitoring 'ui-state-disabled'}}
-                        {{if view.gettingCommand 'ui-state-disabled'}}
-                        ui-btn ui-btn-d ui-shadow ui-btn-icon-right icon-graph-1 ui-caps"
-                    {{action "enableMonitoringClicked" target=view}}>
-                        Enable Monitoring
-                </a>
-
-               {{#if view.gettingCommand}}
-                    <div class="ajax-loader"></div>
+                   {{#if view.gettingCommand}}
+                        <div class="ajax-loader" id="machine-enable-monitoring-loader"></div>
+                   {{/if}}
                {{/if}}
 
+               <a id="enable-monitoring-btn"
+                   class="{{if view.machine.cannotHaveMonitoring 'ui-state-disabled'}}
+                       {{if view.machine.enablingMonitoring 'ui-state-disabled'}}
+                       {{if view.gettingCommand 'ui-state-disabled'}}
+                       ui-btn ui-btn-d ui-shadow ui-btn-icon-right icon-graph-1 ui-caps"
+                   {{action "enableMonitoringClicked" target=view}}>
+                       Enable Monitoring
+               </a>
            {{/if}} {{/if}}
        </div>
     {{/if}}
