@@ -136,20 +136,6 @@ def upload_my_key(context, new_key_name):
     context.execute_steps(u'When I click the button "Add"')
 
 
-@then(u'I wait for the ajax loader for max {seconds} seconds inside '
-      u'"{element_id}"')
-def wait_for_loader_to_finish(context, seconds, element_id):
-    end_time = time() + int(seconds)
-    while time() < end_time:
-        try:
-            panel = context.browser.find_element_by_id(element_id)
-            panel.find_element_by_class_name('ajax-loader')
-            sleep(1)
-        except NoSuchElementException:
-            return
-    assert False, "Ajax loading hasn't finished after %s seconds" % seconds
-
-
 @then(u'I wait for probing to finish for {seconds} seconds max')
 def wait_for_loader_to_finish(context, seconds):
     rows = context.browser.find_elements_by_tag_name('tr')
@@ -202,7 +188,6 @@ def ssh_key_is_added(context, ssh_key_name):
             context.execute_steps(u"""
                 Then I click the button "Add key"
                 And I expect for "non-associated-keys-popup-popup" popup to appear within max 4 seconds
-                When I click the "New key" button inside the "Add key" popup
             """)
             # check if the key is already uploaded but not associated
             key_already_associated = False
@@ -215,47 +200,68 @@ def ssh_key_is_added(context, ssh_key_name):
 
             if not key_already_associated:
                 context.execute_steps(u"""
+                    When I click the "New key" button inside the "Add key" popup
+                    Then I expect for "key-add-popup" popup to appear within max 2 seconds
+                    And I upload the ssh key with name "%s"
+                """ % ssh_key_name)
+
+            context.execute_steps(u"""
+                Then I expect for "machine-keys-panel" side panel to appear within max 4 seconds
+                And I expect for "machine-associating-key-loader" loader to finish within max 100 seconds
+                Then If the key addition was successful
+            """)
+            context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
+            return
+        elif 'keys' in button.text.lower():
+            # otherwise it will be called "? keys" where ? is the number of
+            # saved keys. before adding the key we need to check if it's already
+            # saved
+            context.execute_steps(u'''
+                Then I click the button "%s"
+                And I expect for "machine-keys-panel" side panel to appear within max 4 seconds
+            ''' % button.text)
+            machine_keys_list = context.browser.find_element_by_id("machine-keys")
+            machines_keys = machine_keys_list.find_elements_by_class_name(
+                "small-list-item")
+            checked_texts = []
+            for machines_key in machines_keys:
+                if not machines_key.text or not machines_key.text.strip():
+                    # sometimes the code checks for the texts too fast and they
+                    # haven't been fetched yet so we do a sleep
+                    sleep(1)
+                checked_texts.append(machines_key.text)
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']\
+                        in machines_key.text:
+                    context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
+                    context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
+                    return
+            context.execute_steps(u"""
+                When I click the "New key" button inside the "Manage Keys" panel
+                And I expect for "non-associated-keys-popup" popup to appear within max 4 seconds
+            """)
+            # check if the key is already uploaded but not associated
+            key_already_associated = False
+            non_associated_keys = context.browser.find_element_by_id('non-associated-keys-popup').find_elements_by_tag_name('li')
+            for non_associated_key in non_associated_keys:
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in non_associated_key.text.lower():
+                    non_associated_key.click()
+                    key_already_associated = True
+                    break
+
+            if not key_already_associated:
+                context.execute_steps(u"""
+                    When I click the "New key" button inside the "Add Key" popup
                     Then I expect for "key-add-popup" popup to appear within max 2 seconds
                     And I upload the ssh key with name "%s"
                 """ % ssh_key_name)
 
             context.execute_steps(u"""
                 Then I expect for "key-generate-loader" loader to finish within max 5 seconds
-                And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
-                Then If the key addition was successful
-                Then I click the button "Enable Monitoring"
-            """)
-            return
-        elif 'keys' in button.text.lower():
-            # otherwise it will be called "? keys" where ? is the number of
-            # saved keys. before adding the key we need to check if it's already
-            # saved
-            context.execute_steps(u'Then I click the button "%s"' % button.text)
-            try:
-                machine_keys_list = context.browser.find_element_by_id(
-                    "machine-keys")
-                machines_keys = machine_keys_list.find_elements_by_class_name(
-                    "small-list-item")
-                for machines_key in machines_keys:
-                    if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']\
-                            in machines_key.text:
-                        context.execute_steps(u'Then I click the button '
-                                              u'"Enable Monitoring"')
-                        return
-            except NoSuchElementException:
-                pass
-            context.execute_steps(u"""
-                Then I click the button "%s"
-                And I expect for "non-associated-keys-popup" popup to appear within max 4 seconds
-                When I click the "New key" button inside the "Add key" popup
-                And I expect for "key-add-popup" popup to appear within max 4 seconds
-                Then I upload the ssh key with name "%s"
-                Then I expect for "key-generate-loader" loader to finish within max 5 seconds
-                And I wait for the ajax loader for max 100 seconds inside "machine-keys-panel"
+                And I expect for "machine-associating-key-loader" loader to finish within max 100 seconds
                 And If the key addition was successful
-                Then I click the button "Enable Monitoring"
-                And I expect for "machine-keys-panel" panel to disappear within max 4 seconds
-            """ % (button.text, ssh_key_name))
+            """)
+            context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
+            context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
 
 
 def update_lines(terminal, lines, start_of_empty_lines):
