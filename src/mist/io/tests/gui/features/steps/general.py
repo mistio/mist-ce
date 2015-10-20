@@ -102,16 +102,16 @@ def wait(context, seconds):
     sleep(int(seconds))
 
 
-@then(u'I expect for "{panel_title}" panel to {action} within max {seconds} '
+@then(u'I expect for "{panel_id}" panel to {action} within max {seconds} '
       u'seconds')
-def panel_waiting_with_timeout(context, panel_title, action, seconds):
+def panel_waiting_with_timeout(context, panel_id, action, seconds):
     """
     Function that waits for panel to appear but for a maximum amount of time
     """
     if action == 'appear':
-        css_selector = '#%s:not([class*="ui-collapsible-collapsed"])' % panel_title
+        css_selector = '#%s:not([class*="ui-collapsible-collapsed"])' % panel_id
     elif action == 'disappear':
-        css_selector = '#%s[class*="ui-collapsible-collapsed"]' % panel_title
+        css_selector = '#%s[class*="ui-collapsible-collapsed"]' % panel_id
     else:
         raise ValueError("Action can be either appear or disappear. Duh!")
     try:
@@ -119,20 +119,20 @@ def panel_waiting_with_timeout(context, panel_title, action, seconds):
             EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
     except TimeoutException:
         raise TimeoutException("Panel %s did not %s after %s seconds"
-                               % (panel_title, action, seconds))
+                               % (panel_id, action, seconds))
 
 
-@then(u'I expect for "{popup_name}" popup to {action} within max {seconds} '
+@then(u'I expect for "{popup_id}" popup to {action} within max {seconds} '
       u'seconds')
-def popup_waiting_with_timeout(context, popup_name, action, seconds):
+def popup_waiting_with_timeout(context, popup_id, action, seconds):
     """
     Function that wait for keyadd-popup to appear but for a maximum
     amount of time
     """
     if action == 'appear':
-        css_selector = '#%s[class*="ui-popup-active"]' % popup_name
+        css_selector = '#%s[class*="ui-popup-active"]' % popup_id
     elif action == 'disappear':
-        css_selector = '#%s[class*="ui-popup-hidden"]' % popup_name
+        css_selector = '#%s[class*="ui-popup-hidden"]' % popup_id
     else:
         raise ValueError("Action can be either appear or disappear. Duh!")
     try:
@@ -140,7 +140,28 @@ def popup_waiting_with_timeout(context, popup_name, action, seconds):
             EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
     except TimeoutException:
         raise TimeoutException("Popup %s did not %s after %s seconds"
-                               % (popup_name, action, seconds))
+                               % (popup_id, action, seconds))
+
+
+@then(u'I expect for "{side_panel_id}" side panel to {action} within max '
+      u'{seconds} seconds')
+def popup_waiting_with_timeout(context, side_panel_id, action, seconds):
+    """
+    Function that wait for keyadd-popup to appear but for a maximum
+    amount of time
+    """
+    if action == 'appear':
+        css_selector = '#%s[class*="ui-panel-open"]' % side_panel_id
+    elif action == 'disappear':
+        css_selector = '#%s[class*="ui-panel-closed"]' % side_panel_id
+    else:
+        raise ValueError("Action can be either appear or disappear. Duh!")
+    try:
+        WebDriverWait(context.browser, int(seconds)).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+    except TimeoutException:
+        raise TimeoutException("Side panel %s did not %s after %s seconds"
+                               % (side_panel_id, action, seconds))
 
 
 @then(u'I expect for "{page_title}" page to appear within max {seconds} seconds')
