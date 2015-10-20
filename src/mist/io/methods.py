@@ -3228,6 +3228,15 @@ def set_machine_tags(user, backend_id, machine_id, tags):
 
     if conn.type in config.EC2_PROVIDERS:
         try:
+            ec2_tags = conn.ex_describe_tags(machine)
+            encoded_ec2_tags = {}
+            for ec2_key, ec2_value in ec2_tags.items():
+                if type(ec2_key) ==  unicode:
+                    ec2_key = ec2_key.encode('utf-8')
+                if type(ec2_value) ==  unicode:
+                    ec2_value = ec2_value.encode('utf-8')
+                encoded_ec2_tags[ec2_key] = ec2_value
+            conn.ex_delete_tags(machine, encoded_ec2_tags)
             conn.ex_create_tags(machine, tags_dict)
         except Exception as exc:
             raise BackendUnavailableError(backend_id, exc)
