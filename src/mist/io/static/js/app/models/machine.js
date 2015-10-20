@@ -73,16 +73,23 @@ define('app/models/machine', ['ember'],
                         error: 6,
                         pending: 5,
                         rebooting: 4,
-                        unknown: 3,
-                        running: 2,
+                        running: 3,
+                        unknown: 2,
                         terminated: 1,
                         stopped: 0
                     };
 
                 weight = 100000 * states[this.get('state')];
 
-                if(this.get('hasMonitoring'))
-                    weight += 10000 * (1 + this.get('incidents').length/100);
+                if(this.get('hasMonitoring')) {
+                    var openIncidents = 0;                    
+                    if (this.get('hasOpenIncident')) {
+                        this.get('incidents').forEach(function(incident) {
+                            if(!incident.get('isClosed')) openIncidents += 1;
+                        });
+                    }
+                    weight += 10000 * (1 + openIncidents/100);
+                }
 
                 if(this.get('probed')) {
                     if(this.get('loadavg1')>0)
@@ -91,7 +98,7 @@ define('app/models/machine', ['ember'],
                 }
 
                 return weight;
-            }.property('state', 'hasMonitoring', 'incidents', 'loadavg1', 'loss', 'latency'),
+            }.property('state', 'hasMonitoring', 'hasOpenIncident', 'incidents', 'loadavg1', 'loss', 'latency'),
 
             isUnknown: function () {
                 return this.get('state') == 'unknown';

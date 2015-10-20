@@ -146,11 +146,13 @@ define('app/views/machine_list', ['app/views/page'],
 
                 selectionModeClicked: function (mode) {
                     $('#select-machines-popup').popup('close');
-                    Mist.backendsController.model.forEach(function (backend) {
-                        backend.machines.model.forEach(function (machine) {
-                            machine.set('selected', mode == 'all' || mode == backend.title);
-                        });
+                    Mist.backendsController.get('filteredMachines').forEach(function (machine) {
+                        machine.set('selected', mode == 'all' || mode == machine.backend.title);
                     });
+                },
+
+                clearSearch: function() {
+                    Mist.backendsController.set('searchMachinesTerm', null);
                 }
             }
         });
