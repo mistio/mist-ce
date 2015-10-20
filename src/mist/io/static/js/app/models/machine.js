@@ -81,8 +81,15 @@ define('app/models/machine', ['ember'],
 
                 weight = 100000 * states[this.get('state')];
 
-                if(this.get('hasMonitoring'))
-                    weight += 10000 * (1 + this.get('incidents').length/100);
+                if(this.get('hasMonitoring')) {
+                    var openIncidents = 0;                    
+                    if (this.get('hasOpenIncident')) {
+                        this.get('incidents').forEach(function(incident) {
+                            if(!incident.get('isClosed')) openIncidents += 1;
+                        });
+                    }
+                    weight += 10000 * (1 + openIncidents/100);
+                }
 
                 if(this.get('probed')) {
                     if(this.get('loadavg1')>0)
@@ -91,7 +98,7 @@ define('app/models/machine', ['ember'],
                 }
 
                 return weight;
-            }.property('state', 'hasMonitoring', 'incidents', 'loadavg1', 'loss', 'latency'),
+            }.property('state', 'hasMonitoring', 'hasOpenIncident', 'incidents', 'loadavg1', 'loss', 'latency'),
 
             isUnknown: function () {
                 return this.get('state') == 'unknown';
