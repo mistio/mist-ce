@@ -73,8 +73,8 @@ define('app/models/machine', ['ember'],
                         error: 6,
                         pending: 5,
                         rebooting: 4,
-                        unknown: 3,
-                        running: 2,
+                        running: 3,
+                        unknown: 2,
                         terminated: 1,
                         stopped: 0
                     };
