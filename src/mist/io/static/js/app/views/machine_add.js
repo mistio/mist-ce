@@ -138,8 +138,6 @@ define('app/views/machine_add', ['app/views/controlled'],
                 Ember.run.next(function(){
                     $( "#create-machine" ).collapsible({
                         collapse: function(event, ui) {
-                            Mist.machineAddController.close();
-
                             $(this).children().next().slideUp(250);
                             var id = $(this).attr('id'),
                             overlay = id ? $('#' + id+'-overlay') : false;
