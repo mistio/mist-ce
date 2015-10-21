@@ -46,12 +46,14 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             }.property('model.[].hasNetworks'),
 
             filteredMachines: Ember.computed('machines', 'searchMachinesTerm', function() {
-                var filteredMachines = [];
+                var filteredMachines = [],
+                machines = this.get('machines'),
+                searchMachinesTerm = this.get('searchMachinesTerm');
 
-                if (this.searchMachinesTerm) {
+                if (searchMachinesTerm) {
                     var that = this;
-                    this.machines.forEach(function(machine) {
-                        var regex = new RegExp(that.searchMachinesTerm, 'i');
+                    machines.forEach(function(machine) {
+                        var regex = new RegExp(searchMachinesTerm, 'i');
 
                         if (regex.test(machine.name)) {
                             filteredMachines.push(machine);
@@ -62,38 +64,34 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                         }
                     });
                 } else {
-                    filteredMachines = this.machines;
+                    filteredMachines = machines;
                 }
 
                 return filteredMachines;
             }),
 
             sortedMachines: Ember.computed('filteredMachines', 'filteredMachines.@each.stateWeight', 'filteredMachines.@each.name', 'filteredMachines.@each.backend.title', 'sortBy', function() {
-                if(this.get('filteredMachines'))
+                var filteredMachines = this.get('filteredMachines'),
+                sortBy = this.get('sortBy');
+
+                if(filteredMachines)
                 {
-                    if (this.get('sortBy') == 'state')
+                    if (sortBy == 'state')
                     {
-                        return this.get('filteredMachines').sortBy('stateWeight').reverse();
+                        return filteredMachines.sortBy('stateWeight').reverse();
                     }
 
-                    if (this.get('sortBy') == 'name')
+                    if (sortBy == 'name')
                     {
-                        return this.get('filteredMachines').sortBy('name');
+                        return filteredMachines.sortBy('name');
                     }
 
-                    if (this.get('sortBy') == 'cloud')
+                    if (sortBy == 'cloud')
                     {
-                        return this.get('filteredMachines').sortBy('backend.title', 'name');
+                        return filteredMachines.sortBy('backend.title', 'name');
                     }
                 }
             }),
-
-            sortedMachines: Ember.computed.sort('machines', function(a, b){
-                if (Mist.backendsController.sortBy == 'name')
-                    return a.name.localeCompare(b.name);
-                else
-                    return b.get('stateWeight') - a.get('stateWeight');
-            }).property('machines', 'sortBy', 'machines.@each.stateWeight', 'machines.@each.name'),
 
 
             //
