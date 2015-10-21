@@ -4,6 +4,7 @@
 #key-list-page .ui-content {
     background-color: transparent;
 }
+
 #key-list-page #select-keys-btn {
     float: left;
     font-weight: normal;
@@ -21,6 +22,11 @@
 }
 #key-list-page #select-keys-btn:hover {
     color: #444 !important;
+}
+#select-keys-popup .icon-check:after {
+    font-size: 14px;
+    top: 1.3em;
+    color: #d4d4d4;
 }
 #key-list-page .creation-button {
     margin: 0;
@@ -78,7 +84,6 @@
 }
 
 #key-list-page .key-search-container {
-    position: relative;
     position: relative;
     top: -56px;
     margin-left: 50px;

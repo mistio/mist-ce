@@ -9,11 +9,14 @@ Feature: Actions for Images
   Scenario: Star image from Advanced search
     When I visit the Images page after the counter has loaded
     Then there should be starred Images
-    When I search for a "django" Image
-    And I wait for 2 seconds
-    And I click the button "Continue search on server"
+    When I search for a "bitnami" Image
+    And I click the button "Load more"
     Then Images list should be loaded within 60 seconds
-#    When I star an Image that contains "django"
-#    And I clear the Images search bar
-#    Then Images list should be loaded within 30 seconds
-#    And an Image that contains "django" should be starred
+    When I star an Image that contains "bitnami"
+    And I clear the Images search bar
+    Then Images list should be loaded within 30 seconds
+#    When I search for a "bitnami" Image
+#    And I wait for 100 seconds
+#    Then an image that contains "the_name_that_i_used_before" should be starred
+#    And I unstar the image that contains "the_name_that_i_used_before"
+#    And there should be 1 unstarred images

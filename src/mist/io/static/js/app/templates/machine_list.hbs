@@ -40,7 +40,16 @@
             </div>
             <!-- /grid-b -->
 
-            <ul id="machine-list" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter machines" data-theme="c" class="checkbox-list">
+            <div class="machine-search-container">
+                {{#if Mist.backendsController.searchMachinesTerm}}
+                    <span {{action "clearSearch" target=view}} class="icon-xx"></span>
+                {{else}}
+                    <span class="icon-search"></span>
+                {{/if}}
+                {{input value=Mist.backendsController.searchMachinesTerm placeholder="Filter machines" class="machine-search"}}
+            </div>
+
+            <ul id="machine-list" data-role="listview" data-inset="true" data-theme="c" class="checkbox-list">
                 {{#each view.machines as |machine|}}
                     {{#if machine.backend.enabled}}
                         {{component "machine-list-item" machine=machine class="checkbox-link"}}
@@ -58,16 +67,21 @@
 
     {{component "machine-shell"}}
 
+    {{component "machine-run-script"}}
+
     {{component "machine-power" position="#machines-power-btn"}}
 
     <div id="select-machines-popup" class="ui-mini" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
         <div class="ui-header ui-caps">Sort by</div>
         <ul data-role="listview">
             <li>
-                <a class="ui-btn ui-btn-icon-left {{if view.sortByName 'icon-check'}}" {{action "sortBy" "name" target=view}}>Name</a>
+                <a class="ui-btn ui-btn-icon-left {{if view.sortByState 'icon-check'}}" {{action "sortBy" "state" target=view}}>State</a>
             </li>
             <li>
-                <a class="ui-btn ui-btn-icon-left {{if view.sortByState 'icon-check'}}" {{action "sortBy" "state" target=view}}>State</a>
+                <a class="ui-btn ui-btn-icon-left {{if view.sortByCloud 'icon-check'}}" {{action "sortBy" "cloud" target=view}}>Cloud</a>
+            </li>
+            <li>
+                <a class="ui-btn ui-btn-icon-left {{if view.sortByName 'icon-check'}}" {{action "sortBy" "name" target=view}}>Name</a>
             </li>
         </ul>
 

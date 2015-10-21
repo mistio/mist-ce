@@ -13,7 +13,7 @@ define('app/views/script_list_item', ['app/views/list_item'],
             layoutName: 'script_list_item',
 
             updateCheckbox: function () {
-                var element = this.$('input.ember-checkbox');
+                var element = $('#' + this.elementId + ' input.ember-checkbox');
                 Ember.run.next(this, function () {
                     if (element.checkboxradio) {
                         element.checkboxradio()

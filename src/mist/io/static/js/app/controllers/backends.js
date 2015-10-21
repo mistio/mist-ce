@@ -37,6 +37,8 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             loadingImages: false,
             loadingMachines: false,
 
+            searchMachinesTerm: null,
+
             hasOpenStack: function () {
                 return !!this.model.filterBy('enabled', true).findBy('isOpenStack', true);
             }.property('model.[].isOpenStack', 'model.[].enabled'),
@@ -45,12 +47,48 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 return !!this.model.findBy('hasNetworks', true);
             }.property('model.[].hasNetworks'),
 
-            sortedMachines: Ember.computed.sort('machines', function(a, b){
-                if (Mist.backendsController.sortBy == 'name')
-                    return a.name.localeCompare(b.name)
-                else
-                    return b.get('stateWeight') - a.get('stateWeight');
-            }).property('machines', 'sortBy', 'machines.@each.stateWeight', 'machines.@each.name'),
+            filteredMachines: Ember.computed('machines', 'searchMachinesTerm', function() {
+                var filteredMachines = [];
+
+                if (this.searchMachinesTerm) {
+                    var that = this;
+                    this.machines.forEach(function(machine) {
+                        var regex = new RegExp(that.searchMachinesTerm, 'i');
+
+                        if (regex.test(machine.name)) {
+                            filteredMachines.push(machine);
+                        } else {
+                            if (machine.selected) {
+                                machine.set('selected', false);
+                            }
+                        }
+                    });
+                } else {
+                    filteredMachines = this.machines;
+                }
+
+                return filteredMachines;
+            }),
+
+            sortedMachines: Ember.computed('filteredMachines', 'filteredMachines.@each.stateWeight', 'filteredMachines.@each.name', 'filteredMachines.@each.backend.title', 'sortBy', function() {
+                if(this.get('filteredMachines'))
+                {
+                    if (this.get('sortBy') == 'state')
+                    {
+                        return this.get('filteredMachines').sortBy('stateWeight').reverse();
+                    }
+
+                    if (this.get('sortBy') == 'name')
+                    {
+                        return this.get('filteredMachines').sortBy('name');
+                    }
+
+                    if (this.get('sortBy') == 'cloud')
+                    {
+                        return this.get('filteredMachines').sortBy('backend.title', 'name');
+                    }
+                }
+            }),
 
 
             //

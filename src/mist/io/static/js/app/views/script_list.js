@@ -60,7 +60,7 @@ define('app/views/script_list', ['app/views/page'],
                     Mist.scriptAddController.open();
                 },
 
-                renameClicked: function () {
+                editClicked: function () {
                     Mist.scriptEditController.open(Mist.scriptsController.get('selectedObjects')[0]);
                 },
 
@@ -71,7 +71,7 @@ define('app/views/script_list', ['app/views/page'],
                 selectionModeClicked: function (mode) {
                     $('#select-scripts-popup').popup('close');
                     Ember.run(function () {
-                        Mist.scriptsController.model.forEach(function (script) {
+                        Mist.scriptsController.get('filteredScripts').forEach(function (script) {
                             script.set('selected', mode);
                         });
                     });
@@ -99,6 +99,14 @@ define('app/views/script_list', ['app/views/page'],
                         }
                     });
                 },
+
+                clearClicked: function() {
+                    Mist.scriptsController.clearSearch();
+                },
+
+                sortBy: function (criteria) {
+                    Mist.scriptsController.set('sortByTerm', criteria);
+                }
             }
         });
     }

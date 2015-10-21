@@ -58,6 +58,11 @@ define('app/models/machine', ['ember'],
             //  Computed Properties
             //
 
+            cannotHaveMonitoring: Ember.computed('state', function() {
+                var invalids = ['error', 'stopped', 'terminated', 'pending', 'rebooting'];
+                return invalids.indexOf(this.get('state')) > -1;
+            }),
+
             incidents: function () {
                 return incidents = Mist.openIncidents.filterBy('machineId', this.get('id'));
             }.property('Mist.openIncidents.@each.machine'),
@@ -68,16 +73,23 @@ define('app/models/machine', ['ember'],
                         error: 6,
                         pending: 5,
                         rebooting: 4,
-                        unknown: 3,
-                        running: 2,
+                        running: 3,
+                        unknown: 2,
                         terminated: 1,
                         stopped: 0
                     };
 
                 weight = 100000 * states[this.get('state')];
 
-                if(this.get('hasMonitoring'))
-                    weight += 10000 * (1 + this.get('incidents').length/100);
+                if(this.get('hasMonitoring')) {
+                    var openIncidents = 0;                    
+                    if (this.get('hasOpenIncident')) {
+                        this.get('incidents').forEach(function(incident) {
+                            if(!incident.get('isClosed')) openIncidents += 1;
+                        });
+                    }
+                    weight += 10000 * (1 + openIncidents/100);
+                }
 
                 if(this.get('probed')) {
                     if(this.get('loadavg1')>0)
@@ -86,7 +98,7 @@ define('app/models/machine', ['ember'],
                 }
 
                 return weight;
-            }.property('state', 'hasMonitoring', 'incidents', 'loadavg1', 'loss', 'latency'),
+            }.property('state', 'hasMonitoring', 'hasOpenIncident', 'incidents', 'loadavg1', 'loss', 'latency'),
 
             isUnknown: function () {
                 return this.get('state') == 'unknown';
@@ -95,6 +107,10 @@ define('app/models/machine', ['ember'],
             isRunning: function () {
                 return this.get('state') == 'running';
             }.property('state'),
+
+            hasNotActions: Ember.computed('can_start', 'can_reboot', 'can_destroy', 'can_shutdown', 'can_rename', function() {
+                return !this.get('can_start') && !this.get('can_reboot') && !this.get('can_destroy') && !this.get('can_shutdown') && !this.get('can_rename');
+            }),
 
             netled1: function() {
                 if (this.latency > 0 &&  this.latency < 1000) return 'on';
@@ -129,8 +145,8 @@ define('app/models/machine', ['ember'],
             }.property('imageId'),
 
             hasShell: function () {
-                return this.get('hasKeys') || this.get('backend').get('isDocker');
-            }.property('hasKeys', 'backend.isDocker'),
+                return (this.get('hasKeys') || this.get('backend').get('isDocker')) && this.get('isRunning');
+            }.property('hasKeys', 'isRunning', 'backend.isDocker'),
 
             hasKeys: function () {
                 return !!Mist.keysController.getMachineKeysCount(this);

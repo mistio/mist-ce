@@ -176,7 +176,6 @@ define('app/views/log_list', ['ember'],
                 // Prepare filter
                 var preFilterString = this.get('preFilterString') || ''
                 var filterString = preFilterString + ' ' + (this.get('filterString') || '');
-                console.log(filterString)
                 var filter = filterString.trim().toLowerCase().split(' ').map(
                     function (term) {
                         return term.trim();

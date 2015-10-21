@@ -24,7 +24,7 @@ define('app/routes/machine', ['app/routes/base'],
                             backend_id = machine.backend.id
                         }
                         Mist.logsController.load();
-                        Mist.logsController.view.set('preFilterString', backend_id + ' ' + id );
+                        if (Mist.logsController.view) Mist.logsController.view.set('preFilterString', backend_id + ' ' + id );
                         
                     }, 1000);
                 });

@@ -263,6 +263,66 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             job_id=job_id
         )
 
+@app.task(bind=True, default_retry_delay=2*60)
+def hpcloud_post_create_steps(self, email, backend_id, machine_id, monitoring,
+                              command, key_id, username, password, public_key,
+                              script_id='', script_params='', job_id=None,
+                              hostname='', plugins=None,
+                              post_script_id='', post_script_params=''):
+    from mist.io.methods import connect_provider
+    user = user_from_email(email)
+
+    try:
+        conn = connect_provider(user.backends[backend_id])
+        nodes = conn.list_nodes()
+        node = None
+
+        for n in nodes:
+            if n.id == machine_id:
+                node = n
+                break
+
+        if node and node.state == 0 and len(node.public_ips):
+            # filter out IPv6 addresses
+            ips = filter(lambda ip: ':' not in ip, node.public_ips)
+            host = ips[0]
+
+            post_deploy_steps.delay(
+                email, backend_id, machine_id, monitoring, command, key_id,
+                script_id=script_id, script_params=script_params,
+                job_id=job_id, hostname=hostname, plugins=plugins,
+                post_script_id=post_script_id,
+                post_script_params=post_script_params,
+            )
+
+        else:
+            try:
+                available_networks = conn.ex_list_networks()
+                external_networks = [net for net in available_networks if net.router_external]
+                if external_networks:
+                    ext_net_id = external_networks[0].id
+                else:
+                    ext_net_id = ""
+
+                ports = conn.ex_list_ports()
+
+                port = [port for port in ports if port.get("device_id", "") == node.id][0]
+
+                ip = conn.ex_create_floating_ip(ext_net_id, port['id'])
+                post_deploy_steps.delay(
+                    email, backend_id, machine_id, monitoring, command, key_id,
+                    script_id=script_id, script_params=script_params,
+                    job_id=job_id, hostname=hostname, plugins=plugins,
+                    post_script_id=post_script_id,
+                    post_script_params=post_script_params,
+                )
+
+            except:
+                raise self.retry(exc=Exception(), max_retries=20)
+    except Exception as exc:
+        if str(exc).startswith('Retry'):
+            raise
+
 
 @app.task(bind=True, default_retry_delay=2*60)
 def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
@@ -607,6 +667,20 @@ class ListMachines(UserTask):
         from mist.io import methods
         user = user_from_email(email)
         machines = methods.list_machines(user, backend_id)
+        if multi_user:
+            for machine in machines:
+                kwargs = {}
+                kwargs['backend_id'] = backend_id
+                kwargs['machine_id'] = machine.get('id')
+                from mist.core.methods import list_tags
+                mistio_tags = list_tags(user, resource_type='machine', **kwargs)
+                # optimized for js
+                for tag in mistio_tags:
+                    for key, value in tag.items():
+                        tag_dict = {'key': key, 'value': value}
+                        if tag_dict not in machine['tags']:
+                            machine['tags'].append(tag_dict)
+                # FIXME: optimize!
         log.warn('Returning list machines for user %s backend %s' % (email, backend_id))
         return {'backend_id': backend_id, 'machines': machines}
 

@@ -39,12 +39,19 @@
             </div><!-- /grid-b -->
 
             {{#if Mist.scriptsController.model.length}}
+                <div class="script-search-container">
+                    {{#if Mist.scriptsController.searchTerm}}
+                        <span {{action "clearClicked" target=view}} class="icon-xx"></span>
+                    {{else}}
+                        <span class="icon-search"></span>
+                    {{/if}}
+                    {{input value=Mist.scriptsController.searchTerm placeholder="Filter scripts" class="script-search"}}
+                </div>
+
                 <ul id="script-list" data-role="listview"
-                    data-filter="true"
                     data-inset="true"
-                    data-filter-placeholder="Filter Scripts..."
                     class="checkbox-list">
-                    {{#each Mist.scriptsController.model as |script|}}
+                    {{#each Mist.scriptsController.sortedScripts as |script|}}
                         {{component "script-list-item" script=script class="checkbox-link"}}
                     {{/each}}
                 </ul>
@@ -59,8 +66,17 @@
     {{component "script-edit"}}
 
     <div id="select-scripts-popup" class="ui-mini" data-role="popup" data-transition="flip" data-position-to="#select-scripts-btn">
-        <div class="ui-header ui-caps">Select</div>
+        <div class="ui-header ui-caps">Sort by</div>
+        <ul data-role="listview">
+            <li>
+                <a class="ui-btn ui-btn-icon-left {{if Mist.scriptsController.sortByName 'icon-check'}}" {{action "sortBy" "name" target=view}}>Name</a>
+            </li>
+            <li>
+                <a class="ui-btn ui-btn-icon-left {{if Mist.scriptsController.sortByType 'icon-check'}}" {{action "sortBy" "type" target=view}}>Type</a>
+            </li>
+        </ul>
 
+        <div class="ui-header ui-caps">Select</div>
         <ul data-role='listview'>
             <li data-icon="false">
                 <a {{action "selectionModeClicked" true target=view}}>All</a>
@@ -75,7 +91,7 @@
         <div class="ui-grid-a">
             <div class="{{if view.canRename '' 'ui-state-disabled'}} ui-block-a">
                 <a class="ui-btn ui-btn-icon-right ui-caps icon-edit"
-                    {{action "renameClicked" target=view}}>Rename</a>
+                    {{action "editClicked" target=view}}>Edit</a>
             </div>
             <div class="{{if view.canDelete '' 'ui-state-disabled'}} ui-block-b">
                 <a class="ui-btn ui-btn-icon-right ui-caps icon-xx"

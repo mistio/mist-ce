@@ -583,36 +583,36 @@ def machine_rdp(request):
                     body=rdp_content)
 
 
-@view_config(route_name='machine_metadata', request_method='POST',
+@view_config(route_name='machine_tags', request_method='POST',
              renderer='json')
-def set_machine_metadata(request):
+def set_machine_tags(request):
     """Sets metadata for a machine, given the backend and machine id."""
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     try:
-        tag = request.json_body['tag']
+        tags = request.json_body['tags']
     except:
-        raise RequiredParameterMissingError('tag')
+        raise BadRequestError('tags should be list of tags')
+    if type(tags) != list:
+        raise BadRequestError('tags should be list of tags')
+
     user = user_from_request(request)
-    methods.set_machine_metadata(user, backend_id, machine_id, tag)
+    methods.set_machine_tags(user, backend_id, machine_id, tags)
     return OK
 
 
-@view_config(route_name='machine_metadata', request_method='DELETE',
+@view_config(route_name='machine_tag', request_method='DELETE',
              renderer='json')
-def delete_machine_metadata(request):
-    """Deletes metadata for a machine, given the machine id and the tag to be
+def delete_machine_tag(request):
+    """Deletes tag for a machine, given the machine id and the tag to be
     deleted.
 
     """
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    try:
-        tag = request.json_body['tag']
-    except:
-        raise RequiredParameterMissingError('tag')
+    tag = request.matchdict['tag']
     user = user_from_request(request)
-    methods.delete_machine_metadata(user, backend_id, machine_id, tag)
+    methods.delete_machine_tag(user, backend_id, machine_id, tag)
     return OK
 
 
@@ -685,8 +685,9 @@ def create_network(request):
         raise RequiredParameterMissingError(e)
 
     subnet = request.json_body.get('subnet', None)
+    router = request.json_body.get('router', None)
     user = user_from_request(request)
-    return methods.create_network(user, backend_id, network, subnet)
+    return methods.create_network(user, backend_id, network, subnet, router)
 
 
 @view_config(route_name='network', request_method='DELETE')

@@ -12,14 +12,13 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
 
             //
-            //
             //  Properties
-            //
             //
 
 
             model: [],
             selectedKeys: [],
+            filteredKeys: [],
 
             loading: false,
             addingKey: false,
@@ -30,9 +29,35 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             gettingPrivateKey: false,
             disassociatingKey: false,
             settingDefaultKey: false,
-
             searchTerm: null,
-            filteredKeys: [],
+            sortByTerm: 'default',
+
+            //
+            //  Computed Properties
+            //
+
+            sortById: Ember.computed('sortByTerm', function () {
+                return this.get('sortByTerm') == 'id';
+            }),
+
+            sortByDefault: Ember.computed('sortByTerm', function () {
+                return this.get('sortByTerm') == 'default';
+            }),
+            
+            sortedKeys: Ember.computed('filteredKeys', 'filteredKeys.@each.id', 'filteredKeys.@each.isDefault', 'sortByTerm', function() {
+                if(this.get('filteredKeys'))
+                {
+                    if (this.get('sortById'))
+                    {
+                        return this.get('filteredKeys').sortBy('id');
+                    }
+
+                    if (this.get('sortByDefault'))
+                    {
+                        return this.get('filteredKeys').sortBy('isDefault').reverse();
+                    }
+                }
+            }),
 
 
             //
@@ -353,7 +378,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                     if (this.searchTerm) {
                         var that = this;
                         this.model.forEach(function(key) {
-                            var regex = new RegExp(that.searchTerm);
+                            var regex = new RegExp(that.searchTerm, 'i');
 
                             if (regex.test(key.id)) {
                                 keys.push(key);

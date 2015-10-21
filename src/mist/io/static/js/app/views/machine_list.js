@@ -22,6 +22,10 @@ define('app/views/machine_list', ['app/views/page'],
                 return Mist.backendsController.get('sortBy') == 'name';
             }.property('Mist.backendsController.sortBy'),
 
+            sortByCloud: function () {
+                return Mist.backendsController.get('sortBy') == 'cloud';
+            }.property('Mist.backendsController.sortBy'),
+
 
             //
             //  Initialization
@@ -86,7 +90,7 @@ define('app/views/machine_list', ['app/views/page'],
                         $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');
                     }
 
-                    if(!machine.can_start && !machine.can_reboot && !machine.can_destroy && !machine.can_shutdown && !machine.can_rename) {
+                    if (machine.get('hasNotActions')) {
                         $('#machine-list-page #machines-power-btn').addClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-power-btn').removeClass('ui-state-disabled');
@@ -146,11 +150,13 @@ define('app/views/machine_list', ['app/views/page'],
 
                 selectionModeClicked: function (mode) {
                     $('#select-machines-popup').popup('close');
-                    Mist.backendsController.model.forEach(function (backend) {
-                        backend.machines.model.forEach(function (machine) {
-                            machine.set('selected', mode == 'all' || mode == backend.title);
-                        });
+                    Mist.backendsController.get('filteredMachines').forEach(function (machine) {
+                        machine.set('selected', mode == 'all' || mode == machine.backend.title);
                     });
+                },
+
+                clearSearch: function() {
+                    Mist.backendsController.set('searchMachinesTerm', null);
                 }
             }
         });

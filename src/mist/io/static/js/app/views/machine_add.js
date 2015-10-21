@@ -46,7 +46,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             hasNetworks: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'vcloud'];
+                valids = ['openstack', 'hpcloud', 'vcloud'];
                 return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? true : false) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 

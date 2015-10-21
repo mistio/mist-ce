@@ -4,34 +4,33 @@ define('app/controllers/machine_tags', ['ember'],
      *
      *  @returns Class
      */
-    function () {
+     function () {
         return Ember.Object.extend({
 
-            /**
-             *  Properties
-             */
+            //
+            // Properties
+            //
 
-            formReady: null,
-            newTag: null,
-            machine: null,
-            callback: null,
-            addingTag: null,
-            deletingTag: null,
+             formReady: null,
+             newTags: null,
+             machine: null,
+             callback: null,
+             addingTag: null,
+             deletingTag: null,
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            // Methods
+            //
 
             open: function (machine, callback) {
                 this._clear();
                 this.setProperties({
                     machine: machine,
+                    newTags: machine.tags.length ? machine.tags : [{key: null, value: null}],
                     callback: callback
                 });
-                this._updateFormReady();
+                this.newTags.removeArrayObserver(this.machine.tags);
                 Ember.run.next(function () {
                     $('#machine-tags-popup').popup('open');
                 });
@@ -44,68 +43,144 @@ define('app/controllers/machine_tags', ['ember'],
             },
 
 
-            add: function () {
-                var that = this;
-                var tag = this.newTag;
-                var machine = this.machine;
+            addItem: function() {
+                this.newTags.pushObject({
+                    key: null,
+                    value: null
+                });
+            },
 
+
+            add: function () {
                 if (this.formReady) {
-                    this.set('addingTag', true);
-                    Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata', {
-                        'tag': tag
-                    }).success(function () {
-                        // TODO: move to seperate function and trigger event
-                        machine.tags.pushObject(tag);
-                    }).error(function () {
-                        Mist.notificationController.notify('Failed to add tag: ' + tag);
-                    }).complete(function (success) {
-                        that.setProperties({
-                            addingTag: false,
-                            newTag: null
-                        });
+                    var that = this,
+                    machine = this.machine,
+                    tags = [], payload = [];
+
+                    // create the final array with non-empty key-value pairs
+                    this.newTags.forEach(function(tag) {
+                        if (tag.key) {
+                            tags.push(tag);
+
+                            // change format for API
+                            var newTag = {};
+                            newTag[tag.key] = tag.value;
+                            payload.push(newTag);
+                        }
+                    });
+
+                    that.set('addingTag', true);
+                    Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
+                        'tags': payload
+                    })
+                    .success(function () {
+                        that._updateTags(tags);
+                        that.close();
+                    })
+                    .error(function (message) {
+                        Mist.notificationController.notify('Failed to add tags: ' + message);
+                    })
+                    .complete(function (success) {
+                        that.set('addingTag', false);
                         if (that.callback) that.callback(success, tag);
                     });
                 }
             },
 
+            // Delete tag's line for core
+            deleteTagLine: function (tag) {
+                this.newTags.removeObject(tag);
+            },
 
+            // Delete tag on server for io
             deleteTag: function (tag) {
-                var that = this;
-                var machine = this.machine;
+                var that = this,
+                machine = this.machine;
 
-                this.set('deletingTag', true);
-                Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata', {
-                    'tag': tag
-                }).success(function () {
-                    // TODO: move to seperate function and trigger event
-                    machine.tags.removeObject(tag);
-                }).error(function () {
-                    Mist.notificationController.notify('Failed to delete tag :' + tag);
-                }).complete(function (success) {
-                    that.set('deletingTag', false);
-                    if (that.callback) that.callback(success, tag);
-                });
+                if (this._containsKey(this.machine.tags, tag.key)) {
+                    this.set('deletingTag', true);
+                    Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.key)
+                    .success(function () {
+                        that._removeDeletedTag(tag);
+                    })
+                    .error(function (message) {
+                        Mist.notificationController.notify('Failed to delete tag: ' + message);
+                    })
+                    .complete(function (success) {
+                        that.set('deletingTag', false);
+                        if (that.callback) that.callback(success, tag);
+                    });
+                } else {
+                    this.deleteTagLine(tag);
+                }
             },
 
 
-            /**
-             *
-             *  Pseudo-Private Methods
-             *
-             */
+            //
+            // Pseudo-Private Methods
+            //
 
-            _clear: function () {
+             _clear: function () {
                 this.setProperties({
                     machine: null,
-                    callback: null,
-                    newTag: null
+                    newTags: null,
+                    callback: null
+                });
+            },
+
+            _containsKey: function (collection, key) {
+                var exists = false;
+                collection.forEach(function(tag) {
+                    if(tag.key == key) {
+                        exists = true;
+                    }
+                });
+                return exists;
+            },
+
+            _updateTags: function (tags) {
+                Ember.run(this, function () {
+                    this.get('machine').set('tags', tags);
+                    this.set('newTags', tags);
+                });
+            },
+
+            _removeDeletedTag: function (tag) {
+                Ember.run(this, function () {
+                    this.deleteTagLine(tag);
+                    this.get('machine').set('tags', this.newTags);
                 });
             },
 
             _updateFormReady: function() {
-                var formReady = false;
-                if (this.newTag) {
-                    formReady = true;
+                var formReady = false, tagsKeys = [], error = false;
+                if (this.newTags) {
+                    for (var i = 0, len = this.newTags.length; i < len; i++) {
+                        var tag = this.newTags[i];
+                        if (tag.key) {
+                            // create an array with keys and check for duplicates
+                            if (tagsKeys.indexOf(tag.key) == -1) {
+                                tagsKeys.push(tag.key);
+                            } else {
+                                error = true;
+                                Mist.notificationController.notify('You cannot add tags with the same key!');
+                                break;
+                            }
+                        }
+
+                        // check if pair with just value and without key exists
+                        if (!tag.key && tag.value) {
+                            error = true;
+                            Mist.notificationController.notify('You cannot add tags without key!');
+                            break;
+                        }
+                    }
+
+                    if (error) {
+                        formReady = false;
+                    } else {
+                        formReady = true;
+                    }
 
                     if (formReady && this.addingTag) {
                         formReady = false;
@@ -115,15 +190,13 @@ define('app/controllers/machine_tags', ['ember'],
                 this.set('formReady', formReady);
             },
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            // Observers
+            //
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newTag', 'addingTag')
+            }.observes('newTags.@each.key', 'newTags.@each.value', 'addingTag')
         });
-    }
+}
 );

@@ -29,7 +29,8 @@ define('app/controllers/network_create', ['ember'],
                         name: null,
                         backend: null,
                         adminStateUp: true,
-                        createSubnet: null,
+						createRouter: null,
+                        createSubnet: null
                     });
                     this.subnet.clear();
                 },
@@ -43,6 +44,9 @@ define('app/controllers/network_create', ['ember'],
                     hostRoutes: null,
                     enableDHCP: null,
                     DNS: null,
+                    routerName: null,
+                    routerPublicGateway: true,
+                    createRouter: null,
                     clear: function () {
                         this.setProperties({
                             ipv: 'IPv4',
@@ -54,9 +58,12 @@ define('app/controllers/network_create', ['ember'],
                             hostRoutes: null,
                             enableDHCP: null,
                             DNS: null,
+                            routerName: null,
+                            routerPublicGateway: true,
+                            createRouter: null
                         })
                     }
-                }),
+                })
             }),
 
             adminStateUpToText: function () {
@@ -110,7 +117,6 @@ define('app/controllers/network_create', ['ember'],
                 if (network.adminStateUp !== null)
                     payload.network.admin_state_up = network.adminStateUp;
 
-
                 // Construct subnet params
                 if (network.createSubnet) {
 
@@ -125,7 +131,8 @@ define('app/controllers/network_create', ['ember'],
                     if (subnet.address !== null && subnet.address.length)
                         payload.subnet.cidr = subnet.address;
 
-                    if (subnet.disableGateway !== null && !subnet.disableGateway)
+                    console.log(subnet.disableGateway);
+                    if (!subnet.disableGateway)
                         payload.subnet.gateway_ip = subnet.gatewayIP;
 
                     if (subnet.enableDHCP !== null)
@@ -143,6 +150,17 @@ define('app/controllers/network_create', ['ember'],
                                     };
                                 return {start: '', end: ''};
                             });
+
+                    // Construct router params
+                    if (subnet.createRouter) {
+                        payload.subnet.router = {};
+
+                        if (subnet.routerName) {
+                            payload.subnet.router.name = subnet.routerName;
+                        }
+
+                        payload.subnet.router.publicGateway = subnet.routerPublicGateway;
+                    }
                 }
 
                 var url = '/backends/' + this.network.backend.id +
@@ -150,7 +168,7 @@ define('app/controllers/network_create', ['ember'],
                 var that = this;
                 that.set('creatingNetwork', true);
                 Mist.ajax.POST(url, payload).success(function (network) {
-                    that.close();
+                    that.view.close();
                 }).error(function (message) {
                     Mist.notificationController.notify(message);
                 }).complete(function (success, network) {
@@ -174,7 +192,15 @@ define('app/controllers/network_create', ['ember'],
             _updateFormReady: function() {
                 var formReady = false;
                 if (this.network.name && this.network.backend) {
-                    formReady = true;
+					formReady = true;
+
+                    if (this.network.createSubnet) {
+                        formReady = this.network.subnet.name ? true : false;
+                    }
+
+					if (this.network.subnet.createRouter) {
+						formReady = this.network.subnet.routerName ? true : false;
+					}
                 }
 
                 if (formReady && this.creatingNetwork) {
@@ -192,7 +218,7 @@ define('app/controllers/network_create', ['ember'],
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('network.name', 'network.backend')
+            }.observes('network.name', 'network.backend', 'network.createRouter', 'network.router.name')
         });
     }
 );

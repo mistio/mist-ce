@@ -86,7 +86,7 @@ define('app/controllers/networks', [
                     that.set('deletingNetwork', false);
                     if (callback) callback(success, message);
                 });
-            },
+            }
         });
     }
 );
