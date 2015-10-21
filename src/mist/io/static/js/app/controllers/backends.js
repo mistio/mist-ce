@@ -70,12 +70,25 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 return filteredMachines;
             }),
 
-            sortedMachines: Ember.computed.sort('filteredMachines', function(a, b){
-                if (Mist.backendsController.sortBy == 'name')
-                    return a.name.localeCompare(b.name);
-                else
-                    return b.get('stateWeight') - a.get('stateWeight');
-            }).property('filteredMachines', 'sortBy', 'filteredMachines.@each.stateWeight', 'filteredMachines.@each.name'),
+            sortedMachines: Ember.computed('filteredMachines', 'filteredMachines.@each.stateWeight', 'filteredMachines.@each.name', 'filteredMachines.@each.backend.title', 'sortBy', function() {
+                if(this.get('filteredMachines'))
+                {
+                    if (this.get('sortBy') == 'state')
+                    {
+                        return this.get('filteredMachines').sortBy('stateWeight').reverse();
+                    }
+
+                    if (this.get('sortBy') == 'name')
+                    {
+                        return this.get('filteredMachines').sortBy('name');
+                    }
+
+                    if (this.get('sortBy') == 'cloud')
+                    {
+                        return this.get('filteredMachines').sortBy('backend.title', 'name');
+                    }
+                }
+            }),
 
 
             //
