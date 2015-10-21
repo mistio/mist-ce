@@ -2895,34 +2895,46 @@ def list_networks(user, backend_id):
     backend = user.backends[backend_id]
     conn = connect_provider(backend)
 
-    ret = []
+    ret = {}
+    ret['public'] = []
+    ret['private'] = []
+    ret['routers'] = []
 
     # Get the actual networks
     if conn.type in [Provider.NEPHOSCALE]:
         networks = conn.ex_list_networks()
         for network in networks:
-            ret.append(nephoscale_network_to_dict(network))
+            ret['public'].append(nephoscale_network_to_dict(network))
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         networks = conn.ex_list_networks()
 
         for network in networks:
-            ret.append({
+            ret['public'].append({
                 'id': network.id,
                 'name': network.name,
                 'extra': network.extra,
             })
-    elif conn.type in [Provider.OPENSTACK]:
-        networks = conn.ex_list_neutron_networks()
-        for network in networks:
-            ret.append(openstack_network_to_dict(network))
-    elif conn.type in [Provider.HPCLOUD]:
+    elif conn.type in (Provider.OPENSTACK, Provider.HPCLOUD):
         networks = conn.ex_list_networks()
+        subnets = conn.ex_list_subnets()
+        routers = conn.ex_list_routers()
+
+        public_networks = []
+        for net in networks:
+            if net.router_external:
+                net_index = networks.index(net)
+                public_networks.append(networks.pop(net_index))
+
+        for pub_net in public_networks:
+            ret['public'].append(openstack_network_to_dict(pub_net, subnets))
         for network in networks:
-            ret.append(openstack_network_to_dict(network))
+            ret['private'].append(openstack_network_to_dict(network, subnets))
+        for router in routers:
+            ret['routers'].append(openstack_router_to_dict(router))
     elif conn.type in [Provider.GCE]:
         networks = conn.ex_list_networks()
         for network in networks:
-            ret.append(gce_network_to_dict(network))
+            ret['public'].append(gce_network_to_dict(network))
     elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST,
                        Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
                        Provider.EC2_EU, Provider.EC2_EU_WEST,
@@ -2930,7 +2942,7 @@ def list_networks(user, backend_id):
                        Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON]:
         networks = conn.ex_list_networks()
         for network in networks:
-            ret.append(ec2_network_to_dict(network))
+            ret['public'].append(ec2_network_to_dict(network))
 
     if conn.type == 'libvirt':
         # close connection with libvirt
@@ -2972,16 +2984,15 @@ def gce_network_to_dict(network):
     return net
 
 
-def openstack_network_to_dict(network):
+def openstack_network_to_dict(network, subnets):
     net = {}
     net['name'] = network.name
     net['id'] = network.id
     net['status'] = network.status
-
-    net['subnets'] = []
-    for sub in network.subnets:
-
-        net['subnets'].append(openstack_subnet_to_dict(sub))
+    net['router_external'] = network.router_external
+    net['extra'] = network.extra
+    net['public'] = bool(network.router_external)
+    net['subnets'] = [openstack_subnet_to_dict(subnet) for subnet in subnets if subnet.id in network.subnets]
     return net
 
 
@@ -2995,8 +3006,24 @@ def openstack_subnet_to_dict(subnet):
     net['dns_nameservers'] = subnet.dns_nameservers
     net['allocation_pools'] = subnet.allocation_pools
     net['gateway_ip'] = subnet.gateway_ip
+    net['ip_version'] = subnet.ip_version
+    net['extra'] = subnet.extra
 
     return net
+
+
+def openstack_router_to_dict(router):
+    ret = {}
+
+    ret['name'] = router.name
+    ret['id'] = router.id
+    ret['status'] = router.status
+    ret['external_gateway_info'] = router.external_gateway_info
+    ret['external_gateway'] = router.external_gateway
+    ret['admin_state_up'] = router.admin_state_up
+    ret['extra'] = router.extra
+
+    return ret
 
 
 def associate_ip(user, backend_id, network_id, ip, machine_id=None, assign=True):
