@@ -37,8 +37,6 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             loadingImages: false,
             loadingMachines: false,
 
-            searchMachinesTerm: null,
-
             hasOpenStack: function () {
                 return !!this.model.filterBy('enabled', true).findBy('isOpenStack', true);
             }.property('model.[].isOpenStack', 'model.[].enabled'),
@@ -47,6 +45,7 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 return !!this.model.findBy('hasNetworks', true);
             }.property('model.[].hasNetworks'),
 
+<<<<<<< HEAD
             filteredMachines: Ember.computed('machines', 'searchMachinesTerm', function() {
                 var filteredMachines = [];
 
@@ -89,6 +88,13 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                     }
                 }
             }),
+
+            sortedMachines: Ember.computed.sort('machines', function(a, b){
+                if (Mist.backendsController.sortBy == 'name')
+                    return a.name.localeCompare(b.name);
+                else
+                    return b.get('stateWeight') - a.get('stateWeight');
+            }).property('machines', 'sortBy', 'machines.@each.stateWeight', 'machines.@each.name'),
 
 
             //
