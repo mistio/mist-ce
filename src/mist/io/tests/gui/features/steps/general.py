@@ -251,7 +251,7 @@ def click_button(context, text):
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
-        if popup.lower() in pop.text.lower():
+        if popup.lower() in pop.find_element_by_class_name('ui-title').text.lower():
             if text == '_x_':
                 buttons = pop.find_elements_by_class_name("close")
                 assert len(buttons) > 0, "Could not find the close button"

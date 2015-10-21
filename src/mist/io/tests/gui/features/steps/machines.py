@@ -1,5 +1,3 @@
-
-
 import re
 from behave import *
 from time import time, sleep
