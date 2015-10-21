@@ -22,6 +22,10 @@ define('app/views/machine_list', ['app/views/page'],
                 return Mist.backendsController.get('sortBy') == 'name';
             }.property('Mist.backendsController.sortBy'),
 
+            sortByCloud: function () {
+                return Mist.backendsController.get('sortBy') == 'cloud';
+            }.property('Mist.backendsController.sortBy'),
+
 
             //
             //  Initialization
