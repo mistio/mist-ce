@@ -202,7 +202,7 @@ def loader_name_waiting_with_timeout(context, loader_name, seconds):
     end = time() + int(seconds)
     while time() < end:
         try:
-            loader = context.browser.find_element_by_id(loader_name)
+            context.browser.find_element_by_id(loader_name)
             sleep(1)
         except NoSuchElementException:
             return
@@ -214,7 +214,7 @@ def loader_name_waiting_with_timeout(context, loader_name, seconds):
       u'seconds')
 def become_visible_waiting_with_timeout(context, element_id, seconds):
     try:
-        WebDriverWait(context.browser, 2).until(EC.visibility_of_element_located((By.ID, element_id)))
+        WebDriverWait(context.browser, int(seconds)).until(EC.visibility_of_element_located((By.ID, element_id)))
     except TimeoutException:
         raise TimeoutException("element with id %s did not become visible "
                                "after %s seconds" % (element_id, seconds))
@@ -224,7 +224,7 @@ def become_visible_waiting_with_timeout(context, element_id, seconds):
       u'seconds')
 def become_visible_waiting_with_timeout(context, element_id, seconds):
     try:
-        WebDriverWait(context.browser, 2).until(EC.element_to_be_clickable((By.ID, element_id)))
+        WebDriverWait(context.browser, int(seconds)).until(EC.element_to_be_clickable((By.ID, element_id)))
     except TimeoutException:
         raise TimeoutException("element with id %s did not become visible "
                                "after %s seconds" % (element_id, seconds))
