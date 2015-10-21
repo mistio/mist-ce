@@ -45,7 +45,6 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 return !!this.model.findBy('hasNetworks', true);
             }.property('model.[].hasNetworks'),
 
-<<<<<<< HEAD
             filteredMachines: Ember.computed('machines', 'searchMachinesTerm', function() {
                 var filteredMachines = [];
 
