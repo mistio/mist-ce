@@ -210,8 +210,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                     // Render listviews
                     if ($('.ui-listview').listview) {
-                        $('.ui-listview').listview()
-                                         .listview('refresh');
+                        $('.ui-listview').listview().listview('refresh');
                     }
                 });
              },
