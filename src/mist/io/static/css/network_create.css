@@ -104,7 +104,8 @@
 
 #network-create-subnet-form,
 #network-create-subnet-address-wrapper,
-#network-create-subnet-other-wrapper {
+#network-create-subnet-other-wrapper,
+#network-create-router-form {
     display: none;
 }
 

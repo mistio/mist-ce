@@ -31,20 +31,6 @@ def assert_starred_image(context, text):
     assert len(starred_image) == 1, "Could not find starred image with name %s" % text
 
 
-@when(u'I search for a "{text}" Image')
-def search_image(context, text):
-    if text == 'the_name_that_i_used_before':
-        text = context.mist_config['PREVIOUS_IMAGE_NAME']
-    search_bar = context.browser.find_elements_by_class_name("image-search")
-    assert len(search_bar) > 0, "Could not find the image search input"
-    assert len(search_bar) == 1, "Found more than one image search input " \
-                                 "elements"
-    search_bar = search_bar[0]
-    for letter in text:
-        search_bar.send_keys(letter)
-    sleep(2)
-
-
 @when(u'I star an Image that contains "{text}"')
 def star_image(context, text):
     images_list = context.browser.find_element_by_id("image-list")

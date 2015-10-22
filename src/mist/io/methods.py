@@ -1633,7 +1633,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                          machine_name, image, size, location, networks)
     elif conn.type is Provider.HPCLOUD:
         node = _create_machine_hpcloud(conn, private_key, public_key,
-                                       machine_name, image, size, location)
+                                       machine_name, image, size, location, networks)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
         for loc in locations:
@@ -1693,6 +1693,15 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('username'), node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params, job_id = job_id,
+            hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
+        )
+    elif conn.type == Provider.HPCLOUD:
+        mist.io.tasks.hpcloud_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
@@ -1824,7 +1833,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
 
 
 def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
-                             image, size, location):
+                             image, size, location, networks):
     """Create a machine in HP Cloud.
 
     Here there is no checking done, all parameters are expected to be
@@ -1850,6 +1859,16 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
     #FIXME: Neutron API not currently supported by libcloud
     #need to pass the network on create node - can only omitted if one network only exists
 
+    # select the right OpenStack network object
+    available_networks = conn.ex_list_networks()
+    try:
+        chosen_networks = []
+        for net in available_networks:
+            if net.id in networks:
+                chosen_networks.append(net)
+    except:
+            chosen_networks = []
+
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(name=machine_name,
@@ -1859,7 +1878,8 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
                 ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
-                ex_keyname=server_key)
+                ex_keyname=server_key,
+                networks=chosen_networks)
         except Exception as e:
             raise MachineCreationError("HP Cloud, got exception %s" % e, e)
     return node
@@ -2877,25 +2897,6 @@ def list_networks(user, backend_id):
 
     ret = []
 
-    ## Get the ip addreses of running machines to begin with, use cached
-    ## list_machines response if there's a fresh one
-    #task = mist.io.tasks.ListMachines()
-    #task_result = task.smart_delay(user.email, backend_id, blocking=True)
-    #machines = task_result.get('machines', [])
-
-    ## Separate public & private ips, create ip2machine map
-    #public_ips = IPSet()
-    #private_ips = IPSet()
-    #ips = []
-    #ip2machine = {}
-    #for machine in machines:
-    #    for i in machine['public_ips']:
-    #        public_ips.add(i)
-    #    for i in machine['private_ips']:
-    #        private_ips.add(i)
-    #    #for i in machine['public_ips'] + machine['private_ips']:
-    #    #    ip2machine[i] = machine['id']
-
     # Get the actual networks
     if conn.type in [Provider.NEPHOSCALE]:
         networks = conn.ex_list_networks()
@@ -2903,6 +2904,7 @@ def list_networks(user, backend_id):
             ret.append(nephoscale_network_to_dict(network))
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         networks = conn.ex_list_networks()
+
         for network in networks:
             ret.append({
                 'id': network.id,
@@ -2911,6 +2913,10 @@ def list_networks(user, backend_id):
             })
     elif conn.type in [Provider.OPENSTACK]:
         networks = conn.ex_list_neutron_networks()
+        for network in networks:
+            ret.append(openstack_network_to_dict(network))
+    elif conn.type in [Provider.HPCLOUD]:
+        networks = conn.ex_list_networks()
         for network in networks:
             ret.append(openstack_network_to_dict(network))
     elif conn.type in [Provider.GCE]:
@@ -3005,7 +3011,7 @@ def associate_ip(user, backend_id, network_id, ip, machine_id=None, assign=True)
     return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
 
 
-def create_network(user, backend_id, network, subnet):
+def create_network(user, backend_id, network, subnet, router):
     """
     Creates a new network. If subnet dict is specified, after creating the network
     it will use the new network's id to create a subnet
@@ -3016,9 +3022,101 @@ def create_network(user, backend_id, network, subnet):
     backend = user.backends[backend_id]
 
     conn = connect_provider(backend)
-    if conn.type is not Provider.OPENSTACK:
+    if conn.type not in (Provider.OPENSTACK, Provider.HPCLOUD):
         raise NetworkActionNotSupported()
 
+    if conn.type is Provider.OPENSTACK:
+        ret = _create_network_openstack(conn, network, subnet, router)
+    elif conn.type is Provider.HPCLOUD:
+        ret = _create_network_hpcloud(conn, network, subnet, router)
+
+    task = mist.io.tasks.ListNetworks()
+    task.clear_cache(user.email, backend_id)
+    trigger_session_update(user.email, ['backends'])
+    return ret
+
+
+def _create_network_hpcloud(conn, network, subnet, router):
+    """
+    Create hpcloud network
+    """
+    try:
+        network_name = network.get('name')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    admin_state_up = network.get('admin_state_up', True)
+    shared = network.get('shared', False)
+
+    # First we create the network
+
+    try:
+        new_network = conn.ex_create_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+    except Exception as e:
+        raise NetworkCreationError("Got error %s" % str(e))
+
+    ret = dict()
+    if subnet:
+        network_id = new_network.id
+
+        try:
+            subnet_name = subnet.get('name')
+            cidr = subnet.get('cidr')
+        except Exception as e:
+            raise RequiredParameterMissingError(e)
+
+        allocation_pools = subnet.get('allocation_pools', [])
+        gateway_ip = subnet.get('gateway_ip', None)
+        ip_version = subnet.get('ip_version', '4')
+        enable_dhcp = subnet.get('enable_dhcp', True)
+
+        try:
+            subnet = conn.ex_create_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
+                                           allocation_pools=allocation_pools, gateway_ip=gateway_ip,
+                                           ip_version=ip_version, enable_dhcp=enable_dhcp)
+        except Exception as e:
+            conn.ex_delete_network(network_id)
+            raise NetworkError(e)
+
+        ret['network'] = openstack_network_to_dict(new_network)
+        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
+
+        if router:
+            try:
+                router_name = router.get('name')
+            except Exception as e:
+                raise RequiredParameterMissingError(e)
+
+            subnet_id = ret['network']['subnets'][0]['id']
+            external_gateway = router.get('publicGateway', False)
+
+            # If external gateway, find the ext-net
+            if external_gateway:
+                available_networks = conn.ex_list_networks()
+                external_networks = [net for net in available_networks if net.router_external]
+                if external_networks:
+                    ext_net_id = external_networks[0].id
+                else:
+                    external_gateway = False
+                    ext_net_id = ""
+
+            # First we create the router
+            router_obj = conn.ex_create_router(name=router_name, external_gateway=external_gateway,
+                                               ext_net_id=ext_net_id)
+
+            # Then we attach the router to the subnet
+            router_obj = conn.ex_add_router_interface(router_obj['router']['id'], subnet_id)
+
+    else:
+        ret = openstack_network_to_dict(new_network)
+
+    return ret
+
+
+def _create_network_openstack(conn, network, subnet, router):
+    """
+    Create openstack specific network
+    """
     try:
         network_name = network.get('name')
     except Exception as e:
@@ -3031,7 +3129,7 @@ def create_network(user, backend_id, network, subnet):
     try:
         new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
     except Exception as e:
-        raise NetworkCreationError("Got error r%" % e, e)
+        raise NetworkCreationError("Got error %s" % str(e))
 
     ret = dict()
     if subnet:
@@ -3062,9 +3160,6 @@ def create_network(user, backend_id, network, subnet):
     else:
         ret = openstack_network_to_dict(new_network)
 
-    task = mist.io.tasks.ListNetworks()
-    task.clear_cache(user.email, backend_id)
-    trigger_session_update(user.email, ['backends'])
     return ret
 
 
@@ -3078,13 +3173,18 @@ def delete_network(user, backend_id, network_id):
     backend = user.backends[backend_id]
 
     conn = connect_provider(backend)
-    if conn.type is not Provider.OPENSTACK:
+    if conn.type is Provider.OPENSTACK:
+        try:
+            conn.ex_delete_neutron_network(network_id)
+        except Exception as e:
+            raise NetworkError(e)
+    elif conn.type is Provider.HPCLOUD:
+        try:
+            conn.ex_delete_network(network_id)
+        except Exception as e:
+            raise NetworkError(e)
+    else:
         raise NetworkActionNotSupported()
-
-    try:
-        conn.ex_delete_neutron_network(network_id)
-    except Exception as e:
-        raise NetworkError(e)
 
     try:
         task = mist.io.tasks.ListNetworks()
@@ -3109,8 +3209,6 @@ def set_machine_tags(user, backend_id, machine_id, tags):
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     backend = user.backends[backend_id]
-    if not tags:
-        raise BadRequestError('tags should be list of tags')
 
     conn = connect_provider(backend)
 
@@ -3128,6 +3226,26 @@ def set_machine_tags(user, backend_id, machine_id, tags):
 
     if conn.type in config.EC2_PROVIDERS:
         try:
+            # first get a list of current tags. Make sure
+            # the response dict gets utf-8 encoded
+            # then delete tags and update with the new ones
+            ec2_tags = conn.ex_describe_tags(machine)
+            ec2_tags.pop('Name')
+            encoded_ec2_tags = {}
+            for ec2_key, ec2_value in ec2_tags.items():
+                if type(ec2_key) ==  unicode:
+                    ec2_key = ec2_key.encode('utf-8')
+                if type(ec2_value) ==  unicode:
+                    ec2_value = ec2_value.encode('utf-8')
+                encoded_ec2_tags[ec2_key] = ec2_value
+            conn.ex_delete_tags(machine, encoded_ec2_tags)
+            # ec2 resource can have up to 10 tags, with one of them being the Name
+            if len(tags_dict) > 9:
+                tags_keys = tags_dict.keys()[:9]
+                pop_keys = [key for key in tags_dict.keys() if key not in tags_keys]
+                for key in pop_keys:
+                    tags_dict.pop(key)
+
             conn.ex_create_tags(machine, tags_dict)
         except Exception as exc:
             raise BackendUnavailableError(backend_id, exc)

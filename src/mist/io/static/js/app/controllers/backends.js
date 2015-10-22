@@ -45,12 +45,53 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
                 return !!this.model.findBy('hasNetworks', true);
             }.property('model.[].hasNetworks'),
 
-            sortedMachines: Ember.computed.sort('machines', function(a, b){
-                if (Mist.backendsController.sortBy == 'name')
-                    return a.name.localeCompare(b.name);
-                else
-                    return b.get('stateWeight') - a.get('stateWeight');
-            }).property('machines', 'sortBy', 'machines.@each.stateWeight', 'machines.@each.name'),
+            filteredMachines: Ember.computed('machines', 'searchMachinesTerm', function() {
+                var filteredMachines = [],
+                machines = this.get('machines'),
+                searchMachinesTerm = this.get('searchMachinesTerm');
+
+                if (searchMachinesTerm) {
+                    var that = this;
+                    machines.forEach(function(machine) {
+                        var regex = new RegExp(searchMachinesTerm, 'i');
+
+                        if (regex.test(machine.name)) {
+                            filteredMachines.push(machine);
+                        } else {
+                            if (machine.selected) {
+                                machine.set('selected', false);
+                            }
+                        }
+                    });
+                } else {
+                    filteredMachines = machines;
+                }
+
+                return filteredMachines;
+            }),
+
+            sortedMachines: Ember.computed('filteredMachines', 'filteredMachines.@each.stateWeight', 'filteredMachines.@each.name', 'filteredMachines.@each.backend.title', 'sortBy', function() {
+                var filteredMachines = this.get('filteredMachines'),
+                sortBy = this.get('sortBy');
+
+                if(filteredMachines)
+                {
+                    if (sortBy == 'state')
+                    {
+                        return filteredMachines.sortBy('stateWeight').reverse();
+                    }
+
+                    if (sortBy == 'name')
+                    {
+                        return filteredMachines.sortBy('name');
+                    }
+
+                    if (sortBy == 'cloud')
+                    {
+                        return filteredMachines.sortBy('backend.title', 'name');
+                    }
+                }
+            }),
 
 
             //

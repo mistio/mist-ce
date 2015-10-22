@@ -1,17 +1,14 @@
 import re
-from behave import *
-from time import time, sleep
 from random import randrange
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+from mist.io.tests.gui.features.steps.general import *
 
 
 @when(u'I fill in a random machine name')
 def fill_machine_mame(context):
     textfield = context.browser.find_element_by_id("create-machine-name")
-    random_name = "testlikeapro" + str(randrange(10000))
-    for letter in random_name:
-        textfield.send_keys(letter)
-    context.random_name = random_name
+    context.random_name = "testlikeapro%s" % randrange(10000)
+    textfield.send_keys(context.random_name)
     sleep(1)
 
 
@@ -343,19 +340,6 @@ def check_ssh_connection(context):
 
 @then(u'I search for the "{text}" Machine')
 def search_image(context, text):
-    search_bar = context.browser.find_element_by_class_name("machine-search")
-    assert len(search_bar) > 0, "Could not find the ui-input-search element"
-    assert len(search_bar) == 1, "Found more than one ui-input-search " \
-                                 "elements"
-    search_bar = search_bar[0]
-    search_bar = search_bar.find_elements_by_tag_name('input')
-    assert len(search_bar) > 0, "Could not find the machine search input"
-    assert len(search_bar) == 1, "Found more than one machine search input " \
-                                 "elements"
-    search_bar = search_bar[0]
     if text == 'randomly_created':
         text = context.random_name
-    for letter in text:
-        search_bar.send_keys(letter)
-    sleep(2)
-
+    search_for_something(context, text, 'machine')
