@@ -320,8 +320,8 @@ def check_ssh_connection(context):
 
     # waiting for command input to become available
     while time() < connection_max_time:
-        start_of_empty_lines = update_lines(terminal, lines, start_of_empty_lines)
-        if re.search(":~\$", lines[start_of_empty_lines - 1]):
+        first_output_line = update_lines(terminal, lines, start_of_empty_lines)
+        if re.search(":~#", lines[first_output_line - 1]):
             break
         assert time() + 1 < connection_max_time, "Error while connecting"
         sleep(1)
@@ -330,18 +330,15 @@ def check_ssh_connection(context):
     command_end_time = time() + 20
     # waiting for command output to be returned
     while time() < command_end_time:
-        first_empty_line = update_lines(terminal, lines, start_of_empty_lines)
-        if start_of_empty_lines != first_empty_line:
-            command_output_line = first_empty_line-1
-            if re.search(":~\$", lines[command_output_line]):
-                command_output_line -= 1
-            assert lines[command_output_line] == 'total 0', "Error while " \
-                                                            "waiting for " \
-                                                            "command output"
-            break
-        assert time() + 1 < command_end_time, "Command output took too long"
+        first_empty_line = update_lines(terminal, lines, first_output_line)
+        if first_output_line != first_empty_line:
+            if re.search(":~#", lines[first_empty_line - 1]):
+                assert re.search("total\s\d{1,3}", lines[first_output_line]), \
+                    "Error while waiting for command output"
+                context.browser.find_element_by_id('shell-back').click()
+                return
         sleep(1)
-    context.browser.find_element_by_id('shell-back').click()
+    assert False, "Command output took too long"
 
 
 @then(u'I search for the "{text}" Machine')
