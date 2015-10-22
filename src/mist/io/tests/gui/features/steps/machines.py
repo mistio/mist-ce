@@ -343,7 +343,7 @@ def check_ssh_connection(context):
 
 @then(u'I search for the "{text}" Machine')
 def search_image(context, text):
-    search_bar = context.browser.find_elements_by_class_name("ui-input-search")
+    search_bar = context.browser.find_element_by_class_name("machine-search")
     assert len(search_bar) > 0, "Could not find the ui-input-search element"
     assert len(search_bar) == 1, "Found more than one ui-input-search " \
                                  "elements"
