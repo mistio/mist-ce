@@ -259,23 +259,28 @@ def ssh_key_is_added(context, ssh_key_name):
             context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
 
 
-def update_lines(terminal, lines, start_of_empty_lines):
+def update_lines(terminal, lines):
     """
     Cleans up the terminal from empty lines and marks down the last empty line.
     """
-    new_lines = terminal.find_elements_by_tag_name('div')
-    last_empty_line = start_of_empty_lines
+    all_lines = terminal.find_elements_by_tag_name('div')
     safety_counter = max_safety_count = 5
-    for i in range(start_of_empty_lines, len(new_lines)):
-        line = new_lines[i].text.lstrip().rstrip()
-        last_empty_line = i if not line and safety_counter == max_safety_count \
-            else last_empty_line
-        safety_counter = max_safety_count if line else safety_counter - 1
+    for i in range(len(lines), len(all_lines)):
+        line = all_lines[i].text.rstrip().lstrip()
         if line:
+            for j in range(0, max_safety_count - safety_counter):
+                lines.append(" ")
             lines.append(line)
+        safety_counter = safety_counter - 1 if not line else max_safety_count
         if safety_counter == 0:
             break
-    return last_empty_line
+    return len(lines)
+
+
+def update_single_line(terminal, lines, index):
+    assert index >= 0 and index < len(lines), "Wrong single line index %s" % index
+    all_lines = terminal.find_elements_by_tag_name('div')
+    lines[index] = all_lines[index].text.rstrip().lstrip()
 
 
 @then(u'I test the ssh connection')
@@ -300,16 +305,14 @@ def check_ssh_connection(context):
                      "button. Aborting!"
 
     connection_max_time = time() + 100
-    start_of_empty_lines = 0
     lines = []
 
     # waiting for "Connecting bla bla bla" to be written
     while time() < connection_max_time:
-        first_empty_line = update_lines(terminal, lines, start_of_empty_lines)
-        if start_of_empty_lines != first_empty_line:
+        update_lines(terminal, lines)
+        if len(lines) > 0:
             assert re.match("Connecting\sto\s([0-9]{1,3}\.){4}\.\.", lines[0]),\
                 "Shell is not connecting to server"
-            start_of_empty_lines = first_empty_line
             break
         assert time() + 1 < connection_max_time, "Shell hasn't connected after"\
                                                  "60 seconds. Aborting!"
@@ -317,23 +320,25 @@ def check_ssh_connection(context):
 
     # waiting for command input to become available
     while time() < connection_max_time:
-        first_output_line = update_lines(terminal, lines, start_of_empty_lines)
-        if re.search(":~#", lines[first_output_line - 1]):
+        update_lines(terminal, lines)
+        if re.search(":~#$", lines[-1]):
             break
         assert time() + 1 < connection_max_time, "Error while connecting"
         sleep(1)
 
+    expected_command_output = len(lines)
     terminal.send_keys("ls -l\n")
+    # terminal.send_keys("ls -l\n")
     command_end_time = time() + 20
     # waiting for command output to be returned
     while time() < command_end_time:
-        first_empty_line = update_lines(terminal, lines, first_output_line)
-        if first_output_line != first_empty_line:
-            if re.search(":~#", lines[first_empty_line - 1]):
-                assert re.search("total\s\d{1,3}", lines[first_output_line]), \
-                    "Error while waiting for command output"
-                context.browser.find_element_by_id('shell-back').click()
-                return
+        update_lines(terminal, lines)
+        if len(lines) > expected_command_output and re.search(":~#$", lines[-1]):
+            update_single_line(terminal, lines, expected_command_output - 1)
+            assert re.search("total\s\d{1,3}", lines[expected_command_output]), \
+                "Error while waiting for command output"
+            context.browser.find_element_by_id('shell-back').click()
+            return
         sleep(1)
     assert False, "Command output took too long"
 
