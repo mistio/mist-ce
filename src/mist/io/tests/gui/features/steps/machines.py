@@ -304,7 +304,7 @@ def check_ssh_connection(context):
     assert terminal, "Terminal has not opened 10 seconds after pressing the " \
                      "button. Aborting!"
 
-    connection_max_time = time() + 100
+    connection_max_time = time() + 200
     lines = []
 
     # waiting for "Connecting bla bla bla" to be written
