@@ -37,7 +37,7 @@ Feature: Machines
     When I choose the "randomly_created" machine
     And I click the button "Actions"
     Then I expect for "machine-power-popup-popup" popup to appear within max 4 seconds
-    When I click the button "Reboot"
+    When I click the "Reboot" button inside the "Actions" popup
     Then I expect for "dialog-popup" popup to appear within max 4 seconds
     When I click the button "Yes"
     Then I expect for "dialog-popup" popup to disappear within max 4 seconds
