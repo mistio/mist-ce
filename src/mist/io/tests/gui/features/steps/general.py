@@ -92,12 +92,7 @@ def wait_for_splash_to_load(context, timeout=60):
     assert False, 'Page took longer than %s seconds to load' % str(timeout)
 
 
-@then(u'I wait for {seconds} seconds')
-def wait(context, seconds):
-    sleep(int(seconds))
-
-
-@when(u'I wait for {seconds} seconds')
+@step(u'I wait for {seconds} seconds')
 def wait(context, seconds):
     sleep(int(seconds))
 
@@ -230,12 +225,18 @@ def become_visible_waiting_with_timeout(context, element_id, seconds):
                                "after %s seconds" % (element_id, seconds))
 
 
-@then(u'I click the button "{text}"')
-def then_click(context, text):
-    return click_button(context, text)
+@then(u'I expect for buttons inside "{element_id}" to be '
+      u'clickable within max {seconds} seconds')
+def become_visible_waiting_with_timeout(context, element_id, seconds):
+    try:
+        wrapper = context.browser.find_element_by_id(element_id)
+        WebDriverWait(wrapper, int(seconds)).until(EC.element_to_be_clickable((By.CLASS_NAME, 'ui-btn')))
+    except TimeoutException:
+        raise TimeoutException("element with id %s did not become visible "
+                               "after %s seconds" % (element_id, seconds))
 
 
-@when(u'I click the button "{text}"')
+@step(u'I click the button "{text}"')
 def click_button(context, text):
     """
     This function will try to click a button that says exactly the same thing as
