@@ -40,7 +40,7 @@ define('app/controllers/machine_add', ['ember'],
                 // Scrolling to top fixes that
                 $('#machine-create').find('[data-role="collapsible"]')
                     .collapsible('option', 'collapsedIcon', 'carat-d')
-                    .collapsible('collapse');          
+                    .collapsible('collapse');
 
                 this._clear();
                 this._updateFormReady();

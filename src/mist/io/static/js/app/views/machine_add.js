@@ -138,8 +138,6 @@ define('app/views/machine_add', ['app/views/controlled'],
                 Ember.run.next(function(){
                     $( "#create-machine" ).collapsible({
                         collapse: function(event, ui) {
-                            Mist.machineAddController.close();
-
                             $(this).children().next().slideUp(250);
                             var id = $(this).attr('id'),
                             overlay = id ? $('#' + id+'-overlay') : false;
@@ -210,8 +208,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                     // Render listviews
                     if ($('.ui-listview').listview) {
-                        $('.ui-listview').listview()
-                                         .listview('refresh');
+                        $('.ui-listview').listview().listview('refresh');
                     }
                 });
              },

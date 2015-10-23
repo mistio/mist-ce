@@ -140,10 +140,6 @@
         height: 70px;
     }
 
-    #machine-list-page .machine-search-container {
-        margin-right: 85px !important;
-    }
-
     .machine-state span {
         float: left;
     }
@@ -219,6 +215,10 @@
 @media only screen and  (max-width: 600px) {
     .machine-tags {
         height: 16px;
+    }
+
+    #machine-list-page .machine-search-container {
+        margin-right: 85px !important;
     }
 }
 

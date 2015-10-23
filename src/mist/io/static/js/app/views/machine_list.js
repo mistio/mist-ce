@@ -144,6 +144,10 @@ define('app/views/machine_list', ['app/views/page'],
                     Mist.backendsController.set('sortBy', criteria);
                 },
 
+                clearSearch : function() {
+                    Mist.backendsController.set('searchMachinesTerm', null);
+                },
+
                 selectClicked: function () {
                     $('#select-machines-popup').popup('open').find('.ui-listview').listview('refresh');
                 },
@@ -153,10 +157,6 @@ define('app/views/machine_list', ['app/views/page'],
                     Mist.backendsController.get('filteredMachines').forEach(function (machine) {
                         machine.set('selected', mode == 'all' || mode == machine.backend.title);
                     });
-                },
-
-                clearSearch: function() {
-                    Mist.backendsController.set('searchMachinesTerm', null);
                 }
             }
         });

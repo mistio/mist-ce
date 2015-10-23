@@ -82,7 +82,7 @@ define('app/models/machine', ['ember'],
                 weight = 100000 * states[this.get('state')];
 
                 if(this.get('hasMonitoring')) {
-                    var openIncidents = 0;                    
+                    var openIncidents = 0;
                     if (this.get('hasOpenIncident')) {
                         this.get('incidents').forEach(function(incident) {
                             if(!incident.get('isClosed')) openIncidents += 1;
