@@ -20,7 +20,7 @@ define('app/controllers/logs', ['app/models/log'],
             prettyTimeReady: false,
 
             load: function() {
-                if (!Mist.logs)  {
+                if (!Mist.get('logs') || !Mist.get('logs').channel)  {
                     info('Log channel not yet ready');
                     Ember.run.later(this, this.load, 350);
                 } else {
