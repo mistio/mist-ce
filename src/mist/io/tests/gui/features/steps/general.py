@@ -140,7 +140,7 @@ def popup_waiting_with_timeout(context, popup_id, action, seconds):
 
 @then(u'I expect for "{side_panel_id}" side panel to {action} within max '
       u'{seconds} seconds')
-def popup_waiting_with_timeout(context, side_panel_id, action, seconds):
+def side_panel_waiting_with_timeout(context, side_panel_id, action, seconds):
     """
     Function that wait for keyadd-popup to appear but for a maximum
     amount of time
