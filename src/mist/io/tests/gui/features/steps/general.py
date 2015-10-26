@@ -5,7 +5,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 from selenium.webdriver.remote.webelement import *
 
 
@@ -325,19 +325,24 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # element of the list
     # also doing some cleaning if the text attribute also sends back texts
     # of sub elements
-    button = filter(lambda b: b.text.rstrip().lstrip().split('\n')[0].lower() == text.lower()
-                    and b.value_of_css_property('display') == 'block',
-                    button_collection)
-    if len(button) > 0:
-        return button[0]
+
+    for button in button_collection:
+        try:
+            if button.text.rstrip().lstrip().split('\n')[0].lower() == text.lower():
+                return button
+        except StaleElementReferenceException:
+            pass
 
     # if we haven't found the exact text then we search for something that
     # looks like it
     for button in button_collection:
-        button_text = button.text.split('\n')
-        if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
-            return button
-
+        try:
+            button_text = button.text.split('\n')
+            if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
+                return button
+        except StaleElementReferenceException:
+            pass
+        
     return None
 
 
