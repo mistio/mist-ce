@@ -2918,6 +2918,9 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         subnets = conn.ex_list_subnets()
         routers = conn.ex_list_routers()
+        floatings_ips = conn.ex_list_floating_ips()
+        if floatings_ips:
+            nodes = conn.list_nodes()
 
         public_networks = []
         for net in networks:
@@ -2926,7 +2929,7 @@ def list_networks(user, backend_id):
                 public_networks.append(networks.pop(net_index))
 
         for pub_net in public_networks:
-            ret['public'].append(openstack_network_to_dict(pub_net, subnets))
+            ret['public'].append(openstack_network_to_dict(pub_net, subnets, floatings_ips, nodes))
         for network in networks:
             ret['private'].append(openstack_network_to_dict(network, subnets))
         for router in routers:
@@ -2984,7 +2987,7 @@ def gce_network_to_dict(network):
     return net
 
 
-def openstack_network_to_dict(network, subnets):
+def openstack_network_to_dict(network, subnets, floating_ips=[], nodes=[]):
     net = {}
     net['name'] = network.name
     net['id'] = network.id
@@ -2993,8 +2996,29 @@ def openstack_network_to_dict(network, subnets):
     net['extra'] = network.extra
     net['public'] = bool(network.router_external)
     net['subnets'] = [openstack_subnet_to_dict(subnet) for subnet in subnets if subnet.id in network.subnets]
+    net['floating_ips'] = []
+    for floating_ip in floating_ips:
+        if floating_ip.floating_network_id == network.id:
+            net['floating_ips'].append(openstack_floating_ip_to_dict(floating_ip, nodes))
     return net
 
+
+def openstack_floating_ip_to_dict(floating_ip, nodes=[]):
+    ret = {}
+    ret['id'] = floating_ip.id
+    ret['floating_network_id'] = floating_ip.floating_network_id
+    ret['floating_ip_address'] = floating_ip.floating_ip_address
+    ret['fixed_ip_address'] = floating_ip.fixed_ip_address
+    ret['status'] = str(floating_ip.status)
+    ret['port_id'] = floating_ip.port_id
+    ret['extra'] = floating_ip.extra
+    ret['node_id'] = ''
+
+    for node in nodes:
+        if floating_ip.fixed_ip_address in node.private_ips:
+            ret['node_id'] = node.id
+
+    return ret
 
 def openstack_subnet_to_dict(subnet):
     net = {}
