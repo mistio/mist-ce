@@ -498,6 +498,8 @@ def create_machine(request):
         # hostname: if provided it will be attempted to assign a DNS name
         hostname = request.json_body.get('hostname', '')
         plugins = request.json_body.get('plugins')
+        associate_floating_ip = request.json_body.get('attach_floating_ip', False)
+        associate_floating_ip_subnet = request.json_body.get('attach_floating_ip_subnet', None)
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -516,7 +518,9 @@ def create_machine(request):
               'azure_port_bindings': azure_port_bindings,
               'hostname': hostname, 'plugins': plugins,
               'post_script_id': post_script_id,
-              'post_script_params': post_script_params}
+              'post_script_params': post_script_params,
+              'associate_floating_ip': associate_floating_ip,
+              'associate_floating_ip_subnet': associate_floating_ip_subnet}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:

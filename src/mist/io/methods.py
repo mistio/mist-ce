@@ -1557,7 +1557,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
-                   post_script_id='', post_script_params=''):
+                   post_script_id='', post_script_params='', associate_floating_ip=False,
+                   associate_floating_ip_subnet=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1708,6 +1709,17 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
             post_script_params=post_script_params,
+        )
+    elif conn.type == Provider.OPENSTACK and associate_floating_ip:
+        networks = list_networks(user, backend_id)
+        mist.io.tasks.openstack_post_create_steps.delay(
+            user.email, backend_id, node.id, monitoring, script, key_id,
+            node.extra.get('username'), node.extra.get('password'), public_key,
+            script_id=script_id, script_params=script_params, job_id = job_id,
+            hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
+            networks=networks
         )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -2921,6 +2933,8 @@ def list_networks(user, backend_id):
         floatings_ips = conn.ex_list_floating_ips()
         if floatings_ips:
             nodes = conn.list_nodes()
+        else:
+            nodes = []
 
         public_networks = []
         for net in networks:
