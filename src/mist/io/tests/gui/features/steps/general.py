@@ -236,6 +236,21 @@ def become_visible_waiting_with_timeout(context, element_id, seconds):
                                "after %s seconds" % (element_id, seconds))
 
 
+@when(u'I click the button by "{id_name}" id_name')
+def click_button_id(context, id_name):
+    """
+    This function will try to click a button by id name.
+    And use the function clicketi_click
+    """
+    my_element = context.browser.find_element_by_id(id_name)
+    clicketi_click(context, my_element)
+
+
+@then(u'I click the button "{text}"')
+def then_click(context, text):
+    return click_button(context, text)
+
+
 @step(u'I click the button "{text}"')
 def click_button(context, text):
     """

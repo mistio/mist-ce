@@ -4,6 +4,44 @@ from selenium.common.exceptions import NoSuchElementException, StaleElementRefer
 from mist.io.tests.gui.features.steps.general import *
 
 
+@when(u'I check the sorting by "{sorting_param}"')
+def check_sorting(context, sorting_param):
+    """
+    Create dict with key the arg of the step definition
+    """
+
+    sort_map = {'name':'div.machine-name', 'state':'span.machine-state','cloud':'div.machine-tags span.tag:nth-child(1)'}
+
+    sort_type = sorting_param
+    sorting_selector = sort_map[sort_type]
+
+    machines_elements = context.browser.find_elements_by_css_selector('#machine-list-container li '+sorting_selector)
+    #list with machine's names
+    machines_names_list = [machine_element.text for machine_element in machines_elements]
+    #sorting the machine list
+    my_sorted_machines_list = sorted(machines_names_list)
+    #lists are sorted and they have the same number of elements
+    if my_sorted_machines_list == machines_names_list:
+        pass
+    else:
+        assert False, u'List is not sorted'
+
+
+@when(u'I clear the machines search bar')
+def clear_machines_search_bar(context):
+    search_bar_machine = context.browser.find_element_by_css_selector("div.machine-search-container "
+                                                                      "input.machine-search")
+    search_bar_machine.clear()
+
+
+@when(u'I fill in a "{name}" for specific machine name')
+def fill_specific_machine_name(context,name):
+    textfield = context.browser.find_element_by_id("create-machine-name")
+    specific_name = name
+    textfield.send_keys(specific_name)
+    sleep(1)
+
+
 @when(u'I fill in a random machine name')
 def fill_machine_mame(context):
     textfield = context.browser.find_element_by_id("create-machine-name")
