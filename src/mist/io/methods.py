@@ -2987,7 +2987,7 @@ def gce_network_to_dict(network):
     return net
 
 
-def openstack_network_to_dict(network, subnets, floating_ips=[], nodes=[]):
+def openstack_network_to_dict(network, subnets=[], floating_ips=[], nodes=[]):
     net = {}
     net['name'] = network.name
     net['id'] = network.id
@@ -3178,7 +3178,7 @@ def _create_network_openstack(conn, network, subnet, router):
 
     # First we create the network
     try:
-        new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+        new_network = conn.ex_create_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
     except Exception as e:
         raise NetworkCreationError("Got error %s" % str(e))
 
@@ -3198,11 +3198,11 @@ def _create_network_openstack(conn, network, subnet, router):
         enable_dhcp = subnet.get('enable_dhcp', True)
 
         try:
-            subnet = conn.ex_create_neutron_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
-                                                   allocation_pools=allocation_pools, gateway_ip=gateway_ip,
-                                                   ip_version=ip_version, enable_dhcp=enable_dhcp)
+            subnet = conn.ex_create_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
+                                           allocation_pools=allocation_pools, gateway_ip=gateway_ip,
+                                           ip_version=ip_version, enable_dhcp=enable_dhcp)
         except Exception as e:
-            conn.ex_delete_neutron_network(network_id)
+            conn.ex_delete_network(network_id)
             raise NetworkError(e)
 
         ret['network'] = openstack_network_to_dict(new_network)
