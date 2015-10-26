@@ -8,7 +8,6 @@ only check that all required params are provided. Any further checking should
 be performed inside the corresponding method functions.
 
 """
-
 from datetime import datetime
 
 import traceback
@@ -51,7 +50,6 @@ def exception_handler_mist(exc, request):
     This is a special pyramid view that gets triggered whenever an exception
     is raised from any other view. It catches all exceptions exc where
     isinstance(exc, context) is True.
-
     """
 
     # non-mist exceptions. that shouldn't happen! never!
@@ -77,7 +75,10 @@ def not_found(self, request):
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
 def home(request):
-    """Home page view"""
+    """
+    Home page view
+    """
+
     user = user_from_request(request)
     return {
         'project': 'mist.io',
@@ -100,7 +101,9 @@ def home(request):
 
 @view_config(route_name="check_auth", request_method='POST', renderer="json")
 def check_auth(request):
-    """Check on the mist.core service if authenticated"""
+    """
+    Check on the mist.core service if authenticated
+    """
 
     params = request.json_body
     email = params.get('email', '').lower()
@@ -129,7 +132,9 @@ def check_auth(request):
 
 @view_config(route_name='account', request_method='POST', renderer='json')
 def update_user_settings(request):
-    """try free plan, by communicating to the mist.core service"""
+    """
+    try free plan, by communicating to the mist.core service
+    """
 
     params = request.json_body
     action = params.get('action', '').lower()
@@ -167,10 +172,11 @@ def update_user_settings(request):
 
 @view_config(route_name='backends', request_method='GET', renderer='json')
 def list_backends(request):
-    """Gets the available backends.
-
-    .. note:: Currently, this is only used by the backend controller in js.
-
+    """
+    operation_id: list_backends
+    parameters: []
+    path: /backends
+    summary: 'Request a list of all added backends.
     """
 
     user = user_from_request(request)
@@ -179,7 +185,24 @@ def list_backends(request):
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request):
-    """Adds a new backend."""
+    """
+    description: ' Adds a new backend to the user and returns the backend_id'
+    operation_id: add_backend
+    parameters:
+    - in: body
+      name: title
+      required: true
+      type: ''
+    - name: provider
+      in: body
+      required: true
+      type: ''
+    - in: body
+      name: params
+      required: true
+      type: 'object'
+    path: /backends
+    """
 
     params = request.json_body
     # remove spaces from start/end of string fields that are often included
@@ -256,11 +279,15 @@ def add_backend(request):
 
 @view_config(route_name='backend_action', request_method='DELETE')
 def delete_backend(request):
-    """Deletes a backend.
-
-    .. note:: It assumes the user may re-add it later so it does not remove
-              any key associations.
-
+    """
+    description: Deletes backend with given backend_id.
+    operation_id: delete_backend
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    path: /backends/{backend}
     """
 
     backend_id = request.matchdict['backend']
@@ -271,7 +298,21 @@ def delete_backend(request):
 
 @view_config(route_name='backend_action', request_method='PUT')
 def rename_backend(request):
-    """Renames a backend."""
+    """
+    description: Renames backend with given backend_id.
+    operation_id: rename_backend
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - description: ' New name for the key (will also serve as the key''s id)'
+      in: body
+      name: new_name
+      required: true
+      type: ''
+    path: /backends/{backend}
+    """
 
     backend_id = request.matchdict['backend']
     new_name = request.json_body.get('new_name', '')
@@ -285,6 +326,22 @@ def rename_backend(request):
 
 @view_config(route_name='backend_action', request_method='POST')
 def toggle_backend(request):
+    """
+    description: Toggles backend with given backend_id.
+    operation_id: toggle_backend
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - description: ' New name for the key (will also serve as the key''s id)'
+      in: body
+      name: new_state
+      required: true
+      type: ''
+    path: /backends/{backend}
+    """
+
     backend_id = request.matchdict['backend']
     new_state = request.json_body.get('new_state', '')
     if not new_state:
@@ -305,18 +362,39 @@ def toggle_backend(request):
 
 @view_config(route_name='keys', request_method='GET', renderer='json')
 def list_keys(request):
-    """List keys.
-
-    List all key pairs that are configured on this server. Only the public
-    keys are returned.
-
     """
+    operation_id: list_keys
+    parameters: []
+    path: /keys
+    responses:
+      '200':
+        description: ' A list of Keys instances'
+    summary: 'Retrieves a list of all added Keys'
+    """
+
     user = user_from_request(request)
     return methods.list_keys(user)
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
+    """
+    description: Add key with specific id
+    operation_id: add_key
+    parameters:
+    - description: ' The Key name (id)'
+      in: body
+      name: id
+      required: true
+      type: ''
+    - description: ' The private key'
+      in: path
+      name: priv
+      required: true
+      type: ''
+    path: /keys
+    """
+
     params = request.json_body
     key_id = params.get('id', '')
     private_key = params.get('priv', '')
@@ -333,15 +411,21 @@ def add_key(request):
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
 def delete_key(request):
-    """Delete key.
-
-    When a keypair gets deleted, it takes its asociations with it so just need
-    to remove from the server too.
-
-    If the default key gets deleted, it sets the next one as default, provided
-    that at least another key exists. It returns the list of all keys after
-    the deletion, excluding the private keys (check also list_keys).
-
+    """
+    summary: 'Deletes given keypair.'
+    description: 'Delete key.
+                 When a keypair gets deleted, it takes its asociations with it so just need
+                 to remove from the server too.
+                 If the default key gets deleted, it sets the next one as default, provided
+                 that at least another key exists. It returns the list of all keys after
+                 the deletion, excluding the private keys (check also list_keys).'
+    operation_id: delete_key
+    parameters:
+    - in: path
+      name: key
+      required: true
+      type: 'string'
+    path: /keys/{key}
     """
 
     key_id = request.matchdict.get('key')
@@ -355,6 +439,22 @@ def delete_key(request):
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
+    """
+    description: Edits a given key's name from old_key ---> new_key
+    operation_id: edit_key
+    parameters:
+    - description: ' The new Key name (id)'
+      in: body
+      name: new_id
+      required: true
+      type: ''
+    - description: ' The old key name (id)'
+      in: path
+      name: key
+      required: true
+      type: ''
+    path: /keys/{key}
+    """
 
     old_id = request.matchdict['key']
     new_id = request.json_body.get('new_id')
@@ -368,6 +468,18 @@ def edit_key(request):
 
 @view_config(route_name='key_action', request_method='POST')
 def set_default_key(request):
+    """
+    description: 'Sets a new default key'
+    operation_id: set_default_key
+    parameters:
+    - description: ' Optional. Give if you explicitly want to probe with this key_id'
+      in: path
+      name: key
+      required: true
+      type: ''
+    path: /keys/{key}
+    """
+
     key_id = request.matchdict['key']
     user = user_from_request(request)
 
@@ -377,11 +489,18 @@ def set_default_key(request):
 
 @view_config(route_name='key_private', request_method='GET', renderer='json')
 def get_private_key(request):
-    """Gets private key from keypair name.
-
-    It is used in single key view when the user clicks the display private key
-    button.
-
+    """
+    description: 'Gets private key from keypair name.
+                  It is used in single key view when the user clicks the display private key
+                  button.'
+    operation_id: get_private_key
+    parameters:
+    - description: ' The key id'
+      in: path
+      name: key
+      required: true
+      type: ''
+    path: /keys/{key}
     """
 
     user = user_from_request(request)
@@ -395,6 +514,18 @@ def get_private_key(request):
 
 @view_config(route_name='key_public', request_method='GET', renderer='json')
 def get_public_key(request):
+    """
+    description: 'Gets public key from keypair name.'
+    operation_id: get_public_key
+    parameters:
+    - description: ' The key id'
+      in: path
+      name: key
+      required: true
+      type: ''
+    path: /keys/{key}
+    """
+
     user = user_from_request(request)
     key_id = request.matchdict['key']
     if not key_id:
@@ -414,6 +545,43 @@ def generate_keypair(request):
 @view_config(route_name='key_association', request_method='PUT',
              renderer='json')
 def associate_key(request):
+    """
+    description: 'Associates a key with a machine.
+      If host is set it will also attempt to actually deploy it to the
+      machine. To do that it requires another keypair (existing_key) that can
+      connect to the machine.'
+    operation_id: associate_key
+    parameters:
+    - in: path
+      name: key
+      required: true
+      type: ''
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - default: ''
+      in: body
+      name: host
+      required: false
+      type: ''
+    - default: null
+      in: body
+      name: user
+      required: false
+      type: ''
+    - default: 22
+      in: body
+      name: port
+      required: false
+      type: ''
+    path: /backends/{backend}/machines/{machine}/keys/{key}
+    """
+
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -437,6 +605,32 @@ def associate_key(request):
 @view_config(route_name='key_association', request_method='DELETE',
              renderer='json')
 def disassociate_key(request):
+    """
+    description: 'Disassociates a key from a machine.
+                  If host is set it will also attempt to actually remove it from
+                  the machine.'
+    operation_id: disassociate_key
+    parameters:
+    - in: path
+      name: key
+      required: true
+      type: ''
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - default: null
+      in: body
+      name: host
+      required: false
+      type: ''
+    path: /backends/{backend}/machines/{machine}/keys/{key}
+    """
+
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -452,7 +646,6 @@ def disassociate_key(request):
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
     """Gets machines and their metadata from a backend."""
-
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     return methods.list_machines(user, backend_id)
@@ -460,7 +653,167 @@ def list_machines(request):
 
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
-    """Creates a new virtual machine on the specified backend."""
+    """
+    description: 'Creates a new virtual machine on the specified backend.
+                  If the backend is Rackspace it attempts to deploy the node with an ssh key
+                  provided in config. the method used is the only one working in the old
+                  Rackspace backend. create_node(), from libcloud.compute.base, with ''auth''
+                  kwarg doesn''t do the trick. Didn''t test if you can upload some ssh related
+                  files using the ''ex_files'' kwarg from openstack 1.0 driver.
+                  In Linode creation is a bit different. There you can pass the key file
+                  directly during creation. The Linode API also requires to set a disk size
+                  and doesn''t get it from size.id. So, send size.disk from the client and
+                  use it in all cases just to avoid provider checking. Finally, Linode API
+                  does not support association between a machine and the image it came from.
+                  We could set this, at least for machines created through mist.io in
+                  ex_comment, lroot or lconfig. lroot seems more appropriate. However,
+                  liblcoud doesn''t support linode.config.list at the moment, so no way to
+                  get them. Also, it will create inconsistencies for machines created
+                  through mist.io and those from the Linode interface.'
+    operation_id: create_machine
+    parameters:
+    - in: body
+      name: backend_id
+      required: false
+      type: ''
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - description: ' Associate machine with this key_id'
+      in: body
+      name: key_id
+      required: true
+      type: ''
+    - in: body
+      name: machine_name
+      required: true
+      type: ''
+    - description: ' Id of the backend''s location to create the machine'
+      in: body
+      name: location_id
+      required: true
+      type: ''
+    - description: ' Id of image to be used with the creation'
+      in: body
+      name: image_id
+      required: true
+      type: ''
+    - description: ' If of the size of the machine'
+      in: body
+      name: size_id
+      required: true
+      type: ''
+    - in: body
+      name: script
+      required: false
+      type: ''
+    - description: ' Needed only by Linode backend'
+      in: body
+      name: image_extra
+      required: false
+      type: ''
+    - description: ' Needed only by Linode backend'
+      in: body
+      name: disk
+      required: false
+      type: ''
+    - in: body
+      name: image_name
+      required: false
+      type: ''
+    - in: body
+      name: size_name
+      required: false
+      type: ''
+    - in: body
+      name: location_name
+      required: false
+      type: ''
+    - in: body
+      name: ips
+      required: false
+      type: ''
+    - in: body
+      name: monitoring
+      required: false
+      type: ''
+    - default: []
+      in: body
+      name: networks
+      required: false
+      type: ''
+    - default: []
+      in: body
+      name: docker_env
+      required: false
+      type: ''
+    - default: null
+      in: body
+      name: docker_command
+      required: false
+      type: ''
+    - default: 22
+      in: body
+      name: ssh_port
+      required: false
+      type: ''
+    - default: ''
+      in: body
+      name: script_id
+      required: false
+      type: ''
+    - default: ''
+      in: body
+      name: script_params
+      required: false
+      type: ''
+    - default: null
+      in: body
+      name: job_id
+      required: false
+      type: ''
+    - default: {}
+      in: body
+      name: docker_port_bindings
+      required: false
+      type: ''
+    - default: {}
+      in: body
+      name: docker_exposed_ports
+      required: false
+      type: ''
+    - default: ''
+      in: body
+      name: azure_port_bindings
+      required: false
+      type: ''
+    - default: ''
+      in: body
+      name: hostname
+      required: false
+      type: ''
+    - default: null
+      in: body
+      name: plugins
+      required: false
+      type: ''
+    - default: ''
+      in: body
+      name: post_script_id
+      required: false
+      type: ''
+    - default: ''
+      in: body
+      name: post_script_params
+      required: false
+      type: ''
+    path: /backends/{backend}/machines
+    responses:
+      '200':
+        description: ' An update list of added machines'
+    summary: 'Create a new machine on the given backend'
+    """
 
     backend_id = request.matchdict['backend']
 
@@ -530,6 +883,40 @@ def create_machine(request):
 
 @view_config(route_name='machine', request_method='POST', renderer="json")
 def machine_actions(request):
+    """
+    description: 'Calls a machine action on backends that support it.
+    operation_id: machine_actions
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - in: body
+      name: action
+      required: true
+      type: string
+      enum:
+      - start
+      - stop
+      - reboot
+      - destroy
+      - resize
+      - rename
+    - in: body
+      name: plan_id
+      required: false
+      type: ''
+    responses:
+        '200':
+            description: A list of machines.
+    path: /backends/{backend}/machines/{machine}
+    summary: 'Request actions on specific machine.'
+    """
+
     # TODO: We shouldn't return list_machines, just 200. Save the API!
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -560,7 +947,29 @@ def machine_actions(request):
 
 @view_config(route_name='machine_rdp', request_method='GET', renderer="json")
 def machine_rdp(request):
-    "Generate and return an rdp file for windows machines"
+    """
+    description: Generate and return an rdp file for windows machines
+    operation_id: machine_rdp
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - in: body
+      name: rdp_port
+      required: true
+      type: ''
+    - in: body
+      name: host
+      required: true
+      type: ''
+    path: /backends/{backend}/machines/{machine}/rdp
+    """
+
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
@@ -586,7 +995,25 @@ def machine_rdp(request):
 @view_config(route_name='machine_tags', request_method='POST',
              renderer='json')
 def set_machine_tags(request):
-    """Sets metadata for a machine, given the backend and machine id."""
+    """
+    description: Set tags for a machine, given the backend and machine id.
+    operation_id: set_machine_tags
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - in: body
+      name: tags
+      required: true
+      type: ''
+    path: /backends/{backend}/machines/{machine}/tags
+    """
+
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     try:
@@ -604,10 +1031,29 @@ def set_machine_tags(request):
 @view_config(route_name='machine_tag', request_method='DELETE',
              renderer='json')
 def delete_machine_tag(request):
-    """Deletes tag for a machine, given the machine id and the tag to be
-    deleted.
-
     """
+    description: Delete tag in the db for specified resource_type
+    operation_id: delete_machine_tag
+    parameters:
+    - in: path
+      name: tag
+      required: true
+      type: ''
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - in: body
+      name: resource_type
+      required: true
+      type: ''
+    path: /backends/{backend}/machines/{machine}/tags/{tag}
+    """
+
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     tag = request.matchdict['tag']
@@ -624,10 +1070,24 @@ def list_specific_images(request):
 
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
-    """List images from each backend.
-    Furthermore if a search_term is provided, we loop through each
-    backend and search for that term in the ids and the names of
-    the community images"""
+    """
+    description: 'List images from each backend.
+      Furthermore if a search_term is provided, we loop through each
+      backend and search for that term in the ids and the names of
+      the community images'
+    operation_id: list_images
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - default: null
+      in: body
+      name: term
+      required: false
+      type: ''
+    path: /backends/{backend}/images
+    """
 
     backend_id = request.matchdict['backend']
     try:
@@ -640,7 +1100,21 @@ def list_images(request):
 
 @view_config(route_name='image', request_method='POST', renderer='json')
 def star_image(request):
-    """Toggle image as starred."""
+    """
+    description: Toggle image star (star/unstar)
+    operation_id: star_image
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - description: ' Id of image to be used with the creation'
+      in: path
+      name: image
+      required: true
+      type: ''
+    path: /backends/{backend}/images/{image}
+    """
 
     backend_id = request.matchdict['backend']
     image_id = request.matchdict['image']
@@ -650,7 +1124,17 @@ def star_image(request):
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
-    """List sizes (aka flavors) from each backend."""
+    """
+    description: List sizes (aka flavors) from each backend.
+    operation_id: list_sizes
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    path: /backends/{backend}/sizes
+    """
+
     backend_id = request.matchdict['backend']
     user = user_from_request(request)
     return methods.list_sizes(user, backend_id)
@@ -658,7 +1142,24 @@ def list_sizes(request):
 
 @view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
-    """List locations from each backend."""
+    """
+    description: 'List locations from each backend.
+      Locations mean different things in each backend. e.g. EC2 uses it as a
+      datacenter in a given availability zone, whereas Linode lists availability
+      zones. However all responses share id, name and country eventhough in some
+      cases might be empty, e.g. Openstack.
+      In EC2 all locations by a provider have the same name, so the availability
+      zones are listed instead of name.'
+    operation_id: list_locations
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    path: /backends/{backend}/locations
+    summary: List locations from each backend.
+    """
+
     backend_id = request.matchdict['backend']
     user = user_from_request(request)
     return methods.list_locations(user, backend_id)
@@ -666,7 +1167,19 @@ def list_locations(request):
 
 @view_config(route_name='networks', request_method='GET', renderer='json')
 def list_networks(request):
-    """List networks from each backend."""
+    """
+    description: 'List networks from each backend.
+      Currently NephoScale and Openstack networks are supported. For other providers
+      this returns an empty list'
+    operation_id: list_networks
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    path: /backends/{backend}/networks
+    """
+
     backend_id = request.matchdict['backend']
     user = user_from_request(request)
     return methods.list_networks(user, backend_id)
@@ -675,8 +1188,29 @@ def list_networks(request):
 @view_config(route_name='networks', request_method='POST', renderer='json')
 def create_network(request):
     """
-    Creates a new network. Currently working only with OPENSTACK backend
+    description: 'Creates a new network. If subnet dict is specified, after creating the
+      network it will use the new network's id to create a subnet'
+    operation_id: create_network
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: body
+      name: network
+      required: true
+      type: ''
+    - in: body
+      name: subnet
+      required: true
+      type: 'string'
+    - in: body
+      name: router
+      required: false
+      type: ''
+    path: /backends/{backend}/networks
     """
+
     backend_id = request.matchdict['backend']
 
     try:
@@ -693,8 +1227,20 @@ def create_network(request):
 @view_config(route_name='network', request_method='DELETE')
 def delete_network(request):
     """
-    Deletes a network. Currently working only with OPENSTACK backend
+    description: Delete a neutron network
+    operation_id: delete_network
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: network
+      required: true
+      type: ''
+    path: /backends/{backend}/networks/{network}
     """
+
     backend_id = request.matchdict['backend']
     network_id = request.matchdict['network']
 
@@ -706,6 +1252,32 @@ def delete_network(request):
 
 @view_config(route_name='network', request_method='POST')
 def associate_ip(request):
+    """
+    operation_id: associate_ip
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: network
+      required: true
+      type: ''
+    - in: body
+      name: ip
+      required: true
+      type: ''
+    - default: null
+      in: body
+      name: machine
+      required: true
+    - default: true
+      in: body
+      name: assign
+      required: false
+      type: ''
+    path: /backends/{backend}/networks/{network}
+    """
 
     backend_id = request.matchdict['backend']
     network_id = request.matchdict['network']
@@ -724,11 +1296,42 @@ def associate_ip(request):
 
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
-    """Probes a machine using ping and ssh to collect metrics.
-
-    .. note:: Used for getting uptime and a list of deployed keys.
-
     """
+    description: Ping and SSH to machine and collect various metrics.
+    operation_id: probe
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - in: body
+      name: host
+      required: false
+      type: ''
+    - default: ''
+      description: ' Optional. Give if you explicitly want to probe with this key_id'
+      in: body
+      name: key_id
+      required: false
+      type: ''
+    - default: ''
+      description: ' Optional. Give if you explicitly want a specific user'
+      in: body
+      name: ssh_user
+      required: false
+      type: ''
+    path: /backends/{backend}/machines/{machine}/probe
+    responses:
+      '200':
+        description: ' A list of data received by the probing (e.g. uptime etc)'
+    summary: If no parameter is provided, mist.io will try to probe the machine with the
+      default
+    """
+
     machine_id = request.matchdict['machine']
     backend_id = request.matchdict['backend']
     host = request.json_body.get('host', None)
@@ -744,9 +1347,13 @@ def probe(request):
 
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
 def check_monitoring(request):
-    """Ask the mist.io service if monitoring is enabled for this machine.
-
     """
+    description: Ask the mist.io service if monitoring is enabled for this machine.
+    operation_id: check_monitoring
+    parameters: []
+    path: /monitoring
+    """
+
     user = user_from_request(request)
     ret = methods.check_monitoring(user)
     return ret
@@ -755,10 +1362,57 @@ def check_monitoring(request):
 @view_config(route_name='update_monitoring', request_method='POST',
              renderer='json')
 def update_monitoring(request):
-    """Enable/disable monitoring for this machine using the hosted mist.io
-    service.
-
     """
+    description: Enable monitoring for a machine.
+    operation_id: update_monitoring
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - default: ''
+      description: ' Name of the plugin'
+      in: body
+      name: name
+      required: false
+      type: ''
+    - default: ''
+      in: body
+      name: dns_name
+      required: false
+      type: ''
+    - default: null
+      in: body
+      name: public_ips
+      required: false
+      type: ''
+    - default: false
+      in: body
+      name: no_ssh
+      required: false
+      type: ''
+    - default: false
+      in: body
+      name: dry
+      required: false
+      type: ''
+    - default: true
+      in: body
+      name: deploy_async
+      required: false
+      type: ''
+    - in: body
+      name: action
+      required: false
+      type: ''
+    path: /backends/{backend}/machines/{machine}/monitoring
+    summary: Enable monitoring
+    """
+
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -808,6 +1462,48 @@ def update_monitoring(request):
 
 @view_config(route_name='stats', request_method='GET', renderer='json')
 def get_stats(request):
+    """
+    operation_id: get_stats
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - default: ''
+      description: ' Time formatted as integer, from when to fetch stats (default now)'
+      in: body
+      name: start
+      required: false
+      type: ''
+    - default: ''
+      description: ' Time formatted as integer, until when to fetch stats (default +10
+        seconds)'
+      in: body
+      name: stop
+      required: false
+      type: ''
+    - default: ''
+      description: ' Step to fetch stats (default 10 seconds)'
+      in: body
+      name: step
+      required: false
+      type: ''
+    - default: ''
+      in: body
+      name: metrics
+      required: false
+      type: ''
+    path: /backends/{backend}/machines/{machine}/stats
+    responses:
+      '200':
+        description: ' A dict of stats'
+    summary: 'Get stats of a monitored machine'
+    """
+
     data = methods.get_stats(
         user_from_request(request),
         request.matchdict['backend'],
@@ -824,6 +1520,20 @@ def get_stats(request):
 @view_config(route_name='metrics', request_method='GET',
              renderer='json')
 def find_metrics(request):
+    """
+    operation_id: find_metrics
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    path: /backends/{backend}/machines/{machine}/metrics
+    """
+
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -832,6 +1542,25 @@ def find_metrics(request):
 
 @view_config(route_name='metrics', request_method='PUT', renderer='json')
 def assoc_metric(request):
+    """
+    operation_id: assoc_metric
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - description: ' Metric_id (provided by self.get_stats() )'
+      in: body
+      name: metric_id
+      required: true
+      type: ''
+    path: /backends/{backend}/machines/{machine}/metrics
+    """
+
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -845,6 +1574,25 @@ def assoc_metric(request):
 
 @view_config(route_name='metrics', request_method='DELETE', renderer='json')
 def disassoc_metric(request):
+    """
+    operation_id: disassoc_metric
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - description: ' Metric_id (provided by self.get_stats() )'
+      in: body
+      name: metric_id
+      required: true
+      type: ''
+    path: /backends/{backend}/machines/{machine}/metrics
+    """
+
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -858,6 +1606,40 @@ def disassoc_metric(request):
 
 @view_config(route_name='metric', request_method='PUT', renderer='json')
 def update_metric(request):
+    """
+    operation_id: update_metric
+    parameters:
+    - description: ' Metric_id (provided by self.get_stats() )'
+      in: path
+      name: metric
+      required: true
+      type: ''
+    - default: null
+      description: ' Name of the plugin'
+      in: body
+      name: name
+      required: false
+      type: ''
+    - default: null
+      description: ' Optional. If given the new plugin will be measured according to this
+        unit'
+      in: body
+      name: unit
+      required: false
+      type: ''
+    - default: null
+      in: body
+      name: backend_id
+      required: false
+      type: ''
+    - default: null
+      in: body
+      name: machine_id
+      required: false
+      type: ''
+    path: /metrics/{metric}
+    """
+
     user = user_from_request(request)
     metric_id = request.matchdict['metric']
     params = params_from_request(request)
@@ -875,6 +1657,37 @@ def update_metric(request):
 @view_config(route_name='deploy_plugin', request_method='POST',
              renderer='json')
 def deploy_plugin(request):
+    """
+    operation_id: deploy_plugin
+    parameters:
+    - in: path
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - in: path
+      name: plugin
+      required: true
+      type: ''
+    - description: ' Optional. Can be either "gauge" or "derive"'
+      in: body
+      name: value_type
+      required: false
+      type: ''
+    - in: body
+      name: read_function
+      required: false
+      type: ''
+    - in: body
+      name: host
+      required: true
+      type: ''
+    path: /backends/{backend}/machines/{machine}/plugins/{plugin}
+    """
+
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -905,6 +1718,31 @@ def deploy_plugin(request):
 @view_config(route_name='deploy_plugin', request_method='DELETE',
              renderer='json')
 def undeploy_plugin(request):
+    """
+    operation_id: undeploy_plugin
+    parameters:
+      name: backend
+      required: true
+      type: ''
+    - in: path
+      name: machine
+      required: true
+      type: ''
+    - in: path
+      name: plugin
+      required: true
+      type: ''
+    - in: body
+      name: host
+      required: true
+      type: ''
+    - in: body
+      name: plugin_type
+      required: true
+      type: ''
+    path: /backends/{backend}/machines/{machine}/plugins/{plugin}
+    """
+
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
@@ -942,9 +1780,11 @@ def undeploy_plugin(request):
 
 @view_config(route_name='rules', request_method='POST', renderer='json')
 def update_rule(request):
-    """Creates or updates a rule.
-
     """
+    description: Creates or updates a rule.
+    operation_id: update_rule
+    """
+
     user = user_from_request(request)
     try:
         ret = requests.post(
@@ -965,9 +1805,11 @@ def update_rule(request):
 
 @view_config(route_name='rule', request_method='DELETE')
 def delete_rule(request):
-    """Deletes a rule.
-
     """
+    description: Deletes a rule.
+    operation_id: delete_rule
+    """
+
     user = user_from_request(request)
     try:
         ret = requests.delete(
@@ -988,8 +1830,8 @@ def delete_rule(request):
 @view_config(route_name='providers', request_method='GET', renderer='json')
 def list_supported_providers(request):
     """
-    @param request: A simple GET request
-    @return: Return all of our SUPPORTED PROVIDERS
+    description: Return all of our SUPPORTED PROVIDERS
+    operation_id: list_supported_providers
     """
 
     api_version = request.headers.get('Api-Version', 1)
