@@ -202,11 +202,11 @@ define('app/controllers/machine_add', ['ember'],
                             formReady = false;
                 }
 
+                var re = /^[0-9]*$/;
                 if (this.newMachineProvider.provider == 'libvirt' &&
-                    this.newMachineImage &&
                     (this.newMachineImage.id || this.newMachineLibvirtImagePath) &&
                     this.newMachineName &&
-                    this.newMachineLibvirtDiskPath != '' &&
+                    this.newMachineLibvirtDiskPath &&
                     re.test(this.get('newMachineLibvirtDiskSize'))) {
                         formReady = true;
                 }
@@ -288,7 +288,13 @@ define('app/controllers/machine_add', ['ember'],
                        'newMachineImage',
                        'newMachineScript',
                        'newMachineLocation',
-                       'newMachineProvider')
+                       'newMachineProvider',
+                        'newMachineLibvirtDiskSize',
+                        'newMachineLibvirtDiskPath',
+                        'newMachineLibvirtCPU',
+                        'newMachineLibvirtRAM',
+                        'newMachineLibvirtImagePath',
+                        'newMachineLibvirtExistingDiskPath')
         });
     }
 );

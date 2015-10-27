@@ -135,13 +135,13 @@
             {{view Mist.TextField
                    id="create-machine-disk-path"
                    data-theme="a"
-                   valueBinding="Mist.machineAddController.newMachineLibvirtDiskPath"}}
+                   value=Mist.machineAddController.newMachineLibvirtDiskPath}}
 
             <label for="create-machine-disk-size">Disk Size (GB)</label>
             {{view Mist.TextField
                    id="create-machine-disk-size"
                    data-theme="a"
-                   valueBinding="Mist.machineAddController.newMachineLibvirtDiskSize"}}
+                   value=Mist.machineAddController.newMachineLibvirtDiskSize}}
 
             <label for="create-machine-libvirt-advanced">Advanced Settings</label>
             <div id="create-machine-libvirt-advanced">
@@ -158,13 +158,13 @@
                 {{view Mist.TextField
                        id="create-machine-image-path"
                        data-theme="a"
-                       valueBinding="Mist.machineAddController.newMachineLibvirtImagePath"}}
+                       value=Mist.machineAddController.newMachineLibvirtImagePath}}
 
                 <label for="create-machine-existing-disk-path">Create from existing disk image</label>
                 {{view Mist.TextField
                        id="create-machine-existing-disk-path"
                        data-theme="a"
-                       valueBinding="Mist.machineAddController.newMachineLibvirtExistingDiskPath"}}
+                       value=Mist.machineAddController.newMachineLibvirtExistingDiskPath}}
             </div>
             {{/if}}
         {{else}}
