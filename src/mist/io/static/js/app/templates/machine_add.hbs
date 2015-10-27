@@ -91,13 +91,53 @@
                 </ul>
             </div>
 
+            <label>Image</label>
+            <div id="create-machine-image"
+                 data-role="collapsible"
+                 data-iconpos="right"
+                 data-collapsed-icon="arrow-d"
+                 data-expanded-icon="arrow-u"
+                 data-theme="a"
+                 class="mist-select">
+                <h4>
+                    {{#if Mist.machineAddController.newMachineImage.id}}
+                        <span class="image-icon-small">
+                            <span {{bind-attr class="Mist.machineAddController.newMachineImage.className"}}>
+                            </span>
+                        </span>
+                    {{/if}}
+                    {{Mist.machineAddController.newMachineImage.name}}
+                </h4>
+                <ul data-role="listview" data-theme="a">
+                    {{#each Mist.machineAddController.newMachineProvider.images.model as |image|}}
+                        {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
+                            <li data-icon="false">
+                                <span class="image-icon-small">
+                                    <span class="{{image.className}}"></span>
+                                </span>
+                                <a {{action "selectImage" image target="view"}}>{{image.name}}</a>
+                            </li>
+                        {{else}} {{#if image.star}}
+                            <li data-icon="false">
+                                <a {{action "selectImage" image target="view"}}>
+                                    <span class="image-icon-small">
+                                        <span class="{{image.className}}"></span>
+                                    </span>
+                                    {{image.name}}
+                                </a>
+                            </li>
+                        {{/if}} {{/unless}}
+                    {{/each}}
+                </ul>
+            </div>
+
             <label for="create-machine-disk-path">Path to create VM's disk</label>
             {{view Mist.TextField
                    id="create-machine-disk-path"
                    data-theme="a"
                    valueBinding="Mist.machineAddController.newMachineLibvirtDiskPath"}}
 
-            <label for="create-machine-disk-size">Disk Size (G)</label>
+            <label for="create-machine-disk-size">Disk Size (Gb)</label>
             {{view Mist.TextField
                    id="create-machine-disk-size"
                    data-theme="a"
@@ -125,268 +165,271 @@
                        data-theme="a"
                        valueBinding="Mist.machineAddController.newMachineLibvirtExistingDiskPath"}}
             </div>
-        {{/if}}
+        {{else}}
+        <!-- All Except Libvirt -->
 
-        <!-- Select Image -->
-        <div id="create-machine-image" class="required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
-            <label>Image</label>
-            <div data-role="collapsible"
-                 data-iconpos="right"
-                 data-collapsed-icon="carat-d"
-                 data-expanded-icon="carat-u"
-
-                 class="mist-select">
-                <h4>
-                    {{#if Mist.machineAddController.newMachineImage.id}}
-                        <span class="image-icon-small">
-                            <span class={{Mist.machineAddController.newMachineImage.className}}>
-                            </span>
-                        </span>
-                    {{/if}}
-                    {{Mist.machineAddController.newMachineImage.name}}
-                </h4>
-
-                {{#unless Mist.machineAddController.selectedImage}}
-                <ul data-role="listview" >
-                    {{#each Mist.machineAddController.newMachineProvider.images.model as |image|}}
-                        {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
-                            <li data-icon="false">
-                                <span class="image-icon-small">
-                                    <span class={{image.className}}></span>
-                                </span>
-                                <a {{action "selectImage" image target=view}} title="{{image.name}}">{{image.name}}</a>
-                            </li>
-                        {{else}} {{#if image.star}}
-                            <li data-icon="false">
-                                <a {{action "selectImage" image target=view}} title="{{image.name}}">
-                                    <span class="image-icon-small">
-                                        <span class={{image.className}}></span>
-                                    </span>
-                                    {{image.name}}
-                                </a>
-                            </li>
-                        {{/if}} {{/unless}}
-                    {{/each}}
-                </ul>
-                {{/unless}}
-            </div>
-        </div>
-
-        <div id="size">
-            <div id="create-machine-size" class="{{if Mist.machineAddController.newMachineSize.id 'filled' 'empty'}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} required">
-                <!-- Select Size -->
-                <label>Size</label>
+            <!-- Select Image -->
+            <div id="create-machine-image" class="required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
+                <label>Image</label>
                 <div data-role="collapsible"
-                     data-iconpos="right"
-                     data-collapsed-icon="carat-d"
-                     data-expanded-icon="carat-u"
-
-                     class="mist-select">
-                    <h4>{{Mist.machineAddController.newMachineSize.name}}</h4>
-
-                    <ul data-role="listview" >
-                        {{#each Mist.machineAddController.newMachineProvider.sizes.model as |size|}}
-                        <li data-icon="false">
-                            <a {{action "selectSize" size target=view}} title="{{size.name}} - disk:{{size.disk}}, ram:{{size.ram}}">{{size.name}}
-                                <span class="size-decription">
-                                 - disk:{{size.disk}}, ram:{{size.ram}}
-                                </span>
-                            </a>
-                        </li>
-                        {{/each}}
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Select Location -->
-        {{#if view.hasLocation}}
-        <div id="location">
-            <div id="create-machine-location" class="{{if Mist.machineAddController.newMachineLocation.id 'filled' 'empty'}} required">
-                <label>Location</label>
-                <div data-role="collapsible"
-                     data-iconpos="right"
-                     data-collapsed-icon="carat-d"
-                     data-expanded-icon="carat-u"
-
-                     class="mist-select">
-                    <h4>{{Mist.machineAddController.newMachineLocation.name}}</h4>
-                    <ul data-role="listview">
-                        {{#each Mist.machineAddController.newMachineProvider.locations.model as |location|}}
-                        <li data-icon="false">
-                            <a {{action "selectLocation" location target=view}}>{{location.name}}</a>
-                        </li>
-                        {{/each}}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        {{/if}}
-
-        <!-- Select Key -->
-        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.hasKey 'required'}}">
-            <div id="create-machine-key" >
-                <label>Key</label>
-                <div
-                     data-role="collapsible"
                      data-iconpos="right"
                      data-collapsed-icon="carat-d"
                      data-expanded-icon="carat-u"
 
                      class="mist-select">
                     <h4>
-                        {{#if Mist.machineAddController.newMachineKey.id}}
-                        {{Mist.machineAddController.newMachineKey.id}}
-                        {{else}}
-                        {{Mist.machineAddController.newMachineKey.title}}
+                        {{#if Mist.machineAddController.newMachineImage.id}}
+                            <span class="image-icon-small">
+                                <span class={{Mist.machineAddController.newMachineImage.className}}>
+                                </span>
+                            </span>
                         {{/if}}
+                        {{Mist.machineAddController.newMachineImage.name}}
                     </h4>
 
-                    <ul data-role="listview">
-                        {{#each Mist.keysController.model as |key|}}
-                            <li data-icon="false">
-                                <a {{action "selectKey" key target=view}}>{{key.id}}</a>
-                            </li>
-                        {{/each}}
-                        <li data-icon="false" data-theme="d">
-                            <a {{action "createKeyClicked" target=view}}>Add Key</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Docker Specific -->
-        {{#if view.hasDocker}}
-        <div class="docker">
-
-            <!-- Environment Vars -->
-            <div id="create-machine-env" class="{{if Mist.machineAddController.newMachineDockerEnvironment 'filled' 'empty'}}">
-                <label for="create-machine-env">Environment Variables</label>
-                {{view Mist.TextArea
-                       id="create-machine-env"
-                       value=Mist.machineAddController.newMachineDockerEnvironment}}
-            </div>
-
-            {{#unless view.dockerNeedScript}}
-            <!-- Command -->
-            <div id="create-machine-command" class="required {{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
-                <label for="create-machine-command">Command</label>
-                {{view Mist.TextArea
-                       id="create-machine-command"
-                       value=Mist.machineAddController.newMachineDockerCommand}}
-            </div>
-            {{/unless}}
-
-        </div>
-        {{/if}}
-
-        <!-- Select Networks -->
-        {{#if view.hasNetworks}}
-        <div id="create-machine-network">
-            <label>Networks</label>
-            <fieldset data-role="controlgroup">
-                {{#each Mist.machineAddController.newMachineProvider.networks.model as |network|}}
-                    <input id={{network.id}} name={{network.id}} checked={{network.selected}}
-                        type="checkbox" {{action "toggleNetworkSelection" network on="change" target=view}}>
-                    <label for={{network.id}} data-corners="false">
-                        {{network.name}}
-                    </label>
-                {{/each}}
-            </fieldset>
-        </div>
-        {{/if}}
-
-        <!-- Select Script -->
-        {{#if view.hasScript}}
-        <div id="script">
-            <label for="create-machine-script">Script</label>
-            {{#if Mist.isCore}}
-            {{#if Mist.scriptsController.model.length}}
-                <select class="toggle-field ui-mini" data-role="slider"
-                {{action "switchToggled" on="change" target=view}}>
-                    <option value="basic">basic</option>
-                    <option value="advanced">advanced</option>
-                </select>
-            {{/if}}
-            {{/if}}
-
-            {{#if view.hasAdvancedScript}}
-            <div class="script-option advanced">
-                <label>Select Script</label>
-                <div id="create-machine-script-select"
-                     data-role="collapsible"
-                     data-iconpos="right"
-                     data-collapsed-icon="carat-d"
-                     data-expanded-icon="carat-u"
-
-                     class="mist-select">
-                    <h4>{{#if Mist.machineAddController.newMachineScript.name}}
-                        {{Mist.machineAddController.newMachineScript.name}}
-                        {{else}} Select {{/if}}
-                    </h4>
-                    <ul data-role="listview">
-                        {{#each Mist.scriptsController.model as |script|}}
-                            <li data-icon="false">
-                                <a {{action "selectScript" script target=view}}>{{script.name}}</a>
-                            </li>
+                    {{#unless Mist.machineAddController.selectedImage}}
+                    <ul data-role="listview" >
+                        {{#each Mist.machineAddController.newMachineProvider.images.model as |image|}}
+                            {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
+                                <li data-icon="false">
+                                    <span class="image-icon-small">
+                                        <span class={{image.className}}></span>
+                                    </span>
+                                    <a {{action "selectImage" image target=view}} title="{{image.name}}">{{image.name}}</a>
+                                </li>
+                            {{else}} {{#if image.star}}
+                                <li data-icon="false">
+                                    <a {{action "selectImage" image target=view}} title="{{image.name}}">
+                                        <span class="image-icon-small">
+                                            <span class={{image.className}}></span>
+                                        </span>
+                                        {{image.name}}
+                                    </a>
+                                </li>
+                            {{/if}} {{/unless}}
                         {{/each}}
                     </ul>
+                    {{/unless}}
                 </div>
-
-                {{view Mist.TextArea
-                       id="create-machine-script-params"
-
-                       placeholder="Optional script parameters"
-                       value=Mist.machineAddController.newMachineScriptParams}}
             </div>
-            {{else}}
-            <div class="script-option basic">
-                {{view Mist.TextArea
-                       id="create-machine-script"
-                       value=Mist.machineAddController.newMachineScript}}
+
+            <div id="size">
+                <div id="create-machine-size" class="{{if Mist.machineAddController.newMachineSize.id 'filled' 'empty'}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} required">
+                    <!-- Select Size -->
+                    <label>Size</label>
+                    <div data-role="collapsible"
+                         data-iconpos="right"
+                         data-collapsed-icon="carat-d"
+                         data-expanded-icon="carat-u"
+
+                         class="mist-select">
+                        <h4>{{Mist.machineAddController.newMachineSize.name}}</h4>
+
+                        <ul data-role="listview" >
+                            {{#each Mist.machineAddController.newMachineProvider.sizes.model as |size|}}
+                            <li data-icon="false">
+                                <a {{action "selectSize" size target=view}} title="{{size.name}} - disk:{{size.disk}}, ram:{{size.ram}}">{{size.name}}
+                                    <span class="size-decription">
+                                     - disk:{{size.disk}}, ram:{{size.ram}}
+                                    </span>
+                                </a>
+                            </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Select Location -->
+            {{#if view.hasLocation}}
+            <div id="location">
+                <div id="create-machine-location" class="{{if Mist.machineAddController.newMachineLocation.id 'filled' 'empty'}} required">
+                    <label>Location</label>
+                    <div data-role="collapsible"
+                         data-iconpos="right"
+                         data-collapsed-icon="carat-d"
+                         data-expanded-icon="carat-u"
+
+                         class="mist-select">
+                        <h4>{{Mist.machineAddController.newMachineLocation.name}}</h4>
+                        <ul data-role="listview">
+                            {{#each Mist.machineAddController.newMachineProvider.locations.model as |location|}}
+                            <li data-icon="false">
+                                <a {{action "selectLocation" location target=view}}>{{location.name}}</a>
+                            </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
             </div>
             {{/if}}
-        </div>
-        {{/if}}
 
-        {{#if view.hasDocker}}
-        <div id="ports">
-            <!-- Expose Ports -->
-            <label for="create-machine-ports">Ports</label>
-            {{view Mist.TextArea
-                   id="create-machine-ports"
+            <!-- Select Key -->
+            <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.hasKey 'required'}}">
+                <div id="create-machine-key" >
+                    <label>Key</label>
+                    <div
+                         data-role="collapsible"
+                         data-iconpos="right"
+                         data-collapsed-icon="carat-d"
+                         data-expanded-icon="carat-u"
 
-                   placeholder="e.g. 80:80"
-                   value=Mist.machineAddController.newMachineDockerPorts}}
-        </div>
-        {{/if}}
+                         class="mist-select">
+                        <h4>
+                            {{#if Mist.machineAddController.newMachineKey.id}}
+                            {{Mist.machineAddController.newMachineKey.id}}
+                            {{else}}
+                            {{Mist.machineAddController.newMachineKey.title}}
+                            {{/if}}
+                        </h4>
 
-        {{#if view.hasAzure}}
-        <div class="azure">
-            <!-- Expose Ports -->
-            <div id="create-machine-azure-ports-wrapper" class="{{if Mist.machineAddController.newMachineAzurePorts 'filled' 'empty'}} required">
-                <label for="create-machine-azure-ports">Ports</label>
-                {{view Mist.TextArea
-                       id="create-machine-azure-ports"
-
-                       placeholder="e.g. http tcp 80:80, smtp tcp 25:25, https tcp 443:443"
-                       value=Mist.machineAddController.newMachineAzurePorts}}
+                        <ul data-role="listview">
+                            {{#each Mist.keysController.model as |key|}}
+                                <li data-icon="false">
+                                    <a {{action "selectKey" key target=view}}>{{key.id}}</a>
+                                </li>
+                            {{/each}}
+                            <li data-icon="false" data-theme="d">
+                                <a {{action "createKeyClicked" target=view}}>Add Key</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-        </div>
-        {{/if}}
 
+            <!-- Docker Specific -->
+            {{#if view.hasDocker}}
+            <div class="docker">
 
-        <!-- Enable monitoring -->
-        {{#if view.hasMonitoring}}
-        <div id="create-machine-monitoring">
-            <label>
-            {{view Mist.Checkbox
-                checked=Mist.machineAddController.newMachineMonitoring}}
-            Enable monitoring
-            </label>
-        </div>
+                <!-- Environment Vars -->
+                <div id="create-machine-env" class="{{if Mist.machineAddController.newMachineDockerEnvironment 'filled' 'empty'}}">
+                    <label for="create-machine-env">Environment Variables</label>
+                    {{view Mist.TextArea
+                           id="create-machine-env"
+                           value=Mist.machineAddController.newMachineDockerEnvironment}}
+                </div>
+
+                {{#unless view.dockerNeedScript}}
+                <!-- Command -->
+                <div id="create-machine-command" class="required {{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
+                    <label for="create-machine-command">Command</label>
+                    {{view Mist.TextArea
+                           id="create-machine-command"
+                           value=Mist.machineAddController.newMachineDockerCommand}}
+                </div>
+                {{/unless}}
+
+            </div>
+            {{/if}}
+
+            <!-- Select Networks -->
+            {{#if view.hasNetworks}}
+            <div id="create-machine-network">
+                <label>Networks</label>
+                <fieldset data-role="controlgroup">
+                    {{#each Mist.machineAddController.newMachineProvider.networks.model as |network|}}
+                        <input id={{network.id}} name={{network.id}} checked={{network.selected}}
+                            type="checkbox" {{action "toggleNetworkSelection" network on="change" target=view}}>
+                        <label for={{network.id}} data-corners="false">
+                            {{network.name}}
+                        </label>
+                    {{/each}}
+                </fieldset>
+            </div>
+            {{/if}}
+
+            <!-- Select Script -->
+            {{#if view.hasScript}}
+            <div id="script">
+                <label for="create-machine-script">Script</label>
+                {{#if Mist.isCore}}
+                {{#if Mist.scriptsController.model.length}}
+                    <select class="toggle-field ui-mini" data-role="slider"
+                    {{action "switchToggled" on="change" target=view}}>
+                        <option value="basic">basic</option>
+                        <option value="advanced">advanced</option>
+                    </select>
+                {{/if}}
+                {{/if}}
+
+                {{#if view.hasAdvancedScript}}
+                <div class="script-option advanced">
+                    <label>Select Script</label>
+                    <div id="create-machine-script-select"
+                         data-role="collapsible"
+                         data-iconpos="right"
+                         data-collapsed-icon="carat-d"
+                         data-expanded-icon="carat-u"
+
+                         class="mist-select">
+                        <h4>{{#if Mist.machineAddController.newMachineScript.name}}
+                            {{Mist.machineAddController.newMachineScript.name}}
+                            {{else}} Select {{/if}}
+                        </h4>
+                        <ul data-role="listview">
+                            {{#each Mist.scriptsController.model as |script|}}
+                                <li data-icon="false">
+                                    <a {{action "selectScript" script target=view}}>{{script.name}}</a>
+                                </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+
+                    {{view Mist.TextArea
+                           id="create-machine-script-params"
+
+                           placeholder="Optional script parameters"
+                           value=Mist.machineAddController.newMachineScriptParams}}
+                </div>
+                {{else}}
+                <div class="script-option basic">
+                    {{view Mist.TextArea
+                           id="create-machine-script"
+                           value=Mist.machineAddController.newMachineScript}}
+                </div>
+                {{/if}}
+            </div>
+            {{/if}}
+
+            {{#if view.hasDocker}}
+            <div id="ports">
+                <!-- Expose Ports -->
+                <label for="create-machine-ports">Ports</label>
+                {{view Mist.TextArea
+                       id="create-machine-ports"
+
+                       placeholder="e.g. 80:80"
+                       value=Mist.machineAddController.newMachineDockerPorts}}
+            </div>
+            {{/if}}
+
+            {{#if view.hasAzure}}
+            <div class="azure">
+                <!-- Expose Ports -->
+                <div id="create-machine-azure-ports-wrapper" class="{{if Mist.machineAddController.newMachineAzurePorts 'filled' 'empty'}} required">
+                    <label for="create-machine-azure-ports">Ports</label>
+                    {{view Mist.TextArea
+                           id="create-machine-azure-ports"
+
+                           placeholder="e.g. http tcp 80:80, smtp tcp 25:25, https tcp 443:443"
+                           value=Mist.machineAddController.newMachineAzurePorts}}
+                </div>
+            </div>
+            {{/if}}
+
+            <!-- Enable monitoring -->
+            {{#if view.hasMonitoring}}
+            <div id="create-machine-monitoring">
+                <label>
+                {{view Mist.Checkbox
+                    checked=Mist.machineAddController.newMachineMonitoring}}
+                Enable monitoring
+                </label>
+            </div>
+            {{/if}}
+
         {{/if}}
+        <!-- Libvirt Check -->
 
         {{#if view.price}}
         <div id="create-machine-cost">
