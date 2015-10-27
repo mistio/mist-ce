@@ -42,7 +42,7 @@ define('app/controllers/machines', ['app/models/machine'],
             //
 
             newMachine: function(name, image, size, location, key, script, monitoring,
-                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts) {
+                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtCPU, libvirtRAM, libvirtDiskSize, libvirtDiskPath, libvirtImagePath, libvirtExistingDiskPath) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
                 // the server
@@ -115,7 +115,14 @@ define('app/controllers/machines', ['app/models/machine'],
                         'docker_command': dockerCommand,
                         'docker_exposed_ports': exposedPorts,
                         'docker_port_bindings': portBindings,
-                        'azure_port_bindings': azurePorts
+                        'azure_port_bindings': azurePorts,
+                        //Libvirt
+                        'libvirt_cpu': libvirtCPU,
+                        'libvirt_ram': libvirtRAM,
+                        'libvirt_disk_size': libvirtDiskSize,
+                        'libvirt_disk_path': libvirtDiskPath,
+                        'libvirt_image_path': libvirtImagePath,
+                        'libvirt_existing_disk_path': libvirtExistingDiskPath
                 }).success(function (machine) {
                     machine.backend = that.backend;
                     // Nephoscale returns machine id on request success,

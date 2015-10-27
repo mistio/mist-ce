@@ -13,9 +13,10 @@ define('app/views/machine_add', ['app/views/controlled'],
             changeProviderFlag: false,
             dockerNeedScript: false,
             hasAdvancedScript: false,
-            libvirtAdvanced: 0,
+            hasLibvirtAdvanced: false,
             newMachineLibvirtCPUOptions: null,
             newMachineLibvirtRAMOptions: null,
+
 
             hasLibvirt: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
@@ -240,6 +241,14 @@ define('app/views/machine_add', ['app/views/controlled'],
                     Mist.machineAddController.set('newMachineScriptParams', '');
                     Mist.machineAddController.set('hasScript', value == 'advanced');
                     this.set('hasAdvancedScript', value == 'advanced');
+                    this.renderFields();
+                },
+
+                switchLibvirtAdvanced: function () {
+                    var value = this.$('#create-machine-libvirt-advanced select').val();
+                    Mist.machineAddController.set('newMachineLibvirtImagePath', '');
+                    Mist.machineAddController.set('newMachineLibvirtExistingDiskPath', '');                  
+                    this.set('hasLibvirtAdvanced', value == 1);
                     this.renderFields();
                 },
 

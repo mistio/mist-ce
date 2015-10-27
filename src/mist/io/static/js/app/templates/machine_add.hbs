@@ -137,7 +137,7 @@
                    data-theme="a"
                    valueBinding="Mist.machineAddController.newMachineLibvirtDiskPath"}}
 
-            <label for="create-machine-disk-size">Disk Size (Gb)</label>
+            <label for="create-machine-disk-size">Disk Size (GB)</label>
             {{view Mist.TextField
                    id="create-machine-disk-size"
                    data-theme="a"
@@ -146,12 +146,13 @@
             <label for="create-machine-libvirt-advanced">Advanced Settings</label>
             <div id="create-machine-libvirt-advanced">
                 <select class="toggle-field" data-theme="a" data-role="slider"
-                {{action "switchAdvanced" field on="change" target="view"}}>
+                {{action "switchLibvirtAdvanced" field on="change" target="view"}}>
                     <option value="0">No</option>
                     <option value="1">Yes</option>
                 </select>
             </div>
 
+            {{#if view.hasLibvirtAdvanced}}
             <div id="create-machine-libvirt-advanced-options">
                 <label for="create-machine-disk-size">Create from custom image path</label>
                 {{view Mist.TextField
@@ -165,6 +166,7 @@
                        data-theme="a"
                        valueBinding="Mist.machineAddController.newMachineLibvirtExistingDiskPath"}}
             </div>
+            {{/if}}
         {{else}}
         <!-- All Except Libvirt -->
 

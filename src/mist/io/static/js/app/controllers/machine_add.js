@@ -233,7 +233,13 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineDockerCommand', '')
                     .set('newMachineScriptParams', '')
                     .set('newMachineDockerPorts', '')
-                    .set('newMachineAzurePorts', '');
+                    .set('newMachineAzurePorts', '')
+                    .set('newMachineLibvirtDiskSize', 4)
+                    .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
+                    .set('newMachineLibvirtCPU', 1)
+                    .set('newMachineLibvirtRAM', 512)
+                    .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineLibvirtExistingDiskPath', '');
             },
 
             _selectUnique: function() {
