@@ -28,6 +28,12 @@ define('app/controllers/machine_add', ['ember'],
             newMachineDockerEnvironment: null,
             newMachineDockerPorts: null,
             newMachineAzurePorts: null,
+            newMachineLibvirtCPU: 1,
+            newMachineLibvirtRAM: 512,
+            newMachineLibvirtDiskPath: '/var/lib/libvirt/',
+            newMachineLibvirtDiskSize: 4,
+            newMachineLibvirtImagePath: null,
+            newMachineLibvirtExistingDiskPath: null,
 
 
             //
@@ -120,6 +126,12 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineScriptParams,
                         this.newMachineDockerPorts,
                         this.newMachineAzurePorts,
+                        this.newMachineLibvirtCPU,
+                        this.newMachineLibvirtRAM,
+                        this.newMachineLibvirtDiskSize,
+                        this.newMachineLibvirtDiskPath,
+                        this.newMachineLibvirtImagePath,
+                        this.newMachineLibvirtExistingDiskPath,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }
@@ -142,7 +154,7 @@ define('app/controllers/machine_add', ['ember'],
                 this.set('callback', null)
                     .set('newMachineName', '')
                     .set('newMachineScript', '')
-                    .set('newMachineKey', {'title' : 'Select Key'})
+                    .set('newMachineKey', {'id' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
@@ -151,7 +163,13 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineDockerCommand', '')
                     .set('newMachineScriptParams', '')
                     .set('newMachineDockerPorts', '')
-                    .set('newMachineAzurePorts', '');
+                    .set('newMachineAzurePorts', '')
+                    .set('newMachineLibvirtDiskSize', 4)
+                    .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
+                    .set('newMachineLibvirtCPU', 1)
+                    .set('newMachineLibvirtRAM', 512)
+                    .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineLibvirtExistingDiskPath', '');
                 this.view.clear();
              },
 
@@ -182,6 +200,15 @@ define('app/controllers/machine_add', ['ember'],
                     this.newMachineImage.get('isMist')) {
                         if (!Mist.keysController.keyExists(this.newMachineKey.id))
                             formReady = false;
+                }
+
+                if (this.newMachineProvider.provider == 'libvirt' &&
+                    this.newMachineImage &&
+                    (this.newMachineImage.id || this.newMachineLibvirtImagePath) &&
+                    this.newMachineName &&
+                    this.newMachineLibvirtDiskPath != '' &&
+                    re.test(this.get('newMachineLibvirtDiskSize'))) {
+                        formReady = true;
                 }
 
                 if (formReady && this.addingMachine) {
@@ -228,6 +255,14 @@ define('app/controllers/machine_add', ['ember'],
             providerObserver: function() {
                 Ember.run.once(this, '_selectUnique');
             }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize'),
+
+            sizeObserver: function() {
+                Ember.run.once(this, '_sizeError');
+            }.observes('newMachineLibvirtDiskSize'),
+
+            imagesObserver: function() {
+                Ember.run.once(this, '_imagesError');
+            }.observes('newMachineImage', 'newMachineLibvirtImagePath'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');

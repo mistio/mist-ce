@@ -50,6 +50,83 @@
             </div>
         </div>
 
+        <!-- Libvirt -->
+        {{#if view.hasLibvirt}}
+
+            <!-- Libvirt RAM -->
+            <label for="create-machine-libvirt-ram">RAM</label>
+            <div id="create-machine-libvirt-ram"
+                data-role="collapsible"
+                data-iconpos="right"
+                data-collapsed-icon="check"
+                data-expanded-icon="arrow-u"
+                data-theme="a"
+                class="mist-select">
+                <h4>{{Mist.machineAddController.newMachineLibvirtRAM}} MB</h4>
+                <ul data-role="listview" data-theme="a">
+                {{#each view.newMachineLibvirtRAMOptions as |ram|}}
+                    <li data-icon="false">
+                        <a {{action "selectRAM" ram target="view"}}>{{ram}} MB</a>
+                    </li>
+                {{/each}}
+                </ul>
+            </div>
+
+            <!-- Libvirt CPU -->
+            <label for="create-machine-libvirt-cpu">CPU</label>
+            <div id="create-machine-libvirt-cpu"
+                data-role="collapsible"
+                data-iconpos="right"
+                data-collapsed-icon="check"
+                data-expanded-icon="arrow-u"
+                data-theme="a"
+                class="mist-select">
+                <h4>{{Mist.machineAddController.newMachineLibvirtCPU}}</h4>
+                <ul data-role="listview" data-theme="a">
+                {{#each view.newMachineLibvirtCPUOptions as |cpu|}}
+                    <li data-icon="false">
+                        <a {{action "selectCPU" cpu target="view"}}>{{cpu}}</a>
+                    </li>
+                {{/each}}
+                </ul>
+            </div>
+
+            <label for="create-machine-disk-path">Path to create VM's disk</label>
+            {{view Mist.TextField
+                   id="create-machine-disk-path"
+                   data-theme="a"
+                   valueBinding="Mist.machineAddController.newMachineLibvirtDiskPath"}}
+
+            <label for="create-machine-disk-size">Disk Size (G)</label>
+            {{view Mist.TextField
+                   id="create-machine-disk-size"
+                   data-theme="a"
+                   valueBinding="Mist.machineAddController.newMachineLibvirtDiskSize"}}
+
+            <label for="create-machine-libvirt-advanced">Advanced Settings</label>
+            <div id="create-machine-libvirt-advanced">
+                <select class="toggle-field" data-theme="a" data-role="slider"
+                {{action "switchAdvanced" field on="change" target="view"}}>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div id="create-machine-libvirt-advanced-options">
+                <label for="create-machine-disk-size">Create from custom image path</label>
+                {{view Mist.TextField
+                       id="create-machine-image-path"
+                       data-theme="a"
+                       valueBinding="Mist.machineAddController.newMachineLibvirtImagePath"}}
+
+                <label for="create-machine-existing-disk-path">Create from existing Disk</label>
+                {{view Mist.TextField
+                       id="create-machine-existing-disk-path"
+                       data-theme="a"
+                       valueBinding="Mist.machineAddController.newMachineLibvirtExistingDiskPath"}}
+            </div>
+        {{/if}}
+
         <!-- Select Image -->
         <div id="create-machine-image" class="required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
             <label>Image</label>
