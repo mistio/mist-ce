@@ -1557,7 +1557,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
-                   post_script_id='', post_script_params=''):
+                   post_script_id='', post_script_params='',
+                   disk_size=None, ram=None, cpu=None, disk_path=None, create_from_existing=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1585,11 +1586,18 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
 
+    machine_name = machine_name_validator(conn.type, machine_name)
+
+    if conn.type is Provider.LIBVIRT:
+        node = _create_machine_libvirt(conn, machine_name,
+                                       disk_size, ram, cpu,
+                                       image_id, disk_path, create_from_existing)
+
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
     # if key_id not provided, search for default key
-    if conn.type != Provider.DOCKER:
+    if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
         if not key_id:
             for kid in user.keypairs:
                 if user.keypairs[kid].default:
@@ -1607,7 +1615,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
-    machine_name = machine_name_validator(conn.type, machine_name)
+
     if conn.type is Provider.DOCKER:
         if key_id:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
@@ -2151,6 +2159,28 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
             raise MachineCreationError("Digital Ocean, got exception %s" % e, e)
 
         return node
+
+
+def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
+                            image, disk_path, create_from_existing):
+    """Create a machine in Libvirt.
+    """
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            disk_size=disk_size,
+            ram=ram,
+            cpu=cpu,
+            image=image,
+            disk_path=disk_path,
+            create_from_existing=create_from_existing
+        )
+
+    except Exception as e:
+        raise MachineCreationError("KVM, got exception %s" % e, e)
+
+    return node
 
 
 def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, location):

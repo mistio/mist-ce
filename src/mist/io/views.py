@@ -468,8 +468,23 @@ def create_machine(request):
         key_id = request.json_body.get('key')
         machine_name = request.json_body['name']
         location_id = request.json_body.get('location', None)
-        image_id = request.json_body['image']
-        size_id = request.json_body['size']
+        if request.json_body.get('provider') == 'libvirt':
+            size_id = None
+            image_id = request.json_body.get('image')
+            disk_size = int(request.json_body.get('libvirt_disk_size', 4))
+            ram = int(request.json_body.get('libvirt_ram', 512))
+            cpu = int(request.json_body.get('libvirt_cpu', 1))
+            custom_image_path = request.json_body.get('libvirt_image_path')
+
+            if custom_image_path:
+                image_id = custom_image_path
+            disk_path = request.json_body.get('libvirt_disk_path', '')
+            create_from_existing = request.json_body.get('libvirt_existing_disk_path')
+
+        else:
+            size_id = request.json_body['size']
+            image_id = request.json_body['image']
+            disk_size = ram = cpu = disk_path = create_from_existing = None
         # deploy_script received as unicode, but ScriptDeployment wants str
         script = str(request.json_body.get('script', ''))
         # these are required only for Linode/GCE, passing them anyway
@@ -516,7 +531,9 @@ def create_machine(request):
               'azure_port_bindings': azure_port_bindings,
               'hostname': hostname, 'plugins': plugins,
               'post_script_id': post_script_id,
-              'post_script_params': post_script_params}
+              'post_script_params': post_script_params, 'disk_size': disk_size,
+              'ram': ram, 'cpu': cpu, 'disk_path': disk_path,
+              'create_from_existing': create_from_existing}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
