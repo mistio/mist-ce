@@ -28,9 +28,9 @@ define('app/views/network_create', ['app/views/controlled'],
                 return Mist.networkCreateController.network.backend && Mist.networkCreateController.network.backend.get('isOpenStack');
             }),
 
-            isDisabled: function() {
-                return !Mist.backendsController.hasOpenStack;
-            }.property('Mist.backendsController.hasOpenStack'),
+            isDisabled: Ember.computed('Mist.backendsController.canHaveNetworks', function() {
+                return !Mist.backendsController.get('canHaveNetworks');
+            }),
 
 
             /**
