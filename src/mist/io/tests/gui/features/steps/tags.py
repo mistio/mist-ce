@@ -1,7 +1,7 @@
 import re
-from mist.io.tests.gui.features.steps.general import *
 from time import time, sleep
 from selenium.webdriver.remote.webelement import *
+from mist.io.tests.gui.features.steps.general import *
 
 
 
@@ -14,7 +14,9 @@ def delete_previous_tags(context):
         tag_input = tag.find_elements_by_css_selector("input")
         textfield_key = tag_input[0]
         textfield_value =tag_input[1]
-        if textfield_key.text != " " and textfield_key.text != " ":
+        textfield_key_text = safe_get_element_text(textfield_key)
+        textfield_value_text = safe_get_element_text(textfield_value)
+        if textfield_key_text != " " and textfield_value_text != " ":
             textfield_value.clear()
             textfield_key.clear()
         else:
@@ -50,7 +52,8 @@ def check_the_tags(context,my_key,my_value):
     check_tags = context.browser.find_elements_by_css_selector("#single-machine-info div.tag.pairs")
     words=[]
     for tag in check_tags:
-        tag_lst = tag.text.split("=")
+        tag_text = safe_get_element_text(tag)
+        tag_lst = tag_text.split("=")
         words.append(tag_lst)
 
     if [my_key,my_value] in words:

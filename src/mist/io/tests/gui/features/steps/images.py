@@ -1,5 +1,6 @@
 from behave import *
 from time import time, sleep
+from mist.io.tests.gui.features.steps.general import *
 
 
 @then(u'Images list should be loaded within {seconds} seconds')
@@ -37,7 +38,8 @@ def star_image(context, text):
     images = images_list.find_elements_by_tag_name("li")
 
     for image in images:
-        if text in image.text:
+        image_text = safe_get_element_text(image)
+        if text in image_text:
             star_button = image.find_element_by_class_name("ui-checkbox")
             star_button.click()
             context.mist_config['PREVIOUS_IMAGE_NAME'] = image.find_element_by_tag_name('h3').text
@@ -58,7 +60,8 @@ def unstar_image(context, text):
     if text == 'the_name_that_i_used_before':
         text = context.mist_config['PREVIOUS_IMAGE_NAME']
     for image in images:
-        if text in image.text:
+        image_text = safe_get_element_text(image)
+        if text in image_text:
             star_button = image.find_element_by_class_name("ui-checkbox")
             star_button.click()
             return

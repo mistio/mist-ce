@@ -17,7 +17,7 @@ def check_sorting(context, sorting_param):
 
     machines_elements = context.browser.find_elements_by_css_selector('#machine-list-container li '+sorting_selector)
     #list with machine's names
-    machines_names_list = [machine_element.text for machine_element in machines_elements]
+    machines_names_list = [safe_get_element_text(machine_element) for machine_element in machines_elements]
     #sorting the machine list
     my_sorted_machines_list = sorted(machines_names_list)
     #lists are sorted and they have the same number of elements
@@ -136,7 +136,8 @@ def get_machine(context, name):
         machines = placeholder.find_elements_by_tag_name("li")
 
         for machine in machines:
-            if name in machine.text:
+            machine_text = safe_get_element_text(machine)
+            if name in machine_text:
                 return machine
 
         return None
@@ -174,7 +175,8 @@ def wait_for_loader_to_finish(context, seconds):
     rows = context.browser.find_elements_by_tag_name('tr')
     for row in rows:
         cells = row.find_elements_by_tag_name('td')
-        if cells[0].text == 'Last probed':
+        cells_text = safe_get_element_text(cells[0])
+        if cells_text == 'Last probed':
             end_time = time() + int(seconds)
             while time() < end_time:
                 try:
@@ -192,7 +194,8 @@ def success(context):
     try:
         popup = context.browser.find_element_by_id('machine-userPort-popup-popup')
         div = popup.find_element_by_class_name('message')
-        if div.text == 'Cannot connect as root on port 22':
+        div_text = safe_get_element_text(div)
+        if div_text == 'Cannot connect as root on port 22':
             raise ValueError('Could not connect with server with ssh key')
     except NoSuchElementException:
         pass
@@ -203,10 +206,12 @@ def check_probing(context):
     rows = context.browser.find_elements_by_tag_name('tr')
     for row in rows:
         cells = row.find_elements_by_tag_name('td')
-        if cells[0].text == 'Last probed':
-            message = cells[1].text.split('\n')[0].lower()
+        cells_zero_text = safe_get_element_text(cells[0])
+        if cells_zero_text == 'Last probed':
+            cells_one_text = safe_get_element_text(cells[1])
+            message = cells_one_text.split('\n')[0].lower()
             assert message == 'just now', "Probing of machine failed" \
-                                          "(message is: %s)" % cells[1].text
+                                          "(message is: %s)" % cells_one_text
             return
     assert False, "Could not find any line about probing"
 
@@ -216,7 +221,8 @@ def ssh_key_is_added(context, ssh_key_name):
     # first we have to find the keys button
     buttons = context.browser.find_elements_by_class_name('ui-btn')
     for button in buttons:
-        if 'add key' in button.text.lower():
+        button_text = safe_get_element_text(button)
+        if 'add key' in button_text.lower():
             # if there no keys then it will be called "Add key"
             context.execute_steps(u"""
                 Then I click the button "Add key"
@@ -245,7 +251,7 @@ def ssh_key_is_added(context, ssh_key_name):
             """)
             context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
             return
-        elif 'keys' in button.text.lower():
+        elif 'keys' in button_text.lower():
             # otherwise it will be called "? keys" where ? is the number of
             # saved keys. before adding the key we need to check if it's already
             # saved
@@ -258,13 +264,14 @@ def ssh_key_is_added(context, ssh_key_name):
                 "small-list-item")
             checked_texts = []
             for machines_key in machines_keys:
-                if not machines_key.text or not machines_key.text.strip():
+                machines_key_text = safe_get_element_text(machines_key)
+                if not machines_key_text or not machines_key_text.strip():
                     # sometimes the code checks for the texts too fast and they
                     # haven't been fetched yet so we do a sleep
                     sleep(1)
-                checked_texts.append(machines_key.text)
+                checked_texts.append(machines_key_text)
                 if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']\
-                        in machines_key.text:
+                        in machines_key_text:
                     context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
                     context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
                     return
@@ -304,7 +311,8 @@ def update_lines(terminal, lines):
     all_lines = terminal.find_elements_by_tag_name('div')
     safety_counter = max_safety_count = 5
     for i in range(len(lines), len(all_lines)):
-        line = all_lines[i].text.rstrip().lstrip()
+        all_lines_text = safe_get_element_text(all_lines[i])
+        line = all_lines_text.rstrip().lstrip()
         if line:
             for j in range(0, max_safety_count - safety_counter):
                 lines.append(" ")
@@ -318,7 +326,8 @@ def update_lines(terminal, lines):
 def update_single_line(terminal, lines, index):
     assert index >= 0 and index < len(lines), "Wrong single line index %s" % index
     all_lines = terminal.find_elements_by_tag_name('div')
-    lines[index] = all_lines[index].text.rstrip().lstrip()
+    all_lines_text = safe_get_element_text(all_lines[index])
+    lines[index] = all_lines_text.text.rstrip().lstrip()
 
 
 @then(u'I test the ssh connection')
