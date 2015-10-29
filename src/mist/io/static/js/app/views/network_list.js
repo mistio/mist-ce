@@ -23,10 +23,6 @@ define('app/views/network_list', ['app/views/page'],
                 return this.get('sortByTerm') == 'provider';
             }),
 
-            sortByStatus: Ember.computed('sortByTerm', function () {
-                return this.get('sortByTerm') == 'status';
-            }),
-
             sortedNetworks: Ember.computed('filteredNetworks', 'filteredNetworks.@each.name', 'sortByTerm', function() {
                 if(this.get('filteredNetworks'))
                 {
@@ -38,11 +34,6 @@ define('app/views/network_list', ['app/views/page'],
                     if (this.get('sortByProvider'))
                     {
                         return this.get('filteredNetworks').sortBy('provider.title').reverse();
-                    }
-
-                    if (this.get('sortByStatus'))
-                    {
-                        return this.get('filteredNetworks').sortBy('status').reverse();
                     }
                 }
             }),
