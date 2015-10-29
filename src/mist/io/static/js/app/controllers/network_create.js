@@ -130,7 +130,6 @@ define('app/controllers/network_create', ['ember'],
                     if (subnet.address !== null && subnet.address.length)
                         payload.subnet.cidr = subnet.address;
 
-                    console.log(subnet.disableGateway);
                     if (!subnet.disableGateway)
                         payload.subnet.gateway_ip = subnet.gatewayIP;
 
