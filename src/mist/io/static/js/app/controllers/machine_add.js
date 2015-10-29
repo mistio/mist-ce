@@ -255,7 +255,7 @@ define('app/controllers/machine_add', ['ember'],
             },
 
             _updateLibvirtPath: function() {
-                if (this.get('newMachineProvider') && this.get('newMachineProvider.provider') == 'libvirt' && this.get('newMachineName')) {
+                if (this.get('newMachineProvider.provider') == 'libvirt' && this.get('newMachineName')) {
                     this.set('newMachineLibvirtDiskPath', '/var/lib/libvirt/images/' + this.get('newMachineName') + '.img');
                 }
             },
@@ -278,7 +278,7 @@ define('app/controllers/machine_add', ['ember'],
 
             nameLibvirtObserver: function() {
                 Ember.run.next(this, '_updateLibvirtPath');
-            }.observes('newMachineName'),
+            }.observes('newMachineName', 'newMachineProvider.title'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
