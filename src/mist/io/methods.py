@@ -1710,17 +1710,18 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             post_script_id=post_script_id,
             post_script_params=post_script_params,
         )
-    elif conn.type == Provider.OPENSTACK and associate_floating_ip:
-        networks = list_networks(user, backend_id)
-        mist.io.tasks.openstack_post_create_steps.delay(
-            user.email, backend_id, node.id, monitoring, script, key_id,
-            node.extra.get('username'), node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params,
-            networks=networks
-        )
+    elif conn.type == Provider.OPENSTACK:
+        if associate_floating_ip:
+            networks = list_networks(user, backend_id)
+            mist.io.tasks.openstack_post_create_steps.delay(
+                user.email, backend_id, node.id, monitoring, script, key_id,
+                node.extra.get('username'), node.extra.get('password'), public_key,
+                script_id=script_id, script_params=script_params, job_id = job_id,
+                hostname=hostname, plugins=plugins,
+                post_script_id=post_script_id,
+                post_script_params=post_script_params,
+                networks=networks
+            )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key

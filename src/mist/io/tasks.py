@@ -344,9 +344,6 @@ def openstack_post_create_steps(self, email, backend_id, machine_id, monitoring,
                 node = n
                 break
 
-        log.error("IPS")
-        log.error(node.public_ips)
-
         if node and node.state == 0 and len(node.public_ips):
             # filter out IPv6 addresses
             ips = filter(lambda ip: ':' not in ip, node.public_ips)

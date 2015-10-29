@@ -498,7 +498,7 @@ def create_machine(request):
         # hostname: if provided it will be attempted to assign a DNS name
         hostname = request.json_body.get('hostname', '')
         plugins = request.json_body.get('plugins')
-        associate_floating_ip = request.json_body.get('attach_floating_ip', False)
+        associate_floating_ip = request.json_body.get('associate_floating_ip', False)
         associate_floating_ip_subnet = request.json_body.get('attach_floating_ip_subnet', None)
     except Exception as e:
         raise RequiredParameterMissingError(e)
