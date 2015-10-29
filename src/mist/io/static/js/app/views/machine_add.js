@@ -138,8 +138,6 @@ define('app/views/machine_add', ['app/views/controlled'],
                 Ember.run.next(function(){
                     $( "#create-machine" ).collapsible({
                         collapse: function(event, ui) {
-                            Mist.machineAddController.close();
-
                             $(this).children().next().slideUp(250);
                             var id = $(this).attr('id'),
                             overlay = id ? $('#' + id+'-overlay') : false;
@@ -173,6 +171,9 @@ define('app/views/machine_add', ['app/views/controlled'],
                     dockerNeedScript: false,
                     hasAdvancedScript: false
                 });
+                $('#create-machine-floating-ip .ui-checkbox > .ui-btn')
+					.removeClass('ui-checkbox-off')
+					.addClass('ui-checkbox-on');
              },
 
              checkImageSelected: function(image) {
@@ -212,6 +213,11 @@ define('app/views/machine_add', ['app/views/controlled'],
                     if ($('.ui-listview').listview) {
                         $('.ui-listview').listview()
                                          .listview('refresh');
+                    }
+
+                    // Render checkboxes
+                    if ($('.ember-checkbox').checkboxradio) {
+                        $('.ember-checkbox').checkboxradio().checkboxradio('refresh');
                     }
                 });
              },
@@ -298,9 +304,6 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                 toggleNetworkSelection: function (network) {
                     network.set('selected', !network.selected);
-                    $('#create-machine-machine')
-                        .collapsible('option', 'collapsedIcon', 'check')
-                        .collapsible('collapse');
                 },
 
 
@@ -348,6 +351,19 @@ define('app/views/machine_add', ['app/views/controlled'],
                     if (this.changeProviderFlag) Mist.machineAddController._resetProvider();
                  });
              }.observes('Mist.machineAddController.newMachineProvider'),
+
+             networksObserver: function() {
+                 console.log('i run');
+                 Ember.run.once(this, function () {
+                    if (this.get('hasOpenstack')) {
+                        if (Mist.machineAddController.newMachineProvider.networks.model.filterBy('selected', true).length) {
+                            $('#create-machine-floating-ip').slideDown();
+                        } else {
+                            $('#create-machine-floating-ip').slideUp();
+                        }
+                    }
+                 });
+             }.observes('hasOpenstack', 'Mist.machineAddController.newMachineProvider.networks.model.@each.selected')
         });
     }
 );

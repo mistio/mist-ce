@@ -24,6 +24,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineLocation: null,
             newMachineProvider: null,
             newMachineMonitoring: true,
+            newMachineAssociateFloatingIp: true,
             newMachineDockerCommand: null,
             newMachineDockerEnvironment: null,
             newMachineDockerPorts: null,
@@ -40,7 +41,7 @@ define('app/controllers/machine_add', ['ember'],
                 // Scrolling to top fixes that
                 $('#machine-create').find('[data-role="collapsible"]')
                     .collapsible('option', 'collapsedIcon', 'carat-d')
-                    .collapsible('collapse');          
+                    .collapsible('collapse');
 
                 this._clear();
                 this._updateFormReady();
@@ -115,6 +116,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineKey,
                         this.newMachineScript,
                         this.newMachineMonitoring,
+                        this.newMachineAssociateFloatingIp,
                         this.newMachineDockerEnvironment.trim(),
                         this.newMachineDockerCommand,
                         this.newMachineScriptParams,
@@ -147,6 +149,7 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
                     .set('newMachineProvider', {'title' : 'Select Provider'})
+                    .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
                     .set('newMachineScriptParams', '')
@@ -202,6 +205,7 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
+                    .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
                     .set('newMachineScriptParams', '')
