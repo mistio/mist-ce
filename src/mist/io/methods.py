@@ -3240,7 +3240,7 @@ def delete_network(user, backend_id, network_id):
     conn = connect_provider(backend)
     if conn.type is Provider.OPENSTACK:
         try:
-            conn.ex_delete_neutron_network(network_id)
+            conn.ex_delete_network(network_id)
         except Exception as e:
             raise NetworkError(e)
     elif conn.type is Provider.HPCLOUD:
