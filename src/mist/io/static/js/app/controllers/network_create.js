@@ -29,6 +29,7 @@ define('app/controllers/network_create', ['ember'],
                         name: null,
                         backend: null,
                         adminStateUp: true,
+						createRouter: null,
                         createSubnet: null
                     });
                     this.subnet.clear();

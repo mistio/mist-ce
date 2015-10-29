@@ -19,6 +19,11 @@
 #script-list-page #select-scripts-btn:hover {
     color: #444 !important;
 }
+#select-scripts-popup .icon-check:after {
+    font-size: 14px;
+    top: 1.3em;
+    color: #d4d4d4;
+}
 #script-list-page .ui-filterable .ui-input-search {
     margin-right: 230px !important;
 }
@@ -38,7 +43,38 @@
 }
 #script-list {
     box-shadow: none;
-    margin-top: -52px;
+    margin-top: -48px;
+}
+#script-list-page .script-search-container {
+    position: relative;
+    top: -56px;
+    margin-left: 50px;
+    margin-right: 230px;
+}
+
+#script-list-page .script-search {
+    padding-right: 35px;
+}
+
+#script-list-page .script-search-container [class*='icon-'] {
+    color: #7f7f7f;
+    display: inline-block;
+    background-color: #e8e8e8;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    padding: 0 8px 0 10px;
+    box-sizing: border-box;
+    height: 30.8px;
+    line-height: 30.8px;
+}
+#script-list-page .script-search-container [class*='icon-']:after {
+    font-size: 14px;
+    color: #444;
+}
+
+#script-list-page .script-search-container .icon-xx:hover {
+    cursor: pointer;
 }
 #script-list .script-tags {
     text-align: center;
@@ -49,4 +85,10 @@
 }
 .script-name {
     font-weight: 400;
+}
+
+@media only screen and  (max-width: 600px) {
+    #script-list-page .script-search-container {
+        margin-right: 90px;
+    }
 }

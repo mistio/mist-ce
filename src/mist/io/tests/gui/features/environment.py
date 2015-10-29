@@ -1,7 +1,5 @@
 import random
 
-from behaving import environment as benv
-
 try:
     from mist.io.tests.settings import CREDENTIALS, LOCAL, DEBUG, BASE_DIR, \
                                        MIST_URL, MAIL_PATH
@@ -13,7 +11,6 @@ from mist.io.tests.helpers.selenium_utils import choose_driver
 
 
 def before_all(context):
-    benv.before_all(context)
     context.browser = choose_driver()
 
     context.mist_config = dict()

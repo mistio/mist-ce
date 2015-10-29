@@ -3274,8 +3274,6 @@ def set_machine_tags(user, backend_id, machine_id, tags):
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     backend = user.backends[backend_id]
-    if not tags:
-        raise BadRequestError('tags should be list of tags')
 
     conn = connect_provider(backend)
 
@@ -3293,6 +3291,26 @@ def set_machine_tags(user, backend_id, machine_id, tags):
 
     if conn.type in config.EC2_PROVIDERS:
         try:
+            # first get a list of current tags. Make sure
+            # the response dict gets utf-8 encoded
+            # then delete tags and update with the new ones
+            ec2_tags = conn.ex_describe_tags(machine)
+            ec2_tags.pop('Name')
+            encoded_ec2_tags = {}
+            for ec2_key, ec2_value in ec2_tags.items():
+                if type(ec2_key) ==  unicode:
+                    ec2_key = ec2_key.encode('utf-8')
+                if type(ec2_value) ==  unicode:
+                    ec2_value = ec2_value.encode('utf-8')
+                encoded_ec2_tags[ec2_key] = ec2_value
+            conn.ex_delete_tags(machine, encoded_ec2_tags)
+            # ec2 resource can have up to 10 tags, with one of them being the Name
+            if len(tags_dict) > 9:
+                tags_keys = tags_dict.keys()[:9]
+                pop_keys = [key for key in tags_dict.keys() if key not in tags_keys]
+                for key in pop_keys:
+                    tags_dict.pop(key)
+
             conn.ex_create_tags(machine, tags_dict)
         except Exception as exc:
             raise BackendUnavailableError(backend_id, exc)
