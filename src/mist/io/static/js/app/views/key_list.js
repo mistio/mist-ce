@@ -119,6 +119,11 @@ define('app/views/key_list', ['app/views/page'],
 
                 clearClicked: function() {
                     Mist.keysController.clearSearch();
+                },
+
+
+                sortBy: function (criteria) {
+                    Mist.keysController.set('sortByTerm', criteria);
                 }
             }
         });

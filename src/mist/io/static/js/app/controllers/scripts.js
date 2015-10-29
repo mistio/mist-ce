@@ -11,6 +11,58 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
         return BaseArrayController.extend({
 
             baseModel: ScriptModel,
+            searchTerm: null,
+            sortByTerm: 'name',
+
+            //
+            //  Computed Properties
+            //
+
+            sortByName: Ember.computed('sortByTerm', function () {
+                return this.get('sortByTerm') == 'name';
+            }),
+
+            sortByType: Ember.computed('sortByTerm', function () {
+                return this.get('sortByTerm') == 'type';
+            }),
+
+            filteredScripts: Ember.computed('model', 'searchTerm', function() {
+                var filteredScripts = [];
+
+                if (this.searchTerm) {
+                    var that = this;
+                    this.model.forEach(function(script) {
+                        var regex = new RegExp(that.searchTerm, 'i');
+
+                        if (regex.test(script.name)) {
+                            filteredScripts.push(script);
+                        } else {
+                            if (script.selected) {
+                                script.set('selected', false);
+                            }
+                        }
+                    });
+                } else {
+                    filteredScripts = this.model;
+                }
+
+                return filteredScripts;
+            }),
+
+            sortedScripts: Ember.computed('filteredScripts', 'filteredScripts.@each.name', 'filteredScripts.@each.type', 'sortByTerm', function() {
+                if(this.get('filteredScripts'))
+                {
+                    if (this.get('sortByName'))
+                    {
+                        return this.get('filteredScripts').sortBy('name');
+                    }
+
+                    if (this.get('sortByType'))
+                    {
+                        return this.get('filteredScripts').sortBy('type');
+                    }
+                }
+            }),
 
             addScript: function (args) {
                 var that = this;
@@ -89,6 +141,10 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 if (this.scriptRequest) {
                     return this.getObject(this.scriptRequest);
                 }
+            },
+
+            clearSearch: function() {
+                this.set('searchTerm', null);
             },
 
             _renameScript: function (script, name, description) {

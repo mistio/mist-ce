@@ -5,7 +5,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 from selenium.webdriver.remote.webelement import *
 
 
@@ -89,29 +89,24 @@ def wait_for_splash_to_load(context, timeout=60):
 
         if 'none' in display:
             return
-    assert False, u'Page took longer than %s seconds to load' % str(timeout)
+    assert False, 'Page took longer than %s seconds to load' % str(timeout)
 
 
-@then(u'I wait for {seconds} seconds')
+@step(u'I wait for {seconds} seconds')
 def wait(context, seconds):
     sleep(int(seconds))
 
 
-@when(u'I wait for {seconds} seconds')
-def wait(context, seconds):
-    sleep(int(seconds))
-
-
-@then(u'I expect for "{panel_title}" panel to {action} within max {seconds} '
+@then(u'I expect for "{panel_id}" panel to {action} within max {seconds} '
       u'seconds')
-def panel_waiting_with_timeout(context, panel_title, action, seconds):
+def panel_waiting_with_timeout(context, panel_id, action, seconds):
     """
     Function that waits for panel to appear but for a maximum amount of time
     """
     if action == 'appear':
-        css_selector = '#%s:not([class*="ui-collapsible-collapsed"])' % panel_title
+        css_selector = '#%s:not([class*="ui-collapsible-collapsed"])' % panel_id
     elif action == 'disappear':
-        css_selector = '#%s[class*="ui-collapsible-collapsed"]' % panel_title
+        css_selector = '#%s[class*="ui-collapsible-collapsed"]' % panel_id
     else:
         raise ValueError("Action can be either appear or disappear. Duh!")
     try:
@@ -119,28 +114,49 @@ def panel_waiting_with_timeout(context, panel_title, action, seconds):
             EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
     except TimeoutException:
         raise TimeoutException("Panel %s did not %s after %s seconds"
-                               % (panel_title, action, seconds))
+                               % (panel_id, action, seconds))
 
 
-@then(u'I expect for "{popup_name}" popup to {action} within max {seconds} '
+@then(u'I expect for "{popup_id}" popup to {action} within max {seconds} '
       u'seconds')
-def popup_waiting_with_timeout(context, popup_name, action, seconds):
+def popup_waiting_with_timeout(context, popup_id, action, seconds):
     """
     Function that wait for keyadd-popup to appear but for a maximum
     amount of time
     """
     if action == 'appear':
-        css_selector = '#%s[class*="ui-popup-active"]' % popup_name
+        css_selector = '#%s[class*="ui-popup-active"]' % popup_id
     elif action == 'disappear':
-        css_selector = '#%s[class*="ui-popup-hidden"]' % popup_name
+        css_selector = '#%s[class*="ui-popup-hidden"]' % popup_id
     else:
         raise ValueError("Action can be either appear or disappear. Duh!")
     try:
         WebDriverWait(context.browser, int(seconds)).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
     except TimeoutException:
-        raise TimeoutException("Panel %s did not %s after %s seconds"
-                               % (popup_name, action, seconds))
+        raise TimeoutException("Popup %s did not %s after %s seconds"
+                               % (popup_id, action, seconds))
+
+
+@then(u'I expect for "{side_panel_id}" side panel to {action} within max '
+      u'{seconds} seconds')
+def side_panel_waiting_with_timeout(context, side_panel_id, action, seconds):
+    """
+    Function that wait for keyadd-popup to appear but for a maximum
+    amount of time
+    """
+    if action == 'appear':
+        css_selector = '#%s[class*="ui-panel-open"]' % side_panel_id
+    elif action == 'disappear':
+        css_selector = '#%s[class*="ui-panel-closed"]' % side_panel_id
+    else:
+        raise ValueError("Action can be either appear or disappear. Duh!")
+    try:
+        WebDriverWait(context.browser, int(seconds)).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+    except TimeoutException:
+        raise TimeoutException("Side panel %s did not %s after %s seconds"
+                               % (side_panel_id, action, seconds))
 
 
 @then(u'I expect for "{page_title}" page to appear within max {seconds} seconds')
@@ -181,11 +197,11 @@ def loader_name_waiting_with_timeout(context, loader_name, seconds):
     end = time() + int(seconds)
     while time() < end:
         try:
-            loader = context.browser.find_element_by_id(loader_name)
+            context.browser.find_element_by_id(loader_name)
             sleep(1)
         except NoSuchElementException:
             return
-    assert False, u'Loader %s did not finish after %s seconds' % (loader_name,
+    assert False, 'Loader %s did not finish after %s seconds' % (loader_name,
                                                                   seconds)
 
 
@@ -193,7 +209,7 @@ def loader_name_waiting_with_timeout(context, loader_name, seconds):
       u'seconds')
 def become_visible_waiting_with_timeout(context, element_id, seconds):
     try:
-        WebDriverWait(context.browser, 2).until(EC.visibility_of_element_located((By.ID, element_id)))
+        WebDriverWait(context.browser, int(seconds)).until(EC.visibility_of_element_located((By.ID, element_id)))
     except TimeoutException:
         raise TimeoutException("element with id %s did not become visible "
                                "after %s seconds" % (element_id, seconds))
@@ -203,18 +219,24 @@ def become_visible_waiting_with_timeout(context, element_id, seconds):
       u'seconds')
 def become_visible_waiting_with_timeout(context, element_id, seconds):
     try:
-        WebDriverWait(context.browser, 2).until(EC.element_to_be_clickable((By.ID, element_id)))
+        WebDriverWait(context.browser, int(seconds)).until(EC.element_to_be_clickable((By.ID, element_id)))
     except TimeoutException:
         raise TimeoutException("element with id %s did not become visible "
                                "after %s seconds" % (element_id, seconds))
 
 
-@then(u'I click the button "{text}"')
-def then_click(context, text):
-    return click_button(context, text)
+@then(u'I expect for buttons inside "{element_id}" to be '
+      u'clickable within max {seconds} seconds')
+def become_visible_waiting_with_timeout(context, element_id, seconds):
+    try:
+        wrapper = context.browser.find_element_by_id(element_id)
+        WebDriverWait(wrapper, int(seconds)).until(EC.element_to_be_clickable((By.CLASS_NAME, 'ui-btn')))
+    except TimeoutException:
+        raise TimeoutException("element with id %s did not become visible "
+                               "after %s seconds" % (element_id, seconds))
 
 
-@when(u'I click the button "{text}"')
+@step(u'I click the button "{text}"')
 def click_button(context, text):
     """
     This function will try to click a button that says exactly the same thing as
@@ -230,7 +252,11 @@ def click_button(context, text):
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
-        if popup.lower() in pop.text.lower():
+        title = pop.find_elements_by_class_name('ui-title')
+        if len(title) == 0:
+            continue
+        title = title[0].text
+        if popup.lower() in title.lower():
             if text == '_x_':
                 buttons = pop.find_elements_by_class_name("close")
                 assert len(buttons) > 0, "Could not find the close button"
@@ -267,9 +293,9 @@ def click_button_within_panel(context, text, panel_title):
             found_panel = panel
             break
 
-    assert found_panel, u'Panel with Title %s could not be found. Maybe the ' \
-                        u'driver got refocused or the panel failed to open or '\
-                        u'there is no panel with that title' % panel_title
+    assert found_panel, 'Panel with Title %s could not be found. Maybe the ' \
+                        'driver got refocused or the panel failed to open or '\
+                        'there is no panel with that title' % panel_title
 
     buttons = found_panel.find_elements_by_class_name("ui-btn")
     click_button_from_collection(context, text, buttons,
@@ -299,19 +325,24 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # element of the list
     # also doing some cleaning if the text attribute also sends back texts
     # of sub elements
-    button = filter(lambda b: b.text.rstrip().lstrip().split('\n')[0].lower() == text.lower()
-                    and b.value_of_css_property('display') == 'block',
-                    button_collection)
-    if len(button) > 0:
-        return button[0]
+
+    for button in button_collection:
+        try:
+            if button.text.rstrip().lstrip().split('\n')[0].lower() == text.lower():
+                return button
+        except StaleElementReferenceException:
+            pass
 
     # if we haven't found the exact text then we search for something that
     # looks like it
     for button in button_collection:
-        button_text = button.text.split('\n')
-        if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
-            return button
-
+        try:
+            button_text = button.text.split('\n')
+            if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
+                return button
+        except StaleElementReferenceException:
+            pass
+        
     return None
 
 
@@ -372,8 +403,8 @@ def some_counter_loaded(context, counter_title, counter_number, seconds):
         else:
             sleep(2)
 
-    assert False, u'The counter did not say that more than %s images were ' \
-                  u'loaded' % counter_number
+    assert False, 'The counter did not say that more than %s images were ' \
+                  'loaded' % counter_number
 
 
 @when(u'I visit the {title} page after the counter has loaded')
@@ -458,3 +489,18 @@ def go_to_some_page_without_waiting(context, title):
         except NoSuchElementException:
             pass
         sleep(1)
+
+
+@when(u'I search for a "{text}" {type_of_search}')
+def search_for_something(context, text, type_of_search):
+    type_of_search = type_of_search.lower()
+    if type_of_search not in ['machine', 'key', 'image', 'script', 'network']:
+        raise ValueError("This is type of object does not exist(%s)" % type_of_search)
+    search_bar = context.browser.find_elements_by_class_name("%s-search" % type_of_search)
+    assert len(search_bar) > 0, "Could not find the %s-search search input" % type_of_search
+    assert len(search_bar) == 1, "Found more than one %s-search search input " \
+                                 "elements" % type_of_search
+    search_bar = search_bar[0]
+    for letter in text:
+        search_bar.send_keys(letter)
+    sleep(2)
