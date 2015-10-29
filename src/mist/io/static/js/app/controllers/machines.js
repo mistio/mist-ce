@@ -41,7 +41,7 @@ define('app/controllers/machines', ['app/models/machine'],
             //  Methods
             //
 
-            newMachine: function(name, image, size, location, key, script, monitoring,
+            newMachine: function(provider, name, image, size, location, key, script, monitoring,
                 dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtCPU, libvirtRAM, libvirtDiskSize, libvirtDiskPath, libvirtImagePath, libvirtExistingDiskPath) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -92,6 +92,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
+                        'provider': provider,
                         'name': name,
                         'key': key ? key.id : null,
                         'size': size.id,

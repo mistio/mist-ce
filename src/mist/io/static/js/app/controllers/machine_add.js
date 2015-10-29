@@ -111,9 +111,10 @@ define('app/controllers/machine_add', ['ember'],
                         return;
                     }
                 }
-
+                
                 var that = this;
                 this.newMachineProvider.machines.newMachine(
+                        this.newMachineProvider.provider,
                         this.newMachineName,
                         this.newMachineImage,
                         this.newMachineSize,
