@@ -859,7 +859,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                          post_script_id='', post_script_params='',
                          quantity=1, persist=False, job_id=None,
                          docker_port_bindings={}, docker_exposed_ports={},
-                         azure_port_bindings='', hostname='', plugins=None):
+                         azure_port_bindings='', hostname='', plugins=None,
+                         associate_floating_ip=False):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -894,7 +895,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
             {'hostname': hostname, 'plugins': plugins,
              'post_script_id': post_script_id,
              'post_script_params': post_script_params,
-             'azure_port_bindings': azure_port_bindings}
+             'azure_port_bindings': azure_port_bindings,
+             'associate_floating_ip': associate_floating_ip}
         ))
 
     def create_machine_wrapper(args_kwargs):
