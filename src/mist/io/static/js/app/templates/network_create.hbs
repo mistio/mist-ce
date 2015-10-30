@@ -25,7 +25,6 @@
             Allow only openstack backends for now
         -->
         <div id="network-create-backend-wrapper">
-
             <label for="network-create-backend">Cloud</label>
 
             <div id="network-create-backend"
@@ -220,7 +219,7 @@
 					<!--
 						Create Router
 					-->
-
+                    {{#unless view.isOpenstack}}
 					<div id="network-create-router-wrapper">
 
 						{{view Mist.Checkbox
@@ -259,6 +258,7 @@
 							</div>
 						</div>
 					</div>
+                    {{/unless}}
 
 
                     <!--

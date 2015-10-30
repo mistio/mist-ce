@@ -23,6 +23,14 @@ define('app/models/network', [
             backend: null,
             //ipAddresses: null,
 
+            isPublic: Ember.computed('router_external', function() {
+                return this.get('router_external') == true;
+            }),
+
+            isPrivate: Ember.computed('router_external', function() {
+                return this.get('router_external') == false;
+            }),
+
 
             //
             //  Methods

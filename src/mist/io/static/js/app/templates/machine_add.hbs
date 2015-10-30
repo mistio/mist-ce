@@ -218,6 +218,16 @@
                 {{/each}}
             </fieldset>
         </div>
+
+        <div id="create-machine-floating-ip">
+            {{view Mist.Checkbox
+            data-theme="a"
+            id="associate_floating_ip"
+            checked=Mist.machineAddController.newMachineAssociateFloatingIp}}
+            <label for="associate_floating_ip" data-corners="false">
+                Associate Floating Ip
+            </label>
+        </div>
         {{/if}}
 
         <!-- Select Script -->

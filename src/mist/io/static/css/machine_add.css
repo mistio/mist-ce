@@ -198,3 +198,7 @@
 #machine-create .ui-checkbox label.ui-checkbox-off:hover:after {
     color: #444444 !important;
 }
+
+#create-machine-floating-ip {
+    display: none;
+}
