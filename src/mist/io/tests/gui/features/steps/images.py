@@ -28,7 +28,7 @@ def assert_starred_image(context, text):
     starred_images = filter(lambda li: 'staron' in li.get_attribute('class'), images)
     if text == 'the_name_that_i_used_before':
         text = context.mist_config['PREVIOUS_IMAGE_NAME']
-    starred_image = filter(lambda li: text in li.text.lower(), starred_images)
+    starred_image = filter(lambda li: text in safe_get_element_text(li).lower(), starred_images)
     assert len(starred_image) == 1, "Could not find starred image with name %s" % text
 
 
@@ -42,7 +42,8 @@ def star_image(context, text):
         if text in image_text:
             star_button = image.find_element_by_class_name("ui-checkbox")
             star_button.click()
-            context.mist_config['PREVIOUS_IMAGE_NAME'] = image.find_element_by_tag_name('h3').text
+            image = image.find_element_by_tag_name('h3')
+            context.mist_config['PREVIOUS_IMAGE_NAME'] = safe_get_element_text(image)
             return
 
 

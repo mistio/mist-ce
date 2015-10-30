@@ -334,6 +334,8 @@ def click_button_from_collection(context, text, button_collection=None,
 
 
 def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
+    #import ipdb
+    #ipdb.set_trace()
     if not button_collection:
         button_collection = context.browser.find_elements_by_class_name(btn_cls)
     # search for button with exactly the same text. sometimes the driver returns
@@ -391,7 +393,9 @@ def wait_for_buttons_to_appear(context):
         try:
             images_button = search_for_button(context, 'Images')
             counter_span = images_button.find_element_by_class_name("ui-li-count")
+
             counter_span_text = safe_get_element_text(counter_span)
+
             int(counter_span_text)
             break
         except (NoSuchElementException, StaleElementReferenceException,
@@ -523,8 +527,7 @@ def search_for_something(context, text, type_of_search):
 
 def safe_get_element_text(check_element):
     try:
-        if check_element.text:
-            return check_element.text
+        return check_element.text
     except StaleElementReferenceException:
-        return " "
+        return ""
 
