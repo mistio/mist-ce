@@ -48,7 +48,16 @@
 }
 
 #banner-logo {
-    width: 121px;
+    display: inline-block;
+    width: 120px;
+    height: 54px;
+    background: transparent url(images/logo.png) no-repeat left center;
+}
+@media (min-device-pixel-ratio: 2), (-webkit-min-resolution: 192dpi), (min-resolution: 192dpi) {
+    #banner-logo {
+        background: url(images/logo@2x.png) no-repeat left center;
+        background-size: 120px;
+    }
 }
 
 .user-menu {
