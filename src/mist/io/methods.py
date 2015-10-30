@@ -1232,13 +1232,11 @@ def connect_provider(backend):
     if backend.provider not in ['bare_metal', 'coreos']:
         driver = get_driver(backend.provider)
     if backend.provider == Provider.AZURE:
-        #create a temp file and output the cert there, so that
-        #Azure driver is instantiated by providing a string with the key instead of
-        #a cert file
-        temp_key_file = NamedTemporaryFile(delete=False)
-        temp_key_file.write(backend.apisecret)
-        temp_key_file.close()
-        conn = driver(backend.apikey, temp_key_file.name)
+        # create a temp file and output the cert there, so that
+        # Azure driver is instantiated by providing a string with the key instead of
+        # a cert file
+        with get_temp_file(backend.apisecret) as tmp_key_path:
+            conn = driver(backend.apikey, tmp_key_path)
     elif backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
         #as separate provider
@@ -1313,8 +1311,7 @@ def connect_provider(backend):
     elif backend.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if backend.apisecret:
-            with get_temp_file(backend.apisecret) as tmp_key_path:
-                conn = driver(backend.apiurl, user=backend.apikey, ssh_key=tmp_key_path, ssh_port=backend.ssh_port)
+           conn = driver(backend.apiurl, user=backend.apikey, ssh_key=backend.apisecret, ssh_port=backend.ssh_port)
         else:
             conn = driver(backend.apiurl, user=backend.apikey)
     else:
