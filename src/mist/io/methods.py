@@ -1583,11 +1583,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
 
     machine_name = machine_name_validator(conn.type, machine_name)
 
-    if conn.type is Provider.LIBVIRT:
-        node = _create_machine_libvirt(conn, machine_name,
-                                       disk_size, ram, cpu,
-                                       image_id, disk_path, create_from_existing)
-
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
@@ -1681,6 +1676,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type == Provider.VULTR:
         node = _create_machine_vultr(conn, public_key, machine_name, image,
                                          size, location)
+    elif conn.type is Provider.LIBVIRT:
+        node = _create_machine_libvirt(conn, machine_name,
+                                       disk_size, ram, cpu,
+                                       image_id, disk_path, create_from_existing)
     else:
         raise BadRequestError("Provider unknown.")
 
