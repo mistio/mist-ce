@@ -252,7 +252,25 @@ define('app/controllers/machine_add', ['ember'],
 
             _updateLibvirtPath: function() {
                 if (this.get('newMachineProvider.provider') == 'libvirt' && this.get('newMachineName')) {
-                    this.set('newMachineLibvirtDiskPath', '/var/lib/libvirt/images/' + this.get('newMachineName') + '.img');
+                    this.set('newMachineLibvirtDiskPath', '/var/lib/libvirt/images/' + this.get('newMachineName').trim() + '.img');
+                }
+            },
+
+            _removeFieldsBlanks: function() {
+                if (this.get('newMachineName')) {
+                    this.set('newMachineName', this.get('newMachineName').trim());
+                }
+
+                if (this.get('newMachineLibvirtDiskPath')) {
+                    this.set('newMachineLibvirtDiskPath', this.get('newMachineLibvirtDiskPath').trim());
+                }
+
+                if (this.get('newMachineLibvirtImagePath')) {
+                    this.set('newMachineLibvirtImagePath', this.get('newMachineLibvirtImagePath').trim());
+                }
+
+                if (this.get('newMachineLibvirtExistingDiskPath')) {
+                    this.set('newMachineLibvirtExistingDiskPath', this.get('newMachineLibvirtExistingDiskPath').trim());
                 }
             },
 
@@ -272,9 +290,13 @@ define('app/controllers/machine_add', ['ember'],
                 Ember.run.once(this, '_imagesError');
             }.observes('newMachineImage', 'newMachineLibvirtImagePath'),
 
-            nameLibvirtObserver: function() {
+            libvirtPathObserver: function() {
                 Ember.run.next(this, '_updateLibvirtPath');
             }.observes('newMachineName', 'newMachineProvider.title'),
+
+            fieldsBlanksObserver: function() {
+                Ember.run.once(this, '_removeFieldsBlanks');
+            }.observes('newMachineName', 'newMachineLibvirtDiskPath', 'newMachineLibvirtImagePath', 'newMachineLibvirtExistingDiskPath'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
