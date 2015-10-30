@@ -1194,5 +1194,8 @@ var OS_MAP = [
     ],
     [
         ['windows'], 'windows'
+    ],
+    [
+        ['cirros'], 'cirros'
     ]
 ];
