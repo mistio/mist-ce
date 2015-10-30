@@ -325,6 +325,85 @@ def hpcloud_post_create_steps(self, email, backend_id, machine_id, monitoring,
 
 
 @app.task(bind=True, default_retry_delay=2*60)
+def openstack_post_create_steps(self, email, backend_id, machine_id, monitoring,
+                              command, key_id, username, password, public_key,
+                              script_id='', script_params='', job_id=None,
+                              hostname='', plugins=None,
+                              post_script_id='', post_script_params='', networks=[]):
+
+    from mist.io.methods import connect_provider
+    user = user_from_email(email)
+
+    try:
+        conn = connect_provider(user.backends[backend_id])
+        nodes = conn.list_nodes()
+        node = None
+
+        for n in nodes:
+            if n.id == machine_id:
+                node = n
+                break
+
+        if node and node.state == 0 and len(node.public_ips):
+            # filter out IPv6 addresses
+            ips = filter(lambda ip: ':' not in ip, node.public_ips)
+            host = ips[0]
+
+            post_deploy_steps.delay(
+                email, backend_id, machine_id, monitoring, command, key_id,
+                script_id=script_id, script_params=script_params,
+                job_id=job_id, hostname=hostname, plugins=plugins,
+                post_script_id=post_script_id,
+                post_script_params=post_script_params,
+            )
+
+        else:
+            try:
+                created_floating_ips = []
+                for network in networks['public']:
+                    created_floating_ips += [floating_ip for floating_ip in network['floating_ips']]
+
+                # From the already created floating ips try to find one that is not associated to a node
+                unassociated_floating_ip = None
+                for ip in created_floating_ips:
+                    if not ip['node_id']:
+                        unassociated_floating_ip = ip
+                        break
+
+                # Find the ports which are associated to the machine (e.g. the ports of the private ips)
+                # and use one to associate a floating ip
+                ports = conn.ex_list_ports()
+                machine_port_id = None
+                for port in ports:
+                    if port.get('device_id') == node.id:
+                        machine_port_id = port.get('id')
+                        break
+
+                if unassociated_floating_ip:
+                    log.info("Associating floating ip with machine: %s" % node.id)
+                    ip = conn.ex_associate_floating_ip_to_node(unassociated_floating_ip['id'], machine_port_id)
+                else:
+                    # Find the external network
+                    log.info("Create and associating floating ip with machine: %s" % node.id)
+                    ext_net_id = networks['public'][0]['id']
+                    ip = conn.ex_create_floating_ip(ext_net_id, machine_port_id)
+
+                post_deploy_steps.delay(
+                    email, backend_id, machine_id, monitoring, command, key_id,
+                    script_id=script_id, script_params=script_params,
+                    job_id=job_id, hostname=hostname, plugins=plugins,
+                    post_script_id=post_script_id,
+                    post_script_params=post_script_params,
+                )
+
+            except:
+                raise self.retry(exc=Exception(), max_retries=20)
+    except Exception as exc:
+        if str(exc).startswith('Retry'):
+            raise
+
+
+@app.task(bind=True, default_retry_delay=2*60)
 def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
                             command, key_id, username, password, public_key,
                             script_id='', script_params='', job_id=None,
@@ -777,7 +856,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                          post_script_id='', post_script_params='',
                          quantity=1, persist=False, job_id=None,
                          docker_port_bindings={}, docker_exposed_ports={},
-                         azure_port_bindings='', hostname='', plugins=None):
+                         azure_port_bindings='', hostname='', plugins=None,
+                         associate_floating_ip=False, associate_floating_ip_subnet=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -812,7 +892,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
             {'hostname': hostname, 'plugins': plugins,
              'post_script_id': post_script_id,
              'post_script_params': post_script_params,
-             'azure_port_bindings': azure_port_bindings}
+             'azure_port_bindings': azure_port_bindings,
+             'associate_floating_ip': associate_floating_ip}
         ))
 
     def create_machine_wrapper(args_kwargs):

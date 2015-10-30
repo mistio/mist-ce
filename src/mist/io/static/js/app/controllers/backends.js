@@ -37,6 +37,10 @@ define('app/controllers/backends', ['app/models/backend', 'ember'],
             loadingImages: false,
             loadingMachines: false,
 
+            canHaveNetworks: Ember.computed('model.@each.canHaveNetworks', 'model.@each.enabled', function() {
+                return !!this.model.filterBy('enabled', true).findBy('canHaveNetworks', true);
+            }),
+
             hasOpenStack: function () {
                 return !!this.model.filterBy('enabled', true).findBy('isOpenStack', true);
             }.property('model.[].isOpenStack', 'model.[].enabled'),
