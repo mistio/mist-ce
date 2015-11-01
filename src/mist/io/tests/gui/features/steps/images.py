@@ -38,8 +38,7 @@ def star_image(context, text):
     images = images_list.find_elements_by_tag_name("li")
 
     for image in images:
-        image_text = safe_get_element_text(image)
-        if text in image_text:
+        if text in safe_get_element_text(image):
             star_button = image.find_element_by_class_name("ui-checkbox")
             star_button.click()
             image = image.find_element_by_tag_name('h3')
@@ -61,8 +60,7 @@ def unstar_image(context, text):
     if text == 'the_name_that_i_used_before':
         text = context.mist_config['PREVIOUS_IMAGE_NAME']
     for image in images:
-        image_text = safe_get_element_text(image)
-        if text in image_text:
+        if text in safe_get_element_text(image):
             star_button = image.find_element_by_class_name("ui-checkbox")
             star_button.click()
             return

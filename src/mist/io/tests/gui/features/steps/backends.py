@@ -27,8 +27,7 @@ def given_backend(context, backend):
 
     if backend_buttons:
         for button in backend_buttons:
-            button_text = safe_get_element_text(button)
-            if backend.lower() in button_text.lower():
+            if backend.lower() in safe_get_element_text(button).lower():
                 return
 
     if "openstack" in backend.lower():

@@ -267,10 +267,7 @@ def click_button(context, text):
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
-        title = pop.find_elements_by_class_name('ui-title')
-        if len(title) == 0:
-            continue
-        title = safe_get_element_text(title[0])
+        title = safe_get_element_text(pop.find_element_by_class_name('ui-title'))
         if popup.lower() in title.lower():
             if text == '_x_':
                 buttons = pop.find_elements_by_class_name("close")
@@ -303,9 +300,7 @@ def click_button_within_panel(context, text, panel_title):
     found_panel = None
     for panel in panels:
         header = panel.find_element_by_class_name("ui-collapsible-heading")
-        # header = header.find_element_by_class_name("title")
-        header_text = safe_get_element_text(header)
-        if panel_title.lower() in header_text.lower():
+        if panel_title.lower() in safe_get_element_text(header).lower():
             found_panel = panel
             break
 
@@ -330,7 +325,7 @@ def click_button_from_collection(context, text, button_collection=None,
             return
         except WebDriverException:
             sleep(1)
-        assert False, u'Could not click button that says %s(%s)' % (safe_get_element_text(button), text)
+        assert False, 'Could not click button that says %s(%s)' % (safe_get_element_text(button), text)
 
 
 def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
@@ -354,7 +349,6 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # looks like it
     for button in button_collection:
         button_text = safe_get_element_text(button).split('\n')
-        button_text = button_text
         if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
             return button
 

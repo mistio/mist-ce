@@ -96,8 +96,7 @@ def assert_machine_state(context, name, state, seconds):
         machine = get_machine(context, machine_name)
         if machine:
             try:
-                machine_text = safe_get_element_text(machine)
-                if state in machine_text:
+                if state in safe_get_element_text(machine):
                     return
             except NoSuchElementException:
                 pass
