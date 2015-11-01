@@ -233,7 +233,7 @@ def ssh_key_is_added(context, ssh_key_name):
             key_already_associated = False
             non_associated_keys = context.browser.find_element_by_id('non-associated-keys-popup').find_elements_by_tag_name('li')
             for non_associated_key in non_associated_keys:
-                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in non_associated_key.text.lower():
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in safe_get_element_text(non_associated_key).lower():
                     non_associated_key.click()
                     key_already_associated = True
                     break
@@ -259,7 +259,7 @@ def ssh_key_is_added(context, ssh_key_name):
             context.execute_steps(u'''
                 Then I click the button "%s"
                 And I expect for "machine-keys-panel" side panel to appear within max 4 seconds
-            ''' % button.text)
+            ''' % safe_get_element_text(button))
             machine_keys_list = context.browser.find_element_by_id("machine-keys")
             machines_keys = machine_keys_list.find_elements_by_class_name(
                 "small-list-item")
@@ -284,7 +284,7 @@ def ssh_key_is_added(context, ssh_key_name):
             key_already_associated = False
             non_associated_keys = context.browser.find_element_by_id('non-associated-keys-popup').find_elements_by_tag_name('li')
             for non_associated_key in non_associated_keys:
-                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in non_associated_key.text.lower():
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in safe_get_element_text(non_associated_key).lower():
                     non_associated_key.click()
                     key_already_associated = True
                     break
@@ -328,7 +328,7 @@ def update_single_line(terminal, lines, index):
     assert index >= 0 and index < len(lines), "Wrong single line index %s" % index
     all_lines = terminal.find_elements_by_tag_name('div')
     all_lines_text = safe_get_element_text(all_lines[index])
-    lines[index] = all_lines_text.text.rstrip().lstrip()
+    lines[index] = safe_get_element_text(all_lines_text).rstrip().lstrip()
 
 
 @then(u'I test the ssh connection')
