@@ -41,7 +41,7 @@ define('app/controllers/machines', ['app/models/machine'],
             //  Methods
             //
 
-            newMachine: function(name, image, size, location, key, script, monitoring,
+            newMachine: function(name, image, size, location, key, script, monitoring, associateFloatingIp,
                 dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -110,6 +110,7 @@ define('app/controllers/machines', ['app/models/machine'],
                         'monitoring' : monitoring,
                         // Openstack
                         'networks': networks,
+                        'associate_floating_ip': associateFloatingIp,
                         // Docker
                         'docker_env': environment,
                         'docker_command': dockerCommand,
