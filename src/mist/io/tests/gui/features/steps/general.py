@@ -330,7 +330,7 @@ def click_button_from_collection(context, text, button_collection=None,
             return
         except WebDriverException:
             sleep(1)
-        assert False, u'Could not click button that says %s' % button.text
+        assert False, u'Could not click button that says %s(%s)' % (safe_get_element_text(button), text)
 
 
 def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
