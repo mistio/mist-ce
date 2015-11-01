@@ -78,7 +78,7 @@ def wait_for_splash_to_appear(context, timeout=20):
             return
         except NoSuchElementException:
             sleep(1)
-    assert False, u'Splash did not appear after %s seconds' % str(timeout)
+    assert False, 'Splash did not appear after %s seconds' % str(timeout)
 
 
 def wait_for_splash_to_load(context, timeout=60):
@@ -281,7 +281,7 @@ def click_button_within_popup(context, text, popup):
                         return
                     except WebDriverException:
                         sleep(1)
-                assert False, u'Could not click the close button'
+                assert False, 'Could not click the close button'
             else:
                 buttons = pop.find_elements_by_class_name("ui-btn")
                 click_button_from_collection(context, text, buttons,
