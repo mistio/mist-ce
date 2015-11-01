@@ -1,5 +1,6 @@
 from behave import *
 from time import time, sleep
+from mist.io.tests.gui.features.steps.general import safe_get_element_text
 
 
 @when(u'I fill "{text}" as key name')
@@ -35,7 +36,7 @@ def key_added(context, text, seconds):
     while time() < end_time:
         keys = context.browser.find_elements_by_css_selector(".ui-listview li")
         for key in keys:
-            if text in key.text:
+            if text in safe_get_element_text(key):
                 return
         sleep(2)
 
@@ -49,7 +50,7 @@ def key_deleted(context, text):
 
     keys = context.browser.find_elements_by_css_selector(".ui-listview li")
     for key in keys:
-        if text in key.text:
+        if text in safe_get_element_text(key):
             assert False, u'%s Key is not deleted'
 
     return
