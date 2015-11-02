@@ -1691,19 +1691,20 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
-
-    if conn.type == Provider.AZURE:
-        # for Azure, connect with the generated password, deploy the ssh key
-        # when this is ok, it calss post_deploy for script/monitoring
-        mist.io.tasks.azure_post_create_steps.delay(
-            user.email, backend_id, node.id, monitoring, script, key_id,
-            node.extra.get('username'), node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params,
-        )
-    elif conn.type == Provider.HPCLOUD:
+    # if conn.type == Provider.AZURE:
+    #     log.error("############################")
+    #     log.error(node.extra.get('password'))
+    #     # for Azure, connect with the generated password, deploy the ssh key
+    #     # when this is ok, it calss post_deploy for script/monitoring
+    #     mist.io.tasks.azure_post_create_steps.delay(
+    #         user.email, backend_id, node.id, monitoring, script, key_id,
+    #         node.extra.get('username'), node.extra.get('password'), public_key,
+    #         script_id=script_id, script_params=script_params, job_id = job_id,
+    #         hostname=hostname, plugins=plugins,
+    #         post_script_id=post_script_id,
+    #         post_script_params=post_script_params,
+    #     )
+    if conn.type == Provider.HPCLOUD:
         mist.io.tasks.hpcloud_post_create_steps.delay(
             user.email, backend_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
@@ -2267,6 +2268,7 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
 
     """
     key = public_key.replace('\n', '')
+    key_private = private_key.replace('\n', '')
 
     port_bindings = []
     if azure_port_bindings and type(azure_port_bindings) in [str, unicode]:
@@ -2295,6 +2297,8 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 size=size,
                 image=image,
                 location=location,
+                public_key=public_key,
+                key_pair=private_key,
                 ex_cloud_service_name=cloud_service_name,
                 endpoint_ports=port_bindings,
                 custom_data=base64.b64encode(cloud_init)
