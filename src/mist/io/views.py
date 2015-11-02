@@ -498,7 +498,7 @@ def create_machine(request):
         # hostname: if provided it will be attempted to assign a DNS name
         hostname = request.json_body.get('hostname', '')
         plugins = request.json_body.get('plugins')
-        cloud_init = request.json_body.get('cloud_init', '#!/bin/bash\necho yeah\n')
+        cloud_init = request.json_body.get('cloud_init', '#!/bin/bash\nmkdir /tmp/mist\n')
         associate_floating_ip = request.json_body.get('associate_floating_ip', False)
         associate_floating_ip_subnet = request.json_body.get('attach_floating_ip_subnet', None)
     except Exception as e:
@@ -523,9 +523,6 @@ def create_machine(request):
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet}
-    log.error("###################################")
-    log.error(async)
-    log.error("###################################")
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
