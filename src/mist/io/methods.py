@@ -4,6 +4,7 @@ import random
 import socket
 import tempfile
 import json
+import base64
 import requests
 import subprocess
 import re
@@ -1557,8 +1558,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
-                   post_script_id='', post_script_params='', associate_floating_ip=False,
-                   associate_floating_ip_subnet=None):
+                   post_script_id='', post_script_params='', cloud_init='',
+                   associate_floating_ip=False, associate_floating_ip_subnet=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1665,8 +1666,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                              image, size, location)
     elif conn.type == Provider.AZURE:
         node = _create_machine_azure(conn, key_id, private_key,
-                                             public_key, machine_name,
-                                             image, size, location, cloud_service_name=None, azure_port_bindings=azure_port_bindings)
+                                     public_key, machine_name,
+                                     image, size, location, cloud_init=cloud_init,
+                                     cloud_service_name=None, azure_port_bindings=azure_port_bindings)
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
@@ -2257,7 +2259,7 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location)
 
 
 def _create_machine_azure(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location, cloud_service_name, azure_port_bindings):
+                          machine_name, image, size, location, cloud_init, cloud_service_name, azure_port_bindings):
     """Create a machine Azure.
 
     Here there is no checking done, all parameters are expected to be
@@ -2294,7 +2296,8 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 image=image,
                 location=location,
                 ex_cloud_service_name=cloud_service_name,
-                endpoint_ports=port_bindings
+                endpoint_ports=port_bindings,
+                custom_data=base64.b64encode(cloud_init)
             )
         except Exception as e:
             try:
