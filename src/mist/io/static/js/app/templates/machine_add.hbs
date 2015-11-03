@@ -154,13 +154,13 @@
 
             {{#if view.hasLibvirtAdvanced}}
             <div id="create-machine-libvirt-advanced-options">
-                <label for="create-machine-libvirt-image-path">.iso image path to create VM from</label>
+                <label for="create-machine-libvirt-image-path">Specify .iso image path</label>
                 {{view Mist.TextField
                        id="create-machine-libvirt-image-path"
                        data-theme="a"
                        value=Mist.machineAddController.newMachineLibvirtImagePath}}
 
-                <label for="create-machine-libvirt-existing-disk-path">Existing disk image to create VM from</label>
+                <label for="create-machine-libvirt-existing-disk-path">Specify existing disk image path</label>
                 {{view Mist.TextField
                        id="create-machine-libvirt-existing-disk-path"
                        data-theme="a"
