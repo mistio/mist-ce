@@ -34,6 +34,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineLibvirtDiskSize: 4,
             newMachineLibvirtImagePath: null,
             newMachineLibvirtExistingDiskPath: null,
+            newMachineLibvirtNetwork: 'default',
 
 
             //
@@ -133,6 +134,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineLibvirtDiskPath,
                         this.newMachineLibvirtImagePath,
                         this.newMachineLibvirtExistingDiskPath,
+                        this.newMachineLibvirtNetwork,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }
@@ -165,7 +167,8 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineLibvirtCPU', 1)
                     .set('newMachineLibvirtRAM', 512)
                     .set('newMachineLibvirtImagePath', '')
-                    .set('newMachineLibvirtExistingDiskPath', '');
+                    .set('newMachineLibvirtExistingDiskPath', '')
+                    .set('newMachineLibvirtNetwork', 'default');
                 this.view.clear();
              },
 
@@ -200,7 +203,7 @@ define('app/controllers/machine_add', ['ember'],
 
                 var re = /^[0-9]*$/;
                 if (this.newMachineProvider.provider == 'libvirt' &&
-                    (this.newMachineImage.id || this.newMachineLibvirtImagePath) &&
+                    (this.newMachineImage.id || this.newMachineLibvirtImagePath || this.newMachineLibvirtExistingDiskPath) &&
                     this.newMachineName &&
                     this.newMachineLibvirtDiskPath &&
                     re.test(this.get('newMachineLibvirtDiskSize'))) {
@@ -235,7 +238,8 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineLibvirtCPU', 1)
                     .set('newMachineLibvirtRAM', 512)
                     .set('newMachineLibvirtImagePath', '')
-                    .set('newMachineLibvirtExistingDiskPath', '');
+                    .set('newMachineLibvirtExistingDiskPath', '')
+                    .set('newMachineLibvirtNetwork', 'default');
             },
 
             _selectUnique: function() {
