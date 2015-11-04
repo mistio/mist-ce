@@ -1663,7 +1663,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(conn, key_id, private_key,
                                              public_key, machine_name,
-                                             image, size, location)
+                                             image, size, location, cloud_init)
     elif conn.type == Provider.AZURE:
         node = _create_machine_azure(conn, key_id, private_key,
                                      public_key, machine_name,
@@ -2105,7 +2105,7 @@ def _create_machine_docker(conn, machine_name, image, script=None, public_key=No
     return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location):
+                                  machine_name, image, size, location, user_data):
     """Create a machine in Digital Ocean.
 
     Here there is no checking done, all parameters are expected to be
@@ -2162,6 +2162,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 location=location,
                 ssh_key=tmp_key_path,
                 private_networking=private_networking,
+                user_data=user_data
             )
         except Exception as e:
             raise MachineCreationError("Digital Ocean, got exception %s" % e, e)
