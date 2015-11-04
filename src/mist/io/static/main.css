@@ -459,6 +459,7 @@ textarea {
 }
 #dialog .ui-content{
     text-align: center;
+    word-wrap: break-word;
 }
 .tiny-popup {
     min-width: 150px !important;
