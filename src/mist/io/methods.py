@@ -1629,7 +1629,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
         node = _create_machine_rackspace(conn, public_key, machine_name, image,
-                                         size, location)
+                                         size, location, user_data=cloud_init)
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key,
                                          machine_name, image, size, location, networks, cloud_init)
@@ -1757,7 +1757,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
 
 
 def _create_machine_rackspace(conn, public_key, machine_name,
-                             image, size, location):
+                             image, size, location, user_data):
     """Create a machine in Rackspace.
 
     Here there is no checking done, all parameters are expected to be
@@ -1789,7 +1789,7 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
     try:
         node = conn.create_node(name=machine_name, image=image, size=size,
-                                location=location, ex_keyname=server_key)
+                                location=location, ex_keyname=server_key, ex_userdata=user_data)
         return node
     except Exception as e:
         raise MachineCreationError("Rackspace, got exception %r" % e, exc=e)
