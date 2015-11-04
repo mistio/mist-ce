@@ -1632,7 +1632,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key,
-                                         machine_name, image, size, location, networks)
+                                         machine_name, image, size, location, networks, cloud_init)
     elif conn.type is Provider.HPCLOUD:
         node = _create_machine_hpcloud(conn, private_key, public_key,
                                        machine_name, image, size, location, networks)
@@ -1796,7 +1796,7 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
 
 def _create_machine_openstack(conn, private_key, public_key, machine_name,
-                             image, size, location, networks):
+                             image, size, location, networks, user_data):
     """Create a machine in Openstack.
 
     Here there is no checking done, all parameters are expected to be
@@ -1840,7 +1840,8 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
                 ex_keyname=server_key,
-                networks=chosen_networks)
+                networks=chosen_networks,
+                ex_userdata=user_data)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e, e)
     return node
