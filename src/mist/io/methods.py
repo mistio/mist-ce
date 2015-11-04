@@ -1643,7 +1643,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 location = loc
                 break
         node = _create_machine_ec2(conn, key_id, private_key, public_key,
-                                   machine_name, image, size, location)
+                                   machine_name, image, size, location, cloud_init)
     elif conn.type is Provider.NEPHOSCALE:
         node = _create_machine_nephoscale(conn, key_id, private_key, public_key,
                                           machine_name, image, size,
@@ -1901,7 +1901,7 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
 
 
 def _create_machine_ec2(conn, key_name, private_key, public_key,
-                       machine_name, image, size, location):
+                       machine_name, image, size, location, user_data):
     """Create a machine in Amazon EC2.
 
     Here there is no checking done, all parameters are expected to be
@@ -1946,7 +1946,8 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
                 ssh_key=tmp_key_path,
                 max_tries=1,
                 ex_keyname=key_name,
-                ex_securitygroup=config.EC2_SECURITYGROUP['name']
+                ex_securitygroup=config.EC2_SECURITYGROUP['name'],
+                ex_userdata=user_data
             )
         except Exception as e:
             raise MachineCreationError("EC2, got exception %s" % e, e)
