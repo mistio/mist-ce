@@ -23,7 +23,9 @@ define('app/controllers/machine_add', ['ember'],
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
-            newMachineMonitoring: true,
+            newMachineMonitoring: Ember.computed(function() {
+                return Mist.email ? true : false;
+            }),
             newMachineAssociateFloatingIp: true,
             newMachineDockerCommand: null,
             newMachineDockerEnvironment: null,
