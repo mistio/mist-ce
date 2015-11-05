@@ -371,6 +371,7 @@
 	padding: 0 5px;
 	border-radius: 1px;
 	margin: 3px 0;
+    word-break: break-all;
 }
 
 div.df {
