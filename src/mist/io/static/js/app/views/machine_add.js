@@ -304,10 +304,21 @@ define('app/views/machine_add', ['app/views/controlled'],
                 uploadCloudInit: function () {
                     Mist.fileUploadController.open('Upload Cloud Init' , 'Cloud Init',
                         function (uploadedFile) {
-                            uploadedFile = uploadedFile.trim();
-                            Mist.machineAddController.set('newMachineCloudInit', uploadedFile);
+                            Mist.machineAddController.set('newMachineCloudInit', uploadedFile.trim());
                         },
                         Mist.machineAddController.get('newMachineCloudInit'));
+                },
+
+
+                helpCloudInitClicked: function () {
+                    Mist.machineAddController.setProperties({
+                        helpText: 'demo text',
+                        helpHref: 'demo link',
+                    });
+                    $('#help-tooltip').popup().popup('option', 'positionTo', '#cloud_init_help')
+                    Ember.run.later(function () {
+                        $('#help-tooltip').popup('open');
+                    }, 50);
                 },
 
 

@@ -208,3 +208,36 @@
     padding-top: 5.5px;
     padding-bottom: 5.5px;
 }
+
+#create-machine #cloud-init {
+    margin: 0;
+}
+#create-machine #cloud-init.is-file.empty .ui-btn {
+    background-color: #b5b5b5;
+    color: #fff;
+}
+#create-machine #cloud-init.is-file.empty .ui-btn:hover {
+    border-color: #b5b5b5;
+}
+#create-machine #cloud-init.is-file.filled .ui-btn {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    color: #444;
+    font-size: 16px;
+}
+#create-machine #cloud-init.is-file.filled .ui-btn:hover {
+    color: #444;
+}
+#create-machine .is-file.filled .last-child .ui-btn:after {
+    margin-left: -10px;
+    color: #b5b5b5;
+    font-family: 'MistIcons';
+    content: '\0047';
+    right: 7px;
+    top: 17px;
+    font-size: 19px;
+    margin-top: -10px;
+    position: absolute;
+    text-transform: none;
+    background-image: none;
+}
