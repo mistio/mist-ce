@@ -230,6 +230,18 @@
         </div>
         {{/if}}
 
+        <!-- Select Cloud Init Script -->
+        {{#if view.hasCloudInit}}
+        <div id="cloud-init">
+            <label for="create-machine-cloud-init">Cloud Init</label>
+            <a class="ui-btn ui-btn-d"
+                id="create-machine-cloud-init"
+                {{action "uploadCloudInit" target=view}}>
+                Cloud Init
+            </a>
+        </div>
+        {{/if}}
+
         <!-- Select Script -->
         {{#if view.hasScript}}
         <div id="script">
@@ -342,5 +354,7 @@
 
 <div id="create-machine-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
      {{action "clickOverlay" target=view}}></div>
+
+{{component "file-upload"}}
 
 {{component "key-add"}}

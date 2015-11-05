@@ -202,3 +202,9 @@
 #create-machine-floating-ip {
     display: none;
 }
+
+#create-machine-cloud-init {
+    line-height: 21px;
+    padding-top: 5.5px;
+    padding-bottom: 5.5px;
+}

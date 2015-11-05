@@ -34,6 +34,10 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider ? (provider.provider != 'docker' || (provider.provider == 'docker' && this.get('dockerNeedScript')) ? true : false) : false) : false;
             }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
 
+            hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
+                return true;
+            }),
+
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
                 return this.get('hasKey') == true || this.get('dockerNeedScript');
             }),
@@ -296,10 +300,22 @@ define('app/views/machine_add', ['app/views/controlled'],
                     this._selectKey(key)
                 },
 
+
+                uploadCloudInit: function () {
+                    Mist.fileUploadController.open('Upload Cloud Init' , 'Cloud Init',
+                        function (uploadedFile) {
+                            uploadedFile = uploadedFile.trim();
+                            Mist.machineAddController.set('newMachineCloudInit', uploadedFile);
+                        },
+                        Mist.machineAddController.get('newMachineCloudInit'));
+                },
+
+
                 selectScript: function (script) {
                     Mist.machineAddController.set('newMachineScript', script);
                     $('#create-machine-script-select').collapsible().collapsible('collapse');
                 },
+
 
                 toggleNetworkSelection: function (network) {
                     network.set('selected', !network.selected);
