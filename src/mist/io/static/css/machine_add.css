@@ -212,6 +212,9 @@
 #create-machine #cloud-init {
     margin: 0;
 }
+#create-machine #cloud-init .ui-btn-icon-notext {
+    text-indent: initial;
+}
 #create-machine #cloud-init.is-file.empty .ui-btn {
     background-color: #b5b5b5;
     color: #fff;
@@ -229,6 +232,7 @@
 #create-machine #cloud-init.is-file.filled .ui-btn:hover {
     color: #444;
 }
+
 #create-machine .is-file.filled .last-child .ui-btn:after {
     margin-left: -10px;
     color: #b5b5b5;
@@ -248,4 +252,9 @@
 
 #machine-list-page #file-upload textarea {
     height: 200px !important;
+}
+@media only screen and (max-width: 500px) {
+    #machine-list-page #file-upload.large-popup {
+        width: 100% !important;
+    }
 }

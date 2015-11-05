@@ -35,7 +35,9 @@ define('app/views/machine_add', ['app/views/controlled'],
             }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
 
             hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
-                return true;
+                var provider = Mist.machineAddController.newMachineProvider,
+                valids = ['openstack', 'azure'];
+                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? true : false) : false) : false;
             }),
 
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
@@ -302,7 +304,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
 
                 uploadCloudInit: function () {
-                    Mist.fileUploadController.open('Upload Cloud Init' , 'Cloud Init',
+                    Mist.fileUploadController.open('Post Deploy Script' , 'Script',
                         function (uploadedFile) {
                             Mist.machineAddController.set('newMachineCloudInit', uploadedFile.trim());
                         },

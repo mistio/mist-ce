@@ -233,12 +233,16 @@
         <!-- Select Cloud Init Script -->
         {{#if view.hasCloudInit}}
         <div id="cloud-init" class="field-wrapper is-file {{if Mist.machineAddController.newMachineCloudInit 'filled' 'empty'}}">
-            <label for="create-machine-cloud-init">Cloud Init</label>
+            <label for="create-machine-cloud-init">Post Deploy Script</label>
             <div class="first-child">
                 <a class="ui-btn ui-btn-a"
                     id="create-machine-cloud-init"
                     {{action "uploadCloudInit" target=view}}>
-                    Cloud Init
+                    {{#if Mist.machineAddController.newMachineCloudInit}}
+                    Script
+                    {{else}}
+                    Add Script
+                    {{/if}}
                 </a>
             </div>
             <div class="last-child">
