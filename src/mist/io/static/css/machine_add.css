@@ -215,6 +215,7 @@
 #create-machine #cloud-init.is-file.empty .ui-btn {
     background-color: #b5b5b5;
     color: #fff;
+    font-size: 16px;
 }
 #create-machine #cloud-init.is-file.empty .ui-btn:hover {
     border-color: #b5b5b5;
@@ -240,4 +241,11 @@
     position: absolute;
     text-transform: none;
     background-image: none;
+}
+#machine-list-page #file-upload.large-popup {
+    width: 500px !important;
+}
+
+#machine-list-page #file-upload textarea {
+    height: 200px !important;
 }
