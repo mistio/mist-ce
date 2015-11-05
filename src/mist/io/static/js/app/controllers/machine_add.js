@@ -20,6 +20,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineName: null,
             newMachineSize: null,
             newMachineImage: null,
+            newMachineCloudInit: null,
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
@@ -114,6 +115,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineSize,
                         this.newMachineLocation,
                         this.newMachineKey,
+                        this.newMachineCloudInit,
                         this.newMachineScript,
                         this.newMachineMonitoring,
                         this.newMachineAssociateFloatingIp,
@@ -143,6 +145,7 @@ define('app/controllers/machine_add', ['ember'],
              _clear: function() {
                 this.set('callback', null)
                     .set('newMachineName', '')
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
@@ -200,6 +203,7 @@ define('app/controllers/machine_add', ['ember'],
 
             _resetProvider: function() {
                 this.set('callback', null)
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})

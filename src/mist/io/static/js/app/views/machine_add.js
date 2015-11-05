@@ -352,7 +352,6 @@ define('app/views/machine_add', ['app/views/controlled'],
              }.observes('Mist.machineAddController.newMachineProvider'),
 
              networksObserver: function() {
-                 console.log('i run');
                  Ember.run.once(this, function () {
                     if (this.get('hasOpenstack')) {
                         if (Mist.machineAddController.newMachineProvider.networks.model.filterBy('selected', true).length) {
