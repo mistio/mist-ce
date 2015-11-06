@@ -41,13 +41,13 @@ define('app/views/machine_add', ['app/views/controlled'],
             hasLocation: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
                 valids = ['docker', 'indonesiancloud', 'vcloud'];
-                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? false : true) : false) : false;
+                return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.locations.model.length == 1) ? false : true) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasNetworks: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
                 valids = ['openstack', 'hpcloud', 'vcloud'];
-                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? true : false) : false) : false;
+                return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 && provider.networks.model.length) ? true : false) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasMonitoring: Ember.computed(function() {
@@ -352,7 +352,6 @@ define('app/views/machine_add', ['app/views/controlled'],
              }.observes('Mist.machineAddController.newMachineProvider'),
 
              networksObserver: function() {
-                 console.log('i run');
                  Ember.run.once(this, function () {
                     if (this.get('hasOpenstack')) {
                         if (Mist.machineAddController.newMachineProvider.networks.model.filterBy('selected', true).length) {
