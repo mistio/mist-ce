@@ -1553,7 +1553,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
                    post_script_id='', post_script_params='',
-                   disk_size=None, ram=None, cpu=None, disk_path=None, create_from_existing=None):
+                   disk_size=None, disk_path=None, create_from_existing=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1677,9 +1677,16 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_vultr(conn, public_key, machine_name, image,
                                          size, location)
     elif conn.type is Provider.LIBVIRT:
+        try:
+            # size_id should have a format cpu:ram, eg 1:2048
+            cpu = size_id.split(':')[0]
+            ram = size_id.split(':')[1]
+        except:
+            ram = 512
+            cpu = 1
         node = _create_machine_libvirt(conn, machine_name,
                                        disk_size, ram, cpu,
-                                       image_id, disk_path, create_from_existing)
+                                       image_id, disk_path, create_from_existing, networks)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -2745,6 +2752,7 @@ def list_images(user, backend_id, term=None):
             'name': image.name,
             'star': _image_starred(user, backend_id, image.id)}
            for image in images]
+
     return ret
 
 
@@ -2857,7 +2865,6 @@ def list_sizes(user, backend_id):
                     'name': size.name,
                     'price': size.price,
                     'ram': size.ram})
-
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()
@@ -2900,7 +2907,6 @@ def list_locations(user, backend_id):
         ret.append({'id': location.id,
                     'name': name,
                     'country': location.country})
-
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()
@@ -2926,7 +2932,7 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret.append(nephoscale_network_to_dict(network))
-    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT]:
         networks = conn.ex_list_networks()
 
         for network in networks:
@@ -2955,7 +2961,6 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret.append(ec2_network_to_dict(network))
-
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()
