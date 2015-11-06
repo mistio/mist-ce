@@ -13,7 +13,7 @@ define('app/views/machine_add', ['app/views/controlled'],
             changeProviderFlag: false,
             dockerNeedScript: false,
             hasAdvancedScript: false,
-            hasLibvirtAdvanced: false,
+            hasLibvirtDiskNew: true,
             newMachineLibvirtCPUOptions: null,
             newMachineLibvirtRAMOptions: null,
 
@@ -244,11 +244,11 @@ define('app/views/machine_add', ['app/views/controlled'],
                     this.renderFields();
                 },
 
-                switchLibvirtAdvanced: function () {
-                    var value = this.$('#create-machine-libvirt-advanced select').val();
+                switchLibvirtDiskType: function () {
+                    var value = this.$('#create-machine-libvirt-disk-type select').val();
                     Mist.machineAddController.set('newMachineLibvirtImagePath', '');
                     Mist.machineAddController.set('newMachineLibvirtExistingDiskPath', '');                  
-                    this.set('hasLibvirtAdvanced', value == 1);
+                    this.set('hasLibvirtDiskNew', value != 1);
                     this.renderFields();
                 },
 
@@ -343,37 +343,6 @@ define('app/views/machine_add', ['app/views/controlled'],
                 Mist.machineAddController.set('newMachineKey', key);
             },
 
-            _libvirtOptions: function(backend) {
-                var sizes = backend.sizes.content;
-                if (sizes.length > 0) {
-                   var size = sizes[0], ram = size.ram, cpu = size.disk;
-
-                   if (ram < 512) {
-                        this.set('newMachineLibvirtRAMOptions', [512]);
-                   } else {                                
-                        this.set('newMachineLibvirtRAMOptions', this._range(ram, 512, 512));
-                   }
-
-                   this.set('newMachineLibvirtCPUOptions', this._range(cpu, 1));
-                } else { 
-                    this.set('newMachineLibvirtCPUOptions', [1]);
-                    this.set('newMachineLibvirtRAMOptions', [512]);
-                }
-            },
-
-
-            _range: function(end, start, step) {
-                var start = start || 0,
-                step = step || 1, result = [], item = start;
-
-                while(item <= end) {        
-                    result.push(item);
-                    item += step;
-                }
-
-                return result;
-            },
-
 
             /**
              *
@@ -392,11 +361,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                  Ember.run.once(this, function(){
                     if (this.changeProviderFlag) Mist.machineAddController._resetProvider();
                  });
-             }.observes('Mist.machineAddController.newMachineProvider'),
-
-             libvirtAdvancedObserver: function () {
-                Ember.run.once(this, 'updateAdvancedOptions');
-            }.observes('libvirtAdvanced')
+             }.observes('Mist.machineAddController.newMachineProvider')
         });
     }
 );
