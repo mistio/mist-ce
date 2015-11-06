@@ -36,8 +36,8 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'azure'];
-                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? true : false) : false) : false;
+                valids = ['openstack', 'azure', 'digitalocean'];
+                return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.provider.indexOf('ec2') > -1) ? true : false) : false) : false;
             }),
 
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
