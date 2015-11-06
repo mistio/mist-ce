@@ -52,7 +52,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             }.property('provider'),
 
             hasNetworks: function () {
-                return  ['openstack', 'nephoscale', 'azure', 'vcloud', 'ec2', 'gce', 'indonesian_vcloud', 'hpcloud']
+                return  ['openstack', 'nephoscale', 'azure', 'vcloud', 'ec2', 'gce', 'indonesian_vcloud', 'hpcloud', 'libvirt']
                     .indexOf(this.provider) > -1;
             }.property('provider'),
 
