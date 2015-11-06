@@ -232,25 +232,11 @@
 
         <!-- Select Cloud Init Script -->
         {{#if view.hasCloudInit}}
-        <div id="cloud-init" class="field-wrapper is-file {{if Mist.machineAddController.newMachineCloudInit 'filled' 'empty'}}">
+        <div id="cloud-init">
             <label for="create-machine-cloud-init">Post Deploy Script</label>
-            <div class="first-child">
-                <a class="ui-btn ui-btn-a"
-                    id="create-machine-cloud-init"
-                    {{action "uploadCloudInit" target=view}}>
-                    {{#if Mist.machineAddController.newMachineCloudInit}}
-                    Script
-                    {{else}}
-                    Add Script
-                    {{/if}}
-                </a>
-            </div>
-            <div class="last-child">
-                <a class="ui-btn ui-btn-a ui-btn-icon-notext ui-icon-question"
-                    id="cloud_init_help"
-                    {{action "helpCloudInitClicked" target=view}}>
-                </a>
-            </div>
+            {{view Mist.TextArea
+                   id="create-machine-cloud-init"
+                   value=Mist.machineAddController.newMachineCloudInit}}
         </div>
         {{/if}}
 
@@ -293,7 +279,6 @@
 
                 {{view Mist.TextArea
                        id="create-machine-script-params"
-
                        placeholder="Optional script parameters"
                        value=Mist.machineAddController.newMachineScriptParams}}
             </div>
@@ -366,36 +351,5 @@
 
 <div id="create-machine-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
      {{action "clickOverlay" target=view}}></div>
-
- <div id="help-tooltip-screen"
-     class="ui-popup-screen
-         ui-overlay-b
-         ui-screen-hidden">
- </div>
- <div id="help-tooltip-popup"
-      class="pop
-         ui-popup-container
-         ui-popup-hidden
-         ui-popup-truncate">
-     <div id="help-tooltip"
-          class="ui-popup
-             ui-body-a
-             ui-overlay-shadow
-             ui-corner-all"
-          data-role="popup"
-          data-arrow="true"
-          data-enhanced="true"
-          data-transition="flip">
-         <p>{{Mist.machineAddController.helpText}}
-             {{#if Mist.machineAddController.helpHref}}
-             <a target="_blank" href={{Mist.machineAddController.helpHref}}>
-                 Read more...
-             </a>
-             {{/if}}
-         </p>
-     </div>
- </div>
-
-{{component "file-upload"}}
 
 {{component "key-add"}}

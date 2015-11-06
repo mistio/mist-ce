@@ -303,27 +303,6 @@ define('app/views/machine_add', ['app/views/controlled'],
                 },
 
 
-                uploadCloudInit: function () {
-                    Mist.fileUploadController.open('Post Deploy Script' , 'Script',
-                        function (uploadedFile) {
-                            Mist.machineAddController.set('newMachineCloudInit', uploadedFile.trim());
-                        },
-                        Mist.machineAddController.get('newMachineCloudInit'));
-                },
-
-
-                helpCloudInitClicked: function () {
-                    Mist.machineAddController.setProperties({
-                        helpText: 'demo text',
-                        helpHref: 'demo link',
-                    });
-                    $('#help-tooltip').popup().popup('option', 'positionTo', '#cloud_init_help')
-                    Ember.run.later(function () {
-                        $('#help-tooltip').popup('open');
-                    }, 50);
-                },
-
-
                 selectScript: function (script) {
                     Mist.machineAddController.set('newMachineScript', script);
                     $('#create-machine-script-select').collapsible().collapsible('collapse');
