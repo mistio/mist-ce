@@ -39,8 +39,9 @@ define('app/views/machine_add', ['app/views/controlled'],
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasKey: function() {
-                var provider = Mist.machineAddController.newMachineProvider;
-                return provider ? (provider.provider ? (provider.provider != 'docker' || (provider.provider == 'docker' && this.get('dockerNeedScript')) ? true : false) : false) : false;
+                var provider = Mist.machineAddController.newMachineProvider,
+                invalids = ['docker', 'libvirt'];
+                return provider ? (provider.provider ? (((invalids.indexOf(provider.provider) != -1 ? false : true) || (provider.provider == 'docker' && this.get('dockerNeedScript'))) ? true : false) : false) : false;
             }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
 
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
@@ -49,13 +50,13 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             hasLocation: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['docker', 'indonesiancloud', 'vcloud'];
+                valids = ['docker', 'indonesiancloud', 'vcloud', 'libvirt'];
                 return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? false : true) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasNetworks: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'hpcloud', 'vcloud'];
+                valids = ['openstack', 'hpcloud', 'vcloud', 'libvirt'];
                 return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? true : false) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
@@ -250,6 +251,13 @@ define('app/views/machine_add', ['app/views/controlled'],
                     Mist.machineAddController.set('newMachineLibvirtExistingDiskPath', '');                  
                     this.set('hasLibvirtDiskNew', value != 1);
                     this.renderFields();
+                },
+
+                createLibvirtImage: function () {
+                    console.log('click');
+                    if (this.fieldIsReady) {
+                        this.fieldIsReady('image');
+                    }
                 },
 
 
