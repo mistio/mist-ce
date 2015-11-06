@@ -233,7 +233,7 @@
         <!-- Select Cloud Init Script -->
         {{#if view.hasCloudInit}}
         <div id="cloud-init">
-            <label for="create-machine-cloud-init">Post Deploy Script</label>
+            <label for="create-machine-cloud-init">Cloud Init</label>
             {{view Mist.TextArea
                    id="create-machine-cloud-init"
                    value=Mist.machineAddController.newMachineCloudInit}}
