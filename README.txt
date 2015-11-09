@@ -34,7 +34,7 @@ For vSphere support, you should install pyvmomi library::
 
 In Red Hat based systems the following packages need to be installed::
 
-    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel
+    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel python-zc-buildout
 
 For openSUSE distibution, you'll have to additionally install::
 
