@@ -60,8 +60,8 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? true : false) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
-            hasMonitoring: Ember.computed(function() {
-                return Mist.email ? true : false;
+            hasMonitoring: Ember.computed('hasLibvirt', function() {
+                return Mist.email && !this.get('hasLibvirt') ? true : false;
             }),
 
 
