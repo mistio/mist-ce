@@ -643,7 +643,7 @@ class ListImages(UserTask):
     result_expires = 60 * 60 * 24 * 7
     result_fresh = 60 * 60
     polling = False
-    soft_time_limit = 30
+    soft_time_limit = 60*2
 
     def execute(self, email, backend_id):
         log.warn('Running list images for user %s backend %s' % (email, backend_id))

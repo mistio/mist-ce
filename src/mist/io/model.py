@@ -111,6 +111,7 @@ class Backend(OODict):
     machines = make_field(Machines)()
     starred = ListField()
     unstarred = ListField()
+    images_location = StrField('/var')
 
     def __repr__(self):
         print_fields = ['title', 'provider', 'region']

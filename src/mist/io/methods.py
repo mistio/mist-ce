@@ -747,6 +747,8 @@ def _add_backend_libvirt(user, title, provider, params):
     apikey = params.get('machine_user', 'root')
 
     apisecret = params.get('machine_key', '')
+    images_location = params.get('images_location', '/var')
+
     if apisecret:
         if apisecret not in user.keypairs:
             raise KeypairNotFoundError(apisecret)
@@ -765,7 +767,7 @@ def _add_backend_libvirt(user, title, provider, params):
     backend.enabled = True
     backend.ssh_port = port
     backend_id = backend.get_id()
-
+    backend.images_location = images_location
     return backend_id, backend
 
 
@@ -2724,6 +2726,8 @@ def list_images(user, backend_id, term=None):
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
                               for image, name in config.DOCKER_IMAGES.items()]
             rest_images += conn.list_images()
+        elif conn.type == Provider.LIBVIRT:
+            rest_images = conn.list_images(location=backend.images_location)
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
