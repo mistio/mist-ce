@@ -65,6 +65,8 @@ parser.add_option("--setuptools-version",
 
 options, args = parser.parse_args()
 
+if os.geteuid() == 0:
+    exit('Please run the buildout as non-root user')
 ######################################################################
 # load/install setuptools
 

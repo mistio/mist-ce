@@ -78,7 +78,7 @@ def wait_for_splash_to_appear(context, timeout=20):
             return
         except NoSuchElementException:
             sleep(1)
-    assert False, u'Splash did not appear after %s seconds' % str(timeout)
+    assert False, 'Splash did not appear after %s seconds' % str(timeout)
 
 
 def wait_for_splash_to_load(context, timeout=60):
@@ -236,6 +236,21 @@ def become_visible_waiting_with_timeout(context, element_id, seconds):
                                "after %s seconds" % (element_id, seconds))
 
 
+@when(u'I click the button by "{id_name}" id_name')
+def click_button_id(context, id_name):
+    """
+    This function will try to click a button by id name.
+    And use the function clicketi_click
+    """
+    my_element = context.browser.find_element_by_id(id_name)
+    clicketi_click(context, my_element)
+
+
+@then(u'I click the button "{text}"')
+def then_click(context, text):
+    return click_button(context, text)
+
+
 @step(u'I click the button "{text}"')
 def click_button(context, text):
     """
@@ -252,10 +267,7 @@ def click_button(context, text):
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
-        title = pop.find_elements_by_class_name('ui-title')
-        if len(title) == 0:
-            continue
-        title = title[0].text
+        title = safe_get_element_text(pop.find_element_by_class_name('ui-title'))
         if popup.lower() in title.lower():
             if text == '_x_':
                 buttons = pop.find_elements_by_class_name("close")
@@ -266,7 +278,7 @@ def click_button_within_popup(context, text, popup):
                         return
                     except WebDriverException:
                         sleep(1)
-                assert False, u'Could not click the close button'
+                assert False, 'Could not click the close button'
             else:
                 buttons = pop.find_elements_by_class_name("ui-btn")
                 click_button_from_collection(context, text, buttons,
@@ -288,8 +300,7 @@ def click_button_within_panel(context, text, panel_title):
     found_panel = None
     for panel in panels:
         header = panel.find_element_by_class_name("ui-collapsible-heading")
-        # header = header.find_element_by_class_name("title")
-        if panel_title.lower() in header.text.lower():
+        if panel_title.lower() in safe_get_element_text(header).lower():
             found_panel = panel
             break
 
@@ -314,7 +325,7 @@ def click_button_from_collection(context, text, button_collection=None,
             return
         except WebDriverException:
             sleep(1)
-        assert False, u'Could not click button that says %s' % button.text
+        assert False, 'Could not click button that says %s(%s)' % (safe_get_element_text(button), text)
 
 
 def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
@@ -326,23 +337,21 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # also doing some cleaning if the text attribute also sends back texts
     # of sub elements
 
-    for button in button_collection:
-        try:
-            if button.text.rstrip().lstrip().split('\n')[0].lower() == text.lower():
-                return button
-        except StaleElementReferenceException:
-            pass
+    button = filter(
+        lambda b: safe_get_element_text(b).rstrip().lstrip().split('\n')[
+                      0].lower() == text.lower()
+                  and b.value_of_css_property('display') == 'block',
+        button_collection)
+    if len(button) > 0:
+        return button[0]
 
     # if we haven't found the exact text then we search for something that
     # looks like it
     for button in button_collection:
-        try:
-            button_text = button.text.split('\n')
-            if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
-                return button
-        except StaleElementReferenceException:
-            pass
-        
+        button_text = safe_get_element_text(button).split('\n')
+        if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
+            return button
+
     return None
 
 
@@ -378,7 +387,10 @@ def wait_for_buttons_to_appear(context):
         try:
             images_button = search_for_button(context, 'Images')
             counter_span = images_button.find_element_by_class_name("ui-li-count")
-            int(counter_span.text)
+
+            counter_span_text = safe_get_element_text(counter_span)
+
+            int(counter_span_text)
             break
         except (NoSuchElementException, StaleElementReferenceException,
                 ValueError, AttributeError) as e:
@@ -396,7 +408,8 @@ def some_counter_loaded(context, counter_title, counter_number, seconds):
     end_time = time() + int(seconds)
     while time() < end_time:
         counter_span = counter_found.find_element_by_class_name("ui-li-count")
-        counter = int(counter_span.text)
+        counter_span_text = safe_get_element_text(counter_span)
+        counter = int(counter_span_text)
 
         if counter > int(counter_number):
             return
@@ -504,3 +517,11 @@ def search_for_something(context, text, type_of_search):
     for letter in text:
         search_bar.send_keys(letter)
     sleep(2)
+
+
+def safe_get_element_text(check_element):
+    try:
+        return check_element.text
+    except StaleElementReferenceException:
+        return ""
+
