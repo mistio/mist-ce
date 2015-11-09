@@ -747,7 +747,9 @@ def _add_backend_libvirt(user, title, provider, params):
     apikey = params.get('machine_user', 'root')
 
     apisecret = params.get('machine_key', '')
-    images_location = params.get('images_location', '/var')
+    images_location = params.get('images_location', '')
+    if not images_location:
+        images_location = '/var'
 
     if apisecret:
         if apisecret not in user.keypairs:

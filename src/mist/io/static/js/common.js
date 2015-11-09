@@ -1059,6 +1059,15 @@ var PROVIDER_MAP = {
             optional: true,
             defaultValue: '22',
         },
+        {
+            name: 'images_location',
+            type: 'text',
+            label: 'Path for *.iso images',
+            optional: true,
+            defaultValue: '/var',
+            helpText: 'The path that your *.iso images are located, example /var/lib/libvirt/',
+        },
+
     ],
 
     vcloud: [
