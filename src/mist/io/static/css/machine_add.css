@@ -202,3 +202,7 @@
 #create-machine-floating-ip {
     display: none;
 }
+
+#machine-create textarea {
+	max-height: 150px;
+}

@@ -20,10 +20,13 @@ define('app/controllers/machine_add', ['ember'],
             newMachineName: null,
             newMachineSize: null,
             newMachineImage: null,
+            newMachineCloudInit: null,
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
-            newMachineMonitoring: true,
+            newMachineMonitoring: Ember.computed(function() {
+                return Mist.email ? true : false;
+            }),
             newMachineAssociateFloatingIp: true,
             newMachineDockerCommand: null,
             newMachineDockerEnvironment: null,
@@ -109,19 +112,19 @@ define('app/controllers/machine_add', ['ember'],
 
                 var that = this;
                 this.newMachineProvider.machines.newMachine(
-                        this.newMachineName,
-                        this.newMachineImage,
-                        this.newMachineSize,
-                        this.newMachineLocation,
-                        this.newMachineKey,
-                        this.newMachineScript,
-                        this.newMachineMonitoring,
-                        this.newMachineAssociateFloatingIp,
-                        this.newMachineDockerEnvironment.trim(),
-                        this.newMachineDockerCommand,
-                        this.newMachineScriptParams,
-                        this.newMachineDockerPorts,
-                        this.newMachineAzurePorts,
+                        this.get('newMachineName'),
+                        this.get('newMachineImage'),
+                        this.get('newMachineSize'),
+                        this.get('newMachineLocation'),
+                        this.get('newMachineKey'),
+                        this.get('newMachineScript'),
+                        this.get('newMachineMonitoring'),
+                        this.get('newMachineAssociateFloatingIp'),
+                        this.get('newMachineDockerEnvironment').trim(),
+                        this.get('newMachineDockerCommand'),
+                        this.get('newMachineScriptParams'),
+                        this.get('newMachineDockerPorts'),
+                        this.get('newMachineAzurePorts'),
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }
@@ -143,6 +146,7 @@ define('app/controllers/machine_add', ['ember'],
              _clear: function() {
                 this.set('callback', null)
                     .set('newMachineName', '')
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
@@ -199,6 +203,7 @@ define('app/controllers/machine_add', ['ember'],
 
             _resetProvider: function() {
                 this.set('callback', null)
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
