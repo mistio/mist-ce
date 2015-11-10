@@ -93,7 +93,11 @@
                     {{#if view.hasLibvirt}}
                         <li data-icon="false" data-theme="d">
                             <a {{action "createLibvirtImage" target=view}}>
-                                Create Image
+                                {{#if Mist.machineAddController.newMachineLibvirtImagePath}}
+                                    {{Mist.machineAddController.newMachineLibvirtImagePath}}
+                                {{else}}
+                                    Create Image
+                                {{/if}}
                             </a>
                         </li>
                     {{/if}}

@@ -109,32 +109,33 @@ define('app/controllers/machine_add', ['ember'],
                         return;
                     }
                 }
+                console.log(this);
                 
-                var that = this;
-                this.newMachineProvider.machines.newMachine(
-                        this.newMachineProvider.provider,
-                        this.newMachineName,
-                        this.newMachineImage,
-                        this.newMachineSize,
-                        this.newMachineLocation,
-                        this.newMachineKey,
-                        this.newMachineScript,
-                        this.newMachineMonitoring,
-                        this.newMachineDockerEnvironment.trim(),
-                        this.newMachineDockerCommand,
-                        this.newMachineScriptParams,
-                        this.newMachineDockerPorts,
-                        this.newMachineAzurePorts,
-                        this.newMachineLibvirtDiskSize,
-                        this.newMachineLibvirtDiskPath,
-                        this.newMachineLibvirtImagePath,
-                        this.newMachineLibvirtExistingDiskPath,
-                        function(success, machine) {
-                            that._giveCallback(success, machine);
-                        }
-                );
+                // var that = this;
+                // this.newMachineProvider.machines.newMachine(
+                //         this.newMachineProvider.provider,
+                //         this.newMachineName,
+                //         this.newMachineImage,
+                //         this.newMachineSize,
+                //         this.newMachineLocation,
+                //         this.newMachineKey,
+                //         this.newMachineScript,
+                //         this.newMachineMonitoring,
+                //         this.newMachineDockerEnvironment.trim(),
+                //         this.newMachineDockerCommand,
+                //         this.newMachineScriptParams,
+                //         this.newMachineDockerPorts,
+                //         this.newMachineAzurePorts,
+                //         this.newMachineLibvirtDiskSize,
+                //         this.newMachineLibvirtDiskPath,
+                //         this.newMachineLibvirtImagePath,
+                //         this.newMachineLibvirtExistingDiskPath,
+                //         function(success, machine) {
+                //             that._giveCallback(success, machine);
+                //         }
+                // );
 
-                this.close();
+                // this.close();
             },
 
 
@@ -194,10 +195,9 @@ define('app/controllers/machine_add', ['ember'],
 
                 var re = /^[0-9]*$/;
                 if (this.newMachineProvider.provider == 'libvirt' &&
-                    (this.newMachineImage.id || this.newMachineLibvirtImagePath || this.newMachineLibvirtExistingDiskPath) &&
-                    this.newMachineName &&
-                    this.newMachineLibvirtDiskPath &&
-                    re.test(this.get('newMachineLibvirtDiskSize'))) {
+                    ((this.newMachineImage.id && this.newMachineSize.id) || this.newMachineLibvirtImagePath) &&
+                    ((this.newMachineLibvirtDiskPath && re.test(this.get('newMachineLibvirtDiskSize'))) || this.newMachineLibvirtExistingDiskPath) &&
+                    this.newMachineName) {
                         formReady = true;
                 }
 

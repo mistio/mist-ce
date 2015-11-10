@@ -252,11 +252,22 @@ define('app/views/machine_add', ['app/views/controlled'],
                 },
 
                 createLibvirtImage: function () {
-                    if (this.fieldIsReady) {
-                        this.fieldIsReady('image');
-                    }
+                    var that = this;
+                    Mist.machineImageCreateController.open(function(newImagePath) {
+                        if (newImagePath) {
+                            var imageFaker = Ember.Object.create({
+                                id: newImagePath,
+                                name: newImagePath
+                            });
 
-                    Mist.machineImageCreateController.open();
+                            Mist.machineAddController.setProperties({
+                                'newMachineImage': imageFaker,
+                                'newMachineLibvirtImagePath': newImagePath
+                            });
+
+                            that.fieldIsReady('image');
+                        }
+                    });
                 },
 
 

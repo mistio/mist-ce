@@ -13,10 +13,14 @@
     <div data-role="content">
 
         <form {{action "saveClicked" on="submit" target=view}}>
-            <div id="new-key-name-wrapper" class="required {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
+            <div id="new-key-name-wrapper" class="required {{if Mist.machineImageCreateController.image.path 'filled' 'empty'}}">
                 <label for="new-machine-image-name">Image's path</label>
-                {{input id="new-machine-image-name" value=Mist.machineAddController.newMachineImage.id}}
-            </div>     
+                {{input id="new-machine-image-name" value=Mist.machineImageCreateController.image.path}}
+            </div>
+
+            {{#if Mist.machineImageCreateController.creatingImage}}
+                <div class="ajax-loader"></div>
+            {{/if}}     
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
                 <button type="submit" id="create-image-ok" class="ui-btn ui-btn-d ui-caps">Save</button>
