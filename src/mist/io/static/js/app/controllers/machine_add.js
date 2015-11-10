@@ -194,8 +194,7 @@ define('app/controllers/machine_add', ['ember'],
 
                 var re = /^[0-9]*$/;
                 if (this.newMachineProvider.provider == 'libvirt' &&
-                    ((this.newMachineImage.id && this.newMachineSize.id) || this.newMachineLibvirtImagePath) &&
-                    ((this.newMachineLibvirtDiskPath && re.test(this.get('newMachineLibvirtDiskSize'))) || this.newMachineLibvirtExistingDiskPath) &&
+                    (((this.newMachineImage.id && this.newMachineSize.id) || this.newMachineLibvirtImagePath) || this.newMachineLibvirtExistingDiskPath) &&
                     this.newMachineName) {
                         formReady = true;
                 }
