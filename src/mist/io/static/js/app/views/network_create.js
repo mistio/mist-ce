@@ -24,9 +24,13 @@ define('app/views/network_create', ['app/views/controlled'],
              *  Computed Properties
              */
 
-            isDisabled: function() {
-                return !Mist.backendsController.hasOpenStack;
-            }.property('Mist.backendsController.hasOpenStack'),
+            isOpenstack: Ember.computed('Mist.networkCreateController.network.backend', function() {
+                return Mist.networkCreateController.network.backend && Mist.networkCreateController.network.backend.get('isOpenStack');
+            }),
+
+            isDisabled: Ember.computed('Mist.backendsController.canHaveNetworks', function() {
+                return !Mist.backendsController.get('canHaveNetworks');
+            }),
 
 
             /**
@@ -102,14 +106,17 @@ define('app/views/network_create', ['app/views/controlled'],
             },
 
             renderFields: function () {
-                Ember.run.next(function () {
+                Ember.run.next(function(){
+                    $('body').enhanceWithin();
                     // Render collapsibles
                     if ($('#network-create .ui-collapsible').collapsible)
                         $('#network-create .ui-collapsible').collapsible();
                     // Render listviews
                     if ($('#network-create .ui-listview').listview)
-                        $('#network-create .ui-listview').listview()
-                            .listview('refresh');
+                        $('#network-create .ui-listview').listview().listview('refresh');
+                    // Render checkboxes
+                    if ($('#network-create .ember-checkbox').checkboxradio)
+                        $('#network-create .ember-checkbox').checkboxradio().checkboxradio('refresh');
                 });
             },
 
@@ -136,6 +143,7 @@ define('app/views/network_create', ['app/views/controlled'],
                 backendSelected: function (backend) {
                     Mist.networkCreateController.selectBackend(backend);
                     this._fieldIsReady('backend');
+                    this.renderFields();
                 },
 
                 adminStateSelected: function (isUp) {

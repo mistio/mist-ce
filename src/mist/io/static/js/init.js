@@ -367,8 +367,12 @@ var setupMainChannel = function(socket, callback) {
     })
     .on('list_networks', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.networks.setModel(data.networks);
+        if (backend) {
+            var networks = [];
+            networks.pushObjects(data.networks.public);
+            networks.pushObjects(data.networks.private);
+            backend.networks.setModel(networks);
+        }
     })
     .on('monitoring',function (data){
         Mist.monitoringController._updateMonitoringData(data);

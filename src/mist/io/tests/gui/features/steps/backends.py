@@ -1,7 +1,8 @@
 from behave import *
 from time import time, sleep
 from selenium.common.exceptions import NoSuchElementException
-from mist.io.tests.gui.features.steps.general import search_for_button
+from mist.io.tests.gui.features.steps.general import search_for_button, safe_get_element_text
+
 
 try:
     from mist.io.tests.settings import CREDENTIALS
@@ -26,7 +27,7 @@ def given_backend(context, backend):
 
     if backend_buttons:
         for button in backend_buttons:
-            if backend.lower() in button.text.lower():
+            if backend.lower() in safe_get_element_text(button).lower():
                 return
 
     if "openstack" in backend.lower():

@@ -202,3 +202,11 @@
 #machine-create #create-machine-libvirt-disk-type .ui-slider {
     width: 110px;
 }
+
+#create-machine-floating-ip {
+    display: none;
+}
+
+#machine-create textarea {
+	max-height: 150px;
+}

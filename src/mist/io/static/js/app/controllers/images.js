@@ -103,6 +103,12 @@ define('app/controllers/images',
                         object: image,
                         star: star
                     });
+
+                    // In case we "star" an image we trigger this event to refresh
+                    // images list and make this image appear on top with other starred images
+                    if (star) {
+                        Mist.backendsController.trigger('onImagesChange');
+                    }
                 });
             },
         });

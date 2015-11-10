@@ -1,5 +1,6 @@
 from behave import *
 from time import time, sleep
+from mist.io.tests.gui.features.steps.general import *
 
 
 @then(u'Images list should be loaded within {seconds} seconds')
@@ -27,7 +28,7 @@ def assert_starred_image(context, text):
     starred_images = filter(lambda li: 'staron' in li.get_attribute('class'), images)
     if text == 'the_name_that_i_used_before':
         text = context.mist_config['PREVIOUS_IMAGE_NAME']
-    starred_image = filter(lambda li: text in li.text.lower(), starred_images)
+    starred_image = filter(lambda li: text in safe_get_element_text(li).lower(), starred_images)
     assert len(starred_image) == 1, "Could not find starred image with name %s" % text
 
 
@@ -37,10 +38,11 @@ def star_image(context, text):
     images = images_list.find_elements_by_tag_name("li")
 
     for image in images:
-        if text in image.text:
+        if text in safe_get_element_text(image):
             star_button = image.find_element_by_class_name("ui-checkbox")
             star_button.click()
-            context.mist_config['PREVIOUS_IMAGE_NAME'] = image.find_element_by_tag_name('h3').text
+            image = image.find_element_by_tag_name('h3')
+            context.mist_config['PREVIOUS_IMAGE_NAME'] = safe_get_element_text(image)
             return
 
 
@@ -58,7 +60,7 @@ def unstar_image(context, text):
     if text == 'the_name_that_i_used_before':
         text = context.mist_config['PREVIOUS_IMAGE_NAME']
     for image in images:
-        if text in image.text:
+        if text in safe_get_element_text(image):
             star_button = image.find_element_by_class_name("ui-checkbox")
             star_button.click()
             return

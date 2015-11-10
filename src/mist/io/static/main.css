@@ -48,7 +48,16 @@
 }
 
 #banner-logo {
-    width: 121px;
+    display: inline-block;
+    width: 120px;
+    height: 54px;
+    background: transparent url(images/logo.png) no-repeat left center;
+}
+@media (min-device-pixel-ratio: 2), (-webkit-min-resolution: 192dpi), (min-resolution: 192dpi) {
+    #banner-logo {
+        background: url(images/logo@2x.png) no-repeat left center;
+        background-size: 120px;
+    }
 }
 
 .user-menu {
@@ -450,6 +459,7 @@ textarea {
 }
 #dialog .ui-content{
     text-align: center;
+    word-wrap: break-word;
 }
 .tiny-popup {
     min-width: 150px !important;
@@ -1132,12 +1142,21 @@ ul.checkbox-list .ui-grid-b {
 /* User menu
 -----------------------------------------------------------------------------------------------------------*/
 #me-btn {
-    display: block;
+    display: inline-block;
     background: transparent;
-    height: 48px;
+    height: 56px;
     padding: 0px;
     border-width: 0px;
     box-shadow: 0 0 0 0;
+}
+
+#me-btn:hover {
+    cursor: pointer;
+}
+
+#me-btn:hover .gravatar-image,
+#me-btn:active .gravatar-image {
+    border-color: #0099cc;
 }
 
 #me-btn .owner {

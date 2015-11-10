@@ -41,7 +41,7 @@ define('app/controllers/machines', ['app/models/machine'],
             //  Methods
             //
 
-            newMachine: function(provider, name, image, size, location, key, script, monitoring,
+            newMachine: function(provider, name, image, size, location, key, cloud_init, script, monitoring, associateFloatingIp,
                 dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtDiskSize, libvirtDiskPath, libvirtImagePath, libvirtExistingDiskPath) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -96,6 +96,7 @@ define('app/controllers/machines', ['app/models/machine'],
                         'name': name,
                         'key': key ? key.id : null,
                         'size': size.id,
+                        'cloud_init': cloud_init,
                         'script': script.id ? undefined : script,
                         'script_id': script.id || undefined,
                         'script_params': scriptParams,
@@ -111,6 +112,7 @@ define('app/controllers/machines', ['app/models/machine'],
                         'monitoring' : monitoring,
                         // Openstack
                         'networks': networks,
+                        'associate_floating_ip': associateFloatingIp,
                         // Docker
                         'docker_env': environment,
                         'docker_command': dockerCommand,

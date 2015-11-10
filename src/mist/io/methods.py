@@ -4,6 +4,7 @@ import random
 import socket
 import tempfile
 import json
+import base64
 import requests
 import subprocess
 import re
@@ -1558,8 +1559,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
-                   post_script_id='', post_script_params='',
-                   disk_size=None, disk_path=None, create_from_existing=None):
+                   disk_size=None, disk_path=None, create_from_existing=None,
+                   post_script_id='', post_script_params='', cloud_init='',
+                   associate_floating_ip=False, associate_floating_ip_subnet=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1631,10 +1633,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
         node = _create_machine_rackspace(conn, public_key, machine_name, image,
-                                         size, location)
+                                         size, location, user_data=cloud_init)
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key,
-                                         machine_name, image, size, location, networks)
+                                         machine_name, image, size, location, networks, cloud_init)
     elif conn.type is Provider.HPCLOUD:
         node = _create_machine_hpcloud(conn, private_key, public_key,
                                        machine_name, image, size, location, networks)
@@ -1645,7 +1647,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 location = loc
                 break
         node = _create_machine_ec2(conn, key_id, private_key, public_key,
-                                   machine_name, image, size, location)
+                                   machine_name, image, size, location, cloud_init)
     elif conn.type is Provider.NEPHOSCALE:
         node = _create_machine_nephoscale(conn, key_id, private_key, public_key,
                                           machine_name, image, size,
@@ -1665,11 +1667,12 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(conn, key_id, private_key,
                                              public_key, machine_name,
-                                             image, size, location)
+                                             image, size, location, cloud_init)
     elif conn.type == Provider.AZURE:
         node = _create_machine_azure(conn, key_id, private_key,
-                                             public_key, machine_name,
-                                             image, size, location, cloud_service_name=None, azure_port_bindings=azure_port_bindings)
+                                     public_key, machine_name,
+                                     image, size, location, cloud_init=cloud_init,
+                                     cloud_service_name=None, azure_port_bindings=azure_port_bindings)
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
@@ -1703,7 +1706,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
 
-
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
@@ -1724,6 +1726,18 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             post_script_id=post_script_id,
             post_script_params=post_script_params,
         )
+    elif conn.type == Provider.OPENSTACK:
+        if associate_floating_ip:
+            networks = list_networks(user, backend_id)
+            mist.io.tasks.openstack_post_create_steps.delay(
+                user.email, backend_id, node.id, monitoring, script, key_id,
+                node.extra.get('username'), node.extra.get('password'), public_key,
+                script_id=script_id, script_params=script_params, job_id = job_id,
+                hostname=hostname, plugins=plugins,
+                post_script_id=post_script_id,
+                post_script_params=post_script_params,
+                networks=networks
+            )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key
@@ -1758,7 +1772,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
 
 
 def _create_machine_rackspace(conn, public_key, machine_name,
-                             image, size, location):
+                             image, size, location, user_data):
     """Create a machine in Rackspace.
 
     Here there is no checking done, all parameters are expected to be
@@ -1790,14 +1804,14 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
     try:
         node = conn.create_node(name=machine_name, image=image, size=size,
-                                location=location, ex_keyname=server_key)
+                                location=location, ex_keyname=server_key, ex_userdata=user_data)
         return node
     except Exception as e:
         raise MachineCreationError("Rackspace, got exception %r" % e, exc=e)
 
 
 def _create_machine_openstack(conn, private_key, public_key, machine_name,
-                             image, size, location, networks):
+                             image, size, location, networks, user_data):
     """Create a machine in Openstack.
 
     Here there is no checking done, all parameters are expected to be
@@ -1841,7 +1855,8 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
                 ex_keyname=server_key,
-                networks=chosen_networks)
+                networks=chosen_networks,
+                ex_userdata=user_data)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e, e)
     return node
@@ -1901,7 +1916,7 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
 
 
 def _create_machine_ec2(conn, key_name, private_key, public_key,
-                       machine_name, image, size, location):
+                       machine_name, image, size, location, user_data):
     """Create a machine in Amazon EC2.
 
     Here there is no checking done, all parameters are expected to be
@@ -1946,7 +1961,8 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
                 ssh_key=tmp_key_path,
                 max_tries=1,
                 ex_keyname=key_name,
-                ex_securitygroup=config.EC2_SECURITYGROUP['name']
+                ex_securitygroup=config.EC2_SECURITYGROUP['name'],
+                ex_userdata=user_data
             )
         except Exception as e:
             raise MachineCreationError("EC2, got exception %s" % e, e)
@@ -2104,7 +2120,7 @@ def _create_machine_docker(conn, machine_name, image, script=None, public_key=No
     return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location):
+                                  machine_name, image, size, location, user_data):
     """Create a machine in Digital Ocean.
 
     Here there is no checking done, all parameters are expected to be
@@ -2161,6 +2177,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 location=location,
                 ssh_key=tmp_key_path,
                 private_networking=private_networking,
+                user_data=user_data
             )
         except Exception as e:
             raise MachineCreationError("Digital Ocean, got exception %s" % e, e)
@@ -2283,7 +2300,7 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location)
 
 
 def _create_machine_azure(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location, cloud_service_name, azure_port_bindings):
+                          machine_name, image, size, location, cloud_init, cloud_service_name, azure_port_bindings):
     """Create a machine Azure.
 
     Here there is no checking done, all parameters are expected to be
@@ -2320,7 +2337,8 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 image=image,
                 location=location,
                 ex_cloud_service_name=cloud_service_name,
-                endpoint_ports=port_bindings
+                endpoint_ports=port_bindings,
+                custom_data=base64.b64encode(cloud_init)
             )
         except Exception as e:
             try:
@@ -2935,34 +2953,51 @@ def list_networks(user, backend_id):
     backend = user.backends[backend_id]
     conn = connect_provider(backend)
 
-    ret = []
+    ret = {}
+    ret['public'] = []
+    ret['private'] = []
+    ret['routers'] = []
 
     # Get the actual networks
     if conn.type in [Provider.NEPHOSCALE]:
         networks = conn.ex_list_networks()
         for network in networks:
-            ret.append(nephoscale_network_to_dict(network))
-    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT]:
+            ret['public'].append(nephoscale_network_to_dict(network))
+    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         networks = conn.ex_list_networks()
 
         for network in networks:
-            ret.append({
+            ret['public'].append({
                 'id': network.id,
                 'name': network.name,
                 'extra': network.extra,
             })
-    elif conn.type in [Provider.OPENSTACK]:
-        networks = conn.ex_list_neutron_networks()
-        for network in networks:
-            ret.append(openstack_network_to_dict(network))
-    elif conn.type in [Provider.HPCLOUD]:
+    elif conn.type in (Provider.OPENSTACK, Provider.HPCLOUD):
         networks = conn.ex_list_networks()
+        subnets = conn.ex_list_subnets()
+        routers = conn.ex_list_routers()
+        floatings_ips = conn.ex_list_floating_ips()
+        if floatings_ips:
+            nodes = conn.list_nodes()
+        else:
+            nodes = []
+
+        public_networks = []
+        for net in networks:
+            if net.router_external:
+                net_index = networks.index(net)
+                public_networks.append(networks.pop(net_index))
+
+        for pub_net in public_networks:
+            ret['public'].append(openstack_network_to_dict(pub_net, subnets, floatings_ips, nodes))
         for network in networks:
-            ret.append(openstack_network_to_dict(network))
+            ret['private'].append(openstack_network_to_dict(network, subnets))
+        for router in routers:
+            ret['routers'].append(openstack_router_to_dict(router))
     elif conn.type in [Provider.GCE]:
         networks = conn.ex_list_networks()
         for network in networks:
-            ret.append(gce_network_to_dict(network))
+            ret['public'].append(gce_network_to_dict(network))
     elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST,
                        Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
                        Provider.EC2_EU, Provider.EC2_EU_WEST,
@@ -2970,7 +3005,8 @@ def list_networks(user, backend_id):
                        Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON]:
         networks = conn.ex_list_networks()
         for network in networks:
-            ret.append(ec2_network_to_dict(network))
+            ret['public'].append(ec2_network_to_dict(network))
+
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()
@@ -3011,18 +3047,38 @@ def gce_network_to_dict(network):
     return net
 
 
-def openstack_network_to_dict(network):
+def openstack_network_to_dict(network, subnets=[], floating_ips=[], nodes=[]):
     net = {}
     net['name'] = network.name
     net['id'] = network.id
     net['status'] = network.status
-
-    net['subnets'] = []
-    for sub in network.subnets:
-
-        net['subnets'].append(openstack_subnet_to_dict(sub))
+    net['router_external'] = network.router_external
+    net['extra'] = network.extra
+    net['public'] = bool(network.router_external)
+    net['subnets'] = [openstack_subnet_to_dict(subnet) for subnet in subnets if subnet.id in network.subnets]
+    net['floating_ips'] = []
+    for floating_ip in floating_ips:
+        if floating_ip.floating_network_id == network.id:
+            net['floating_ips'].append(openstack_floating_ip_to_dict(floating_ip, nodes))
     return net
 
+
+def openstack_floating_ip_to_dict(floating_ip, nodes=[]):
+    ret = {}
+    ret['id'] = floating_ip.id
+    ret['floating_network_id'] = floating_ip.floating_network_id
+    ret['floating_ip_address'] = floating_ip.floating_ip_address
+    ret['fixed_ip_address'] = floating_ip.fixed_ip_address
+    ret['status'] = str(floating_ip.status)
+    ret['port_id'] = floating_ip.port_id
+    ret['extra'] = floating_ip.extra
+    ret['node_id'] = ''
+
+    for node in nodes:
+        if floating_ip.fixed_ip_address in node.private_ips:
+            ret['node_id'] = node.id
+
+    return ret
 
 def openstack_subnet_to_dict(subnet):
     net = {}
@@ -3034,8 +3090,24 @@ def openstack_subnet_to_dict(subnet):
     net['dns_nameservers'] = subnet.dns_nameservers
     net['allocation_pools'] = subnet.allocation_pools
     net['gateway_ip'] = subnet.gateway_ip
+    net['ip_version'] = subnet.ip_version
+    net['extra'] = subnet.extra
 
     return net
+
+
+def openstack_router_to_dict(router):
+    ret = {}
+
+    ret['name'] = router.name
+    ret['id'] = router.id
+    ret['status'] = router.status
+    ret['external_gateway_info'] = router.external_gateway_info
+    ret['external_gateway'] = router.external_gateway
+    ret['admin_state_up'] = router.admin_state_up
+    ret['extra'] = router.extra
+
+    return ret
 
 
 def associate_ip(user, backend_id, network_id, ip, machine_id=None, assign=True):
@@ -3166,7 +3238,7 @@ def _create_network_openstack(conn, network, subnet, router):
 
     # First we create the network
     try:
-        new_network = conn.ex_create_neutron_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+        new_network = conn.ex_create_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
     except Exception as e:
         raise NetworkCreationError("Got error %s" % str(e))
 
@@ -3186,11 +3258,11 @@ def _create_network_openstack(conn, network, subnet, router):
         enable_dhcp = subnet.get('enable_dhcp', True)
 
         try:
-            subnet = conn.ex_create_neutron_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
-                                                   allocation_pools=allocation_pools, gateway_ip=gateway_ip,
-                                                   ip_version=ip_version, enable_dhcp=enable_dhcp)
+            subnet = conn.ex_create_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
+                                           allocation_pools=allocation_pools, gateway_ip=gateway_ip,
+                                           ip_version=ip_version, enable_dhcp=enable_dhcp)
         except Exception as e:
-            conn.ex_delete_neutron_network(network_id)
+            conn.ex_delete_network(network_id)
             raise NetworkError(e)
 
         ret['network'] = openstack_network_to_dict(new_network)
@@ -3214,7 +3286,7 @@ def delete_network(user, backend_id, network_id):
     conn = connect_provider(backend)
     if conn.type is Provider.OPENSTACK:
         try:
-            conn.ex_delete_neutron_network(network_id)
+            conn.ex_delete_network(network_id)
         except Exception as e:
             raise NetworkError(e)
     elif conn.type is Provider.HPCLOUD:

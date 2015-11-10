@@ -506,6 +506,9 @@ def create_machine(request):
         # hostname: if provided it will be attempted to assign a DNS name
         hostname = request.json_body.get('hostname', '')
         plugins = request.json_body.get('plugins')
+        cloud_init = request.json_body.get('cloud_init', '')
+        associate_floating_ip = request.json_body.get('associate_floating_ip', False)
+        associate_floating_ip_subnet = request.json_body.get('attach_floating_ip_subnet', None)
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -527,6 +530,9 @@ def create_machine(request):
               'post_script_params': post_script_params, 'disk_size': disk_size,
               'disk_path': disk_path,
               'create_from_existing': create_from_existing}
+              'cloud_init': cloud_init,
+              'associate_floating_ip': associate_floating_ip,
+              'associate_floating_ip_subnet': associate_floating_ip_subnet}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:

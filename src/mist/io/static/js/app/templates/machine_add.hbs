@@ -263,6 +263,26 @@
                 {{/each}}
             </fieldset>
         </div>
+
+        <div id="create-machine-floating-ip">
+            {{view Mist.Checkbox
+            data-theme="a"
+            id="associate_floating_ip"
+            checked=Mist.machineAddController.newMachineAssociateFloatingIp}}
+            <label for="associate_floating_ip" data-corners="false">
+                Associate Floating Ip
+            </label>
+        </div>
+        {{/if}}
+
+        <!-- Select Cloud Init Script -->
+        {{#if view.hasCloudInit}}
+        <div id="cloud-init">
+            <label for="create-machine-cloud-init">Cloud Init</label>
+            {{view Mist.TextArea
+                   id="create-machine-cloud-init"
+                   value=Mist.machineAddController.newMachineCloudInit}}
+        </div>
         {{/if}}
 
         <!-- Select Script -->
@@ -304,7 +324,6 @@
 
                 {{view Mist.TextArea
                        id="create-machine-script-params"
-
                        placeholder="Optional script parameters"
                        value=Mist.machineAddController.newMachineScriptParams}}
             </div>
