@@ -529,7 +529,7 @@ def create_machine(request):
               'post_script_id': post_script_id,
               'post_script_params': post_script_params, 'disk_size': disk_size,
               'disk_path': disk_path,
-              'create_from_existing': create_from_existing}
+              'create_from_existing': create_from_existing,
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet}
