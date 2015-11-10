@@ -254,10 +254,11 @@ define('app/views/machine_add', ['app/views/controlled'],
                 },
 
                 createLibvirtImage: function () {
-                    console.log('click');
                     if (this.fieldIsReady) {
                         this.fieldIsReady('image');
                     }
+
+                    Mist.machineImageCreateController.open();
                 },
 
 
