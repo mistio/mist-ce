@@ -28,13 +28,10 @@ define('app/controllers/machine_add', ['ember'],
             newMachineDockerEnvironment: null,
             newMachineDockerPorts: null,
             newMachineAzurePorts: null,
-            newMachineLibvirtCPU: 1,
-            newMachineLibvirtRAM: 512,
             newMachineLibvirtDiskPath: '/var/lib/libvirt/',
             newMachineLibvirtDiskSize: 4,
             newMachineLibvirtImagePath: null,
             newMachineLibvirtExistingDiskPath: null,
-            newMachineLibvirtNetwork: 'default',
 
 
             //
@@ -128,13 +125,10 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineScriptParams,
                         this.newMachineDockerPorts,
                         this.newMachineAzurePorts,
-                        this.newMachineLibvirtCPU,
-                        this.newMachineLibvirtRAM,
                         this.newMachineLibvirtDiskSize,
                         this.newMachineLibvirtDiskPath,
                         this.newMachineLibvirtImagePath,
                         this.newMachineLibvirtExistingDiskPath,
-                        this.newMachineLibvirtNetwork,
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }
@@ -164,11 +158,8 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineAzurePorts', '')
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
-                    .set('newMachineLibvirtCPU', 1)
-                    .set('newMachineLibvirtRAM', 512)
                     .set('newMachineLibvirtImagePath', '')
-                    .set('newMachineLibvirtExistingDiskPath', '')
-                    .set('newMachineLibvirtNetwork', 'default');
+                    .set('newMachineLibvirtExistingDiskPath', '');
                 this.view.clear();
              },
 
@@ -235,11 +226,8 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineAzurePorts', '')
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
-                    .set('newMachineLibvirtCPU', 1)
-                    .set('newMachineLibvirtRAM', 512)
                     .set('newMachineLibvirtImagePath', '')
-                    .set('newMachineLibvirtExistingDiskPath', '')
-                    .set('newMachineLibvirtNetwork', 'default');
+                    .set('newMachineLibvirtExistingDiskPath', '');
             },
 
             _selectUnique: function() {
@@ -313,8 +301,6 @@ define('app/controllers/machine_add', ['ember'],
                        'newMachineProvider',
                         'newMachineLibvirtDiskSize',
                         'newMachineLibvirtDiskPath',
-                        'newMachineLibvirtCPU',
-                        'newMachineLibvirtRAM',
                         'newMachineLibvirtImagePath',
                         'newMachineLibvirtExistingDiskPath')
         });

@@ -14,8 +14,6 @@ define('app/views/machine_add', ['app/views/controlled'],
             dockerNeedScript: false,
             hasAdvancedScript: false,
             hasLibvirtDiskNew: true,
-            newMachineLibvirtCPUOptions: null,
-            newMachineLibvirtRAMOptions: null,
 
 
             hasLibvirt: function() {
