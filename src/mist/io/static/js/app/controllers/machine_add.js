@@ -20,6 +20,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineName: null,
             newMachineSize: null,
             newMachineImage: null,
+            newMachineCloudInit: null,
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
@@ -145,6 +146,7 @@ define('app/controllers/machine_add', ['ember'],
              _clear: function() {
                 this.set('callback', null)
                     .set('newMachineName', '')
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
@@ -169,10 +171,9 @@ define('app/controllers/machine_add', ['ember'],
                     formReady = true;
                 }
 
-                // SSH key and location are optional for docker
+                // SSH key is optional for docker
                 if (this.newMachineProvider.provider != 'docker') {
-                    if (!(Mist.keysController.keyExists(this.newMachineKey.id) &&
-                        this.newMachineLocation.id)) {
+                    if (!Mist.keysController.keyExists(this.newMachineKey.id)) {
                         formReady = false;
                     }
                 }
@@ -202,6 +203,7 @@ define('app/controllers/machine_add', ['ember'],
 
             _resetProvider: function() {
                 this.set('callback', null)
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
@@ -218,7 +220,9 @@ define('app/controllers/machine_add', ['ember'],
             _selectUnique: function() {
                 // Locations Check
                 if (this.newMachineProvider.locations) {
-                    if (this.newMachineProvider.locations.model.length == 1) this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                    if (this.newMachineProvider.locations.model.length == 1) {
+                        this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                    }
                 }
 
                 // Sizes Check
