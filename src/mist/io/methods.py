@@ -1239,8 +1239,10 @@ def connect_provider(backend):
         # create a temp file and output the cert there, so that
         # Azure driver is instantiated by providing a string with the key instead of
         # a cert file
-        with get_temp_file(backend.apisecret) as tmp_key_path:
-            conn = driver(backend.apikey, tmp_key_path)
+        temp_key_file = NamedTemporaryFile(delete=False)
+        temp_key_file.write(backend.apisecret)
+        temp_key_file.close()
+        conn = driver(backend.apikey, temp_key_file.name)
     elif backend.provider == Provider.OPENSTACK:
         #keep this for backend compatibility, however we now use HPCLOUD
         #as separate provider
