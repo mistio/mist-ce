@@ -24,10 +24,8 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="/resources/images/favicons/mstile-144x144.png">
     <meta name="theme-color" content="#ffffff">
-    <!-- <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" type="text/css"> -->
-    <!-- <link rel="stylesheet" href="/resources/theme.css"/>  -->
-    <!-- <link rel="stylesheet" href="/resources/main.css"/> -->
-    <link rel="stylesheet" href="/resources/css/missing.css"/> 
+    <script tal:condition="csrf_token|nothing" tal:content="string: var CSRF_TOKEN=${csrf_token}" />
+    <link rel="stylesheet" href="/resources/css/missing.css"/>
 
     <!-- Begin CSS Files -->
     <link tal:condition="not:css_build|nothing" rel="stylesheet" type="text/css" href="resources/dist/animate.css/animate.min.css">
@@ -37,6 +35,24 @@
 
     <link tal:condition="css_build|nothing" rel="stylesheet" type="text/css" href="core/landing${last_build}.min.css">
     <!-- End CSS Files -->
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-30476788-1', 'mist.io');
+      ga('require', 'linkid', 'linkid.js');
+      ga('require', 'displayfeatures');
+      ga('send', 'pageview');
+    </script>
+
+    <!-- mixpanel-->
+    <script type="text/javascript">(function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");
+     for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="//cdn.mxpnl.com/libs/mixpanel-2.2.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
+     mixpanel.init("6175413d7db86dbb0381ff84f8b9bd67");
+     </script>
 </head>
 
 <body>
@@ -68,7 +84,7 @@
                                 <li><a href="http://docs.mist.io/" class="waves-effect waves-light" target="_blank">Docs</a></li>
                                 <li><a href="http://blog.mist.io/" class="waves-effect waves-light" target="_blank">Blog</a></li>
                                 <li><a class="waves-effect waves-light" target="_blank" href="http://mistio.workable.com/">Jobs</a></li>
-                                <li><a href="#modalLogin" class="btn white text-black waves-effect waves-light modal-trigger">Sign In</a></li>
+                                <li tal:condition="not:auth|nothing"><a href="#modalLogin" class="btn white text-black waves-effect waves-light modal-trigger">Sign In</a></li>
                             </ul>
 
                             <ul id="nav-mobile" class="side-nav">
@@ -78,7 +94,7 @@
                                 <li><a href="http://docs.mist.io/" class="waves-effect waves-light" target="_blank">Docs</a></li>
                                 <li><a href="http://blog.mist.io/" class="waves-effect waves-light" target="_blank">Blog</a></li>
                                 <li><a class="waves-effect waves-light" target="_blank" href="http://mistio.workable.com/">Jobs</a></li>
-                                <li><a href="#modalLogin" class="btn white text-black waves-effect waves-light modal-trigger">Sign In</a></li>
+                                <li tal:condition="not:auth|nothing"><a href="#modalLogin" class="btn white text-black waves-effect waves-light modal-trigger">Sign In</a></li>
                             </ul>
                             <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
                         </div>
