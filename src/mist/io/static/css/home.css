@@ -1,14 +1,40 @@
 /* Home Page CSS
 -----------------------------------------------------------------------------------------------------------*/
 
-@media all and (min-width: 561px) {
-    #home-page .ui-block-a {
-        padding-right: 15px;
-    }
+#home-page .ui-block-a {
+    padding-right: 15px;
+}
+
+#home-page .ui-block-b {
+    padding-left: 15px;
+}
+
+#home-page .ui-content .ui-grid-a,
+#home-page .ui-content .ui-grid-b,
+#home-page .ui-content .ui-grid-c {
+    overflow: visible;
+}
+
+#home-page .ui-grid-a .ui-block-a,
+#home-page .ui-grid-a .ui-block-b {
+    transition: width .5s;
+    -webkit-transition: width .5s;
+}
+
+#home-page .ui-grid-a {
+   margin-top: -10px;
+   clear: both;
+}
+
+@media all and (max-width: 701px) {
+    #home-page .ui-block-a,
     #home-page .ui-block-b {
-        padding-left: 15px;
+        float: none;
+        width: 100%;
+        padding: 0;
     }
 }
+
 #home-page .options-list li a,
 #home-page .incident-list li a {
     border-top: 1px solid #eeedeb;
@@ -35,23 +61,6 @@
     #home-page .ui-listview .ajax-loader {
         margin-top: -19px;
     }
-}
-
-#home-page .ui-content .ui-grid-a,
-#home-page .ui-content .ui-grid-b,
-#home-page .ui-content .ui-grid-c {
-    overflow: visible;
-}
-
-#home-page .ui-grid-a .ui-block-a,
-#home-page .ui-grid-a .ui-block-b {
-    transition: width .5s;
-    -webkit-transition: width .5s;
-}
-
-#home-page .ui-grid-a {
-   margin-top: -10px;
-   clear: both;
 }
 
 #home-page ul.incidents {
