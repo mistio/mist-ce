@@ -63,6 +63,10 @@ define('app/models/machine', ['ember'],
                 return invalids.indexOf(this.get('state')) > -1;
             }),
 
+            cannotHaveProbe: Ember.computed('state', function() {
+                return this.get('state') == 'terminated';
+            }),
+
             incidents: function () {
                 return incidents = Mist.openIncidents.filterBy('machineId', this.get('id'));
             }.property('Mist.openIncidents.@each.machine'),
