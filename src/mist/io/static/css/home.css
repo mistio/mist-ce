@@ -265,33 +265,13 @@
     }
 
     .incidents .incident .rule-condition,
-    .incidents .incident .time,
-    .incidents .incident .duration {
+    .incidents .incident .time {
         float: none;
         position: absolute;
         right: 37.5px;
     }
 
-    .incidents .incident .rule-condition {
-        position: relative;
-        float: left;
-        right: 0;
-        left: 10px;
-    }
-
-    .incidents .incident .duration {
-        right: 37.5px;
+    .incidents .incident .time {
         top: 27px;
-    }
-
-    .incidents .alert.incident .time {
-        top: 27px;
-    }
-
-    .incidents .alert.incident .rule-condition {
-        float: none;
-        position: absolute;
-        right: 37.5px;
-        left: inherit;
     }
 }
