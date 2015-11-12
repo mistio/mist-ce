@@ -895,7 +895,10 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
              'post_script_params': post_script_params,
              'azure_port_bindings': azure_port_bindings,
              'associate_floating_ip': associate_floating_ip,
-             'cloud_init': cloud_init}
+             'cloud_init': cloud_init,
+             'disk_size': disk_size,
+             'disk_path': disk_path,
+             'create_from_existing': create_from_existing}
         ))
 
     def create_machine_wrapper(args_kwargs):
