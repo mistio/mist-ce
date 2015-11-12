@@ -771,6 +771,19 @@ var PROVIDER_MAP = {
         },
     ],
 
+    packet: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Packet.net',
+        },
+        {
+            name: 'api_key',
+            type: 'password',
+            helpText: 'You can find your API Token on the Packet.net portal'
+        },
+    ],
+
     docker: [
         {
             name: 'title',
