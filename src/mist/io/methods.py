@@ -2237,8 +2237,18 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
         # key exists and will be deployed
         pass
 
+    # if project_id is not specified, use the project for which the driver
+    # has been initiated. If driver hasn't been initiated with a project,
+    # then use the first one from the projects
+
     if not project_id:
-        project_id = conn.ex_list_projects()[0]
+        if conn.project_id:
+            project_id = conn.project_id
+        else:
+            try:
+                project_id = conn.projects[0]
+            except IndexError:
+                raise BadRequestError("You don't have any projects on packet.net")
 
     try:
         node = conn.create_node(
