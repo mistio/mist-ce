@@ -2224,15 +2224,19 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
 
     """
     key = public_key.replace('\n', '')
+    try:
+        conn.create_key_pair('mistio', key)
+    except:
+        # key exists
+        pass
 
     auth = NodeAuthSSHKey(pubkey=key)
 
     try:
         node = conn.create_node(
             name=machine_name,
-            image=image,
             size=size,
-            auth=auth,
+            image=image,
             location=location
         )
     except Exception as e:
