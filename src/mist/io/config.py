@@ -292,6 +292,12 @@ SUPPORTED_PROVIDERS_V_2 = [
         'title': 'VMWare vSphere',
         'provider' : Provider.VSPHERE,
         'regions': []
+    },
+    # Packet.net
+    {
+        'title': 'Packet.net',
+        'provider' : Provider.PACKET,
+        'regions': []
     }
 ]
 
