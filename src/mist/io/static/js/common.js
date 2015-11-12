@@ -782,6 +782,13 @@ var PROVIDER_MAP = {
             type: 'password',
             helpText: 'You can find your API Token on the Packet.net portal'
         },
+        {
+            name: 'project_id',
+            type: 'text',
+            label: 'Project',
+            optional: true,
+            helpText: 'Optionally specify the project name'
+        }
     ],
 
     docker: [
