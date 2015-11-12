@@ -1577,7 +1577,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
                    post_script_id='', post_script_params='', cloud_init='',
-                   associate_floating_ip=False, associate_floating_ip_subnet=None):
+                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1701,7 +1701,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type == Provider.PACKET:
         node = _create_machine_packet(conn, public_key, machine_name, image,
-                                         size, location)
+                                         size, location, cloud_init)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -2216,7 +2216,7 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
     return node
 
 
-def _create_machine_packet(conn, public_key, machine_name, image, size, location):
+def _create_machine_packet(conn, public_key, machine_name, image, size, location, cloud_init, project_id=None):
     """Create a machine in Packet.net.
 
     Here there is no checking done, all parameters are expected to be
@@ -2227,17 +2227,20 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
     try:
         conn.create_key_pair('mistio', key)
     except:
-        # key exists
+        # key exists and will be deployed
         pass
 
-    auth = NodeAuthSSHKey(pubkey=key)
+    if not project_id:
+        project_id = conn.ex_list_projects()[0]
 
     try:
         node = conn.create_node(
             name=machine_name,
             size=size,
             image=image,
-            location=location
+            location=location,
+            ex_project_id=project_id,
+            userdata=cloud_init
         )
     except Exception as e:
         raise MachineCreationError("Packet.net, got exception %s" % e, e)
