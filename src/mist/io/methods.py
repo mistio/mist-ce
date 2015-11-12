@@ -892,6 +892,7 @@ def _add_backend_packet(title, provider, params):
     api_key = params.get('api_key', '')
     if not api_key:
         raise RequiredParameterMissingError('api_key')
+    project_id = params.get('project_id', '')
 
     backend = model.Backend()
     backend.title = title
@@ -900,7 +901,8 @@ def _add_backend_packet(title, provider, params):
     backend.apisecret = api_key
     backend.enabled = True
     backend_id = backend.get_id()
-
+    if project_id:
+        backend.tenant_name = project_id
     return backend_id, backend
 
 
@@ -1284,8 +1286,13 @@ def connect_provider(backend):
     elif backend.provider == Provider.HPCLOUD:
         conn = driver(backend.apikey, backend.apisecret, backend.tenant_name,
                       region=backend.region)
-    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR, Provider.PACKET]:
+    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR]:
         conn = driver(backend.apisecret)
+    elif backend.provider == Provider.PACKET:
+        if backend.tenant_name:
+            conn = driver(backend.apisecret, project=backend.tenant_nam)
+        else:
+            conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
     elif backend.provider == Provider.DOCKER:
