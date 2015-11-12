@@ -1210,5 +1210,8 @@ var OS_MAP = [
     ],
     [
         ['cirros'], 'cirros'
+    ],
+    [
+        ['packet', 'packet']
     ]
 ];
