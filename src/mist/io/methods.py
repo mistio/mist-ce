@@ -284,6 +284,8 @@ def add_backend_v_2(user, title, provider, params):
         backend_id, backend = _add_backend_vultr(title, provider, params)
     elif provider == 'vsphere':
         backend_id, backend = _add_backend_vsphere(title, provider, params)
+    elif provider == 'packet':
+        backend_id, backend = _add_backend_packet(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -886,6 +888,22 @@ def _add_backend_vultr(title, provider, params):
     return backend_id, backend
 
 
+def _add_backend_packet(title, provider, params):
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+
+    backend = model.Backend()
+    backend.title = title
+    backend.provider = provider
+    backend.apikey = api_key
+    backend.apisecret = api_key
+    backend.enabled = True
+    backend_id = backend.get_id()
+
+    return backend_id, backend
+
+
 def _add_backend_vsphere(title, provider, params):
     username = params.get('username', '')
     if not username:
@@ -1266,7 +1284,7 @@ def connect_provider(backend):
     elif backend.provider == Provider.HPCLOUD:
         conn = driver(backend.apikey, backend.apisecret, backend.tenant_name,
                       region=backend.region)
-    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR]:
+    elif backend.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR, Provider.PACKET]:
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
@@ -1354,7 +1372,7 @@ def get_machine_actions(machine_from_api, conn, extra):
         if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                          Provider.NEPHOSCALE, Provider.SOFTLAYER,
                          Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                         Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR, 'bare_metal', 'coreos'):
+                         Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR, Provider.PACKET, 'bare_metal', 'coreos'):
             can_tag = False
 
     # for other states
@@ -1680,6 +1698,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type == Provider.VULTR:
         node = _create_machine_vultr(conn, public_key, machine_name, image,
+                                         size, location)
+    elif conn.type == Provider.PACKET:
+        node = _create_machine_packet(conn, public_key, machine_name, image,
                                          size, location)
     else:
         raise BadRequestError("Provider unknown.")
@@ -2194,8 +2215,9 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
 
     return node
 
-def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
-    """Create a machine in Vultr.
+
+def _create_machine_packet(conn, public_key, machine_name, image, size, location):
+    """Create a machine in Packet.net.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
@@ -2214,10 +2236,9 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location)
             location=location
         )
     except Exception as e:
-        raise MachineCreationError("Vultr, got exception %s" % e, e)
+        raise MachineCreationError("Packet.net, got exception %s" % e, e)
 
     return node
-
 
 
 def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
