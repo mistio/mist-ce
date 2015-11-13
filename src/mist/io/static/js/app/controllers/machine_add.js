@@ -24,9 +24,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
-            newMachineMonitoring: Ember.computed(function() {
-                return Mist.email ? true : false;
-            }),
+            newMachineMonitoring: null,
             newMachineAssociateFloatingIp: true,
             newMachineDockerCommand: null,
             newMachineDockerEnvironment: null,
@@ -117,6 +115,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.get('newMachineSize'),
                         this.get('newMachineLocation'),
                         this.get('newMachineKey'),
+                        this.get('newMachineCloudInit'),
                         this.get('newMachineScript'),
                         this.get('newMachineMonitoring'),
                         this.get('newMachineAssociateFloatingIp'),
@@ -153,6 +152,7 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
                     .set('newMachineProvider', {'title' : 'Select Provider'})
+                    .set('newMachineMonitoring', Mist.email ? true : false)
                     .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
