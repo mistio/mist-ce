@@ -19,7 +19,7 @@
 
         <!-- Header -->
 
-        <div class="ui-header ui-bar-b" role="banner">
+        <div class="ui-header ui-bar-b {{if view.hasError 'failure'}} {{if view.hasSuccess 'success'}}" role="banner">
 
             <h1 class="ui-title ui-caps">
                 {{Mist.dialogController.options.head}}

@@ -47,6 +47,16 @@ define('app/views/dialog', ['app/views/popup'],
             }.property('Mist.dialogController.type'),
 
 
+            hasError: Ember.computed('isPlain', 'Mist.dialogController.options.head', function() {
+                return this.get('isPlain') && Mist.dialogController.options.head == 'Error';
+            }),
+
+
+            hasSuccess: Ember.computed('isPlain', 'Mist.dialogController.options.head', function() {
+                return this.get('isPlain') && Mist.dialogController.options.head == 'Success';
+            }),
+
+
             //
             //
             //  Methods

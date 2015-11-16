@@ -398,11 +398,11 @@ var setupMainChannel = function(socket, callback) {
             if (machine && machine.id) {
                 dialogBody
                     .push({
-                        paragraph: data.title,
+                        paragraph: data.title + ' on:',
                         class: null
                     }, {
                         link: machine.name,
-                        class: 'ui-btn ui-btn-d ui-shadow',
+                        class: 'ui-btn ui-btn-a ui-shadow',
                         href: '#/machines/' + machineId,
                         closeDialog: true,
                     });

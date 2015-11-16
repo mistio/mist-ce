@@ -175,10 +175,30 @@ h4 {
 .ui-popup-container .ui-header {
     border: none !important;
     background-color: #d4d4d4;
-    color: #000;
+    color: #000000;
     text-transform: uppercase;
     padding: 15px;
     text-shadow: 0 0 0 transparent;
+}
+
+.ui-popup-container h1.ui-title {
+    font-size: 18px;
+    color: #000000;
+    text-align: left;
+    padding: 0;
+}
+
+.ui-popup-container .ui-header.success {
+    background-color: #64b247;
+}
+
+.ui-popup-container .ui-header.failure {
+    background-color: #d96557;
+}
+
+.ui-popup-container .ui-header.success h1.ui-title,
+.ui-popup-container .ui-header.failure h1.ui-title {
+    color: #ffffff;
 }
 
 .ui-popup-container .ui-content {
