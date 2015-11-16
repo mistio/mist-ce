@@ -26,7 +26,6 @@
     <meta name="msapplication-TileImage" content="/resources/images/favicons/mstile-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <script tal:condition="csrf_token|nothing" tal:content="string: var CSRF_TOKEN=${csrf_token}" />
-    <link rel="stylesheet" href="/resources/css/missing.css"/>
 
     <!-- Begin CSS Files -->
     <link tal:condition="not:css_build|nothing" rel="stylesheet" type="text/css" href="resources/dist/animate.css/animate.min.css">
@@ -35,6 +34,8 @@
     <link tal:condition="not:css_build|nothing" rel="stylesheet" type="text/css" href="core/landing.css">
 
     <link tal:condition="css_build|nothing" rel="stylesheet" type="text/css" href="core/landing${last_build}.min.css">
+
+    <link rel="stylesheet" href="/resources/css/missing.css"/>
     <!-- End CSS Files -->
 
     <script>

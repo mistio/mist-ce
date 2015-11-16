@@ -44,20 +44,11 @@ section.error-message {
     float: left;
     padding: 0 0.75rem;
 }
-.row .col.l12 {
-    margin-left: 0;
-    width: 100%;
-}
-.row .col.l4 {
-    margin-left: 0;
-    width: 33.3333%;
-}
-/*media queries */
-.row .col.m4 {}
-.row .col.m12 {}
 
-.row .col.s12 {}
 /* missing css */
+#error-page nav ul li:last-child {
+    margin-left: 0;
+}
 #error-inner img {
     width: 160px;
     height: auto;
@@ -115,6 +106,8 @@ section.error-message {
 .footer-logo {
     margin-top: 30px;
     border-top: 1px solid #dedede;
+    width: 100%;
+    display: block;
 }
 .footer-logo img {
     padding-top: 3em;
@@ -126,5 +119,39 @@ section.error-message {
 
     #error-inner {
         padding: 40px;
+    }
+}
+
+/*media queries */
+@media only screen and (min-width : 601) {
+    .row .col.s12 {
+        width: 100%;
+        margin-left: 0;
+        float: none; 
+        display: block;
+    }
+}
+@media only screen and (min-width : 992px) {
+    .row .col.m4 {
+        width: 33.3333%;
+        margin-left: 0;
+    }
+    .row .col.m12 {
+        width: 100%;
+        margin-left: 0;
+        float: none;
+        display: block;
+    }
+}
+@media only screen and (min-width: 1200px) {
+    .row .col.l12 {
+        margin-left: 0;
+        width: 100%;
+        float: none;
+        display: block;
+    }
+    .row .col.l4 {
+        margin-left: 0;
+        width: 33.3333%;
     }
 }
