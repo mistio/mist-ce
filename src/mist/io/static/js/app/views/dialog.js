@@ -46,7 +46,8 @@ define('app/views/dialog', ['app/views/popup'],
                 return Mist.dialogController.type == DIALOG_TYPES.IS_PLAIN;
             }.property('Mist.dialogController.type'),
 
-
+            // Following two work only for notify event dialogs
+            // to provide success / error css style
             hasError: Ember.computed('isPlain', 'Mist.dialogController.options.head', function() {
                 return this.get('isPlain') && Mist.dialogController.options.head == 'Error';
             }),
