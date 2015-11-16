@@ -10,18 +10,6 @@ body {
 *, *::before, *::after {
     box-sizing: inherit;
 }
-.btn, .btn-large {
-    border: none;
-    border-radius: 2px;
-    display: inline-block;
-    height: 54px;
-    line-height: 56px;
-    outline: 0;
-    padding: 0 2rem;
-    text-transform: uppercase;
-    vertical-align: middle;
-    -webkit-tap-highlight-color: transparent; 
-}
 #error-page {
     background-color: #fff;
 }
@@ -92,8 +80,22 @@ section.error-message {
     letter-spacing: 0.5px;
     text-align: center;
     text-decoration: none;
+    border-radius: 2px;
+    border: none;
+    display: inline-block;
+    height: 54px;
+    line-height: 56px;
+    outline: 0;
+    padding: 0 2rem;
+    text-transform: uppercase;
+    vertical-align: middle;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.3s ease-out 0s;
     transition: all 0.2s ease-out 0s;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+#error-inner a.btn:hover, #error-inner a.btn-large:hover {
+    box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
 #error-inner {
     text-align: center;
