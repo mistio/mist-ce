@@ -1,28 +1,100 @@
+/* overwrites from theme css */
+body {
+    font-size: 18px;
+    letter-spacing: 0px;
+}
+.ui-bar-a {
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+/* brought from landing & materialize css */
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+.btn, .btn-large {
+    border: none;
+    border-radius: 2px;
+    display: inline-block;
+    height: 54px;
+    line-height: 56px;
+    outline: 0;
+    padding: 0 2rem;
+    text-transform: uppercase;
+    vertical-align: middle;
+    -webkit-tap-highlight-color: transparent; 
+}
+#error-page {
+    background-color: #fff;
+}
+section {
+    display: block;
+}
 section.error-message {
     background-color: #e8e8e8;
 }
+.container {
+    max-width: 1100px;
+    width: 85%;
+    margin: 0 auto;
+}
+.center, .center-align {
+    text-align: center;
+}
+.row::after {
+    clear: both;
+    content: "";
+    display: table;
+}
+.container .row {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+}
+.row {
+    margin-bottom: 20px;
+}
+.row .col {
+    box-sizing: border-box;
+    float: left;
+    padding: 0 0.75rem;
+}
+.row .col.l12 {
+    margin-left: 0;
+    width: 100%;
+}
+.row .col.l4 {
+    margin-left: 0;
+    width: 33.3333%;
+}
+/*media queries */
+.row .col.m4 {}
+.row .col.m12 {}
+
+.row .col.s12 {}
+/* missing css */
 #error-inner img {
     width: 160px;
     height: auto;
 }
-
 #error-inner h1 {
     font-size: 40px;
     margin: 10px 0 20px;
     letter-spacing: 3px;
 }
-
 #error-inner h2 {
     font-size: 26px;
     line-height: 1.4em;
     font-weight: 300;
     text-transform: uppercase;
 }
-
 #error-inner a.btn-large {
     background-color: #09c;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease-out 0s;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
-
 #error-inner {
     text-align: center;
     padding: 100px;
@@ -32,6 +104,11 @@ section.error-message {
 }
 .error-footer p {
     opacity: 0.86;
+    margin: 18px 0;
+    color: #444;
+}
+.error-footer a {
+    text-decoration: none;
 }
 .footer-logo {
     margin-top: 30px;

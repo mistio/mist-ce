@@ -2,6 +2,7 @@
 <html xmlns:tal="http://xml.zope.org/namespaces/tal">
 
 <head>
+    <base href="/"> 
     <meta charset="utf-8">
     <meta content='True' name='HandheldFriendly' />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
@@ -104,7 +105,7 @@
         </section>
         <section class="error-message">
             <div role="main" class="ui-content row" data-theme="a">
-                <div id="error-inner" class="ui-shadow container">
+                <div id="error-inner" class="container">
                     <img src="/resources/images/404.png" alt=""/>
                     <div id="message">
                         <h1>404</h1>
@@ -118,15 +119,12 @@
             <div class="container">
                 <div role="aside" class="row">
                     <div class="col l4 m4 s12 center">
-                        <!-- <h5>Check the docs</h5> -->
                         <p>Make sure you <a href="http://docs.mist.io" target="_blank">consult our Docs</a> if you are developing on Mist.io</p>
                     </div>
                     <div class="col l4 m4 s12 center">
-                        <!-- <h5>Contact us</h5> -->
                         <p>You can also <a href="http://docs.mist.io/contact" target="_blank">contact us</a> if you have questions</p>
                     </div>
                     <div class="col l4 m4 s12 center">
-                        <!-- <h5>Report a bug</h5> -->
                         <p>Found a bug? File an issue at our <a href="https://github.com/mistio/mist.io" target="_blank">github repository</a></p>
                     </div>
                     <div class="col l12 m12 s12 center footer-logo">
