@@ -28,7 +28,7 @@
         <div id="machine-list-container" class="ui-shadow">
             <div class="ui-grid-b machines-header">
                 <div class="ui-block-a">
-                    {{#if Mist.backendsController.model.length}}
+                    {{#if Mist.cloudsController.model.length}}
                     <a id="select-machines-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
                             ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
                     {{/if}}
@@ -41,17 +41,17 @@
             <!-- /grid-b -->
 
             <div class="machine-search-container">
-                {{#if Mist.backendsController.searchMachinesTerm}}
+                {{#if Mist.cloudsController.searchMachinesTerm}}
                     <span {{action "clearSearch" target=view}} class="icon-xx"></span>
                 {{else}}
                     <span class="icon-search"></span>
                 {{/if}}
-                {{input value=Mist.backendsController.searchMachinesTerm placeholder="Filter machines" class="machine-search"}}
+                {{input value=Mist.cloudsController.searchMachinesTerm placeholder="Filter machines" class="machine-search"}}
             </div>
 
             <ul id="machine-list" data-role="listview" data-inset="true" data-theme="c" class="checkbox-list">
                 {{#each view.machines as |machine|}}
-                    {{#if machine.backend.enabled}}
+                    {{#if machine.cloud.enabled}}
                         {{component "machine-list-item" machine=machine class="checkbox-link"}}
                     {{/if}}
                 {{/each}}
@@ -93,11 +93,11 @@
             <li data-icon="false">
                 <a {{action "selectionModeClicked" "none" target=view}}>None</a>
             </li>
-            {{#each Mist.backendsController.model as |backend|}}
-                {{#if backend.enabled}}
+            {{#each Mist.cloudsController.model as |cloud|}}
+                {{#if cloud.enabled}}
                     <li data-icon="false">
-                        <a {{action "selectionModeClicked" backend.title target=view}}>
-                            {{backend.title}}
+                        <a {{action "selectionModeClicked" cloud.title target=view}}>
+                            {{cloud.title}}
                         </a>
                     </li>
                 {{/if}}

@@ -75,8 +75,8 @@ class UnauthorizedError(MistError):
     http_code = 401
 
 
-class BackendUnauthorizedError(UnauthorizedError):
-    msg = "Invalid backend credentials"
+class CloudUnauthorizedError(UnauthorizedError):
+    msg = "Invalid cloud credentials"
 
 
 class MachineUnauthorizedError(UnauthorizedError):
@@ -101,12 +101,12 @@ class NotFoundError(MistError):
     http_code = 404
 
 
-class BackendNotFoundError(NotFoundError, KeyError):
-    msg = "Backend not found"
+class CloudNotFoundError(NotFoundError, KeyError):
+    msg = "Cloud not found"
 
 
 class NetworkActionNotSupported(MistError):
-    msg = "Action is not supported for this backend"
+    msg = "Action is not supported for this cloud"
     http_code = 404
 
 
@@ -138,12 +138,12 @@ class ConflictError(MistError):
     http_code = 409
 
 
-class BackendExistsError(ConflictError):
-    msg = "Backend exists"
+class CloudExistsError(ConflictError):
+    msg = "Cloud exists"
 
 
-class BackendNameExistsError(ConflictError):
-    msg = "Backend name exists"
+class CloudNameExistsError(ConflictError):
+    msg = "Cloud name exists"
 
 
 class KeypairExistsError(ConflictError):
@@ -178,8 +178,8 @@ class ServiceUnavailableError(MistError):
     http_code = 503
 
 
-class BackendUnavailableError(ServiceUnavailableError):
-    msg = "Backend unavailable"
+class CloudUnavailableError(ServiceUnavailableError):
+    msg = "Cloud unavailable"
 
 
 class MachineUnavailableError(ServiceUnavailableError):

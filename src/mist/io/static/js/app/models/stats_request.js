@@ -34,7 +34,7 @@ define('app/models/stats_request', ['ember'],
                 this.setProperties({
                     metrics: [],
                     id: REQUEST_COUNTER++,
-                    url: '/backends/' + machine.backend.id +
+                    url: '/clouds/' + machine.cloud.id +
                         '/machines/' + machine.id + '/stats'
                 });
             }.on('init'),

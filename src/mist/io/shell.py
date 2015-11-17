@@ -16,7 +16,7 @@ import thread
 import ssl
 import tempfile
 
-from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
+from mist.io.exceptions import CloudNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
@@ -50,7 +50,7 @@ class ParamikoShell(object):
 
     Or:
     shell = Shell('localhost')
-    shell.autoconfigure(user, backend_id, machine_id)
+    shell.autoconfigure(user, cloud_id, machine_id)
     for line in shell.command_stream('ps -fe'):
     print line
 
@@ -209,7 +209,7 @@ class ParamikoShell(object):
             yield line
             line = stdout.readline()
 
-    def autoconfigure(self, user, backend_id, machine_id,
+    def autoconfigure(self, user, cloud_id, machine_id,
                       key_id=None, username=None, password=None, port=22):
         """Autoconfigure SSH client.
 
@@ -223,9 +223,9 @@ class ParamikoShell(object):
         """
 
         log.info("autoconfiguring Shell for machine %s:%s",
-                 backend_id, machine_id)
-        if backend_id not in user.backends:
-            raise BackendNotFoundError(backend_id)
+                 cloud_id, machine_id)
+        if cloud_id not in user.clouds:
+            raise CloudNotFoundError(cloud_id)
         if key_id and key_id not in user.keypairs:
             raise KeypairNotFoundError(key_id)
 
@@ -242,7 +242,7 @@ class ParamikoShell(object):
             sudo_keys = []
             for key_id in keypairs:
                 for machine in keypairs[key_id].machines:
-                    if [backend_id, machine_id] == machine[:2]:
+                    if [cloud_id, machine_id] == machine[:2]:
                         assoc_keys.append(key_id)
                         if len(machine) > 2 and \
                                 int(time() - machine[2]) < 7*24*3600:
@@ -266,7 +266,7 @@ class ParamikoShell(object):
                 users = [username]
             else:
                 for machine in keypair.machines:
-                    if machine[:2] == [backend_id, machine_id]:
+                    if machine[:2] == [cloud_id, machine_id]:
                         if len(machine) >= 4 and machine[3]:
                             users.append(machine[3])
                             break
@@ -274,7 +274,7 @@ class ParamikoShell(object):
                 # check to see if some other key is associated with machine
                 for other_keypair in user.keypairs.values():
                     for machine in other_keypair.machines:
-                        if machine[:2] == [backend_id, machine_id]:
+                        if machine[:2] == [cloud_id, machine_id]:
                             if len(machine) >= 4 and machine[3]:
                                 ssh_user = machine[3]
                                 if ssh_user not in users:
@@ -322,7 +322,7 @@ class ParamikoShell(object):
                         continue
                 # we managed to connect succesfully, return
                 # but first update key
-                assoc = [backend_id,
+                assoc = [cloud_id,
                          machine_id,
                          time(),
                          ssh_user,
@@ -335,7 +335,7 @@ class ParamikoShell(object):
                             updated = False
                             for i in range(len(user.keypairs[key_id].machines)):
                                 machine = user.keypairs[key_id].machines[i]
-                                if [backend_id, machine_id] == machine[:2]:
+                                if [cloud_id, machine_id] == machine[:2]:
                                     old_assoc = user.keypairs[key_id].machines[i]
                                     user.keypairs[key_id].machines[i] = assoc
                                     updated = True
@@ -364,7 +364,7 @@ class ParamikoShell(object):
                     trigger_session_update(user.email, ['keys'])
                 return key_id, ssh_user
 
-        raise MachineUnauthorizedError("%s:%s" % (backend_id, machine_id))
+        raise MachineUnauthorizedError("%s:%s" % (cloud_id, machine_id))
 
     def __del__(self):
         self.disconnect()
@@ -382,32 +382,32 @@ class DockerShell(object):
         self.sslopt = {}
         self.buffer = ""
 
-    def autoconfigure(self, user, backend_id, machine_id, **kwargs):
+    def autoconfigure(self, user, cloud_id, machine_id, **kwargs):
         log.info("autoconfiguring DockerShell for machine %s:%s",
-                 backend_id, machine_id)
-        if backend_id not in user.backends:
-            raise BackendNotFoundError(backend_id)
+                 cloud_id, machine_id)
+        if cloud_id not in user.clouds:
+            raise CloudNotFoundError(cloud_id)
 
-        backend = user.backends[backend_id]
-        docker_port = backend.docker_port
+        cloud = user.clouds[cloud_id]
+        docker_port = cloud.docker_port
 
         # For basic auth
-        if backend.apikey and backend.apisecret:
+        if cloud.apikey and cloud.apisecret:
             self.uri = "://%s:%s@%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
-                       (backend.apikey, backend.apisecret, self.host, docker_port, machine_id)
+                       (cloud.apikey, cloud.apisecret, self.host, docker_port, machine_id)
         else:
             self.uri = "://%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
                        (self.host, docker_port, machine_id)
 
         # For tls
-        if backend.key_file and backend.cert_file:
+        if cloud.key_file and cloud.cert_file:
             self.protocol = "wss"
             tempkey = tempfile.NamedTemporaryFile(delete=False)
             with open(tempkey.name, "w") as f:
-                f.write(backend.key_file)
+                f.write(cloud.key_file)
             tempcert = tempfile.NamedTemporaryFile(delete=False)
             with open(tempcert.name, "w") as f:
-                f.write(backend.cert_file)
+                f.write(cloud.cert_file)
 
             self.sslopt = {
                 'cert_reqs': ssl.CERT_NONE,
@@ -508,15 +508,15 @@ class Shell(object):
                                         password=password, port=port)
             self.ssh = self._shell.ssh
 
-    def autoconfigure(self, user, backend_id, machine_id, key_id=None,
+    def autoconfigure(self, user, cloud_id, machine_id, key_id=None,
                       username=None, password=None, port=22):
         if isinstance(self._shell, ParamikoShell):
             return self._shell.autoconfigure(
-                user, backend_id, machine_id, key_id=key_id,
+                user, cloud_id, machine_id, key_id=key_id,
                 username=username, password=password, port=port
             )
         elif isinstance(self._shell, DockerShell):
-            return self._shell.autoconfigure(user, backend_id, machine_id)
+            return self._shell.autoconfigure(user, cloud_id, machine_id)
 
     def connect(self, username, key=None, password=None, port=22):
         if isinstance(self._shell, ParamikoShell):

@@ -29,7 +29,7 @@ class ShellHubClient(HubClient):
 
 if __name__ == "__main__":
     worker_kwargs = {
-        'backend_id': 'tUEMvnye1BqMeqNEoLDrFy2EiT8',
+        'cloud_id': 'tUEMvnye1BqMeqNEoLDrFy2EiT8',
         'machine_id': 'bc41da46814e0c7b69167e2862d400c24419ec3dcdc48a72c4ede789c6ed981e',
         'host': '69.50.244.209',
         'columns': 80,

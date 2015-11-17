@@ -124,11 +124,11 @@
     <div class="col-md-12">
       
   <dl class="get">
-<dt id="get--backends-backend_id-machines-machine_id-shell?host=host_ip&amp;command=shell_command">
-<code class="descname">GET </code><code class="descname">/backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</code><a class="headerlink" href="#get--backends-backend_id-machines-machine_id-shell?host=host_ip&command=shell_command" title="Permalink to this definition">¶</a></dt>
+<dt id="get--clouds-cloud_id-machines-machine_id-shell?host=host_ip&amp;command=shell_command">
+<code class="descname">GET </code><code class="descname">/clouds/{cloud_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</code><a class="headerlink" href="#get--clouds-cloud_id-machines-machine_id-shell?host=host_ip&command=shell_command" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run shell command in machine. Mist will yield an html body with the command&#8217;s output.</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&amp;command=uptime
+<div class="highlight-http"><div class="highlight"><pre>GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&amp;command=uptime
 Host: mist.io
 Accept: application/json; charset=UTF-8
 </pre></div>

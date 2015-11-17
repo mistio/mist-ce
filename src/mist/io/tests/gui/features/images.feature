@@ -4,7 +4,7 @@ Feature: Actions for Images
   Background:
     When I visit mist.io
     Then I wait for the mist.io splash page to load
-    Given "EC2" backend has been added
+    Given "EC2" cloud has been added
 
   Scenario: Star image from Advanced search
     When I visit the Images page after the counter has loaded
