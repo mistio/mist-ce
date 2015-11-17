@@ -21,7 +21,7 @@ import tornado.iostream
 import requests
 
 try:
-    from mist.core.helpers import user_from_session_id
+    from mist.core.auth.methods import user_from_session_id
     from mist.core import config
     from mist.core.methods import get_stats
     multi_user = True
