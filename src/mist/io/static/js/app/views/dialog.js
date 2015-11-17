@@ -67,6 +67,8 @@ define('app/views/dialog', ['app/views/popup'],
 
             open: function() {
                 Ember.run.later(this, function() {
+                    $('body').enhanceWithin();
+                    
                     $(this.popupId)
                         .popup()
                         .popup('reposition', {

@@ -1487,12 +1487,13 @@ ul.checkbox-list .ui-grid-b {
 
 /* Dialog
 ------------------------------------------------------------------------------*/
-.command-container {
+#dialog-popup .command-container {
     white-space: pre;
     text-align: left;
     max-height: 250px;
     overflow: auto;
     word-wrap: break-word;
+    margin: 0;
 }
 
 #dialog-popup .duration {

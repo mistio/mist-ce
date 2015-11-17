@@ -48,7 +48,10 @@
                 {{/if}}
 
                 {{#if optionBody.command}}
-                    <pre class="command-container" {{action "commandClicked" optionBody on="click" target=view}}>{{optionBody.command}}</pre>
+                    <div id="command-collapsible" data-role="collapsible" data-collapsed="false" class="ui-shadow">
+                        <h4>Output</h4>
+                        <pre class="command-container" {{action "commandClicked" optionBody on="click" target=view}}>{{optionBody.command}}</pre>
+                    </div>
                 {{/if}}
 
             {{/each}}
