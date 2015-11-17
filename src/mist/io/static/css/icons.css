@@ -152,20 +152,6 @@
     content:'\004F';
 }
 
-/*#machine_key .ui-icon-minus:after {
-    content:'\0073';
-}
-
-#machine_key .ui-icon-plus:after {
-    content:'\0044';
-    background-color: transparent !important;
-    right: 10px;
-    left: inherit;
-    color: #fff !important;
-    font-size: 16px;
-    margin-top: -12px;
-}*/
-
 .ui-filterable .ui-icon-delete:after {
     background-image: none;
     content: '\006b' !important;

@@ -1507,6 +1507,15 @@ ul.checkbox-list .ui-grid-b {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
 }
 
+#dialog-popup .icon-machine{
+    color: #000000 !important;
+    padding: .6em 1.1em .6em 2em !important;
+}
+#dialog-popup .icon-machine:hover{
+    color: #000000 !important;
+    background-color: #edece8 !important;
+}
+
 /* Border radius override */
 .ui-corner-all {
     -webkit-border-radius: 0 /*{global-radii-blocks}*/;

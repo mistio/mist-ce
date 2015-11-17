@@ -402,7 +402,7 @@ var setupMainChannel = function(socket, callback) {
                         class: null
                     }, {
                         link: machine.name,
-                        class: 'ui-btn ui-btn-a ui-shadow',
+                        class: 'ui-btn ui-btn-a ui-shadow ui-btn-icon-left icon-machine',
                         href: '#/machines/' + machineId,
                         closeDialog: true,
                     });
