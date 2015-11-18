@@ -1,45 +1,45 @@
 /* overwrites from theme css */
-body {
+#error-page  {
     font-size: 18px;
     letter-spacing: 0px;
 }
-.ui-bar-a {
+#error-page .ui-bar-a {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
 /* brought from landing & materialize css */
-*, *::before, *::after {
+#error-page *, #error-page *::before, #error-page *::after {
     box-sizing: inherit;
 }
 #error-page {
     background-color: #fff;
 }
-section {
+#error-page section {
     display: block;
 }
-section.error-message {
+#error-page section.error-message {
     background-color: #e8e8e8;
 }
-.container {
+#error-page .container {
     max-width: 1100px;
     width: 85%;
     margin: 0 auto;
 }
-.center, .center-align {
+#error-page .center, #error-page .center-align {
     text-align: center;
 }
-.row::after {
+#error-page .row::after {
     clear: both;
     content: "";
     display: table;
 }
-.container .row {
+#error-page .container .row {
     margin-left: -0.75rem;
     margin-right: -0.75rem;
 }
-.row {
+#error-page .row {
     margin-bottom: 20px;
 }
-.row .col {
+#error-page .row .col {
     box-sizing: border-box;
     float: left;
     padding: 0 0.75rem;
@@ -92,24 +92,18 @@ section.error-message {
     text-align: center;
     padding: 100px;
 }
-.ui-loader {
+#error-body .ui-loader {
     display: none;
 }
-.error-footer p {
+#error-page .error-footer p {
     opacity: 0.86;
     margin: 18px 0;
     color: #444;
 }
-.error-footer a {
+#error-page .error-footer a {
     text-decoration: none;
 }
-.footer-logo {
-    margin-top: 30px;
-    border-top: 1px solid #dedede;
-    width: 100%;
-    display: block;
-}
-.footer-logo img {
+#error-page .footer-logo img {
     padding-top: 3em;
 }
 @media only screen and  (max-width: 600px) {
@@ -124,7 +118,7 @@ section.error-message {
 
 /*media queries */
 @media only screen and (min-width : 601) {
-    .row .col.s12 {
+    #error-page .row .col.s12 {
         width: 100%;
         margin-left: 0;
         float: none; 
@@ -132,11 +126,11 @@ section.error-message {
     }
 }
 @media only screen and (min-width : 992px) {
-    .row .col.m4 {
+    #error-page .row .col.m4 {
         width: 33.3333%;
         margin-left: 0;
     }
-    .row .col.m12 {
+    #error-page .row .col.m12 {
         width: 100%;
         margin-left: 0;
         float: none;
@@ -144,14 +138,22 @@ section.error-message {
     }
 }
 @media only screen and (min-width: 1200px) {
-    .row .col.l12 {
+    #error-page .row .col.l12 {
         margin-left: 0;
         width: 100%;
         float: none;
         display: block;
     }
-    .row .col.l4 {
+    #error-page .row .col.l4 {
         margin-left: 0;
         width: 33.3333%;
     }
+}
+#error-page .footer-logo {
+    margin-top: 30px;
+    border-top: 1px solid #dedede;
+    width: 100%;
+    display: block;
+    float: none;
+    clear: both;
 }

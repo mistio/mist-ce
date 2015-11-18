@@ -57,7 +57,7 @@
      </script>
 </head>
 
-<body>
+<body id="error-body">
     <div id="error-page" data-role="page" class="ui-page-active ui-page">
 
         <!-- Page header -->
@@ -344,7 +344,7 @@
 
 
     <script src="/resources/dist/jquery/jquery.min.js" type="text/javascript"></script>
-    <script src="/resources/dist/jqm/js/jquery.mobile-1.4.5.min.js" type="text/javascript"></script>
+    <!-- <script src="/resources/dist/jqm/js/jquery.mobile-1.4.5.min.js" type="text/javascript"></script> -->
     <script>
         var Missing = {
             init: function() {
@@ -370,10 +370,10 @@
     <!-- Begin JS Files -->
     <script tal:condition="not:js_build|nothing" type="text/javascript" src="resources/dist/jquery/jquery.min.js"></script>
     <script tal:condition="not:js_build|nothing" type="text/javascript" src="resources/dist/jquery-validation/jquery.validate.min.js"></script>
-    <script tal:condition="not:js_build|nothing" type="text/javascript" src="resources/dist/wow/wow.min.js"></script>
+    <!-- <script tal:condition="not:js_build|nothing" type="text/javascript" src="resources/dist/wow/wow.min.js"></script> -->
     <script tal:condition="not:js_build|nothing" type="text/javascript" src="resources/dist/Materialize/dist/js/materialize.min.js"></script>
-    <script tal:condition="not:js_build|nothing" type="text/javascript" src="resources/dist/masonry/dist/masonry.pkgd.min.js"></script>
-    <script tal:condition="not:js_build|nothing" type="text/javascript" src="resources/dist/imagesloaded/imagesloaded.pkgd.min.js"></script>
+    <!-- <script tal:condition="not:js_build|nothing" type="text/javascript" src="resources/dist/masonry/dist/masonry.pkgd.min.js"></script> -->
+    <!-- <script tal:condition="not:js_build|nothing" type="text/javascript" src="resources/dist/imagesloaded/imagesloaded.pkgd.min.js"></script> -->
     <script tal:condition="not:js_build|nothing" type="text/javascript" src="core/landing.js"></script>
 
     <script tal:condition="js_build|nothing" type="text/javascript" src="core/landing${last_build}.min.js"></script>
