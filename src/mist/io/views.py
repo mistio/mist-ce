@@ -102,7 +102,7 @@ def home(request):
 def check_auth(request):
     """Check on the mist.core service if authenticated"""
 
-    params = request.json_body
+    params = params_from_request(request)
     email = params.get('email', '').lower()
     password = params.get('password', '')
 
@@ -131,7 +131,7 @@ def check_auth(request):
 def update_user_settings(request):
     """try free plan, by communicating to the mist.core service"""
 
-    params = request.json_body
+    params = params_from_request(request)
     action = params.get('action', '').lower()
     plan = params.get('plan', '')
     name = params.get('name', '')
@@ -180,8 +180,7 @@ def list_backends(request):
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request):
     """Adds a new backend."""
-
-    params = request.json_body
+    params = params_from_request(request)
     # remove spaces from start/end of string fields that are often included
     # when pasting keys, preventing thus succesfull connection with the
     # backend
@@ -317,7 +316,7 @@ def list_keys(request):
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
-    params = request.json_body
+    params = params_from_request(request)
     key_id = params.get('id', '')
     private_key = params.get('priv', '')
 
@@ -484,9 +483,9 @@ def create_machine(request):
         docker_env = request.json_body.get('docker_env', [])
         docker_command = request.json_body.get('docker_command', None)
         script_id = request.json_body.get('script_id', '')
-        script_params = request.json_body.get('script_params', '')
+        script_params = params_from_request(request).get('script_params', '')
         post_script_id = request.json_body.get('post_script_id', '')
-        post_script_params = request.json_body.get('post_script_params', '')
+        post_script_params = params_from_request(request).get('post_script_params', '')
         async = request.json_body.get('async', False)
         quantity = request.json_body.get('quantity', 1)
         persist = request.json_body.get('persist', False)
@@ -540,7 +539,7 @@ def machine_actions(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
-    params = request.json_body
+    params = params_from_request(request)
     action = params.get('action', '')
     plan_id = params.get('plan_id', '')
     # plan_id is the id of the plan to resize
