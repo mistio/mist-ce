@@ -408,7 +408,7 @@ def get_public_key(request):
 def generate_keypair(request):
     keypair = Keypair()
     keypair.generate()
-    return {'priv': keypair.private}
+    return {'priv': keypair.private, 'public': keypair.public}
 
 
 @view_config(route_name='key_association', request_method='PUT',
