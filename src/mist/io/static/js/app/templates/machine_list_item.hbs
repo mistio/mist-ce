@@ -5,7 +5,7 @@
         <div class="ui-grid-b">
             <div class="ui-block-a machine-name">{{machine.name}}</div>
 
-            <span class="ui-block-b machine-state">
+            <span class="ui-block-b machine-state" title="machine state"> 
                 {{#unless machine.isUnknown}}
                 <span class={{view.machine.state}}>
                 {{machine.state}}
@@ -22,10 +22,10 @@
             <div class="ui-block-c machine-leds">
 
                 {{#unless machine.pendingCreation}}
-                    <span class="icon-dummy monitoring-state"></span>
+                    <span class="icon-dummy monitoring-state" title="monitoring state"></span>
 
                     <div class="{{machine.probing}} {{machine.probed}}">
-                        <div class="loadleds">
+                        <div class="loadleds" title="machine load">
                             <div class="{{machine.loadavg15}} led">
                             </div>
                             <div class="{{machine.loadavg5}} led">
@@ -34,7 +34,7 @@
                             </div>
                         </div>
 
-                        <div class="netleds">
+                        <div class="netleds" title="machine network load">
                             <div class="{{machine.netled4}} netled1">
                             </div>
                             <div class="{{machine.netled3}} netled2">
@@ -50,9 +50,9 @@
             </div>
 
             <div class="ui-block-c machine-tags">
-                <span class="tag">{{machine.backend.title}}</span>
+                <span class="tag" title="machine cloud">{{machine.backend.title}}</span>
                 {{#each machine.tags as |tag|}}
-					<span class="tag pairs">{{tag.key}}{{#if tag.value}}={{tag.value}}{{/if}}</span>
+					<span class="tag pairs" title="machine tags">{{tag.key}}{{#if tag.value}}={{tag.value}}{{/if}}</span>
                 {{/each}}
             </div>
 
@@ -65,7 +65,7 @@
         <div class="ui-grid-b">
             <div class="ui-block-a machine-name">{{machine.name}}</div>
 
-            <span class="ui-block-b machine-state">
+            <span class="ui-block-b machine-state" title="machine state"> 
                 <span>{{machine.state}}</span>
             </span>
 
