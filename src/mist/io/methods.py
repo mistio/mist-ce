@@ -2240,18 +2240,21 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
     # if project_id is not specified, use the project for which the driver
     # has been initiated. If driver hasn't been initiated with a project,
     # then use the first one from the projects
-
+    ex_project_id = None
     if not project_id:
         if conn.project_id:
-            project_id = conn.project_id
+            ex_project_id = conn.project_id
         else:
             try:
-                project_id = conn.projects[0]
+                ex_project_id = conn.projects[0].id
             except IndexError:
                 raise BadRequestError("You don't have any projects on packet.net")
     else:
-        project_ids = [p_id.id for p_id in conn.projects]
-        if project_id not in project_ids:
+        for project_obj in conn.projects:
+            if project_id in [project_obj.name, project_obj.id]:
+                ex_project_id = project_obj.id
+                break
+        if not ex_project_id:
             raise BadRequestError("Project id is invalid")
 
     try:
@@ -2260,7 +2263,7 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
             size=size,
             image=image,
             location=location,
-            ex_project_id=project_id,
+            ex_project_id=ex_project_id,
             userdata=cloud_init
         )
     except Exception as e:
