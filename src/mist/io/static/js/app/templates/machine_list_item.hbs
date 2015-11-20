@@ -25,7 +25,8 @@
                     <span class="icon-dummy monitoring-state" title="monitoring state"></span>
 
                     <div class="{{machine.probing}} {{machine.probed}}">
-                        <div class="loadleds" title="average data load">
+                    	{{#if machine.loadavg}}
+                        <div class="loadleds" title="load average {{machine.loadavg}}">
                             <div class="{{machine.loadavg15}} led">
                             </div>
                             <div class="{{machine.loadavg5}} led">
@@ -33,8 +34,10 @@
                             <div class="{{machine.loadavg1}} led">
                             </div>
                         </div>
+                        {{/if}
 
-                        <div class="netleds" title="network load">
+                        {{#if machine.latency}}
+                        <div class="netleds" title="round-trip time {{machine.latency}}ms">
                             <div class="{{machine.netled4}} netled1">
                             </div>
                             <div class="{{machine.netled3}} netled2">
@@ -44,6 +47,7 @@
                             <div class="{{machine.netled1}} netled4">
                             </div>
                         </div>
+                        {{/if}}
                     </div>
                 {{/unless}}
 
