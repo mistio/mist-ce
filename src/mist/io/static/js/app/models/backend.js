@@ -1,12 +1,12 @@
 define('app/models/backend', ['app/controllers/machines', 'app/controllers/images', 'app/controllers/sizes',
-                              'app/controllers/locations','app/controllers/networks', 'ember'],
+                              'app/controllers/locations','app/controllers/networks', 'app/controllers/projects', 'ember'],
     /**
      *  Backend Model
      *
      *  @returns Class
      */
     function (MachinesController, ImagesController, SizesController,
-        LocationsController, NetworksController) {
+        LocationsController, NetworksController, ProjectsController) {
         return Ember.Object.extend(Ember.Evented, {
 
             //
@@ -26,6 +26,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             selectedNetworks: [],
 
             sizes: null,
+            projects: null,
             images: null,
             machines: null,
             locations: null,
@@ -103,6 +104,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.machines = MachinesController.create({backend: this, model: []});
                     this.locations = LocationsController.create({backend: this, model: []});
                     this.networks = NetworksController.create({backend: this, model: []});
+                    this.projects = ProjectsController.create({backend: this, model: []});
 
                     // Add events
                     this.sizes.on('onSizeListChange', this, '_updateSizeCount');
