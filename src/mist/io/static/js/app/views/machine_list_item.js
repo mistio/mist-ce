@@ -36,7 +36,7 @@ define('app/views/machine_list_item', ['app/views/list_item'],
                 if (this.machine.hasMonitoring){
                     if (this.machine.get('hasOpenIncident'))
                         return 'Machine has Incident'; 
-                return 'Monitoring state is good';                    
+                    return 'Monitoring state is good';
                 }
                 return 'Monitoring not enabled';
             }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
