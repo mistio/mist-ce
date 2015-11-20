@@ -343,6 +343,9 @@ var setupMainChannel = function(socket, callback) {
             callback();
         callback = null;
     })
+    .on('list_projects', function(data) {
+        console.log(data);
+    })
     .on('list_sizes', function (data) {
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend)
