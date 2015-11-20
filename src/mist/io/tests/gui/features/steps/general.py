@@ -251,18 +251,16 @@ def click_button_id(context, id_name):
     clicketi_click(context, my_element)
 
 
-@then(u'I click the button "{text}"')
-def then_click(context, text):
-    return click_button(context, text)
-
-
 @step(u'I click the button "{text}"')
 def click_button(context, text):
     """
     This function will try to click a button that says exactly the same thing as
     the text given. If it doesn't find any button like that then it will try
-    to find a button that contains the text given.
+    to find a button that contains the text given. If text is a key inside
+    mist_config dict then it's value will be used.
     """
+    if context.mist_config.get(text):
+        text = context.mist_config[text]
     click_button_from_collection(context, text,
                                  error_message='Could not find button that '
                                                'contains %s' % text)
@@ -498,7 +496,7 @@ def go_to_some_page_without_waiting(context, title):
         Then I wait for the links in homepage to appear
         When I click the button "%s"
         And I wait for "%s" list page to load
-    ''' % title)
+    ''' % (title, title))
 
 
 @step(u'I wait for "{title}" list page to load')
