@@ -22,32 +22,35 @@
             <div class="ui-block-c machine-leds">
 
                 {{#unless machine.pendingCreation}}
-                    <span class="icon-dummy monitoring-state" title="monitoring state"></span>
+                    <span class="icon-dummy monitoring-state" title="{{monitoringTooltip}}"></span>
 
                     <div class="{{machine.probing}} {{machine.probed}}">
-                    	{{#if machine.loadavg}}
-                        <div class="loadleds" title="load average {{machine.loadavg}}">
-                            <div class="{{machine.loadavg15}} led">
+                        <div class="machineload">
+                        	{{#if machine.loadavg}}
+                            <div class="loadleds" title="load average {{machine.loadavg}}">
+                                <div class="{{machine.loadavg15}} led">
+                                </div>
+                                <div class="{{machine.loadavg5}} led">
+                                </div>
+                                <div class="{{machine.loadavg1}} led">
+                                </div>
                             </div>
-                            <div class="{{machine.loadavg5}} led">
-                            </div>
-                            <div class="{{machine.loadavg1}} led">
-                            </div>
+                            {{/if}}
                         </div>
-                        {{/if}
-
-                        {{#if machine.latency}}
-                        <div class="netleds" title="round-trip time {{machine.latency}}ms">
-                            <div class="{{machine.netled4}} netled1">
+                        <div class="machinenet">
+                            {{#if machine.latency}}
+                            <div class="netleds" title="round-trip time {{machine.latency}}ms">
+                                <div class="{{machine.netled4}} netled1">
+                                </div>
+                                <div class="{{machine.netled3}} netled2">
+                                </div>
+                                <div class="{{machine.netled2}} netled3">
+                                </div>
+                                <div class="{{machine.netled1}} netled4">
+                                </div>
                             </div>
-                            <div class="{{machine.netled3}} netled2">
-                            </div>
-                            <div class="{{machine.netled2}} netled3">
-                            </div>
-                            <div class="{{machine.netled1}} netled4">
-                            </div>
+                            {{/if}}
                         </div>
-                        {{/if}}
                     </div>
                 {{/unless}}
 
