@@ -1290,7 +1290,7 @@ def connect_provider(backend):
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.PACKET:
         if backend.tenant_name:
-            conn = driver(backend.apisecret, project=backend.tenant_nam)
+            conn = driver(backend.apisecret, project=backend.tenant_name)
         else:
             conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
@@ -1708,7 +1708,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type == Provider.PACKET:
         node = _create_machine_packet(conn, public_key, machine_name, image,
-                                         size, location, cloud_init)
+                                         size, location, cloud_init, project_id)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -2249,6 +2249,10 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
                 project_id = conn.projects[0]
             except IndexError:
                 raise BadRequestError("You don't have any projects on packet.net")
+    else:
+        project_ids = [p_id.id for p_id in conn.projects]
+        if project_id not in project_ids:
+            raise BadRequestError("Project id is invalid")
 
     try:
         node = conn.create_node(
@@ -3011,6 +3015,36 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret['public'].append(ec2_network_to_dict(network))
+
+    if conn.type == 'libvirt':
+        # close connection with libvirt
+        conn.disconnect()
+    return ret
+
+
+def list_projects(user, backend_id):
+    """List projects for each account.
+    Currently supported for Packet.net. For other providers
+    this returns an empty list
+    """
+
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    conn = connect_provider(backend)
+
+    ret = {}
+    if conn.type in [Provider.PACKET]:
+        projects = conn.ex_list_projects()
+    else:
+        projects = []
+
+    ret = [{'id': project.id,
+            'name': project.name,
+            'extra': project.extra
+            }
+           for project in projects]
+    return ret
 
     if conn.type == 'libvirt':
         # close connection with libvirt

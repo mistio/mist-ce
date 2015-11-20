@@ -733,6 +733,23 @@ class ListImages(UserTask):
         return {'backend_id': backend_id, 'images': images}
 
 
+class ListProjects(UserTask):
+    abstract = False
+    task_key = 'list_projects'
+    result_expires = 60 * 60 * 24 * 7
+    result_fresh = 60 * 60
+    polling = False
+    soft_time_limit = 30
+
+    def execute(self, email, backend_id):
+        log.warn('Running list projects for user %s backend %s' % (email, backend_id))
+        from mist.io import methods
+        user = user_from_email(email)
+        projects = methods.list_projects(user, backend_id)
+        log.warn('Returning list projects for user %s backend %s' % (email, backend_id))
+        return {'backend_id': backend_id, 'projects': projects}
+
+
 class ListMachines(UserTask):
     abstract = False
     task_key = 'list_machines'
