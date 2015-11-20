@@ -74,3 +74,35 @@ def unstar_image(context, num):
                                               "unstarred images" % \
                                               (len(unstarred_images), int(num))
 
+
+def scroll_down_and_wait(context, wait_for_starred_images=False, wait=5):
+    """
+    Wait for a few seconds until new images are loaded
+    :return: True if new images have been loaded, False otherwise
+    """
+    previous_scroll_height = context.browser.find_elements_by_class_name('checkbox-link')[-1].location['y']
+    context.browser.execute_script("window.scrollTo(0, %s)"
+                                   % previous_scroll_height)
+    end_time = time() + wait
+    while time() < end_time:
+        sleep(1)
+        last_image = context.browser.find_elements_by_class_name('checkbox-link')[-1]
+        scroll_height = last_image.location['y']
+        if previous_scroll_height != scroll_height:
+            if not wait_for_starred_images and 'staroff' in last_image.get_attribute('class'):
+                return False
+            return True
+
+    return False
+
+
+@step(u'I scroll down until all starred images appear')
+def get_all_starred_images(context):
+    while scroll_down_and_wait(context, wait_for_starred_images=True):
+        pass
+
+
+@step(u'I scroll down untill all images appear')
+def get_all_images(context):
+    while scroll_down_and_wait(context):
+        pass
