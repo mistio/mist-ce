@@ -15,7 +15,7 @@ define('app/views/user_menu', ['ember', 'md5'],
             //
             layoutName: 'user_menu',
             isNotCore: !IS_CORE,
-            accountUrl: '/account',
+            accountUrl: URL_PREFIX + '/account',
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +
                   encodeURIComponent('https://mist.io/resources/images/sprite-images/user.png') +'&s='+(window.devicePixelRatio > 1.5 ? 100 : 50)),
             hasName: Ember.computed(function() {

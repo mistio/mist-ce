@@ -197,9 +197,18 @@
     top: 4px;
 }
 .machine-leds {
-    width: 120px !important;
+    width: 90px !important;
     float: right;
     margin-right: 5px;
+}
+.machineload {
+    width: 24px;
+    display: inline-block;
+    float: right;
+}
+.machinenet {
+    width: 24px;
+    display: inline-block;
 }
 .machine-tags {
     float: right;

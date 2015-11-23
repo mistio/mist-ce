@@ -2976,8 +2976,10 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         subnets = conn.ex_list_subnets()
         routers = conn.ex_list_routers()
-        floatings_ips = conn.ex_list_floating_ips()
-        if floatings_ips:
+        floating_ips = conn.ex_list_floating_ips()
+        if conn.connection.tenant_id:
+            floating_ips = [floating_ip for floating_ip in floating_ips if floating_ip.extra.get('tenant_id') == conn.connection.tenant_id]
+        if floating_ips:
             nodes = conn.list_nodes()
         else:
             nodes = []
@@ -2989,7 +2991,7 @@ def list_networks(user, backend_id):
                 public_networks.append(networks.pop(net_index))
 
         for pub_net in public_networks:
-            ret['public'].append(openstack_network_to_dict(pub_net, subnets, floatings_ips, nodes))
+            ret['public'].append(openstack_network_to_dict(pub_net, subnets, floating_ips, nodes))
         for network in networks:
             ret['private'].append(openstack_network_to_dict(network, subnets))
         for router in routers:

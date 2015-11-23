@@ -102,7 +102,7 @@ def home(request):
 def check_auth(request):
     """Check on the mist.core service if authenticated"""
 
-    params = request.json_body
+    params = params_from_request(request)
     email = params.get('email', '').lower()
     password = params.get('password', '')
 
@@ -131,7 +131,7 @@ def check_auth(request):
 def update_user_settings(request):
     """try free plan, by communicating to the mist.core service"""
 
-    params = request.json_body
+    params = params_from_request(request)
     action = params.get('action', '').lower()
     plan = params.get('plan', '')
     name = params.get('name', '')
@@ -180,8 +180,7 @@ def list_backends(request):
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request):
     """Adds a new backend."""
-
-    params = request.json_body
+    params = params_from_request(request)
     # remove spaces from start/end of string fields that are often included
     # when pasting keys, preventing thus succesfull connection with the
     # backend
@@ -274,7 +273,8 @@ def rename_backend(request):
     """Renames a backend."""
 
     backend_id = request.matchdict['backend']
-    new_name = request.json_body.get('new_name', '')
+    params = params_from_request(request)
+    new_name = params.get('new_name', '')
     if not new_name:
         raise RequiredParameterMissingError('new_name')
 
@@ -286,7 +286,8 @@ def rename_backend(request):
 @view_config(route_name='backend_action', request_method='POST')
 def toggle_backend(request):
     backend_id = request.matchdict['backend']
-    new_state = request.json_body.get('new_state', '')
+    params = params_from_request(request)
+    new_state = params.get('new_state', '')
     if not new_state:
         raise RequiredParameterMissingError('new_state')
 
@@ -317,7 +318,7 @@ def list_keys(request):
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
-    params = request.json_body
+    params = params_from_request(request)
     key_id = params.get('id', '')
     private_key = params.get('priv', '')
 
@@ -357,7 +358,8 @@ def delete_key(request):
 def edit_key(request):
 
     old_id = request.matchdict['key']
-    new_id = request.json_body.get('new_id')
+    params = params_from_request(request)
+    new_id = params.get('new_id')
     if not new_id:
         raise RequiredParameterMissingError("new_id")
 
@@ -408,7 +410,7 @@ def get_public_key(request):
 def generate_keypair(request):
     keypair = Keypair()
     keypair.generate()
-    return {'priv': keypair.private}
+    return {'priv': keypair.private, 'public': keypair.public}
 
 
 @view_config(route_name='key_association', request_method='PUT',
@@ -417,7 +419,8 @@ def associate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    ssh_user = request.json_body.get('user', None)
+    params = params_from_request(request)
+    ssh_user = params.get('user', None)
     try:
         ssh_port = int(request.json_body.get('port', 22))
     except:
@@ -492,9 +495,9 @@ def create_machine(request):
         docker_env = request.json_body.get('docker_env', [])
         docker_command = request.json_body.get('docker_command', None)
         script_id = request.json_body.get('script_id', '')
-        script_params = request.json_body.get('script_params', '')
+        script_params = params_from_request(request).get('script_params', '')
         post_script_id = request.json_body.get('post_script_id', '')
-        post_script_params = request.json_body.get('post_script_params', '')
+        post_script_params = params_from_request(request).get('post_script_params', '')
         async = request.json_body.get('async', False)
         quantity = request.json_body.get('quantity', 1)
         persist = request.json_body.get('persist', False)
@@ -550,7 +553,7 @@ def machine_actions(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
-    params = request.json_body
+    params = params_from_request(request)
     action = params.get('action', '')
     plan_id = params.get('plan_id', '')
     # plan_id is the id of the plan to resize
@@ -725,9 +728,10 @@ def associate_ip(request):
 
     backend_id = request.matchdict['backend']
     network_id = request.matchdict['network']
-    ip = request.json_body.get('ip')
-    machine = request.json_body.get('machine')
-    assign = request.json_body.get('assign', True)
+    params = params_from_request(request)
+    ip = params.get('ip')
+    machine = params.get('machine')
+    assign = params.get('assign', True)
     user = user_from_request(request)
 
     ret = methods.associate_ip(user, backend_id, network_id, ip, machine,
@@ -747,9 +751,10 @@ def probe(request):
     """
     machine_id = request.matchdict['machine']
     backend_id = request.matchdict['backend']
-    host = request.json_body.get('host', None)
-    key_id = request.json_body.get('key', None)
-    ssh_user = request.params.get('ssh_user', '')
+    params = params_from_request(request)
+    host = params.get('host', None)
+    key_id = params.get('key', None)
+    ssh_user = params.get('ssh_user', '')
     # FIXME: simply don't pass a key parameter
     if key_id == 'undefined':
         key_id = ''
@@ -778,10 +783,11 @@ def update_monitoring(request):
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
+    params = params_from_request(request)
     if not user.mist_api_token:
         log.info("trying to authenticate to service first")
-        email = request.json_body.get('email')
-        password = request.json_body.get('password')
+        email = params.get('email')
+        password = params.get('password')
         if not email or not password:
             raise UnauthorizedError("You need to authenticate to mist.io.")
         payload = {'email': email, 'password': password}
@@ -801,12 +807,12 @@ def update_monitoring(request):
         else:
             raise UnauthorizedError("You need to authenticate to mist.io.")
 
-    action = request.json_body['action'] or 'enable'
-    name = request.json_body.get('name', '')
-    public_ips = request.json_body.get('public_ips', [])
-    dns_name = request.json_body.get('dns_name', '')
-    no_ssh = bool(request.json_body.get('no_ssh', False))
-    dry = bool(request.json_body.get('dry', False))
+    action = params.get('action') or 'enable'
+    name = params.get('name', '')
+    public_ips = params.get('public_ips', [])
+    dns_name = params.get('dns_name', '')
+    no_ssh = bool(params.get('no_ssh', False))
+    dry = bool(params.get('dry', False))
 
     if action == 'enable':
         ret_dict = methods.enable_monitoring(
@@ -962,10 +968,11 @@ def update_rule(request):
 
     """
     user = user_from_request(request)
+    params = params_from_request(request)
     try:
         ret = requests.post(
             config.CORE_URI + request.path,
-            params=request.json_body,
+            params=params,
             headers={'Authorization': get_auth_header(user)},
             verify=config.SSL_VERIFY
         )
