@@ -12,7 +12,7 @@ define('app/views/machine_list_item', ['app/views/list_item'],
             //
             layoutName: 'machine_list_item',
             machine: null,
-            classNameBindings: ['machineState', 'monitoringState'],
+            classNameBindings: ['machineState', 'monitoringState', 'monitoringTooltip'],
 
 
             //
@@ -30,6 +30,15 @@ define('app/views/machine_list_item', ['app/views/list_item'],
                     return 'has-monitoring';
                 }
                 return 'no-monitoring';
+            }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
+
+            monitoringTooltip: function() {
+                if (this.machine.hasMonitoring){
+                    if (this.machine.get('hasOpenIncident'))
+                        return 'Machine has Incident'; 
+                    return 'Monitoring state is good';
+                }
+                return 'Monitoring not enabled';
             }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
 
 
