@@ -501,7 +501,7 @@ def create_machine(request):
         cloud_init = request.json_body.get('cloud_init', '')
         associate_floating_ip = request.json_body.get('associate_floating_ip', False)
         associate_floating_ip_subnet = request.json_body.get('attach_floating_ip_subnet', None)
-        project_id = request.json_body.get('project_id', None)
+        project_id = request.json_body.get('project', None)
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
