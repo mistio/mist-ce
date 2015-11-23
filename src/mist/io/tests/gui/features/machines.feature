@@ -100,7 +100,7 @@ Feature: Machines
   Scenario: Create machine from Panel and from Image
     When I visit the Images page after the counter has loaded
     Then there should be starred Images
-    When I search for a "ubuntu" Image
+    When I search for the "ubuntu" Image
     Then Images list should be loaded within 60 seconds
     When I click the button "Ubuntu Server 14.04 LTS (PV)"
     Then I expect for "single-image-page" page to appear within max 2 seconds

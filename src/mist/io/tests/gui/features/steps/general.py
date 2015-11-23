@@ -531,7 +531,7 @@ def wait_for_some_list_page_to_load(context, title):
         sleep(1)
 
 
-@when(u'I search for a "{text}" {type_of_search}')
+@when(u'I search for the "{text}" {type_of_search}')
 def search_for_something(context, text, type_of_search):
     type_of_search = type_of_search.lower()
     if type_of_search not in ['machine', 'key', 'image', 'script', 'network']:
