@@ -2264,7 +2264,7 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
             image=image,
             location=location,
             ex_project_id=ex_project_id,
-            userdata=cloud_init
+            cloud_init=cloud_init
         )
     except Exception as e:
         raise MachineCreationError("Packet.net, got exception %s" % e, e)
