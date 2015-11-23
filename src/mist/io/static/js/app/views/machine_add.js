@@ -311,8 +311,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                 selectProject: function(project) {
                     this.fieldIsReady('project');
 
-                    project.set('selected', !project.selected);
-                    console.log(project);
+                    Mist.machineAddController.set('newMachineProject', project);
                 },
 
 
