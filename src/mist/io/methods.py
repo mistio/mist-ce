@@ -4260,6 +4260,10 @@ def machine_name_validator(provider, name):
         if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
             raise MachineNameValidationError("machine name may only contain ASCII letters " + \
                 "or numbers, dashes and dots")
+    elif provider is Provider.PACKET:
+        if not re.search(r'^[0-9a-zA-Z-.]+$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and periods")
     elif provider == Provider.AZURE:
         pass
     elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
