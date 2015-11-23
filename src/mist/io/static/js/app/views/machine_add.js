@@ -208,7 +208,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
 
              renderFields: function () {
-                Ember.run.next(function () {
+                Ember.run.schedule('afterRender', this, function() {
 
                     // Render collapsibles
                     if ($('.ui-collapsible').collapsible) {
