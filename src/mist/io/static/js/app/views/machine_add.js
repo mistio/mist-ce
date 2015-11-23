@@ -29,6 +29,11 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider && provider.provider == 'azure' ? true : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
+            hasPacket: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider && provider.provider == 'packet' ? true : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
             hasKey: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
                 return provider ? (provider.provider ? (provider.provider != 'docker' || (provider.provider == 'docker' && this.get('dockerNeedScript')) ? true : false) : false) : false;
@@ -36,7 +41,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'azure', 'digitalocean'];
+                valids = ['openstack', 'azure', 'digitalocean', 'packet'];
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.provider.indexOf('ec2') > -1) ? true : false) : false) : false;
             }),
 
@@ -300,6 +305,14 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                 selectKey: function (key) {
                     this._selectKey(key)
+                },
+
+
+                selectProject: function(project) {
+                    this.fieldIsReady('project');
+
+                    project.set('selected', !project.selected);
+                    console.log(project);
                 },
 
 

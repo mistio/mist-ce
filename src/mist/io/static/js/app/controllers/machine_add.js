@@ -24,9 +24,8 @@ define('app/controllers/machine_add', ['ember'],
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
-            newMachineMonitoring: Ember.computed(function() {
-                return Mist.email ? true : false;
-            }),
+            newMachineProject: null,
+            newMachineMonitoring: null,
             newMachineAssociateFloatingIp: true,
             newMachineDockerCommand: null,
             newMachineDockerEnvironment: null,
@@ -117,7 +116,9 @@ define('app/controllers/machine_add', ['ember'],
                         this.get('newMachineSize'),
                         this.get('newMachineLocation'),
                         this.get('newMachineKey'),
+                        this.get('newMachineCloudInit'),
                         this.get('newMachineScript'),
+                        this.get('newMachineProject'),
                         this.get('newMachineMonitoring'),
                         this.get('newMachineAssociateFloatingIp'),
                         this.get('newMachineDockerEnvironment').trim(),
@@ -148,11 +149,13 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineName', '')
                     .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
+                    .set('newMachineProject', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
                     .set('newMachineProvider', {'title' : 'Select Provider'})
+                    .set('newMachineMonitoring', Mist.email ? true : false)
                     .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
@@ -205,6 +208,7 @@ define('app/controllers/machine_add', ['ember'],
                 this.set('callback', null)
                     .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
+                    .set('newMachineProject', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
@@ -229,6 +233,11 @@ define('app/controllers/machine_add', ['ember'],
                 if (this.newMachineProvider.sizes) {
                     if (this.newMachineProvider.sizes.model.length == 1) this.set('newMachineSize', this.newMachineProvider.sizes.model[0]);
                 }
+
+                // Projects Check
+                if (this.newMachineProvider.projects) {
+                    if (this.newMachineProvider.projects.model.length == 1) this.set('newMachineProject', this.newMachineProvider.projects.model[0]);
+                }
             },
 
             //
@@ -237,7 +246,7 @@ define('app/controllers/machine_add', ['ember'],
 
             providerObserver: function() {
                 Ember.run.once(this, '_selectUnique');
-            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize'),
+            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize', 'newMachineProject'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
