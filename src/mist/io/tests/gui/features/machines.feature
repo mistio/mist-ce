@@ -215,13 +215,3 @@ Feature: Machines
     Then I expect for "dialog-popup" popup to disappear within max 4 seconds
     And "secondmachinekey" key should be deleted
     When I wait for 2 seconds
-
-
-
-
-
-
-
-
-
-

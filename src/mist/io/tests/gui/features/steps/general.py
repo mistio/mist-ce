@@ -335,6 +335,8 @@ def click_button_within_panel(context, text, panel_title):
                         'there is no panel with that title' % panel_title
 
     buttons = found_panel.find_elements_by_class_name("ui-btn")
+    if context.mist_config.get(text):
+        text = context.mist_config[text]
     click_button_from_collection(context, text, buttons,
                                  error_message='Could not find %s button'
                                                ' inside %s panel' %
@@ -539,6 +541,8 @@ def search_for_something(context, text, type_of_search):
     assert len(search_bar) == 1, "Found more than one %s-search search input " \
                                  "elements" % type_of_search
     search_bar = search_bar[0]
+    if context.mist_config.get(text):
+        text = context.mist_config[text]
     for letter in text:
         search_bar.send_keys(letter)
     sleep(2)
@@ -549,3 +553,11 @@ def safe_get_element_text(check_element):
         return check_element.text
     except StaleElementReferenceException:
         return ""
+
+
+@step(u'I type "{some_text}" in input with id "{element_id}"')
+def give_some_input(context, some_text, element_id):
+    input_element = context.browser.find_element_by_id(element_id)
+    if context.mist_config.get(some_text):
+        some_text = context.mist_config[some_text]
+    input_element.send_keys(some_text)
