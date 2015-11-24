@@ -86,19 +86,19 @@ define('app/views/log_list_item', ['app/views/list_item'],
                 return this.get('log').get('type') == 'incident';
             }.property('log.type'),
 
-            backendTitle: function () {
+            cloudTitle: function () {
                 var log = this.get('log');
-                var backendId = log.get('backend_id');
-                if (Mist.backendsController && Mist.backendsController.backendExists(backendId))
-                    return Mist.backendsController.getBackend(backendId).title;
+                var cloudId = log.get('cloud_id');
+                if (Mist.cloudsController && Mist.cloudsController.cloudExists(cloudId))
+                    return Mist.cloudsController.getCloud(cloudId).title;
                 return false;
-            }.property('log.backend_id'),
+            }.property('log.cloud_id'),
 
             machineLink: function () {
                 var log = this.get('log');
-                var backendId = log.get('backend_id');
+                var cloudId = log.get('cloud_id');
                 var machineId = log.get('machine_id');
-                return Mist.backendsController && Mist.backendsController.getMachine(machineId, backendId);
+                return Mist.cloudsController && Mist.cloudsController.getMachine(machineId, cloudId);
             }.property('log.machine_id'),
 
             showEmail: function () {

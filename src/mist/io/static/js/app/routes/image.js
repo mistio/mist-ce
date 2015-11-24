@@ -14,7 +14,7 @@ define('app/routes/image', ['app/routes/base'],
                 Ember.run.next(this, function () {
                     var model = this.modelFor('image'),
                     id = model._id || model.id,
-                    image = Mist.backendsController.getImage(id);
+                    image = Mist.cloudsController.getImage(id);
 
                     this.set('documentTitle', 'mist.io - ' + (image ? image.id : id));
                 });
@@ -26,12 +26,12 @@ define('app/routes/image', ['app/routes/base'],
 
             model: function (args) {
                 var id = args.image_id,
-                model = Mist.backendsController.getImage(id);
+                model = Mist.cloudsController.getImage(id);
 
                 if(!model) {
                     return null;
                 }
-                return Mist.backendsController.getImage(id);
+                return Mist.cloudsController.getImage(id);
             }
         });
     }

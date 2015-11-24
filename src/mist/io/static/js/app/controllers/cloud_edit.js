@@ -1,6 +1,6 @@
-define('app/controllers/backend_edit', ['ember'],
+define('app/controllers/cloud_edit', ['ember'],
     //
-    //  Backend Edit Controller
+    //  Cloud Edit Controller
     //
     //  @returns Class
     //
@@ -18,10 +18,10 @@ define('app/controllers/backend_edit', ['ember'],
             //
 
             formReady: null,
-            backend: null,
+            cloud: null,
             newTitle: null,
             newState: null,
-            editingBackend: null,
+            editingCloud: null,
 
 
             //
@@ -31,12 +31,12 @@ define('app/controllers/backend_edit', ['ember'],
             //
 
 
-            open: function (backend, position) {
+            open: function (cloud, position) {
                 this._clear();
                 this.setProperties({
-                    backend: backend,
-                    newTitle: backend.title,
-                    newState: backend.enabled,
+                    cloud: cloud,
+                    newTitle: cloud.title,
+                    newState: cloud.enabled,
                 });
                 this._updateFormReady();
                 this.view.open(position);
@@ -52,9 +52,9 @@ define('app/controllers/backend_edit', ['ember'],
             rename: function () {
 
                 if (this.formReady) {
-                    this.set('editingBackend', true);
-                    Mist.backendsController.renameBackend({
-                        backend: this.backend,
+                    this.set('editingCloud', true);
+                    Mist.cloudsController.renameCloud({
+                        cloud: this.cloud,
                         newTitle: this.newTitle,
                         callback: this._rename
                     });
@@ -64,10 +64,10 @@ define('app/controllers/backend_edit', ['ember'],
 
             toggle: function () {
 
-                if (this.newState == this.backend.enabled) return;
+                if (this.newState == this.cloud.enabled) return;
 
-                Mist.backendsController.toggleBackend({
-                    backend: this.backend,
+                Mist.cloudsController.toggleCloud({
+                    cloud: this.cloud,
                     newState: this.newState,
                     callback: this._toggle
                 });
@@ -76,8 +76,8 @@ define('app/controllers/backend_edit', ['ember'],
 
             delete: function () {
 
-                Mist.backendsController.deleteBackend({
-                    backend: this.backend,
+                Mist.cloudsController.deleteCloud({
+                    cloud: this.cloud,
                     callback: this._delete
                 });
             },
@@ -92,7 +92,7 @@ define('app/controllers/backend_edit', ['ember'],
 
             _clear: function () {
                 this.setProperties({
-                    backend: {},
+                    cloud: {},
                     newTitle: null,
                     newState: null,
                 })
@@ -100,11 +100,11 @@ define('app/controllers/backend_edit', ['ember'],
 
             _updateFormReady: function() {
                 var formReady = false;
-                if (this.newTitle != this.backend.title && this.newTitle) {
+                if (this.newTitle != this.cloud.title && this.newTitle) {
                     formReady = true;
                 }
 
-                if (formReady && this.editingBackend) {
+                if (formReady && this.editingCloud) {
                     formReady = false;
                 }
 
@@ -113,21 +113,21 @@ define('app/controllers/backend_edit', ['ember'],
 
 
             _rename: function () {
-                var that = Mist.backendEditController;
-                if (!that.backend) return;
-                that.set('newTitle', that.backend.title);
+                var that = Mist.cloudEditController;
+                if (!that.cloud) return;
+                that.set('newTitle', that.cloud.title);
             },
 
 
             _toggle: function () {
-                var that = Mist.backendEditController;
-                if (!that.backend) return;
-                that.set('newState', that.backend.enabled);
+                var that = Mist.cloudEditController;
+                if (!that.cloud) return;
+                that.set('newState', that.cloud.enabled);
             },
 
 
             _delete: function (success) {
-                var that = Mist.backendEditController;
+                var that = Mist.cloudEditController;
                 if (success) that.close();
             },
 
@@ -141,7 +141,7 @@ define('app/controllers/backend_edit', ['ember'],
 
             stateObserver: function () {
                 Ember.run.once(this, '_toggle');
-            }.observes('backend.enabled'),
+            }.observes('cloud.enabled'),
 
 
             newStateObserver: function () {
@@ -151,7 +151,7 @@ define('app/controllers/backend_edit', ['ember'],
 
             newTitleObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newTitle', 'editingBackend')
+            }.observes('newTitle', 'editingCloud')
         });
     }
 );

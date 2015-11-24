@@ -70,7 +70,7 @@ define('app/controllers/machine_tags', ['ember'],
                     });
 
                     that.set('addingTag', true);
-                    Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags', {
+                    Mist.ajax.POST('clouds/' + machine.cloud.id + '/machines/' + machine.id + '/tags', {
                         'tags': payload
                     })
                     .success(function () {
@@ -99,7 +99,7 @@ define('app/controllers/machine_tags', ['ember'],
 
                 if (this._containsKey(this.machine.tags, tag.key)) {
                     this.set('deletingTag', true);
-                    Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/tags/' + tag.key)
+                    Mist.ajax.DELETE('clouds/' + machine.cloud.id + '/machines/' + machine.id + '/tags/' + tag.key)
                     .success(function () {
                         that._removeDeletedTag(tag);
                     })
