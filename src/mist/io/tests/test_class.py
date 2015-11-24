@@ -2,7 +2,7 @@ import os
 import unittest
 import random
 
-import backends as backends
+import clouds as clouds
 import keypairs as keypairs
 import machines as machines
 
@@ -43,7 +43,7 @@ class TestClass(unittest.TestCase):
         config_file.close()
 
         self.uri = self.test_config['MIST_URI']
-        self.credentials = self.test_config['BACKEND_KEYS']
+        self.credentials = self.test_config['CLOUD_KEYS']
         self.machine_name = self.test_config['MACHINE_NAME']
         self.cookie = self.test_config['COOKIE']
 
@@ -92,28 +92,28 @@ class TestClass(unittest.TestCase):
         so a view '/providers' was made in views.py
         """
         print ">>>Getting supported providers:"
-        self.test_config['SUPPORTED_PROVIDERS'] = backends.supported_providers(self.uri, cookie=self.cookie)
+        self.test_config['SUPPORTED_PROVIDERS'] = clouds.supported_providers(self.uri, cookie=self.cookie)
         for provider in self.test_config['SUPPORTED_PROVIDERS']:
             print "Provider: %s --> Title: %s " % (provider['provider'], provider['title'])
 
-    ###########BACKENDS ACTIONS ###############################
+    ###########CLOUDS ACTIONS ###############################
 
-    def test_01_list_backends(self):
+    def test_01_list_clouds(self):
         """
-        --> List Backends
-        This one lists all of our backends and it is used every time
-        we add or delete a backend in order to confirm our action and see
+        --> List Clouds
+        This one lists all of our clouds and it is used every time
+        we add or delete a cloud in order to confirm our action and see
         if our information agrees with the information sent from the API
         """
-        print "\n>>>List of Backends:"
-        self.test_config['BACKENDS'] = backends.list_backends(self.uri, cookie=self.cookie) or {}
-        for back in self.test_config['BACKENDS']:
+        print "\n>>>List of Clouds:"
+        self.test_config['CLOUDS'] = clouds.list_clouds(self.uri, cookie=self.cookie) or {}
+        for back in self.test_config['CLOUDS']:
             print back['title']
 
-    def test_020_add_EC2_backend(self):
+    def test_020_add_EC2_cloud(self):
         """
-        -->Add EC2 Backends
-        Adds all EC2 Backends, if no EC2 creds are given in the yaml file it will
+        -->Add EC2 Clouds
+        Adds all EC2 Clouds, if no EC2 creds are given in the yaml file it will
         print a Message and return True
         """
         providers = self.test_config['SUPPORTED_PROVIDERS']
@@ -122,26 +122,26 @@ class TestClass(unittest.TestCase):
         apisecret = creds['api_secret']
 
         if not apikey or not apisecret:
-            print "\n>>>Could not find credentials for EC2, will not add backend"
+            print "\n>>>Could not find credentials for EC2, will not add cloud"
             return
 
         for prov in providers:
             if "EC2 AP SOUTHEAST" in prov['title']:
                 title = prov['title']
                 provider = prov['provider']
-                print "\n>>>Adding %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
-                self.test_config['BACKENDS'][backend['id']] = backend
+                print "\n>>>Adding %s cloud" % title
+                cloud = clouds.add_cloud(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
+                self.test_config['CLOUDS'][cloud['id']] = cloud
                 #TODO erase the break
                 break
 
-        print"\nList all backends:"
-        for back in backends.list_backends(self.uri, cookie=self.cookie):
+        print"\nList all clouds:"
+        for back in clouds.list_clouds(self.uri, cookie=self.cookie):
             print back['title']
 
-    def test_021_add_Rackspace_backend(self):
+    def test_021_add_Rackspace_cloud(self):
         """
-        --->Add Rackspace Backends
+        --->Add Rackspace Clouds
         """
         providers = self.test_config['SUPPORTED_PROVIDERS']
         creds = self.credentials['Rackspace']
@@ -149,26 +149,26 @@ class TestClass(unittest.TestCase):
         apisecret = creds['api_key']
 
         if not apikey or not apisecret:
-            print "\n>>>Could not find credentials for Rackspace, will not add backend"
+            print "\n>>>Could not find credentials for Rackspace, will not add cloud"
             return
 
         for prov in providers:
             if "Rack" in prov['title']:
                 title = prov['title']
                 provider = prov['provider']
-                print "\n>>>Adding %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
-                self.test_config['BACKENDS'][backend['id']] = backend
+                print "\n>>>Adding %s cloud" % title
+                cloud = clouds.add_cloud(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
+                self.test_config['CLOUDS'][cloud['id']] = cloud
                 #TODO erase the break
                 break
 
-        print"\nList all backends:"
-        for back in backends.list_backends(self.uri, cookie=self.cookie):
+        print"\nList all clouds:"
+        for back in clouds.list_clouds(self.uri, cookie=self.cookie):
             print back['title']
 
-    def test_022_add_Nephoscale_backend(self):
+    def test_022_add_Nephoscale_cloud(self):
         """
-        --->Add Nephoscale Backend
+        --->Add Nephoscale Cloud
         """
         providers = self.test_config['SUPPORTED_PROVIDERS']
         creds = self.credentials['Nephoscale']
@@ -176,24 +176,24 @@ class TestClass(unittest.TestCase):
         apisecret = creds['password']
 
         if not apikey or not apisecret:
-            print "\n>>>Could not find credentials for Nephoscale, will not add backend"
+            print "\n>>>Could not find credentials for Nephoscale, will not add cloud"
             return
 
         for prov in providers:
             if "Nepho" in prov['title']:
                 title = prov['title']
                 provider = prov['provider']
-                print "\n>>>Addind %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
-                self.test_config['BACKENDS'][backend['id']] = backend
+                print "\n>>>Addind %s cloud" % title
+                cloud = clouds.add_cloud(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
+                self.test_config['CLOUDS'][cloud['id']] = cloud
 
-        print"\nList all backends:"
-        for back in backends.list_backends(self.uri, cookie=self.cookie):
+        print"\nList all clouds:"
+        for back in clouds.list_clouds(self.uri, cookie=self.cookie):
             print back['title']
 
-    def test_023_add_DigitalOcean_backend(self):
+    def test_023_add_DigitalOcean_cloud(self):
         """
-        --->Add DigitalOcean Backend
+        --->Add DigitalOcean Cloud
         """
         providers = self.test_config['SUPPORTED_PROVIDERS']
         creds = self.credentials['DigitalOcean']
@@ -201,24 +201,24 @@ class TestClass(unittest.TestCase):
         apisecret = creds['api_key']
 
         if not apikey or not apisecret:
-            print "\n>>>Could not find credentials for DigitalOcean, will not add backend"
+            print "\n>>>Could not find credentials for DigitalOcean, will not add cloud"
             return
 
         for prov in providers:
             if "Digital" in prov['title']:
                 title = prov['title']
                 provider = prov['provider']
-                print "\n>>>Addind %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
-                self.test_config['BACKENDS'][backend['id']] = backend
+                print "\n>>>Addind %s cloud" % title
+                cloud = clouds.add_cloud(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
+                self.test_config['CLOUDS'][cloud['id']] = cloud
 
-        print"\nList all backends:"
-        for back in backends.list_backends(self.uri, cookie=self.cookie):
+        print"\nList all clouds:"
+        for back in clouds.list_clouds(self.uri, cookie=self.cookie):
             print back['title']
 
-    def test_024_add_SoftLayer_backend(self):
+    def test_024_add_SoftLayer_cloud(self):
         """
-        --->Add SoftLayer Backend
+        --->Add SoftLayer Cloud
         """
         providers = self.test_config['SUPPORTED_PROVIDERS']
         creds = self.credentials['SoftLayer']
@@ -226,19 +226,19 @@ class TestClass(unittest.TestCase):
         apisecret = creds['api_key']
 
         if not apikey or not apisecret:
-            print "\n>>>Could not find credentials for SoftLayer, will not add backend"
+            print "\n>>>Could not find credentials for SoftLayer, will not add cloud"
             return
 
         for prov in providers:
             if "Soft" in prov['title']:
                 title = prov['title']
                 provider = prov['provider']
-                print "\n>>>Addind %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
-                self.test_config['BACKENDS'][backend['id']] = backend
+                print "\n>>>Addind %s cloud" % title
+                cloud = clouds.add_cloud(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
+                self.test_config['CLOUDS'][cloud['id']] = cloud
 
-        print"\nList all backends:"
-        for back in backends.list_backends(self.uri, cookie=self.cookie):
+        print"\nList all clouds:"
+        for back in clouds.list_clouds(self.uri, cookie=self.cookie):
             print back['title']
 
 
@@ -341,14 +341,14 @@ class TestClass(unittest.TestCase):
     def test_040_list_images(self):
         """
         --->List Images
-        Lists all available images for every added Backend
+        Lists all available images for every added Cloud
         """
-        for backend_id in self.test_config['BACKENDS']:
-            #backend_id = self.test_config['BACKENDS'].keys()[0]
-            print "\n>>>List of images for Backend %s" % \
-                  self.test_config['BACKENDS'][backend_id]['title']
-            images = backends.list_images(self.uri, backend_id, cookie=self.cookie)
-            self.test_config['BACKENDS'][backend_id]['images'] = images
+        for cloud_id in self.test_config['CLOUDS']:
+            #cloud_id = self.test_config['CLOUDS'].keys()[0]
+            print "\n>>>List of images for Cloud %s" % \
+                  self.test_config['CLOUDS'][cloud_id]['title']
+            images = clouds.list_images(self.uri, cloud_id, cookie=self.cookie)
+            self.test_config['CLOUDS'][cloud_id]['images'] = images
             for image in images:
                 print image['name']
 
@@ -361,39 +361,39 @@ class TestClass(unittest.TestCase):
     #
     #     Our API is lightyears ahead :-)
     #     """
-    #     backend_id = self.test_config['BACKENDS'].keys()[0]
+    #     cloud_id = self.test_config['CLOUDS'].keys()[0]
     #     search_term = "Ubuntu"
     #     print "\n>>>Searching for %s image " % search_term
     #
-    #     images = backends.list_images(self.uri, backend_id, search_term=search_term, cookie=self.cookie)
+    #     images = clouds.list_images(self.uri, cloud_id, search_term=search_term, cookie=self.cookie)
     #     for image in images:
     #         print image['name']
 
     def test_041_list_sizes(self):
         """
         --->List Sizes
-        Lists all sizes for every added Backend
+        Lists all sizes for every added Cloud
         """
-        for backend_id in self.test_config['BACKENDS']:
-            print "\n>>>List of sizes for Backend %s" % \
-                  self.test_config['BACKENDS'][backend_id]['title']
+        for cloud_id in self.test_config['CLOUDS']:
+            print "\n>>>List of sizes for Cloud %s" % \
+                  self.test_config['CLOUDS'][cloud_id]['title']
 
-            sizes = backends.list_sizes(self.uri, backend_id, cookie=self.cookie)
-            self.test_config['BACKENDS'][backend_id]['sizes'] = sizes
+            sizes = clouds.list_sizes(self.uri, cloud_id, cookie=self.cookie)
+            self.test_config['CLOUDS'][cloud_id]['sizes'] = sizes
             for size in sizes:
                 print size['name']
 
     def test_042_list_locations(self):
         """
         --->List Locations
-        Lists all locations for every backend
+        Lists all locations for every cloud
         """
-        for backend_id in self.test_config['BACKENDS']:
-            print "\n>>>List of locations for Backend %s" % \
-                  self.test_config['BACKENDS'][backend_id]['title']
+        for cloud_id in self.test_config['CLOUDS']:
+            print "\n>>>List of locations for Cloud %s" % \
+                  self.test_config['CLOUDS'][cloud_id]['title']
 
-            locations = backends.list_locations(self.uri, backend_id, cookie=self.cookie)
-            self.test_config['BACKENDS'][backend_id]['locations'] = locations
+            locations = clouds.list_locations(self.uri, cloud_id, cookie=self.cookie)
+            self.test_config['CLOUDS'][cloud_id]['locations'] = locations
             for location in locations:
                 print location['name']
 
@@ -401,7 +401,7 @@ class TestClass(unittest.TestCase):
     def test_050_list_machines(self):
         """
         --->List Machines
-        Lists all our machine for every added Backend
+        Lists all our machine for every added Cloud
 
         Important: this method will be used in after each machine
         action (e.g. reboot, start etc) cause it returns along with
@@ -411,22 +411,22 @@ class TestClass(unittest.TestCase):
         That's why we call this one before each of our machine
         actions....
         """
-        for backend_id in self.test_config['BACKENDS']:
-            print "\n>>>List of machines for Backend %s" % \
-                  self.test_config['BACKENDS'][backend_id]['title']
+        for cloud_id in self.test_config['CLOUDS']:
+            print "\n>>>List of machines for Cloud %s" % \
+                  self.test_config['CLOUDS'][cloud_id]['title']
 
-            mach = machines.list_machines(self.uri, backend_id, cookie=self.cookie)
+            mach = machines.list_machines(self.uri, cloud_id, cookie=self.cookie)
             if mach == {} or mach == []:
-                self.test_config['BACKENDS'][backend_id]['machines'] = {}
+                self.test_config['CLOUDS'][cloud_id]['machines'] = {}
             else:
                 try:
                     for machine in mach:
-                        self.test_config['BACKENDS'][backend_id]['machines'][machine['name']] = machine
+                        self.test_config['CLOUDS'][cloud_id]['machines'][machine['name']] = machine
                         print machine['name'], machine['state']
                 except KeyError:
-                    self.test_config['BACKENDS'][backend_id]['machines'] = {}
+                    self.test_config['CLOUDS'][cloud_id]['machines'] = {}
                     for machine in mach:
-                        self.test_config['BACKENDS'][backend_id]['machines'][machine['name']] = machine
+                        self.test_config['CLOUDS'][cloud_id]['machines'][machine['name']] = machine
                         print machine['name'], machine['state']
 
     def test_051_create_machine_on_EC2_NorthEast(self):
@@ -436,14 +436,14 @@ class TestClass(unittest.TestCase):
 
         Creates a machine!
 
-        Params needed are the backend_id, the image_id, the size, the location.
+        Params needed are the cloud_id, the image_id, the size, the location.
         We have some optional params as well:
         Script: If we want a script to be run
         Key_id: Yes, key_id is optional, our view handles that. So we pass no key_id
         to test the ingenuity of our API.
 
         We chose to create a Machine in EC2 NorthEast for many reasons:
-        We do not want start creatong Machines in every Backend and EC2 is rather
+        We do not want start creatong Machines in every Cloud and EC2 is rather
         quick in creating machines.
 
         For the machine name:
@@ -451,17 +451,17 @@ class TestClass(unittest.TestCase):
         provided in the yaml file (MACHINE_NAME) and add a random number next to it.
 
         """
-        #Find the backend_ip of a EC2 Backend
-        backend_id = None
+        #Find the cloud_ip of a EC2 Cloud
+        cloud_id = None
         image_id = None
         size = None
         location = None
         script = 'touch me'
 
 
-        for b_id in self.test_config['BACKENDS']:
-            if "EC2 AP SOUTHEAST" in self.test_config['BACKENDS'][b_id]['title']:
-                backend_id = b_id
+        for b_id in self.test_config['CLOUDS']:
+            if "EC2 AP SOUTHEAST" in self.test_config['CLOUDS'][b_id]['title']:
+                cloud_id = b_id
                 break
 
         for key_id in self.test_config['KEYPAIRS']:
@@ -475,25 +475,25 @@ class TestClass(unittest.TestCase):
         while True:
             seq = range(300)
             name = self.test_config['MACHINE_NAME'] + str(random.choice(seq))
-            if name not in self.test_config['BACKENDS'][backend_id]['machines']:
+            if name not in self.test_config['CLOUDS'][cloud_id]['machines']:
                 break
 
-        image_id = self.test_config['BACKENDS'][backend_id]['images'][0]['id']
-        size = self.test_config['BACKENDS'][backend_id]['sizes'][0]['id']
-        location = self.test_config['BACKENDS'][backend_id]['locations'][0]['id']
+        image_id = self.test_config['CLOUDS'][cloud_id]['images'][0]['id']
+        size = self.test_config['CLOUDS'][cloud_id]['sizes'][0]['id']
+        location = self.test_config['CLOUDS'][cloud_id]['locations'][0]['id']
 
 
         print "\n>>>Will now Create Machine:"
         print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         print "Name: %s" % name
-        print "Backend: %s" % self.test_config['BACKENDS'][backend_id]['title']
+        print "Cloud: %s" % self.test_config['CLOUDS'][cloud_id]['title']
         print "With Key: %s" % key_id
         print "Image Id: %s" % image_id
         print "Size Id: %s" % size
         print "Location Id: %s" % location
         print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
-        machine = machines.create_machine(self.uri, backend_id, key_id, name, location, image_id, size, cookie=self.cookie)
+        machine = machines.create_machine(self.uri, cloud_id, key_id, name, location, image_id, size, cookie=self.cookie)
         print "Created Machine %s" % machine['name']
         self.test_050_list_machines()
 
@@ -501,36 +501,36 @@ class TestClass(unittest.TestCase):
         """--->Reboot machine"""
         self.test_050_list_machines()
         print "\n>>>Reboot Machine:"
-        for backend_id in self.test_config['BACKENDS']:
-            for machine in self.test_config['BACKENDS'][backend_id]['machines']:
+        for cloud_id in self.test_config['CLOUDS']:
+            for machine in self.test_config['CLOUDS'][cloud_id]['machines']:
                 if self.test_config['MACHINE_NAME'] in machine and \
-                        self.test_config['BACKENDS'][backend_id]['machines'][machine]['can_reboot']:
-                    machine_id = self.test_config['BACKENDS'][backend_id]['machines'][machine]['id']
-                    machines.reboot_machine(self.uri, backend_id, machine_id, cookie=self.cookie)
+                        self.test_config['CLOUDS'][cloud_id]['machines'][machine]['can_reboot']:
+                    machine_id = self.test_config['CLOUDS'][cloud_id]['machines'][machine]['id']
+                    machines.reboot_machine(self.uri, cloud_id, machine_id, cookie=self.cookie)
                     return True
 
     def test_053_stop_machine(self):
         """--->Stop machine"""
         self.test_050_list_machines()
         print "\n>>>Stop Machine:"
-        for backend_id in self.test_config['BACKENDS']:
-            for machine in self.test_config['BACKENDS'][backend_id]['machines']:
+        for cloud_id in self.test_config['CLOUDS']:
+            for machine in self.test_config['CLOUDS'][cloud_id]['machines']:
                 if self.test_config['MACHINE_NAME'] in machine and \
-                        self.test_config['BACKENDS'][backend_id]['machines'][machine]['can_reboot']:
-                    machine_id = self.test_config['BACKENDS'][backend_id]['machines'][machine]['id']
-                    machines.stop_machine(self.uri, backend_id, machine_id, cookie=self.cookie)
+                        self.test_config['CLOUDS'][cloud_id]['machines'][machine]['can_reboot']:
+                    machine_id = self.test_config['CLOUDS'][cloud_id]['machines'][machine]['id']
+                    machines.stop_machine(self.uri, cloud_id, machine_id, cookie=self.cookie)
                     return True
 
     def test_054_start_machine(self):
         """--->Start machine"""
         self.test_050_list_machines()
         print "\n>>>Start Machine:"
-        for backend_id in self.test_config['BACKENDS']:
-            for machine in self.test_config['BACKENDS'][backend_id]['machines']:
+        for cloud_id in self.test_config['CLOUDS']:
+            for machine in self.test_config['CLOUDS'][cloud_id]['machines']:
                 if self.test_config['MACHINE_NAME'] in machine and \
-                        self.test_config['BACKENDS'][backend_id]['machines'][machine]['can_start']:
-                    machine_id = self.test_config['BACKENDS'][backend_id]['machines'][machine]['id']
-                    machines.start_machine(self.uri, backend_id, machine_id, cookie=self.cookie)
+                        self.test_config['CLOUDS'][cloud_id]['machines'][machine]['can_start']:
+                    machine_id = self.test_config['CLOUDS'][cloud_id]['machines'][machine]['id']
+                    machines.start_machine(self.uri, cloud_id, machine_id, cookie=self.cookie)
                     return True
 
     ###########CLEANING UP#####################################
@@ -538,11 +538,11 @@ class TestClass(unittest.TestCase):
     def test_055_destroy_machines(self):
         """--->Destroy Machines"""
         print "\n>>>Destroy machines:"
-        for backend_id in self.test_config['BACKENDS']:
-            for machine in self.test_config['BACKENDS'][backend_id]['machines']:
-                if self.test_config['MACHINE_NAME'] in machine and self.test_config['BACKENDS'][backend_id]['machines'][machine]['can_destroy']:
-                    machine_id = self.test_config['BACKENDS'][backend_id]['machines'][machine]['id']
-                    machines.destroy_machine(self.uri, backend_id, machine_id, cookie=self.cookie)
+        for cloud_id in self.test_config['CLOUDS']:
+            for machine in self.test_config['CLOUDS'][cloud_id]['machines']:
+                if self.test_config['MACHINE_NAME'] in machine and self.test_config['CLOUDS'][cloud_id]['machines'][machine]['can_destroy']:
+                    machine_id = self.test_config['CLOUDS'][cloud_id]['machines'][machine]['id']
+                    machines.destroy_machine(self.uri, cloud_id, machine_id, cookie=self.cookie)
                     return True
 
     def test_935_delete_all_keys(self):
@@ -553,16 +553,16 @@ class TestClass(unittest.TestCase):
                 keypairs.delete_key(self.uri, key['id'])
                 del self.test_config['KEYPAIRS'][key['id']]
 
-    def test_94_delete_all_backends(self):
-        """--->Delete All Backends"""
-        print "\n>>>Deleting all backends:"
-        for back in backends.list_backends(self.uri):
-            backends.delete_backend(self.uri, back['id'])
-            del self.test_config['BACKENDS'][back['id']]
+    def test_94_delete_all_clouds(self):
+        """--->Delete All Clouds"""
+        print "\n>>>Deleting all clouds:"
+        for back in clouds.list_clouds(self.uri):
+            clouds.delete_cloud(self.uri, back['id'])
+            del self.test_config['CLOUDS'][back['id']]
 
     def test_99_clean_up(self):
         """--->Cleaning up"""
         print "\n>>>Cleaning up..."
-        self.test_config['BACKENDS'] = {}
+        self.test_config['CLOUDS'] = {}
         self.test_config['KEYPAIRS'] = {}
         self.test_config['SUPPORTED_PROVIDERS'] = []

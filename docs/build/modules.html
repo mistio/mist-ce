@@ -170,9 +170,9 @@ only source file where we import things from pyramid. View functions should
 only check that all required params are provided. Any further checking should
 be performed inside the corresponding method functions.</p>
 <dl class="function">
-<dt id="mist.io.views.add_backend">
-<code class="descclassname">mist.io.views.</code><code class="descname">add_backend</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.add_backend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a new backend.</p>
+<dt id="mist.io.views.add_cloud">
+<code class="descclassname">mist.io.views.</code><code class="descname">add_cloud</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.add_cloud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new cloud.</p>
 </dd></dl>
 
 <dl class="function">
@@ -210,19 +210,19 @@ be performed inside the corresponding method functions.</p>
 <dl class="function">
 <dt id="mist.io.views.create_machine">
 <code class="descclassname">mist.io.views.</code><code class="descname">create_machine</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.create_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new virtual machine on the specified backend.</p>
+<dd><p>Creates a new virtual machine on the specified cloud.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.views.create_network">
 <code class="descclassname">mist.io.views.</code><code class="descname">create_network</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.create_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new network. Currently working only with OPENSTACK backend</p>
+<dd><p>Creates a new network. Currently working only with OPENSTACK cloud</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="mist.io.views.delete_backend">
-<code class="descclassname">mist.io.views.</code><code class="descname">delete_backend</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.delete_backend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes a backend.</p>
+<dt id="mist.io.views.delete_cloud">
+<code class="descclassname">mist.io.views.</code><code class="descname">delete_cloud</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.delete_cloud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a cloud.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">It assumes the user may re-add it later so it does not remove
@@ -251,7 +251,7 @@ deleted.</p>
 <dl class="function">
 <dt id="mist.io.views.delete_network">
 <code class="descclassname">mist.io.views.</code><code class="descname">delete_network</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.delete_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes a network. Currently working only with OPENSTACK backend</p>
+<dd><p>Deletes a network. Currently working only with OPENSTACK cloud</p>
 </dd></dl>
 
 <dl class="function">
@@ -324,21 +324,21 @@ button.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="mist.io.views.list_backends">
-<code class="descclassname">mist.io.views.</code><code class="descname">list_backends</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.list_backends" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the available backends.</p>
+<dt id="mist.io.views.list_clouds">
+<code class="descclassname">mist.io.views.</code><code class="descname">list_clouds</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.list_clouds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the available clouds.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Currently, this is only used by the backend controller in js.</p>
+<p class="last">Currently, this is only used by the cloud controller in js.</p>
 </div>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.views.list_images">
 <code class="descclassname">mist.io.views.</code><code class="descname">list_images</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.list_images" title="Permalink to this definition">¶</a></dt>
-<dd><p>List images from each backend.
+<dd><p>List images from each cloud.
 Furthermore if a search_term is provided, we loop through each
-backend and search for that term in the ids and the names of
+cloud and search for that term in the ids and the names of
 the community images</p>
 </dd></dl>
 
@@ -353,25 +353,25 @@ keys are returned.</p>
 <dl class="function">
 <dt id="mist.io.views.list_locations">
 <code class="descclassname">mist.io.views.</code><code class="descname">list_locations</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.list_locations" title="Permalink to this definition">¶</a></dt>
-<dd><p>List locations from each backend.</p>
+<dd><p>List locations from each cloud.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.views.list_machines">
 <code class="descclassname">mist.io.views.</code><code class="descname">list_machines</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.list_machines" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets machines and their metadata from a backend.</p>
+<dd><p>Gets machines and their metadata from a cloud.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.views.list_networks">
 <code class="descclassname">mist.io.views.</code><code class="descname">list_networks</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.list_networks" title="Permalink to this definition">¶</a></dt>
-<dd><p>List networks from each backend.</p>
+<dd><p>List networks from each cloud.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.views.list_sizes">
 <code class="descclassname">mist.io.views.</code><code class="descname">list_sizes</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.list_sizes" title="Permalink to this definition">¶</a></dt>
-<dd><p>List sizes (aka flavors) from each backend.</p>
+<dd><p>List sizes (aka flavors) from each cloud.</p>
 </dd></dl>
 
 <dl class="function">
@@ -413,9 +413,9 @@ keys are returned.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="mist.io.views.rename_backend">
-<code class="descclassname">mist.io.views.</code><code class="descname">rename_backend</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.rename_backend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Renames a backend.</p>
+<dt id="mist.io.views.rename_cloud">
+<code class="descclassname">mist.io.views.</code><code class="descname">rename_cloud</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.rename_cloud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renames a cloud.</p>
 </dd></dl>
 
 <dl class="function">
@@ -426,7 +426,7 @@ keys are returned.</p>
 <dl class="function">
 <dt id="mist.io.views.set_machine_metadata">
 <code class="descclassname">mist.io.views.</code><code class="descname">set_machine_metadata</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.set_machine_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets metadata for a machine, given the backend and machine id.</p>
+<dd><p>Sets metadata for a machine, given the cloud and machine id.</p>
 </dd></dl>
 
 <dl class="function">
@@ -441,8 +441,8 @@ keys are returned.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="mist.io.views.toggle_backend">
-<code class="descclassname">mist.io.views.</code><code class="descname">toggle_backend</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.toggle_backend" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.views.toggle_cloud">
+<code class="descclassname">mist.io.views.</code><code class="descname">toggle_cloud</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.views.toggle_cloud" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -478,16 +478,16 @@ service.</p>
 <div class="section" id="module-mist.io.methods">
 <span id="mist-io-methods"></span><h2><a class="reference internal" href="#module-mist.io.methods" title="mist.io.methods"><code class="xref py py-mod docutils literal"><span class="pre">mist.io.methods</span></code></a><a class="headerlink" href="#module-mist.io.methods" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="mist.io.methods.add_backend">
-<code class="descclassname">mist.io.methods.</code><code class="descname">add_backend</code><span class="sig-paren">(</span><em>user</em>, <em>title</em>, <em>provider</em>, <em>apikey</em>, <em>apisecret</em>, <em>apiurl</em>, <em>tenant_name</em>, <em>machine_hostname=''</em>, <em>region=''</em>, <em>machine_key=''</em>, <em>machine_user=''</em>, <em>compute_endpoint=''</em>, <em>port=22</em>, <em>docker_port=4243</em>, <em>remove_on_error=True</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.add_backend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a new backend to the user and returns the new backend_id.</p>
+<dt id="mist.io.methods.add_cloud">
+<code class="descclassname">mist.io.methods.</code><code class="descname">add_cloud</code><span class="sig-paren">(</span><em>user</em>, <em>title</em>, <em>provider</em>, <em>apikey</em>, <em>apisecret</em>, <em>apiurl</em>, <em>tenant_name</em>, <em>machine_hostname=''</em>, <em>region=''</em>, <em>machine_key=''</em>, <em>machine_user=''</em>, <em>compute_endpoint=''</em>, <em>port=22</em>, <em>docker_port=4243</em>, <em>remove_on_error=True</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.add_cloud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new cloud to the user and returns the new cloud_id.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="mist.io.methods.add_backend_v_2">
-<code class="descclassname">mist.io.methods.</code><code class="descname">add_backend_v_2</code><span class="sig-paren">(</span><em>user</em>, <em>title</em>, <em>provider</em>, <em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.add_backend_v_2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Version 2 of add_backend
-Adds a new backend to the user and returns the backend_id</p>
+<dt id="mist.io.methods.add_cloud_v_2">
+<code class="descclassname">mist.io.methods.</code><code class="descname">add_cloud_v_2</code><span class="sig-paren">(</span><em>user</em>, <em>title</em>, <em>provider</em>, <em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.add_cloud_v_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version 2 of add_cloud
+Adds a new cloud to the user and returns the cloud_id</p>
 </dd></dl>
 
 <dl class="function">
@@ -498,17 +498,17 @@ Adds a new backend to the user and returns the backend_id</p>
 
 <dl class="function">
 <dt id="mist.io.methods.assoc_metric">
-<code class="descclassname">mist.io.methods.</code><code class="descname">assoc_metric</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>metric_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.assoc_metric" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">assoc_metric</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>metric_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.assoc_metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.associate_ip">
-<code class="descclassname">mist.io.methods.</code><code class="descname">associate_ip</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>network_id</em>, <em>ip</em>, <em>machine_id=None</em>, <em>assign=True</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.associate_ip" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">associate_ip</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>network_id</em>, <em>ip</em>, <em>machine_id=None</em>, <em>assign=True</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.associate_ip" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.associate_key">
-<code class="descclassname">mist.io.methods.</code><code class="descname">associate_key</code><span class="sig-paren">(</span><em>user</em>, <em>key_id</em>, <em>backend_id</em>, <em>machine_id</em>, <em>host=''</em>, <em>username=None</em>, <em>port=22</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.associate_key" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">associate_key</code><span class="sig-paren">(</span><em>user</em>, <em>key_id</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>host=''</em>, <em>username=None</em>, <em>port=22</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.associate_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Associates a key with a machine.</p>
 <p>If host is set it will also attempt to actually deploy it to the
 machine. To do that it requires another keypair (existing_key) that can
@@ -523,8 +523,8 @@ connect to the machine.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.connect_provider">
-<code class="descclassname">mist.io.methods.</code><code class="descname">connect_provider</code><span class="sig-paren">(</span><em>backend</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.connect_provider" title="Permalink to this definition">¶</a></dt>
-<dd><p>Establishes backend connection using the credentials specified.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">connect_provider</code><span class="sig-paren">(</span><em>cloud</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.connect_provider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Establishes cloud connection using the credentials specified.</p>
 <p>It has been tested with:</p>
 <blockquote>
 <div><ul class="simple">
@@ -534,24 +534,24 @@ connect to the machine.</p>
 <li>Linode</li>
 </ul>
 </div></blockquote>
-<p>Backend is expected to be a mist.io.model.Backend</p>
+<p>Cloud is expected to be a mist.io.model.Cloud</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.create_dns_a_record">
 <code class="descclassname">mist.io.methods.</code><code class="descname">create_dns_a_record</code><span class="sig-paren">(</span><em>user</em>, <em>domain_name</em>, <em>ip_addr</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.create_dns_a_record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Will try to create DNS A record for specified domain name and IP addr.</p>
-<p>All backends for which there is DNS support will be tried to see if the
+<p>All clouds for which there is DNS support will be tried to see if the
 relevant zone exists.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.create_machine">
-<code class="descclassname">mist.io.methods.</code><code class="descname">create_machine</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>key_id</em>, <em>machine_name</em>, <em>location_id</em>, <em>image_id</em>, <em>size_id</em>, <em>script</em>, <em>image_extra</em>, <em>disk</em>, <em>image_name</em>, <em>size_name</em>, <em>location_name</em>, <em>ips</em>, <em>monitoring</em>, <em>networks=[]</em>, <em>docker_env=[]</em>, <em>docker_command=None</em>, <em>ssh_port=22</em>, <em>script_id=''</em>, <em>script_params=''</em>, <em>job_id=None</em>, <em>docker_port_bindings={}</em>, <em>docker_exposed_ports={}</em>, <em>hostname=''</em>, <em>plugins=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.create_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new virtual machine on the specified backend.</p>
-<p>If the backend is Rackspace it attempts to deploy the node with an ssh key
+<code class="descclassname">mist.io.methods.</code><code class="descname">create_machine</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>key_id</em>, <em>machine_name</em>, <em>location_id</em>, <em>image_id</em>, <em>size_id</em>, <em>script</em>, <em>image_extra</em>, <em>disk</em>, <em>image_name</em>, <em>size_name</em>, <em>location_name</em>, <em>ips</em>, <em>monitoring</em>, <em>networks=[]</em>, <em>docker_env=[]</em>, <em>docker_command=None</em>, <em>ssh_port=22</em>, <em>script_id=''</em>, <em>script_params=''</em>, <em>job_id=None</em>, <em>docker_port_bindings={}</em>, <em>docker_exposed_ports={}</em>, <em>hostname=''</em>, <em>plugins=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.create_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new virtual machine on the specified cloud.</p>
+<p>If the cloud is Rackspace it attempts to deploy the node with an ssh key
 provided in config. the method used is the only one working in the old
-Rackspace backend. create_node(), from libcloud.compute.base, with &#8216;auth&#8217;
+Rackspace cloud. create_node(), from libcloud.compute.base, with &#8216;auth&#8217;
 kwarg doesn&#8217;t do the trick. Didn&#8217;t test if you can upload some ssh related
 files using the &#8216;ex_files&#8217; kwarg from openstack 1.0 driver.</p>
 <p>In Linode creation is a bit different. There you can pass the key file
@@ -568,15 +568,15 @@ through mist.io and those from the Linode interface.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.create_network">
-<code class="descclassname">mist.io.methods.</code><code class="descname">create_network</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>network</em>, <em>subnet</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.create_network" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">create_network</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>network</em>, <em>subnet</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.create_network" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new network. If subnet dict is specified, after creating the network
 it will use the new network&#8217;s id to create a subnet</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="mist.io.methods.delete_backend">
-<code class="descclassname">mist.io.methods.</code><code class="descname">delete_backend</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.delete_backend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes backend with given backend_id.</p>
+<dt id="mist.io.methods.delete_cloud">
+<code class="descclassname">mist.io.methods.</code><code class="descname">delete_cloud</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.delete_cloud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes cloud with given cloud_id.</p>
 </dd></dl>
 
 <dl class="function">
@@ -592,7 +592,7 @@ if there are still keys left and assignes another one as default.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.delete_machine_metadata">
-<code class="descclassname">mist.io.methods.</code><code class="descname">delete_machine_metadata</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.delete_machine_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">delete_machine_metadata</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.delete_machine_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes metadata for a machine, given the machine id and the tag to be
 deleted.</p>
 <p>Libcloud handles this differently for each provider. Linode and Rackspace,
@@ -607,24 +607,24 @@ u&#8217;f&#8217; is &#8216;f&#8217; returns false.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.delete_network">
-<code class="descclassname">mist.io.methods.</code><code class="descname">delete_network</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>network_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.delete_network" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">delete_network</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>network_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.delete_network" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a neutron network</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.deploy_collectd">
-<code class="descclassname">mist.io.methods.</code><code class="descname">deploy_collectd</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>extra_vars</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.deploy_collectd" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">deploy_collectd</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>extra_vars</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.deploy_collectd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.deploy_python_plugin">
-<code class="descclassname">mist.io.methods.</code><code class="descname">deploy_python_plugin</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>plugin_id</em>, <em>value_type</em>, <em>read_function</em>, <em>host</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.deploy_python_plugin" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">deploy_python_plugin</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>plugin_id</em>, <em>value_type</em>, <em>read_function</em>, <em>host</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.deploy_python_plugin" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.destroy_machine">
-<code class="descclassname">mist.io.methods.</code><code class="descname">destroy_machine</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.destroy_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Destroys a machine on a certain backend.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">destroy_machine</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.destroy_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroys a machine on a certain cloud.</p>
 <p>After destroying a machine it also deletes all key associations. However,
 it doesn&#8217;t undeploy the keypair. There is no need to do it because the
 machine will be destroyed.</p>
@@ -632,18 +632,18 @@ machine will be destroyed.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.disable_monitoring">
-<code class="descclassname">mist.io.methods.</code><code class="descname">disable_monitoring</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>no_ssh=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.disable_monitoring" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">disable_monitoring</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>no_ssh=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.disable_monitoring" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disable monitoring for a machine.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.disassoc_metric">
-<code class="descclassname">mist.io.methods.</code><code class="descname">disassoc_metric</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>metric_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.disassoc_metric" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">disassoc_metric</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>metric_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.disassoc_metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.disassociate_key">
-<code class="descclassname">mist.io.methods.</code><code class="descname">disassociate_key</code><span class="sig-paren">(</span><em>user</em>, <em>key_id</em>, <em>backend_id</em>, <em>machine_id</em>, <em>host=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.disassociate_key" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">disassociate_key</code><span class="sig-paren">(</span><em>user</em>, <em>key_id</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>host=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.disassociate_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disassociates a key from a machine.</p>
 <p>If host is set it will also attempt to actually remove it from
 the machine.</p>
@@ -666,13 +666,13 @@ the machine.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.enable_monitoring">
-<code class="descclassname">mist.io.methods.</code><code class="descname">enable_monitoring</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>name=''</em>, <em>dns_name=''</em>, <em>public_ips=None</em>, <em>no_ssh=False</em>, <em>dry=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.enable_monitoring" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">enable_monitoring</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>name=''</em>, <em>dns_name=''</em>, <em>public_ips=None</em>, <em>no_ssh=False</em>, <em>dry=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.enable_monitoring" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enable monitoring for a machine.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.find_metrics">
-<code class="descclassname">mist.io.methods.</code><code class="descname">find_metrics</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.find_metrics" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">find_metrics</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.find_metrics" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -698,7 +698,7 @@ the machine.</p>
 <dl class="function">
 <dt id="mist.io.methods.get_machine_actions">
 <code class="descclassname">mist.io.methods.</code><code class="descname">get_machine_actions</code><span class="sig-paren">(</span><em>machine_from_api</em>, <em>conn</em>, <em>extra</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.get_machine_actions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns available machine actions based on backend type.</p>
+<dd><p>Returns available machine actions based on cloud type.</p>
 <p>Rackspace, Linode and openstack support the same options, but EC2 also
 supports start/stop.</p>
 <p>The available actions are based on the machine state. The state
@@ -707,20 +707,20 @@ codes supported by mist.io are those of libcloud, check config.py.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.get_stats">
-<code class="descclassname">mist.io.methods.</code><code class="descname">get_stats</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>start=''</em>, <em>stop=''</em>, <em>step=''</em>, <em>metrics=''</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.get_stats" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">get_stats</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>start=''</em>, <em>stop=''</em>, <em>step=''</em>, <em>metrics=''</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.get_stats" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="mist.io.methods.list_backends">
-<code class="descclassname">mist.io.methods.</code><code class="descname">list_backends</code><span class="sig-paren">(</span><em>user</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_backends" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.methods.list_clouds">
+<code class="descclassname">mist.io.methods.</code><code class="descname">list_clouds</code><span class="sig-paren">(</span><em>user</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_clouds" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.list_images">
-<code class="descclassname">mist.io.methods.</code><code class="descname">list_images</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>term=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_images" title="Permalink to this definition">¶</a></dt>
-<dd><p>List images from each backend.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">list_images</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>term=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>List images from each cloud.</p>
 <p>Furthermore if a search_term is provided, we loop through each
-backend and search for that term in the ids and the names of
+cloud and search for that term in the ids and the names of
 the community images</p>
 </dd></dl>
 
@@ -731,9 +731,9 @@ the community images</p>
 
 <dl class="function">
 <dt id="mist.io.methods.list_locations">
-<code class="descclassname">mist.io.methods.</code><code class="descname">list_locations</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_locations" title="Permalink to this definition">¶</a></dt>
-<dd><p>List locations from each backend.</p>
-<p>Locations mean different things in each backend. e.g. EC2 uses it as a
+<code class="descclassname">mist.io.methods.</code><code class="descname">list_locations</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>List locations from each cloud.</p>
+<p>Locations mean different things in each cloud. e.g. EC2 uses it as a
 datacenter in a given availability zone, whereas Linode lists availability
 zones. However all responses share id, name and country eventhough in some
 cases might be empty, e.g. Openstack.</p>
@@ -743,22 +743,22 @@ zones are listed instead of name.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.list_machines">
-<code class="descclassname">mist.io.methods.</code><code class="descname">list_machines</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_machines" title="Permalink to this definition">¶</a></dt>
-<dd><p>List all machines in this backend via API call to the provider.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">list_machines</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_machines" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all machines in this cloud via API call to the provider.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.list_networks">
-<code class="descclassname">mist.io.methods.</code><code class="descname">list_networks</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_networks" title="Permalink to this definition">¶</a></dt>
-<dd><p>List networks from each backend.
+<code class="descclassname">mist.io.methods.</code><code class="descname">list_networks</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_networks" title="Permalink to this definition">¶</a></dt>
+<dd><p>List networks from each cloud.
 Currently NephoScale and Openstack networks are supported. For other providers
 this returns an empty list</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.list_sizes">
-<code class="descclassname">mist.io.methods.</code><code class="descname">list_sizes</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_sizes" title="Permalink to this definition">¶</a></dt>
-<dd><p>List sizes (aka flavors) from each backend.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">list_sizes</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.list_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>List sizes (aka flavors) from each cloud.</p>
 </dd></dl>
 
 <dl class="function">
@@ -801,43 +801,43 @@ Provider specific</p>
 
 <dl class="function">
 <dt id="mist.io.methods.probe">
-<code class="descclassname">mist.io.methods.</code><code class="descname">probe</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>host</em>, <em>key_id=''</em>, <em>ssh_user=''</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.probe" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">probe</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>host</em>, <em>key_id=''</em>, <em>ssh_user=''</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.probe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ping and SSH to machine and collect various metrics.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.probe_ssh_only">
-<code class="descclassname">mist.io.methods.</code><code class="descname">probe_ssh_only</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>host</em>, <em>key_id=''</em>, <em>ssh_user=''</em>, <em>shell=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.probe_ssh_only" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">probe_ssh_only</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>host</em>, <em>key_id=''</em>, <em>ssh_user=''</em>, <em>shell=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.probe_ssh_only" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ping and SSH to machine and collect various metrics.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.reboot_machine">
-<code class="descclassname">mist.io.methods.</code><code class="descname">reboot_machine</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.reboot_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reboots a machine on a certain backend.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">reboot_machine</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.reboot_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reboots a machine on a certain cloud.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="mist.io.methods.rename_backend">
-<code class="descclassname">mist.io.methods.</code><code class="descname">rename_backend</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>new_name</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.rename_backend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Renames backend with given backend_id.</p>
+<dt id="mist.io.methods.rename_cloud">
+<code class="descclassname">mist.io.methods.</code><code class="descname">rename_cloud</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>new_name</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.rename_cloud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renames cloud with given cloud_id.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.rename_machine">
-<code class="descclassname">mist.io.methods.</code><code class="descname">rename_machine</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.rename_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Renames a machine on a certain backend.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">rename_machine</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.rename_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renames a machine on a certain cloud.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.resize_machine">
-<code class="descclassname">mist.io.methods.</code><code class="descname">resize_machine</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>plan_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.resize_machine" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">resize_machine</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>plan_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.resize_machine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resize a machine on an other plan.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.run_playbook">
-<code class="descclassname">mist.io.methods.</code><code class="descname">run_playbook</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>playbook_path</em>, <em>extra_vars=None</em>, <em>force_handlers=False</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.run_playbook" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">run_playbook</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>playbook_path</em>, <em>extra_vars=None</em>, <em>force_handlers=False</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.run_playbook" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -851,8 +851,8 @@ Provider specific</p>
 
 <dl class="function">
 <dt id="mist.io.methods.set_machine_metadata">
-<code class="descclassname">mist.io.methods.</code><code class="descname">set_machine_metadata</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.set_machine_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets metadata for a machine, given the backend and machine id.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">set_machine_metadata</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>tag</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.set_machine_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets metadata for a machine, given the cloud and machine id.</p>
 <p>Libcloud handles this differently for each provider. Linode and Rackspace,
 at least the old Rackspace providers, don&#8217;t support metadata adding.</p>
 <p>machine_id comes as u&#8217;...&#8217; but the rest are plain strings so use == when
@@ -861,7 +861,7 @@ comparing in ifs. u&#8217;f&#8217; is &#8216;f&#8217; returns false and &#8216;i
 
 <dl class="function">
 <dt id="mist.io.methods.ssh_command">
-<code class="descclassname">mist.io.methods.</code><code class="descname">ssh_command</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>host</em>, <em>command</em>, <em>key_id=None</em>, <em>username=None</em>, <em>password=None</em>, <em>port=22</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.ssh_command" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">ssh_command</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>host</em>, <em>command</em>, <em>key_id=None</em>, <em>username=None</em>, <em>password=None</em>, <em>port=22</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.ssh_command" title="Permalink to this definition">¶</a></dt>
 <dd><p>We initialize a Shell instant (for mist.io.shell).</p>
 <p>Autoconfigures shell and returns command&#8217;s output as string.
 Raises MachineUnauthorizedError if it doesn&#8217;t manage to connect.</p>
@@ -869,14 +869,14 @@ Raises MachineUnauthorizedError if it doesn&#8217;t manage to connect.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.star_image">
-<code class="descclassname">mist.io.methods.</code><code class="descname">star_image</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>image_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.star_image" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">star_image</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>image_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.star_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggle image star (star/unstar)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.start_machine">
-<code class="descclassname">mist.io.methods.</code><code class="descname">start_machine</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.start_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Starts a machine on backends that support it.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">start_machine</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.start_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a machine on clouds that support it.</p>
 <p>Currently only EC2 supports that.
 Normally try won&#8217;t get an AttributeError exception because this
 action is not allowed for machines that don&#8217;t support it. Check
@@ -885,8 +885,8 @@ helpers.get_machine_actions.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.stop_machine">
-<code class="descclassname">mist.io.methods.</code><code class="descname">stop_machine</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.stop_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stops a machine on backends that support it.</p>
+<code class="descclassname">mist.io.methods.</code><code class="descname">stop_machine</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.stop_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops a machine on clouds that support it.</p>
 <p>Currently only EC2 supports that.
 Normally try won&#8217;t get an AttributeError exception because this
 action is not allowed for machines that don&#8217;t support it. Check
@@ -895,17 +895,17 @@ helpers.get_machine_actions.</p>
 
 <dl class="function">
 <dt id="mist.io.methods.undeploy_collectd">
-<code class="descclassname">mist.io.methods.</code><code class="descname">undeploy_collectd</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.undeploy_collectd" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">undeploy_collectd</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.undeploy_collectd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.undeploy_python_plugin">
-<code class="descclassname">mist.io.methods.</code><code class="descname">undeploy_python_plugin</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>plugin_id</em>, <em>host</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.undeploy_python_plugin" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">undeploy_python_plugin</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>plugin_id</em>, <em>host</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.undeploy_python_plugin" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="mist.io.methods.update_metric">
-<code class="descclassname">mist.io.methods.</code><code class="descname">update_metric</code><span class="sig-paren">(</span><em>user</em>, <em>metric_id</em>, <em>name=None</em>, <em>unit=None</em>, <em>backend_id=None</em>, <em>machine_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.update_metric" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mist.io.methods.</code><code class="descname">update_metric</code><span class="sig-paren">(</span><em>user</em>, <em>metric_id</em>, <em>name=None</em>, <em>unit=None</em>, <em>cloud_id=None</em>, <em>machine_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.methods.update_metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -918,7 +918,7 @@ any of several more similar combinations.</p>
 operations like reading from and writing to some storage. The rest of
 the application knows nothing about how the storage is implemented and
 is only presented with a simple, object oriented API.</p>
-<p>Mist io uses yaml files as its storage backend. We store data using a
+<p>Mist io uses yaml files as its storage cloud. We store data using a
 main dict consisting of nested dicts, lists, ints, strs etc. This
 module provides an object oriented interface on those dicts.</p>
 <p>A basic class here is OODict that defines a dict to object mapper.
@@ -976,7 +976,7 @@ errors.</p>
 <p>What is a field? A field object doesn&#8217;t actually hold the value
 corresponding to that field. It just contains the information of how
 this value should look like, what type it should have in the storage
-backend and what in the python frontend plus a default value, should
+cloud and what in the python frontend plus a default value, should
 there be no corresponding value set. It is used by OODict&#8217;s and
 FieldSequence&#8217;s to appropriately handle the values fetched from storage.</p>
 <dl class="attribute">
@@ -991,14 +991,14 @@ also accepted inputs and should not raise errors.</p>
 <dl class="method">
 <dt id="mist.io.dal.Field.cast2back">
 <code class="descname">cast2back</code><span class="sig-paren">(</span><em>front_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.dal.Field.cast2back" title="Permalink to this definition">¶</a></dt>
-<dd><p>Take a value from the frontend and cast to backend, replacing with
+<dd><p>Take a value from the frontend and cast to cloud, replacing with
 default if None.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="mist.io.dal.Field.cast2front">
 <code class="descname">cast2front</code><span class="sig-paren">(</span><em>back_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.dal.Field.cast2front" title="Permalink to this definition">¶</a></dt>
-<dd><p>Take a value from the backend and cast to frontend, replacing with
+<dd><p>Take a value from the cloud and cast to frontend, replacing with
 default if None.</p>
 </dd></dl>
 
@@ -1017,7 +1017,7 @@ also accepted inputs and should not raise errors.</p>
 <dt id="mist.io.dal.FieldsDict">
 <em class="property">class </em><code class="descclassname">mist.io.dal.</code><code class="descname">FieldsDict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.dal.FieldsDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>This defines a dict like container object that parses the real dict
-in the backend by treating the items as fields. It inherits basic
+in the cloud by treating the items as fields. It inherits basic
 container methods getitem, setitem, delitem and len from FieldsSequence
 and adds the iter method. Based on these basic container methods, the
 MutableMapping ABC provides the rest of the dict api, so you can use
@@ -1028,7 +1028,7 @@ this container just as you would do with a dict(clear, setdefault etc).</p>
 <dt id="mist.io.dal.FieldsList">
 <em class="property">class </em><code class="descclassname">mist.io.dal.</code><code class="descname">FieldsList</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.dal.FieldsList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This defines a list like container object that parses the real list
-in the backend by treating the items as fields. It inherits basic
+in the cloud by treating the items as fields. It inherits basic
 container methods getitem, setitem, delitem and len from FieldsSequence
 and adds the insert method. Based on these basic container methods, the
 MutableSequence ABC provides the rest of the list api, so you can use
@@ -1254,7 +1254,7 @@ exception.</p>
 <em class="property">class </em><code class="descclassname">mist.io.dal.</code><code class="descname">ObjectField</code><span class="sig-paren">(</span><em>val=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.dal.ObjectField" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is an abstract base class that inherits from Field. It
 assumes that front type is a subclass of BaseObject and changes
-the way values are casted to backend accordingly.</p>
+the way values are casted to cloud accordingly.</p>
 <dl class="method">
 <dt id="mist.io.dal.ObjectField.cast2back">
 <code class="descname">cast2back</code><span class="sig-paren">(</span><em>front_value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.dal.ObjectField.cast2back" title="Permalink to this definition">¶</a></dt>
@@ -1314,114 +1314,114 @@ the field type defined in the class. This collection can be used as a field
 in some OODict by use of make_field. If it sounds too complicated, just look
 the code below, it should be pretty self-explanatory.</p>
 <dl class="class">
-<dt id="mist.io.model.Backend">
-<em class="property">class </em><code class="descclassname">mist.io.model.</code><code class="descname">Backend</code><span class="sig-paren">(</span><em>_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.model.Backend" title="Permalink to this definition">¶</a></dt>
-<dd><p>A cloud vm provider backend</p>
+<dt id="mist.io.model.Cloud">
+<em class="property">class </em><code class="descclassname">mist.io.model.</code><code class="descname">Cloud</code><span class="sig-paren">(</span><em>_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.model.Cloud" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cloud vm provider cloud</p>
 <dl class="attribute">
-<dt id="mist.io.model.Backend.apikey">
-<code class="descname">apikey</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.apikey" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.apikey">
+<code class="descname">apikey</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.apikey" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.apisecret">
-<code class="descname">apisecret</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.apisecret" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.apisecret">
+<code class="descname">apisecret</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.apisecret" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.apiurl">
-<code class="descname">apiurl</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.apiurl" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.apiurl">
+<code class="descname">apiurl</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.apiurl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.auth_version">
-<code class="descname">auth_version</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.auth_version" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.auth_version">
+<code class="descname">auth_version</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.auth_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.cert_file">
-<code class="descname">cert_file</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.cert_file" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.cert_file">
+<code class="descname">cert_file</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.cert_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.compute_endpoint">
-<code class="descname">compute_endpoint</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.compute_endpoint" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.compute_endpoint">
+<code class="descname">compute_endpoint</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.compute_endpoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.docker_port">
-<code class="descname">docker_port</code><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(4243)</em><a class="headerlink" href="#mist.io.model.Backend.docker_port" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.docker_port">
+<code class="descname">docker_port</code><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(4243)</em><a class="headerlink" href="#mist.io.model.Cloud.docker_port" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.enabled">
-<code class="descname">enabled</code><em class="property"> = &lt;class 'mist.io.dal.BoolField'&gt;(False)</em><a class="headerlink" href="#mist.io.model.Backend.enabled" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.enabled">
+<code class="descname">enabled</code><em class="property"> = &lt;class 'mist.io.dal.BoolField'&gt;(False)</em><a class="headerlink" href="#mist.io.model.Cloud.enabled" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="mist.io.model.Backend.get_id">
-<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.model.Backend.get_id" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.get_id">
+<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.model.Cloud.get_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.key_file">
-<code class="descname">key_file</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.key_file" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.key_file">
+<code class="descname">key_file</code><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.key_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.machine_count">
-<code class="descname">machine_count</code><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(0)</em><a class="headerlink" href="#mist.io.model.Backend.machine_count" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.machine_count">
+<code class="descname">machine_count</code><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(0)</em><a class="headerlink" href="#mist.io.model.Cloud.machine_count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.machines">
-<code class="descname">machines</code><em class="property"> = &lt;class 'mist.io.dal.FieldsDictField'&gt;(&lt;class 'mist.io.model.Machines'&gt;: {})</em><a class="headerlink" href="#mist.io.model.Backend.machines" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.machines">
+<code class="descname">machines</code><em class="property"> = &lt;class 'mist.io.dal.FieldsDictField'&gt;(&lt;class 'mist.io.model.Machines'&gt;: {})</em><a class="headerlink" href="#mist.io.model.Cloud.machines" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.poll_interval">
-<code class="descname">poll_interval</code><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(10000)</em><a class="headerlink" href="#mist.io.model.Backend.poll_interval" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.poll_interval">
+<code class="descname">poll_interval</code><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(10000)</em><a class="headerlink" href="#mist.io.model.Cloud.poll_interval" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.provider">
-<code class="descname">provider</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.provider" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.provider">
+<code class="descname">provider</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.provider" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.region">
-<code class="descname">region</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.region" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.region">
+<code class="descname">region</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.region" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.ssh_port">
-<code class="descname">ssh_port</code><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(22)</em><a class="headerlink" href="#mist.io.model.Backend.ssh_port" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.ssh_port">
+<code class="descname">ssh_port</code><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(22)</em><a class="headerlink" href="#mist.io.model.Cloud.ssh_port" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.starred">
-<code class="descname">starred</code><em class="property"> = &lt;class 'mist.io.dal.ListField'&gt;([])</em><a class="headerlink" href="#mist.io.model.Backend.starred" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.starred">
+<code class="descname">starred</code><em class="property"> = &lt;class 'mist.io.dal.ListField'&gt;([])</em><a class="headerlink" href="#mist.io.model.Cloud.starred" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.tenant_name">
-<code class="descname">tenant_name</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.tenant_name" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.tenant_name">
+<code class="descname">tenant_name</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.tenant_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.title">
-<code class="descname">title</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.title" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.title">
+<code class="descname">title</code><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Cloud.title" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mist.io.model.Backend.unstarred">
-<code class="descname">unstarred</code><em class="property"> = &lt;class 'mist.io.dal.ListField'&gt;([])</em><a class="headerlink" href="#mist.io.model.Backend.unstarred" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Cloud.unstarred">
+<code class="descname">unstarred</code><em class="property"> = &lt;class 'mist.io.dal.ListField'&gt;([])</em><a class="headerlink" href="#mist.io.model.Cloud.unstarred" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="mist.io.model.Backends">
-<em class="property">class </em><code class="descclassname">mist.io.model.</code><code class="descname">Backends</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.model.Backends" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.Clouds">
+<em class="property">class </em><code class="descclassname">mist.io.model.</code><code class="descname">Clouds</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.model.Clouds" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
@@ -1477,8 +1477,8 @@ Only works for RSA.</p>
 <dl class="class">
 <dt id="mist.io.model.Machine">
 <em class="property">class </em><code class="descclassname">mist.io.model.</code><code class="descname">Machine</code><span class="sig-paren">(</span><em>_dict=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.model.Machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>A saved machine in the machines list of some backend.</p>
-<p>For the time being, only bare metal machines are saved, for API backends
+<dd><p>A saved machine in the machines list of some cloud.</p>
+<p>For the time being, only bare metal machines are saved, for API clouds
 we get the machine list from the provider.</p>
 <dl class="attribute">
 <dt id="mist.io.model.Machine.dns_name">
@@ -1520,8 +1520,8 @@ we get the machine list from the provider.</p>
 <dl class="class">
 <dt id="mist.io.model.Machines">
 <em class="property">class </em><code class="descclassname">mist.io.model.</code><code class="descname">Machines</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.model.Machines" title="Permalink to this definition">¶</a></dt>
-<dd><p>Collection of machines of a certain backend.</p>
-<p>For the time being, only bare metal machines are saved, for API backends
+<dd><p>Collection of machines of a certain cloud.</p>
+<p>For the time being, only bare metal machines are saved, for API clouds
 we get the machine list from the provider.</p>
 </dd></dl>
 
@@ -1533,8 +1533,8 @@ necessary to find and save users in memcache and in mongo.
 It transforms the user dict into an object with consistent
 attributes instead of inconsistent dict with missing keys.</p>
 <dl class="attribute">
-<dt id="mist.io.model.User.backends">
-<code class="descname">backends</code><em class="property"> = &lt;class 'mist.io.dal.FieldsDictField'&gt;(&lt;class 'mist.io.model.Backends'&gt;: {})</em><a class="headerlink" href="#mist.io.model.User.backends" title="Permalink to this definition">¶</a></dt>
+<dt id="mist.io.model.User.clouds">
+<code class="descname">clouds</code><em class="property"> = &lt;class 'mist.io.dal.FieldsDictField'&gt;(&lt;class 'mist.io.model.Clouds'&gt;: {})</em><a class="headerlink" href="#mist.io.model.User.clouds" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1566,7 +1566,7 @@ SSH.</p>
 <dd><p>Docker Shell achieved through the docker hosts API, by opening a websocket</p>
 <dl class="method">
 <dt id="mist.io.shell.DockerShell.autoconfigure">
-<code class="descname">autoconfigure</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.shell.DockerShell.autoconfigure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">autoconfigure</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.shell.DockerShell.autoconfigure" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1600,12 +1600,12 @@ shell = Shell(&#8216;localhost&#8217;, username=&#8217;root&#8217;, password=&#8
 print shell.command(&#8216;uptime&#8217;)</p>
 <p>Or:
 shell = Shell(&#8216;localhost&#8217;)
-shell.autoconfigure(user, backend_id, machine_id)
+shell.autoconfigure(user, cloud_id, machine_id)
 for line in shell.command_stream(&#8216;ps -fe&#8217;):
 print line</p>
 <dl class="method">
 <dt id="mist.io.shell.ParamikoShell.autoconfigure">
-<code class="descname">autoconfigure</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>key_id=None</em>, <em>username=None</em>, <em>password=None</em>, <em>port=22</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.shell.ParamikoShell.autoconfigure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">autoconfigure</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>key_id=None</em>, <em>username=None</em>, <em>password=None</em>, <em>port=22</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.shell.ParamikoShell.autoconfigure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Autoconfigure SSH client.</p>
 <p>This will do its best effort to find a suitable keypair and username
 and will try to connect. If it fails it raises
@@ -1666,7 +1666,7 @@ the private key.</p>
 <dd><p>Proxy Shell Class to distinguish weather we are talking about Docker or Paramiko Shell</p>
 <dl class="method">
 <dt id="mist.io.shell.Shell.autoconfigure">
-<code class="descname">autoconfigure</code><span class="sig-paren">(</span><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>key_id=None</em>, <em>username=None</em>, <em>password=None</em>, <em>port=22</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.shell.Shell.autoconfigure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">autoconfigure</code><span class="sig-paren">(</span><em>user</em>, <em>cloud_id</em>, <em>machine_id</em>, <em>key_id=None</em>, <em>username=None</em>, <em>password=None</em>, <em>port=22</em><span class="sig-paren">)</span><a class="headerlink" href="#mist.io.shell.Shell.autoconfigure" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

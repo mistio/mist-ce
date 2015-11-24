@@ -27,7 +27,7 @@ define('app/views/machine_keys_list_item', ['app/views/list_item'],
                 var that = this;
                 this.key.machines.some(function(machine) {
                     if (machine[1] == machineToFind.id &&
-                        machine[0] == machineToFind.backend.id) {
+                        machine[0] == machineToFind.cloud.id) {
                             if (that.key.probing) {
                                 that.set('keyIcon', 'probing');
                             } else if (machine[2] > 0) {

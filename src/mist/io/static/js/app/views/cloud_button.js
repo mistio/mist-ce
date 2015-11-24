@@ -1,6 +1,6 @@
-define('app/views/backend_button', [],
+define('app/views/cloud_button', [],
     //
-    //  Backend Button View
+    //  Cloud Button View
     //
     //  @returns Class
     //
@@ -8,14 +8,14 @@ define('app/views/backend_button', [],
 
         'use strict';
 
-        return App.BackendButtonComponent = Ember.Component.extend({
+        return App.CloudButtonComponent = Ember.Component.extend({
 
             //
             //  Properties
             //
 
-            layoutName: 'backend_button',
-            backend: null,
+            layoutName: 'cloud_button',
+            cloud: null,
 
 
             //
@@ -23,11 +23,11 @@ define('app/views/backend_button', [],
             //
 
             load: function () {
-                this.renderBackends();
+                this.renderClouds();
             }.on('didInsertElement'),
 
             unload: function () {
-                this.renderBackends();
+                this.renderClouds();
             }.on('willDestroyElement'),
 
 
@@ -35,10 +35,10 @@ define('app/views/backend_button', [],
             //  Methods
             //
 
-            renderBackends: function () {
+            renderClouds: function () {
                 Ember.run.next(function () {
-                    if ($('#backend-buttons').controlgroup)
-                        $('#backend-buttons').controlgroup('refresh');
+                    if ($('#cloud-buttons').controlgroup)
+                        $('#cloud-buttons').controlgroup('refresh');
                 });
             },
 
@@ -49,7 +49,7 @@ define('app/views/backend_button', [],
 
             actions: {
                 buttonClicked: function () {
-                    Mist.backendEditController.open(this.backend, '#' + this.elementId);
+                    Mist.cloudEditController.open(this.cloud, '#' + this.elementId);
                 }
             }
         });

@@ -28,7 +28,7 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
                 // Add event listeners
                 Mist.keysController.on('onKeyListChange', this, 'updateView');
                 Mist.keysController.on('onKeyDisassociate', this, 'updateMachines');
-                Mist.backendsController.on('onMachineListChange', this, 'updateMachines');
+                Mist.cloudsController.on('onMachineListChange', this, 'updateMachines');
 
                 Ember.run.next(this, this.updateView);
 
@@ -40,7 +40,7 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
                 // Remove event listeners
                 Mist.keysController.off('onKeyListChange', this, 'updateView');
                 Mist.keysController.off('onKeyDisassociate', this, 'updateMachines');
-                Mist.backendsController.off('onMachineListChange', this, 'updateMachines');
+                Mist.cloudsController.off('onMachineListChange', this, 'updateMachines');
 
             }.on('willDestroyElement'),
 
@@ -85,14 +85,14 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
                 // that are associated with this key
                 var newMachines = [];
                 this.key.machines.forEach(function (machine) {
-                    var newMachine = Mist.backendsController.getMachine(machine[1], machine[0]);
+                    var newMachine = Mist.cloudsController.getMachine(machine[1], machine[0]);
                     if (!newMachine) {
-                        var backend = Mist.backendsController.getBackend(machine[0]);
+                        var cloud = Mist.cloudsController.getCloud(machine[0]);
                         newMachine = Machine.create({
                             id: machine[1],
                             name: machine[1],
-                            state: backend ? 'terminated' : 'unknown',
-                            backend: backend ? backend : machine[0],
+                            state: cloud ? 'terminated' : 'unknown',
+                            cloud: cloud ? cloud : machine[0],
                             isGhost: true,
                         });
                     }

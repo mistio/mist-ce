@@ -3,9 +3,9 @@ define('app/templates/templates', ['ember'], function() {
   return function (callback) {
       require([
         'text!app/templates/application.hbs',
-        'text!app/templates/backend_add.hbs',
-        'text!app/templates/backend_button.hbs',
-        'text!app/templates/backend_edit.hbs',
+        'text!app/templates/cloud_add.hbs',
+        'text!app/templates/cloud_button.hbs',
+        'text!app/templates/cloud_edit.hbs',
         'text!app/templates/dialog.hbs',
         'text!app/templates/file_upload.hbs',
         'text!app/templates/graph_button.hbs',
@@ -68,9 +68,9 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/machine_run_script.hbs',
       ], function () {
         Ember.TEMPLATES['application'] = Ember.Handlebars.compile(arguments[0]);
-        Ember.TEMPLATES['backend_add'] = Ember.Handlebars.compile(arguments[1]);
-        Ember.TEMPLATES['backend_button'] = Ember.Handlebars.compile(arguments[2]);
-        Ember.TEMPLATES['backend_edit'] = Ember.Handlebars.compile(arguments[3]);
+        Ember.TEMPLATES['cloud_add'] = Ember.Handlebars.compile(arguments[1]);
+        Ember.TEMPLATES['cloud_button'] = Ember.Handlebars.compile(arguments[2]);
+        Ember.TEMPLATES['cloud_edit'] = Ember.Handlebars.compile(arguments[3]);
         Ember.TEMPLATES['dialog'] = Ember.Handlebars.compile(arguments[4]);
         Ember.TEMPLATES['file_upload'] = Ember.Handlebars.compile(arguments[5]);
         Ember.TEMPLATES['graph_button'] = Ember.Handlebars.compile(arguments[6]);

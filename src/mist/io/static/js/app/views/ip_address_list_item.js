@@ -33,7 +33,7 @@ define('app/views/ip_address_list_item', ['app/views/list_item'],
                     }
                     var ip = this.get('model');
                     var that = this;
-                    ip.get('network').get('backend').get('networks').reserveIP({
+                    ip.get('network').get('cloud').get('networks').reserveIP({
                         reserve: !ip.reserved,
                         callback: function (success) {
                             if (!success)

@@ -49,7 +49,7 @@
                 <div class="ui-block-b">
                     <!-- Show spinner if machines are being loaded -->
                     {{#unless model.id}}
-                        {{#if Mist.backendsController.loadingMachines}}
+                        {{#if Mist.cloudsController.loadingMachines}}
                             <div class="ajax-loader"></div>
                         {{/if}}
                     {{/unless}}

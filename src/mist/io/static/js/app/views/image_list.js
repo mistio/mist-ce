@@ -38,12 +38,12 @@ define('app/views/image_list', ['app/views/page'],
 
                 // Add event listeners
                 Mist.imageSearchController.on('onSearchEnd', this, 'updateBaseImages');
-                Mist.backendsController.on('onImagesChange', this, 'updateDefaultImages');
+                Mist.cloudsController.on('onImagesChange', this, 'updateDefaultImages');
 
                 var that = this;
                 Ember.run.later(this, function () {
                     if (!this.isDestroyed)
-                        Mist.backendsController.trigger('onImagesChange');
+                        Mist.cloudsController.trigger('onImagesChange');
 
                     // Handle scrolling
                     $(window).on('scroll', function (e) {
@@ -58,8 +58,8 @@ define('app/views/image_list', ['app/views/page'],
 
                 // Remove event listeners
                 var that = this;
-                Mist.backendsController.model.forEach(function(backend) {
-                    backend.off('onImagesChange', that, 'updateBaseImages');
+                Mist.cloudsController.model.forEach(function(cloud) {
+                    cloud.off('onImagesChange', that, 'updateBaseImages');
                 });
                 Mist.imageSearchController.off('onSearchEnd', this, 'updateBaseImages');
                 $(window).off('scroll');
@@ -92,8 +92,8 @@ define('app/views/image_list', ['app/views/page'],
 
             updateDefaultImages: function () {
                 var newImages = [];
-                Mist.backendsController.model.forEach(function (backend) {
-                    backend.images.model.forEach(function (image) {
+                Mist.cloudsController.model.forEach(function (cloud) {
+                    cloud.images.model.forEach(function (image) {
                         if (image.star)
                             newImages.unshift(image);
                         else
