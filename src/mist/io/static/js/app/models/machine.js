@@ -17,7 +17,7 @@ define('app/models/machine', ['ember'],
             probed: null,
             keysCount: 0,
             probing: null,
-            backend: null,
+            cloud: null,
             selected: null,
             hasMonitoring: null,
             probeInterval: 30000,
@@ -61,6 +61,10 @@ define('app/models/machine', ['ember'],
             cannotHaveMonitoring: Ember.computed('state', function() {
                 var invalids = ['error', 'stopped', 'terminated', 'pending', 'rebooting'];
                 return invalids.indexOf(this.get('state')) > -1;
+            }),
+
+            cannotHaveProbe: Ember.computed('state', function() {
+                return this.get('state') == 'terminated';
             }),
 
             incidents: function () {
@@ -141,12 +145,12 @@ define('app/models/machine', ['ember'],
             },
 
             image: function() {
-                return this.get('backend').get('images').getObject(this.imageId);
+                return this.get('cloud').get('images').getObject(this.imageId);
             }.property('imageId'),
 
             hasShell: function () {
-                return (this.get('hasKeys') || this.get('backend').get('isDocker')) && this.get('isRunning');
-            }.property('hasKeys', 'isRunning', 'backend.isDocker'),
+                return (this.get('hasKeys') || this.get('cloud').get('isDocker')) && this.get('isRunning');
+            }.property('hasKeys', 'isRunning', 'cloud.isDocker'),
 
             hasKeys: function () {
                 return !!Mist.keysController.getMachineKeysCount(this);
@@ -200,7 +204,7 @@ define('app/models/machine', ['ember'],
                 if (!this.get('isWindows'))
                     return '';
                 var port = this.get('extra').remote_desktop_port || 3389;
-                var url = '/backends/' + this.get('backend.id') +
+                var url = '/clouds/' + this.get('cloud.id') +
                     '/machines/' + this.get('id') + '/rdp?' +
                     'host=' + this.get('host') + '&' +
                     'rdp_port=' + port;
@@ -213,23 +217,23 @@ define('app/models/machine', ['ember'],
             //
 
             shutdown: function(callback) {
-                this.backend.shutdownMachine(this.id, callback);
+                this.cloud.shutdownMachine(this.id, callback);
             },
 
             destroy: function(callback) {
-                this.backend.destroyMachine(this.id, callback);
+                this.cloud.destroyMachine(this.id, callback);
             },
 
             reboot: function(callback) {
-                this.backend.rebootMachine(this.id, callback);
+                this.cloud.rebootMachine(this.id, callback);
             },
 
             start: function(callback) {
-                this.backend.startMachine(this.id, callback);
+                this.cloud.startMachine(this.id, callback);
             },
 
             rename: function(callback) {
-                this.backend.renameMachine(this.id,callback);
+                this.cloud.renameMachine(this.id,callback);
             },
 
             waitFor: function(state) {
@@ -252,11 +256,11 @@ define('app/models/machine', ['ember'],
                     return machine == this.id;
                 if (machine instanceof Array)
                     if (machine[1] == this.id &&
-                        machine[0] == this.backend.id)
+                        machine[0] == this.cloud.id)
                             return true;
                 if (machine instanceof Object)
                     if (machine.id == this.id &&
-                        machine.backend.id == this.backend.id)
+                        machine.cloud.id == this.cloud.id)
                             return true;
                 return false;
             },
@@ -285,10 +289,10 @@ define('app/models/machine', ['ember'],
             },
 
             probe: function(keyId, callback) {
-                if (!this.backend.enabled) return;
+                if (!this.cloud.enabled) return;
                 if (this.state != 'running') return;
                 var that = this;
-                Mist.backendsController.probeMachine(that, keyId, function(success) {
+                Mist.cloudsController.probeMachine(that, keyId, function(success) {
                     if (callback) {
                         callback(success);
                     }
@@ -310,7 +314,7 @@ define('app/models/machine', ['ember'],
                         return 'cold';
                     }
                 }
-                if (!this.backend || !this.backend.enabled) return;
+                if (!this.cloud || !this.cloud.enabled) return;
                 if (data.uptime) {
                     uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
                     this.set('uptimeChecked', new Date(data.timestamp * 1000));
@@ -342,7 +346,7 @@ define('app/models/machine', ['ember'],
                 this.set('loss', data.packets_loss || this.loss);
                 this.set('latency', data.rtt_avg ? Math.floor(data.rtt_avg) : this.latency);
                 this.set('df', data.df || this.df);
-                Mist.backendsController.trigger('onMachineProbe', this);
+                Mist.cloudsController.trigger('onMachineProbe', this);
             },
 
 

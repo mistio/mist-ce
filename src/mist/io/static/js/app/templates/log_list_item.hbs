@@ -27,17 +27,17 @@
                 <td>Date</td>
                 <td>{{unbound view.fullPrettyTime}}</td>
             </tr>
-            {{#if view.backendTitle}}
+            {{#if view.cloudTitle}}
             <tr>
-                <td>Backend Title</td>
-                <td>{{view.backendTitle}}</td>
+                <td>Cloud Title</td>
+                <td>{{view.cloudTitle}}</td>
             </tr>
             {{/if}}
             {{#if view.machineLink}}
             <tr>
                 <td>Machine</td>
                 <td>
-                    {{#link-to "machine" view.machineLink}}
+                    {{#link-to "machine" view.machineLink class="machine-log-link ui-shadow"}}
                         {{unbound view.machineLink.name}}
                     {{/link-to}}
                 </td>
@@ -47,7 +47,7 @@
             <tr>
                 <td>Script</td>
                 <td>
-                    {{#link-to "script" view.scriptLink}}
+                    {{#link-to "script" view.scriptLink class="script-log-link ui-shadow"}}
                         {{unbound view.scriptLink.name}}
                     {{/link-to}}
                 </td>

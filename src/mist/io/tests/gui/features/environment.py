@@ -18,11 +18,12 @@ def before_all(context):
     context.mist_config['KEY_NAME'] = "TESTKEY" + str(random.randint(1, 10000))
     context.mist_config['CREDENTIALS'] = CREDENTIALS
 
-    if not LOCAL:
-        docker_info = docker_all_in_one(flavor="io")
-        context.remote_info = docker_info
+    # if not LOCAL:
+    #     docker_info = docker_all_in_one(flavor="io")
+    #     context.remote_info = docker_info
 
-    context.mist_config['MIST_URL'] = MIST_URL if LOCAL else docker_info['URL']
+    context.mist_config['MIST_URL'] = MIST_URL
+    # if LOCAL else docker_info['URL']
 
 
 def after_step(context, step):
@@ -36,8 +37,8 @@ def after_step(context, step):
 
 def after_all(context):
     context.browser.quit()
-    if not LOCAL:
-        node = context.remote_info['node']
-        container = context.remote_info['container']
-        node.kill(container)
-        node.remove_container(container)
+    # if not LOCAL:
+    #     node = context.remote_info['node']
+    #     container = context.remote_info['container']
+    #     node.kill(container)
+    #     node.remove_container(container)

@@ -124,11 +124,11 @@
     <div class="col-md-12">
       
   <dl class="get">
-<dt id="get--backends-backend_id-images">
-<code class="descname">GET </code><code class="descname">/backends/{backend_id}/images</code><a class="headerlink" href="#get--backends-backend_id-images" title="Permalink to this definition">¶</a></dt>
-<dd><p>List available images for this backend</p>
+<dt id="get--clouds-cloud_id-images">
+<code class="descname">GET </code><code class="descname">/clouds/{cloud_id}/images</code><a class="headerlink" href="#get--clouds-cloud_id-images" title="Permalink to this definition">¶</a></dt>
+<dd><p>List available images for this cloud</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/images
+<div class="highlight-http"><div class="highlight"><pre>GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/images
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
@@ -150,7 +150,7 @@ Accept: application/json; charset=UTF-8
 </tbody>
 </table>
 <p>If search_term is given, mist will return only images that include the search term, otherwise
-mist will return all available images for the given backend. If the given backend is an EC2 Backend, mist will
+mist will return all available images for the given cloud. If the given cloud is an EC2 Cloud, mist will
 search through all EC2 images including community and custom images.</p>
 <p><strong>Example response</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>[

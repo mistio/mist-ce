@@ -1,10 +1,10 @@
-define('app/controllers/backend_add', ['app/models/backend'],
+define('app/controllers/cloud_add', ['app/models/cloud'],
     //
-    //  Backend Add Controller
+    //  Cloud Add Controller
     //
     //  @returns Class
     //
-    function (Backend) {
+    function (Cloud) {
 
         'use strict';
 
@@ -69,14 +69,14 @@ define('app/controllers/backend_add', ['app/models/backend'],
                 });
 
                 var that = this;
-                Mist.backendsController.addBackend({
+                Mist.cloudsController.addCloud({
                     payload: payload,
-                    callback: function (success, backend) {
+                    callback: function (success, cloud) {
                         Ember.run.later(function () {
                             if (payload.monitoring === true)
-                                that._showMonitoringPopup(backend, payload);
+                                that._showMonitoringPopup(cloud, payload);
                             }, 200);
-                        that._giveCallback(success, backend);
+                        that._giveCallback(success, cloud);
                         if (success) that.close();
                     }
                 });
@@ -87,7 +87,7 @@ define('app/controllers/backend_add', ['app/models/backend'],
             //  Pseudo-Private Methods
             //
 
-            _showMonitoringPopup: function (backend, payload) {
+            _showMonitoringPopup: function (cloud, payload) {
                 if (payload.windows)
                     showCommand({
                         body: [
@@ -96,7 +96,7 @@ define('app/controllers/backend_add', ['app/models/backend'],
                                     ' to install the monitoring agent:'
                             },
                             {
-                                command: backend.monitoring.windows_command
+                                command: cloud.monitoring.windows_command
                             }
                         ]
                     });
@@ -108,7 +108,7 @@ define('app/controllers/backend_add', ['app/models/backend'],
                                     ' to install the monitoring agent:'
                             },
                             {
-                                command: backend.monitoring.coreos_command
+                                command: cloud.monitoring.coreos_command
                             }
                         ]
                     });
@@ -120,7 +120,7 @@ define('app/controllers/backend_add', ['app/models/backend'],
                                    ' to install the monitoring agent:'
                             },
                             {
-                                command: backend.monitoring.unix_command
+                                command: cloud.monitoring.unix_command
                             }
                         ]
                     });
@@ -141,8 +141,8 @@ define('app/controllers/backend_add', ['app/models/backend'],
                 });
             },
 
-            _giveCallback: function (success, backend) {
-                if (this.callback) this.callback(success, backend);
+            _giveCallback: function (success, cloud) {
+                if (this.callback) this.callback(success, cloud);
             },
         });
     }
