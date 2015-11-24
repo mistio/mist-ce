@@ -11,20 +11,20 @@ define('app/views/machine_list', ['app/views/page'],
             selectedMachine: null,
 
             machines: function () {
-                return Mist.backendsController.get('sortedMachines').slice(0, Mist.backendsController.get('displayCount'));
-            }.property('Mist.backendsController.sortedMachines', 'Mist.backendsController.displayCount'),
+                return Mist.cloudsController.get('sortedMachines').slice(0, Mist.cloudsController.get('displayCount'));
+            }.property('Mist.cloudsController.sortedMachines', 'Mist.cloudsController.displayCount'),
 
             sortByState: function () {
-                return Mist.backendsController.get('sortBy') == 'state';
-            }.property('Mist.backendsController.sortBy'),
+                return Mist.cloudsController.get('sortBy') == 'state';
+            }.property('Mist.cloudsController.sortBy'),
 
             sortByName: function () {
-                return Mist.backendsController.get('sortBy') == 'name';
-            }.property('Mist.backendsController.sortBy'),
+                return Mist.cloudsController.get('sortBy') == 'name';
+            }.property('Mist.cloudsController.sortBy'),
 
             sortByCloud: function () {
-                return Mist.backendsController.get('sortBy') == 'cloud';
-            }.property('Mist.backendsController.sortBy'),
+                return Mist.cloudsController.get('sortBy') == 'cloud';
+            }.property('Mist.cloudsController.sortBy'),
 
 
             //
@@ -34,24 +34,24 @@ define('app/views/machine_list', ['app/views/page'],
             load: function () {
                 // Add event listeners
                 Mist.machineAddController.set('selectedImage', null);
-                Mist.backendsController.on('onMachineProbe', this, 'updateFooter');
-                Mist.backendsController.on('onSelectedMachinesChange', this, 'updateFooter');
-                Mist.backendsController.set('displayCount', 30);
+                Mist.cloudsController.on('onMachineProbe', this, 'updateFooter');
+                Mist.cloudsController.on('onSelectedMachinesChange', this, 'updateFooter');
+                Mist.cloudsController.set('displayCount', 30);
                 this._initializeScrolling();
             }.on('didInsertElement'),
 
             unload: function () {
                 // Remove event listeners
-                Mist.backendsController.off('onMachineProbe', this, 'updateFooter');
-                Mist.backendsController.off('onSelectedMachinesChange', this, 'updateFooter');
+                Mist.cloudsController.off('onMachineProbe', this, 'updateFooter');
+                Mist.cloudsController.off('onSelectedMachinesChange', this, 'updateFooter');
                 $(window).off('scroll');
             }.on('willDestroyElement'),
 
             _initializeScrolling: function () {
                 $(window).on('scroll', function (e) {
                     if (Mist.isScrolledToBottom() &&
-                        Mist.backendsController.get('machines').length > Mist.backendsController.get('displayCount')) {
-                            Mist.backendsController.set('displayCount', Mist.backendsController.get('displayCount') + 30);
+                        Mist.cloudsController.get('machines').length > Mist.cloudsController.get('displayCount')) {
+                            Mist.cloudsController.set('displayCount', Mist.cloudsController.get('displayCount') + 30);
                     }
                 });
             },
@@ -66,14 +66,14 @@ define('app/views/machine_list', ['app/views/page'],
                     return;
                 var connectText = 'Shell';
                 this.set('selectedMachine', null)
-                switch (Mist.backendsController.selectedMachines.length) {
+                switch (Mist.cloudsController.selectedMachines.length) {
                 case 0:
                     $('#machine-list-page .ui-footer')
                     .slideUp()
                     .find('.ui-btn').addClass('ui-state-disabled');
                     break;
                 case 1:
-                    var machine = Mist.backendsController.selectedMachines[0];
+                    var machine = Mist.cloudsController.selectedMachines[0];
                     connectText = machine.get('connectText');
                     $('#machine-list-page .ui-footer').slideDown();
 
@@ -99,7 +99,7 @@ define('app/views/machine_list', ['app/views/page'],
                 default:
                     var haveActions = true;
 
-                    Mist.backendsController.selectedMachines.forEach(function (machine, index) {
+                    Mist.cloudsController.selectedMachines.forEach(function (machine, index) {
                         if (!machine.can_start && !machine.can_reboot && !machine.can_destroy && !machine.can_shutdown) {
                             haveActions = false;
                         }
@@ -129,23 +129,23 @@ define('app/views/machine_list', ['app/views/page'],
                 },
 
                 tagsClicked: function () {
-                    Mist.machineTagsController.open(Mist.backendsController.selectedMachines[0]);
+                    Mist.machineTagsController.open(Mist.cloudsController.selectedMachines[0]);
                 },
 
                 actionsClicked: function () {
-                    Mist.machinePowerController.open(Mist.backendsController.selectedMachines);
+                    Mist.machinePowerController.open(Mist.cloudsController.selectedMachines);
                 },
 
                 shellClicked: function () {
-                    Mist.machineShellController.open(Mist.backendsController.selectedMachines[0]);
+                    Mist.machineShellController.open(Mist.cloudsController.selectedMachines[0]);
                 },
 
                 sortBy: function (criteria) {
-                    Mist.backendsController.set('sortBy', criteria);
+                    Mist.cloudsController.set('sortBy', criteria);
                 },
 
                 clearSearch : function() {
-                    Mist.backendsController.set('searchMachinesTerm', null);
+                    Mist.cloudsController.set('searchMachinesTerm', null);
                 },
 
                 selectClicked: function () {
@@ -154,8 +154,8 @@ define('app/views/machine_list', ['app/views/page'],
 
                 selectionModeClicked: function (mode) {
                     $('#select-machines-popup').popup('close');
-                    Mist.backendsController.get('filteredMachines').forEach(function (machine) {
-                        machine.set('selected', mode == 'all' || mode == machine.backend.title);
+                    Mist.cloudsController.get('filteredMachines').forEach(function (machine) {
+                        machine.set('selected', mode == 'all' || mode == machine.cloud.title);
                     });
                 }
             }

@@ -148,7 +148,7 @@ define('app/controllers/machine_keys', ['ember'],
                     Mist.keysController.model.forEach(function (key) {
                         found = false;
                         key.machines.some(function (machine) {
-                            if (that.machine.id == machine[1] && that.machine.backend.id == machine[0]) {
+                            if (that.machine.id == machine[1] && that.machine.cloud.id == machine[0]) {
                                 newAssociatedKeys.push(key);
                                 return found = true;
                             }

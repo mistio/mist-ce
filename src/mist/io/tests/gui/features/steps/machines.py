@@ -10,17 +10,20 @@ def check_sorting(context, sorting_param):
     Create dict with key the arg of the step definition
     """
 
-    sort_map = {'name':'div.machine-name', 'state':'span.machine-state','cloud':'div.machine-tags span.tag:nth-child(1)'}
+    sort_map = {'name': 'div.machine-name', 'state': 'span.machine-state',
+                'cloud': 'div.machine-tags span.tag:nth-child(1)'}
 
     sort_type = sorting_param
     sorting_selector = sort_map[sort_type]
 
-    machines_elements = context.browser.find_elements_by_css_selector('#machine-list-container li '+sorting_selector)
-    #list with machine's names
-    machines_names_list = [safe_get_element_text(machine_element) for machine_element in machines_elements]
-    #sorting the machine list
+    machines_elements = context.browser.find_elements_by_css_selector(
+        '#machine-list-container li ' + sorting_selector)
+    # list with machine's names
+    machines_names_list = [safe_get_element_text(machine_element) for
+                           machine_element in machines_elements]
+    # sorting the machine list
     my_sorted_machines_list = sorted(machines_names_list)
-    #lists are sorted and they have the same number of elements
+    # lists are sorted and they have the same number of elements
     if my_sorted_machines_list == machines_names_list:
         pass
     else:
@@ -29,8 +32,9 @@ def check_sorting(context, sorting_param):
 
 @when(u'I clear the machines search bar')
 def clear_machines_search_bar(context):
-    search_bar_machine = context.browser.find_element_by_css_selector("div.machine-search-container "
-                                                                      "input.machine-search")
+    search_bar_machine = context.browser.find_element_by_css_selector(
+        "div.machine-search-container "
+        "input.machine-search")
     search_bar_machine.clear()
 
 
@@ -72,7 +76,10 @@ def assert_machine_added(context, name, seconds):
     if "randomly_created" in name:
         machine_name = context.random_name
     else:
-        machine_name = name
+        if context.mist_config.get(name):
+            machine_name = name
+        else:
+            machine_name = name
 
     end_time = time() + int(seconds)
     while time() < end_time:
@@ -127,7 +134,8 @@ def assert_machine_probed(context, name, seconds):
                 pass
             sleep(3)
 
-    assert False, u'%s machine is not probed within %s seconds' % (machine_name, seconds)
+    assert False, u'%s machine is not probed within %s seconds' % (
+                    machine_name, seconds)
 
 
 def get_machine(context, name):
@@ -164,9 +172,11 @@ def upload_my_key(context, new_key_name):
                                           'after 5 seconds'
             sleep(1)
     key_name = context.browser.find_element_by_id("key-add-id")
-    key_name.send_keys(context.mist_config['CREDENTIALS'][new_key_name]['key_name'])
+    key_name.send_keys(
+        context.mist_config['CREDENTIALS'][new_key_name]['key_name'])
     upload = context.browser.find_element_by_id("key-add-upload")
-    upload.send_keys(context.mist_config['CREDENTIALS'][new_key_name]['key_path'])
+    upload.send_keys(
+        context.mist_config['CREDENTIALS'][new_key_name]['key_path'])
     context.execute_steps(u'When I click the button "Add"')
 
 

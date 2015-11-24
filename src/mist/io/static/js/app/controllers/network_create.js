@@ -21,13 +21,13 @@ define('app/controllers/network_create', ['ember'],
             creatingNetwork: false,
             network: Ember.Object.create({
                 name: null,
-                backend: null,
+                cloud: null,
                 adminStateUp: true,
                 createSubnet: null,
                 clear: function () {
                     this.setProperties({
                         name: null,
-                        backend: null,
+                        cloud: null,
                         adminStateUp: true,
 						createRouter: null,
                         createSubnet: null
@@ -87,8 +87,8 @@ define('app/controllers/network_create', ['ember'],
                 this._clear();
             },
 
-            selectBackend: function (backend) {
-                this.network.set('backend', backend);
+            selectCloud: function (cloud) {
+                this.network.set('cloud', cloud);
             },
 
 
@@ -162,7 +162,7 @@ define('app/controllers/network_create', ['ember'],
                     }
                 }
 
-                var url = '/backends/' + this.network.backend.id +
+                var url = '/clouds/' + this.network.cloud.id +
                     '/networks';
                 var that = this;
                 that.set('creatingNetwork', true);
@@ -190,7 +190,7 @@ define('app/controllers/network_create', ['ember'],
 
             _updateFormReady: function() {
                 var formReady = false;
-                if (this.network.name && this.network.backend) {
+                if (this.network.name && this.network.cloud) {
 					formReady = true;
 
                     if (this.network.createSubnet) {
@@ -217,7 +217,7 @@ define('app/controllers/network_create', ['ember'],
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('network.name', 'network.backend', 'network.createRouter', 'network.router.name')
+            }.observes('network.name', 'network.cloud', 'network.createRouter', 'network.router.name')
         });
     }
 );

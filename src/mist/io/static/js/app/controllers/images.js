@@ -19,7 +19,7 @@ define('app/controllers/images',
             //
 
             baseModel: ImageModel,
-            passOnProperties: ['backend'],
+            passOnProperties: ['cloud'],
 
 
             //
@@ -37,16 +37,16 @@ define('app/controllers/images',
 
             searchImages: function (filter, callback) {
                 var that = this;
-                Mist.ajax.POST('/backends/' + this.backend.id + '/images', {
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/images', {
                     'search_term': filter
                 }).error(function () {
                     Mist.notificationController.notify(
-                        'Failed to search images on ' + that.backend.title);
+                        'Failed to search images on ' + that.cloud.title);
                 }).complete(function (success, images) {
                     var imagesToReturn = [];
                     if (success) {
                         images.forEach(function (image) {
-                            image.backend = that.backend;
+                            image.cloud = that.cloud;
                             imagesToReturn.push(ImageModel.create(image));
                         });
                     }
@@ -56,7 +56,7 @@ define('app/controllers/images',
 
             toggleImageStar: function (image, callback) {
                 var that = this;
-                Mist.ajax.POST('/backends/' + this.backend.id + '/images/' + image.id, {
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/images/' + image.id, {
                 }).success(function (star) {
                     if (!that.objectExists(image.id))
                         that._addObject(image);
@@ -107,7 +107,7 @@ define('app/controllers/images',
                     // In case we "star" an image we trigger this event to refresh
                     // images list and make this image appear on top with other starred images
                     if (star) {
-                        Mist.backendsController.trigger('onImagesChange');
+                        Mist.cloudsController.trigger('onImagesChange');
                     }
                 });
             },

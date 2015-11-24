@@ -146,9 +146,9 @@ var LOADER_STEPS = {
 var loadFiles = function (callback) {
     require([
         'templates',
-        'app/controllers/backend_add',
-        'app/controllers/backend_edit',
-        'app/controllers/backends',
+        'app/controllers/cloud_add',
+        'app/controllers/cloud_edit',
+        'app/controllers/clouds',
         'app/controllers/cookies',
         'app/controllers/datasources',
         'app/controllers/dialog',
@@ -196,9 +196,9 @@ var loadFiles = function (callback) {
         'app/routes/scripts',
 
         'app/views/home',
-        'app/views/backend_add',
-        'app/views/backend_button',
-        'app/views/backend_edit',
+        'app/views/cloud_add',
+        'app/views/cloud_button',
+        'app/views/cloud_edit',
         'app/views/dialog',
         'app/views/file_upload',
         'app/views/graph_button',
