@@ -346,9 +346,9 @@ var setupMainChannel = function(socket, callback) {
         callback = null;
     })
     .on('list_projects', function(data) {
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend)
-            backend.projects.setModel(data.projects);
+        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+        if (cloud)
+            cloud.projects.setModel(data.projects);
     })
     .on('list_sizes', function (data) {
         var cloud = Mist.cloudsController.getCloud(data.cloud_id);
