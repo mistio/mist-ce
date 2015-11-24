@@ -15,10 +15,10 @@ Supported Providers
 
 .. include:: providers_api.rst
 
-Backends Actions
+Clouds Actions
 ----------------
 
-.. include:: backends_api.rst
+.. include:: clouds_api.rst
 
 Keys Actions
 ------------

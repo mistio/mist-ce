@@ -56,9 +56,9 @@ log = logging.getLogger(__name__)
 
 
 class Machine(OODict):
-    """A saved machine in the machines list of some backend.
+    """A saved machine in the machines list of some cloud.
 
-    For the time being, only bare metal machines are saved, for API backends
+    For the time being, only bare metal machines are saved, for API clouds
     we get the machine list from the provider.
 
     """
@@ -76,9 +76,9 @@ class Machine(OODict):
 
 
 class Machines(FieldsDict):
-    """Collection of machines of a certain backend.
+    """Collection of machines of a certain cloud.
 
-    For the time being, only bare metal machines are saved, for API backends
+    For the time being, only bare metal machines are saved, for API clouds
     we get the machine list from the provider.
 
     """
@@ -87,8 +87,8 @@ class Machines(FieldsDict):
     _key_error = exceptions.MachineNotFoundError
 
 
-class Backend(OODict):
-    """A cloud vm provider backend"""
+class Cloud(OODict):
+    """A cloud vm provider cloud"""
 
     enabled = BoolField()
     machine_count = IntField()
@@ -114,7 +114,7 @@ class Backend(OODict):
 
     def __repr__(self):
         print_fields = ['title', 'provider', 'region']
-        return super(Backend, self).__repr__(print_fields)
+        return super(Cloud, self).__repr__(print_fields)
 
     def get_id(self):
         from mist.io.helpers import b58_encode
@@ -134,10 +134,10 @@ class Backend(OODict):
         return b58_encode(int(sha1(concat).hexdigest(), 16))
 
 
-class Backends(FieldsDict):
+class Clouds(FieldsDict):
 
-    _item_type = make_field(Backend)
-    _key_error = exceptions.BackendNotFoundError
+    _item_type = make_field(Cloud)
+    _key_error = exceptions.CloudNotFoundError
 
 
 class Keypair(OODict):
@@ -207,7 +207,7 @@ class User(DalUser):
 
     email = StrField()
     mist_api_token = StrField()
-    backends = make_field(Backends)()
+    clouds = make_field(Clouds)()
     keypairs = make_field(Keypairs)()
 
     def __repr__(self):

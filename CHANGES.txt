@@ -28,9 +28,9 @@ https://github.com/mistio/mist.io/pulls?direction=desc&sort=created&state=closed
 - reset machine selection when leaving machine list view
 - fix bug that prevented login to the service in order to get server stats
 - don't allow adding duplicate SSH keys
-- don't allow adding duplicate backends
+- don't allow adding duplicate clouds
 - fix refreshing of the enable monitoring popup
-- support Rackspace Sydney backend
+- support Rackspace Sydney cloud
 - upgrade libcloud version
 - stop polling a machine for data after user disables monitoring for that machine
 - fix duplicate rules bug
@@ -53,7 +53,7 @@ https://github.com/mistio/mist.io/pulls?direction=desc&sort=created&state=closed
 0.9.2
 -----
 
-- update apikey/secret backend labels for Rackspace and Linode
+- update apikey/secret cloud labels for Rackspace and Linode
 - make the s in Rackspace lowercase
 - automatically generate key on create machine when there are no keys available
 - change default rule value to 5 instead of 60 since it refers to avg load
@@ -75,7 +75,7 @@ https://github.com/mistio/mist.io/pulls?direction=desc&sort=created&state=closed
 - Enable monitoring by connecting to mist.io service
 - Several graph related fixes for machine stats
 - Shell fixes and styling
-- Change the UI of add backend and add machine
+- Change the UI of add cloud and add machine
 - Optionally run deployment script after machine creation
 - Add key section and key actions
 - Convert all jQuery Mobile dialogs to popups and panels

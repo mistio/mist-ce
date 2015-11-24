@@ -45,8 +45,8 @@ define('app/views/network_list', ['app/views/page'],
 
             load: function () {
                 // Add event listeners
-                Mist.backendsController.on('onSelectedNetworksChange', this, 'updateFooter');
-                Mist.backendsController.on('onNetworkListChange', this, 'updateFilteredNetworks');
+                Mist.cloudsController.on('onSelectedNetworksChange', this, 'updateFooter');
+                Mist.cloudsController.on('onNetworkListChange', this, 'updateFilteredNetworks');
 
                 this.updateFilteredNetworks();
                 this.updateFooter();
@@ -54,8 +54,8 @@ define('app/views/network_list', ['app/views/page'],
 
             unload: function () {
                 // Remove event listeners
-                Mist.backendsController.off('onSelectedNetworksChange', this, 'updateFooter');
-                Mist.backendsController.off('onNetworkListChange', this, 'updateFilteredNetworks');
+                Mist.cloudsController.off('onSelectedNetworksChange', this, 'updateFooter');
+                Mist.cloudsController.off('onNetworkListChange', this, 'updateFilteredNetworks');
             }.on('willDestroyElement'),
 
 
@@ -64,7 +64,7 @@ define('app/views/network_list', ['app/views/page'],
             //
 
             updateFooter: function () {
-                if (Mist.backendsController.selectedNetworks.length)
+                if (Mist.cloudsController.selectedNetworks.length)
                     $('#network-list-page .ui-footer').slideDown();
                 else
                     $('#network-list-page .ui-footer').slideUp();
@@ -81,7 +81,7 @@ define('app/views/network_list', ['app/views/page'],
                 },
 
                 deleteClicked: function () {
-                    var networkNames = Mist.backendsController
+                    var networkNames = Mist.cloudsController
                         .selectedNetworks.toStringByProperty('name');
 
                     Mist.dialogController.open({
@@ -89,15 +89,15 @@ define('app/views/network_list', ['app/views/page'],
                         head: 'Delete networks',
                         body: [
                             {
-                                paragraph: 'Are you sure you want to delete ' + (Mist.backendsController
+                                paragraph: 'Are you sure you want to delete ' + (Mist.cloudsController
                         .selectedNetworks.length > 1 ? 'these networks: ' : 'this network: ') +
                                     networkNames + ' ?'
                             }
                         ],
                         callback: function (didConfirm) {
                             if (didConfirm) {
-                                Mist.backendsController.selectedNetworks.forEach(function (network) {
-                                    network.backend.networks.deleteNetwork(network.id);
+                                Mist.cloudsController.selectedNetworks.forEach(function (network) {
+                                    network.cloud.networks.deleteNetwork(network.id);
                                 });
                             }
                         }
@@ -113,7 +113,7 @@ define('app/views/network_list', ['app/views/page'],
 
                     Ember.run(this, function () {
                         this.get('filteredNetworks').forEach(function (network) {
-                            if(network.backend.enabled && network.backend.get('isOpenStack')) {
+                            if(network.cloud.enabled && network.cloud.get('isOpenStack')) {
                                 network.set('selected', mode);
                             }
                         });
@@ -132,9 +132,9 @@ define('app/views/network_list', ['app/views/page'],
             updateFilteredNetworks: function() {
                 var networks = [], filteredNetworks = [];
 
-                Mist.backendsController.model.forEach(function (backend) {
-                    if (backend.get('enabled')) {
-                        networks.pushObjects(backend.networks.model);
+                Mist.cloudsController.model.forEach(function (cloud) {
+                    if (cloud.get('enabled')) {
+                        networks.pushObjects(cloud.networks.model);
                     }
                 });
 

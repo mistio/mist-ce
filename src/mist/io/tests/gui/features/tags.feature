@@ -4,7 +4,7 @@ Feature: Tags
   Background:
     When I visit mist.io
     Then I wait for the mist.io splash page to load
-    Given "EC2" backend has been added
+    Given "EC2" cloud has been added
 
 
   @create-tag

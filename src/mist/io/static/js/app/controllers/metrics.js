@@ -33,7 +33,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             addMetric: function (machine, metric, callback) {
 
                 var machine_id = machine.id || null;
-                var backend_id = machine.backend ? machine.backend.id : null;
+                var cloud_id = machine.cloud ? machine.cloud.id : null;
 
                 var that = this;
                 this.set('addingMetric', true);
@@ -41,7 +41,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                     'name': metric.name,
                     'unit': metric.unit,
                     'machine_id': machine_id,
-                    'backend_id': backend_id,
+                    'cloud_id': cloud_id,
                 }).success(function(data) {
                     metric.machines = machine ? [machine] : [];
                     that._addMetric(metric, machine);
@@ -73,8 +73,8 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
 
             disableMetric: function (metric, machine, callback) {
                 var machine_id = machine.id || null;
-                var backend_id = machine.backend ? machine.backend.id : null;
-                var url = '/backends/' + backend_id +
+                var cloud_id = machine.cloud ? machine.cloud.id : null;
+                var url = '/clouds/' + cloud_id +
                         '/machines/' + machine_id +
                         '/plugins/' + metric.pluginId;
 
@@ -96,8 +96,8 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             disassociateMetric: function (metric, machine, callback) {
 
                 var machine_id = machine.id || null;
-                var backend_id = machine.backend ? machine.backend.id : null;
-                var url = '/backends/' + backend_id +
+                var cloud_id = machine.cloud ? machine.cloud.id : null;
+                var url = '/clouds/' + cloud_id +
                         '/machines/' + machine_id +
                         '/metrics';
 

@@ -236,7 +236,7 @@ def amqp_user_listening(user):
         connection.close()
 
 
-def trigger_session_update(email, sections=['backends', 'keys', 'monitoring']):
+def trigger_session_update(email, sections=['clouds', 'keys', 'monitoring']):
     amqp_publish_user(email, routing_key='update', data=sections)
 
 
