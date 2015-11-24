@@ -64,6 +64,17 @@
             </div>
 
 
+            <!-- Key Public Field -->
+            {{#if Mist.keyAddController.keyPublic}}
+            <div id="key-add-public-container">
+                <label for="key-add-private">Public Key
+
+                    {{view Ember.TextArea id="key-add-public"
+                           value=Mist.keyAddController.keyPublic}}
+                </label>
+            </div>
+            {{/if}}
+
 
             <!-- Generate and Upload buttons -->
 
