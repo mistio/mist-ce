@@ -99,20 +99,12 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
             load: function () {
                 Ember.run(this, function () {
                     // Add controllers
-<<<<<<< HEAD:src/mist/io/static/js/app/models/backend.js
-                    this.sizes = SizesController.create({backend: this, model: []});
-                    this.images = ImagesController.create({backend: this, model: []});
-                    this.machines = MachinesController.create({backend: this, model: []});
-                    this.locations = LocationsController.create({backend: this, model: []});
-                    this.networks = NetworksController.create({backend: this, model: []});
-                    this.projects = ProjectsController.create({backend: this, model: []});
-=======
                     this.sizes = SizesController.create({cloud: this, model: []});
                     this.images = ImagesController.create({cloud: this, model: []});
                     this.machines = MachinesController.create({cloud: this, model: []});
                     this.locations = LocationsController.create({cloud: this, model: []});
                     this.networks = NetworksController.create({cloud: this, model: []});
->>>>>>> staging:src/mist/io/static/js/app/models/cloud.js
+                    this.projects = ProjectsController.create({cloud: this, model: []});
 
                     // Add events
                     this.sizes.on('onSizeListChange', this, '_updateSizeCount');
