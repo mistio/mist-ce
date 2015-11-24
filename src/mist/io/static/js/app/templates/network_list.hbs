@@ -28,7 +28,7 @@
         <div id="network-list-container" class="ui-shadow">
             <div class="ui-grid-b networks-header">
                 <div class="ui-block-a">
-                    {{#if Mist.backendsController.hasNetworks}}
+                    {{#if Mist.cloudsController.hasNetworks}}
                         <a id="select-networks-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
                                 ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
                     {{/if}}

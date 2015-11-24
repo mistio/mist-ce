@@ -19,15 +19,15 @@ define('app/views/image', ['app/views/page'],
             extra: null,
 
             providerIconClass: function() {
-                if (!this.image || !this.image.backend || !this.image.backend.provider)
+                if (!this.image || !this.image.cloud || !this.image.cloud.provider)
                     return '';
-                return 'provider-' + this.image.backend.getSimpleProvider();
-            }.property('image.backend.provider'),
+                return 'provider-' + this.image.cloud.getSimpleProvider();
+            }.property('image.cloud.provider'),
 
 
             imageIconClass: function () {
                 if (!this.image) return 'image-generic';
-                return 'image-' + this.image.backend.images.getImageOS(this.image.id);
+                return 'image-' + this.image.cloud.images.getImageOS(this.image.id);
             }.property('image'),
 
 
@@ -51,7 +51,7 @@ define('app/views/image', ['app/views/page'],
 
             updateCurrentImage: function() {
                 Ember.run(this, function() {
-                    var image = Mist.backendsController.getRequestedImage();
+                    var image = Mist.cloudsController.getRequestedImage();
                     if (image) this.get('controller').set('model', image);
 
                     this.set('image', this.get('controller').get('model'));

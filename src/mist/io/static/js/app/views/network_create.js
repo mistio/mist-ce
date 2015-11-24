@@ -24,12 +24,12 @@ define('app/views/network_create', ['app/views/controlled'],
              *  Computed Properties
              */
 
-            isOpenstack: Ember.computed('Mist.networkCreateController.network.backend', function() {
-                return Mist.networkCreateController.network.backend && Mist.networkCreateController.network.backend.get('isOpenStack');
+            isOpenstack: Ember.computed('Mist.networkCreateController.network.cloud', function() {
+                return Mist.networkCreateController.network.cloud && Mist.networkCreateController.network.cloud.get('isOpenStack');
             }),
 
-            isDisabled: Ember.computed('Mist.backendsController.canHaveNetworks', function() {
-                return !Mist.backendsController.get('canHaveNetworks');
+            isDisabled: Ember.computed('Mist.cloudsController.canHaveNetworks', function() {
+                return !Mist.cloudsController.get('canHaveNetworks');
             }),
 
 
@@ -140,9 +140,9 @@ define('app/views/network_create', ['app/views/controlled'],
                     this.close();
                 },
 
-                backendSelected: function (backend) {
-                    Mist.networkCreateController.selectBackend(backend);
-                    this._fieldIsReady('backend');
+                cloudSelected: function (cloud) {
+                    Mist.networkCreateController.selectCloud(cloud);
+                    this._fieldIsReady('cloud');
                     this.renderFields();
                 },
 

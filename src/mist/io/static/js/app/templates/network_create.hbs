@@ -20,28 +20,28 @@
         </div>
 
         <!--
-            Select Backend
+            Select Cloud
 
-            Allow only openstack backends for now
+            Allow only openstack clouds for now
         -->
-        <div id="network-create-backend-wrapper">
-            <label for="network-create-backend">Cloud</label>
+        <div id="network-create-cloud-wrapper">
+            <label for="network-create-cloud">Cloud</label>
 
-            <div id="network-create-backend"
+            <div id="network-create-cloud"
                 data-role="collapsible"
                 data-iconpos="right"
                 data-collapsed-icon="carat-d"
                 data-expanded-icon="carat-u"
                 data-theme="a"
-                class="mist-select {{if Mist.networkCreateController.network.backend 'filled' 'empty'}} required">
+                class="mist-select {{if Mist.networkCreateController.network.cloud 'filled' 'empty'}} required">
 
                 <h4>
                     {{#with Mist.networkCreateController.network as |network|}}
-                        {{#if network.backend}}
+                        {{#if network.cloud}}
                             <span class="provider-icon-small">
-                                 <span class="{{network.backend.className}}"></span>
+                                 <span class="{{network.cloud.className}}"></span>
                              </span>
-                            {{network.backend.title}}
+                            {{network.cloud.title}}
                         {{else}}
                             Select cloud
                         {{/if}}
@@ -50,15 +50,15 @@
 
                 <ul data-role="listview" data-theme="a">
 
-                    {{#each Mist.backendsController.model as |backend|}}
-                        {{#if backend.enabled}}
-                            {{#if backend.canHaveNetworks}}
+                    {{#each Mist.cloudsController.model as |cloud|}}
+                        {{#if cloud.enabled}}
+                            {{#if cloud.canHaveNetworks}}
                                 <li data-icon="false">
-                                    <a {{action "backendSelected" backend target=view}}>
+                                    <a {{action "cloudSelected" cloud target=view}}>
                                         <span class="provider-icon-small">
-                                             <span class="{{backend.className}}"></span>
+                                             <span class="{{cloud.className}}"></span>
                                          </span>
-                                        {{backend.title}}
+                                        {{cloud.title}}
                                     </a>
                                 </li>
                             {{/if}}

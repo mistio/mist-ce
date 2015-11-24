@@ -44,6 +44,8 @@
     <script tal:content="string: var LAST_NAME=${last_name}" />
     <script tal:content="string: var CSRF_TOKEN=${csrf_token}" />
     <script tal:content="string: var BETA_FEATURES=${beta_features}" />
+    <script tal:condition="user_ga_id|nothing" tal:content="string: var USER_GA_ID=${user_ga_id}" />
+    <script tal:content="string: var ANALYTICS_ID='${google_analytics_id}'" />
 
     <script src="resources/dist/requirejs/require.js"></script>
 

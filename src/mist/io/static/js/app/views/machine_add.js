@@ -143,7 +143,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                 // Add event listeners
                 Mist.scriptsController.on('onChange', this, 'renderFields');
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.on('onImagesChange', this, 'renderFields');
+                Mist.cloudsController.on('onImagesChange', this, 'renderFields');
 
              }.on('didInsertElement'),
 
@@ -165,7 +165,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                 // Remove event listeners
                 Mist.scriptsController.off('onChange', this, 'renderFields');
                 Mist.keysController.off('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.off('onImagesChange', this, 'renderFields');
+                Mist.cloudsController.off('onImagesChange', this, 'renderFields');
 
              }.on('willDestroyElement'),
 
@@ -195,7 +195,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                     this.triggerAction({
                         action:'selectProvider',
                         target: this,
-                        actionContext: image.backend
+                        actionContext: image.cloud
                     });
 
                     this.triggerAction({
@@ -216,7 +216,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
 
              renderFields: function () {
-                Ember.run.schedule('afterRender', this, function () {
+                Ember.run.schedule('afterRender', this, function() {
 
                     // Render collapsibles
                     if ($('.ui-collapsible').collapsible) {
@@ -285,19 +285,19 @@ define('app/views/machine_add', ['app/views/controlled'],
                 },
 
 
-                selectProvider: function (backend) {
+                selectProvider: function (cloud) {
 
                     if (this.fieldIsReady) {
                         this.fieldIsReady('provider');
                     }
 
-                    backend.networks.model.forEach(function (network, index) {
+                    cloud.networks.model.forEach(function (network, index) {
                         network.set('selected', false);
                     });
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineImage', {'name' : 'Select Image'})
                                              .set('newMachineSize', {'name' : 'Select Size'})
-                                             .set('newMachineProvider', backend);
+                                             .set('newMachineProvider', cloud);
 
                     // Check we are not on single image page
                     if(! Mist.machineAddController.get('selectedImage')) this.set('changeProviderFlag', true);

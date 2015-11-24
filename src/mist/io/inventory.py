@@ -14,7 +14,7 @@ class MistInventory(object):
         self.keys = {}
         if not machines:
             machines = [(bid, m['id'])
-                        for bid in self.user.backends
+                        for bid in self.user.clouds
                         for m in self._list_machines(bid)]
 
         for bid, mid in machines:
@@ -55,15 +55,15 @@ class MistInventory(object):
              files.update({'id_rsa/%s' % key_id: private_key})
         return files
 
-    def _list_machines(self, backend_id):
-        if backend_id not in self._cache:
-            print 'Actually doing list_machines for %s' % backend_id
-            machines = mist.io.methods.list_machines(self.user, backend_id)
-            self._cache[backend_id] = machines
-        return self._cache[backend_id]
+    def _list_machines(self, cloud_id):
+        if cloud_id not in self._cache:
+            print 'Actually doing list_machines for %s' % cloud_id
+            machines = mist.io.methods.list_machines(self.user, cloud_id)
+            self._cache[cloud_id] = machines
+        return self._cache[cloud_id]
 
-    def find_machine_details(self, backend_id, machine_id):
-        machines = self._list_machines(backend_id)
+    def find_machine_details(self, cloud_id, machine_id):
+        machines = self._list_machines(cloud_id)
         for machine in machines:
             if machine['id'] == machine_id:
                 name = machine['name'].replace(' ', '_')
@@ -76,11 +76,11 @@ class MistInventory(object):
                 return name, ip_addr
         raise Exception('Machine not found in list_machines')
 
-    def find_ssh_settings(self, backend_id, machine_id):
+    def find_ssh_settings(self, cloud_id, machine_id):
         assocs = []
         for key_id, keypair in self.user.keypairs.items():
             for assoc in keypair.machines:
-                if [backend_id, machine_id] == assoc[:2]:
+                if [cloud_id, machine_id] == assoc[:2]:
                     assocs.append({
                         'key_id': key_id,
                         'last': assoc[2] if len(assoc) > 2 else 0,
