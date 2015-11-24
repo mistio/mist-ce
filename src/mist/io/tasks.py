@@ -741,13 +741,13 @@ class ListProjects(UserTask):
     polling = False
     soft_time_limit = 30
 
-    def execute(self, email, backend_id):
-        log.warn('Running list projects for user %s backend %s' % (email, backend_id))
+    def execute(self, email, cloud_id):
+        log.warn('Running list projects for user %s cloud %s' % (email, cloud_id))
         from mist.io import methods
         user = user_from_email(email)
-        projects = methods.list_projects(user, backend_id)
-        log.warn('Returning list projects for user %s backend %s' % (email, backend_id))
-        return {'backend_id': backend_id, 'projects': projects}
+        projects = methods.list_projects(user, cloud_id)
+        log.warn('Returning list projects for user %s cloud %s' % (email, cloud_id))
+        return {'cloud_id': cloud_id, 'projects': projects}
 
 
 class ListMachines(UserTask):

@@ -3027,16 +3027,16 @@ def list_networks(user, cloud_id):
     return ret
 
 
-def list_projects(user, backend_id):
+def list_projects(user, cloud_id):
     """List projects for each account.
     Currently supported for Packet.net. For other providers
     this returns an empty list
     """
 
-    if backend_id not in user.backends:
-        raise BackendNotFoundError(backend_id)
-    backend = user.backends[backend_id]
-    conn = connect_provider(backend)
+    if cloud_id not in user.clouds:
+        raise CloudNotFoundError(cloud_id)
+    cloud = user.clouds[cloud_id]
+    conn = connect_provider(cloud)
 
     ret = {}
     if conn.type in [Provider.PACKET]:
