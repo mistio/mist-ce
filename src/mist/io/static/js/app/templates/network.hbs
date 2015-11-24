@@ -69,7 +69,7 @@
         data-transition="flip">
 
         <ul data-role="listview">
-            {{#each model.backend.machines.model as |machine|}}
+            {{#each model.cloud.machines.model as |machine|}}
             <li data-icon="false">
                 <a {{action "assignMachine" machine target=view}}>
                     {{machine.name}}
@@ -81,7 +81,7 @@
 
     {{component "dialog-popup"}}
 
-    {{#if model.backend.isOpenStack}}
+    {{#if model.cloud.isOpenStack}}
     <div class="single-action-footer ui-footer ui-bar-b">
         <a class="ui-btn ui-caps ui-btn-icon-right icon-xx"
             {{action "deleteClicked" target=view}}>

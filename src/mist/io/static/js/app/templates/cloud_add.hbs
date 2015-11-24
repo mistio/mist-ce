@@ -1,12 +1,12 @@
-<!-- Add backend button -->
-<div id="add-backend" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible"
+<!-- Add cloud button -->
+<div id="add-cloud" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible"
      data-role="collapsible"
      data-collapsed="true">
 
    <h4>Add cloud</h4>
 
-    <div id="backend-add" class="ui-content">
-        <div id="new-backend-provider"
+    <div id="cloud-add" class="ui-content">
+        <div id="new-cloud-provider"
             class="mist-select"
             data-role="collapsible"
             data-collapsed-icon="noicon"
@@ -34,7 +34,7 @@
             </ul>
         </div>
         {{#if view.provider.title}}
-        <div id="backend-add-fields">
+        <div id="cloud-add-fields">
             {{#each view.providerFields as |field|}}
                 {{#if field.show}}
                 <div class="{{field.className}} field {{view.provider.provider}}">
@@ -161,13 +161,13 @@
                 {{/if}}
             {{/each}}
 
-            {{#if Mist.backendsController.addingBackend}}
-                <div id="backend-add-loader" class="ajax-loader"></div>
+            {{#if Mist.cloudsController.addingCloud}}
+                <div id="cloud-add-loader" class="ajax-loader"></div>
             {{/if}}
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                <a id="new-backend-ok"
-                    class="{{if view.isReady '' 'ui-state-disabled'}} {{if Mist.backendsController.addingBackend 'ui-state-disabled'}} ui-btn ui-btn-d ui-shadow ui-caps ok-only"
+                <a id="new-cloud-ok"
+                    class="{{if view.isReady '' 'ui-state-disabled'}} {{if Mist.cloudsController.addingCloud 'ui-state-disabled'}} ui-btn ui-btn-d ui-shadow ui-caps ok-only"
                     {{action "addClicked" target=view}}>Add</a>
             </div>
         </div>
@@ -175,5 +175,5 @@
     </div>
 </div>
 
-<div id="add-backend-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
+<div id="add-cloud-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
      {{action "clickOverlay" target=view}}></div>

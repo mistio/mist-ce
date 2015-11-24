@@ -1,4 +1,4 @@
-.. http:get:: /backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&command={shell_command}
+.. http:get:: /clouds/{cloud_id}/machines/{machine_id}/shell?host={host_ip}&command={shell_command}
 
    Run shell command in machine. Mist will yield an html body with the command's output.
 
@@ -6,7 +6,7 @@
 
    .. sourcecode:: http
 
-      GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&command=uptime
+      GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&command=uptime
       Host: mist.io
       Accept: application/json; charset=UTF-8
 

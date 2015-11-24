@@ -10,66 +10,66 @@ except ImportError:
     pass
 
 
-@given(u'"{backend}" backend has been added')
-def given_backend(context, backend):
-    backend_buttons = []
+@given(u'"{cloud}" cloud has been added')
+def given_cloud(context, cloud):
+    cloud_buttons = []
     end_time = time() + 5
     while time() < end_time:
         try:
-            backends = context.browser.find_element_by_id("backend-buttons")
-            backend_buttons = backends.find_elements_by_class_name("ui-btn")
-            if backend_buttons:
+            clouds = context.browser.find_element_by_id("cloud-buttons")
+            cloud_buttons = clouds.find_elements_by_class_name("ui-btn")
+            if cloud_buttons:
                 break
         except:
             pass
 
         sleep(2)
 
-    if backend_buttons:
-        for button in backend_buttons:
-            if backend.lower() in safe_get_element_text(button).lower():
+    if cloud_buttons:
+        for button in cloud_buttons:
+            if cloud.lower() in safe_get_element_text(button).lower():
                 return
 
-    if "openstack" in backend.lower():
+    if "openstack" in cloud.lower():
         creds = "OPENSTACK"
-    elif "rackspace" in backend.lower():
+    elif "rackspace" in cloud.lower():
         creds = "RACKSPACE"
-    elif "softlayer" in backend.lower():
+    elif "softlayer" in cloud.lower():
         creds = "SOFTLAYER"
-    elif "hp" in backend.lower():
+    elif "hp" in cloud.lower():
         creds = "HP"
-    elif "ec2" in backend.lower():
+    elif "ec2" in cloud.lower():
         creds = "EC2"
-    elif "nepho" in backend.lower():
+    elif "nepho" in cloud.lower():
         creds = "NEPHOSCALE"
-    elif "linode" in backend.lower():
+    elif "linode" in cloud.lower():
         creds = "LINODE"
-    elif "docker" in backend.lower():
+    elif "docker" in cloud.lower():
         creds = "DOCKER"
-    elif "digitalocean" in backend.lower():
+    elif "digitalocean" in cloud.lower():
         creds = "DIGITALOCEAN"
-    elif "indonesian" in backend.lower():
+    elif "indonesian" in cloud.lower():
         creds = "INDONESIAN"
-    elif "libvirt" in backend.lower():
+    elif "libvirt" in cloud.lower():
         creds = "LIBVIRT"
     else:
-        assert False, u'Could not find credentials for %s' % backend
+        assert False, u'Could not find credentials for %s' % cloud
 
     context.execute_steps(u'''
         When I click the button "Add cloud"
-        Then I expect for "new-backend-provider" panel to appear within max 2 seconds
+        Then I expect for "new-cloud-provider" panel to appear within max 2 seconds
         And I click the button "%s"
-        And I expect for "new-backend-provider" panel to disappear within max 2 seconds
-        Then I expect for "backend-add-fields" to be visible within max 2 seconds
+        And I expect for "new-cloud-provider" panel to disappear within max 2 seconds
+        Then I expect for "cloud-add-fields" to be visible within max 2 seconds
         When I use my "%s" credentials
         And I click the button "Add"
-        Then the "%s" backend should be added within 60 seconds
-    ''' % (backend, creds, backend))
+        Then the "%s" cloud should be added within 60 seconds
+    ''' % (cloud, creds, cloud))
 
 
-@when(u'I use my "{backend}" credentials')
-def backend_creds(context, backend):
-    if "AZURE" in backend:
+@when(u'I use my "{cloud}" credentials')
+def cloud_creds(context, cloud):
+    if "AZURE" in cloud:
         subscription_id = None
         for i in range(0, 2):
             try:
@@ -90,7 +90,7 @@ def backend_creds(context, backend):
         When I click the "Done" button inside the "Upload" popup
         Then I expect for "file-upload-popup" popup to disappear within max 2 seconds
         ''')
-    elif "GCE" in backend:
+    elif "GCE" in cloud:
         title = context.browser.find_element_by_id("title")
         for i in range(1, 6):
             title.send_keys(u'\ue003')
@@ -108,7 +108,7 @@ def backend_creds(context, backend):
         When I click the "Done" button inside the "Upload" popup
         Then I expect for "file-upload-popup" popup to disappear within max 4 seconds
         ''')
-    elif "OPENSTACK" in backend:
+    elif "OPENSTACK" in cloud:
         username = context.browser.find_element_by_id("username")
         username.send_keys(context.mist_config['CREDENTIALS']['OPENSTACK']['username'])
         password = context.browser.find_element_by_id("password")
@@ -117,7 +117,7 @@ def backend_creds(context, backend):
         auth_url.send_keys(context.mist_config['CREDENTIALS']['OPENSTACK']['auth_url'])
         tenant_name = context.browser.find_element_by_id("tenant_name")
         tenant_name.send_keys(context.mist_config['CREDENTIALS']['OPENSTACK']['tenant_name'])
-    elif "RACKSPACE" in backend:
+    elif "RACKSPACE" in cloud:
         context.execute_steps(u'''
         When I click the button "Select Region"
         And I click the button "%s"''' % context.mist_config['CREDENTIALS']['RACKSPACE']['region'])
@@ -129,7 +129,7 @@ def backend_creds(context, backend):
         username.send_keys(context.mist_config['CREDENTIALS']['RACKSPACE']['username'])
         api_key = context.browser.find_element_by_id("api_key")
         api_key.send_keys(context.mist_config['CREDENTIALS']['RACKSPACE']['api_key'])
-    elif "HP" in backend:
+    elif "HP" in cloud:
         context.execute_steps(u'''
         When I click the button "Select Region"
         And I click the button "%s"''' % context.mist_config['CREDENTIALS']['HP']['region'])
@@ -143,12 +143,12 @@ def backend_creds(context, backend):
         password.send_keys(context.mist_config['CREDENTIALS']['HP']['password'])
         tenant_name = context.browser.find_element_by_id("tenant_name")
         tenant_name.send_keys(context.mist_config['CREDENTIALS']['HP']['tenant_name'])
-    elif "SOFTLAYER" in backend:
+    elif "SOFTLAYER" in cloud:
         username = context.browser.find_element_by_id("username")
         username.send_keys(context.mist_config['CREDENTIALS']['SOFTLAYER']['username'])
         api_key = context.browser.find_element_by_id("api_key")
         api_key.send_keys(context.mist_config['CREDENTIALS']['SOFTLAYER']['api_key'])
-    elif "EC2" in backend:
+    elif "EC2" in cloud:
         context.execute_steps(u'''
         When I click the button "Select Region"
         And I click the button "%s"''' % context.mist_config['CREDENTIALS']['EC2']['region'])
@@ -160,7 +160,7 @@ def backend_creds(context, backend):
         api_key.send_keys(context.mist_config['CREDENTIALS']['EC2']['api_key'])
         api_secret = context.browser.find_element_by_id("api_secret")
         api_secret.send_keys(context.mist_config['CREDENTIALS']['EC2']['api_secret'])
-    elif "NEPHOSCALE" in backend:
+    elif "NEPHOSCALE" in cloud:
         title = context.browser.find_element_by_id("title")
         for i in range(20):
             title.send_keys(u'\ue003')
@@ -169,10 +169,10 @@ def backend_creds(context, backend):
         username.send_keys(context.mist_config['CREDENTIALS']['NEPHOSCALE']['username'])
         password = context.browser.find_element_by_id("password")
         password.send_keys(context.mist_config['CREDENTIALS']['NEPHOSCALE']['password'])
-    elif "LINODE" in backend:
+    elif "LINODE" in cloud:
         api_key = context.browser.find_element_by_id("api_key")
         api_key.send_keys(context.mist_config['CREDENTIALS']['LINODE']['api_key'])
-    elif "DOCKER" in backend:
+    elif "DOCKER" in cloud:
         host = context.browser.find_element_by_id("docker_host")
         host.send_keys(context.mist_config['CREDENTIALS']['DOCKER']['host'])
         port = context.browser.find_element_by_id("docker_port")
@@ -195,10 +195,10 @@ def backend_creds(context, backend):
         file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
         file_upload_ok.click()
         sleep(2)
-    elif "DIGITALOCEAN" in backend:
+    elif "DIGITALOCEAN" in cloud:
         token_input = context.browser.find_element_by_id("token")
         token_input.send_keys(context.mist_config['CREDENTIALS']['DIGITALOCEAN']['token'])
-    elif "VMWARE" in backend:
+    elif "VMWARE" in cloud:
         username = context.browser.find_element_by_id("username")
         username.send_keys(context.mist_config['CREDENTIALS']['VMWARE']['username'])
         password = context.browser.find_element_by_id("password")
@@ -207,14 +207,14 @@ def backend_creds(context, backend):
         organization.send_keys(context.mist_config['CREDENTIALS']['VMWARE']['organization'])
         host = context.browser.find_element_by_id("host")
         host.send_keys(context.mist_config['CREDENTIALS']['VMWARE']['host'])
-    elif "INDONESIAN" in backend:
+    elif "INDONESIAN" in cloud:
         username = context.browser.find_element_by_id("username")
         username.send_keys(context.mist_config['CREDENTIALS']['INDONESIAN']['username'])
         password = context.browser.find_element_by_id("password")
         password.send_keys(context.mist_config['CREDENTIALS']['INDONESIAN']['password'])
         organization = context.browser.find_element_by_id("organization")
         organization.send_keys(context.mist_config['CREDENTIALS']['INDONESIAN']['organization'])
-    elif "LIBVIRT" in backend:
+    elif "LIBVIRT" in cloud:
         title = context.browser.find_element_by_id("title")
         for i in range(20):
             title.send_keys(u'\ue003')
@@ -236,9 +236,9 @@ def backend_creds(context, backend):
         sleep(5)
 
 
-@when(u'I rename the backend to "{new_name}"')
-def rename_backend(context, new_name):
-    popup = context.browser.find_element_by_id("backend-edit")
+@when(u'I rename the cloud to "{new_name}"')
+def rename_cloud(context, new_name):
+    popup = context.browser.find_element_by_id("cloud-edit")
     textfield = popup.find_element_by_class_name("ui-input-text").find_element_by_tag_name("input")
     for i in range(20):
         textfield.send_keys(u'\ue003')
@@ -248,19 +248,19 @@ def rename_backend(context, new_name):
         sleep(0.7)
 
 
-@then(u'the "{backend}" backend should be added within {seconds} seconds')
-def backend_added(context, backend, seconds):
+@then(u'the "{cloud}" cloud should be added within {seconds} seconds')
+def cloud_added(context, cloud, seconds):
     end_time = time() + int(seconds)
     while time() < end_time:
-        button = search_for_button(context, backend, btn_cls='cloud-btn')
+        button = search_for_button(context, cloud, btn_cls='cloud-btn')
         if button:
             return
         sleep(2)
 
-    assert False, u'%s is not added within %s seconds' %(backend, seconds)
+    assert False, u'%s is not added within %s seconds' %(cloud, seconds)
 
 
-@then(u'the "{backend}" backend should be deleted')
-def backend_deleted(context, backend):
-    button = search_for_button(context, backend, btn_cls='cloud-btn')
+@then(u'the "{cloud}" cloud should be deleted')
+def cloud_deleted(context, cloud):
+    button = search_for_button(context, cloud, btn_cls='cloud-btn')
     assert not button, ""

@@ -42,8 +42,8 @@ define('app/models/rule', ['app/models/base'],
                     return Mist.rulesController.getAggregateByValue(aggregate);
                 },
                 machine: function (machine) {
-                    return Mist.backendsController.getMachine(
-                        machine, this.get('backend')) || machine;
+                    return Mist.cloudsController.getMachine(
+                        machine, this.get('cloud')) || machine;
                 },
             },
 

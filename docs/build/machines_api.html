@@ -124,11 +124,11 @@
     <div class="col-md-12">
       
   <dl class="get">
-<dt id="get--backends-backend_id-machines">
-<code class="descname">GET </code><code class="descname">/backends/{backend_id}/machines</code><a class="headerlink" href="#get--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of all added machines for this backend</p>
+<dt id="get--clouds-cloud_id-machines">
+<code class="descname">GET </code><code class="descname">/clouds/{cloud_id}/machines</code><a class="headerlink" href="#get--clouds-cloud_id-machines" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all added machines for this cloud</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+<div class="highlight-http"><div class="highlight"><pre>GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines
 Host: mist.io
 Accept: application/json; charset=UTF-8
 </pre></div>
@@ -193,11 +193,11 @@ Accept: application/json; charset=UTF-8
 </dd></dl>
 
 <dl class="post">
-<dt id="post--backends-backend_id-machines">
-<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines</code><a class="headerlink" href="#post--backends-backend_id-machines" title="Permalink to this definition">¶</a></dt>
+<dt id="post--clouds-cloud_id-machines">
+<code class="descname">POST </code><code class="descname">/clouds/{cloud_id}/machines</code><a class="headerlink" href="#post--clouds-cloud_id-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create machine</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+<div class="highlight-http"><div class="highlight"><pre>POST /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
@@ -434,11 +434,11 @@ Accept: application/json; charset=UTF-8
 </dd></dl>
 
 <dl class="post">
-<dt id="post--backends-backend_id-machines-machine_id">
-<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines/{machine_id}</code><a class="headerlink" href="#post--backends-backend_id-machines-machine_id" title="Permalink to this definition">¶</a></dt>
+<dt id="post--clouds-cloud_id-machines-machine_id">
+<code class="descname">POST </code><code class="descname">/clouds/{cloud_id}/machines/{machine_id}</code><a class="headerlink" href="#post--clouds-cloud_id-machines-machine_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Machine actions like reboot, destroy, shutdown and start</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>  POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
+<div class="highlight-http"><div class="highlight"><pre>  POST /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
   Host: mist.io
   Accept: application/json; charset=UTF-8
 
@@ -462,11 +462,11 @@ Accept: application/json; charset=UTF-8
 </dd></dl>
 
 <dl class="post">
-<dt id="post--backends-backend_id-machines-machine_id-metadata">
-<code class="descname">POST </code><code class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</code><a class="headerlink" href="#post--backends-backend_id-machines-machine_id-metadata" title="Permalink to this definition">¶</a></dt>
+<dt id="post--clouds-cloud_id-machines-machine_id-metadata">
+<code class="descname">POST </code><code class="descname">/clouds/{cloud_id}/machines/{machine_id}/metadata</code><a class="headerlink" href="#post--clouds-cloud_id-machines-machine_id-metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add tags/metadata for machine</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
+<div class="highlight-http"><div class="highlight"><pre>POST /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
 Host: mist.io
 Accept: application/json; charset=UTF-8
 

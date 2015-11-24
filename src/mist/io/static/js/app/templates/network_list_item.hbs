@@ -1,5 +1,5 @@
 <label>
-    {{#if network.backend.isOpenStack}}
+    {{#if network.cloud.isOpenStack}}
         {{view Mist.Checkbox checked=network.selected}}
     {{else}}
         {{view Mist.Checkbox checked=network.selected data-disabled="true"}}
@@ -11,7 +11,7 @@
         <div class="ui-block-a network-name">{{network.name}}</div>
         <div class="ui-block-b">{{#if network.isPublic}}Public{{/if}} {{#if network.isPrivate}}Private{{/if}}</div>
         <div class="ui-block-c key-tags">
-            <span class="tag">{{network.backend.title}}</span>
+            <span class="tag">{{network.cloud.title}}</span>
         </div>
     </div>
 

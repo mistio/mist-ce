@@ -165,25 +165,26 @@ def update_user_settings(request):
         raise UnauthorizedError()
 
 
-@view_config(route_name='backends', request_method='GET', renderer='json')
-def list_backends(request):
-    """Gets the available backends.
+@view_config(route_name='clouds', request_method='GET', renderer='json')
+def list_clouds(request):
+    """Gets the available clouds.
 
-    .. note:: Currently, this is only used by the backend controller in js.
+    .. note:: Currently, this is only used by the cloud controller in js.
 
     """
 
     user = user_from_request(request)
-    return methods.list_backends(user)
+    return methods.list_clouds(user)
 
 
-@view_config(route_name='backends', request_method='POST', renderer='json')
-def add_backend(request):
-    """Adds a new backend."""
+@view_config(route_name='clouds', request_method='POST', renderer='json')
+def add_cloud(request):
+    """Adds a new cloud."""
+
     params = params_from_request(request)
     # remove spaces from start/end of string fields that are often included
     # when pasting keys, preventing thus succesfull connection with the
-    # backend
+    # cloud
     for key in params.keys():
         if type(params[key]) in [unicode, str]:
             params[key] = params[key].rstrip().lstrip()
@@ -199,8 +200,8 @@ def add_backend(request):
 
     monitoring = None
     if int(api_version) == 2:
-        ret = methods.add_backend_v_2(user, title, provider, params)
-        backend_id = ret['backend_id']
+        ret = methods.add_cloud_v_2(user, title, provider, params)
+        cloud_id = ret['cloud_id']
         monitoring = ret.get('monitoring')
     else:
         apikey = params.get('apikey', '')
@@ -224,7 +225,7 @@ def add_backend(request):
         compute_endpoint = params.get('compute_endpoint', '')
         # TODO: check if all necessary information was provided in the request
 
-        backend_id = methods.add_backend(
+        cloud_id = methods.add_cloud(
             user, title, provider, apikey, apisecret, apiurl,
             tenant_name=tenant_name,
             machine_hostname=machine_hostname, machine_key=machine_key,
@@ -234,73 +235,73 @@ def add_backend(request):
             remove_on_error=remove_on_error,
         )
 
-    backend = user.backends[backend_id]
+    cloud = user.clouds[cloud_id]
     ret = {
-        'index': len(user.backends) - 1,
-        'id': backend_id,
-        'apikey': backend.apikey,
-        'apiurl': backend.apiurl,
-        'tenant_name': backend.tenant_name,
-        'title': backend.title,
-        'provider': backend.provider,
-        'poll_interval': backend.poll_interval,
-        'region': backend.region,
+        'index': len(user.clouds) - 1,
+        'id': cloud_id,
+        'apikey': cloud.apikey,
+        'apiurl': cloud.apiurl,
+        'tenant_name': cloud.tenant_name,
+        'title': cloud.title,
+        'provider': cloud.provider,
+        'poll_interval': cloud.poll_interval,
+        'region': cloud.region,
         'status': 'off',
-        'enabled': backend.enabled,
+        'enabled': cloud.enabled,
     }
     if monitoring:
         ret['monitoring'] = monitoring
     return ret
 
 
-@view_config(route_name='backend_action', request_method='DELETE')
-def delete_backend(request):
-    """Deletes a backend.
+@view_config(route_name='cloud_action', request_method='DELETE')
+def delete_cloud(request):
+    """Deletes a cloud.
 
     .. note:: It assumes the user may re-add it later so it does not remove
               any key associations.
 
     """
 
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     user = user_from_request(request)
-    methods.delete_backend(user, backend_id)
+    methods.delete_cloud(user, cloud_id)
     return OK
 
 
-@view_config(route_name='backend_action', request_method='PUT')
-def rename_backend(request):
-    """Renames a backend."""
+@view_config(route_name='cloud_action', request_method='PUT')
+def rename_cloud(request):
+    """Renames a cloud."""
 
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
     new_name = params.get('new_name', '')
     if not new_name:
         raise RequiredParameterMissingError('new_name')
 
     user = user_from_request(request)
-    methods.rename_backend(user, backend_id, new_name)
+    methods.rename_cloud(user, cloud_id, new_name)
     return OK
 
 
-@view_config(route_name='backend_action', request_method='POST')
-def toggle_backend(request):
-    backend_id = request.matchdict['backend']
+@view_config(route_name='cloud_action', request_method='POST')
+def toggle_cloud(request):
+    cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
     new_state = params.get('new_state', '')
     if not new_state:
         raise RequiredParameterMissingError('new_state')
 
     if new_state != "1" and new_state != "0":
-        raise BadRequestError('Invalid backend state')
+        raise BadRequestError('Invalid cloud state')
 
     user = user_from_request(request)
-    if backend_id not in user.backends:
-        raise BackendNotFoundError()
+    if cloud_id not in user.clouds:
+        raise CloudNotFoundError()
     with user.lock_n_load():
-        user.backends[backend_id].enabled = bool(int(new_state))
+        user.clouds[cloud_id].enabled = bool(int(new_state))
         user.save()
-    trigger_session_update(user.email, ['backends'])
+    trigger_session_update(user.email, ['clouds'])
     return OK
 
 
@@ -417,7 +418,7 @@ def generate_keypair(request):
              renderer='json')
 def associate_key(request):
     key_id = request.matchdict['key']
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     ssh_user = params.get('user', None)
@@ -432,7 +433,7 @@ def associate_key(request):
     if not host:
         raise RequiredParameterMissingError('host')
     user = user_from_request(request)
-    methods.associate_key(user, key_id, backend_id, machine_id, host,
+    methods.associate_key(user, key_id, cloud_id, machine_id, host,
                           username=ssh_user, port=ssh_port)
     return user.keypairs[key_id].machines
 
@@ -441,31 +442,31 @@ def associate_key(request):
              renderer='json')
 def disassociate_key(request):
     key_id = request.matchdict['key']
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     try:
         host = request.json_body.get('host')
     except:
         host = None
     user = user_from_request(request)
-    methods.disassociate_key(user, key_id, backend_id, machine_id, host)
+    methods.disassociate_key(user, key_id, cloud_id, machine_id, host)
     return user.keypairs[key_id].machines
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
-    """Gets machines and their metadata from a backend."""
+    """Gets machines and their metadata from a cloud."""
 
     user = user_from_request(request)
-    backend_id = request.matchdict['backend']
-    return methods.list_machines(user, backend_id)
+    cloud_id = request.matchdict['cloud']
+    return methods.list_machines(user, cloud_id)
 
 
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
-    """Creates a new virtual machine on the specified backend."""
+    """Creates a new virtual machine on the specified cloud."""
 
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
 
     try:
         key_id = request.json_body.get('key')
@@ -511,7 +512,7 @@ def create_machine(request):
     import uuid
     job_id = uuid.uuid4().hex
     from mist.io import tasks
-    args = (backend_id, key_id, machine_name,
+    args = (cloud_id, key_id, machine_name,
             location_id, image_id, size_id, script,
             image_extra, disk, image_name, size_name,
             location_name, ips, monitoring, networks,
@@ -540,7 +541,7 @@ def create_machine(request):
 @view_config(route_name='machine', request_method='POST', renderer="json")
 def machine_actions(request):
     # TODO: We shouldn't return list_machines, just 200. Save the API!
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
     params = params_from_request(request)
@@ -551,26 +552,26 @@ def machine_actions(request):
 
     if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename'):
         if action == 'start':
-            methods.start_machine(user, backend_id, machine_id)
+            methods.start_machine(user, cloud_id, machine_id)
         elif action == 'stop':
-            methods.stop_machine(user, backend_id, machine_id)
+            methods.stop_machine(user, cloud_id, machine_id)
         elif action == 'reboot':
-            methods.reboot_machine(user, backend_id, machine_id)
+            methods.reboot_machine(user, cloud_id, machine_id)
         elif action == 'destroy':
-            methods.destroy_machine(user, backend_id, machine_id)
+            methods.destroy_machine(user, cloud_id, machine_id)
         elif action == 'resize':
-            methods.resize_machine(user, backend_id, machine_id, plan_id)
+            methods.resize_machine(user, cloud_id, machine_id, plan_id)
         elif action == 'rename':
-            methods.rename_machine(user, backend_id, machine_id, name)
+            methods.rename_machine(user, cloud_id, machine_id, name)
         # return OK
-        return methods.list_machines(user, backend_id)
+        return methods.list_machines(user, cloud_id)
     raise BadRequestError()
 
 
 @view_config(route_name='machine_rdp', request_method='GET', renderer="json")
 def machine_rdp(request):
     "Generate and return an rdp file for windows machines"
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
     rdp_port = request.params.get('rdp_port', 3389)
@@ -595,8 +596,8 @@ def machine_rdp(request):
 @view_config(route_name='machine_tags', request_method='POST',
              renderer='json')
 def set_machine_tags(request):
-    """Sets metadata for a machine, given the backend and machine id."""
-    backend_id = request.matchdict['backend']
+    """Sets metadata for a machine, given the cloud and machine id."""
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     try:
         tags = request.json_body['tags']
@@ -606,7 +607,7 @@ def set_machine_tags(request):
         raise BadRequestError('tags should be list of tags')
 
     user = user_from_request(request)
-    methods.set_machine_tags(user, backend_id, machine_id, tags)
+    methods.set_machine_tags(user, cloud_id, machine_id, tags)
     return OK
 
 
@@ -617,11 +618,11 @@ def delete_machine_tag(request):
     deleted.
 
     """
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     tag = request.matchdict['tag']
     user = user_from_request(request)
-    methods.delete_machine_tag(user, backend_id, machine_id, tag)
+    methods.delete_machine_tag(user, cloud_id, machine_id, tag)
     return OK
 
 
@@ -633,60 +634,60 @@ def list_specific_images(request):
 
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
-    """List images from each backend.
+    """List images from each cloud.
     Furthermore if a search_term is provided, we loop through each
-    backend and search for that term in the ids and the names of
+    cloud and search for that term in the ids and the names of
     the community images"""
 
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     try:
         term = request.json_body.get('search_term', '').lower()
     except:
         term = None
     user = user_from_request(request)
-    return methods.list_images(user, backend_id, term)
+    return methods.list_images(user, cloud_id, term)
 
 
 @view_config(route_name='image', request_method='POST', renderer='json')
 def star_image(request):
     """Toggle image as starred."""
 
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     image_id = request.matchdict['image']
     user = user_from_request(request)
-    return methods.star_image(user, backend_id, image_id)
+    return methods.star_image(user, cloud_id, image_id)
 
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
-    """List sizes (aka flavors) from each backend."""
-    backend_id = request.matchdict['backend']
+    """List sizes (aka flavors) from each cloud."""
+    cloud_id = request.matchdict['cloud']
     user = user_from_request(request)
-    return methods.list_sizes(user, backend_id)
+    return methods.list_sizes(user, cloud_id)
 
 
 @view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
-    """List locations from each backend."""
-    backend_id = request.matchdict['backend']
+    """List locations from each cloud."""
+    cloud_id = request.matchdict['cloud']
     user = user_from_request(request)
-    return methods.list_locations(user, backend_id)
+    return methods.list_locations(user, cloud_id)
 
 
 @view_config(route_name='networks', request_method='GET', renderer='json')
 def list_networks(request):
-    """List networks from each backend."""
-    backend_id = request.matchdict['backend']
+    """List networks from each cloud."""
+    cloud_id = request.matchdict['cloud']
     user = user_from_request(request)
-    return methods.list_networks(user, backend_id)
+    return methods.list_networks(user, cloud_id)
 
 
 @view_config(route_name='networks', request_method='POST', renderer='json')
 def create_network(request):
     """
-    Creates a new network. Currently working only with OPENSTACK backend
+    Creates a new network. Currently working only with OPENSTACK cloud
     """
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
 
     try:
         network = request.json_body.get('network')
@@ -696,19 +697,19 @@ def create_network(request):
     subnet = request.json_body.get('subnet', None)
     router = request.json_body.get('router', None)
     user = user_from_request(request)
-    return methods.create_network(user, backend_id, network, subnet, router)
+    return methods.create_network(user, cloud_id, network, subnet, router)
 
 
 @view_config(route_name='network', request_method='DELETE')
 def delete_network(request):
     """
-    Deletes a network. Currently working only with OPENSTACK backend
+    Deletes a network. Currently working only with OPENSTACK cloud
     """
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     network_id = request.matchdict['network']
 
     user = user_from_request(request)
-    methods.delete_network(user, backend_id, network_id)
+    methods.delete_network(user, cloud_id, network_id)
 
     return OK
 
@@ -716,7 +717,7 @@ def delete_network(request):
 @view_config(route_name='network', request_method='POST')
 def associate_ip(request):
 
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     network_id = request.matchdict['network']
     params = params_from_request(request)
     ip = params.get('ip')
@@ -724,7 +725,7 @@ def associate_ip(request):
     assign = params.get('assign', True)
     user = user_from_request(request)
 
-    ret = methods.associate_ip(user, backend_id, network_id, ip, machine,
+    ret = methods.associate_ip(user, cloud_id, network_id, ip, machine,
                                assign)
     if ret:
         return OK
@@ -740,7 +741,7 @@ def probe(request):
 
     """
     machine_id = request.matchdict['machine']
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
     host = params.get('host', None)
     key_id = params.get('key', None)
@@ -749,7 +750,7 @@ def probe(request):
     if key_id == 'undefined':
         key_id = ''
     user = user_from_request(request)
-    ret = methods.probe(user, backend_id, machine_id, host, key_id, ssh_user)
+    ret = methods.probe(user, cloud_id, machine_id, host, key_id, ssh_user)
     return ret
 
 
@@ -771,7 +772,7 @@ def update_monitoring(request):
 
     """
     user = user_from_request(request)
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     if not user.mist_api_token:
@@ -806,11 +807,11 @@ def update_monitoring(request):
 
     if action == 'enable':
         ret_dict = methods.enable_monitoring(
-            user, backend_id, machine_id, name, dns_name, public_ips,
+            user, cloud_id, machine_id, name, dns_name, public_ips,
             no_ssh=no_ssh, dry=dry
         )
     elif action == 'disable':
-        methods.disable_monitoring(user, backend_id, machine_id, no_ssh=no_ssh)
+        methods.disable_monitoring(user, cloud_id, machine_id, no_ssh=no_ssh)
         ret_dict = {}
     else:
         raise BadRequestError()
@@ -822,7 +823,7 @@ def update_monitoring(request):
 def get_stats(request):
     data = methods.get_stats(
         user_from_request(request),
-        request.matchdict['backend'],
+        request.matchdict['cloud'],
         request.matchdict['machine'],
         request.params.get('start'),
         request.params.get('stop'),
@@ -837,34 +838,34 @@ def get_stats(request):
              renderer='json')
 def find_metrics(request):
     user = user_from_request(request)
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
-    return methods.find_metrics(user, backend_id, machine_id)
+    return methods.find_metrics(user, cloud_id, machine_id)
 
 
 @view_config(route_name='metrics', request_method='PUT', renderer='json')
 def assoc_metric(request):
     user = user_from_request(request)
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     metric_id = params.get('metric_id')
     if not metric_id:
         raise RequiredParameterMissingError('metric_id')
-    methods.assoc_metric(user, backend_id, machine_id, metric_id)
+    methods.assoc_metric(user, cloud_id, machine_id, metric_id)
     return {}
 
 
 @view_config(route_name='metrics', request_method='DELETE', renderer='json')
 def disassoc_metric(request):
     user = user_from_request(request)
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     metric_id = params.get('metric_id')
     if not metric_id:
         raise RequiredParameterMissingError('metric_id')
-    methods.disassoc_metric(user, backend_id, machine_id, metric_id)
+    methods.disassoc_metric(user, cloud_id, machine_id, metric_id)
     return {}
 
 
@@ -878,7 +879,7 @@ def update_metric(request):
         metric_id,
         name=params.get('name'),
         unit=params.get('unit'),
-        backend_id=params.get('backend_id'),
+        cloud_id=params.get('cloud_id'),
         machine_id=params.get('machine_id'),
     )
     return {}
@@ -888,7 +889,7 @@ def update_metric(request):
              renderer='json')
 def deploy_plugin(request):
     user = user_from_request(request)
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     plugin_id = request.matchdict['plugin']
     params = params_from_request(request)
@@ -896,7 +897,7 @@ def deploy_plugin(request):
     host = params.get('host')
     if plugin_type == 'python':
         ret = methods.deploy_python_plugin(
-            user, backend_id, machine_id, plugin_id,
+            user, cloud_id, machine_id, plugin_id,
             value_type=params.get('value_type', 'gauge'),
             read_function=params.get('read_function'),
             host=host,
@@ -906,7 +907,7 @@ def deploy_plugin(request):
             metric_id=ret['metric_id'],
             name=params.get('name'),
             unit=params.get('unit'),
-            backend_id=backend_id,
+            cloud_id=cloud_id,
             machine_id=machine_id,
         )
         return ret
@@ -918,14 +919,14 @@ def deploy_plugin(request):
              renderer='json')
 def undeploy_plugin(request):
     user = user_from_request(request)
-    backend_id = request.matchdict['backend']
+    cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     plugin_id = request.matchdict['plugin']
     params = params_from_request(request)
     plugin_type = params.get('plugin_type')
     host = params.get('host')
     if plugin_type == 'python':
-        ret = methods.undeploy_python_plugin(user, backend_id,
+        ret = methods.undeploy_python_plugin(user, cloud_id,
                                              machine_id, plugin_id, host)
         return ret
     else:
