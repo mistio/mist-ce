@@ -123,15 +123,14 @@
                                         <li class="incident">
                                             <a class="icon-check ui-btn ui-btn-icon-right"
                                                 {{action "incidentClicked" incident target=view}}>
-                                                <span class="time">{{incident.closed}} ago </span>
                                                 <span class="machine">
                                                     {{incident.machineName}}:
                                                 </span>
                                                 <span class="rule-condition">
                                                     {{incident.ruleText}}
                                                 </span>
-                                                <span class="duration">
-                                                    for {{incident.duration}}
+                                                <span class="time">
+                                                    {{incident.closed}} ago, for {{incident.duration}}
                                                 </span>
                                             </a>
                                         </li>
