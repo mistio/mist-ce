@@ -1,46 +1,133 @@
+/* overwrites from theme css */
+#error-body {
+    margin: 0;
+    padding: 0;
+}
+#error-page {
+    font-size: 1em;
+    line-height: 1.3;
+    font-family: "Open Sans", sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    letter-spacing: 0px;
+}
+#error-page .ui-bar-a {
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+#error-body .ui-page {
+    display: block;
+}
+/* brought from landing & materialize css */
+#error-page *, #error-page *::before, #error-page *::after {
+    box-sizing: inherit;
+}
+#error-page {
+    background-color: #fff;
+}
+#error-page #banner-logo{
+    display: inline-block;
+    width: 120px;
+    height: 54px;
+    background: transparent url(../images/logo.png) no-repeat left center;
+}
+#error-page section {
+    display: block;
+}
+#error-page section.error-message {
+    background-color: #e8e8e8;
+}
+#error-page .container {
+    max-width: 1100px;
+    width: 85%;
+    margin: 0 auto;
+}
+#error-page .center, #error-page .center-align {
+    text-align: center;
+}
+#error-page .row::after {
+    clear: both;
+    content: "";
+    display: table;
+}
+#error-page .container .row {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+}
+#error-page .row {
+    margin-bottom: 20px;
+}
+#error-page .row .col {
+    box-sizing: border-box;
+    float: left;
+    padding: 0 0.75rem;
+}
+#error-page p a {
+    color: #0099cc;
+}
+.ui-body-a, .ui-page-theme-a .ui-body-inherit, html .ui-bar-a .ui-body-inherit, html .ui-body-a .ui-body-inherit, html body .ui-group-theme-a .ui-body-inherit, html .ui-panel-page-container-a {
+    overflow: hidden;
+}
+/* missing css */
+#error-page nav ul li:last-child {
+    margin-left: 0;
+}
 #error-inner img {
     width: 160px;
     height: auto;
 }
-
 #error-inner h1 {
     font-size: 40px;
-    font-family: "Open Sans", sans-serif;
-    text-shadow: 2px 2px 0 #d4d4d4;
     margin: 10px 0 20px;
     letter-spacing: 3px;
 }
-
 #error-inner h2 {
     font-size: 26px;
     line-height: 1.4em;
-    font-family: "Open Sans", sans-serif;
     font-weight: 300;
     text-transform: uppercase;
 }
-
-#error-inner a {
-    padding: 15px 20px;
-    color: #000;
-    background-color: #d4d4d4;
-    -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-    text-transform: uppercase;
-    text-decoration: none;
-    display: inline-block;
-}
-
-#error-inner a:hover {
+#error-inner a.btn-large {
+    background-color: #09c;
     color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 2px;
+    border: none;
+    display: inline-block;
+    height: 54px;
+    line-height: 56px;
+    outline: 0;
+    padding: 0 2rem;
+    text-transform: uppercase;
+    vertical-align: middle;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.3s ease-out 0s;
+    transition: all 0.2s ease-out 0s;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
-
+#error-inner a.btn:hover, #error-inner a.btn-large:hover {
+    box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+}
 #error-inner {
-    margin: 30px auto;
     text-align: center;
     padding: 100px;
-    background-color: #FAF9F4;
 }
-
+#error-body .ui-loader {
+    display: none;
+}
+#error-page .error-footer p {
+    opacity: 0.86;
+    margin: 18px 0;
+    color: #444;
+}
+#error-page .error-footer a {
+    text-decoration: none;
+}
+#error-page .footer-logo img {
+    padding-top: 3em;
+}
 @media only screen and  (max-width: 600px) {
     #error-inner img {
         width: 100px;
@@ -49,4 +136,46 @@
     #error-inner {
         padding: 40px;
     }
+}
+
+/*media queries */
+@media only screen and (min-width : 601) {
+    #error-page .row .col.s12 {
+        width: 100%;
+        margin-left: 0;
+        float: none; 
+        display: block;
+    }
+}
+@media only screen and (min-width : 992px) {
+    #error-page .row .col.m4 {
+        width: 33.3333%;
+        margin-left: 0;
+    }
+    #error-page .row .col.m12 {
+        width: 100%;
+        margin-left: 0;
+        float: none;
+        display: block;
+    }
+}
+@media only screen and (min-width: 1200px) {
+    #error-page .row .col.l12 {
+        margin-left: 0;
+        width: 100%;
+        float: none;
+        display: block;
+    }
+    #error-page .row .col.l4 {
+        margin-left: 0;
+        width: 33.3333%;
+    }
+}
+#error-page .footer-logo {
+    margin-top: 30px;
+    border-top: 1px solid #dedede;
+    width: 100%;
+    display: block;
+    float: none;
+    clear: both;
 }
