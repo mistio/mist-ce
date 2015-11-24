@@ -23,7 +23,6 @@ Feature: Add second-tier clouds
     | GCE                   | GCE          |
     | DigitalOcean          | DIGITALOCEAN |
     | Rackspace             | RACKSPACE    |
-    | HP Helion Cloud       | HP           |
     | SoftLayer             | SOFTLAYER    |
     | EC2                   | EC2          |
     | NephoScale            | NEPHOSCALE   |
