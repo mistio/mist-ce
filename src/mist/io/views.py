@@ -31,6 +31,7 @@ from mist.io.model import Keypair
 from mist.io.shell import Shell
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
+import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update
@@ -70,8 +71,9 @@ def exception_handler_mist(exc, request):
 @view_config(context='pyramid.httpexceptions.HTTPNotFound',
              renderer='templates/404.pt')
 def not_found(self, request):
-    request.response.status = 404
-    return {}
+
+    return pyramid.httpexceptions.HTTPFound(request.host_url+"/#"+request.path)
+
 
 
 @view_config(route_name='home', request_method='GET',

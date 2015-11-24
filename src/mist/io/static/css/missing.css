@@ -1,14 +1,7 @@
 /* overwrites from theme css */
-body#error-body {
-    height: auto;
-    position: absolute;
-    min-height: 100%;
+#error-body {
     margin: 0;
-    padding: 0;    
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    padding: 0;
 }
 #error-page {
     font-size: 1em;
@@ -18,16 +11,7 @@ body#error-body {
     font-size: 18px;
     letter-spacing: 0px;
 }
-/*popup*/
-body#error-page div#user-menu-popup-popup {
-    box-shadow: 0 0 1px rgba(255,255,255,.5);
-    display: none;
-    position: absolute;
-}
-body#error-page div#ui-popup-screen {
-    display: none;
-}
-#error-body .ui-bar-a {
+#error-page .ui-bar-a {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
 #error-body .ui-page {
@@ -79,6 +63,9 @@ body#error-page div#ui-popup-screen {
 }
 #error-page p a {
     color: #0099cc;
+}
+.ui-body-a, .ui-page-theme-a .ui-body-inherit, html .ui-bar-a .ui-body-inherit, html .ui-body-a .ui-body-inherit, html body .ui-group-theme-a .ui-body-inherit, html .ui-panel-page-container-a {
+    overflow: hidden;
 }
 /* missing css */
 #error-page nav ul li:last-child {
