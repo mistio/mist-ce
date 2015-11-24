@@ -289,3 +289,11 @@ label[for='event-error'] {
 label[for='event-error'].ui-btn:hover, label[for='event-error'].ui-btn-active {
     border-bottom: 2px solid #FF513D !important;
 }
+
+.log-list li a.machine-log-link,
+.log-list li a.script-log-link {
+    background-color: #faf9f4 !important;
+    color: #7f7f7f !important;
+    padding: 5px 10px !important;
+    text-decoration: none;
+}

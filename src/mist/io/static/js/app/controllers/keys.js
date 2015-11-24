@@ -43,7 +43,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             sortByDefault: Ember.computed('sortByTerm', function () {
                 return this.get('sortByTerm') == 'default';
             }),
-            
+
             sortedKeys: Ember.computed('filteredKeys', 'filteredKeys.@each.id', 'filteredKeys.@each.isDefault', 'sortByTerm', function() {
                 if(this.get('filteredKeys'))
                 {
@@ -199,7 +199,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                         'Failed to generate key');
                 }).complete(function (success, key) {
                     that.set('generatingKey', false);
-                    if (args.callback) args.callback(success, key.priv);
+                    if (args.callback) args.callback(success, key.priv, key.public);
                 });
             },
 

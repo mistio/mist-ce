@@ -41,7 +41,7 @@ define('app/controllers/machines', ['app/models/machine'],
             //  Methods
             //
 
-            newMachine: function(name, image, size, location, key, script, monitoring, associateFloatingIp,
+            newMachine: function(name, image, size, location, key, cloud_init, script, monitoring, associateFloatingIp,
                 dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -95,6 +95,7 @@ define('app/controllers/machines', ['app/models/machine'],
                         'name': name,
                         'key': key ? key.id : null,
                         'size': size.id,
+                        'cloud_init': cloud_init,
                         'script': script.id ? undefined : script,
                         'script_id': script.id || undefined,
                         'script_params': scriptParams,

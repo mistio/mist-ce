@@ -4,6 +4,7 @@ import random
 import socket
 import tempfile
 import json
+import base64
 import requests
 import subprocess
 import re
@@ -1557,8 +1558,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
-                   post_script_id='', post_script_params='', associate_floating_ip=False,
-                   associate_floating_ip_subnet=None):
+                   post_script_id='', post_script_params='', cloud_init='',
+                   associate_floating_ip=False, associate_floating_ip_subnet=None):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -1628,10 +1629,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
         node = _create_machine_rackspace(conn, public_key, machine_name, image,
-                                         size, location)
+                                         size, location, user_data=cloud_init)
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key,
-                                         machine_name, image, size, location, networks)
+                                         machine_name, image, size, location, networks, cloud_init)
     elif conn.type is Provider.HPCLOUD:
         node = _create_machine_hpcloud(conn, private_key, public_key,
                                        machine_name, image, size, location, networks)
@@ -1642,7 +1643,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                 location = loc
                 break
         node = _create_machine_ec2(conn, key_id, private_key, public_key,
-                                   machine_name, image, size, location)
+                                   machine_name, image, size, location, cloud_init)
     elif conn.type is Provider.NEPHOSCALE:
         node = _create_machine_nephoscale(conn, key_id, private_key, public_key,
                                           machine_name, image, size,
@@ -1662,11 +1663,12 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(conn, key_id, private_key,
                                              public_key, machine_name,
-                                             image, size, location)
+                                             image, size, location, cloud_init)
     elif conn.type == Provider.AZURE:
         node = _create_machine_azure(conn, key_id, private_key,
-                                             public_key, machine_name,
-                                             image, size, location, cloud_service_name=None, azure_port_bindings=azure_port_bindings)
+                                     public_key, machine_name,
+                                     image, size, location, cloud_init=cloud_init,
+                                     cloud_service_name=None, azure_port_bindings=azure_port_bindings)
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
@@ -1688,7 +1690,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                       username=node.extra.get('username'), port=ssh_port)
     elif key_id:
         associate_key(user, key_id, backend_id, node.id, port=ssh_port)
-
 
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
@@ -1756,7 +1757,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
 
 
 def _create_machine_rackspace(conn, public_key, machine_name,
-                             image, size, location):
+                             image, size, location, user_data):
     """Create a machine in Rackspace.
 
     Here there is no checking done, all parameters are expected to be
@@ -1788,14 +1789,14 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
     try:
         node = conn.create_node(name=machine_name, image=image, size=size,
-                                location=location, ex_keyname=server_key)
+                                location=location, ex_keyname=server_key, ex_userdata=user_data)
         return node
     except Exception as e:
         raise MachineCreationError("Rackspace, got exception %r" % e, exc=e)
 
 
 def _create_machine_openstack(conn, private_key, public_key, machine_name,
-                             image, size, location, networks):
+                             image, size, location, networks, user_data):
     """Create a machine in Openstack.
 
     Here there is no checking done, all parameters are expected to be
@@ -1839,7 +1840,8 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
                 ex_keyname=server_key,
-                networks=chosen_networks)
+                networks=chosen_networks,
+                ex_userdata=user_data)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e, e)
     return node
@@ -1899,7 +1901,7 @@ def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
 
 
 def _create_machine_ec2(conn, key_name, private_key, public_key,
-                       machine_name, image, size, location):
+                       machine_name, image, size, location, user_data):
     """Create a machine in Amazon EC2.
 
     Here there is no checking done, all parameters are expected to be
@@ -1944,7 +1946,8 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
                 ssh_key=tmp_key_path,
                 max_tries=1,
                 ex_keyname=key_name,
-                ex_securitygroup=config.EC2_SECURITYGROUP['name']
+                ex_securitygroup=config.EC2_SECURITYGROUP['name'],
+                ex_userdata=user_data
             )
         except Exception as e:
             raise MachineCreationError("EC2, got exception %s" % e, e)
@@ -2102,7 +2105,7 @@ def _create_machine_docker(conn, machine_name, image, script=None, public_key=No
     return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location):
+                                  machine_name, image, size, location, user_data):
     """Create a machine in Digital Ocean.
 
     Here there is no checking done, all parameters are expected to be
@@ -2159,6 +2162,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                 location=location,
                 ssh_key=tmp_key_path,
                 private_networking=private_networking,
+                user_data=user_data
             )
         except Exception as e:
             raise MachineCreationError("Digital Ocean, got exception %s" % e, e)
@@ -2257,7 +2261,7 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location)
 
 
 def _create_machine_azure(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location, cloud_service_name, azure_port_bindings):
+                          machine_name, image, size, location, cloud_init, cloud_service_name, azure_port_bindings):
     """Create a machine Azure.
 
     Here there is no checking done, all parameters are expected to be
@@ -2294,7 +2298,8 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 image=image,
                 location=location,
                 ex_cloud_service_name=cloud_service_name,
-                endpoint_ports=port_bindings
+                endpoint_ports=port_bindings,
+                custom_data=base64.b64encode(cloud_init)
             )
         except Exception as e:
             try:
@@ -2931,8 +2936,10 @@ def list_networks(user, backend_id):
         networks = conn.ex_list_networks()
         subnets = conn.ex_list_subnets()
         routers = conn.ex_list_routers()
-        floatings_ips = conn.ex_list_floating_ips()
-        if floatings_ips:
+        floating_ips = conn.ex_list_floating_ips()
+        if conn.connection.tenant_id:
+            floating_ips = [floating_ip for floating_ip in floating_ips if floating_ip.extra.get('tenant_id') == conn.connection.tenant_id]
+        if floating_ips:
             nodes = conn.list_nodes()
         else:
             nodes = []
@@ -2944,7 +2951,7 @@ def list_networks(user, backend_id):
                 public_networks.append(networks.pop(net_index))
 
         for pub_net in public_networks:
-            ret['public'].append(openstack_network_to_dict(pub_net, subnets, floatings_ips, nodes))
+            ret['public'].append(openstack_network_to_dict(pub_net, subnets, floating_ips, nodes))
         for network in networks:
             ret['private'].append(openstack_network_to_dict(network, subnets))
         for router in routers:
