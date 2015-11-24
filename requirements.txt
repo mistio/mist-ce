@@ -3,7 +3,7 @@ pyramid==1.4
 apache-libcloud
 PasteDeploy==1.5.2
 PasteScript==2.0.2
-paramiko==1.15.1
+paramiko==1.16.0
 PyYAML==3.11
 pycrypto==2.6.1
 requests==2.7.0
