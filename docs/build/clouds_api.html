@@ -99,7 +99,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="_sources/backends_api.txt"
+  <a href="_sources/clouds_api.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -124,11 +124,11 @@
     <div class="col-md-12">
       
   <dl class="get">
-<dt id="get--backends">
-<code class="descname">GET </code><code class="descname">/backends</code><a class="headerlink" href="#get--backends" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of all added backends</p>
+<dt id="get--clouds">
+<code class="descname">GET </code><code class="descname">/clouds</code><a class="headerlink" href="#get--clouds" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all added clouds</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>GET /backends
+<div class="highlight-http"><div class="highlight"><pre>GET /clouds
 Host: mist.io
 Accept: application/json; charset=UTF-8
 </pre></div>
@@ -161,13 +161,13 @@ Accept: application/json; charset=UTF-8
 </dd></dl>
 
 <dl class="post">
-<dt id="post--backends">
-<code class="descname">POST </code><code class="descname">/backends</code><a class="headerlink" href="#post--backends" title="Permalink to this definition">¶</a></dt>
+<dt id="post--clouds">
+<code class="descname">POST </code><code class="descname">/clouds</code><a class="headerlink" href="#post--clouds" title="Permalink to this definition">¶</a></dt>
 <dd><p>In each POST API request, you have to include the <code class="docutils literal"><span class="pre">`Api-Version`</span></code> header</p>
 <div class="highlight-http"><div class="highlight"><pre>{&#39;Api-Version&#39;:2}
 </pre></div>
 </div>
-<p><strong>Add EC2 Backend</strong>:</p>
+<p><strong>Add EC2 Cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;EC2 Ireland&quot;,
     &quot;provider&quot;:&quot;ec2&quot;,
@@ -183,7 +183,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>region</strong> (<em>string</em>) &#8211; <em>(required)</em> Region Id, as found in the supported providers list</li>
 <li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> EC2 API Key</li>
@@ -193,7 +193,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Openstack Backend</strong>:</p>
+<p><strong>Add Openstack Cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;OpenStack&quot;,
     &quot;provider&quot;:&quot;openstack&quot;,
@@ -210,7 +210,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Username for Openstack</li>
 <li><strong>password</strong> (<em>string</em>) &#8211; <em>(required)</em> Password for Openstack</li>
@@ -223,7 +223,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Rackspace backend</strong>:</p>
+<p><strong>Add Rackspace cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;Rackspace Chicago&quot;,
     &quot;provider&quot;:&quot;rackspace&quot;,
@@ -239,7 +239,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>region</strong> (<em>string</em>) &#8211; <em>(required)</em> Region Id as found in supported providers list</li>
 <li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Rackspace username</li>
@@ -249,9 +249,9 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Nephoscale backend</strong>:</p>
+<p><strong>Add Nephoscale cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
-    &quot;title&quot;:&quot;MyNephoBackend&quot;,
+    &quot;title&quot;:&quot;MyNephoCloud&quot;,
     &quot;provider&quot;:&quot;nephoscale&quot;,
     &quot;username&quot;:&quot;myuser&quot;,
     &quot;password&quot;:&quot;nephopass&quot;
@@ -264,7 +264,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Nephoscale username</li>
 <li><strong>password</strong> (<em>string</em>) &#8211; <em>(required)</em> Nephoscale password</li>
@@ -273,9 +273,9 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Softlayer backend</strong>:</p>
+<p><strong>Add Softlayer cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
-    &quot;title&quot;:&quot;MySoftLayerBackend&quot;,
+    &quot;title&quot;:&quot;MySoftLayerCloud&quot;,
     &quot;provider&quot;:&quot;softlayer&quot;,
     &quot;username&quot;:&quot;myuser&quot;,
     &quot;api_key&quot;:&quot;oinoh*jhbJHVJHV77t8&quot;
@@ -288,7 +288,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Softlayer username</li>
 <li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> Softlayer API Key</li>
@@ -297,9 +297,9 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Digital Ocean backend</strong>:</p>
+<p><strong>Add Digital Ocean cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
-    &quot;title&quot;:&quot;DigiBackend&quot;,
+    &quot;title&quot;:&quot;DigiCloud&quot;,
     &quot;provider&quot;:&quot;digitalocean&quot;,
     &quot;token&quot;:&quot;dodjhLKJHiuyghv98756fugjhg7687uygjhgjgj&quot;,
 }
@@ -311,7 +311,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>token</strong> (<em>string</em>) &#8211; <em>(required)</em> Generated Token from Digital Ocean</li>
 </ul>
@@ -319,7 +319,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Google Compute Engine backend</strong>:</p>
+<p><strong>Add Google Compute Engine cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;MyGCE&quot;,
     &quot;provider&quot;:&quot;gce&quot;,
@@ -335,7 +335,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>email</strong> (<em>string</em>) &#8211; <em>(required)</em> Email Address generated by your GCE account</li>
 <li><strong>project_id</strong> (<em>string</em>) &#8211; <em>(required)</em> You GCE Project&#8217;s ID</li>
@@ -345,7 +345,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Azure backend</strong>:</p>
+<p><strong>Add Azure cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;MyAzure&quot;,
     &quot;provider&quot;:&quot;azure&quot;,
@@ -360,7 +360,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>subscription_id</strong> (<em>string</em>) &#8211; <em>(required)</em> Subscription ID for your Azure account</li>
 <li><strong>certificate</strong> (<em>string</em>) &#8211; <em>(required)</em> The Certificate you have generated for your Azure account</li>
@@ -369,7 +369,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Linode backend</strong>:</p>
+<p><strong>Add Linode cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;Linode&quot;,
     &quot;provider&quot;:&quot;linode&quot;,
@@ -383,7 +383,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> The API Key for your Linode account</li>
 </ul>
@@ -391,7 +391,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Docker backend</strong>:</p>
+<p><strong>Add Docker cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;MyDocher&quot;,
     &quot;provider&quot;:&quot;docker&quot;,
@@ -408,7 +408,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>docker_host</strong> (<em>string</em>) &#8211; <em>(required)</em> The host of your Docker</li>
 <li><strong>docker_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> The port on which your Docker API is exposed to. By default will be <code class="docutils literal"><span class="pre">`4243`</span></code></li>
@@ -421,7 +421,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add CoreOS backend</strong>:</p>
+<p><strong>Add CoreOS cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;Core OS&quot;,
     &quot;provider&quot;:&quot;coreos&quot;,
@@ -438,7 +438,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
 <li><strong>machine_user</strong> (<em>string</em>) &#8211; <em>(optional)</em> User to connect with your server</li>
@@ -449,7 +449,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add HP Cloud backend</strong>:</p>
+<p><strong>Add HP Cloud cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;HP&quot;,
     &quot;provider&quot;:&quot;hpcloud:region-a.geo-1&quot;,
@@ -465,7 +465,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Username for your HP Cloud Account</li>
 <li><strong>password</strong> (<em>string</em>) &#8211; <em>(required)</em> Password for your HP Cloud Account</li>
@@ -475,7 +475,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Single Server/Bare Metal Unix backend</strong>:</p>
+<p><strong>Add Single Server/Bare Metal Unix cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;MyServer&quot;,
     &quot;provider&quot;:&quot;bare_metal&quot;,
@@ -492,7 +492,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
 <li><strong>machine_user</strong> (<em>string</em>) &#8211; <em>(required)</em> User to connect with your server</li>
@@ -503,7 +503,7 @@ Accept: application/json; charset=UTF-8
 </tr>
 </tbody>
 </table>
-<p><strong>Add Windows Server backend</strong>:</p>
+<p><strong>Add Windows Server cloud</strong>:</p>
 <div class="highlight-http"><div class="highlight"><pre>{
     &quot;title&quot;:&quot;MyWindows&quot;,
     &quot;provider&quot;:&quot;bare_metal&quot;,
@@ -519,7 +519,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the backend</li>
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
 <li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
 <li><strong>windows</strong> (<em>boolean</em>) &#8211; <em>(required)</em>  This boolean informs mist.io that this Bare Metal server is a Windows Server</li>
@@ -532,11 +532,11 @@ Accept: application/json; charset=UTF-8
 </dd></dl>
 
 <dl class="delete">
-<dt id="delete--backends-backend_id">
-<code class="descname">DELETE </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#delete--backends-backend_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delete backend</p>
+<dt id="delete--clouds-cloud_id">
+<code class="descname">DELETE </code><code class="descname">/clouds/{cloud_id}</code><a class="headerlink" href="#delete--clouds-cloud_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete cloud</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>DELETE /backends/2tK74h4mXbjjLlkjjO4SHn3
+<div class="highlight-http"><div class="highlight"><pre>DELETE /clouds/2tK74h4mXbjjLlkjjO4SHn3
 Host: mist.io
 Accept: application/json; charset=UTF-8
 </pre></div>
@@ -544,16 +544,16 @@ Accept: application/json; charset=UTF-8
 </dd></dl>
 
 <dl class="put">
-<dt id="put--backends-backend_id">
-<code class="descname">PUT </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#put--backends-backend_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rename backend</p>
+<dt id="put--clouds-cloud_id">
+<code class="descname">PUT </code><code class="descname">/clouds/{cloud_id}</code><a class="headerlink" href="#put--clouds-cloud_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename cloud</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>PUT /backends
+<div class="highlight-http"><div class="highlight"><pre>PUT /clouds
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-  &quot;new_name&quot;:&quot;Renamed Backend&quot;
+  &quot;new_name&quot;:&quot;Renamed Cloud&quot;
 }
 </pre></div>
 </div>
@@ -563,7 +563,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>new_name</strong> (<em>string</em>) &#8211; <em>required</em> New name for backend</li>
+<li><strong>new_name</strong> (<em>string</em>) &#8211; <em>required</em> New name for cloud</li>
 </ul>
 </td>
 </tr>
@@ -572,11 +572,11 @@ Accept: application/json; charset=UTF-8
 </dd></dl>
 
 <dl class="post">
-<dt id="post--backends-backend_id">
-<code class="descname">POST </code><code class="descname">/backends/{backend_id}</code><a class="headerlink" href="#post--backends-backend_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Toggle state of backend between enabled and disabled</p>
+<dt id="post--clouds-cloud_id">
+<code class="descname">POST </code><code class="descname">/clouds/{cloud_id}</code><a class="headerlink" href="#post--clouds-cloud_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggle state of cloud between enabled and disabled</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3
+<div class="highlight-http"><div class="highlight"><pre>POST /clouds/2tK74h4mXbjjLlkjjO4SHn3
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
@@ -591,7 +591,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>newState</strong> (<em>string</em>) &#8211; <em>required</em> True to enable, False to disable backend</li>
+<li><strong>newState</strong> (<em>string</em>) &#8211; <em>required</em> True to enable, False to disable cloud</li>
 </ul>
 </td>
 </tr>
@@ -600,11 +600,11 @@ Accept: application/json; charset=UTF-8
 </dd></dl>
 
 <dl class="get">
-<dt id="get--backends-backend_id-sizes">
-<code class="descname">GET </code><code class="descname">/backends/{backend_id}/sizes</code><a class="headerlink" href="#get--backends-backend_id-sizes" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of all sizes provided by backend</p>
+<dt id="get--clouds-cloud_id-sizes">
+<code class="descname">GET </code><code class="descname">/clouds/{cloud_id}/sizes</code><a class="headerlink" href="#get--clouds-cloud_id-sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all sizes provided by cloud</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/sizes
+<div class="highlight-http"><div class="highlight"><pre>GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/sizes
 Host: mist.io
 Accept: application/json; charset=UTF-8
 </pre></div>
@@ -735,11 +735,11 @@ Accept: application/json; charset=UTF-8
 </dd></dl>
 
 <dl class="get">
-<dt id="get--backends-backend_id-locations">
-<code class="descname">GET </code><code class="descname">/backends/{backend_id}/locations</code><a class="headerlink" href="#get--backends-backend_id-locations" title="Permalink to this definition">¶</a></dt>
-<dd><p>List locations provided by backend</p>
+<dt id="get--clouds-cloud_id-locations">
+<code class="descname">GET </code><code class="descname">/clouds/{cloud_id}/locations</code><a class="headerlink" href="#get--clouds-cloud_id-locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>List locations provided by cloud</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/locations
+<div class="highlight-http"><div class="highlight"><pre>GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/locations
 Host: mist.io
 Accept: application/json; charset=UTF-8
 </pre></div>

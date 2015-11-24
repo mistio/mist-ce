@@ -20,7 +20,7 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
         super(ShellHubWorker, self).__init__(*args, **kwargs)
         self.shell = None
         self.channel = None
-        for key in ('email', 'backend_id', 'machine_id', 'host',
+        for key in ('email', 'cloud_id', 'machine_id', 'host',
                     'columns', 'rows'):
             if not self.params.get(key):
                 log.error("%s: Param '%s' missing from worker kwargs.",
@@ -43,14 +43,14 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
         self.shell = mist.io.shell.Shell(data['host'])
         try:
             key_id, ssh_user = self.shell.autoconfigure(
-                self.user, data['backend_id'], data['machine_id']
+                self.user, data['cloud_id'], data['machine_id']
             )
         except Exception as exc:
             if self.provider == 'docker':
                 self.shell = mist.io.shell.Shell(data['host'],
                                                  provider='docker')
                 key_id, ssh_user = self.shell.autoconfigure(
-                    self.user, data['backend_id'], data['machine_id']
+                    self.user, data['cloud_id'], data['machine_id']
                 )
             else:
                 log.warning("%s: Couldn't connect with SSH, error %r.",
@@ -151,7 +151,7 @@ class ShellHubClient(mist.io.hub.main.HubClient):
 
 if __name__ == "__main__":
     worker_kwargs = {
-        'backend_id': 'tUEMvnye1BqMeqNEoLDrFy2EiT8',
+        'cloud_id': 'tUEMvnye1BqMeqNEoLDrFy2EiT8',
         'machine_id': 'bc41da46814e0c7b69167e2862d400c24419ec3dcdc48a72c4ede789c6ed981e',
         'host': '69.50.244.209',
         'columns': 80,

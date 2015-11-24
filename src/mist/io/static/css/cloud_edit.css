@@ -1,51 +1,51 @@
 
-/* Backend Edit Popup CSS
+/* Cloud Edit Popup CSS
 -----------------------------------------------------------------------------------------------------------*/
-#backend-edit .ui-slider {
+#cloud-edit .ui-slider {
     width: 120px;
 }
-#backend-edit .state {
+#cloud-edit .state {
     position: relative;
     bottom: 11px;
     left: 24px;
 }
-#backend-edit .field-wrapper .ui-input-text,
-#backend-edit .field-wrapper #edit-title-ok {
+#cloud-edit .field-wrapper .ui-input-text,
+#cloud-edit .field-wrapper #edit-title-ok {
     float: left;
     display: block;
     box-sizing: border-box;
     margin: .4em 0 1em;
 }
-#backend-edit .field-wrapper .ui-input-text {
+#cloud-edit .field-wrapper .ui-input-text {
     width: calc(100% - 51px);
 }
-#backend-edit .field-wrapper #edit-title-ok {
+#cloud-edit .field-wrapper #edit-title-ok {
     padding: 5.5px 10px;
     width: initial;
     line-height: 21px;
 }
-#backend-edit .field-wrapper:after {
+#cloud-edit .field-wrapper:after {
     content: '';
     clear: both;
     display: table;
 }
 
-#backend-edit .ui-field-contain {
+#cloud-edit .ui-field-contain {
     overflow: visible;
     height: 50px;
     border-bottom: none;
     margin: 6px 0;
 }
 
-#backend-edit .button-back {
+#cloud-edit .button-back {
     margin: 0 auto;
 }
 
-#backend-edit .ui-input-text {
+#cloud-edit .ui-input-text {
     margin: .4em 0 1em;
 }
 
-#backend-delete-confirm label {
+#cloud-delete-confirm label {
     margin: 10px 0;
     text-align: center;
 }

@@ -7,7 +7,7 @@ Feature: Machines
 
   @machines-linode
   Scenario: Machine Actions Linode
-    Given "Linode" backend has been added
+    Given "Linode" cloud has been added
     Then Images counter should be greater than 0 within 80 seconds
     When I click the button "Machines"
     And I click the button "Create"
@@ -48,7 +48,7 @@ Feature: Machines
 
   @machines-rackspace
   Scenario: Machine Actions Rackspace
-    Given "Rackspace ORD" backend has been added
+    Given "Rackspace ORD" cloud has been added
     Then Images counter should be greater than 0 within 80 seconds
     When I click the button "Machines"
     And I click the button "Create"
@@ -90,7 +90,7 @@ Feature: Machines
 
   @machines-softlayer
   Scenario: Machine Actions SoftLayer
-    Given "SoftLayer" backend has been added
+    Given "SoftLayer" cloud has been added
     Then Images counter should be greater than 0 within 80 seconds
     When I click the button "Machines"
     And I click the button "Create"

@@ -122,7 +122,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 that.set('runningScript', true);
                 Mist.ajax.POST('/scripts/' + args.script.script.id, {
                     'machine_id': args.script.machine.id,
-                    'backend_id': args.script.machine.backend.id,
+                    'cloud_id': args.script.machine.cloud.id,
                     'params': args.script.parameters
                 }).error(function (message) {
                     Mist.notificationController.notify(message);

@@ -4,6 +4,48 @@ from selenium.common.exceptions import NoSuchElementException, StaleElementRefer
 from mist.io.tests.gui.features.steps.general import *
 
 
+@when(u'I check the sorting by "{sorting_param}"')
+def check_sorting(context, sorting_param):
+    """
+    Create dict with key the arg of the step definition
+    """
+
+    sort_map = {'name': 'div.machine-name', 'state': 'span.machine-state',
+                'cloud': 'div.machine-tags span.tag:nth-child(1)'}
+
+    sort_type = sorting_param
+    sorting_selector = sort_map[sort_type]
+
+    machines_elements = context.browser.find_elements_by_css_selector(
+        '#machine-list-container li ' + sorting_selector)
+    # list with machine's names
+    machines_names_list = [safe_get_element_text(machine_element) for
+                           machine_element in machines_elements]
+    # sorting the machine list
+    my_sorted_machines_list = sorted(machines_names_list)
+    # lists are sorted and they have the same number of elements
+    if my_sorted_machines_list == machines_names_list:
+        pass
+    else:
+        assert False, u'List is not sorted'
+
+
+@when(u'I clear the machines search bar')
+def clear_machines_search_bar(context):
+    search_bar_machine = context.browser.find_element_by_css_selector(
+        "div.machine-search-container "
+        "input.machine-search")
+    search_bar_machine.clear()
+
+
+@when(u'I fill in a "{name}" for specific machine name')
+def fill_specific_machine_name(context,name):
+    textfield = context.browser.find_element_by_id("create-machine-name")
+    specific_name = name
+    textfield.send_keys(specific_name)
+    sleep(1)
+
+
 @when(u'I fill in a random machine name')
 def fill_machine_mame(context):
     textfield = context.browser.find_element_by_id("create-machine-name")
@@ -34,7 +76,10 @@ def assert_machine_added(context, name, seconds):
     if "randomly_created" in name:
         machine_name = context.random_name
     else:
-        machine_name = name
+        if context.mist_config.get(name):
+            machine_name = name
+        else:
+            machine_name = name
 
     end_time = time() + int(seconds)
     while time() < end_time:
@@ -58,7 +103,7 @@ def assert_machine_state(context, name, state, seconds):
         machine = get_machine(context, machine_name)
         if machine:
             try:
-                if state in machine.text:
+                if state in safe_get_element_text(machine):
                     return
             except NoSuchElementException:
                 pass
@@ -89,7 +134,8 @@ def assert_machine_probed(context, name, seconds):
                 pass
             sleep(3)
 
-    assert False, u'%s machine is not probed within %s seconds' % (machine_name, seconds)
+    assert False, u'%s machine is not probed within %s seconds' % (
+                    machine_name, seconds)
 
 
 def get_machine(context, name):
@@ -98,7 +144,8 @@ def get_machine(context, name):
         machines = placeholder.find_elements_by_tag_name("li")
 
         for machine in machines:
-            if name in machine.text:
+            machine_text = safe_get_element_text(machine)
+            if name in machine_text:
                 return machine
 
         return None
@@ -125,9 +172,11 @@ def upload_my_key(context, new_key_name):
                                           'after 5 seconds'
             sleep(1)
     key_name = context.browser.find_element_by_id("key-add-id")
-    key_name.send_keys(context.mist_config['CREDENTIALS'][new_key_name]['key_name'])
+    key_name.send_keys(
+        context.mist_config['CREDENTIALS'][new_key_name]['key_name'])
     upload = context.browser.find_element_by_id("key-add-upload")
-    upload.send_keys(context.mist_config['CREDENTIALS'][new_key_name]['key_path'])
+    upload.send_keys(
+        context.mist_config['CREDENTIALS'][new_key_name]['key_path'])
     context.execute_steps(u'When I click the button "Add"')
 
 
@@ -136,7 +185,8 @@ def wait_for_loader_to_finish(context, seconds):
     rows = context.browser.find_elements_by_tag_name('tr')
     for row in rows:
         cells = row.find_elements_by_tag_name('td')
-        if cells[0].text == 'Last probed':
+        cells_text = safe_get_element_text(cells[0])
+        if cells_text == 'Last probed':
             end_time = time() + int(seconds)
             while time() < end_time:
                 try:
@@ -154,7 +204,8 @@ def success(context):
     try:
         popup = context.browser.find_element_by_id('machine-userPort-popup-popup')
         div = popup.find_element_by_class_name('message')
-        if div.text == 'Cannot connect as root on port 22':
+        div_text = safe_get_element_text(div)
+        if div_text == 'Cannot connect as root on port 22':
             raise ValueError('Could not connect with server with ssh key')
     except NoSuchElementException:
         pass
@@ -165,10 +216,12 @@ def check_probing(context):
     rows = context.browser.find_elements_by_tag_name('tr')
     for row in rows:
         cells = row.find_elements_by_tag_name('td')
-        if cells[0].text == 'Last probed':
-            message = cells[1].text.split('\n')[0].lower()
+        cells_zero_text = safe_get_element_text(cells[0])
+        if cells_zero_text == 'Last probed':
+            cells_one_text = safe_get_element_text(cells[1])
+            message = cells_one_text.split('\n')[0].lower()
             assert message == 'just now', "Probing of machine failed" \
-                                          "(message is: %s)" % cells[1].text
+                                          "(message is: %s)" % cells_one_text
             return
     assert False, "Could not find any line about probing"
 
@@ -178,7 +231,8 @@ def ssh_key_is_added(context, ssh_key_name):
     # first we have to find the keys button
     buttons = context.browser.find_elements_by_class_name('ui-btn')
     for button in buttons:
-        if 'add key' in button.text.lower():
+        button_text = safe_get_element_text(button)
+        if 'add key' in button_text.lower():
             # if there no keys then it will be called "Add key"
             context.execute_steps(u"""
                 Then I click the button "Add key"
@@ -188,7 +242,7 @@ def ssh_key_is_added(context, ssh_key_name):
             key_already_associated = False
             non_associated_keys = context.browser.find_element_by_id('non-associated-keys-popup').find_elements_by_tag_name('li')
             for non_associated_key in non_associated_keys:
-                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in non_associated_key.text.lower():
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in safe_get_element_text(non_associated_key).lower():
                     non_associated_key.click()
                     key_already_associated = True
                     break
@@ -207,26 +261,27 @@ def ssh_key_is_added(context, ssh_key_name):
             """)
             context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
             return
-        elif 'keys' in button.text.lower():
+        elif 'keys' in button_text.lower():
             # otherwise it will be called "? keys" where ? is the number of
             # saved keys. before adding the key we need to check if it's already
             # saved
             context.execute_steps(u'''
                 Then I click the button "%s"
                 And I expect for "machine-keys-panel" side panel to appear within max 4 seconds
-            ''' % button.text)
+            ''' % safe_get_element_text(button))
             machine_keys_list = context.browser.find_element_by_id("machine-keys")
             machines_keys = machine_keys_list.find_elements_by_class_name(
                 "small-list-item")
             checked_texts = []
             for machines_key in machines_keys:
-                if not machines_key.text or not machines_key.text.strip():
+                machines_key_text = safe_get_element_text(machines_key)
+                if not machines_key_text or not machines_key_text.strip():
                     # sometimes the code checks for the texts too fast and they
                     # haven't been fetched yet so we do a sleep
                     sleep(1)
-                checked_texts.append(machines_key.text)
+                checked_texts.append(machines_key_text)
                 if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']\
-                        in machines_key.text:
+                        in machines_key_text:
                     context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
                     context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
                     return
@@ -238,7 +293,7 @@ def ssh_key_is_added(context, ssh_key_name):
             key_already_associated = False
             non_associated_keys = context.browser.find_element_by_id('non-associated-keys-popup').find_elements_by_tag_name('li')
             for non_associated_key in non_associated_keys:
-                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in non_associated_key.text.lower():
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in safe_get_element_text(non_associated_key).lower():
                     non_associated_key.click()
                     key_already_associated = True
                     break
@@ -266,7 +321,8 @@ def update_lines(terminal, lines):
     all_lines = terminal.find_elements_by_tag_name('div')
     safety_counter = max_safety_count = 5
     for i in range(len(lines), len(all_lines)):
-        line = all_lines[i].text.rstrip().lstrip()
+        all_lines_text = safe_get_element_text(all_lines[i])
+        line = all_lines_text.rstrip().lstrip()
         if line:
             for j in range(0, max_safety_count - safety_counter):
                 lines.append(" ")
@@ -280,7 +336,8 @@ def update_lines(terminal, lines):
 def update_single_line(terminal, lines, index):
     assert index >= 0 and index < len(lines), "Wrong single line index %s" % index
     all_lines = terminal.find_elements_by_tag_name('div')
-    lines[index] = all_lines[index].text.rstrip().lstrip()
+    all_lines_text = safe_get_element_text(all_lines[index])
+    lines[index] = safe_get_element_text(all_lines_text).rstrip().lstrip()
 
 
 @then(u'I test the ssh connection')

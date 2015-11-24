@@ -13,8 +13,8 @@ define('app/routes/machines', ['app/routes/base'],
             documentTitle: 'mist.io - machines',
 
             exit: function() {
-                Mist.backendsController.model.forEach(function(backend) {
-                    backend.machines.model.setEach('selected', false);
+                Mist.cloudsController.model.forEach(function(cloud) {
+                    cloud.machines.model.setEach('selected', false);
                 });
             }
         });
