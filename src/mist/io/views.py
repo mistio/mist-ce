@@ -576,7 +576,7 @@ def machine_actions(request):
         elif action == 'rename':
             methods.rename_machine(user, cloud_id, machine_id, name)
         elif action == 'undefine':
-            methods.undefine_machine(user, cloud_id, machine_id, name)
+            methods.undefine_machine(user, cloud_id, machine_id)
         # return OK
         return methods.list_machines(user, cloud_id)
     raise BadRequestError()
