@@ -284,6 +284,8 @@ def add_cloud_v_2(user, title, provider, params):
         cloud_id, cloud = _add_cloud_vultr(title, provider, params)
     elif provider == 'vsphere':
         cloud_id, cloud = _add_cloud_vsphere(title, provider, params)
+    elif provider == 'packet':
+        cloud_id, cloud = _add_cloud_packet(title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -892,6 +894,24 @@ def _add_cloud_vultr(title, provider, params):
     return cloud_id, cloud
 
 
+def _add_cloud_packet(title, provider, params):
+    api_key = params.get('api_key', '')
+    if not api_key:
+        raise RequiredParameterMissingError('api_key')
+    project_id = params.get('project_id', '')
+
+    cloud = model.Cloud()
+    cloud.title = title
+    cloud.provider = provider
+    cloud.apikey = api_key
+    cloud.apisecret = api_key
+    cloud.enabled = True
+    cloud_id = cloud.get_id()
+    if project_id:
+        cloud.tenant_name = project_id
+    return cloud_id, cloud
+
+
 def _add_cloud_vsphere(title, provider, params):
     username = params.get('username', '')
     if not username:
@@ -1274,6 +1294,11 @@ def connect_provider(cloud):
                       region=cloud.region)
     elif cloud.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR]:
         conn = driver(cloud.apisecret)
+    elif cloud.provider == Provider.PACKET:
+        if cloud.tenant_name:
+            conn = driver(cloud.apisecret, project=cloud.tenant_name)
+        else:
+            conn = driver(cloud.apisecret)
     elif cloud.provider == Provider.GCE:
         conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
     elif cloud.provider == Provider.DOCKER:
@@ -1358,7 +1383,7 @@ def get_machine_actions(machine_from_api, conn, extra):
         if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                          Provider.NEPHOSCALE, Provider.SOFTLAYER,
                          Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                         Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR, 'bare_metal', 'coreos'):
+                         Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR, Provider.PACKET, 'bare_metal', 'coreos'):
             can_tag = False
 
     # for other states
@@ -1567,7 +1592,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    azure_port_bindings='', hostname='', plugins=None,
                    disk_size=None, disk_path=None, create_from_existing=None,
                    post_script_id='', post_script_params='', cloud_init='',
-                   associate_floating_ip=False, associate_floating_ip_subnet=None):
+                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1702,6 +1727,9 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         node = _create_machine_libvirt(conn, machine_name,
                                        disk_size, ram, cpu,
                                        image_id, disk_path, create_from_existing, networks)
+    elif conn.type == Provider.PACKET:
+        node = _create_machine_packet(conn, public_key, machine_name, image,
+                                         size, location, cloud_init, project_id)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -2239,30 +2267,54 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
 
     return node
 
-def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
-    """Create a machine in Vultr.
+
+def _create_machine_packet(conn, public_key, machine_name, image, size, location, cloud_init, project_id=None):
+    """Create a machine in Packet.net.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
 
     """
     key = public_key.replace('\n', '')
+    try:
+        conn.create_key_pair('mistio', key)
+    except:
+        # key exists and will be deployed
+        pass
 
-    auth = NodeAuthSSHKey(pubkey=key)
+    # if project_id is not specified, use the project for which the driver
+    # has been initiated. If driver hasn't been initiated with a project,
+    # then use the first one from the projects
+    ex_project_id = None
+    if not project_id:
+        if conn.project_id:
+            ex_project_id = conn.project_id
+        else:
+            try:
+                ex_project_id = conn.projects[0].id
+            except IndexError:
+                raise BadRequestError("You don't have any projects on packet.net")
+    else:
+        for project_obj in conn.projects:
+            if project_id in [project_obj.name, project_obj.id]:
+                ex_project_id = project_obj.id
+                break
+        if not ex_project_id:
+            raise BadRequestError("Project id is invalid")
 
     try:
         node = conn.create_node(
             name=machine_name,
-            image=image,
             size=size,
-            auth=auth,
-            location=location
+            image=image,
+            location=location,
+            ex_project_id=ex_project_id,
+            cloud_init=cloud_init
         )
     except Exception as e:
-        raise MachineCreationError("Vultr, got exception %s" % e, e)
+        raise MachineCreationError("Packet.net, got exception %s" % e, e)
 
     return node
-
 
 
 def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
@@ -3023,6 +3075,36 @@ def list_networks(user, cloud_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret['public'].append(ec2_network_to_dict(network))
+
+    if conn.type == 'libvirt':
+        # close connection with libvirt
+        conn.disconnect()
+    return ret
+
+
+def list_projects(user, cloud_id):
+    """List projects for each account.
+    Currently supported for Packet.net. For other providers
+    this returns an empty list
+    """
+
+    if cloud_id not in user.clouds:
+        raise CloudNotFoundError(cloud_id)
+    cloud = user.clouds[cloud_id]
+    conn = connect_provider(cloud)
+
+    ret = {}
+    if conn.type in [Provider.PACKET]:
+        projects = conn.ex_list_projects()
+    else:
+        projects = []
+
+    ret = [{'id': project.id,
+            'name': project.name,
+            'extra': project.extra
+            }
+           for project in projects]
+    return ret
 
     if conn.type == 'libvirt':
         # close connection with libvirt
@@ -4235,6 +4317,10 @@ def machine_name_validator(provider, name):
         if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
             raise MachineNameValidationError("machine name may only contain ASCII letters " + \
                 "or numbers, dashes and dots")
+    elif provider is Provider.PACKET:
+        if not re.search(r'^[0-9a-zA-Z-.]+$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and periods")
     elif provider == Provider.AZURE:
         pass
     elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:

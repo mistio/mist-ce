@@ -24,6 +24,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
+            newMachineProject: null,
             newMachineMonitoring: null,
             newMachineAssociateFloatingIp: true,
             newMachineDockerCommand: null,
@@ -122,6 +123,7 @@ define('app/controllers/machine_add', ['ember'],
                         this.newMachineKey,
                         this.newMachineCloudInit,
                         this.newMachineScript,
+                        this.newMachineProject,
                         this.newMachineMonitoring,
                         this.newMachineAssociateFloatingIp,
                         this.newMachineDockerEnvironment.trim(),
@@ -153,6 +155,7 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {'id' : 'Select Key'})
+                    .set('newMachineProject', '')
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
@@ -221,6 +224,7 @@ define('app/controllers/machine_add', ['ember'],
                 this.set('callback', null)
                     .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
+                    .set('newMachineProject', '')
                     .set('newMachineKey', {'title' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
@@ -248,6 +252,11 @@ define('app/controllers/machine_add', ['ember'],
                 // Sizes Check
                 if (this.newMachineProvider.sizes) {
                     if (this.newMachineProvider.sizes.model.length == 1) this.set('newMachineSize', this.newMachineProvider.sizes.model[0]);
+                }
+
+                // Projects Check
+                if (this.newMachineProvider.projects) {
+                    if (this.newMachineProvider.projects.model.length == 1) this.set('newMachineProject', this.newMachineProvider.projects.model[0]);
                 }
             },
 
@@ -281,7 +290,7 @@ define('app/controllers/machine_add', ['ember'],
 
             providerObserver: function() {
                 Ember.run.once(this, '_selectUnique');
-            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize'),
+            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize', 'newMachineProject'),
 
             sizeObserver: function() {
                 Ember.run.once(this, '_sizeError');

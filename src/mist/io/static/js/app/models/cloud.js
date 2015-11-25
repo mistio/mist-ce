@@ -1,12 +1,12 @@
 define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images', 'app/controllers/sizes',
-                              'app/controllers/locations','app/controllers/networks', 'ember'],
+                              'app/controllers/locations', 'app/controllers/projects', 'app/controllers/networks', 'ember'],
     /**
      *  Cloud Model
      *
      *  @returns Class
      */
     function (MachinesController, ImagesController, SizesController,
-        LocationsController, NetworksController) {
+        LocationsController, NetworksController, ProjectsController) {
         return Ember.Object.extend(Ember.Evented, {
 
             //
@@ -26,6 +26,7 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
             selectedNetworks: [],
 
             sizes: null,
+            projects: null,
             images: null,
             machines: null,
             locations: null,
@@ -103,6 +104,7 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
                     this.machines = MachinesController.create({cloud: this, model: []});
                     this.locations = LocationsController.create({cloud: this, model: []});
                     this.networks = NetworksController.create({cloud: this, model: []});
+                    this.projects = ProjectsController.create({cloud: this, model: []});
 
                     // Add events
                     this.sizes.on('onSizeListChange', this, '_updateSizeCount');

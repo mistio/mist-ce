@@ -181,7 +181,7 @@ class MainConnection(MistConnection):
                           ('list_images', tasks.ListImages()),
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
-                          ('list_locations', tasks.ListLocations()),):
+                          ('list_locations', tasks.ListLocations()), ('list_projects', tasks.ListProjects()),):
             for cloud_id in self.user.clouds:
                 if self.user.clouds[cloud_id].enabled:
                     cached = task.smart_delay(self.user.email, cloud_id)
@@ -234,7 +234,7 @@ class MainConnection(MistConnection):
         log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_networks', 'list_machines',
-                               'list_locations', 'ping']):
+                               'list_locations', 'list_projects', 'ping']):
             self.send(routing_key, result)
             if routing_key == 'probe':
                 log.warn('send probe')

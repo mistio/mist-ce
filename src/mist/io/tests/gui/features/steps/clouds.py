@@ -52,6 +52,8 @@ def given_cloud(context, cloud):
         creds = "INDONESIAN"
     elif "libvirt" in cloud.lower():
         creds = "LIBVIRT"
+    elif "packet.net" in cloud.lower():
+        creds = "PACKET"
     else:
         assert False, u'Could not find credentials for %s' % cloud
 
@@ -234,6 +236,11 @@ def cloud_creds(context, cloud):
         key_add_button = context.browser.find_element_by_id("key-add-ok")
         key_add_button.click()
         sleep(5)
+    elif "PACKET" in cloud:
+        api_key = context.browser.find_element_by_id("api_key")
+        for i in range(20):
+            api_key.send_keys(u'\ue003')
+        api_key.send_keys(context.mist_config['CREDENTIALS']['PACKET']['api_key'])
 
 
 @when(u'I rename the cloud to "{new_name}"')

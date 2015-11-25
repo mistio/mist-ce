@@ -42,7 +42,8 @@ define('app/controllers/machines', ['app/models/machine'],
             //  Methods
             //
 
-            newMachine: function(provider, name, image, size, location, key, cloud_init, script, monitoring, associateFloatingIp,
+
+            newMachine: function(provider, name, image, size, location, key, cloud_init, script, project, monitoring, associateFloatingIp,
                 dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtDiskSize, libvirtDiskPath, libvirtImagePath, libvirtExistingDiskPath) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
@@ -104,6 +105,8 @@ define('app/controllers/machines', ['app/models/machine'],
                         'script_params': scriptParams,
                         'image': image.id,
                         'location': location.id,
+                        //Packet.net
+                        'project': project.id || undefined,
                         // Linode specific
                         'disk': size.disk,
                         'image_extra': image.extra,

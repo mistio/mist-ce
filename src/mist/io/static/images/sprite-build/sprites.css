@@ -33,4 +33,5 @@ ilb { display: inline-block; }  .provider-vultr { background-image: url('icon-sp
 .provider-libvirt { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-libvirt { background-position: -0px -1466px; }
 .image-coreos { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .image-coreos { background-position: -0px -1514px; }
 .provider-vsphere { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-vsphere { background-position: -0px -1562px; }
-.image-cirros { background-image: url('icon-sprite-1432130152.png') !important; } .image-cirros { background-position: -0px -1610px; }
+.image-cirros { background-image: url('icon-sprite-1432130152.png') !important; } .image-cirros { background-position: 0px -1610px; }
+.provider-packet { background-image: url('icon-sprite-1432130152.png') !important; } .provider-packet { background-position: 0px -1652px; }

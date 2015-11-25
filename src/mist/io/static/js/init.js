@@ -37,6 +37,7 @@ var loadApp = function (
     ScriptEditController,
     ScriptRunController,
     ScriptsController,
+    ProjectsController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -123,6 +124,7 @@ var loadApp = function (
     App.set('scriptAddController', ScriptAddController.create());
     App.set('scriptRunController', ScriptRunController.create());
     App.set('scriptEditController', ScriptEditController.create());
+    App.set('projectsController', ProjectsController.create());
     App.set('machineRunScriptController', MachineRunScriptController.create());
     App.set('machineImageCreateController', MachineImageCreateController.create());
 
@@ -344,6 +346,11 @@ var setupMainChannel = function(socket, callback) {
         if (callback)
             callback();
         callback = null;
+    })
+    .on('list_projects', function(data) {
+        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+        if (cloud)
+            cloud.projects.setModel(data.projects);
     })
     .on('list_sizes', function (data) {
         var cloud = Mist.cloudsController.getCloud(data.cloud_id);
