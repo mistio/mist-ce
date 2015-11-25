@@ -1,19 +1,19 @@
 
-#add-backend.ui-collapsible-collapsed {
+#add-cloud.ui-collapsible-collapsed {
     width: 215px;
 }
 
-#add-backend {
+#add-cloud {
     width: 281px;
     margin:  0 0 6px 0 !important;
 }
 
-#add-backend-overlay {
+#add-cloud-overlay {
     z-index: 899;
     min-height: 800px;
 }
 
-#no-collection #add-backend-overlay {
+#no-collection #add-cloud-overlay {
     min-height: 1200px;
 }
 
@@ -23,64 +23,64 @@ h4.pendingSelect > a {
     text-transform: uppercase;
 }
 
-.mist-select + div#backend-add-fields {
+.mist-select + div#cloud-add-fields {
     display: none !important;
     background-color: #FAF9F4;
     padding: 0 1em 1em;
 }
 
-.mist-select.ui-collapsible-collapsed + div#backend-add-fields {
+.mist-select.ui-collapsible-collapsed + div#cloud-add-fields {
     display: block !important;
 }
 
-#backend-add-fields .ui-listview {
+#cloud-add-fields .ui-listview {
     margin: 0;
 }
 
-#backend-add #new-backend-provider .ui-listview {
+#cloud-add #new-cloud-provider .ui-listview {
     border-radius: 0;
 }
 
-#backend-add #new-backend-provider .ui-collapsible-heading {
+#cloud-add #new-cloud-provider .ui-collapsible-heading {
     text-transform: none;
 }
 
-#backend-add h4.select-provider a,
-#backend-add h4 a:hover,
-#backend-add ul li a:hover {
+#cloud-add h4.select-provider a,
+#cloud-add h4 a:hover,
+#cloud-add ul li a:hover {
     background-color: #66C2E0;
     border-color: #66C2E0;
     color: #fff !important;
     text-shadow: 0 0 0 #66C2E0;
 }
 
-#backend-add h4.select-provider a:active,
-#backend-add h4 a:active,
-#backend-add ul li a:active {
+#cloud-add h4.select-provider a:active,
+#cloud-add h4 a:active,
+#cloud-add ul li a:active {
     background-color: #66C2E0;
     border-color: #66C2E0;
     text-shadow: 0 0 0 #66C2E0;
 }
 
-#backend-add #new-backend-provider h4.ui-collapsible-heading {
+#cloud-add #new-cloud-provider h4.ui-collapsible-heading {
     display: none;
 }
 
-#backend-add #new-backend-provider h4.ui-collapsible-heading.ui-collapsible-heading-collapsed {
+#cloud-add #new-cloud-provider h4.ui-collapsible-heading.ui-collapsible-heading-collapsed {
     display: block;
 }
-#backend-add .field-wrapper .ui-collapsible-content .ui-listview {
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview {
     margin: 0;
     max-height: 120px;
     overflow-y: auto;
 }
-#backend-add #new-backend-provider h4.ui-collapsible-heading.ui-collapsible-heading-collapsed > a{
+#cloud-add #new-cloud-provider h4.ui-collapsible-heading.ui-collapsible-heading-collapsed > a{
     text-align: center !important;
     padding-right: 22px;
     padding-left: 42px;
 }
 
-#backend-add .field-wrapper .ui-collapsible-heading > a {
+#cloud-add .field-wrapper .ui-collapsible-heading > a {
     background-color: #fff !important;
     border-color: #b5b5b5 !important;
     color: #444 !important;
@@ -88,33 +88,33 @@ h4.pendingSelect > a {
     padding-left: .75em !important;
     text-transform: none;
 }
-#backend-add .field-wrapper .ui-collapsible-heading > a:after {
+#cloud-add .field-wrapper .ui-collapsible-heading > a:after {
     background-image: none;
     font-size: 14px;
     margin-top: -6px;
     color: #444;
 }
-#backend-add .field-wrapper .ui-collapsible-heading.ui-collapsible-heading-collapsed > a:after {
+#cloud-add .field-wrapper .ui-collapsible-heading.ui-collapsible-heading-collapsed > a:after {
     content: '\0072';
 }
-#backend-add .field-wrapper .ui-collapsible-heading > a:after {
+#cloud-add .field-wrapper .ui-collapsible-heading > a:after {
     content: '\0073';
 }
-#backend-add .field-wrapper.is-file.filled .ui-btn {
+#cloud-add .field-wrapper.is-file.filled .ui-btn {
     background-color: #FAF9F4;
     border-color: #FAF9F4;
     color: #444;
     font-size: 16px;
 }
-#backend-add .field-wrapper.is-file.filled .last-child .ui-btn {
+#cloud-add .field-wrapper.is-file.filled .last-child .ui-btn {
     text-indent: initial;
 }
-#backend-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn:hover,
-#backend-add .field-wrapper.is-file.filled .first-child .ui-btn:hover {
+#cloud-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn:hover,
+#cloud-add .field-wrapper.is-file.filled .first-child .ui-btn:hover {
     color: #444 !important;
 }
-#backend-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn:after,
-#backend-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
+#cloud-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn:after,
+#cloud-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
     font-family: 'MistIcons';
     content: '\0047';
     right: 7px;
@@ -125,64 +125,64 @@ h4.pendingSelect > a {
     text-transform: none;
     background-image: none;
 }
-#backend-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
+#cloud-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
     margin-left: -10px;
     color: #b5b5b5;
 }
-#backend-add .field-wrapper .filled .ui-collapsible-heading-toggle {
+#cloud-add .field-wrapper .filled .ui-collapsible-heading-toggle {
     color: #444 !important;
     background-color: #fff !important;
     border-color: #b5b5b5 !important;
 }
-#backend-add .field-wrapper .ui-collapsible-content .ui-listview {
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview {
     margin: 0;
     border: 1px solid #b5b5b5;
     margin: -1px 0 0 !important;
 }
-#backend-add .field-wrapper.empty.required .ui-collapsible-heading > a {
+#cloud-add .field-wrapper.empty.required .ui-collapsible-heading > a {
     text-transform: titlecase;
     text-align: left !important;
     color: #7f7f7f !important;
 }
-#backend-add .field-wrapper.empty.required .ui-collapsible-heading > a,
-#backend-add .field-wrapper.empty.required .ui-collapsible-content > .ui-listview {
+#cloud-add .field-wrapper.empty.required .ui-collapsible-heading > a,
+#cloud-add .field-wrapper.empty.required .ui-collapsible-content > .ui-listview {
     border-color: #0099cc !important;
 }
-#backend-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn {
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn {
     background-color: #fff;
     padding-left: .75em !important;
     border: none;
 }
-#backend-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn.ui-btn-d {
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn.ui-btn-d {
     background-color: #0099cc;
     color: #fff !important;
 }
-#backend-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn:hover {
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn:hover {
     background-color: #66C2E0;
     color: #fff !important;
 }
-#backend-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn,
-#backend-add .field-wrapper .ui-collapsible-heading-toggle {
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn,
+#cloud-add .field-wrapper .ui-collapsible-heading-toggle {
     line-height: 21px;
     padding-top: 5.5px !important;
     padding-bottom: 5.5px !important;
     font-size: 14px;
 }
-#backend-add ul {
+#cloud-add ul {
     border-top-width: 0px;
 }
 
-#backend-add.ui-content {
+#cloud-add.ui-content {
     background-color: #FAF9F4;
     padding: 0;
     width: 281px;
     margin-top: -8px;
 }
 
-#backend-add label {
+#cloud-add label {
     margin-top: 1em;
 }
-#backend-add ul.mist-select {
+#cloud-add ul.mist-select {
     max-height: 400px;
     min-width: 280px;
     overflow-y: scroll;
@@ -190,7 +190,7 @@ h4.pendingSelect > a {
     border-radius: 0 0 .5em .5em;
 }
 
-#backend-add .ui-slider {
+#cloud-add .ui-slider {
     width: 100%;
     margin-top: 8px;
     margin-bottom: 8px;
@@ -201,43 +201,43 @@ h4.pendingSelect > a {
     height: 34px;
 }
 
-#backend-add .docker .first-child .ui-slider {
+#cloud-add .docker .first-child .ui-slider {
     width: 100%;
     margin-top: 8px;
 }
 
-#backend-add-advanced {
+#cloud-add-advanced {
 	display: none;
 }
 
-#backend-add #opentack-advanced-wrapper {
+#cloud-add #opentack-advanced-wrapper {
     text-align: center;
     margin-bottom: -20px;
 }
 
-#backend-add .toggle-field {
+#cloud-add .toggle-field {
     width: 100%;
 }
 
-#backend-add .on,
-#backend-add .off {
+#cloud-add .on,
+#cloud-add .off {
     display: block;
     width: 100%;
 }
 
-#backend-add .on {
+#cloud-add .on {
     display: none;
 }
 
-#backend-add .on {
+#cloud-add .on {
     margin-top: 20px;
 }
 
-#backend-add .docker.on label {
+#cloud-add .docker.on label {
     display: none;
 }
 
-#backend-add .label-wrapper {
+#cloud-add .label-wrapper {
     display: table;
     width: 100%;
 }
@@ -252,13 +252,13 @@ h4.pendingSelect > a {
     font-weight: normal;
 }
 
-#backend-add .ui-checkbox label:hover {
+#cloud-add .ui-checkbox label:hover {
     background-color: #FAF9F4;
     border-color: #FAF9F4;
     color: #000000 !important;
 }
 
-#backend-add .ui-checkbox label:after {
+#cloud-add .ui-checkbox label:after {
     background-image: none !important;
     background-color: transparent !important;
     opacity: 1;
@@ -266,27 +266,27 @@ h4.pendingSelect > a {
     transition: color .2s linear;
 }
 
-#backend-add .ui-checkbox label.ui-checkbox-on:after {
+#cloud-add .ui-checkbox label.ui-checkbox-on:after {
     color: #000;
 }
 
-#backend-add .ui-checkbox label.ui-checkbox-off:after {
+#cloud-add .ui-checkbox label.ui-checkbox-off:after {
     color: #d1d1d1;
 }
 
-#backend-add .ui-checkbox label.ui-checkbox-off:hover:after {
+#cloud-add .ui-checkbox label.ui-checkbox-off:hover:after {
     color: #444444 !important;
 }
 
-#backend-add .ok-cancel {
+#cloud-add .ok-cancel {
     margin-top: 16px;
 }
 
-#backend-add-fields .ui-collapsible-heading-toggle {
+#cloud-add-fields .ui-collapsible-heading-toggle {
     font-size: 16px;
 }
 
-#backend-add-fields .ui-collapsible-heading-toggle:hover {
+#cloud-add-fields .ui-collapsible-heading-toggle:hover {
     border-color: #0099cc;
 }
 

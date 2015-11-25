@@ -33,14 +33,14 @@
 
                 {{#unless Mist.machineAddController.selectedImage}}
                 <ul data-role="listview" >
-                    {{#each Mist.backendsController.model as |backend|}}
-                        {{#if backend.canCreateMachine}}
+                    {{#each Mist.cloudsController.model as |cloud|}}
+                        {{#if cloud.canCreateMachine}}
                             <li data-icon="false">
-                                <a {{action "selectProvider" backend target=view}} title="{{backend.title}}">
+                                <a {{action "selectProvider" cloud target=view}} title="{{cloud.title}}">
                                     <span class="provider-icon-small">
-                                        <span class={{backend.className}}></span>
+                                        <span class={{cloud.className}}></span>
                                     </span>
-                                    {{backend.title}}
+                                    {{cloud.title}}
                                 </a>
                             </li>
                         {{/if}}
@@ -178,6 +178,37 @@
                 </div>
             </div>
         </div>
+
+        {{#if view.hasPacket}}
+        <div id="packet" class="{{if Mist.machineAddController.newMachineProject 'filled' 'empty'}} required">
+            <div id="create-machine-project" >
+                <label>Project</label>
+                <div
+                     data-role="collapsible"
+                     data-iconpos="right"
+                     data-collapsed-icon="carat-d"
+                     data-expanded-icon="carat-u"
+
+                     class="mist-select">
+                    <h4>
+                        {{#if Mist.machineAddController.newMachineProject.name}}
+                        {{Mist.machineAddController.newMachineProject.name}}
+                        {{else}}
+                        Select
+                        {{/if}}
+                    </h4>
+
+                    <ul data-role="listview">
+                        {{#each Mist.machineAddController.newMachineProvider.projects.model as |project|}}
+                            <li data-icon="false">
+                                <a {{action "selectProject" project target=view}}>{{project.name}}</a>
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {{/if}}
 
         <!-- Docker Specific -->
         {{#if view.hasDocker}}

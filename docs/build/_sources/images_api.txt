@@ -1,12 +1,12 @@
-.. http:get:: /backends/{backend_id}/images
+.. http:get:: /clouds/{cloud_id}/images
 
-   List available images for this backend
+   List available images for this cloud
 
    **Example request**:
 
    .. sourcecode:: http
 
-      GET /backends/2tK74h4mXbjjLlkjjO4SHn3/images
+      GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/images
       Host: mist.io
       Accept: application/json; charset=UTF-8
 
@@ -16,7 +16,7 @@
 
    :jsonparam string search_term:  *not required*
    If search_term is given, mist will return only images that include the search term, otherwise
-   mist will return all available images for the given backend. If the given backend is an EC2 Backend, mist will
+   mist will return all available images for the given cloud. If the given cloud is an EC2 Cloud, mist will
    search through all EC2 images including community and custom images.
 
    **Example response**:

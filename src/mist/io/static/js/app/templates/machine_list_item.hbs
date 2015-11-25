@@ -1,11 +1,11 @@
 {{#unless view.machine.isGhost}}
-    <label>{{view Mist.Checkbox checked=machine.selected}}</label>
+    <label title="select machine">{{view Mist.Checkbox checked=machine.selected}}</label>
     {{#link-to "machine" machine}}
 
         <div class="ui-grid-b">
             <div class="ui-block-a machine-name">{{machine.name}}</div>
 
-            <span class="ui-block-b machine-state">
+            <span class="ui-block-b machine-state" title="machine state"> 
                 {{#unless machine.isUnknown}}
                 <span class={{view.machine.state}}>
                 {{machine.state}}
@@ -22,27 +22,34 @@
             <div class="ui-block-c machine-leds">
 
                 {{#unless machine.pendingCreation}}
-                    <span class="icon-dummy monitoring-state"></span>
+                    <span class="icon-dummy monitoring-state" title="{{monitoringTooltip}}"></span>
 
                     <div class="{{machine.probing}} {{machine.probed}}">
-                        <div class="loadleds">
-                            <div class="{{machine.loadavg15}} led">
+                        <div class="machineload">
+                        	{{#if machine.loadavg}}
+                            <div class="loadleds" title="load average {{machine.loadavg}}">
+                                <div class="{{machine.loadavg15}} led">
+                                </div>
+                                <div class="{{machine.loadavg5}} led">
+                                </div>
+                                <div class="{{machine.loadavg1}} led">
+                                </div>
                             </div>
-                            <div class="{{machine.loadavg5}} led">
-                            </div>
-                            <div class="{{machine.loadavg1}} led">
-                            </div>
+                            {{/if}}
                         </div>
-
-                        <div class="netleds">
-                            <div class="{{machine.netled4}} netled1">
+                        <div class="machinenet">
+                            {{#if machine.latency}}
+                            <div class="netleds" title="round-trip time {{machine.latency}}ms">
+                                <div class="{{machine.netled4}} netled1">
+                                </div>
+                                <div class="{{machine.netled3}} netled2">
+                                </div>
+                                <div class="{{machine.netled2}} netled3">
+                                </div>
+                                <div class="{{machine.netled1}} netled4">
+                                </div>
                             </div>
-                            <div class="{{machine.netled3}} netled2">
-                            </div>
-                            <div class="{{machine.netled2}} netled3">
-                            </div>
-                            <div class="{{machine.netled1}} netled4">
-                            </div>
+                            {{/if}}
                         </div>
                     </div>
                 {{/unless}}
@@ -50,9 +57,9 @@
             </div>
 
             <div class="ui-block-c machine-tags">
-                <span class="tag">{{machine.backend.title}}</span>
+                <span class="tag" title="machine cloud">{{machine.cloud.title}}</span>
                 {{#each machine.tags as |tag|}}
-					<span class="tag pairs">{{tag.key}}{{#if tag.value}}={{tag.value}}{{/if}}</span>
+					<span class="tag pairs" title="machine tags">{{tag.key}}{{#if tag.value}}={{tag.value}}{{/if}}</span>
                 {{/each}}
             </div>
 
@@ -65,7 +72,7 @@
         <div class="ui-grid-b">
             <div class="ui-block-a machine-name">{{machine.name}}</div>
 
-            <span class="ui-block-b machine-state">
+            <span class="ui-block-b machine-state" title="machine state"> 
                 <span>{{machine.state}}</span>
             </span>
 

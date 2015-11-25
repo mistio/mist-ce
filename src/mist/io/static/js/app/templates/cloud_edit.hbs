@@ -1,13 +1,13 @@
 <!-- Popup Overlay -->
 
-<div id="backend-edit-screen"
+<div id="cloud-edit-screen"
     class="ui-popup-screen
         ui-overlay-b
         ui-screen-hidden">
 </div>
 
 <!-- Popup Wrapper -->
-<div id="backend-edit-popup"
+<div id="cloud-edit-popup"
      class="pop
         ui-popup-container
         ui-popup-hidden
@@ -15,7 +15,7 @@
 
     <!-- Popup -->
 
-    <div id="backend-edit"
+    <div id="cloud-edit"
          class="mid-popup
             ui-popup
             ui-body-a
@@ -38,37 +38,37 @@
 
         <div role="main" class="ui-content" data-theme="a">
 
-            <!-- New backend title text field -->
+            <!-- New cloud title text field -->
 
             <label for=newTitle>Title</label>
             <form {{action "renameClicked" on="submit" target=view}}>
-                <div class="field-wrapper {{if Mist.backendEditController.newTitle 'filled' 'empty'}} required">
-                    {{view Mist.TextField value=Mist.backendEditController.newTitle}}
+                <div class="field-wrapper {{if Mist.cloudEditController.newTitle 'filled' 'empty'}} required">
+                    {{view Mist.TextField value=Mist.cloudEditController.newTitle}}
 
                     <button type="submit" id="edit-title-ok" class="ui-btn ui-btn-d ui-caps">Ok</button>
                 </div>
             </form>      
 
-            <!-- Backend state toggle switch -->
+            <!-- Cloud state toggle switch -->
 
             <label for=newTitle>State</label>
             <div class="ui-field-contain">
-                <select id="backend-toggle" data-role="slider"
+                <select id="cloud-toggle" data-role="slider"
                     {{action "stateToggleSwitched" target=view on="change"}}>
                         <option value="0">Disabled</option>
                         <option value="1">Enabled</option>
                 </select>
-                <span class="state">{{Mist.backendEditController.backend.state}}</span>
+                <span class="state">{{Mist.cloudEditController.cloud.state}}</span>
             </div>
 
-            {{#if Mist.backendsController.deletingBackend}}
+            {{#if Mist.cloudsController.deletingCloud}}
                 <div class="ajax-loader"></div>
             {{/if}}
 
-            <!-- Copyable backend ID -->
+            <!-- Copyable cloud ID -->
 
             <label >ID</label>
-            <input type="text" readonly="readonly"  value={{Mist.backendEditController.backend.id}}>
+            <input type="text" readonly="readonly"  value={{Mist.cloudEditController.cloud.id}}>
 
             <!-- Delete button - Back button -->
 
@@ -81,7 +81,7 @@
 
             <!-- Delete confirmation -->
 
-            <div id="backend-delete-confirm" style="display:none">
+            <div id="cloud-delete-confirm" style="display:none">
                 <label>Confirm cloud removal?</label>
                 <label id="monitoring-message" style="display:none">There are monitored machines.
                     <br />Monitoring for these will be disabled

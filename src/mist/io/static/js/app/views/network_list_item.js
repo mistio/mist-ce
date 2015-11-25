@@ -18,8 +18,8 @@ define('app/views/network_list_item', ['app/views/list_item'],
 			 */
 
 			isDisabled: function() {
-                return !this.network.get('backend.isOpenStack');
-            }.property('network.backend.isOpenStack'),
+                return !this.network.get('cloud.isOpenStack');
+            }.property('network.cloud.isOpenStack'),
 
 			/**
 			 *

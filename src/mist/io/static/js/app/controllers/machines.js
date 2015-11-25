@@ -13,7 +13,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
             model: [],
             loading: null,
-            backend: null,
+            cloud: null,
             failCounter: null,
             addingMachine: null,
             startingMachine: null,
@@ -41,14 +41,14 @@ define('app/controllers/machines', ['app/models/machine'],
             //  Methods
             //
 
-            newMachine: function(name, image, size, location, key, cloud_init, script, monitoring, associateFloatingIp,
+            newMachine: function(name, image, size, location, key, cloud_init, script, project, monitoring, associateFloatingIp,
                 dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
                 // the server
                 var dummyMachine = Machine.create({
                     'state': 'pending',
-                    'backend': this.backend,
+                    'cloud': this.cloud,
                     'name': name,
                     'image': image,
                     'id': -1,
@@ -63,7 +63,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
                 // Construct array of network ids for openstack
                 var networks = [];
-                this.backend.networks.model.forEach(function (network) {
+                this.cloud.networks.model.forEach(function (network) {
                     if (network.selected)
                         networks.push(network.id);
                 });
@@ -91,7 +91,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 }
 
                 this.set('addingMachine', true);
-                Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
+                Mist.ajax.POST('clouds/' + this.cloud.id + '/machines', {
                         'name': name,
                         'key': key ? key.id : null,
                         'size': size.id,
@@ -101,6 +101,8 @@ define('app/controllers/machines', ['app/models/machine'],
                         'script_params': scriptParams,
                         'image': image.id,
                         'location': location.id,
+                        //Packet.net
+                        'project': project.id || undefined,
                         // Linode specific
                         'disk': size.disk,
                         'image_extra': image.extra,
@@ -119,11 +121,11 @@ define('app/controllers/machines', ['app/models/machine'],
                         'docker_port_bindings': portBindings,
                         'azure_port_bindings': azurePorts
                 }).success(function (machine) {
-                    machine.backend = that.backend;
+                    machine.cloud = that.cloud;
                     // Nephoscale returns machine id on request success,
                     // but the machine is not listed on the next list_machines.
                     // This makes the machine dissappear from the UI.
-                    if (that.backend.provider != 'nephoscale')
+                    if (that.cloud.provider != 'nephoscale')
                         that._createMachine(machine, key, dummyMachine);
                     else
                         dummyMachine.set('pendingCreation', false);
@@ -142,7 +144,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('stopped');
                 machine.lockOn('pending');
                 this.set('shutingdownMachine', true);
-                Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
                     'action' : 'stop'
                 }).success(function() {
                     //that._shutdownMachine(machineId);
@@ -163,7 +165,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.lockOn('pending');
                 this.set('destroyingMachine', true);
                 machine.set('beingDestroyed', true);
-                Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {
                     //that._destroyMachine(machineId);
@@ -184,7 +186,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('running');
                 machine.lockOn('rebooting');
                 this.set('rebootingMachine', true);
-                Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
                     'action' : 'reboot'
                 }).success(function() {
                     //that.rebootMachine(machineId);
@@ -204,7 +206,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('running');
                 machine.lockOn('pending');
                 this.set('startingMachine', true);
-                Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
                     'action' : 'start'
                 }).success(function() {
                     //that.startMachine(machineId);
@@ -272,13 +274,13 @@ define('app/controllers/machines', ['app/models/machine'],
                         } else {
 
                             // Add new machine
-                            machine.backend = that.backend;
+                            machine.cloud = that.cloud;
                             that.model.pushObject(Machine.create(machine));
                         }
                     });
 
                     that._updateMonitoredMachines();
-                    Mist.backendsController._updateMachines();
+                    Mist.cloudsController._updateMachines();
                     that.trigger('onMachineListChange');
                 });
             },
@@ -323,7 +325,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     // Pass machine reference to rules
                     Mist.rulesController.model.forEach(function (rule) {
                         if (rule.machine && rule.machine.id) return;
-                        if (machine.equals([rule.backend, rule.machine]))
+                        if (machine.equals([rule.cloud, rule.machine]))
                             rule.set('machine', machine);
                     });
 

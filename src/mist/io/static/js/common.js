@@ -771,6 +771,26 @@ var PROVIDER_MAP = {
         },
     ],
 
+    packet: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Packet.net',
+        },
+        {
+            name: 'api_key',
+            type: 'password',
+            helpText: 'You can find your API Token on the Packet.net portal'
+        },
+        {
+            name: 'project_id',
+            type: 'text',
+            label: 'Project',
+            optional: true,
+            helpText: 'Optionally specify the project name'
+        }
+    ],
+
     docker: [
         {
             name: 'title',
@@ -1197,5 +1217,8 @@ var OS_MAP = [
     ],
     [
         ['cirros'], 'cirros'
+    ],
+    [
+        ['packet', 'packet']
     ]
 ];

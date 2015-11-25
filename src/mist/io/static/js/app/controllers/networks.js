@@ -17,9 +17,9 @@ define('app/controllers/networks', [
             //  Properties
             //
 
-            backend: null,
+            cloud: null,
             baseModel: NetworkModel,
-            passOnProperties: ['backend'],
+            passOnProperties: ['cloud'],
 
 
             //
@@ -28,12 +28,12 @@ define('app/controllers/networks', [
 
             associateIP: function (args) {
                 var machineId;
-                if (args.machine.backend.provider == 'nephoscale')
+                if (args.machine.cloud.provider == 'nephoscale')
                     machineId = args.machine.extra.id;
                 else
                     machineId = args.machine.id;
 
-                var url = '/backends/' + this.backend.id +
+                var url = '/clouds/' + this.cloud.id +
                     '/networks/' + args.network.id;
 
                 var that = this;
@@ -53,7 +53,7 @@ define('app/controllers/networks', [
             },
 
             reserveIP: function (args) {
-                var url = '/backends/' + this.backend.id +
+                var url = '/clouds/' + this.cloud.id +
                 '/networks/' + args.network.id;
 
                 var that = this;
@@ -75,7 +75,7 @@ define('app/controllers/networks', [
             deleteNetwork: function (networkId, callback) {
                 var that = this;
                 that.set('deletingNetwork', true);
-                var url = '/backends/' + this.backend.id +
+                var url = '/clouds/' + this.cloud.id +
                     '/networks/' + networkId;
                 Mist.ajax.DELETE(url)
                 .success(function () {

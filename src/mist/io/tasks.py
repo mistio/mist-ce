@@ -64,25 +64,25 @@ app.conf.update(**config.CELERY_SETTINGS)
 
 
 @app.task
-def update_machine_count(email, backend_id, machine_count):
+def update_machine_count(email, cloud_id, machine_count):
     if not multi_user:
         return
 
     user = user_from_email(email)
     with user.lock_n_load():
-        user.backends[backend_id].machine_count = machine_count
+        user.clouds[cloud_id].machine_count = machine_count
         user.total_machine_count = sum(
-            [backend.machine_count for backend in user.backends.values()]
+            [cloud.machine_count for cloud in user.clouds.values()]
         )
         user.save()
 
 
 @app.task
-def ssh_command(email, backend_id, machine_id, host, command,
+def ssh_command(email, cloud_id, machine_id, host, command,
                       key_id=None, username=None, password=None, port=22):
     user = user_from_email(email)
     shell = Shell(host)
-    key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
+    key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id,
                                            key_id, username, password, port)
     retval, output = shell.command(command)
     shell.disconnect()
@@ -93,7 +93,7 @@ def ssh_command(email, backend_id, machine_id, host, command,
 
 
 @app.task(bind=True, default_retry_delay=3*60)
-def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
+def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
                       key_id=None, username=None, password=None, port=22,
                       script_id='', script_params='', job_id=None,
                       hostname='', plugins=None,
@@ -114,12 +114,12 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
     user = user_from_email(email)
     tmp_log = lambda msg, *args: log.error('Post deploy: %s' % msg, *args)
     tmp_log('Entering post deploy steps for %s %s %s',
-            user.email, backend_id, machine_id)
+            user.email, cloud_id, machine_id)
     try:
         # find the node we're looking for and get its hostname
         node = None
         try:
-            conn = connect_provider(user.backends[backend_id])
+            conn = connect_provider(user.clouds[cloud_id])
             nodes = conn.list_nodes() # TODO: use cache
             for n in nodes:
                 if n.id == machine_id:
@@ -144,15 +144,15 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             # to be able to enable monitoring
             tmp_log('attempting to connect to shell')
             key_id, ssh_user = shell.autoconfigure(
-                user, backend_id, node.id, key_id, username, password, port
+                user, cloud_id, node.id, key_id, username, password, port
             )
             tmp_log('connected to shell')
-            result = probe_ssh_only(user, backend_id, machine_id, host=None,
+            result = probe_ssh_only(user, cloud_id, machine_id, host=None,
                            key_id=key_id, ssh_user=ssh_user, shell=shell)
             log_dict = {
                     'email': email,
                     'event_type': 'job',
-                    'backend_id': backend_id,
+                    'cloud_id': cloud_id,
                     'machine_id': machine_id,
                     'job_id': job_id,
                     'host': host,
@@ -161,9 +161,9 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                 }
 
             log_event(action='probe', result=result, **log_dict)
-            backend = user.backends[backend_id]
-            msg = "Backend:\n  Name: %s\n  Id: %s\n" % (backend.title,
-                                                        backend_id)
+            cloud = user.clouds[cloud_id]
+            msg = "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title,
+                                                        cloud_id)
             msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name,
                                                              node.id)
 
@@ -181,7 +181,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             if script_id and multi_user:
                 tmp_log('will run script_id %s', script_id)
                 ret = run_script.run(
-                    user.email, script_id, backend_id, machine_id,
+                    user.email, script_id, cloud_id, machine_id,
                     params=script_params, host=host, job_id=job_id
                 )
                 error = ret['error']
@@ -198,7 +198,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
                                                   else 'succeeded')
                 error = retval > 0
                 notify_user(user, title,
-                            backend_id=backend_id,
+                            cloud_id=cloud_id,
                             machine_id=machine_id,
                             machine_name=node.name,
                             command=command,
@@ -217,7 +217,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
 
             if monitoring:
                 try:
-                    enable_monitoring(user, backend_id, node.id,
+                    enable_monitoring(user, cloud_id, node.id,
                         name=node.name, dns_name=node.extra.get('dns_name',''),
                         public_ips=ips, no_ssh=False, dry=False, job_id=job_id,
                         plugins=plugins, deploy_async=False,
@@ -233,7 +233,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
             if post_script_id and multi_user:
                 tmp_log('will run post_script_id %s', post_script_id)
                 ret = run_script.run(
-                    user.email, post_script_id, backend_id, machine_id,
+                    user.email, post_script_id, cloud_id, machine_id,
                     params=post_script_params, host=host, job_id=job_id,
                     action_prefix='post_',
                 )
@@ -250,12 +250,12 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
         if str(exc).startswith('Retry'):
             raise
         notify_user(user, "Deployment script failed for machine %s" % machine_id)
-        notify_admin("Deployment script failed for machine %s in backend %s by user %s" % (machine_id, backend_id, email), repr(exc))
+        notify_admin("Deployment script failed for machine %s in cloud %s by user %s" % (machine_id, cloud_id, email), repr(exc))
         log_event(
             email=email,
             event_type='job',
             action='post_deploy_finished',
-            backend_id=backend_id,
+            cloud_id=cloud_id,
             machine_id=machine_id,
             enable_monitoring=bool(monitoring),
             command=command,
@@ -264,7 +264,7 @@ def post_deploy_steps(self, email, backend_id, machine_id, monitoring, command,
         )
 
 @app.task(bind=True, default_retry_delay=2*60)
-def hpcloud_post_create_steps(self, email, backend_id, machine_id, monitoring,
+def hpcloud_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                               command, key_id, username, password, public_key,
                               script_id='', script_params='', job_id=None,
                               hostname='', plugins=None,
@@ -273,7 +273,7 @@ def hpcloud_post_create_steps(self, email, backend_id, machine_id, monitoring,
     user = user_from_email(email)
 
     try:
-        conn = connect_provider(user.backends[backend_id])
+        conn = connect_provider(user.clouds[cloud_id])
         nodes = conn.list_nodes()
         node = None
 
@@ -288,7 +288,7 @@ def hpcloud_post_create_steps(self, email, backend_id, machine_id, monitoring,
             host = ips[0]
 
             post_deploy_steps.delay(
-                email, backend_id, machine_id, monitoring, command, key_id,
+                email, cloud_id, machine_id, monitoring, command, key_id,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
@@ -310,7 +310,7 @@ def hpcloud_post_create_steps(self, email, backend_id, machine_id, monitoring,
 
                 ip = conn.ex_create_floating_ip(ext_net_id, port['id'])
                 post_deploy_steps.delay(
-                    email, backend_id, machine_id, monitoring, command, key_id,
+                    email, cloud_id, machine_id, monitoring, command, key_id,
                     script_id=script_id, script_params=script_params,
                     job_id=job_id, hostname=hostname, plugins=plugins,
                     post_script_id=post_script_id,
@@ -325,7 +325,7 @@ def hpcloud_post_create_steps(self, email, backend_id, machine_id, monitoring,
 
 
 @app.task(bind=True, default_retry_delay=2*60)
-def openstack_post_create_steps(self, email, backend_id, machine_id, monitoring,
+def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                               command, key_id, username, password, public_key,
                               script_id='', script_params='', job_id=None,
                               hostname='', plugins=None,
@@ -335,7 +335,7 @@ def openstack_post_create_steps(self, email, backend_id, machine_id, monitoring,
     user = user_from_email(email)
 
     try:
-        conn = connect_provider(user.backends[backend_id])
+        conn = connect_provider(user.clouds[cloud_id])
         nodes = conn.list_nodes()
         node = None
 
@@ -350,7 +350,7 @@ def openstack_post_create_steps(self, email, backend_id, machine_id, monitoring,
             host = ips[0]
 
             post_deploy_steps.delay(
-                email, backend_id, machine_id, monitoring, command, key_id,
+                email, cloud_id, machine_id, monitoring, command, key_id,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
@@ -389,7 +389,7 @@ def openstack_post_create_steps(self, email, backend_id, machine_id, monitoring,
                     ip = conn.ex_create_floating_ip(ext_net_id, machine_port_id)
 
                 post_deploy_steps.delay(
-                    email, backend_id, machine_id, monitoring, command, key_id,
+                    email, cloud_id, machine_id, monitoring, command, key_id,
                     script_id=script_id, script_params=script_params,
                     job_id=job_id, hostname=hostname, plugins=plugins,
                     post_script_id=post_script_id,
@@ -404,7 +404,7 @@ def openstack_post_create_steps(self, email, backend_id, machine_id, monitoring,
 
 
 @app.task(bind=True, default_retry_delay=2*60)
-def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
+def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                             command, key_id, username, password, public_key,
                             script_id='', script_params='', job_id=None,
                             hostname='', plugins=None,
@@ -414,7 +414,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
 
     try:
         # find the node we're looking for and get its hostname
-        conn = connect_provider(user.backends[backend_id])
+        conn = connect_provider(user.clouds[cloud_id])
         nodes = conn.list_nodes()
         node = None
         for n in nodes:
@@ -461,7 +461,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
             ssh.close()
 
             post_deploy_steps.delay(
-                email, backend_id, machine_id, monitoring, command, key_id,
+                email, cloud_id, machine_id, monitoring, command, key_id,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
@@ -477,7 +477,7 @@ def azure_post_create_steps(self, email, backend_id, machine_id, monitoring,
 
 @app.task(bind=True, default_retry_delay=2*60)
 def rackspace_first_gen_post_create_steps(
-    self, email, backend_id, machine_id, monitoring, command, key_id,
+    self, email, cloud_id, machine_id, monitoring, command, key_id,
     password, public_key, username='root', script_id='', script_params='',
     job_id=None, hostname='', plugins=None, post_script_id='',
     post_script_params=''
@@ -487,7 +487,7 @@ def rackspace_first_gen_post_create_steps(
 
     try:
         # find the node we're looking for and get its hostname
-        conn = connect_provider(user.backends[backend_id])
+        conn = connect_provider(user.clouds[cloud_id])
         nodes = conn.list_nodes()
         node = None
         for n in nodes:
@@ -519,7 +519,7 @@ def rackspace_first_gen_post_create_steps(
             ssh.close()
 
             post_deploy_steps.delay(
-                email, backend_id, machine_id, monitoring, command, key_id,
+                email, cloud_id, machine_id, monitoring, command, key_id,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
@@ -677,11 +677,11 @@ class ListSizes(UserTask):
     polling = False
     soft_time_limit = 30
 
-    def execute(self, email, backend_id):
+    def execute(self, email, cloud_id):
         from mist.io import methods
         user = user_from_email(email)
-        sizes = methods.list_sizes(user, backend_id)
-        return {'backend_id': backend_id, 'sizes': sizes}
+        sizes = methods.list_sizes(user, cloud_id)
+        return {'cloud_id': cloud_id, 'sizes': sizes}
 
 
 class ListLocations(UserTask):
@@ -692,11 +692,11 @@ class ListLocations(UserTask):
     polling = False
     soft_time_limit = 30
 
-    def execute(self, email, backend_id):
+    def execute(self, email, cloud_id):
         from mist.io import methods
         user = user_from_email(email)
-        locations = methods.list_locations(user, backend_id)
-        return {'backend_id': backend_id, 'locations': locations}
+        locations = methods.list_locations(user, cloud_id)
+        return {'cloud_id': cloud_id, 'locations': locations}
 
 
 class ListNetworks(UserTask):
@@ -707,13 +707,13 @@ class ListNetworks(UserTask):
     polling = False
     soft_time_limit = 30
 
-    def execute(self, email, backend_id):
-        log.warn('Running list networks for user %s backend %s' % (email, backend_id))
+    def execute(self, email, cloud_id):
+        log.warn('Running list networks for user %s cloud %s' % (email, cloud_id))
         from mist.io import methods
         user = user_from_email(email)
-        networks = methods.list_networks(user, backend_id)
-        log.warn('Returning list networks for user %s backend %s' % (email, backend_id))
-        return {'backend_id': backend_id, 'networks': networks}
+        networks = methods.list_networks(user, cloud_id)
+        log.warn('Returning list networks for user %s cloud %s' % (email, cloud_id))
+        return {'cloud_id': cloud_id, 'networks': networks}
 
 
 class ListImages(UserTask):
@@ -724,13 +724,30 @@ class ListImages(UserTask):
     polling = False
     soft_time_limit = 30
 
-    def execute(self, email, backend_id):
-        log.warn('Running list images for user %s backend %s' % (email, backend_id))
+    def execute(self, email, cloud_id):
+        log.warn('Running list images for user %s cloud %s' % (email, cloud_id))
         from mist.io import methods
         user = user_from_email(email)
-        images = methods.list_images(user, backend_id)
-        log.warn('Returning list images for user %s backend %s' % (email, backend_id))
-        return {'backend_id': backend_id, 'images': images}
+        images = methods.list_images(user, cloud_id)
+        log.warn('Returning list images for user %s cloud %s' % (email, cloud_id))
+        return {'cloud_id': cloud_id, 'images': images}
+
+
+class ListProjects(UserTask):
+    abstract = False
+    task_key = 'list_projects'
+    result_expires = 60 * 60 * 24 * 7
+    result_fresh = 60 * 60
+    polling = False
+    soft_time_limit = 30
+
+    def execute(self, email, cloud_id):
+        log.warn('Running list projects for user %s cloud %s' % (email, cloud_id))
+        from mist.io import methods
+        user = user_from_email(email)
+        projects = methods.list_projects(user, cloud_id)
+        log.warn('Returning list projects for user %s cloud %s' % (email, cloud_id))
+        return {'cloud_id': cloud_id, 'projects': projects}
 
 
 class ListMachines(UserTask):
@@ -741,15 +758,15 @@ class ListMachines(UserTask):
     polling = True
     soft_time_limit = 60
 
-    def execute(self, email, backend_id):
-        log.warn('Running list machines for user %s backend %s' % (email, backend_id))
+    def execute(self, email, cloud_id):
+        log.warn('Running list machines for user %s cloud %s' % (email, cloud_id))
         from mist.io import methods
         user = user_from_email(email)
-        machines = methods.list_machines(user, backend_id)
+        machines = methods.list_machines(user, cloud_id)
         if multi_user:
             for machine in machines:
                 kwargs = {}
-                kwargs['backend_id'] = backend_id
+                kwargs['cloud_id'] = cloud_id
                 kwargs['machine_id'] = machine.get('id')
                 from mist.core.methods import list_tags
                 mistio_tags = list_tags(user, resource_type='machine', **kwargs)
@@ -760,10 +777,10 @@ class ListMachines(UserTask):
                         if tag_dict not in machine['tags']:
                             machine['tags'].append(tag_dict)
                 # FIXME: optimize!
-        log.warn('Returning list machines for user %s backend %s' % (email, backend_id))
-        return {'backend_id': backend_id, 'machines': machines}
+        log.warn('Returning list machines for user %s cloud %s' % (email, cloud_id))
+        return {'cloud_id': cloud_id, 'machines': machines}
 
-    def error_rerun_handler(self, exc, errors, email, backend_id):
+    def error_rerun_handler(self, exc, errors, email, cloud_id):
         from mist.io.methods import notify_user
 
         if len(errors) < 6:
@@ -772,22 +789,22 @@ class ListMachines(UserTask):
         user = user_from_email(email)
 
         if len(errors) == 6: # If does not respond for a minute
-            notify_user(user, 'Backend %s does not respond' % user.backends[backend_id].title,
-                        email_notify=False, backend_id=backend_id)
+            notify_user(user, 'Cloud %s does not respond' % user.clouds[cloud_id].title,
+                        email_notify=False, cloud_id=cloud_id)
 
         # Keep retrying for 30 minutes
         times = [60, 60, 120, 300, 600, 600]
         index = len(errors) - 6
         if index < len(times):
             return times[index]
-        else: # If backend still unresponsive disable it & notify user
+        else: # If cloud still unresponsive disable it & notify user
             with user.lock_n_load():
-                user.backends[backend_id].enabled = False
+                user.clouds[cloud_id].enabled = False
                 user.save()
-            notify_user(user, "Backend %s disabled after not responding for 30mins" % user.backends[backend_id].title,
-                        email_notify=True, backend_id=backend_id)
-            log_event(user.email, 'incident', action='disable_backend',
-                      backend_id=backend_id, error="Backend unresponsive")
+            notify_user(user, "Cloud %s disabled after not responding for 30mins" % user.clouds[cloud_id].title,
+                        email_notify=True, cloud_id=cloud_id)
+            log_event(user.email, 'incident', action='disable_cloud',
+                      cloud_id=cloud_id, error="Cloud unresponsive")
 
 
 class ProbeSSH(UserTask):
@@ -798,11 +815,11 @@ class ProbeSSH(UserTask):
     polling = True
     soft_time_limit = 60
 
-    def execute(self, email, backend_id, machine_id, host):
+    def execute(self, email, cloud_id, machine_id, host):
         user = user_from_email(email)
         from mist.io.methods import probe_ssh_only
-        res = probe_ssh_only(user, backend_id, machine_id, host)
-        return {'backend_id': backend_id,
+        res = probe_ssh_only(user, cloud_id, machine_id, host)
+        return {'cloud_id': cloud_id,
                 'machine_id': machine_id,
                 'host': host,
                 'result': res}
@@ -821,10 +838,10 @@ class Ping(UserTask):
     polling = True
     soft_time_limit = 30
 
-    def execute(self, email, backend_id, machine_id, host):
+    def execute(self, email, cloud_id, machine_id, host):
         from mist.io import methods
         res = methods.ping(host)
-        return {'backend_id': backend_id,
+        return {'cloud_id': cloud_id,
                 'machine_id': machine_id,
                 'host': host,
                 'result': res}
@@ -834,21 +851,21 @@ class Ping(UserTask):
 
 
 @app.task
-def deploy_collectd(email, backend_id, machine_id, extra_vars):
+def deploy_collectd(email, cloud_id, machine_id, extra_vars):
     import mist.io.methods
     user = user_from_email(email)
-    mist.io.methods.deploy_collectd(user, backend_id, machine_id, extra_vars)
+    mist.io.methods.deploy_collectd(user, cloud_id, machine_id, extra_vars)
 
 
 @app.task
-def undeploy_collectd(email, backend_id, machine_id):
+def undeploy_collectd(email, cloud_id, machine_id):
     user = user_from_email(email)
     import mist.io.methods
-    mist.io.methods.undeploy_collectd(user, backend_id, machine_id)
+    mist.io.methods.undeploy_collectd(user, cloud_id, machine_id)
 
 
 @app.task
-def create_machine_async(email, backend_id, key_id, machine_name, location_id,
+def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          image_id, size_id, script, image_extra, disk,
                          image_name, size_name, location_name, ips, monitoring,
                          networks, docker_env, docker_command,
@@ -857,7 +874,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
                          quantity=1, persist=False, job_id=None,
                          docker_port_bindings={}, docker_exposed_ports={},
                          azure_port_bindings='', hostname='', plugins=None,
-                         cloud_init='', associate_floating_ip=False, associate_floating_ip_subnet=None):
+                         cloud_init='', associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -870,7 +887,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
     job_id = job_id or uuid.uuid4().hex
 
     log_event(email, 'job', 'async_machine_creation_started', job_id=job_id,
-              backend_id=backend_id, script=script, script_id=script_id,
+              cloud_id=cloud_id, script=script, script_id=script_id,
               script_params=script_params, monitoring=monitoring,
               persist=persist, quantity=quantity)
 
@@ -885,7 +902,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
     specs = []
     for name in names:
         specs.append((
-            (user, backend_id, key_id, name, location_id, image_id,
+            (user, cloud_id, key_id, name, location_id, image_id,
              size_id, script, image_extra, disk, image_name, size_name,
              location_name, ips, monitoring, networks, docker_env,
              docker_command, 22, script_id, script_params, job_id),
@@ -894,7 +911,8 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
              'post_script_params': post_script_params,
              'azure_port_bindings': azure_port_bindings,
              'associate_floating_ip': associate_floating_ip,
-             'cloud_init': cloud_init}
+             'cloud_init': cloud_init,
+             'project_id': project_id}
         ))
 
     def create_machine_wrapper(args_kwargs):
@@ -909,7 +927,7 @@ def create_machine_async(email, backend_id, key_id, machine_name, location_id,
         finally:
             name = args[3]
             log_event(email, 'job', 'machine_creation_finished', job_id=job_id,
-                      backend_id=backend_id, machine_name=name, error=error)
+                      cloud_id=cloud_id, machine_name=name, error=error)
 
     pool.map(create_machine_wrapper, specs)
     pool.close()
