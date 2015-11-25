@@ -22,8 +22,8 @@ define('app/views/machine_add', ['app/views/controlled'],
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasLibvirtDiskSize: function() {
-                var hasSize = true;
-                if (this.get('hasLibvirt') && Mist.machineAddController.newMachineImage.name.substring(Mist.machineAddController.newMachineImage.name.length - 4) == '.img') {
+                var hasSize = true, name = Mist.machineAddController.newMachineImage.name;
+                if (this.get('hasLibvirt') && name.substring(name.length - 4) == '.img') {
                     hasSize = false;
                 }
                 return hasSize;
