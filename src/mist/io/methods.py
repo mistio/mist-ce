@@ -2818,7 +2818,7 @@ def list_images(user, cloud_id, term=None):
                               for image, name in config.DOCKER_IMAGES.items()]
             rest_images += conn.list_images()
         elif conn.type == Provider.LIBVIRT:
-            rest_images = conn.list_images(location=backend.images_location)
+            rest_images = conn.list_images(location=cloud.images_location)
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
