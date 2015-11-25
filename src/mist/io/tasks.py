@@ -915,7 +915,7 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
              'cloud_init': cloud_init,
              'disk_size': disk_size,
              'disk_path': disk_path,
-             'create_from_existing': create_from_existing}
+             'create_from_existing': create_from_existing,
              'project_id': project_id}
         ))
 
