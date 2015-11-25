@@ -27,6 +27,7 @@ Feature: Add second-tier clouds
     | EC2                   | EC2          |
     | NephoScale            | NEPHOSCALE   |
     | Linode                | LINODE       |
+    | Packet.net            | PACKET       |
 #    | VMware vCloud         | VMWARE       |
 #    | Indonesian Cloud      | INDONESIAN   |
 #    | KVM (via libvirt)     | LIBVIRT      |
