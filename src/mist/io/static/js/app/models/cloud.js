@@ -129,7 +129,7 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
                         Ember.run.once(this, 'loadingLocationsObserver');
                     });
                     this.networks.addObserver('loading', this, function () {
-                        Ember.run.once(this, 'loadingNetowrksObserver');
+                        Ember.run.once(this, 'loadingNetworksObserver');
                     });
                 });
             }.on('init'),
