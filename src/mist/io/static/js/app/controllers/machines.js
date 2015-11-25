@@ -18,6 +18,7 @@ define('app/controllers/machines', ['app/models/machine'],
             addingMachine: null,
             startingMachine: null,
             rebootingMachine: null,
+            undefiningMachine: null,
             destroyingMachine: null,
             shutingdownMachine: null,
 
@@ -201,6 +202,26 @@ define('app/controllers/machines', ['app/models/machine'],
                 }).complete(function(success) {
                     that.set('rebootingMachine', false);
                     that.trigger('onMachineReboot');
+                    if (callback) callback(success);
+                });
+            },
+
+            undefineMachine: function(machineId, callback) {
+                var that = this;
+                var machine = this.getMachine(machineId);
+                machine.waitFor('undefined');
+                machine.lockOn('pending');
+                this.set('undefiningMachine', true);
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    'action' : 'undefine'
+                }).success(function() {
+                    //that._destroyMachine(machineId);
+                }).error(function() {
+                    machine.restoreState();
+                    Mist.notificationController.notify('Failed to undefine machine');
+                }).complete(function(success) {
+                    that.set('undefiningMachine', false);
+                    that.trigger('onMachineUndefine');
                     if (callback) callback(success);
                 });
             },

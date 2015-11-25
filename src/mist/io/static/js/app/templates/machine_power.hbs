@@ -38,6 +38,11 @@
         <a id="destroy-machine-option" class="ui-btn ui-btn-d ui-caps ui-shadow"
             {{action "actionClicked" "destroy" target=view}}>Destroy</a>
         {{/if}}
+        {{#if Mist.machinePowerController.canUndefine}}
+        <a id="undefine-machine-option" class="ui-btn ui-btn-d ui-caps ui-shadow"
+            {{action "actionClicked" "undefine" target=view}}>Undefine</a>
+        {{/if}}
+
     </div>
 </div>
 

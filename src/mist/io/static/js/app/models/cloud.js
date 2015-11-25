@@ -165,6 +165,10 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
                 this.machines.rebootMachine(machineId, callback);
             },
 
+            undefineMachine: function (machineId, callback) {
+                this.machines.undefineMachine(machineId, callback);
+            },
+
             startMachine: function (machineId, callback) {
                 this.machines.startMachine(machineId, callback);
             },

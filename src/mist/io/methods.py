@@ -1348,6 +1348,7 @@ def get_machine_actions(machine_from_api, conn, extra):
     can_destroy = True
     can_reboot = True
     can_tag = True
+    can_undefine = False
 
     # tag allowed on mist.core only for all providers, mist.io
     # supports only EC2, RackSpace, GCE, OpenStack
@@ -1393,6 +1394,7 @@ def get_machine_actions(machine_from_api, conn, extra):
             can_start = True
 
     if conn.type in [Provider.LIBVIRT]:
+        can_undefine = True
         if machine_from_api.state is NodeState.TERMINATED:
         # in libvirt a terminated machine can be started
             can_start = True
@@ -1406,6 +1408,7 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_stop = False
         can_destroy = False
         can_start = False
+        can_undefine = False
 
     if conn.type in (Provider.LINODE, Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
                      Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in config.EC2_PROVIDERS:
@@ -1419,6 +1422,7 @@ def get_machine_actions(machine_from_api, conn, extra):
             'can_destroy': can_destroy,
             'can_reboot': can_reboot,
             'can_tag': can_tag,
+            'can_undefine': can_undefine,
             'can_rename': can_rename}
 
 
@@ -2455,11 +2459,11 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
 
 
 def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None):
-    """Start, stop, reboot, resize and destroy have the same logic underneath, the only
+    """Start, stop, reboot, resize, undefine and destroy have the same logic underneath, the only
     thing that changes is the action. This helper function saves us some code.
 
     """
-    actions = ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename')
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename', 'undefine')
 
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
@@ -2530,6 +2534,10 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 conn.ex_stop_node(machine, ex_cloud_service_name=cloud_service)
             else:
                 conn.ex_stop_node(machine)
+        elif action is 'undefine':
+            # In libcloud undefine means destroy machine and delete XML configuration
+            if conn.type == 'libvirt':
+                conn.ex_undefine_node(machine)
         elif action is 'resize':
             conn.ex_resize_node(node, plan_id)
         elif action is 'rename':
@@ -2623,6 +2631,11 @@ def stop_machine(user, cloud_id, machine_id):
 def reboot_machine(user, cloud_id, machine_id):
     """Reboots a machine on a certain cloud."""
     _machine_action(user, cloud_id, machine_id, 'reboot')
+
+
+def undefine_machine(user, cloud_id, machine_id):
+    """Undefines machine - used in KVM libvirt to destroy machine + delete XML conf"""
+    _machine_action(user, cloud_id, machine_id, 'undefine')
 
 
 def rename_machine(user, cloud_id, machine_id, name):

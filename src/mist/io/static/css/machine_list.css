@@ -111,7 +111,7 @@
 .rebooting .machine-state span {
     color: #4E68BB;
 }
-.terminated .machine-state span {
+.terminated .machine-state span, .undefining .machine-state span {
     color: #AAAAAA;
 }
 .error .machine-state span {
