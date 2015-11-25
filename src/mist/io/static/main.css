@@ -1167,6 +1167,9 @@ ul.checkbox-list .ui-grid-b {
     font-weight: 400;
     text-shadow: none;
     text-transform: uppercase;
+    max-width: calc(100% - 60px);
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 #me-btn .owner.name {
