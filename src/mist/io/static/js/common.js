@@ -89,8 +89,10 @@ var appLoader = {
         info('Loaded in', Date.now() - startTime, 'ms');
 
         // Send google analytics call
-        ga('create', ANALYTICS_ID, { 'userId': USER_GA_ID});
-		ga('send', 'event', 'LoggedInJS', 'Success');
+        if (ANALYTICS_ID && USER_GA_ID){
+            ga('create', ANALYTICS_ID, { 'userId': USER_GA_ID});
+            ga('send', 'event', 'LoggedInJS', 'Success');
+        }
     },
 
 
