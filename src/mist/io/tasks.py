@@ -733,6 +733,23 @@ class ListImages(UserTask):
         return {'cloud_id': cloud_id, 'images': images}
 
 
+class ListProjects(UserTask):
+    abstract = False
+    task_key = 'list_projects'
+    result_expires = 60 * 60 * 24 * 7
+    result_fresh = 60 * 60
+    polling = False
+    soft_time_limit = 30
+
+    def execute(self, email, cloud_id):
+        log.warn('Running list projects for user %s cloud %s' % (email, cloud_id))
+        from mist.io import methods
+        user = user_from_email(email)
+        projects = methods.list_projects(user, cloud_id)
+        log.warn('Returning list projects for user %s cloud %s' % (email, cloud_id))
+        return {'cloud_id': cloud_id, 'projects': projects}
+
+
 class ListMachines(UserTask):
     abstract = False
     task_key = 'list_machines'
@@ -857,7 +874,7 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          quantity=1, persist=False, job_id=None,
                          docker_port_bindings={}, docker_exposed_ports={},
                          azure_port_bindings='', hostname='', plugins=None,
-                         cloud_init='', associate_floating_ip=False, associate_floating_ip_subnet=None):
+                         cloud_init='', associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -894,7 +911,8 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
              'post_script_params': post_script_params,
              'azure_port_bindings': azure_port_bindings,
              'associate_floating_ip': associate_floating_ip,
-             'cloud_init': cloud_init}
+             'cloud_init': cloud_init,
+             'project_id': project_id}
         ))
 
     def create_machine_wrapper(args_kwargs):
