@@ -151,11 +151,13 @@
                        data-theme="a"
                        value=Mist.machineAddController.newMachineLibvirtDiskPath}}
 
+                {{#if view.hasLibvirtDiskSize}}
                 <label for="create-machine-disk-size">Disk Size (GB)</label>
                 {{view Mist.TextField
                        id="create-machine-disk-size"
                        data-theme="a"
                        value=Mist.machineAddController.newMachineLibvirtDiskSize}}
+                {{/if}}
             {{else}}
                 <label for="create-machine-libvirt-existing-disk-path">Specify existing disk image path</label>
                 {{view Mist.TextField

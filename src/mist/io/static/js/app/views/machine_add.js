@@ -21,6 +21,14 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider && provider.provider == 'libvirt' ? true : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
+            hasLibvirtDiskSize: function() {
+                var hasSize = true;
+                if (this.get('hasLibvirt') && Mist.machineAddController.newMachineImage.name.substring(Mist.machineAddController.newMachineImage.name.length - 4) == '.img') {
+                    hasSize = false;
+                }
+                return hasSize;
+            }.property('hasLibvirt', 'Mist.machineAddController.newMachineImage.name'),
+
             hasDocker: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
                 return provider ? (provider.provider && provider.provider == 'docker' ? true : false) : false;
