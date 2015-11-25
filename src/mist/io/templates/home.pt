@@ -77,7 +77,6 @@
       ga('require', 'linkid', 'linkid.js');
       ga('require', 'displayfeatures');
       ga('send', 'pageview');
-      }
     </script>
     <link rel="stylesheet" href="resources/jquery.mobile.icons.min.css" />
 </head>
