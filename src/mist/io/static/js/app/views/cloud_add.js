@@ -79,6 +79,7 @@ define('app/views/cloud_add', ['app/views/controlled'],
             close: function () {
                 $('#add-cloud').collapsible('collapse');
                 $('#new-cloud-provider').collapsible('expand');
+                $('#new-cloud-provider ul').animate({scrollTop: 0}, 100);
             },
 
             autocompleteCredentials: function (provider) {
