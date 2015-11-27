@@ -27,8 +27,8 @@
 }
 
 @media all and (max-width: 701px) {
-    #home-page .ui-block-a,
-    #home-page .ui-block-b {
+    #dashboard-options .ui-block-a,
+    #dashboard-options .ui-block-b {
         float: none;
         width: 100%;
         padding: 0;
