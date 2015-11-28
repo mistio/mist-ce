@@ -62,7 +62,7 @@ define('app/views/machine_add', ['app/views/controlled'],
             }),
 
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
-                return this.get('hasKey') == true || this.get('dockerNeedScript');
+                return this.get('hasKey') || this.get('dockerNeedScript');
             }),
 
             hasLocation: function() {
@@ -327,7 +327,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineImage', image);
 
-                    this.set('dockerNeedScript', image.get('isMist'));
+                    this.set('dockerNeedScript', this.get('hasDocker') && image.get('isMist'));
                 },
 
 
