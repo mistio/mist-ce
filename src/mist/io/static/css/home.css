@@ -1,14 +1,40 @@
 /* Home Page CSS
 -----------------------------------------------------------------------------------------------------------*/
 
-@media all and (min-width: 561px) {
-    #home-page .ui-block-a {
-        padding-right: 15px;
-    }
-    #home-page .ui-block-b {
-        padding-left: 15px;
+#home-page .ui-block-a {
+    padding-right: 15px;
+}
+
+#home-page .ui-block-b {
+    padding-left: 15px;
+}
+
+#home-page .ui-content .ui-grid-a,
+#home-page .ui-content .ui-grid-b,
+#home-page .ui-content .ui-grid-c {
+    overflow: visible;
+}
+
+#home-page .ui-grid-a .ui-block-a,
+#home-page .ui-grid-a .ui-block-b {
+    transition: width .5s;
+    -webkit-transition: width .5s;
+}
+
+#home-page .ui-grid-a {
+   margin-top: -10px;
+   clear: both;
+}
+
+@media all and (max-width: 701px) {
+    #dashboard-options .ui-block-a,
+    #dashboard-options .ui-block-b {
+        float: none;
+        width: 100%;
+        padding: 0;
     }
 }
+
 #home-page .options-list li a,
 #home-page .incident-list li a {
     border-top: 1px solid #eeedeb;
@@ -35,23 +61,6 @@
     #home-page .ui-listview .ajax-loader {
         margin-top: -19px;
     }
-}
-
-#home-page .ui-content .ui-grid-a,
-#home-page .ui-content .ui-grid-b,
-#home-page .ui-content .ui-grid-c {
-    overflow: visible;
-}
-
-#home-page .ui-grid-a .ui-block-a,
-#home-page .ui-grid-a .ui-block-b {
-    transition: width .5s;
-    -webkit-transition: width .5s;
-}
-
-#home-page .ui-grid-a {
-   margin-top: -10px;
-   clear: both;
 }
 
 #home-page ul.incidents {
@@ -164,7 +173,7 @@
 .incidents .ui-listview {
     margin-top: 0;
     max-height: 89.4px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .incidents.is-core .ui-listview,
@@ -211,7 +220,6 @@
 .incidents .alert.incident a {
     color: #fff;
     background-color: #d96557;
-    padding-right: 70px !important;
 }
 .incidents .alert.incident a:after {
     content: '\0056';
@@ -248,4 +256,22 @@
 
 #home-page .logs {
     clear: both;
+}
+
+@media all and (max-width: 1050px) {
+    .incidents .incident .machine {
+        line-height: 35px;
+        float: left;
+    }
+
+    .incidents .incident .rule-condition,
+    .incidents .incident .time {
+        float: none;
+        position: absolute;
+        right: 37.5px;
+    }
+
+    .incidents .incident .time {
+        top: 27px;
+    }
 }

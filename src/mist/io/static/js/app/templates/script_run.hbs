@@ -42,9 +42,9 @@
                         {{/with}}
                     </h4>
                     <ul data-role="listview" data-theme="a">
-                        {{#each Mist.backendsController.model as |backend|}}
-                        {{#if backend.enabled}}
-                            {{#each backend.machines.model as |machine|}}
+                        {{#each Mist.cloudsController.model as |cloud|}}
+                        {{#if cloud.enabled}}
+                            {{#each cloud.machines.model as |machine|}}
                             {{#if machine.hasKeys}}
                                 <li data-icon="false">
                                     <a {{action "machineClicked" machine target=view}}>

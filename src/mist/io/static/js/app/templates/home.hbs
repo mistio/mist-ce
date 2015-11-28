@@ -14,18 +14,18 @@
     <!-- Page Body -->
     <div role="main" class="ui-content" data-theme="c">
 
-        {{#if Mist.backendsController.loading}}
+        {{#if Mist.cloudsController.loading}}
             <!-- Loader !-->
         {{else}}
-            {{#if Mist.backendsController.model}}
-                {{view "backendAdd"}}
+            {{#if Mist.cloudsController.model}}
+                {{view "cloudAdd"}}
             {{else}}
             <div id="no-collection" class="ui-responsive">
                 <div id="no-collection-inner" class="ui-shadow">
                     <span class="icon-cloud-check"></span>
                     <h1>Welcome to mist.io</h1>
                     <h2>Get started by adding your clouds.</h2>
-                    {{view "backendAdd"}}
+                    {{view "cloudAdd"}}
                     <p>
                         Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM & bare metal hosts.
                     </p>
@@ -34,16 +34,16 @@
             {{/if}}
         {{/if}}
 
-        <!-- Backends list -->
-        <div id="backend-buttons" data-role="controlgroup" data-type="horizontal"
+        <!-- Clouds list -->
+        <div id="cloud-buttons" data-role="controlgroup" data-type="horizontal"
             class="ui-controlgroup ui-controlgroup-horizontal ui-caps">
-            {{#each Mist.backendsController.model as |backend|}}
-                {{component "backend-button" backend=backend
+            {{#each Mist.cloudsController.model as |cloud|}}
+                {{component "cloud-button" cloud=cloud
                        class="ui-btn ui-input-btn ui-shadow"}}
             {{/each}}
         </div>
 
-        {{#if Mist.backendsController.model.length}}
+        {{#if Mist.cloudsController.model.length}}
         <div id="dashboard-options" class="ui-grid-a ui-responsive">
             <div class="{{if Mist.isCore 'ui-block-a' ''}}">
                 <div class="ui-body ui-shadow">
@@ -63,18 +63,18 @@
                         <li class="ui-li-has-count">
                             {{#link-to 'images' class="ui-btn ui-btn-icon-left icon-image ui-alt-icon"}}
                                 <span class="ui-li-count ui-body-inherit">
-                                    {{Mist.backendsController.imageCount}}
+                                    {{Mist.cloudsController.imageCount}}
                                 </span>
                                 Images
                             {{/link-to}}
                         </li>
 
                         <!-- Networks link -->
-                        {{#if Mist.backendsController.hasNetworks}}
+                        {{#if Mist.cloudsController.hasNetworks}}
                         <li class="ui-li-has-count">
                             {{#link-to 'networks' class="ui-btn ui-btn-icon-left icon-network ui-alt-icon"}}
                                 <span class="ui-li-count ui-body-inherit">
-                                    {{Mist.backendsController.networkCount}}
+                                    {{Mist.cloudsController.networkCount}}
                                 </span>
                                 Networks
                             {{/link-to}}
@@ -109,7 +109,7 @@
             {{#if Mist.isCore}}
             <div class="ui-block-b">
                 <div class="ui-body ui-shadow">
-                    <div class="incidents {{if view.hasIncidents '' 'no-incidents'}} {{if Mist.isCore 'is-core' '' }} {{if Mist.backendsController.hasNetworks 'has-networks' ''}}">
+                    <div class="incidents {{if view.hasIncidents '' 'no-incidents'}} {{if Mist.isCore 'is-core' '' }} {{if Mist.cloudsController.hasNetworks 'has-networks' ''}}">
                         <h4 class="ui-caps">Incidents</h4>
                         {{#if view.hasIncidents}}
                             <ul class="ui-listview ui-listview-inset incident-list">
@@ -123,15 +123,14 @@
                                         <li class="incident">
                                             <a class="icon-check ui-btn ui-btn-icon-right"
                                                 {{action "incidentClicked" incident target=view}}>
-                                                <span class="time">{{incident.closed}} ago </span>
                                                 <span class="machine">
                                                     {{incident.machineName}}:
                                                 </span>
                                                 <span class="rule-condition">
                                                     {{incident.ruleText}}
                                                 </span>
-                                                <span class="duration">
-                                                    for {{incident.duration}}
+                                                <span class="time">
+                                                    {{incident.closed}} ago, for {{incident.duration}}
                                                 </span>
                                             </a>
                                         </li>
@@ -195,9 +194,9 @@
              data-arrow="true"
              data-enhanced="true"
              data-transition="flip">
-            <p>{{Mist.backendAddController.helpText}}
-                {{#if Mist.backendAddController.helpHref}}
-                <a target="_blank" href={{Mist.backendAddController.helpHref}}>
+            <p>{{Mist.cloudAddController.helpText}}
+                {{#if Mist.cloudAddController.helpHref}}
+                <a target="_blank" href={{Mist.cloudAddController.helpHref}}>
                     Read more...
                 </a>
                 {{/if}}
@@ -207,6 +206,6 @@
 
     {{component "file-upload"}}
     {{component "key-add"}}
-    {{component "backend-edit"}}
+    {{component "cloud-edit"}}
     {{component "dialog-popup"}}
 </div>

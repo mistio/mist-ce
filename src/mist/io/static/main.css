@@ -21,10 +21,10 @@
 @import url("css/metric_add.css");
 @import url("css/machine_monitoring.css");
 @import url("css/file_upload.css");
-@import url("css/backend_add.css");
+@import url("css/cloud_add.css");
 @import url("css/machine_add.css");
 @import url("css/machine_keys.css");
-@import url("css/backend_edit.css");
+@import url("css/cloud_edit.css");
 @import url("css/machine_tags.css");
 @import url("css/machine_list.css");
 @import url("css/machine_run_script.css");
@@ -32,7 +32,7 @@
 @import url("css/network_create.css");
 @import url("css/machine_power.css");
 @import url("css/machine_shell.css");
-@import url("css/backend_button.css");
+@import url("css/cloud_button.css");
 @import url("css/graph_list.css");
 @import url("css/metric_add_custom.css");
 @import url("css/script.css");
@@ -61,7 +61,7 @@
 }
 
 .user-menu {
-    height: auto;
+    height: 56px;
     text-align: right;
 }
 
@@ -1162,6 +1162,7 @@ ul.checkbox-list .ui-grid-b {
 /* User menu
 -----------------------------------------------------------------------------------------------------------*/
 #me-btn {
+    width: 100%;
     display: inline-block;
     background: transparent;
     height: 56px;
@@ -1187,6 +1188,9 @@ ul.checkbox-list .ui-grid-b {
     font-weight: 400;
     text-shadow: none;
     text-transform: uppercase;
+    max-width: calc(100% - 60px);
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 #me-btn .owner.name {
@@ -1296,7 +1300,7 @@ ul.checkbox-list .ui-grid-b {
 
 .loadleds {
     position: relative;
-    left: -5px
+    right: 8px
 }
 
 .led {
@@ -1391,7 +1395,7 @@ ul.checkbox-list .ui-grid-b {
     box-sizing: border-box;
 }
 
-#backend-delete-confirm .ok-cancel {
+#cloud-delete-confirm .ok-cancel {
     margin-bottom: 1em;
 }
 

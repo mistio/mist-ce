@@ -1,9 +1,9 @@
 var loadApp = function(
     callback,
     TemplatesBuild,
-    BackendAddController,
-    BackendEditController,
-    BackendsController,
+    CloudAddController,
+    CloudEditController,
+    CloudsController,
     CookiesController,
     DatasourcesController,
     DialogController,
@@ -36,6 +36,7 @@ var loadApp = function(
     ScriptEditController,
     ScriptRunController,
     ScriptsController,
+    ProjectsController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -99,14 +100,14 @@ var loadApp = function(
     App.set('keyEditController', KeyEditController.create());
     App.set('cookiesController', CookiesController.create());
     App.set('ruleEditController', RuleEditController.create());
-    App.set('backendsController', BackendsController.create());
+    App.set('cloudsController', CloudsController.create());
     App.set('metricAddController', MetricAddController.create());
     App.set('fileUploadController', FileUploadController.create());
     App.set('machinesController', MachinesController.create());
     App.set('machineAddController', MachineAddController.create());
-    App.set('backendAddController', BackendAddController.create());
+    App.set('cloudAddController', CloudAddController.create());
     App.set('monitoringController', MonitoringController.create());
-    App.set('backendEditController', BackendEditController.create());
+    App.set('cloudEditController', CloudEditController.create());
     App.set('machineTagsController', MachineTagsController.create());
     App.set('machineKeysController', MachineKeysController.create());
     App.set('imagesController', ImagesController.create());
@@ -123,6 +124,7 @@ var loadApp = function(
     App.set('scriptAddController', ScriptAddController.create());
     App.set('scriptRunController', ScriptRunController.create());
     App.set('scriptEditController', ScriptEditController.create());
+    App.set('projectsController', ProjectsController.create());
     App.set('machineRunScriptController', MachineRunScriptController.create());
 
 
@@ -328,55 +330,60 @@ var setupMainChannel = function(socket, callback) {
     if (Mist.isCore) {
         //  TODO: This is a temporary ajax-request to get the scripts.
         //  It should be converted into a "list_scripts" socket handler
-        //  as soon as the backend supports it
+        //  as soon as the cloud supports it
         Mist.ajax.GET('/scripts').success(function(scripts) {
             Mist.scriptsController.setModel(scripts);
         });
     }
 
-    socket.on('list_keys', function(keys) {
+    socket
+        .on('list_keys', function(keys) {
             Mist.keysController.load(keys);
         })
-        .on('list_backends', function(backends) {
-            Mist.backendsController.load(backends);
-            Mist.backendsController.set('loaded');
+        .on('list_clouds', function(clouds) {
+            Mist.cloudsController.load(clouds);
+            Mist.cloudsController.set('loaded');
             if (callback)
                 callback();
             callback = null;
         })
+        .on('list_projects', function(data) {
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.projects.setModel(data.projects);
+        })
         .on('list_sizes', function(data) {
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend)
-                backend.sizes.setModel(data.sizes);
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.sizes.setModel(data.sizes);
         })
         .on('list_images', function(data) {
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend)
-                backend.images.setModel(data.images);
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.images.setModel(data.images);
         })
         .on('list_machines', function(data) {
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend)
-                backend.machines.load(data.machines);
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.machines.load(data.machines);
         })
         .on('list_locations', function(data) {
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend)
-                backend.locations.setModel(data.locations);
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.locations.setModel(data.locations);
         })
         .on('list_networks', function(data) {
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend) {
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud) {
                 var networks = [];
-                networks.pushObjects(data.networks.public);
-                networks.pushObjects(data.networks.private);
-                backend.networks.setModel(networks);
+                networks.pushObjects(data.networks.public, data.networks.private);
+                cloud.networks.setModel(networks);
             }
         })
         .on('monitoring', function(data) {
             Mist.monitoringController._updateMonitoringData(data);
             Mist.monitoringController.trigger('onMonitoringDataUpdate');
-            Mist.backendsController.set('checkedMonitoring', true);
+            Mist.cloudsController.set('checkedMonitoring', true);
         })
         .on('stats', function(data) {
             Mist.graphsController._handleSocketResponse(data);
@@ -392,8 +399,8 @@ var setupMainChannel = function(socket, callback) {
 
             // Extract machine information
             var machineId = data.machine_id;
-            var backendId = data.backend_id;
-            var machine = Mist.backendsController.getMachine(machineId, backendId);
+            var cloudId = data.cloud_id;
+            var machine = Mist.cloudsController.getMachine(machineId, cloudId);
 
             if (machine && machine.id) {
                 dialogBody
@@ -442,7 +449,7 @@ var setupMainChannel = function(socket, callback) {
         .emit('ready');
 
     function onProbe(data) {
-        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        var machine = Mist.cloudsController.getMachine(data.machine_id, data.cloud_id);
         if (machine)
             machine.probeSuccess(data.result);
     }

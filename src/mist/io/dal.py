@@ -8,7 +8,7 @@ operations like reading from and writing to some storage. The rest of
 the application knows nothing about how the storage is implemented and
 is only presented with a simple, object oriented API.
 
-Mist io uses yaml files as its storage backend. We store data using a
+Mist io uses yaml files as its storage cloud. We store data using a
 main dict consisting of nested dicts, lists, ints, strs etc. This
 module provides an object oriented interface on those dicts.
 
@@ -63,7 +63,7 @@ class Field(object):
     What is a field? A field object doesn't actually hold the value
     corresponding to that field. It just contains the information of how
     this value should look like, what type it should have in the storage
-    backend and what in the python frontend plus a default value, should
+    cloud and what in the python frontend plus a default value, should
     there be no corresponding value set. It is used by OODict's and
     FieldSequence's to appropriately handle the values fetched from storage.
 
@@ -90,7 +90,7 @@ class Field(object):
         """
 
     def cast2front(self, back_value=None):
-        """Take a value from the backend and cast to frontend, replacing with
+        """Take a value from the cloud and cast to frontend, replacing with
         default if None.
 
         """
@@ -99,7 +99,7 @@ class Field(object):
         return self._cast(back_value, self.back_types, self.front_types)
 
     def cast2back(self, front_value=None):
-        """Take a value from the frontend and cast to backend, replacing with
+        """Take a value from the frontend and cast to cloud, replacing with
         default if None.
 
         """
@@ -203,7 +203,7 @@ class BoolField(Field):
 class ObjectField(Field):
     """This is an abstract base class that inherits from Field. It
     assumes that front type is a subclass of BaseObject and changes
-    the way values are casted to backend accordingly.
+    the way values are casted to cloud accordingly.
 
     """
 
@@ -229,7 +229,7 @@ def make_field(obj_type):
     if issubclass(obj_type, OODict):
 
         class OODictField(ObjectField):
-            """Field subtype that is stored as a dict in the backend and
+            """Field subtype that is stored as a dict in the cloud and
             handled as an OODict in the frontend.
 
             """
@@ -240,7 +240,7 @@ def make_field(obj_type):
     if issubclass(obj_type, FieldsList):
 
         class FieldsListField(ObjectField):
-            """Field subtype that is stored as a list in the backend and
+            """Field subtype that is stored as a list in the cloud and
             handled as a FieldsList in the frontend.
 
             """
@@ -251,7 +251,7 @@ def make_field(obj_type):
     if issubclass(obj_type, FieldsDict):
 
         class FieldsDictField(ObjectField):
-            """Field subtype that is stored as a dict in the backend and
+            """Field subtype that is stored as a dict in the cloud and
             handled as a FieldsDict in the frontend.
 
             """
@@ -434,7 +434,7 @@ class FieldsSequence(object):
 
 class FieldsList(FieldsSequence, MutableSequence):
     """This defines a list like container object that parses the real list
-    in the backend by treating the items as fields. It inherits basic
+    in the cloud by treating the items as fields. It inherits basic
     container methods getitem, setitem, delitem and len from FieldsSequence
     and adds the insert method. Based on these basic container methods, the
     MutableSequence ABC provides the rest of the list api, so you can use
@@ -457,7 +457,7 @@ class FieldsList(FieldsSequence, MutableSequence):
 
 class FieldsDict(FieldsSequence, MutableMapping):
     """This defines a dict like container object that parses the real dict
-    in the backend by treating the items as fields. It inherits basic
+    in the cloud by treating the items as fields. It inherits basic
     container methods getitem, setitem, delitem and len from FieldsSequence
     and adds the iter method. Based on these basic container methods, the
     MutableMapping ABC provides the rest of the dict api, so you can use

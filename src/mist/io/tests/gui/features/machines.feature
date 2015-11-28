@@ -4,7 +4,7 @@ Feature: Machines
   Background:
     When I visit mist.io
     Then I wait for the mist.io splash page to load
-    Given "EC2" backend has been added
+    Given "EC2" cloud has been added
 
   @machine-creation
   Scenario: Machine Actions EC2
@@ -100,7 +100,7 @@ Feature: Machines
   Scenario: Create machine from Panel and from Image
     When I visit the Images page after the counter has loaded
     Then there should be starred Images
-    When I search for a "ubuntu" Image
+    When I search for the "ubuntu" Image
     Then Images list should be loaded within 60 seconds
     When I click the button "Ubuntu Server 14.04 LTS (PV)"
     Then I expect for "single-image-page" page to appear within max 2 seconds
@@ -215,13 +215,3 @@ Feature: Machines
     Then I expect for "dialog-popup" popup to disappear within max 4 seconds
     And "secondmachinekey" key should be deleted
     When I wait for 2 seconds
-
-
-
-
-
-
-
-
-
-

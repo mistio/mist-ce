@@ -1,6 +1,6 @@
-define('app/views/backend_add', ['app/views/controlled'],
+define('app/views/cloud_add', ['app/views/controlled'],
     //
-    //  Backend Add View
+    //  Cloud Add View
     //
     //  @returns Class
     //
@@ -8,10 +8,10 @@ define('app/views/backend_add', ['app/views/controlled'],
 
         'use strict';
 
-        return App.BackendAddView = ControlledComponent.extend({
+        return App.CloudAddView = ControlledComponent.extend({
 
-            layoutName: 'backend_add',
-            controllerName: 'backendAddController',
+            layoutName: 'cloud_add',
+            controllerName: 'cloudAddController',
 
             selectedRegion: null,
             selectedIndonesianRegion: 'my.idcloudonline.com',
@@ -23,15 +23,15 @@ define('app/views/backend_add', ['app/views/controlled'],
             //
 
             provider: function() {
-                return Mist.backendAddController.get('provider');
-            }.property('Mist.backendAddController.provider'),
+                return Mist.cloudAddController.get('provider');
+            }.property('Mist.cloudAddController.provider'),
 
             providerFields: function () {
                 return getProviderFields(this.get('provider'));
             }.property('provider'),
 
             providerList: function() {
-                return Mist.backendAddController.get('providerList');
+                return Mist.cloudAddController.get('providerList');
             }.property(),
 
             hasAdvanced: function () {
@@ -66,19 +66,20 @@ define('app/views/backend_add', ['app/views/controlled'],
             //
 
             clear: function () {
-                $('#backend-add-fields').hide();
+                $('#cloud-add-fields').hide();
                 Ember.run.next(this, function () {
                     $('body').enhanceWithin();
-                    $('#new-backend-provider').collapsible('collapse');
-                    $('#add-backend').collapsible('expand');
-                    $('#backend-add-fields').fadeIn();
-                    $('#add-backend-overlay').removeClass('ui-screen-hidden').addClass('in');
+                    $('#new-cloud-provider').collapsible('collapse');
+                    $('#add-cloud').collapsible('expand');
+                    $('#cloud-add-fields').fadeIn();
+                    $('#add-cloud-overlay').removeClass('ui-screen-hidden').addClass('in');
                 });
             },
 
             close: function () {
-                $('#add-backend').collapsible('collapse');
-                $('#new-backend-provider').collapsible('expand');
+                $('#add-cloud').collapsible('collapse');
+                $('#new-cloud-provider').collapsible('expand');
+                $('#new-cloud-provider ul').animate({scrollTop: 0}, 100);
             },
 
             autocompleteCredentials: function (provider) {
@@ -89,25 +90,25 @@ define('app/views/backend_add', ['app/views/controlled'],
                 if (!fields || !fields.findBy('type', 'region'))
                     return;
 
-                Mist.backendsController.model.some(function (backend) {
+                Mist.cloudsController.model.some(function (cloud) {
 
-                    // backend.provider == provider.provider won't work
-                    // because we still save backends in the database using
+                    // cloud.provider == provider.provider won't work
+                    // because we still save clouds in the database using
                     // the old format for compatibility reasons
-                    if (backend.getSimpleProvider() == provider.provider) {
+                    if (cloud.getSimpleProvider() == provider.provider) {
 
                         if (provider.provider == 'ec2') {
-                            fields.findBy('name', 'api_key').set('value', backend.apikey);
+                            fields.findBy('name', 'api_key').set('value', cloud.apikey);
                             fields.findBy('name', 'api_secret').set('value', 'getsecretfromdb');
                         }
                         if (provider.provider == 'rackspace') {
-                            fields.findBy('name', 'username').set('value', backend.apikey);
+                            fields.findBy('name', 'username').set('value', cloud.apikey);
                             fields.findBy('name', 'api_key').set('value', 'getsecretfromdb');
                         }
                         if (provider.provider == 'hpcloud') {
-                            fields.findBy('name', 'username').set('value', backend.apikey);
+                            fields.findBy('name', 'username').set('value', cloud.apikey);
                             fields.findBy('name', 'password').set('value', 'getsecretfromdb');
-                            fields.findBy('name', 'tenant_name').set('value', backend.tenant_name);
+                            fields.findBy('name', 'tenant_name').set('value', cloud.tenant_name);
                         }
                     }
                 });
@@ -120,13 +121,13 @@ define('app/views/backend_add', ['app/views/controlled'],
 
             actions: {
                 clickOverlay: function() {
-                    $('#add-backend').collapsible('collapse');
+                    $('#add-cloud').collapsible('collapse');
                 },
 
                 selectProvider: function (provider, field) {
                     clearProviderFields(provider);
                     Ember.run.next(this, function(){
-                        Mist.backendAddController.set('provider', provider);
+                        Mist.cloudAddController.set('provider', provider);
                         this.clear();
                         this.autocompleteCredentials(provider);
                     })
@@ -182,15 +183,15 @@ define('app/views/backend_add', ['app/views/controlled'],
                 },
 
                 backClicked: function() {
-                    Mist.backendAddController.close();
+                    Mist.cloudAddController.close();
                 },
 
                 addClicked: function() {
-                    Mist.backendAddController.add();
+                    Mist.cloudAddController.add();
                 },
 
                 helpClicked: function (field) {
-                    Mist.backendAddController.setProperties({
+                    Mist.cloudAddController.setProperties({
                         helpText: field.helpText,
                         helpHref: field.helpHref,
                     });
