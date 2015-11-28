@@ -18,7 +18,9 @@
                 {{component "graph-list" actionProxy=view}}
         </div>
 
-        {{component "rule-list" rules=view.rules}}
+        {{#unless view.pendingFirstStats}}
+            {{component "rule-list" rules=view.rules}}
+        {{/unless}}
 
         <div id="monitoring-bottom-btns">
             <div data-rule="ui-grid-a">

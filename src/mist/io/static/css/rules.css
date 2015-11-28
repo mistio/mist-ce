@@ -69,9 +69,15 @@
     padding-left: 9px;
 }
 
+#rule-operator .ui-listview,
+#rule-aggregate .ui-listview {
+    margin: 0;
+}
+
 #rule-metric .ui-listview {
     max-height: 200px;
-    overflow-y: scroll;
+    overflow-y: auto;
+    margin: 0;
 }
 
 /*

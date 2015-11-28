@@ -1,5 +1,5 @@
 define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images', 'app/controllers/sizes',
-                              'app/controllers/locations', 'app/controllers/projects', 'app/controllers/networks', 'ember'],
+                              'app/controllers/locations', 'app/controllers/networks', 'app/controllers/projects', 'ember'],
     /**
      *  Cloud Model
      *
@@ -129,7 +129,7 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
                         Ember.run.once(this, 'loadingLocationsObserver');
                     });
                     this.networks.addObserver('loading', this, function () {
-                        Ember.run.once(this, 'loadingNetowrksObserver');
+                        Ember.run.once(this, 'loadingNetworksObserver');
                     });
                 });
             }.on('init'),

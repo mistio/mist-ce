@@ -13,7 +13,7 @@
             data-expanded-icon="noicon"
             data-iconpos="none"
             data-collapsed="false">
-            <h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed {{if view.provider '' 'select-provider'}}" data-icon="false">
+            <h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed {{if view.provider '' 'select-provider hidden'}}" data-icon="false">
                    <span class="provider-icon-small">
                         <span class={{view.provider.className}}></span>
                     </span>
@@ -65,7 +65,7 @@
                                     {{#if field.value}}
                                         {{field.buttonFilledText}}
                                     {{else}}
-                                        {{field.buttonText}}                                        
+                                        {{field.buttonText}}
                                     {{/if}}
                                 </a>
                             {{/if}}
