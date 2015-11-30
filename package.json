@@ -16,8 +16,7 @@
     "yamljs": "^0.2.4"
   },
   "devDependencies": {
-    "grunt-string-replace": "^1.2.0",
-    "yamljs": "^0.2.4"
+    "grunt-string-replace": "^1.2.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
