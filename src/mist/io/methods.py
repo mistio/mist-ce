@@ -1705,7 +1705,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type == Provider.VULTR:
         node = _create_machine_vultr(conn, public_key, machine_name, image,
-                                         size, location, cloud_init)
+                                         size, location)
     elif conn.type == Provider.PACKET:
         node = _create_machine_packet(conn, public_key, machine_name, image,
                                          size, location, cloud_init, project_id)
@@ -2272,7 +2272,7 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
     return node
 
 
-def _create_machine_vultr(conn, public_key, machine_name, image, size, location, cloud_init):
+def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
     """Create a machine in Vultr.
 
     Here there is no checking done, all parameters are expected to be
@@ -2304,8 +2304,7 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location,
             size=size,
             image=image,
             location=location,
-            ssh_key=[server_key],
-            userdata=cloud_init
+            ssh_key=[server_key]
         )
     except Exception as e:
         raise MachineCreationError("Vultr, got exception %s" % e, e)
