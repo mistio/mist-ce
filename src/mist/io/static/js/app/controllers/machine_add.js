@@ -287,7 +287,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     if (error) {
                         console.log('error');
                         this.set('invalidCloudInit', true);
-                        Mist.notificationController.timeNotify('Please start your cloud init script with #!/bin/bash or use a valid yaml configuration file', 4000);
+                        Mist.notificationController.timeNotify('Please start your cloud init script with #!/bin/bash or use a valid yaml configuration file (should start with #cloud-config)', 4000);
                     } else {
                         this.set('invalidCloudInit', false);
                     }
