@@ -156,3 +156,8 @@
     background-image: none;
     content: '\006b' !important;
 }
+/* Script Notification */
+#dialog-popup #command-collapsible .ui-collapsible .ui-icon-minus:after, 
+#dialog-popup #command-collapsible .ui-collapsible .ui-icon-plus:after {
+    left: 14px !important;
+}
