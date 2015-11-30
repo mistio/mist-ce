@@ -1680,7 +1680,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                 size = size
                 break
         node = _create_machine_gce(conn, key_id, private_key, public_key,
-                                         machine_name, image, size, location)
+                                         machine_name, image, size, location, cloud_init)
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
                                          machine_name, image, size,
@@ -2412,7 +2412,7 @@ def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks
 
 
 def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
-                        image, size, location):
+                        image, size, location, cloud_init):
     """Create a machine in GCE.
 
     Here there is no checking done, all parameters are expected to be
@@ -2424,6 +2424,8 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
     metadata = {#'startup-script': script,
                 'sshKeys': 'user:%s' % key}
     #metadata for ssh user, ssh key and script to deploy
+    if cloud_init:
+        metadata['startup-script'] = cloud_init
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
