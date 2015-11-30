@@ -300,15 +300,9 @@ def add_cloud_v_2(user, title, provider, params):
             log.error("Error while adding cloud: %r" % exc)
             raise CloudUnauthorizedError(exc)
         except Exception as exc:
-<<<<<<< HEAD
-            log.error("Error while adding backend%r" % exc)
-            raise BackendUnavailableError(exc)
-        if provider not in ['vsphere']:
-=======
             log.error("Error while adding cloud%r" % exc)
             raise CloudUnavailableError(exc)
         if provider not in ['vshere']:
->>>>>>> staging
             # in some providers -eg vSphere- this is not needed
             # as we are sure we got a succesfull connection with
             # the provider if connect_provider doesn't fail
