@@ -61,7 +61,7 @@
 }
 
 .user-menu {
-    height: auto;
+    height: 56px;
     text-align: right;
 }
 
@@ -1142,6 +1142,7 @@ ul.checkbox-list .ui-grid-b {
 /* User menu
 -----------------------------------------------------------------------------------------------------------*/
 #me-btn {
+    width: 100%;
     display: inline-block;
     background: transparent;
     height: 56px;
@@ -1167,6 +1168,9 @@ ul.checkbox-list .ui-grid-b {
     font-weight: 400;
     text-shadow: none;
     text-transform: uppercase;
+    max-width: calc(100% - 60px);
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 #me-btn .owner.name {

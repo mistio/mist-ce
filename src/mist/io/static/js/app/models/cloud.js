@@ -1,5 +1,5 @@
 define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images', 'app/controllers/sizes',
-                              'app/controllers/locations', 'app/controllers/projects', 'app/controllers/networks', 'ember'],
+                              'app/controllers/locations', 'app/controllers/networks', 'app/controllers/projects', 'ember'],
     /**
      *  Cloud Model
      *

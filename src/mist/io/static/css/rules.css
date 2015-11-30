@@ -69,7 +69,8 @@
     padding-left: 9px;
 }
 
-#rule-operator .ui-listview {
+#rule-operator .ui-listview,
+#rule-aggregate .ui-listview {
     margin: 0;
 }
 
