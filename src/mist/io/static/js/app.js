@@ -27,6 +27,7 @@ require.config({
         d3: '../dist/d3/d3.min',
         c3: '../dist/c3/c3.min',
         term: '../dist/term.js/src/term',
+        yamljs: '../dist/yamljs/dist/yaml.min',
         init: 'init',
         common: 'common',
         multiplex: 'multiplex'
