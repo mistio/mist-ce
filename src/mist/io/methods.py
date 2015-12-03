@@ -1700,7 +1700,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                 size = size
                 break
         node = _create_machine_gce(conn, key_id, private_key, public_key,
-                                         machine_name, image, size, location)
+                                         machine_name, image, size, location, cloud_init)
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
                                          machine_name, image, size,
@@ -1725,7 +1725,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type == Provider.VULTR:
         node = _create_machine_vultr(conn, public_key, machine_name, image,
-                                         size, location)
+                                         size, location, cloud_init)
+
     elif conn.type is Provider.LIBVIRT:
         try:
             # size_id should have a format cpu:ram, eg 1:2048
@@ -2327,7 +2328,7 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
     return node
 
 
-def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
+def _create_machine_vultr(conn, public_key, machine_name, image, size, location, cloud_init):
     """Create a machine in Vultr.
 
     Here there is no checking done, all parameters are expected to be
@@ -2359,7 +2360,8 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location)
             size=size,
             image=image,
             location=location,
-            ssh_key=[server_key]
+            ssh_key=[server_key],
+            userdata=cloud_init
         )
     except Exception as e:
         raise MachineCreationError("Vultr, got exception %s" % e, e)
@@ -2467,7 +2469,7 @@ def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks
 
 
 def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
-                        image, size, location):
+                        image, size, location, cloud_init):
     """Create a machine in GCE.
 
     Here there is no checking done, all parameters are expected to be
@@ -2479,6 +2481,8 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
     metadata = {#'startup-script': script,
                 'sshKeys': 'user:%s' % key}
     #metadata for ssh user, ssh key and script to deploy
+    if cloud_init:
+        metadata['startup-script'] = cloud_init
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
