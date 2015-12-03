@@ -67,8 +67,8 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             hasLocation: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['docker', 'indonesiancloud', 'vcloud', 'libvirt'];
-                return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.locations.model.length == 1) ? false : true) : false) : false;
+                invalids = ['docker', 'indonesiancloud', 'vcloud', 'libvirt'];
+                return provider ? (provider.provider ? ((invalids.indexOf(provider.provider) != -1 || provider.locations.model.length == 1) ? false : true) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasNetworks: function() {
