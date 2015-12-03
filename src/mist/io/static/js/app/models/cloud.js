@@ -171,6 +171,14 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
                 this.machines.undefineMachine(machineId, callback);
             },
 
+            resumeMachine: function (machineId, callback) {
+                this.machines.resumeMachine(machineId, callback);
+            },
+
+            suspendMachine: function (machineId, callback) {
+                this.machines.suspendMachine(machineId, callback);
+            },
+
             startMachine: function (machineId, callback) {
                 this.machines.startMachine(machineId, callback);
             },

@@ -16,6 +16,8 @@ define('app/controllers/machine_power', ['ember'],
             canStart: null,
             canReboot: null,
             canUndefine: null,
+            canSuspend: null,
+            canResume: null,
             canDestroy: null,
             canShutdown: null,
             canRename: null,
@@ -91,8 +93,10 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('callback', null);
                     this.set('canStart', null);
                     this.set('canReboot', null);
-                    this.set('canUndefine', null);
                     this.set('canDestroy', null);
+                    this.set('canSuspend', null);
+                    this.set('canUndefine', null);
+                    this.set('canResume', null);
                     this.set('canShutdown', null);
                     this.set('canRename', null);
                     this.set('canRunScript', null);
@@ -104,6 +108,8 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canStart', !this.machines.findBy('can_start', false));
                     this.set('canReboot', !this.machines.findBy('can_reboot', false));
                     this.set('canUndefine', !this.machines.findBy('can_undefine', false));
+                    this.set('canResume', !this.machines.findBy('can_resume', false));
+                    this.set('canSuspend', !this.machines.findBy('can_suspend', false));
                     this.set('canDestroy', !this.machines.findBy('can_destroy', false));
                     this.set('canShutdown', !this.machines.findBy('can_stop', false));
                     if(this.machines.length == 1 && this.machines[0].get('can_rename')) {
@@ -135,6 +141,10 @@ define('app/controllers/machine_power', ['ember'],
                         machine.reboot();
                     } else if (action == 'undefine') {
                         machine.undefine();
+                    } else if (action == 'suspend') {
+                        machine.suspend();
+                    } else if (action == 'resume') {
+                        machine.resume();
                     } else if (action == 'start') {
                         machine.start();
                     }

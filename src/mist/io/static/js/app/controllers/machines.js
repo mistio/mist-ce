@@ -19,6 +19,8 @@ define('app/controllers/machines', ['app/models/machine'],
             startingMachine: null,
             rebootingMachine: null,
             undefiningMachine: null,
+            resumingMachine: null,
+            suspendingMachine: null,
             destroyingMachine: null,
             shutingdownMachine: null,
 
@@ -225,6 +227,44 @@ define('app/controllers/machines', ['app/models/machine'],
                 }).complete(function(success) {
                     that.set('undefiningMachine', false);
                     that.trigger('onMachineUndefine');
+                    if (callback) callback(success);
+                });
+            },
+
+            suspendMachine: function(machineId, callback) {
+                var that = this;
+                var machine = this.getMachine(machineId);
+                machine.waitFor('suspended');
+                machine.lockOn('pending');
+                this.set('suspendingMachine', true);
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    'action' : 'suspend'
+                }).success(function() {
+                    //that._destroyMachine(machineId);
+                }).error(function() {
+                    machine.restoreState();
+                    Mist.notificationController.notify('Failed to suspend machine');
+                }).complete(function(success) {
+                    that.set('suspendingMachine', false);
+                    if (callback) callback(success);
+                });
+            },
+
+            resumeMachine: function(machineId, callback) {
+                var that = this;
+                var machine = this.getMachine(machineId);
+                machine.waitFor('running');
+                machine.lockOn('pending');
+                this.set('resumingMachine', true);
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    'action' : 'resume'
+                }).success(function() {
+                    //that.startMachine(machineId);
+                }).error(function() {
+                    machine.restoreState();
+                    Mist.notificationController.notify('Failed to resume machine');
+                }).complete(function(success) {
+                    that.set('resumingMachine', false);
                     if (callback) callback(success);
                 });
             },

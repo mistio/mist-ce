@@ -42,6 +42,14 @@
         <a id="undefine-machine-option" class="ui-btn ui-btn-d ui-caps ui-shadow"
             {{action "actionClicked" "undefine" target=view}}>Undefine</a>
         {{/if}}
+        {{#if Mist.machinePowerController.canSuspend}}
+        <a id="suspend-machine-option" class="ui-btn ui-btn-d ui-caps ui-shadow"
+            {{action "actionClicked" "suspend" target=view}}>Suspend</a>
+        {{/if}}
+        {{#if Mist.machinePowerController.canResume}}
+        <a id="resume-machine-option" class="ui-btn ui-btn-d ui-caps ui-shadow"
+            {{action "actionClicked" "resume" target=view}}>Resume</a>
+        {{/if}}
 
     </div>
 </div>
