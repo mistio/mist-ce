@@ -1,0 +1,71 @@
+<dom-module id="app-bar">
+  <link rel="import" type="css" href="app-bar.css">
+  <template>
+    <content></content>
+    <div id="search" class="horizontal layout center" show$="{{showingSearch}}" on-tap="toggleSearch">
+      <iron-icon icon="search" hidden$="[[noSearch]]"></iron-icon>
+      <form on-submit="performSearch" class="flex">
+        <input type="search" id="query" value="{{query::keyup}}" autocomplete="off" placeholder="Search" on-blur="clearSearch">
+      </form>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'app-bar',
+    properties: {
+      query: {
+        type: String,
+        notify: true
+      },
+      showingSearch: {
+        type: Boolean,
+        value: false
+      },
+      noSearch: {
+        type: Boolean,
+        value: false
+      }
+    },
+    observers: [
+      'updateSearchDisplay(showingSearch)'
+    ],
+    listeners: {
+      keyup: 'hotkeys'
+    },
+    toggleSearch: function(e) {
+      if (e) {
+        e.stopPropagation();
+      }
+      if (e.target === this.$.query) {
+        return;
+      }
+
+      this.showingSearch = !this.showingSearch;
+    },
+    clearSearch: function() {
+      this.showingSearch = false;
+    },
+    updateSearchDisplay: function(showingSearch) {
+      if (showingSearch) {
+        this.classList.add('search-on');
+        this.async(function() {
+          this.$.query.focus();
+        });
+      } else {
+        this.classList.remove('search-on');
+      }
+    },
+    hotkeys: function(e) {
+      // ESC
+      if (e.keyCode === 27 && Polymer.dom(e).rootTarget === this.$.query) {
+        this.showingSearch = false;
+      }
+    },
+    performSearch: function(e) {
+      e.preventDefault();
+      this.fire('nav', {url: '?q=' + this.query});
+    }
+  });
+</script>

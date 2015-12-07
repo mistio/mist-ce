@@ -77,6 +77,13 @@ def main(global_config, **settings):
     configurator.add_renderer('json', json_renderer)
     configurator.add_static_view('resources', 'mist.io:static')
     configurator.add_static_view('docs', path='../../../docs/build')
+
+    # polymer resources
+    configurator.add_static_view('bower_components', path='../../../bower_components')
+    configurator.add_static_view('elements', path='../../../app/elements')
+    configurator.add_static_view('images', path='../../../app/images')
+    configurator.add_static_view('styles', path='../../../app/styles')
+
     configurator.include(add_routes)
     configurator.scan()
     app = configurator.make_wsgi_app()

@@ -1,0 +1,20 @@
+<style is="custom-style">
+  :root {
+    --app-sidebar-width: 272px;
+    --app-sidebar-background: var(--primary-background-color);
+  }
+</style>
+
+<dom-module id="app-sidebar">
+  <link rel="import" type="css" href="app-sidebar.css">
+  <template>
+    <content></content>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'app-sidebar',
+    enableCustomStyleProperties: true
+  });
+</script>

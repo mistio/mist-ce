@@ -1,0 +1,81 @@
+<dom-module id="responsive-element">
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  <template>
+    <content></content>
+  </template>
+</dom-module>
+
+<script>
+  (function() {
+    var _els = [];
+    var _lastRecalc = new Date().getTime();
+    var _recalc = function() {
+      for (var i = 0; i < _els.length; i++) {
+        _els[i].recalc();
+      }
+    };
+
+    Polymer({
+      is: 'responsive-element',
+      properties: {
+        size: {
+          type: String,
+          readOnly: true,
+          reflectToAttribute: true
+        },
+        s: {
+          type: Number,
+          value: 768
+        },
+        m: {
+          type: Number,
+          value: 992
+        },
+        l: {
+          type: Number,
+          value: 1200
+        },
+        xl: {
+          type: Number,
+          value: 1600
+        }
+      },
+      attached: function() {
+        _els.push(this);
+        this.recalc();
+      },
+      detached: function() {
+        _els.splice(_els.indexOf(this), 1);
+      },
+      recalc: function() {
+        var w = this.getBoundingClientRect().width;
+
+        if (w < this.s) { this._setSize('xs'); }
+        else if (w < this.m) { this._setSize('s'); }
+        else if (w < this.l) { this._setSize('m'); }
+        else if (w < this.xl) { this._setSize('l'); }
+        else { this._setSize('xl'); }
+      }
+    });
+
+    var _debounce = function(func, wait, immediate) {
+      var timeout;
+      return function() {
+        var context = this, args = arguments;
+        var later = function() {
+          timeout = null;
+          if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+      };
+    };
+    window.addEventListener('resize', _debounce(_recalc, 6));
+  })();
+</script>

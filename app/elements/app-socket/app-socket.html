@@ -1,0 +1,331 @@
+<script src="../../bower_components/sockjs/sockjs.min.js"></script>
+<script>
+DEBUG_SOCKET = false;
+SockJS.websocket.roundTrips = 5;
+Polymer({
+    is: 'app-socket',
+    url: '/socket',
+    properties: {
+        socket: {
+            type: Object
+        },
+        model: {
+            type: Object,
+            notify: true
+        }
+    },
+
+    ready: function () {
+        // Create the socket
+        this.socket = new SockJS(this.url, null,
+            {'protocols_whitelist': ['websocket', 'xhr-polling']}
+        );
+
+        // Connect the receiver
+        var receiver = this.messageReceived.bind(this);
+        this.socket.onmessage = function(e) {
+            receiver(e.data);
+        };
+
+        // Handle error & close
+        this.socket.onerror = this.connectionError;
+        this.socket.onclose = this.connectionClosed;
+
+        // When socket connects create mux and prepare channels
+        var that = this;
+        this.socket.onopen = function () {
+            console.log('CONNECTION ESTABLISHED');
+            this.mux = new MultiplexedWebSocket(this);
+            that.setupChannel('main', function() {
+                console.log('Channel main initialized')
+            });
+            that.setupChannel('logs', function() {
+                console.log('Channel logs initialized')
+            });
+        };
+    },
+
+    setupChannel: function (namespace, callback) {
+        var channel = this.socket.mux.channel(namespace);
+        var that = this;
+        console.info('Connecting', namespace)
+        channel.onopen = function(e){
+            that.setupChannelEvents(namespace, function () {
+                console.info('Connected', namespace);
+                if (callback instanceof Function)
+                    callback();
+                if (that.onConnect instanceof Function)
+                    that.onConnect(that);
+            });
+        }
+    },
+
+    setupChannelEvents: function (namespace, callback) {
+        var channel = this.socket.mux.channel(namespace),
+            that = this;
+        channel.on('open', function () {
+            console.log('Channel %s opened', namespace);
+        });
+
+        if (namespace == 'main') {
+            channel.on('list_keys', function (data) {
+                console.debug('list_keys', data);
+                that._updateKeys(data);
+            });
+            channel.on('list_clouds', function (data) {
+                console.debug('list_clouds', data);
+                that._updateClouds(data);
+            });
+            channel.on('list_machines', function (data) {
+                console.debug('list_machines', data);
+                that._updateMachines(data);
+            });
+            channel.on('list_sizes', function (data) {
+                console.debug('list_sizes', data);
+                that._updateSizes(data);
+            });
+            channel.on('list_locations', function (data) {
+                console.debug('list_locations', data);
+                that._updateLocations(data);
+            });
+            channel.on('list_images', function (data) {
+                console.debug('list_images', data);
+                that._updateImages(data);
+            });
+            channel.on('list_networks', function (data) {
+                console.debug('list_networks', data);
+                that._updateNetworks(data);
+            });
+            channel.on('list_projects', function (data) {
+                console.debug('list_projects', data);
+                that._updateProjects(data);
+            });
+            channel.on('probe', function (data) {
+                console.debug('probe', data);
+                that._probe(data);
+            });
+            channel.on('ping', function (data) {
+                console.debug('ping', data);
+                that._ping(data);
+            });
+            channel.on('monitoring', function (data) {
+                console.debug('monitoring', data);
+                that._updateMonitoring(data);
+            });
+        } else if (namespace == 'logs') {
+            channel.on('logs', function (data) {
+                console.debug('logs', data);
+            });
+        }
+        channel.send('ready');
+        if (callback)
+            callback();
+    },
+
+    connectionClosed: function () {
+        console.log('CONNECTION CLOSED');
+        // TODO: try to reconnect
+    },
+
+    connectionError: function () {
+        console.log('CONNECTION ERROR');
+        // TODO: try to reconnect
+    },
+
+    messageReceived: function (message) {
+        if (DEBUG_SOCKET)
+            console.log('RECEIVED: ' + message);
+    },
+
+    sendMessage: function (message) {
+        this.sock.send(message);
+        if (DEBUG_SOCKET)
+            console.log('SENT: ' + message);
+    },
+
+    _updateClouds: function (data) {
+        this.set('model.clouds', _generateMap(data));
+        this.set('model.cloudsArray', data);
+        this.set('model.pending.clouds', false);
+    },
+
+    _updateMonitoring: function (data) {
+        console.warn('got monitoring', data);
+        this.set('model.pending.monitoring', false);
+    },
+
+    _updateKeys: function (data) {
+        this.set('model.keys', _generateMap(data));
+        this.set('model.keysArray', data);
+    },
+
+    _updateSizes: function (data) {
+        this.set('model.clouds.' + data.cloud_id + '.sizes', _generateMap(data.sizes));
+        this.set('model.clouds.' + data.cloud_id + '.sizesArray', data.sizes);
+    },
+
+    _updateLocations: function (data) {
+        this.set('model.clouds.' + data.cloud_id + '.locations', _generateMap(data.locations));
+        this.set('model.clouds.' + data.cloud_id + '.locationsArray', data.locations);
+    },
+
+    _updateImages: function (data) {
+        this.set('model.clouds.' + data.cloud_id + '.images', _generateMap(data.images));
+        this.set('model.clouds.' + data.cloud_id + '.imagesArray', data.images);
+        var allImages = [];
+        this.model.cloudsArray.forEach(
+          function(cloud){
+            return allImages = allImages.concat(cloud.imagesArray != undefined ? cloud.imagesArray : [])}
+        );
+        this.set('model.imagesArray', allImages);
+    },
+
+    _updateMachines: function (data) {
+        this.set('model.clouds.' + data.cloud_id + '.machines', _generateMap(data.machines));
+        this.set('model.clouds.' + data.cloud_id + '.machinesArray', data.machines);
+        var allMachines = [];
+        this.model.cloudsArray.forEach(
+          function(cloud){
+            return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])}
+        );
+        this.set('model.machinesArray', allMachines);
+    },
+
+    _updateNetworks: function (data) {
+        this.set('model.clouds.' + data.cloud_id + '.networks', _generateMap(data.networks));
+        this.set('model.clouds.' + data.cloud_id + '.networksArray', data.networks);
+        var allNetworks = [];
+        this.model.cloudsArray.forEach(
+          function(cloud){
+            return allNetworks = allNetworks.concat(cloud.networksArray != undefined ? cloud.networksArray : [])}
+        );
+        this.set('model.networksArray', allNetworks);
+    },
+
+    _updateProjects: function (data) {
+        this.set('model.clouds.' + data.cloud_id + '.projects', _generateMap(data.projects));
+        this.set('model.clouds.' + data.cloud_id + '.projectsArray', data.projects);
+    },
+
+    _probe: function (data) {
+        // TODO
+    },
+
+    _ping: function (data) {
+        // TODO
+    }
+
+})
+
+var _generateMap = function(list) {
+  var out = {};
+  for (var i = 0; i < list.length; i++) {
+    out[list[i].id] = list[i];
+  }
+  return out;
+};
+
+// ****
+
+var DumbEventTarget = function() {
+    this._listeners = {};
+};
+DumbEventTarget.prototype._ensure = function(type) {
+    if(!(type in this._listeners)) this._listeners[type] = [];
+};
+DumbEventTarget.prototype.addEventListener = function(type, listener) {
+    this._ensure(type);
+    this._listeners[type].push(listener);
+};
+DumbEventTarget.prototype.on = function(type, listener) {
+    console.info("Adding listener to " + this.name + " for event " + type);
+    this.addEventListener(type, listener);
+};
+DumbEventTarget.prototype.off = function(type, listener) {
+    console.info("Removing listener to " + this.name + " for event " + type);
+    this.removeEventListener(type, listener);
+};
+DumbEventTarget.prototype.emit = function(type) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    if (args.length == 1) {
+        var data = args[0]
+        if (data.data){
+            var keys = Object.keys(data.data);
+            if (keys.length == 1) {
+                type = keys[0];
+                data = data.data[type];
+                args = [data];
+            }
+        }
+    }
+    console.debug("Channel " + this.name + " got event '" + type + "'.");
+    this._ensure(type);
+    if (!(('on' + type in this) || (this._listeners[type].length))) {
+        console.warn("No listeners for '" + type + "' in " + this.name + ".");
+    }
+    if (this['on' + type]) this['on' + type].apply(this, args);
+    for (var i=0; i < this._listeners[type].length; i++) {
+        this._listeners[type][i].apply(this, args);
+    }
+};
+
+
+/**** Mux ****/
+
+var MultiplexedWebSocket = function(ws) {
+    var that = this;
+    this.ws = ws;
+    this.channels = {};
+    this.ws.addEventListener('message', function(e) {
+        var t = e.data.split(',');
+        var type = t.shift(), name = t.shift(), payload = t.join();
+        if(!(name in that.channels)) {
+            return;
+        }
+        var sub = that.channels[name];
+
+        switch(type) {
+        case 'uns':
+            delete that.channels[name];
+            sub.emit('close', {});
+            break;
+        case 'msg':
+            sub.emit('message', {data: JSON.parse(payload)});
+            break
+        }
+    });
+};
+
+MultiplexedWebSocket.prototype.channel = function(raw_name) {
+    return this.channels[escape(raw_name)] =
+        new Channel(this.ws, escape(raw_name), this.channels);
+};
+
+var Channel = function(ws, name, channels) {
+    DumbEventTarget.call(this);
+    var that = this;
+    this.ws = ws;
+    this.name = name;
+    this.channels = channels;
+    var onopen = function() {
+        that.ws.send('sub,' + that.name);
+        that.emit('open');
+    };
+    if(ws.readyState > 0) {
+        setTimeout(onopen, 0);
+    } else {
+        this.ws.addEventListener('open', onopen);
+    }
+};
+
+Channel.prototype = new DumbEventTarget()
+Channel.prototype.send = function(data) {
+    this.ws.send('msg,' + this.name + ',' + data);
+};
+Channel.prototype.close = function() {
+    var that = this;
+    this.ws.send('uns,' + this.name);
+    delete this.channels[this.name];
+    setTimeout(function(){that.emit('close', {})},0);
+};
+</script>

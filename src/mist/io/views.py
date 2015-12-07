@@ -16,6 +16,7 @@ import requests
 import json
 
 from pyramid.response import Response
+from pyramid.renderers import render_to_response
 
 try:
     from mist.core import config
@@ -68,20 +69,24 @@ def exception_handler_mist(exc, request):
     return Response(str(exc), exc.http_code)
 
 
-@view_config(context='pyramid.httpexceptions.HTTPNotFound',
-             renderer='templates/404.pt')
-def not_found(self, request):
-
-    return pyramid.httpexceptions.HTTPFound(request.host_url+"/#"+request.path)
-
+#@view_config(context='pyramid.httpexceptions.HTTPNotFound',
+#             renderer='templates/404.pt')
+#def not_found(self, request):
+#    return pyramid.httpexceptions.HTTPFound(request.host_url+"/#"+request.path)
 
 
-@view_config(route_name='home', request_method='GET',
-             renderer='templates/home.pt')
+
+@view_config(route_name='home', request_method='GET')
 def home(request):
     """Home page view"""
+    params = params_from_request(request)
     user = user_from_request(request)
-    return {
+    if params.get('poly', ''):
+        template = 'poly.pt'
+    else:
+        template = 'home.pt'
+    return render_to_response('templates/%s' % template,
+        {
         'project': 'mist.io',
         'email': json.dumps(user.email),
         'first_name': json.dumps(""),
@@ -97,7 +102,7 @@ def home(request):
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
         'last_build': config.LAST_BUILD
-    }
+        }, request=request)
 
 
 @view_config(route_name="check_auth", request_method='POST', renderer="json")

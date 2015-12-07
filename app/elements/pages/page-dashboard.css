@@ -1,0 +1,49 @@
+paper-header-panel {
+  background: rgb(245, 245, 245);
+}
+
+span.cloud-title {
+    bottom: -2px;
+    position: relative;
+}
+
+paper-header-panel .fit.style-scope.page-dashboard {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+google-chart {
+  height: 300px;
+  width: 50em;
+}
+
+.clouds {
+    display: inline;
+}
+
+.content {
+  display: block;
+  padding: 50px 0;
+}
+
+a.main-section {
+  width: 185px;
+  margin: 8px;
+}
+
+@media (max-width: 489px) {
+  a.main-section {
+    width: calc(100% - 16px);
+  }
+}
+
+.search.active {
+  left: 15px;
+}
+
+@media (max-width: 639px) {
+  paper-toolbar /deep/ #topBar {
+    margin-top: 4px;
+    padding: 0 16px;
+  }
+}

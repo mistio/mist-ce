@@ -1,0 +1,28 @@
+<link rel="import" href="../theme-color/theme-color.html">
+
+<dom-module id="section-tile">
+  <link rel="import" type="css" href="section-tile.css">
+  <template>
+    <theme-color id="content" color="[[color]]" class="vertical layout" themed>
+      <h2 class="count">[[count]]</h2>
+      <h3 class="title">[[name]] <iron-icon icon="[[icon]]"></iron-icon></h3>
+   </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'section-tile',
+    enableCustomStyleProperties: true,
+    properties: {
+      section: {type: String},
+      count: {type: Number}
+    },
+    attached: function() {
+      var tiles = this.parentNode.querySelectorAll('section-tile');
+      var index = Array.prototype.indexOf.call(tiles, this);
+      setTimeout(function() {
+        this.classList.add('active');
+      }.bind(this), (index + 1) * 50);
+    }
+  });
+</script>

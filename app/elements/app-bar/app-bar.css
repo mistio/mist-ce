@@ -1,0 +1,58 @@
+:host * {
+  box-sizing: border-box;
+}
+
+:host(.search-on) {
+  left: 0;
+  background: inherit;
+  z-index: 1001;
+}
+
+:host ::content iron-icon {
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+#search {
+  position: relative;
+}
+
+#search iron-icon {
+  margin-right: 0;
+  margin-left: 16px;
+  margin-top: -2px;
+}
+
+#search[show] {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  left: 0;
+  top: 0;
+  padding: 0 16px;
+  background: #fff;
+  margin-top: 2px;
+}
+
+#search[show] iron-icon {
+  margin-left: 0px;
+}
+
+#search input {
+  display: none;
+  font-family: var(--primary-font-family);
+  font-size: 15px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 2px;
+  -webkit-appearance: none;
+}
+
+#search[show] input {
+  display: block;
+}
+
+#search input:focus {
+  outline: 0;
+}

@@ -1,0 +1,58 @@
+<style is="custom-style">
+  * {
+    --app-logo-color: var(--primary-text-color);
+    --app-logo-font-size: 20px;
+  }
+</style>
+
+<dom-module id="app-logo">
+  <style>
+    :host {
+      font-size: var(--app-logo-font-size);
+    }
+
+    a {
+      max-width: 125px;
+      color: var(--app-logo-color);
+      text-transform: none;
+      text-decoration: none;
+    }
+
+    :host([full]) a {
+      max-width: 200px;
+    }
+
+    h1 {
+      font-size: 18px;
+      padding: 0 0 0 16px;
+      font-weight: 500;
+      color: #606060;
+      margin: 0;
+    }
+
+    img {
+      min-width: 36px;
+      padding: 2px;
+      box-sizing: border-box;
+      margin: 6px;
+    }
+  </style>
+  <template>
+    <a href="/?poly=1" is="pushstate-anchor" class="horizontal layout center">
+      <img src="/images/logo.svg" width="128" alt="Mist.io Logo">
+    </a>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'app-logo',
+    enableCustomStyleProperties: true,
+    properties: {
+      full: {
+        type: Boolean,
+        value: false
+      }
+    }
+  });
+</script>
