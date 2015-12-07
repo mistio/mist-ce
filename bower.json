@@ -37,7 +37,8 @@
     "pushstate-anchor": "~0.3.0",
     "color": "~2.5.0",
     "polymer-localforage": "https://github.com/addyosmani/polymer-localforage.git#gh-pages",
-    "excess-router": "~0.9.9"
+    "excess-router": "~0.9.9",
+    "iron-routes": "*"
   },
   "resolutions": {
     "jquery": "~2.1.4",
