@@ -24,6 +24,7 @@ define('app/controllers/key_add', ['ember'],
 
             keyId: null,
             keyPrivate: null,
+            keyPublic: null,
 
             addingKey: null,
             uploadingKey: null,
@@ -89,6 +90,7 @@ define('app/controllers/key_add', ['ember'],
                     callback: null,
                     keyId: null,
                     keyPrivate: null,
+                    keyPublic: null
                 });
             },
 
@@ -111,12 +113,20 @@ define('app/controllers/key_add', ['ember'],
             },
 
 
-            _generate: function (success, keyPrivate) {
+            _generate: function (success, keyPrivate, keyPublic) {
                 info('generate key callback');
                 var that = Mist.keyAddController;
                 that.set('generatingKey', false);
-                if (success)
-                    that.set('keyPrivate', keyPrivate);
+                if (success) {                    
+                    that.setProperties({
+                        'keyPrivate': keyPrivate,
+                        'keyPublic': keyPublic
+                    });
+
+                    Ember.run.next(function() {
+                        $('body').enhanceWithin();
+                    });
+                }
             },
 
 

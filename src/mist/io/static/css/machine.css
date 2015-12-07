@@ -157,8 +157,8 @@
 	border: none;
 }
 
-#single-machine-page .info-table tr:hover {
-	background-color: #f2f2f2;
+#single-machine-page .info-table tr:nth-child(2n) {
+	background-color: #f7f5ed;
 }
 
 #single-machine-page .info-table .ip {
@@ -371,6 +371,7 @@
 	padding: 0 5px;
 	border-radius: 1px;
 	margin: 3px 0;
+	word-break: break-all;
 }
 
 div.df {

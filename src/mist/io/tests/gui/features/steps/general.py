@@ -78,7 +78,7 @@ def wait_for_splash_to_appear(context, timeout=20):
             return
         except NoSuchElementException:
             sleep(1)
-    assert False, u'Splash did not appear after %s seconds' % str(timeout)
+    assert False, 'Splash did not appear after %s seconds' % str(timeout)
 
 
 def wait_for_splash_to_load(context, timeout=60):
@@ -95,6 +95,11 @@ def wait_for_splash_to_load(context, timeout=60):
 @step(u'I wait for {seconds} seconds')
 def wait(context, seconds):
     sleep(int(seconds))
+
+
+@step(u'I refresh the current page')
+def refresh_the_page(context):
+    context.browser.refresh()
 
 
 @then(u'I expect for "{panel_id}" panel to {action} within max {seconds} '
@@ -236,13 +241,26 @@ def become_visible_waiting_with_timeout(context, element_id, seconds):
                                "after %s seconds" % (element_id, seconds))
 
 
+@when(u'I click the button by "{id_name}" id_name')
+def click_button_id(context, id_name):
+    """
+    This function will try to click a button by id name.
+    And use the function clicketi_click
+    """
+    my_element = context.browser.find_element_by_id(id_name)
+    clicketi_click(context, my_element)
+
+
 @step(u'I click the button "{text}"')
 def click_button(context, text):
     """
     This function will try to click a button that says exactly the same thing as
     the text given. If it doesn't find any button like that then it will try
-    to find a button that contains the text given.
+    to find a button that contains the text given. If text is a key inside
+    mist_config dict then it's value will be used.
     """
+    if context.mist_config.get(text):
+        text = context.mist_config[text]
     click_button_from_collection(context, text,
                                  error_message='Could not find button that '
                                                'contains %s' % text)
@@ -252,10 +270,7 @@ def click_button(context, text):
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
-        title = pop.find_elements_by_class_name('ui-title')
-        if len(title) == 0:
-            continue
-        title = title[0].text
+        title = safe_get_element_text(pop.find_element_by_class_name('ui-title'))
         if popup.lower() in title.lower():
             if text == '_x_':
                 buttons = pop.find_elements_by_class_name("close")
@@ -266,7 +281,7 @@ def click_button_within_popup(context, text, popup):
                         return
                     except WebDriverException:
                         sleep(1)
-                assert False, u'Could not click the close button'
+                assert False, 'Could not click the close button'
             else:
                 buttons = pop.find_elements_by_class_name("ui-btn")
                 click_button_from_collection(context, text, buttons,
@@ -274,6 +289,29 @@ def click_button_within_popup(context, text, popup):
                                              'popup' % (text, popup))
                 return
     assert False, "Could not find popup with title %s" % popup
+
+
+@when(u'I click the "{text}" button inside the popup with id "{popup_id}" ')
+def click_button_within_popup_with_id(context, text, popup_id):
+    popup = context.browser.find_element_by_id(popup_id)
+    if "ui-popup-active" not in popup.get_attribute('class'):
+        raise Exception("Popup with id %s is not open" % popup_id)
+    if text == '_x_':
+        buttons = popup.find_elements_by_class_name("close")
+        assert len(buttons) > 0, "Could not find the close button"
+        for i in range(0, 2):
+            try:
+                clicketi_click(context, buttons[0])
+                return
+            except WebDriverException:
+                sleep(1)
+        assert False, 'Could not click the close button'
+    else:
+        buttons = popup.find_elements_by_class_name("ui-btn")
+        click_button_from_collection(context, text, buttons,
+                                     'Could not find %s button in popup'
+                                     'with id  %s' % (text, popup_id))
+        return
 
 
 @when(u'I click the "{text}" button inside the "{panel_title}" panel')
@@ -288,8 +326,7 @@ def click_button_within_panel(context, text, panel_title):
     found_panel = None
     for panel in panels:
         header = panel.find_element_by_class_name("ui-collapsible-heading")
-        # header = header.find_element_by_class_name("title")
-        if panel_title.lower() in header.text.lower():
+        if panel_title.lower() in safe_get_element_text(header).lower():
             found_panel = panel
             break
 
@@ -298,6 +335,8 @@ def click_button_within_panel(context, text, panel_title):
                         'there is no panel with that title' % panel_title
 
     buttons = found_panel.find_elements_by_class_name("ui-btn")
+    if context.mist_config.get(text):
+        text = context.mist_config[text]
     click_button_from_collection(context, text, buttons,
                                  error_message='Could not find %s button'
                                                ' inside %s panel' %
@@ -314,7 +353,7 @@ def click_button_from_collection(context, text, button_collection=None,
             return
         except WebDriverException:
             sleep(1)
-        assert False, u'Could not click button that says %s' % button.text
+        assert False, 'Could not click button that says %s(%s)' % (safe_get_element_text(button), text)
 
 
 def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
@@ -326,23 +365,21 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # also doing some cleaning if the text attribute also sends back texts
     # of sub elements
 
-    for button in button_collection:
-        try:
-            if button.text.rstrip().lstrip().split('\n')[0].lower() == text.lower():
-                return button
-        except StaleElementReferenceException:
-            pass
+    button = filter(
+        lambda b: safe_get_element_text(b).rstrip().lstrip().split('\n')[
+                      0].lower() == text.lower()
+                  and b.value_of_css_property('display') == 'block',
+        button_collection)
+    if len(button) > 0:
+        return button[0]
 
     # if we haven't found the exact text then we search for something that
     # looks like it
     for button in button_collection:
-        try:
-            button_text = button.text.split('\n')
-            if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
-                return button
-        except StaleElementReferenceException:
-            pass
-        
+        button_text = safe_get_element_text(button).split('\n')
+        if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
+            return button
+
     return None
 
 
@@ -378,7 +415,10 @@ def wait_for_buttons_to_appear(context):
         try:
             images_button = search_for_button(context, 'Images')
             counter_span = images_button.find_element_by_class_name("ui-li-count")
-            int(counter_span.text)
+
+            counter_span_text = safe_get_element_text(counter_span)
+
+            int(counter_span_text)
             break
         except (NoSuchElementException, StaleElementReferenceException,
                 ValueError, AttributeError) as e:
@@ -396,7 +436,8 @@ def some_counter_loaded(context, counter_title, counter_number, seconds):
     end_time = time() + int(seconds)
     while time() < end_time:
         counter_span = counter_found.find_element_by_class_name("ui-li-count")
-        counter = int(counter_span.text)
+        counter_span_text = safe_get_element_text(counter_span)
+        counter = int(counter_span_text)
 
         if counter > int(counter_number):
             return
@@ -414,7 +455,8 @@ def go_to_some_page_after_loading(context, title):
     the choice of waiting for the counter to load.
     For now the code will not be very accurate for keys page
     """
-    go_to_some_page_after_counter_loading(context, title, title)
+    context.execute_steps(u'When I visit the %s page after the %s counter has'
+                          u' loaded' % (title, title))
 
 
 @when(u'I visit the {title} page after the {counter_title} counter has loaded')
@@ -428,24 +470,12 @@ def go_to_some_page_after_counter_loading(context, title, counter_title):
         raise ValueError('The page given is unknown')
     if counter_title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts']:
         raise ValueError('The page given is unknown')
-    context.execute_steps(u'Then I wait for the links in homepage to appear')
-    context.execute_steps(u'Then %s counter should be greater than 0 '
-                          u'within 80 seconds' % counter_title)
-
-    go_to_some_page_without_waiting(context, title)
-
-    end_time = time() + 5
-    list_of_things = context.browser.find_element_by_id('%s-list' % title.lower().rpartition(title[-1])[0])
-    while time() < end_time:
-        try:
-            items_loaded = list_of_things.find_elements_by_tag_name('li')
-            if len(items_loaded) > 0:
-                return
-        except NoSuchElementException:
-            pass
-        assert time() + 1 < end_time, "No elements where loaded after 5" \
-                                      " seconds"
-        sleep(1)
+    context.execute_steps(u'''
+        Then I wait for the links in homepage to appear
+        Then %s counter should be greater than 0 within 80 seconds
+        When I click the button "%s"
+        And I wait for "%s" list page to load
+    ''' % (counter_title, title, title))
 
 
 @when(u'I visit the {title} page')
@@ -464,9 +494,19 @@ def go_to_some_page_without_waiting(context, title):
     if not i_am_in_homepage(context):
         if not str(context.browser.current_url).endswith(title.lower()):
             context.execute_steps(u'When I click the button "Home"')
-    context.execute_steps(u'Then I wait for the links in homepage to appear')
-    context.execute_steps(u'When I click the button "%s"' % title)
+    context.execute_steps(u'''
+        Then I wait for the links in homepage to appear
+        When I click the button "%s"
+        And I wait for "%s" list page to load
+    ''' % (title, title))
 
+
+@step(u'I wait for "{title}" list page to load')
+def wait_for_some_list_page_to_load(context, title):
+    if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts',
+                     'Account']:
+        raise ValueError('The page given is unknown')
+    # Wait for the list page to appear
     end_time = time() + 5
     while time() < end_time:
         try:
@@ -477,9 +517,9 @@ def go_to_some_page_without_waiting(context, title):
                                           "after 5 seconds" % title.lower()
             sleep(1)
 
-    # this code will stop waiting after 3 seconds if nothing appears otherwise
+    # this code will stop waiting after 5 seconds if nothing appears otherwise
     # it will stop as soon as a list is loaded
-    end_time = time() + 3
+    end_time = time() + 5
     while time() < end_time:
         try:
             list_of_things = context.browser.find_element_by_id('%s-list' % title.lower().rpartition(title[-1])[0])
@@ -491,7 +531,7 @@ def go_to_some_page_without_waiting(context, title):
         sleep(1)
 
 
-@when(u'I search for a "{text}" {type_of_search}')
+@when(u'I search for the "{text}" {type_of_search}')
 def search_for_something(context, text, type_of_search):
     type_of_search = type_of_search.lower()
     if type_of_search not in ['machine', 'key', 'image', 'script', 'network']:
@@ -501,6 +541,23 @@ def search_for_something(context, text, type_of_search):
     assert len(search_bar) == 1, "Found more than one %s-search search input " \
                                  "elements" % type_of_search
     search_bar = search_bar[0]
+    if context.mist_config.get(text):
+        text = context.mist_config[text]
     for letter in text:
         search_bar.send_keys(letter)
     sleep(2)
+
+
+def safe_get_element_text(check_element):
+    try:
+        return check_element.text
+    except StaleElementReferenceException:
+        return ""
+
+
+@step(u'I type "{some_text}" in input with id "{element_id}"')
+def give_some_input(context, some_text, element_id):
+    input_element = context.browser.find_element_by_id(element_id)
+    if context.mist_config.get(some_text):
+        some_text = context.mist_config[some_text]
+    input_element.send_keys(some_text)

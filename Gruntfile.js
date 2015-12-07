@@ -125,6 +125,14 @@ module.exports = function(grunt) {
                     force: true
                 }
             },
+            yamljs: {
+                target: '../node_modules/yamljs/',
+                link: 'dist/yamljs',
+                options: {
+                    overwrite: true,
+                    force: true
+                }
+            },
             images: {
                 target: '../src/mist/io/static/images',
                 link: 'dist/images',
@@ -164,13 +172,19 @@ module.exports = function(grunt) {
         'string-replace': {
             version: {
                 files: {
-                    'settings.py': 'settings.py'
+                    'settings.py': 'settings.py',
+                    'db.yaml': 'db.yaml',
                 },
                 options: {
                     replacements: [{
                         pattern: /LAST_BUILD = .*/,
                         replacement: 'LAST_BUILD = ' + timestamp
-                    }]
+                    },
+                    {
+                        pattern: 'backend',
+                        replacement: 'cloud'
+                    }
+                    ]
                 }
             }
         }
@@ -201,6 +215,7 @@ module.exports = function(grunt) {
 		'symlink:images',
 		'symlink:fonts',
 		'symlink:states',
+		'symlink:yamljs',
 		'requirejs',
 		'symlink:mistjs',
 		'symlink:mistcss',

@@ -193,13 +193,13 @@ define('app/controllers/graphs', ['app/models/stats_request', 'ember'],
                 var data = this._generatePayload(request);
                 var machine = request.datasources[0].machine;
                 Mist.main.emit('stats',
-                    machine.backend.id,
+                    machine.cloud.id,
                     machine.id,
                     data.start,
                     data.stop,
                     data.step,
                     request.id,
-                    request.metrics // backend will ignore this
+                    request.metrics // cloud will ignore this
                 );
             },
 

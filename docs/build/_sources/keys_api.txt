@@ -40,7 +40,7 @@
        }
     ]
 
-   For each Key a list of associated machines is returned with *backend_id, machine_id, username_of_machine, if_sudo* in this order
+   For each Key a list of associated machines is returned with *cloud_id, machine_id, username_of_machine, if_sudo* in this order
 
 .. http:put:: /keys
 

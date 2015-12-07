@@ -43,7 +43,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             sortByDefault: Ember.computed('sortByTerm', function () {
                 return this.get('sortByTerm') == 'default';
             }),
-            
+
             sortedKeys: Ember.computed('filteredKeys', 'filteredKeys.@each.id', 'filteredKeys.@each.isDefault', 'sortByTerm', function() {
                 if(this.get('filteredKeys'))
                 {
@@ -157,7 +157,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
                 var that = this;
                 this.set('associatingKey', true);
-                Mist.ajax.PUT('/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyId, {
+                Mist.ajax.PUT('/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/keys/' + keyId, {
                     'host': machine.getHost(),
                     'user': user,
                     'port': port
@@ -174,10 +174,10 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
 
             disassociateKey: function(keyId, machine, host, callback) {
-                var backend_id = machine.backend.id ? machine.backend.id : machine.backend;
+                var cloud_id = machine.cloud.id ? machine.cloud.id : machine.cloud;
                 var that = this;
                 this.set('disassociatingKey', true);
-                Mist.ajax.DELETE('/backends/' + backend_id + '/machines/' + machine.id + '/keys/' + keyId, {
+                Mist.ajax.DELETE('/clouds/' + cloud_id + '/machines/' + machine.id + '/keys/' + keyId, {
                     'host': machine.getHost()
                 }).success(function() {
                     that._disassociateKey(keyId, machine);
@@ -199,7 +199,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                         'Failed to generate key');
                 }).complete(function (success, key) {
                     that.set('generatingKey', false);
-                    if (args.callback) args.callback(success, key.priv);
+                    if (args.callback) args.callback(success, key.priv, key.public);
                 });
             },
 
@@ -332,7 +332,9 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             _associateKey: function(keyId, machine) {
                 Ember.run(this, function() {
-                    this.getKey(keyId).machines.pushObject([machine.backend.id, machine.id]);
+                    var key = this.getKey(keyId);
+                    key.machines.pushObject([machine.cloud.id, machine.id]);
+                    Mist.machineKeysController.probe(key);
                     machine.setProperties({
                         probed: true,
                         keysCount: this.getMachineKeysCount(machine),
@@ -346,8 +348,8 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                 Ember.run(this, function() {
                     var key = this.getKey(keyId);
                     key.machines.some(function (key_machine) {
-                        if (key_machine[1] == machine.id && (key_machine[0] == machine.backend.id ||
-                                                             key_machine[0] == machine.backend)) { // For ghost machines
+                        if (key_machine[1] == machine.id && (key_machine[0] == machine.cloud.id ||
+                                                             key_machine[0] == machine.cloud)) { // For ghost machines
                             key.machines.removeObject(key_machine);
                             return true;
                         }

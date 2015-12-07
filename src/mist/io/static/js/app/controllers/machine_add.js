@@ -1,4 +1,4 @@
-define('app/controllers/machine_add', ['ember'],
+define('app/controllers/machine_add', ['ember', 'yamljs'],
     /**
      *  Machine Add Controller
      *
@@ -20,10 +20,12 @@ define('app/controllers/machine_add', ['ember'],
             newMachineName: null,
             newMachineSize: null,
             newMachineImage: null,
+            newMachineCloudInit: null,
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
-            newMachineMonitoring: true,
+            newMachineProject: null,
+            newMachineMonitoring: null,
             newMachineAssociateFloatingIp: true,
             newMachineDockerCommand: null,
             newMachineDockerEnvironment: null,
@@ -65,7 +67,7 @@ define('app/controllers/machine_add', ['ember'],
 
                 if (providerName == 'NephoScale') {
                     var re = /^[0-9a-z_-]*$/;
-                    if ( machineName.length > 64 || !re.test(machineName)) {
+                    if (machineName.length > 64 || !re.test(machineName)) {
 
                         Mist.notificationController.timeNotify(
                             'Server name in NephoScale may have lower-case letters, numbers, hyphen (\'-\') and underscore (\'_\') characters, cannot exceed 64 ' +
@@ -74,12 +76,12 @@ define('app/controllers/machine_add', ['ember'],
                     }
                     if (machineSize.indexOf('CS025') > -1) {
                         if ((machineImage != 'Linux Ubuntu Server 10.04 LTS 64-bit') &&
-                            (machineImage !='Linux CentOS 6.2 64-bit')) {
+                            (machineImage != 'Linux CentOS 6.2 64-bit')) {
 
-                                Mist.notificationController.timeNotify(
-                                    'On CS025 size you can only create one of the two images: ' +
-                                    'Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit', 7000);
-                                return;
+                            Mist.notificationController.timeNotify(
+                                'On CS025 size you can only create one of the two images: ' +
+                                'Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit', 7000);
+                            return;
                         }
                     }
                 }
@@ -109,22 +111,24 @@ define('app/controllers/machine_add', ['ember'],
 
                 var that = this;
                 this.newMachineProvider.machines.newMachine(
-                        this.newMachineName,
-                        this.newMachineImage,
-                        this.newMachineSize,
-                        this.newMachineLocation,
-                        this.newMachineKey,
-                        this.newMachineScript,
-                        this.newMachineMonitoring,
-                        this.newMachineAssociateFloatingIp,
-                        this.newMachineDockerEnvironment.trim(),
-                        this.newMachineDockerCommand,
-                        this.newMachineScriptParams,
-                        this.newMachineDockerPorts,
-                        this.newMachineAzurePorts,
-                        function(success, machine) {
-                            that._giveCallback(success, machine);
-                        }
+                    this.get('newMachineName'),
+                    this.get('newMachineImage'),
+                    this.get('newMachineSize'),
+                    this.get('newMachineLocation'),
+                    this.get('newMachineKey'),
+                    this.get('newMachineCloudInit'),
+                    this.get('newMachineScript'),
+                    this.get('newMachineProject'),
+                    this.get('newMachineMonitoring'),
+                    this.get('newMachineAssociateFloatingIp'),
+                    this.get('newMachineDockerEnvironment').trim(),
+                    this.get('newMachineDockerCommand'),
+                    this.get('newMachineScriptParams'),
+                    this.get('newMachineDockerPorts'),
+                    this.get('newMachineAzurePorts'),
+                    function(success, machine) {
+                        that._giveCallback(success, machine);
+                    }
                 );
 
                 this.close();
@@ -140,15 +144,28 @@ define('app/controllers/machine_add', ['ember'],
             //  Pseudo-Private Methods
             //
 
-             _clear: function() {
+            _clear: function() {
                 this.set('callback', null)
                     .set('newMachineName', '')
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
-                    .set('newMachineKey', {'title' : 'Select Key'})
-                    .set('newMachineSize', {'name' : 'Select Size'})
-                    .set('newMachineImage', {'name' : 'Select Image'})
-                    .set('newMachineLocation', {'name' : 'Select Location'})
-                    .set('newMachineProvider', {'title' : 'Select Provider'})
+                    .set('newMachineProject', '')
+                    .set('newMachineKey', {
+                        'title': 'Select Key'
+                    })
+                    .set('newMachineSize', {
+                        'name': 'Select Size'
+                    })
+                    .set('newMachineImage', {
+                        'name': 'Select Image'
+                    })
+                    .set('newMachineLocation', {
+                        'name': 'Select Location'
+                    })
+                    .set('newMachineProvider', {
+                        'title': 'Select Provider'
+                    })
+                    .set('newMachineMonitoring', Mist.email ? true : false)
                     .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
@@ -156,7 +173,7 @@ define('app/controllers/machine_add', ['ember'],
                     .set('newMachineDockerPorts', '')
                     .set('newMachineAzurePorts', '');
                 this.view.clear();
-             },
+            },
 
             _updateFormReady: function() {
                 var formReady = false;
@@ -167,24 +184,35 @@ define('app/controllers/machine_add', ['ember'],
                     formReady = true;
                 }
 
-                // SSH key and location are optional for docker
+                // SSH key is optional for docker
                 if (this.newMachineProvider.provider != 'docker') {
-                    if (!(Mist.keysController.keyExists(this.newMachineKey.id) &&
-                        this.newMachineLocation.id)) {
+                    if (!Mist.keysController.keyExists(this.newMachineKey.id)) {
                         formReady = false;
                     }
                 }
 
                 if (this.newMachineProvider.provider == 'docker' && !this.view.dockerNeedScript) {
-                    if(! this.newMachineDockerCommand) {
+                    if (!this.newMachineDockerCommand) {
                         formReady = false;
                     }
                 }
 
                 if (this.newMachineImage.id &&
                     this.newMachineImage.get('isMist')) {
-                        if (!Mist.keysController.keyExists(this.newMachineKey.id))
+                    if (!Mist.keysController.keyExists(this.newMachineKey.id))
+                        formReady = false;
+                }
+
+                var cloudInit = this.get('newMachineCloudInit').trim();
+                if (cloudInit) {
+                    try {
+                        if ( ! (cloudInit.substring(0, 12) == "#!/bin/bash\n" || (YAML.parse(cloudInit) && cloudInit.substring(0, 13) == '#cloud-config'))) {
                             formReady = false;
+                            Mist.notificationController.timeNotify('Please start your cloud init script with #!/bin/bash or use a valid yaml configuration file (should start with #cloud-config)', 4000);
+                        }
+                    } catch (err) {
+
+                    }
                 }
 
                 if (formReady && this.addingMachine) {
@@ -200,11 +228,21 @@ define('app/controllers/machine_add', ['ember'],
 
             _resetProvider: function() {
                 this.set('callback', null)
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
-                    .set('newMachineKey', {'title' : 'Select Key'})
-                    .set('newMachineSize', {'name' : 'Select Size'})
-                    .set('newMachineImage', {'name' : 'Select Image'})
-                    .set('newMachineLocation', {'name' : 'Select Location'})
+                    .set('newMachineProject', '')
+                    .set('newMachineKey', {
+                        'title': 'Select Key'
+                    })
+                    .set('newMachineSize', {
+                        'name': 'Select Size'
+                    })
+                    .set('newMachineImage', {
+                        'name': 'Select Image'
+                    })
+                    .set('newMachineLocation', {
+                        'name': 'Select Location'
+                    })
                     .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
@@ -216,12 +254,19 @@ define('app/controllers/machine_add', ['ember'],
             _selectUnique: function() {
                 // Locations Check
                 if (this.newMachineProvider.locations) {
-                    if (this.newMachineProvider.locations.model.length == 1) this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                    if (this.newMachineProvider.locations.model.length == 1) {
+                        this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                    }
                 }
 
                 // Sizes Check
                 if (this.newMachineProvider.sizes) {
                     if (this.newMachineProvider.sizes.model.length == 1) this.set('newMachineSize', this.newMachineProvider.sizes.model[0]);
+                }
+
+                // Projects Check
+                if (this.newMachineProvider.projects) {
+                    if (this.newMachineProvider.projects.model.length == 1) this.set('newMachineProject', this.newMachineProvider.projects.model[0]);
                 }
             },
 
@@ -231,17 +276,18 @@ define('app/controllers/machine_add', ['ember'],
 
             providerObserver: function() {
                 Ember.run.once(this, '_selectUnique');
-            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize'),
+            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize', 'newMachineProject'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
             }.observes('newMachineKey',
-                       'newMachineName',
-                       'newMachineSize',
-                       'newMachineImage',
-                       'newMachineScript',
-                       'newMachineLocation',
-                       'newMachineProvider')
+                'newMachineName',
+                'newMachineSize',
+                'newMachineImage',
+                'newMachineScript',
+                'newMachineLocation',
+                'newMachineProvider',
+                'newMachineCloudInit')
         });
     }
 );
