@@ -15,9 +15,6 @@
   <template>
       <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
         <app-sidebar drawer>
-          <paper-toolbar>
-            <app-logo class="flex" tabindex="1"></app-logo>
-          </paper-toolbar>
           <div class="content">
             <div id="section-tag" hidden$="[[!tag]]">
               <span>[[tag]]</span> <iron-icon icon="clear" on-tap="clearTag"></iron-icon>
@@ -61,10 +58,12 @@
         </app-sidebar>
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
-            <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex">[[pageTitle]]</h2>
+            <h2 class="flex">[[_filteredElements.length]] [[pageTitle]]</h2>
+            <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
+            <paper-icon-button icon="icons:sort"></paper-icon-button>
             <paper-icon-button class="toggleViewButton" icon="[[viewIcon]]" on-tap="toggleView" hidden$="[[_forceCards]]"></paper-icon-button>
+            <paper-icon-button icon="account-circle"></paper-icon-button>
           </div>
           <div id="content">
             <div id="section-heading" hidden$="[[!section]]">

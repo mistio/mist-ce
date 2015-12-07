@@ -152,8 +152,8 @@ paper-toolbar nav .active {
 
 paper-fab {
     position: fixed;
-    right: 32px;
-    bottom: 32px;
+    right: 8px;
+    bottom: 16px;
     background-color: #D96557;
     z-index: 10;
 }
