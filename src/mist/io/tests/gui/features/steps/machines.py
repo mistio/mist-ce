@@ -38,12 +38,24 @@ def clear_machines_search_bar(context):
     search_bar_machine.clear()
 
 
-@when(u'I fill in a "{machine_name}" machine name')
-def fill_machine_mame(context, machine_name):
-    if not context.mist_config.get(machine_name):
-        context.mist_config[machine_name] = "testlikeapro%s" % randrange(10000)
+@when(u'I fill in a "{name}" machine name')
+def fill_machine_mame(context, name):
+    """
+    This step will create a random machine name and a suitable name for an
+    accompanying ssh key and will update the context.
+    """
+    if 'random' in name or context.mist_config.get(name):
+        if not context.mist_config.get(name):
+            if 'random ' in name:
+                name = name.lstrip('random ')
+            machine_name = context.mist_config[name] = "testlikeapro%s" % randrange(10000)
+        else:
+            machine_name = context.mist_config[name]
+    else:
+        machine_name = name
     textfield = context.browser.find_element_by_id("create-machine-name")
-    textfield.send_keys(context.mist_config[machine_name])
+    textfield.send_keys(machine_name)
+    context.mist_config[name + "_machine_key"] = machine_name + "_key"
     sleep(1)
 
 

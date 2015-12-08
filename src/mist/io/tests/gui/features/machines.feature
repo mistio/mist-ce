@@ -11,7 +11,7 @@ Feature: Machines
     When I visit the Machines page after the counter has loaded
     And I click the button "Create Machine"
     Then I expect for "create-machine" panel to appear within max 4 seconds
-    When I fill in a random machine name
+    When I fill in a "randomly_created" machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
     And I click the "EC2" button inside the "Create Machine" panel
     And I click the "Select Image" button inside the "Create Machine" panel
@@ -23,7 +23,7 @@ Feature: Machines
     And I click the "Select Key" button inside the "Create Machine" panel
     And I click the "Add Key" button inside the "Create Machine" panel
     Then I expect for "key-add-popup" popup to appear within max 4 seconds
-    When I fill "randomly_created" as key name
+    When I fill "randomly_created_machine_key" as key name
     And I click the "Generate" button inside the "Add key" popup
     Then I expect for "key-generate-loader" loader to finish within max 10 seconds
     When I click the "Add" button inside the "Add key" popup
@@ -105,7 +105,7 @@ Feature: Machines
     When I click the button "Ubuntu Server 14.04 LTS (PV)"
     Then I expect for "single-image-page" page to appear within max 2 seconds
     And I click the button "Create Machine"
-    When I fill in a "second" machine name
+    When I fill in a "random second" machine name
     And I click the "Select Size" button inside the "Create Machine" panel
     And I click the "Micro Instance" button inside the "Create Machine" panel
     And I click the "Select Location" button inside the "Create Machine" panel
@@ -113,7 +113,7 @@ Feature: Machines
     And I click the "Select Key" button inside the "Create Machine" panel
     And I click the "Add Key" button inside the "Create Machine" panel
     Then I expect for "key-add-popup" popup to appear within max 2 seconds
-    When I fill "secondmachinekey" as key name
+    When I fill "second_machine_key" as key name
     And I click the "Generate" button inside the "Add key" popup
     Then I expect for "key-generate-loader" loader to finish within max 10 seconds
     When I click the "Add" button inside the "Add key" popup
@@ -136,7 +136,7 @@ Feature: Machines
 
     And I click the button "Create Machine"
     Then I expect for "create-machine" panel to appear within max 4 seconds
-    When I fill in a "first" machine name
+    When I fill in a "random first" machine name
     And I click the "Select Provider" button inside the "Create Machine" panel
     And I click the "EC2" button inside the "Create Machine" panel
     And I click the "Select Image" button inside the "Create Machine" panel
@@ -148,7 +148,7 @@ Feature: Machines
     And I click the "Select Key" button inside the "Create Machine" panel
     And I click the "Add Key" button inside the "Create Machine" panel
     Then I expect for "key-add-popup" popup to appear within max 4 seconds
-    When I fill "firstmachinekey" as key name
+    When I fill "first_machine_key" as key name
     And I click the "Generate" button inside the "Add key" popup
     Then I expect for "key-generate-loader" loader to finish within max 10 seconds
     When I click the "Add" button inside the "Add key" popup
@@ -179,9 +179,10 @@ Feature: Machines
     Then I expect for "dialog-popup" popup to appear within max 4 seconds
     When I click the button "Yes"
     Then I expect for "dialog-popup" popup to disappear within max 4 seconds
-    #And "randomly_created" machine state should be "running" within 200 seconds
+    When I choose the "first" machine
 
     When I clear the machines search bar
+    Then I search for the "second" Machine
     When I choose the "second" machine
     And I click the button "Actions"
     Then I expect for "machine-power-popup-popup" popup to appear within max 4 seconds
@@ -189,24 +190,32 @@ Feature: Machines
     Then I expect for "dialog-popup" popup to appear within max 4 seconds
     When I click the button "Yes"
     Then I expect for "dialog-popup" popup to disappear within max 4 seconds
+    When I choose the "second" machine
+
+    When I clear the machines search bar
+    Then I search for the "first" Machine
     And "first" machine state should be "terminated" within 200 seconds
+
+    When I clear the machines search bar
+    Then I search for the "second" Machine
     And "second" machine state should be "terminated" within 200 seconds
+    When I choose the "second" machine
 
     When I click the button "HOME"
     And I click the button "KEYS"
     Then I expect for "key-list-page" page to appear within max 2 seconds
-    When I click the button "firstmachinekey"
+    When I click the button "first_machine_key"
     Then I expect for "single-key-page" page to appear within max 4 seconds
     When I click the button "Delete"
     Then I expect for "dialog-popup" popup to appear within max 4 seconds
     When I click the button "Yes"
     Then I expect for "dialog-popup" popup to disappear within max 4 seconds
-    And "firstmachinekey" key should be deleted
-    When I click the button "secondmachinekey"
+    And "first_machine_key" key should be deleted
+    When I click the button "second_machine_key"
     Then I expect for "single-key-page" page to appear within max 4 seconds
     When I click the button "Delete"
     Then I expect for "dialog-popup" popup to appear within max 4 seconds
     When I click the button "Yes"
     Then I expect for "dialog-popup" popup to disappear within max 4 seconds
-    And "secondmachinekey" key should be deleted
+    And "second_machine_key" key should be deleted
     When I wait for 2 seconds
