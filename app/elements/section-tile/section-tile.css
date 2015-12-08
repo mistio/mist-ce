@@ -54,7 +54,7 @@ h3 {
   transition-timing-function: var(--material-curve-320);
   text-transform: uppercase;
   text-align: center;
-  margin: 5px 0 0 16px;
+  margin: 5px 0 0 0;
 }
 
 :host(.active) h3 {
@@ -68,7 +68,7 @@ h3 {
     color: #fff;
     opacity: .8;
     vertical-align: text-top;
-    margin-left: 10px;
+    margin-left: 6px;
 }
 
 :host(.active) .symbol {

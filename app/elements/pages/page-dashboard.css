@@ -55,10 +55,7 @@ paper-toolbar {
     margin-top: 4px;
     padding: 0 16px;
   }
-}
-
-@media (max-width: 992px) {
-  .content a.main-section:first-child {
-    /*min-width: calc(100% - 16px);*/
+  a.main-section:first-child {
+    min-width: calc(100% - 16px);
   }
 }
