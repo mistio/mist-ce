@@ -38,26 +38,19 @@ def clear_machines_search_bar(context):
     search_bar_machine.clear()
 
 
-@when(u'I fill in a "{name}" for specific machine name')
-def fill_specific_machine_name(context,name):
+@when(u'I fill in a "{machine_name}" machine name')
+def fill_machine_mame(context, machine_name):
+    if not context.mist_config.get(machine_name):
+        context.mist_config[machine_name] = "testlikeapro%s" % randrange(10000)
     textfield = context.browser.find_element_by_id("create-machine-name")
-    specific_name = name
-    textfield.send_keys(specific_name)
-    sleep(1)
-
-
-@when(u'I fill in a random machine name')
-def fill_machine_mame(context):
-    textfield = context.browser.find_element_by_id("create-machine-name")
-    context.random_name = "testlikeapro%s" % randrange(10000)
-    textfield.send_keys(context.random_name)
+    textfield.send_keys(context.mist_config[machine_name])
     sleep(1)
 
 
 @when(u'I choose the "{name}" machine')
 def choose_machine(context, name):
-    if "randomly_created" in name:
-        name = context.random_name
+    if context.mist_config.get(name):
+        name = context.mist_config.get(name)
 
     end_time = time() + 20
     while time() < end_time:
@@ -73,17 +66,12 @@ def choose_machine(context, name):
 
 @then(u'I should see the "{name}" machine added within {seconds} seconds')
 def assert_machine_added(context, name, seconds):
-    if "randomly_created" in name:
-        machine_name = context.random_name
-    else:
-        if context.mist_config.get(name):
-            machine_name = name
-        else:
-            machine_name = name
+    if context.mist_config.get(name):
+        name = context.mist_config.get(name)
 
     end_time = time() + int(seconds)
     while time() < end_time:
-        machine = get_machine(context, machine_name)
+        machine = get_machine(context, name)
         if machine:
             return
         sleep(2)
@@ -93,14 +81,12 @@ def assert_machine_added(context, name, seconds):
 
 @then(u'"{name}" machine state should be "{state}" within {seconds} seconds')
 def assert_machine_state(context, name, state, seconds):
-    if "randomly_created" in name:
-        machine_name = context.random_name
-    else:
-        machine_name = name
+    if context.mist_config.get(name):
+        name = context.mist_config.get(name)
 
     end_time = time() + int(seconds)
     while time() < end_time:
-        machine = get_machine(context, machine_name)
+        machine = get_machine(context, name)
         if machine:
             try:
                 if state in safe_get_element_text(machine):
@@ -111,19 +97,17 @@ def assert_machine_state(context, name, state, seconds):
                 pass
         sleep(2)
 
-    assert False, u'%s state is not "%s"' % (machine_name, state)
+    assert False, u'%s state is not "%s"' % (name, state)
 
 
 @then(u'"{name}" machine should be probed within {seconds} seconds')
 def assert_machine_probed(context, name, seconds):
-    if "randomly_created" in name:
-        machine_name = context.random_name
-    else:
-        machine_name = name
+    if context.mist_config.get(name):
+        name = context.mist_config.get(name)
 
     end_time = time() + int(seconds)
     while time() < end_time:
-        machine = get_machine(context, machine_name)
+        machine = get_machine(context, name)
         if machine:
             try:
                 probed = machine.find_element_by_class_name("probed")
@@ -135,7 +119,7 @@ def assert_machine_probed(context, name, seconds):
             sleep(3)
 
     assert False, u'%s machine is not probed within %s seconds' % (
-                    machine_name, seconds)
+                    name, seconds)
 
 
 def get_machine(context, name):
@@ -402,6 +386,6 @@ def check_ssh_connection(context):
 
 @then(u'I search for the "{text}" Machine')
 def search_image(context, text):
-    if text == 'randomly_created':
-        text = context.random_name
+    if context.mist_config.get(text):
+        text = context.mist_config.get(text)
     search_for_something(context, text, 'machine')
