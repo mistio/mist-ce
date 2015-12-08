@@ -10,7 +10,7 @@
   opacity: 1;
 }
 
-#content {
+.content {
   display: block;
   position: relative;
   width: 100%;
@@ -33,12 +33,13 @@
 h2 {
   font-weight: 400;
   font-size: 54px;
-  margin: 16px;
+  margin: 16px 0 5px 0;
   transform: translate(-50px, 0);
   opacity: 0;
   transition: all 500ms 320ms;
   transition-timing-function: var(--material-curve-320);
   text-align: center;
+  min-height: 1em;
 }
 
 :host(.active) h2 {
@@ -52,8 +53,8 @@ h3 {
   transition: all 600ms 320ms;
   transition-timing-function: var(--material-curve-320);
   text-transform: uppercase;
-  text-align: left;
-  width: 130px;
+  text-align: center;
+  margin: 5px 0 0 16px;
 }
 
 :host(.active) h3 {
@@ -66,10 +67,8 @@ h3 {
     height: 24px;
     color: #fff;
     opacity: .8;
-    position: relative;
-    right: -6px;
-    top: 2px;
-    float: right;
+    vertical-align: text-top;
+    margin-left: 10px;
 }
 
 :host(.active) .symbol {
@@ -79,8 +78,6 @@ h3 {
 
 .title {
   display: block;
-  margin: 0 8px 6px;
-  height: 35px;
   font-size: 20px;
   font-weight: 500;
   line-height: 28px;

@@ -38,7 +38,7 @@ p {
 h1 {
   font-size: 45px;
   font-weight: 400;
-  letter-spacing: -.018em;
+  /*letter-spacing: -.018em;*/
   line-height: 48px;
 }
 
@@ -53,7 +53,7 @@ h2 {
 h3 {
   font-size: 24px;
   font-weight: 400;
-  letter-spacing: -.012em;
+ /* letter-spacing: -.012em;*/
   line-height: 32px;
 }
 
@@ -152,14 +152,14 @@ paper-toolbar nav .active {
 
 paper-fab {
     position: fixed;
-    right: 8px;
+    right: 32px;
     bottom: 16px;
     background-color: #D96557;
     z-index: 10;
 }
 
 paper-fab > iron-icon {
-    color: #fff !important;
+    color: #fff;
 }
 
 iron-icon {

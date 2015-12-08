@@ -27,39 +27,41 @@
           </template>
       </div>
       <div class="sections layout horizontal wrap">
-        <a href="/machines" class="main-section flex-none">
+        <a href="/machines" class="main-section flex">
           <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
           </section-tile>
         </a>
-        <a href="/images" class="main-section flex-none">
+        <a href="/images" class="main-section flex">
           <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="{{model.imagesArray.length}}">
           </section-tile>
         </a>
-        <a href="/keys" class="main-section flex-none">
+        <a href="/keys" class="main-section flex">
           <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="{{model.keysArray.length}}">
           </section-tile>
         </a>
-        <a href="/networks" class="main-section flex-none">
+        <a href="/networks" class="main-section flex">
           <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="{{model.networksArray.length}}">
           </section-tile>
         </a>
-        <a href="/scripts" class="main-section flex-none">
+        <a href="/scripts" class="main-section flex">
           <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="{{model.scriptsArray.length}}">
           </section-tile>
         </a>
       </div>
-      <google-chart
-          id="mutating_gauge"
-          type="line"
-          data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]'
-          options='{"width": "100%",
-                    "height": 240,
-                    "redFrom": 90,
-                    "redTo": 100,
-                    "yellowFrom": 75,
-                    "yellowTo": 90,
-                    "minorTicks": 5}'>
-      </google-chart>
+      <div class="sections layout horizontal wrap">
+        <google-chart
+            id="mutating_gauge"
+            type="line"
+            data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]'
+            options='{"width": "100%",
+                      "height": 240,
+                      "redFrom": 90,
+                      "redTo": 100,
+                      "yellowFrom": 75,
+                      "yellowTo": 90,
+                      "minorTicks": 5}'>
+        </google-chart>
+      </div>
     </paper-header-panel>
   </template>
 </dom-module>

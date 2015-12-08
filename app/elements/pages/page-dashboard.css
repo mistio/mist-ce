@@ -18,7 +18,7 @@ google-chart {
 }
 
 .clouds {
-    display: inline;
+  display: inline;
 }
 
 .content {
@@ -27,8 +27,17 @@ google-chart {
 }
 
 a.main-section {
-  width: 185px;
+  min-width: 200px;
   margin: 8px;
+}
+
+paper-button {
+  background-color: #fff;
+  margin: 0 0.5em 10px 10px;  
+}
+
+paper-toolbar {
+  background-color: #fff;
 }
 
 @media (max-width: 489px) {
@@ -45,5 +54,11 @@ a.main-section {
   paper-toolbar /deep/ #topBar {
     margin-top: 4px;
     padding: 0 16px;
+  }
+}
+
+@media (max-width: 992px) {
+  .content a.main-section:first-child {
+    /*min-width: calc(100% - 16px);*/
   }
 }
