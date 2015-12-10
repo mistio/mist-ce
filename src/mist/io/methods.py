@@ -102,25 +102,28 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         cloud.enabled = True
         cloud.machines[machine_id] = machine
         cloud_id = cloud.get_id()
+        if cloud_id in user.clouds:
+            raise CloudExistsError(cloud_id)
+
         with user.lock_n_load():
-            if cloud_id in user.clouds:
-                raise CloudExistsError(cloud_id)
             user.clouds[cloud_id] = cloud
-            # try to connect. this will either fail and we'll delete the
-            # cloud, or it will work and it will create the association
-            if remove_on_error:
-                try:
-                    ssh_command(
-                        user, cloud_id, machine_id, machine_hostname, 'uptime',
-                        key_id=machine_key, username=machine_user, password=None,
-                        port=port
-                    )
-                except MachineUnauthorizedError as exc:
-                    # remove cloud
+            user.save()
+
+        # try to connect. this will either fail and we'll delete the
+        # cloud, or it will work and it will create the association
+        if remove_on_error:
+            try:
+                ssh_command(
+                    user, cloud_id, machine_id, machine_hostname, 'uptime',
+                    key_id=machine_key, username=machine_user, password=None,
+                    port=port
+                )
+            except MachineUnauthorizedError as exc:
+                # remove cloud
+                with user.lock_n_load():
                     del user.clouds[cloud_id]
                     user.save()
-                    raise CloudUnauthorizedError(exc)
-            user.save()
+                raise CloudUnauthorizedError(exc)
     else:
         # if api secret not given, search if we already know it
         # FIXME: just pass along an empty apisecret
@@ -378,26 +381,27 @@ def _add_cloud_bare_metal(user, title, provider, params):
     cloud.enabled = True
     cloud.machines[machine_id] = machine
     cloud_id = cloud.get_id()
+    if cloud_id in user.clouds:
+        raise CloudExistsError(cloud_id)
 
     with user.lock_n_load():
-        if cloud_id in user.clouds:
-            raise CloudExistsError(cloud_id)
         user.clouds[cloud_id] = cloud
-        # try to connect. this will either fail and we'll delete the
-        # cloud, or it will work and it will create the association
-        if use_ssh:
-            try:
-                ssh_command(
-                    user, cloud_id, machine_id, machine_hostname, 'uptime',
-                    key_id=machine_key, username=machine_user, password=None,
-                    port=port
-                )
-            except MachineUnauthorizedError as exc:
-                raise CloudUnauthorizedError(exc)
-            except ServiceUnavailableError as exc:
-                raise MistError("Couldn't connect to host '%s'."
-                                % machine_hostname)
         user.save()
+
+    # try to connect. this will either fail and we'll delete the
+    # cloud, or it will work and it will create the association
+    if use_ssh:
+        try:
+            ssh_command(
+                user, cloud_id, machine_id, machine_hostname, 'uptime',
+                key_id=machine_key, username=machine_user, password=None,
+                port=port
+            )
+        except MachineUnauthorizedError as exc:
+            raise CloudUnauthorizedError(exc)
+        except ServiceUnavailableError as exc:
+            raise MistError("Couldn't connect to host '%s'."
+                            % machine_hostname)
     if params.get('monitoring'):
         try:
             from mist.core.methods import enable_monitoring as _en_monitoring
@@ -449,10 +453,13 @@ def _add_cloud_coreos(user, title, provider, params):
     cloud.machines[machine_id] = machine
     cloud_id = cloud.get_id()
 
+    if cloud_id in user.clouds:
+        raise CloudExistsError(cloud_id)
+
     with user.lock_n_load():
-        if cloud_id in user.clouds:
-            raise CloudExistsError(cloud_id)
         user.clouds[cloud_id] = cloud
+        user.save()
+
         # try to connect. this will either fail and we'll delete the
         # cloud, or it will work and it will create the association
         if use_ssh:
@@ -467,7 +474,6 @@ def _add_cloud_coreos(user, title, provider, params):
             except ServiceUnavailableError as exc:
                 raise MistError("Couldn't connect to host '%s'."
                                 % machine_hostname)
-        user.save()
 
     if params.get('monitoring'):
         try:
