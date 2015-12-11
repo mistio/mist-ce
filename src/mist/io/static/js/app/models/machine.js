@@ -59,7 +59,7 @@ define('app/models/machine', ['ember'],
             //
 
             cannotHaveMonitoring: Ember.computed('state', function() {
-                var invalids = ['error', 'stopped', 'terminated', 'pending', 'rebooting'];
+                var invalids = ['error', 'stopped', 'terminated', 'undefining', 'pending', 'rebooting'];
                 return invalids.indexOf(this.get('state')) > -1;
             }),
 
@@ -79,7 +79,9 @@ define('app/models/machine', ['ember'],
                         rebooting: 4,
                         running: 3,
                         unknown: 2,
+                        suspended: 2,
                         terminated: 1,
+                        undefining: 1,
                         stopped: 0
                     };
 
@@ -112,8 +114,8 @@ define('app/models/machine', ['ember'],
                 return this.get('state') == 'running';
             }.property('state'),
 
-            hasNotActions: Ember.computed('can_start', 'can_reboot', 'can_destroy', 'can_shutdown', 'can_rename', function() {
-                return !this.get('can_start') && !this.get('can_reboot') && !this.get('can_destroy') && !this.get('can_shutdown') && !this.get('can_rename');
+            hasNotActions: Ember.computed('can_start', 'can_reboot', 'can_destroy', 'can_shutdown', 'can_rename', 'can_undefine', 'can_suspend', 'can_resume', function() {
+                return !this.get('can_start') && !this.get('can_reboot') && !this.get('can_destroy') && !this.get('can_shutdown') && !this.get('can_rename') && !this.get('can_undefine') && !this.get('can_suspend') && !this.get('can_resume');
             }),
 
             netled1: function() {
@@ -226,6 +228,18 @@ define('app/models/machine', ['ember'],
 
             reboot: function(callback) {
                 this.cloud.rebootMachine(this.id, callback);
+            },
+
+            undefine: function(callback) {
+                this.cloud.undefineMachine(this.id, callback);
+            },
+
+            suspend: function(callback) {
+                this.cloud.suspendMachine(this.id, callback);
+            },
+
+            resume: function(callback) {
+                this.cloud.resumeMachine(this.id, callback);
             },
 
             start: function(callback) {

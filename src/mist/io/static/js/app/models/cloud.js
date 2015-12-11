@@ -53,7 +53,7 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
             }.property('provider'),
 
             hasNetworks: function () {
-                return  ['openstack', 'nephoscale', 'azure', 'vcloud', 'ec2', 'gce', 'indonesian_vcloud', 'hpcloud']
+                return  ['openstack', 'nephoscale', 'azure', 'vcloud', 'ec2', 'gce', 'indonesian_vcloud', 'hpcloud', 'libvirt']
                     .indexOf(this.provider) > -1;
             }.property('provider'),
 
@@ -84,7 +84,7 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
 
             canCreateMachine: function () {
                 return this.enabled &&
-                    ['indonesian_vcloud', 'bare_metal', 'libvirt', 'vsphere'].indexOf(this.provider) == -1;
+                    ['indonesian_vcloud', 'bare_metal', 'vsphere'].indexOf(this.provider) == -1;
             }.property('provider', 'enabled'),
 
             className: function () {
@@ -165,6 +165,18 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
 
             rebootMachine: function (machineId, callback) {
                 this.machines.rebootMachine(machineId, callback);
+            },
+
+            undefineMachine: function (machineId, callback) {
+                this.machines.undefineMachine(machineId, callback);
+            },
+
+            resumeMachine: function (machineId, callback) {
+                this.machines.resumeMachine(machineId, callback);
+            },
+
+            suspendMachine: function (machineId, callback) {
+                this.machines.suspendMachine(machineId, callback);
             },
 
             startMachine: function (machineId, callback) {
