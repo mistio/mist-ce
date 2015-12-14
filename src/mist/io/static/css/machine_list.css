@@ -105,13 +105,13 @@
 .running .machine-state span {
     color: #64b247;
 }
-.pending .machine-state span {
+.pending .machine-state span, .suspended .machine-state span {
     color: #E09400;
 }
 .rebooting .machine-state span {
     color: #4E68BB;
 }
-.terminated .machine-state span {
+.terminated .machine-state span, .undefining .machine-state span {
     color: #AAAAAA;
 }
 .error .machine-state span {

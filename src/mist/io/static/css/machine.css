@@ -33,7 +33,7 @@
 	color: #64b247;
 }
 
-#single-machine-page .ui-block-b h4.ui-title.pending {
+#single-machine-page .ui-block-b h4.ui-title.pending, #single-machine-page .ui-block-b h4.ui-title.suspended {
 	color: #E09400;
 }
 
@@ -45,7 +45,7 @@
 	color: #4E68BB;
 }
 
-#single-machine-page .ui-block-b h4.ui-title.terminated {
+#single-machine-page .ui-block-b h4.ui-title.terminated, #single-machine-page .ui-block-b h4.ui-title.undefining {
 	color: #AAAAAA;
 }
 
