@@ -13,13 +13,18 @@ define('app/controllers/script_run', ['ember'],
             scriptToRun: Ember.Object.create({
                 script: {},
                 machine: '',
-                parameters: ''
+                parameters: '',
+                scheduler: '',
+                interval: {
+                    every: '',
+                    period: ''
+                }
             }),
 
             open: function (script) {
                 this.clear();
                 this.get('scriptToRun').set('script', script);
-                
+
                 this.view.open();
             },
 
@@ -33,6 +38,11 @@ define('app/controllers/script_run', ['ember'],
                     script: {},
                     machine: '',
                     parameters: '',
+                    scheduler: this.view.scriptSchedulers[0],
+                    interval: {
+                        every: '',
+                        period: ''
+                    }
                 });
             },
 

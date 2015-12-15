@@ -46,36 +46,6 @@ define('app/views/script_add', ['app/views/controlled'],
                 value: 'inline'
             }],
 
-            scriptSchedulers: [{
-                label: 'Now',
-                value: 'now'
-            }, {
-                label: 'One-Off',
-                value: 'one_off',
-            }, {
-                label: 'Interval',
-                value: 'interval'
-            }, {
-                label: 'Crontab',
-                value: 'crontab'
-            }],
-
-            scriptPeriods: [{
-                label: 'seconds',
-                limit: 60,
-            }, {
-                label: 'minutes',
-                limit: 60
-            }, {
-                label: 'hours',
-                limit: 24
-            }, {
-                label: 'days',
-                limit: 30
-            }],
-            scriptEveryOptions: [],
-
-
             //
             //  Computed Properties
             //
@@ -109,18 +79,6 @@ define('app/views/script_add', ['app/views/controlled'],
             isGitHub: function() {
                 return Mist.scriptAddController.newScript.source.value == 'github';
             }.property('Mist.scriptAddController.newScript.source'),
-
-            isOneOff: function() {
-                return Mist.scriptAddController.newScript.scheduler.value == 'one_off';
-            }.property('Mist.scriptAddController.newScript.scheduler'),
-
-            isInterval: function() {
-                return Mist.scriptAddController.newScript.scheduler.value == 'interval';
-            }.property('Mist.scriptAddController.newScript.scheduler'),
-
-            isCron: function() {
-                return Mist.scriptAddController.newScript.scheduler.value == 'crontab';
-            }.property('Mist.scriptAddController.newScript.scheduler'),
 
             load: function() {
                 Ember.run.next(function() {
@@ -204,44 +162,8 @@ define('app/views/script_add', ['app/views/controlled'],
                 this.renderFields();
             },
 
-            selectScheduler: function(scheduler) {
-                this.closeDropdown('scheduler');
-                Mist.scriptAddController.get('newScript').set('scheduler', scheduler);
-                this.renderFields();
-            },
-
-            selectPeriod: function(period) {
-                this.closeDropdown('period');
-                Mist.scriptAddController.setProperties({
-                    'newScript.interval.period': period,
-                    'newScript.interval.every': 1
-                });
-                this.setEveryOptions(period.limit, 1);
-                this.renderFields();
-            },
-
-            selectEvery: function(every) {
-                this.closeDropdown('every');
-                Mist.scriptAddController.get('newScript').set('interval.every', every);
-                this.renderFields();
-            },
-
             closeDropdown: function(el) {
                 this.$('#script-add-' + el + ' .mist-select').collapsible('collapse');
-            },
-
-            setEveryOptions: function(end, start, step) {
-                var start = start || 0,
-                    step = step || 1,
-                    result = [],
-                    item = start;
-
-                while (item <= end) {
-                    result.push(item);
-                    item += step;
-                }
-
-                this.set('scriptEveryOptions', result);
             },
 
             showSourceBundle: function(source) {
@@ -265,18 +187,6 @@ define('app/views/script_add', ['app/views/controlled'],
 
                 selectSource: function(source) {
                     this.selectSource(source);
-                },
-
-                selectScheduler: function(scheduler) {
-                    this.selectScheduler(scheduler);
-                },
-
-                selectPeriod: function(period) {
-                    this.selectPeriod(period);
-                },
-
-                selectEvery: function(every) {
-                    this.selectEvery(every);
                 },
 
                 backClicked: function() {
