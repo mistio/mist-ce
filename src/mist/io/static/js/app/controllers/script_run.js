@@ -77,6 +77,26 @@ define('app/controllers/script_run', ['ember'],
                 });
             },
 
+            //
+            // Observers
+            //
+
+            schedulerObserver: function() {
+                this.get('scriptToRun').setProperties({
+                    interval: {
+                        every: '',
+                        period: ''
+                    },
+                    crontab: {
+                        minute: '',
+                        hour: '',
+                        day_of_week: '',
+                        day_of_month: '',
+                        month_of_year: ''
+                    }
+                });
+            }.observes('scriptToRun.scheduler')
+
         });
     }
 );

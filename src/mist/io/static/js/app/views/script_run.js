@@ -59,23 +59,23 @@ define('app/views/script_run', ['app/views/popup'],
             }.property('Mist.scriptRunController.scriptToRun.scheduler'),
 
             crontabMinutes: Ember.computed(function() {
-                return this._setOptions(59, 0);
+                return ['Every minute'].concat(this._setOptions(59, 0));
             }),
 
             crontabHours: Ember.computed(function() {
-                return this._setOptions(23, 0);
+                return ['Every hour'].concat(this._setOptions(23, 0));
             }),
 
             crontabDaysOfWeek: Ember.computed(function() {
-                return this._setOptions(7, 0);
+                return ['Every dat'].concat(this._setOptions(7, 0));
             }),
 
             crontabDaysOfMonth: Ember.computed(function() {
-                return this._setOptions(31, 1);
+                return ['Every day'].concat(this._setOptions(31, 1));
             }),
 
-            crontabMonthOfYear: Ember.computed(function() {
-                return this._setOptions(12, 1);
+            crontabMonthsOfYear: Ember.computed(function() {
+                return ['Every month'].concat(this._setOptions(12, 1));
             }),
 
             //
@@ -107,13 +107,12 @@ define('app/views/script_run', ['app/views/popup'],
             },
 
             _selectScheduler: function(scheduler) {
-                console.log(scheduler);
                 this._closeDropdown('scheduler');
                 Mist.scriptRunController.get('scriptToRun').set('scheduler', scheduler);
                 this._renderFields();
             },
 
-            _selectPeriod: function(period) {
+            _selectIntervalPeriod: function(period) {
                 this._closeDropdown('interval-period');
                 Mist.scriptRunController.setProperties({
                     'scriptToRun.interval.period': period,
@@ -123,7 +122,7 @@ define('app/views/script_run', ['app/views/popup'],
                 this._renderFields();
             },
 
-            _selectEvery: function(every) {
+            _selectIntervalEvery: function(every) {
                 this._closeDropdown('interval-every');
                 Mist.scriptRunController.get('scriptToRun').set('interval.every', every);
                 this._renderFields();
@@ -176,12 +175,12 @@ define('app/views/script_run', ['app/views/popup'],
                     this._selectScheduler(scheduler);
                 },
 
-                selectPeriod: function(period) {
-                    this._selectPeriod(period);
+                selectIntervalPeriod: function(period) {
+                    this._selectIntervalPeriod(period);
                 },
 
-                selectEvery: function(every) {
-                    this._selectEvery(every);
+                selectIntervalEvery: function(every) {
+                    this._selectIntervalEvery(every);
                 },
 
                 selectCrontabMinute: function(minute) {

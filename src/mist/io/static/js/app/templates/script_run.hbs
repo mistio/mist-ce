@@ -119,7 +119,7 @@
                         <ul data-role="listview">
                             {{#each view.scriptPeriods as |period|}}
                                 <li data-icon="false" data-theme="a">
-                                    <a {{action "selectPeriod" period target=view}}>{{period.label}}</a>
+                                    <a {{action "selectIntervalPeriod" period target=view}}>{{period.label}}</a>
                                 </li>
                             {{/each}}
                         </ul>
@@ -144,7 +144,7 @@
                             <ul data-role="listview">
                                 {{#each view.scriptEveryOptions as |every|}}
                                     <li data-icon="false" data-theme="a">
-                                        <a {{action "selectEvery" every target=view}}>{{every}}</a>
+                                        <a {{action "selectIntervalEvery" every target=view}}>{{every}}</a>
                                     </li>
                                 {{/each}}
                             </ul>
