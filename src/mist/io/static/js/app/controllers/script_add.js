@@ -20,6 +20,7 @@ define('app/controllers/script_add', ['ember'],
                 text: '',
                 source: {},
                 description: '',
+                scheduler: 'now'
             }),
 
 
@@ -61,6 +62,7 @@ define('app/controllers/script_add', ['ember'],
                     source: '',
                     script: '',
                     description: '',
+                    scheduler: this.view.scriptSchedulers[0]
                 });
             },
 

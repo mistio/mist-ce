@@ -133,6 +133,54 @@
         </div>
         {{/if}}
 
+        <!--
+            Select script scheduler
+        -->
+
+        <div id="script-add-scheduler" class="form-field {{if Mist.scriptAddController.newScript.scheduler.label 'filled' 'empty'}} required">
+            <label>Scheduler</label>
+            <div  class="mist-select"
+                data-role="collapsible"
+                data-iconpos="right"
+                data-collapsed-icon="carat-d"
+                data-expanded-icon="carat-u">
+                    <h4>
+                        {{Mist.scriptAddController.newScript.scheduler.label}}
+                    </h4>
+                    <ul data-role="listview">
+                        {{#each view.scriptSchedulers as |scriptSchedule|}}
+                            <li data-icon="false" data-theme="a">
+                                <a {{action "selectScheduler" scriptSchedule target=view}}>{{scriptSchedule.label}}</a>
+                            </li>
+                        {{/each}}
+                    </ul>
+            </div>
+        </div>
+
+        {{#if view.isOneOff}}
+            <div class="form-field">
+                <p>
+                    One Off options here
+                </p>
+            </div>
+        {{/if}}
+
+        {{#if view.isInterval}}
+            <div class="form-field">
+                <p>
+                    Interval options here
+                </p>
+            </div>
+        {{/if}}
+
+        {{#if view.isCron}}
+        <div class="form-field">
+            <p>
+                Cron options here
+            </p>
+        </div>
+        {{/if}}
+
         {{#if Mist.scriptsController.addingScript}}
             <div class="ajax-loader"></div>
         {{/if}}

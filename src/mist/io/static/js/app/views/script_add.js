@@ -46,6 +46,20 @@ define('app/views/script_add', ['app/views/controlled'],
                 value: 'inline'
             }],
 
+            scriptSchedulers: [{
+                label: 'Now',
+                value: 'now'
+            }, {
+                label: 'One-Off',
+                value: 'one_off',
+            }, {
+                label: 'Interval',
+                value: 'interval'
+            }, {
+                label: 'Crontab',
+                value: 'crontab'
+            }],
+
 
             //
             //  Computed Properties
@@ -80,6 +94,18 @@ define('app/views/script_add', ['app/views/controlled'],
             isGitHub: function(){
                 return Mist.scriptAddController.newScript.source.value == 'github';
             }.property('Mist.scriptAddController.newScript.source'),
+
+            isOneOff: function(){
+                return Mist.scriptAddController.newScript.scheduler.value == 'one_off';
+            }.property('Mist.scriptAddController.newScript.scheduler'),
+
+            isInterval: function(){
+                return Mist.scriptAddController.newScript.scheduler.value == 'interval';
+            }.property('Mist.scriptAddController.newScript.scheduler'),
+
+            isCron: function(){
+                return Mist.scriptAddController.newScript.scheduler.value == 'crontab';
+            }.property('Mist.scriptAddController.newScript.scheduler'),
 
             load: function () {
                Ember.run.next(function(){
@@ -159,12 +185,21 @@ define('app/views/script_add', ['app/views/controlled'],
                 });
             },
 
+            selectScheduler: function(scheduler) {
+                this.closeScheduleSelect();
+                Mist.scriptAddController.get('newScript').set('scheduler', scheduler);
+            },
+
             closeTypeSelect: function () {
                 this.$('#script-add-type .mist-select').collapsible('collapse');
             },
 
             closeSourceSelect: function () {
                 this.$('#script-add-source .mist-select').collapsible('collapse');
+            },
+
+            closeScheduleSelect: function () {
+                this.$('#script-add-scheduler .mist-select').collapsible('collapse');
             },
 
             showSourceBundle: function (source) {
@@ -188,6 +223,10 @@ define('app/views/script_add', ['app/views/controlled'],
 
                 selectSource: function (source) {
                     this.selectSource(source);
+                },
+
+                selectScheduler: function (scheduler) {
+                    this.selectScheduler(scheduler);
                 },
 
                 backClicked: function () {
