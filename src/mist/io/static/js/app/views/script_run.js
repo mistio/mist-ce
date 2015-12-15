@@ -47,16 +47,16 @@ define('app/views/script_run', ['app/views/popup'],
             }.property('Mist.scriptRunController.scriptToRun.machine'),
 
             isOneOff: function() {
-                return Mist.scriptAddController.newScript.scheduler.value == 'one_off';
-            }.property('Mist.scriptAddController.newScript.scheduler'),
+                return Mist.scriptRunController.scriptToRun.scheduler.value == 'one_off';
+            }.property('Mist.scriptRunController.scriptToRun.scheduler'),
 
             isInterval: function() {
-                return Mist.scriptAddController.newScript.scheduler.value == 'interval';
-            }.property('Mist.scriptAddController.newScript.scheduler'),
+                return Mist.scriptRunController.scriptToRun.scheduler.value == 'interval';
+            }.property('Mist.scriptRunController.scriptToRun.scheduler'),
 
             isCron: function() {
-                return Mist.scriptAddController.newScript.scheduler.value == 'crontab';
-            }.property('Mist.scriptAddController.newScript.scheduler'),
+                return Mist.scriptRunController.scriptToRun.scheduler.value == 'crontab';
+            }.property('Mist.scriptRunController.scriptToRun.scheduler'),
 
             //
             // Methods
@@ -69,7 +69,7 @@ define('app/views/script_run', ['app/views/popup'],
             },
 
             _closeDropdown: function(el) {
-                this.$('#script-run-' + el + ' .mist-select').collapsible('collapse');
+                $('#script-run-' + el + ' .mist-select').collapsible('collapse');
             },
 
             _setEveryOptions: function(end, start, step) {
@@ -87,6 +87,7 @@ define('app/views/script_run', ['app/views/popup'],
             },
 
             _selectScheduler: function(scheduler) {
+                console.log(scheduler);
                 this._closeDropdown('scheduler');
                 Mist.scriptRunController.get('scriptToRun').set('scheduler', scheduler);
                 this._renderFields();

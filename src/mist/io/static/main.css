@@ -857,7 +857,7 @@ ul.checkbox-list .ui-grid-b {
 .ui-footer {
     position: fixed;
     display: none;
-    z-index: 2000;
+    z-index: 800;
     width: 100%;
     bottom: 0;
 }

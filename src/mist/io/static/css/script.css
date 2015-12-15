@@ -81,6 +81,9 @@
 #single-script-page .log-list ul li a {
     margin: 0;
 }
+#script-run {
+    margin-bottom: 60px;
+}
 #run-script .ui-collapsible-heading {
     text-transform: capitalize;
 }
