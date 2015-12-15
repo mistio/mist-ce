@@ -25,7 +25,8 @@ define('app/controllers/script_run', ['ember'],
                     day_of_week: '',
                     day_of_month: '',
                     month_of_year: ''
-                }
+                },
+                expires: ''
             }),
 
             load: function() {
@@ -62,7 +63,8 @@ define('app/controllers/script_run', ['ember'],
                         day_of_week: '',
                         day_of_month: '',
                         month_of_year: ''
-                    }
+                    },
+                    expires: ''
                 });
             },
 
@@ -93,7 +95,8 @@ define('app/controllers/script_run', ['ember'],
                         day_of_week: '',
                         day_of_month: '',
                         month_of_year: ''
-                    }
+                    },
+                    expires: ''
                 });
             }.observes('scriptToRun.scheduler')
 

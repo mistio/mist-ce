@@ -275,6 +275,13 @@
                 </div>
             {{/if}}
 
+            {{#if view.hasExpire}}
+                <div id="script-run-expire" class="form-field {{if Mist.scriptRunController.scriptToRun.expire 'filled' 'empty'}} required">
+                    <label>Expiration date</label>
+                    <input type="text" value="expiration date here">
+                </div>
+            {{/if}}
+
             {{#if Mist.scriptsController.runningScript}}
                 <div class="ajax-loader"></div>
             {{/if}}

@@ -78,6 +78,10 @@ define('app/views/script_run', ['app/views/popup'],
                 return ['Every month'].concat(this._setOptions(12, 1));
             }),
 
+            hasExpire: Ember.computed('isInterval', 'isCron', function() {
+                return this.get('isInterval') || this.get('isCron');
+            }),
+
             //
             // Methods
             //
