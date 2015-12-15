@@ -166,11 +166,55 @@
         {{/if}}
 
         {{#if view.isInterval}}
-            <div class="form-field">
-                <p>
-                    Interval options here
-                </p>
+            <div id="script-add-period" class="form-field {{if Mist.scriptAddController.newScript.interval.period 'filled' 'empty'}} required">
+                <label>Period</label>
+                <div  class="mist-select"
+                    data-role="collapsible"
+                    data-iconpos="right"
+                    data-collapsed-icon="carat-d"
+                    data-expanded-icon="carat-u">
+                        <h4>
+                            {{#if Mist.scriptAddController.newScript.interval.period}}
+                                {{Mist.scriptAddController.newScript.interval.period.label}}
+                            {{else}}
+                                Select period
+                            {{/if}}
+                        </h4>
+                        <ul data-role="listview">
+                            {{#each view.scriptPeriods as |period|}}
+                                <li data-icon="false" data-theme="a">
+                                    <a {{action "selectPeriod" period target=view}}>{{period.label}}</a>
+                                </li>
+                            {{/each}}
+                        </ul>
+                </div>
             </div>
+
+            {{#if Mist.scriptAddController.newScript.interval.period}}
+                <div id="script-add-every" class="form-field {{if Mist.scriptAddController.newScript.interval.every 'filled' 'empty'}} required">
+                    <label>Every</label>
+                    <div  class="mist-select"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u">
+                            <h4>
+                                {{#if Mist.scriptAddController.newScript.interval.every}}
+                                    {{Mist.scriptAddController.newScript.interval.every}}
+                                {{else}}
+                                    Select interval
+                                {{/if}}
+                            </h4>
+                            <ul data-role="listview">
+                                {{#each view.scriptEveryOptions as |every|}}
+                                    <li data-icon="false" data-theme="a">
+                                        <a {{action "selectEvery" every target=view}}>{{every}}</a>
+                                    </li>
+                                {{/each}}
+                            </ul>
+                    </div>
+                </div>
+            {{/if}}
         {{/if}}
 
         {{#if view.isCron}}

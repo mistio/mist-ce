@@ -20,7 +20,11 @@ define('app/controllers/script_add', ['ember'],
                 text: '',
                 source: {},
                 description: '',
-                scheduler: 'now'
+                scheduler: '',
+                interval: {
+                    every: '',
+                    period: ''
+                }
             }),
 
 
@@ -62,7 +66,11 @@ define('app/controllers/script_add', ['ember'],
                     source: '',
                     script: '',
                     description: '',
-                    scheduler: this.view.scriptSchedulers[0]
+                    scheduler: this.view.scriptSchedulers[0],
+                    interval: {
+                        every: '',
+                        period: ''
+                    }
                 });
             },
 

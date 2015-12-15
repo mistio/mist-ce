@@ -4,7 +4,7 @@ define('app/views/script_add', ['app/views/controlled'],
     //
     //  @returns Class
     //
-    function (ControlledComponent) {
+    function(ControlledComponent) {
 
         'use strict';
 
@@ -60,12 +60,27 @@ define('app/views/script_add', ['app/views/controlled'],
                 value: 'crontab'
             }],
 
+            scriptPeriods: [{
+                label: 'seconds',
+                limit: 60,
+            }, {
+                label: 'minutes',
+                limit: 60
+            }, {
+                label: 'hours',
+                limit: 24
+            }, {
+                label: 'days',
+                limit: 30
+            }],
+            scriptEveryOptions: [],
+
 
             //
             //  Computed Properties
             //
 
-            isReady: function () {
+            isReady: function() {
                 var script = Mist.scriptAddController.get('newScript');
                 var name = script.get('name');
                 var type = script.get('type');
@@ -83,64 +98,64 @@ define('app/views/script_add', ['app/views/controlled'],
                 'Mist.scriptAddController.newScript.script'
             ),
 
-            isInline: function(){
+            isInline: function() {
                 return Mist.scriptAddController.newScript.source.value == 'inline';
             }.property('Mist.scriptAddController.newScript.source'),
 
-            isURL: function(){
+            isURL: function() {
                 return Mist.scriptAddController.newScript.source.value == 'url';
             }.property('Mist.scriptAddController.newScript.source'),
 
-            isGitHub: function(){
+            isGitHub: function() {
                 return Mist.scriptAddController.newScript.source.value == 'github';
             }.property('Mist.scriptAddController.newScript.source'),
 
-            isOneOff: function(){
+            isOneOff: function() {
                 return Mist.scriptAddController.newScript.scheduler.value == 'one_off';
             }.property('Mist.scriptAddController.newScript.scheduler'),
 
-            isInterval: function(){
+            isInterval: function() {
                 return Mist.scriptAddController.newScript.scheduler.value == 'interval';
             }.property('Mist.scriptAddController.newScript.scheduler'),
 
-            isCron: function(){
+            isCron: function() {
                 return Mist.scriptAddController.newScript.scheduler.value == 'crontab';
             }.property('Mist.scriptAddController.newScript.scheduler'),
 
-            load: function () {
-               Ember.run.next(function(){
-                   $( "#add-script" ).collapsible({
-                       expand: function(event, ui) {
-                           Mist.scriptAddController.open();
+            load: function() {
+                Ember.run.next(function() {
+                    $("#add-script").collapsible({
+                        expand: function(event, ui) {
+                            Mist.scriptAddController.open();
 
-                           var id = $(this).attr('id'),
-                           overlay = id ? $('#' + id+'-overlay') : false;
-                           if (overlay) {
-                               overlay.removeClass('ui-screen-hidden').addClass('in');
-                           }
-                           $(this).children().next().hide();
-                           $(this).children().next().slideDown(250);
-                       }
-                   });
-               });
+                            var id = $(this).attr('id'),
+                                overlay = id ? $('#' + id + '-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('ui-screen-hidden').addClass('in');
+                            }
+                            $(this).children().next().hide();
+                            $(this).children().next().slideDown(250);
+                        }
+                    });
+                });
             }.on('didInsertElement'),
 
 
-            unload: function () {
-               Ember.run.next(function(){
-                   $( "#add-script" ).collapsible({
-                       collapse: function(event, ui) {
-                           Mist.scriptAddController.close();
+            unload: function() {
+                Ember.run.next(function() {
+                    $("#add-script").collapsible({
+                        collapse: function(event, ui) {
+                            Mist.scriptAddController.close();
 
-                           $(this).children().next().slideUp(250);
-                           var id = $(this).attr('id'),
-                           overlay = id ? $('#' + id+'-overlay') : false;
-                           if (overlay) {
-                               overlay.removeClass('in').addClass('ui-screen-hidden');
-                           }
-                       }
-                   });
-               });
+                            $(this).children().next().slideUp(250);
+                            var id = $(this).attr('id'),
+                                overlay = id ? $('#' + id + '-overlay') : false;
+                            if (overlay) {
+                                overlay.removeClass('in').addClass('ui-screen-hidden');
+                            }
+                        }
+                    });
+                });
             }.on('willDestroyElement'),
 
 
@@ -148,18 +163,24 @@ define('app/views/script_add', ['app/views/controlled'],
             //  Methods
             //
 
-            clear: function () {
-                this.closeTypeSelect();
-                this.closeSourceSelect();
+            clear: function() {
+                this.closeDropdown('type');
+                this.closeDropdown('source');
             },
 
-            selectType: function (type) {
-                this.closeTypeSelect();
+            renderFields: function() {
+                Ember.run.schedule('afterRender', this, function() {
+                    $('body').enhanceWithin();
+                });
+            },
+
+            selectType: function(type) {
+                this.closeDropdown('type');
                 Mist.scriptAddController.get('newScript').set('type', type);
                 this.setScript();
             },
 
-            setScript: function () {
+            setScript: function() {
                 var newScript = Mist.scriptAddController.get('newScript');
                 var type = newScript.get('type');
                 if (type.value == 'ansible')
@@ -168,8 +189,8 @@ define('app/views/script_add', ['app/views/controlled'],
                     newScript.set('script', DEFAULT_SCRIPT);
             },
 
-            selectSource: function (source) {
-                this.closeSourceSelect();
+            selectSource: function(source) {
+                this.closeDropdown('source');
                 this.showSourceBundle(source);
                 var newScript = Mist.scriptAddController.get('newScript');
                 newScript.set('source', source);
@@ -180,30 +201,51 @@ define('app/views/script_add', ['app/views/controlled'],
                 if (source.value == 'inline')
                     this.setScript();
 
-                Ember.run.next(function(){
-                    $('body').enhanceWithin();
-                });
+                this.renderFields();
             },
 
             selectScheduler: function(scheduler) {
-                this.closeScheduleSelect();
+                this.closeDropdown('scheduler');
                 Mist.scriptAddController.get('newScript').set('scheduler', scheduler);
+                this.renderFields();
             },
 
-            closeTypeSelect: function () {
-                this.$('#script-add-type .mist-select').collapsible('collapse');
+            selectPeriod: function(period) {
+                this.closeDropdown('period');
+                Mist.scriptAddController.setProperties({
+                    'newScript.interval.period': period,
+                    'newScript.interval.every': 1
+                });
+                this.setEveryOptions(period.limit, 1);
+                this.renderFields();
             },
 
-            closeSourceSelect: function () {
-                this.$('#script-add-source .mist-select').collapsible('collapse');
+            selectEvery: function(every) {
+                this.closeDropdown('every');
+                Mist.scriptAddController.get('newScript').set('interval.every', every);
+                this.renderFields();
             },
 
-            closeScheduleSelect: function () {
-                this.$('#script-add-scheduler .mist-select').collapsible('collapse');
+            closeDropdown: function(el) {
+                this.$('#script-add-' + el + ' .mist-select').collapsible('collapse');
             },
 
-            showSourceBundle: function (source) {
-                this.$('.'+source.value).slideDown();
+            setEveryOptions: function(end, start, step) {
+                var start = start || 0,
+                    step = step || 1,
+                    result = [],
+                    item = start;
+
+                while (item <= end) {
+                    result.push(item);
+                    item += step;
+                }
+
+                this.set('scriptEveryOptions', result);
+            },
+
+            showSourceBundle: function(source) {
+                this.$('.' + source.value).slideDown();
                 this.$('#script-add-description').slideDown();
             },
 
@@ -217,23 +259,31 @@ define('app/views/script_add', ['app/views/controlled'],
                     $('#add-script').collapsible('collapse');
                 },
 
-                selectType: function (type) {
+                selectType: function(type) {
                     this.selectType(type);
                 },
 
-                selectSource: function (source) {
+                selectSource: function(source) {
                     this.selectSource(source);
                 },
 
-                selectScheduler: function (scheduler) {
+                selectScheduler: function(scheduler) {
                     this.selectScheduler(scheduler);
                 },
 
-                backClicked: function () {
+                selectPeriod: function(period) {
+                    this.selectPeriod(period);
+                },
+
+                selectEvery: function(every) {
+                    this.selectEvery(every);
+                },
+
+                backClicked: function() {
                     Mist.scriptAddController.close();
                 },
 
-                addClicked: function () {
+                addClicked: function() {
                     Mist.scriptAddController.add();
                 }
             },
