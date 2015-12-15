@@ -13,6 +13,10 @@
 <dom-module id="page-list">
   <link rel="import" type="css" href="page-list.css">
   <template>
+      <app-socket model="{{model}}"></app-socket>
+      <iron-routes for="page-list">
+        <iron-route path="/machines/:uuid"></iron-route>
+      </iron-routes>
       <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
         <app-sidebar drawer>
           <div class="content">
@@ -30,22 +34,8 @@
                 <template is="dom-repeat" items="[[sections]]">
                   <a class="section" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(section.id,item.id)]]" tabindex="1">
                     <div class="layout horizontal center">
-                      <template is="dom-if" if="[[_isMachines(item.id)]]">
-                        <section-symbol aria-hidden="true" model="{{model}}" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
-                      </template>
-                      <template is="dom-if" if="[[_isImages(item.id)]]">
-                        <section-symbol aria-hidden="true" model="{{model}}" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
-                      </template>
-                      <template is="dom-if" if="[[_isKeys(item.id)]]">
-                        <section-symbol aria-hidden="true" model="{{model}}" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
-                      </template>
-                      <template is="dom-if" if="[[_isNetworks(item.id)]]">
-                        <section-symbol aria-hidden="true" model="{{model}}" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
-                      </template>
-                      <template is="dom-if" if="[[_isScripts(item.id)]]">
-                        <section-symbol aria-hidden="true" model="{{model}}" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
-                      </template>
-                      <span class="title flex">[[item.id]]</span>
+                        <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
+                        <span class="title flex">[[item.id]]</span>
                     </div>
                   </a>
                 </template>
@@ -70,10 +60,10 @@
               <div class="description">[[section.description]]</div>
             </div>
 
-            <template is="dom-if" if="[[_stampCards(view)]]" restamp>
+            <template is="dom-if" if="[[_stampCards(view)]]">
               <element-table-cards id="element-cards" sections="[[sections]]" section="[[section]]" elements="[[_filteredElements]]"></element-table-cards>
             </template>
-            <template is="dom-if" if="[[_stampTable(view)]]" restamp>
+            <template is="dom-if" if="[[_stampTable(view)]]">
               <element-table sections="[[sections]]" section="[[section]]" elements="[[_filteredElements]]" on-tag-selected="updateTag"></element-table>
             </template>
           </div>
@@ -281,21 +271,6 @@
       },
       _isEqual: function(a,b) {
         return a === b;
-      },
-      _isMachines: function(section) {
-        return section == 'machines';
-      },
-      _isImages: function(section) {
-        return section == 'images';
-      },
-      _isKeys: function(section) {
-        return section == 'keys';
-      },
-      _isNetworks: function(section) {
-        return section == 'networks';
-      },
-      _isScripts: function(section) {
-        return section == 'scripts';
       },
       _getColor: function() {
         return this.section && this.section.color ? this.section.color : '';

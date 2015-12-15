@@ -51,8 +51,8 @@
 
       .row a {
         box-sizing: border-box;
-        cursor: pointer;
-        overflow: hidden;
+        /*cursor: pointer;*/ /*they block the a to go*/
+        /*overflow: hidden;*/
         width: 100%;
         padding: 15px 24px;
         font-weight: 400;
@@ -103,9 +103,10 @@
     </div>
     <template is="dom-repeat" items="[[elements]]">
       <div class="row" data-index$="[[index]]">
-        <a href$="[[_elementLink(item.uuid)]]">
-          <div class="name">[[item.name]]</div>
-          <div class="description">[[item.description]]</div>
+        <a href$="[[_elementLink(item.uuid)]]">          
+            <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
+            <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
+            <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
         </a>
       </div>
     </template>
@@ -159,7 +160,7 @@
         } else {
           this.fire('nav', {url: A.href});
         }
-        e.preventDefault();
+        //e.preventDefault();
       }
     },
 
@@ -233,7 +234,7 @@
       }, 1);
     },
 
-     _layoutIfNeeded: function(el) {
+    _layoutIfNeeded: function(el) {
       return el.offsetTop;
     }
   });

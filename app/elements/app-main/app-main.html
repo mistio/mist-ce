@@ -50,7 +50,7 @@
       <section><page-dashboard model="{{model}}" sections="[[sections]]"></page-dashboard></section>
       <section><page-list model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]"></page-list></section>
       <section params="{{params}}"><h1>Machine {{params.uuid}}</h1></section>
-      <section><page-list model="{{model}}" sections="[[sectionsArray]]" section="[[sections.images]]"></page-list></section>
+      <section><page-list model="{{model}}" elements="{{model.imagesArray}}" sections="[[sectionsArray]]" section="[[sections.images]]"></page-list></section>
       <section><page-list model="{{model}}" elements="{{model.keysArray}}" sections="[[sectionsArray]]" section="[[sections.keys]]"></page-list></section>
       <section><page-list model="{{model}}" elements="{{model.networksArray}}" sections="[[sectionsArray]]" section="[[sections.networks]]"></page-list></section>
       <section><page-list model="{{model}}" sections="[[sectionsArray]]" section="[[sections.scripts]]"></page-list></section>

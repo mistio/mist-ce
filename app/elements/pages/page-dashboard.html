@@ -2,6 +2,8 @@
 
 <link rel="import" href="../section-tile/section-tile.html">
 
+<link rel="import" href="../section-incidents/section-incidents.html">
+
 <dom-module id="page-dashboard">
   <link rel="import" type="css" href="page-dashboard.css">
   <template>
@@ -48,7 +50,7 @@
           </section-tile>
         </a>
       </div>
-      <div class="sections layout horizontal wrap">
+
         <google-chart
             id="mutating_gauge"
             type="line"
@@ -61,7 +63,9 @@
                       "yellowTo": 90,
                       "minorTicks": 5}'>
         </google-chart>
-      </div>
+
+        <section-incidents></section-incidents>
+
     </paper-header-panel>
   </template>
 </dom-module>

@@ -197,7 +197,7 @@ Polymer({
         var allNetworks = [];
         this.model.cloudsArray.forEach(
           function(cloud){
-            return allNetworks = allNetworks.concat(cloud.networksArray != undefined ? cloud.networksArray : [])}
+            return allNetworks = allNetworks.concat(cloud.networksArray != undefined && cloud.networksArray.public.length > 0 ? cloud.networksArray.public : [])}
         );
         this.set('model.networksArray', allNetworks);
     },
