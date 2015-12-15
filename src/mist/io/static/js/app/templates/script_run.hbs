@@ -91,72 +91,188 @@
                 </div>
             </div>
 
+
+
             {{#if view.isOneOff}}
                 <div class="form-field">
-                    <p>
-                        One Off options here
-                    </p>
+                    <!-- <div class="form-field">
+                        <input id="datetimepicker" type="text" >
+                    </div> -->
                 </div>
             {{/if}}
 
             {{#if view.isInterval}}
-                <div id="script-run-period" class="form-field {{if Mist.scriptRunController.scriptToRun.interval.period 'filled' 'empty'}} required">
+                <div id="script-run-interval-period" class="form-field {{if Mist.scriptRunController.scriptToRun.interval.period 'filled' 'empty'}} required">
                     <label>Period</label>
                     <div class="mist-select"
                         data-role="collapsible"
                         data-iconpos="right"
                         data-collapsed-icon="carat-d"
                         data-expanded-icon="carat-u">
-                            <h4>
-                                {{#if Mist.scriptRunController.scriptToRun.interval.period}}
-                                    {{Mist.scriptRunController.scriptToRun.interval.period.label}}
-                                {{else}}
-                                    Select period
-                                {{/if}}
-                            </h4>
-                            <ul data-role="listview">
-                                {{#each view.scriptPeriods as |period|}}
-                                    <li data-icon="false" data-theme="a">
-                                        <a {{action "selectPeriod" period target=view}}>{{period.label}}</a>
-                                    </li>
-                                {{/each}}
-                            </ul>
+                        <h4>
+                            {{#if Mist.scriptRunController.scriptToRun.interval.period}}
+                                {{Mist.scriptRunController.scriptToRun.interval.period.label}}
+                            {{else}}
+                                Select period
+                            {{/if}}
+                        </h4>
+                        <ul data-role="listview">
+                            {{#each view.scriptPeriods as |period|}}
+                                <li data-icon="false" data-theme="a">
+                                    <a {{action "selectPeriod" period target=view}}>{{period.label}}</a>
+                                </li>
+                            {{/each}}
+                        </ul>
                     </div>
                 </div>
 
                 {{#if Mist.scriptRunController.scriptToRun.interval.period}}
-                    <div id="script-run-every" class="form-field {{if Mist.scriptRunController.scriptToRun.interval.every 'filled' 'empty'}} required">
+                    <div id="script-run-interval-every" class="form-field {{if Mist.scriptRunController.scriptToRun.interval.every 'filled' 'empty'}} required">
                         <label>Every</label>
                         <div  class="mist-select"
                             data-role="collapsible"
                             data-iconpos="right"
                             data-collapsed-icon="carat-d"
                             data-expanded-icon="carat-u">
-                                <h4>
-                                    {{#if Mist.scriptRunController.scriptToRun.interval.every}}
-                                        {{Mist.scriptRunController.scriptToRun.interval.every}}
-                                    {{else}}
-                                        Select interval
-                                    {{/if}}
-                                </h4>
-                                <ul data-role="listview">
-                                    {{#each view.scriptEveryOptions as |every|}}
-                                        <li data-icon="false" data-theme="a">
-                                            <a {{action "selectEvery" every target=view}}>{{every}}</a>
-                                        </li>
-                                    {{/each}}
-                                </ul>
+                            <h4>
+                                {{#if Mist.scriptRunController.scriptToRun.interval.every}}
+                                    {{Mist.scriptRunController.scriptToRun.interval.every}}
+                                {{else}}
+                                    Select interval
+                                {{/if}}
+                            </h4>
+                            <ul data-role="listview">
+                                {{#each view.scriptEveryOptions as |every|}}
+                                    <li data-icon="false" data-theme="a">
+                                        <a {{action "selectEvery" every target=view}}>{{every}}</a>
+                                    </li>
+                                {{/each}}
+                            </ul>
                         </div>
                     </div>
                 {{/if}}
             {{/if}}
 
             {{#if view.isCron}}
-            <div class="form-field">
-                <p>
-                    Cron options here
-                </p>
-            </div>
+                <div id="script-run-crontab-minute" class="form-field {{if Mist.scriptRunController.scriptToRun.crontab.minute 'filled' 'empty'}} required">
+                    <label>Minute</label>
+                    <div class="mist-select"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u">
+                        <h4>
+                            {{#if Mist.scriptRunController.scriptToRun.crontab.minute}}
+                                {{Mist.scriptRunController.scriptToRun.crontab.minute}}
+                            {{else}}
+                                Select minutes
+                            {{/if}}
+                        </h4>
+                        <ul data-role="listview">
+                            {{#each view.crontabMinutes as |minute|}}
+                                <li data-icon="false" data-theme="a">
+                                    <a {{action "selectCrontabMinute" minute target=view}}>{{minute}}</a>
+                                </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="script-run-crontab-hour" class="form-field {{if Mist.scriptRunController.scriptToRun.crontab.hour 'filled' 'empty'}} required">
+                    <label>Hour</label>
+                    <div class="mist-select"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u">
+                        <h4>
+                            {{#if Mist.scriptRunController.scriptToRun.crontab.hour}}
+                                {{Mist.scriptRunController.scriptToRun.crontab.hour}}
+                            {{else}}
+                                Select hour
+                            {{/if}}
+                        </h4>
+                        <ul data-role="listview">
+                            {{#each view.crontabHours as |hour|}}
+                                <li data-icon="false" data-theme="a">
+                                    <a {{action "selectCrontabHour" hour target=view}}>{{hour}}</a>
+                                </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="script-run-crontab-day-of-week" class="form-field {{if Mist.scriptRunController.scriptToRun.crontab.day_of_week 'filled' 'empty'}} required">
+                    <label>Day of week</label>
+                    <div class="mist-select"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u">
+                        <h4>
+                            {{#if Mist.scriptRunController.scriptToRun.crontab.day_of_week}}
+                                {{Mist.scriptRunController.scriptToRun.crontab.day_of_week}}
+                            {{else}}
+                                Select day
+                            {{/if}}
+                        </h4>
+                        <ul data-role="listview">
+                            {{#each view.crontabDaysOfWeek as |day|}}
+                                <li data-icon="false" data-theme="a">
+                                    <a {{action "selectCrontabDayOfWeek" day target=view}}>{{day}}</a>
+                                </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="script-run-crontab-day-of-month" class="form-field {{if Mist.scriptRunController.scriptToRun.crontab.day_of_month 'filled' 'empty'}} required">
+                    <label>Day of month</label>
+                    <div class="mist-select"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u">
+                        <h4>
+                            {{#if Mist.scriptRunController.scriptToRun.crontab.day_of_month}}
+                                {{Mist.scriptRunController.scriptToRun.crontab.day_of_month}}
+                            {{else}}
+                                Select day
+                            {{/if}}
+                        </h4>
+                        <ul data-role="listview">
+                            {{#each view.crontabDaysOfMonth as |day|}}
+                                <li data-icon="false" data-theme="a">
+                                    <a {{action "selectCrontabDayOfMonth" day target=view}}>{{day}}</a>
+                                </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="script-run-crontab-month-of-year" class="form-field {{if Mist.scriptRunController.scriptToRun.crontab.month_of_year 'filled' 'empty'}} required">
+                    <label>Month of year</label>
+                    <div class="mist-select"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u">
+                        <h4>
+                            {{#if Mist.scriptRunController.scriptToRun.crontab.month_of_year}}
+                                {{Mist.scriptRunController.scriptToRun.crontab.month_of_year}}
+                            {{else}}
+                                Select month
+                            {{/if}}
+                        </h4>
+                        <ul data-role="listview">
+                            {{#each view.crontabMonthsOfYear as |month|}}
+                                <li data-icon="false" data-theme="a">
+                                    <a {{action "selectCrontabMonthOfYear" month target=view}}>{{month}}</a>
+                                </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
             {{/if}}
 
             {{#if Mist.scriptsController.runningScript}}

@@ -58,6 +58,26 @@ define('app/views/script_run', ['app/views/popup'],
                 return Mist.scriptRunController.scriptToRun.scheduler.value == 'crontab';
             }.property('Mist.scriptRunController.scriptToRun.scheduler'),
 
+            crontabMinutes: Ember.computed(function() {
+                return this._setOptions(59, 0);
+            }),
+
+            crontabHours: Ember.computed(function() {
+                return this._setOptions(23, 0);
+            }),
+
+            crontabDaysOfWeek: Ember.computed(function() {
+                return this._setOptions(7, 0);
+            }),
+
+            crontabDaysOfMonth: Ember.computed(function() {
+                return this._setOptions(31, 1);
+            }),
+
+            crontabMonthOfYear: Ember.computed(function() {
+                return this._setOptions(12, 1);
+            }),
+
             //
             // Methods
             //
@@ -72,7 +92,7 @@ define('app/views/script_run', ['app/views/popup'],
                 $('#script-run-' + el + ' .mist-select').collapsible('collapse');
             },
 
-            _setEveryOptions: function(end, start, step) {
+            _setOptions: function(end, start, step) {
                 var start = start || 0,
                     step = step || 1,
                     result = [],
@@ -83,7 +103,7 @@ define('app/views/script_run', ['app/views/popup'],
                     item += step;
                 }
 
-                this.set('scriptEveryOptions', result);
+                return result;
             },
 
             _selectScheduler: function(scheduler) {
@@ -94,19 +114,44 @@ define('app/views/script_run', ['app/views/popup'],
             },
 
             _selectPeriod: function(period) {
-                this._closeDropdown('period');
+                this._closeDropdown('interval-period');
                 Mist.scriptRunController.setProperties({
                     'scriptToRun.interval.period': period,
                     'scriptToRun.interval.every': 1
                 });
-                this._setEveryOptions(period.limit, 1);
+                this.set('scriptEveryOptions', this._setOptions(period.limit, 1));
                 this._renderFields();
             },
 
             _selectEvery: function(every) {
-                this._closeDropdown('every');
+                this._closeDropdown('interval-every');
                 Mist.scriptRunController.get('scriptToRun').set('interval.every', every);
                 this._renderFields();
+            },
+
+            _selectCrontabMinute: function(minute) {
+                this._closeDropdown('crontab-minute');
+                Mist.scriptRunController.get('scriptToRun').set('crontab.minute', minute);
+            },
+
+            _selectCrontabHour: function(hour) {
+                this._closeDropdown('crontab-hour');
+                Mist.scriptRunController.get('scriptToRun').set('crontab.hour', hour);
+            },
+
+            _selectCrontabDayOfWeek: function(day) {
+                this._closeDropdown('crontab-day-of-week');
+                Mist.scriptRunController.get('scriptToRun').set('crontab.day_of_week', day);
+            },
+
+            _selectCrontabDayOfMonth: function(day) {
+                this._closeDropdown('crontab-day-of-month');
+                Mist.scriptRunController.get('scriptToRun').set('crontab.day_of_month', day);
+            },
+
+            _selectCrontabMonthOfYear: function(month) {
+                this._closeDropdown('crontab-month-of-year');
+                Mist.scriptRunController.get('scriptToRun').set('crontab.month_of_year', month);
             },
 
             //
@@ -137,6 +182,26 @@ define('app/views/script_run', ['app/views/popup'],
 
                 selectEvery: function(every) {
                     this._selectEvery(every);
+                },
+
+                selectCrontabMinute: function(minute) {
+                    this._selectCrontabMinute(minute);
+                },
+
+                selectCrontabHour: function(hour) {
+                    this._selectCrontabHour(hour);
+                },
+
+                selectCrontabDayOfWeek: function(day) {
+                    this._selectCrontabDayOfWeek(day);
+                },
+
+                selectCrontabDayOfMonth: function(day) {
+                    this._selectCrontabDayOfMonth(day);
+                },
+
+                selectCrontabMonthOfYear: function(day) {
+                    this._selectCrontabMonthOfYear(day);
                 }
             }
         });

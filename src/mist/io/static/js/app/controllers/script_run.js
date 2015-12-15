@@ -18,8 +18,21 @@ define('app/controllers/script_run', ['ember'],
                 interval: {
                     every: '',
                     period: ''
+                },
+                crontab: {
+                    minute: '',
+                    hour: '',
+                    day_of_week: '',
+                    day_of_month: '',
+                    month_of_year: ''
                 }
             }),
+
+            load: function() {
+                Ember.run.next(function() {
+                    $('#datetimepicker').datetimepicker();
+                });
+            }.on('didInsertElement'),
 
             open: function (script) {
                 this.clear();
@@ -42,6 +55,13 @@ define('app/controllers/script_run', ['ember'],
                     interval: {
                         every: '',
                         period: ''
+                    },
+                    crontab: {
+                        minute: '',
+                        hour: '',
+                        day_of_week: '',
+                        day_of_month: '',
+                        month_of_year: ''
                     }
                 });
             },
