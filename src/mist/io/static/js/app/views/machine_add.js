@@ -58,8 +58,8 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.provider.indexOf('ec2') > -1) ? true : false) : false) : false;
             }),
 
-            hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
-                return this.get('hasKey') || this.get('dockerNeedScript');
+            hasScript: Ember.computed('needsKey', 'dockerNeedScript', function() {
+                return this.get('needsKey') || this.get('dockerNeedScript');
             }),
 
             hasLocation: function() {
