@@ -331,10 +331,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                 Ember.run.once(this, '_selectUnique');
             }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize', 'newMachineProject'),
 
-            sizeObserver: function() {
-                Ember.run.once(this, '_sizeError');
-            }.observes('newMachineLibvirtDiskSize'),
-
             libvirtPathObserver: function() {
                 Ember.run.next(this, '_updateLibvirtPath');
             }.observes('newMachineName', 'newMachineProvider.title'),

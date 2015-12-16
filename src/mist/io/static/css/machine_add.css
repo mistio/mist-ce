@@ -211,3 +211,8 @@
 #machine-create textarea {
 	max-height: 150px;
 }
+
+#create-machine .field-wrapper > div.last-child:not(.first-child) a {
+    margin-top: 44px;
+    margin-bottom: 0;
+}
