@@ -21,14 +21,6 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider && provider.provider == 'libvirt' ? true : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
-            hasLibvirtDiskSize: function() {
-                var hasSize = true, name = Mist.machineAddController.newMachineImage.name;
-                if (this.get('hasLibvirt') && name.substring(name.length - 4) == '.img') {
-                    hasSize = false;
-                }
-                return hasSize;
-            }.property('hasLibvirt', 'Mist.machineAddController.newMachineImage.name'),
-
             hasDocker: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
                 return provider ? (provider.provider && provider.provider == 'docker' ? true : false) : false;
@@ -51,13 +43,18 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             hasKey: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                invalids = ['docker', 'libvirt'];
+                invalids = ['docker'];
                 return provider ? (provider.provider ? (((invalids.indexOf(provider.provider) != -1 ? false : true) || (provider.provider == 'docker' && this.get('dockerNeedScript'))) ? true : false) : false) : false;
             }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
 
+            needsKey: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return this.get('hasKey') && provider.provider != 'libvirt';
+            }.property('hasKey', 'Mist.machineAddController.newMachineProvider'),
+
             hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'azure', 'digitalocean', 'packet', 'gce', 'rackspace', 'rackspace_first_gen', 'vultr'];
+                valids = ['openstack', 'azure', 'digitalocean', 'packet', 'gce', 'rackspace', 'rackspace_first_gen', 'vultr', 'libvirt'];
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.provider.indexOf('ec2') > -1) ? true : false) : false) : false;
             }),
 

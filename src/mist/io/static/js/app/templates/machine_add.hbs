@@ -151,13 +151,11 @@
                        data-theme="a"
                        value=Mist.machineAddController.newMachineLibvirtDiskPath}}
 
-                {{#if view.hasLibvirtDiskSize}}
                 <label for="create-machine-disk-size">Disk Size (GB)</label>
                 {{view Mist.TextField
                        id="create-machine-disk-size"
                        data-theme="a"
                        value=Mist.machineAddController.newMachineLibvirtDiskSize}}
-                {{/if}}
             {{else}}
                 <label for="create-machine-libvirt-existing-disk-path">Specify existing disk image path</label>
                 {{view Mist.TextField
@@ -193,7 +191,7 @@
 
         <!-- Select Key -->
         {{#if view.hasKey}}
-        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.hasKey 'required'}}">
+        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.needsKey 'required'}}">
             <div id="create-machine-key" >
                 <label>Key</label>
                 <div
