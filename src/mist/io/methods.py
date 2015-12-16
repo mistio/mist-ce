@@ -1744,7 +1744,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         except:
             ram = 512
             cpu = 1
-        node = _create_machine_libvirt(conn, name=machine_name,
+        node = _create_machine_libvirt(conn, machine_name,
                                        disk_size=disk_size, ram=ram, cpu=cpu,
                                        image=image_id, disk_path=disk_path,
                                        create_from_existing=create_from_existing,
@@ -2244,10 +2244,9 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
 
 
 def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
-                            image, disk_path, create_from_existing, networks):
+                            image, disk_path, create_from_existing, networks, public_key, cloud_init):
     """Create a machine in Libvirt.
     """
-
 
     try:
         node = conn.create_node(
@@ -2258,7 +2257,9 @@ def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
             image=image,
             disk_path=disk_path,
             create_from_existing=create_from_existing,
-            networks=networks
+            networks=networks,
+            public_key=public_key,
+            cloud_init=cloud_init
         )
 
     except Exception as e:
