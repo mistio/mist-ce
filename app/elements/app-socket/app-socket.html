@@ -198,9 +198,9 @@ Polymer({
         this.model.cloudsArray.forEach(
           function(cloud){
             if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length){
-                cloud.networksArray.public.forEach(function(net){net["type"]="public"; allNetworks.push(net);});
-                cloud.networksArray.private.forEach(function(net){net["type"]="private"; allNetworks.push(net);});
-                cloud.networksArray.routers.forEach(function(net){net["type"]="router"; allNetworks.push(net);});
+                cloud.networksArray.public.forEach(function(net){net["type"]="public"; net["provider"]=cloud.provider; allNetworks.push(net);});
+                cloud.networksArray.private.forEach(function(net){net["type"]="private"; net["provider"]=cloud.provider; allNetworks.push(net);});
+                cloud.networksArray.routers.forEach(function(net){net["type"]="router"; net["provider"]=cloud.provider; allNetworks.push(net);});
                 return allNetworks; 
                 }
             }
