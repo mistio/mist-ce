@@ -297,6 +297,14 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                 }
             },
 
+            _updateProvidersMonitoring: function() {
+                if (this.get('newMachineProvider.provider') == 'libvirt') {
+                    this.set('newMachineMonitoring', false);
+                } else {
+                    this.set('newMachineMonitoring', Mist.email ? true : false);
+                }
+            },
+
             _removeFieldsBlanks: function() {
                 if (this.get('newMachineName')) {
                     this.set('newMachineName', this.get('newMachineName').trim());
@@ -330,6 +338,10 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             libvirtPathObserver: function() {
                 Ember.run.next(this, '_updateLibvirtPath');
             }.observes('newMachineName', 'newMachineProvider.title'),
+
+            providersMonitoringObserver: function() {
+                Ember.run.next(this, '_updateProvidersMonitoring');
+            }.observes('newMachineProvider.provider'),
 
             fieldsBlanksObserver: function() {
                 Ember.run.once(this, '_removeFieldsBlanks');

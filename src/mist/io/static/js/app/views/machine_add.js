@@ -48,9 +48,8 @@ define('app/views/machine_add', ['app/views/controlled'],
             }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
 
             needsKey: function() {
-                var provider = Mist.machineAddController.newMachineProvider;
-                return this.get('hasKey') && provider.provider != 'libvirt';
-            }.property('hasKey', 'Mist.machineAddController.newMachineProvider'),
+                return this.get('hasKey') && !this.get('hasLibvirt');
+            }.property('hasKey', 'hasLibvirt'),
 
             hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
                 var provider = Mist.machineAddController.newMachineProvider,
@@ -58,8 +57,8 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.provider.indexOf('ec2') > -1) ? true : false) : false) : false;
             }),
 
-            hasScript: Ember.computed('needsKey', 'dockerNeedScript', function() {
-                return this.get('needsKey') || this.get('dockerNeedScript');
+            hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
+                return this.get('hasKey') || this.get('dockerNeedScript');
             }),
 
             hasLocation: function() {
@@ -74,8 +73,8 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 && provider.networks.model.length) ? true : false) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
-            hasMonitoring: Ember.computed('hasLibvirt', function() {
-                return Mist.email && !this.get('hasLibvirt') ? true : false;
+            hasMonitoring: Ember.computed(function() {
+                return Mist.email ? true : false;
             }),
 
 
@@ -397,6 +396,10 @@ define('app/views/machine_add', ['app/views/controlled'],
              *  Observers
              *
              */
+
+             monitoringObserver: function() {
+                Ember.run.once(this, 'renderFields');
+             }.observes('Mist.machineAddController.newMachineMonitoring'),
 
              bindingsObserver: function () {
                 Ember.run.once(this, 'renderFields');
