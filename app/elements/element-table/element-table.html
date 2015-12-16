@@ -72,6 +72,19 @@
         font-weight: 500;
       }
 
+      .id{
+        min-width: 300px;
+      } 
+
+      .type  {
+        min-width: 100px;
+      }
+
+      .no-data{
+        font-style: italic;
+        padding: 15px 24px;
+      }
+
       .name .narrow {
         display: none;
       }
@@ -101,10 +114,14 @@
       <div class="name">Name <span class="narrow">/ Description</span></div>
       <div class="description">Description</div>
     </div>
-    <template is="dom-repeat" items="[[elements]]">
+    <div class="row no-data" hidden$="[[elements]]">
+        there are no data yet
+    </div>
+    <template is="dom-repeat" items="[[elements]]">      
       <div class="row" data-index$="[[index]]">
         <a href$="[[_elementLink(item.uuid)]]">          
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
+            <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
             <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
         </a>

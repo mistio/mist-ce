@@ -197,7 +197,13 @@ Polymer({
         var allNetworks = [];
         this.model.cloudsArray.forEach(
           function(cloud){
-            return allNetworks = allNetworks.concat(cloud.networksArray != undefined && cloud.networksArray.public.length > 0 ? cloud.networksArray.public : [])}
+            if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length){
+                cloud.networksArray.public.forEach(function(net){net["type"]="public"; allNetworks.push(net);});
+                cloud.networksArray.private.forEach(function(net){net["type"]="private"; allNetworks.push(net);});
+                cloud.networksArray.routers.forEach(function(net){net["type"]="router"; allNetworks.push(net);});
+                return allNetworks; 
+                }
+            }
         );
         this.set('model.networksArray', allNetworks);
     },
