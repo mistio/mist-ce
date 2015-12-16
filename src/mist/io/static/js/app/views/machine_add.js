@@ -13,6 +13,21 @@ define('app/views/machine_add', ['app/views/controlled'],
             changeProviderFlag: false,
             dockerNeedScript: false,
             hasAdvancedScript: false,
+            hasLibvirtDiskNew: true,
+
+
+            hasLibvirt: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider && provider.provider == 'libvirt' ? true : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasLibvirtDiskSize: function() {
+                var hasSize = true, name = Mist.machineAddController.newMachineImage.name;
+                if (this.get('hasLibvirt') && name.substring(name.length - 4) == '.img') {
+                    hasSize = false;
+                }
+                return hasSize;
+            }.property('hasLibvirt', 'Mist.machineAddController.newMachineImage.name'),
 
             hasDocker: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
@@ -35,34 +50,35 @@ define('app/views/machine_add', ['app/views/controlled'],
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasKey: function() {
-                var provider = Mist.machineAddController.newMachineProvider;
-                return provider ? (provider.provider ? (provider.provider != 'docker' || (provider.provider == 'docker' && this.get('dockerNeedScript')) ? true : false) : false) : false;
+                var provider = Mist.machineAddController.newMachineProvider,
+                invalids = ['docker', 'libvirt'];
+                return provider ? (provider.provider ? (((invalids.indexOf(provider.provider) != -1 ? false : true) || (provider.provider == 'docker' && this.get('dockerNeedScript'))) ? true : false) : false) : false;
             }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
 
             hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'azure', 'digitalocean', 'packet'];
+                valids = ['openstack', 'azure', 'digitalocean', 'packet', 'gce', 'rackspace', 'rackspace_first_gen', 'vultr'];
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.provider.indexOf('ec2') > -1) ? true : false) : false) : false;
             }),
 
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
-                return this.get('hasKey') == true || this.get('dockerNeedScript');
+                return this.get('hasKey') || this.get('dockerNeedScript');
             }),
 
             hasLocation: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['docker', 'indonesiancloud', 'vcloud'];
-                return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.locations.model.length == 1) ? false : true) : false) : false;
+                invalids = ['docker', 'indonesiancloud', 'vcloud', 'libvirt'];
+                return provider ? (provider.provider ? ((invalids.indexOf(provider.provider) != -1 || provider.locations.model.length == 1) ? false : true) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasNetworks: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'hpcloud', 'vcloud'];
+                valids = ['openstack', 'hpcloud', 'vcloud', 'libvirt'];
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 && provider.networks.model.length) ? true : false) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
-            hasMonitoring: Ember.computed(function() {
-                return Mist.email ? true : false;
+            hasMonitoring: Ember.computed('hasLibvirt', function() {
+                return Mist.email && !this.get('hasLibvirt') ? true : false;
             }),
 
 
@@ -254,6 +270,33 @@ define('app/views/machine_add', ['app/views/controlled'],
                     this.renderFields();
                 },
 
+                switchLibvirtDiskType: function () {
+                    var value = this.$('#create-machine-libvirt-disk-type select').val();
+                    Mist.machineAddController.set('newMachineLibvirtImagePath', '');
+                    Mist.machineAddController.set('newMachineLibvirtExistingDiskPath', '');
+                    this.set('hasLibvirtDiskNew', value != 1);
+                    this.renderFields();
+                },
+
+                createLibvirtImage: function () {
+                    var that = this;
+                    Mist.machineImageCreateController.open(function(newImagePath) {
+                        if (newImagePath) {
+                            var imageFaker = Ember.Object.create({
+                                id: newImagePath,
+                                name: newImagePath
+                            });
+
+                            Mist.machineAddController.setProperties({
+                                'newMachineImage': imageFaker,
+                                'newMachineLibvirtImagePath': newImagePath
+                            });
+
+                            that.fieldIsReady('image');
+                        }
+                    });
+                },
+
 
                 selectProvider: function (cloud) {
 
@@ -284,7 +327,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineImage', image);
 
-                    this.set('dockerNeedScript', image.get('isMist'));
+                    this.set('dockerNeedScript', this.get('hasDocker') && image.get('isMist'));
                 },
 
 
