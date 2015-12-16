@@ -31,6 +31,10 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             newMachineDockerEnvironment: null,
             newMachineDockerPorts: null,
             newMachineAzurePorts: null,
+            newMachineLibvirtDiskPath: '/var/lib/libvirt/',
+            newMachineLibvirtDiskSize: 4,
+            newMachineLibvirtImagePath: null,
+            newMachineLibvirtExistingDiskPath: null,
 
 
             //
@@ -111,32 +115,33 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
 
                 var that = this;
                 this.newMachineProvider.machines.newMachine(
-                    this.get('newMachineName'),
-                    this.get('newMachineImage'),
-                    this.get('newMachineSize'),
-                    this.get('newMachineLocation'),
-                    this.get('newMachineKey'),
-                    this.get('newMachineCloudInit'),
-                    this.get('newMachineScript'),
-                    this.get('newMachineProject'),
-                    this.get('newMachineMonitoring'),
-                    this.get('newMachineAssociateFloatingIp'),
-                    this.get('newMachineDockerEnvironment').trim(),
-                    this.get('newMachineDockerCommand'),
-                    this.get('newMachineScriptParams'),
-                    this.get('newMachineDockerPorts'),
-                    this.get('newMachineAzurePorts'),
-                    function(success, machine) {
-                        that._giveCallback(success, machine);
-                    }
+                        this.newMachineProvider.provider,
+                        this.newMachineName,
+                        this.newMachineImage,
+                        this.newMachineSize,
+                        this.newMachineLocation,
+                        this.newMachineKey,
+                        this.newMachineCloudInit,
+                        this.newMachineScript,
+                        this.newMachineProject,
+                        this.newMachineMonitoring,
+                        this.newMachineAssociateFloatingIp,
+                        this.newMachineDockerEnvironment.trim(),
+                        this.newMachineDockerCommand,
+                        this.newMachineScriptParams,
+                        this.newMachineDockerPorts,
+                        this.newMachineAzurePorts,
+                        this.newMachineLibvirtDiskSize,
+                        this.newMachineLibvirtDiskPath,
+                        this.newMachineLibvirtImagePath,
+                        this.newMachineLibvirtExistingDiskPath,
+
+                        function(success, machine) {
+                            that._giveCallback(success, machine);
+                        }
                 );
 
                 this.close();
-
-                // Redirect to machine list view if user is in image list view
-                if ($('#image-list-page').length) {
-                    Mist.__container__.lookup('router:main').transitionTo('machines');
-                }
             },
 
 
@@ -149,6 +154,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineName', '')
                     .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
+                    .set('newMachineKey', {'id' : 'Select Key'})
                     .set('newMachineProject', '')
                     .set('newMachineKey', {
                         'title': 'Select Key'
@@ -171,7 +177,11 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineDockerCommand', '')
                     .set('newMachineScriptParams', '')
                     .set('newMachineDockerPorts', '')
-                    .set('newMachineAzurePorts', '');
+                    .set('newMachineAzurePorts', '')
+                    .set('newMachineLibvirtDiskSize', 4)
+                    .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
+                    .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineLibvirtExistingDiskPath', '');
                 this.view.clear();
             },
 
@@ -215,6 +225,13 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     }
                 }
 
+                var re = /^[0-9]*$/;
+                if (this.newMachineProvider.provider == 'libvirt' &&
+                    ((this.newMachineImage.id || this.newMachineLibvirtImagePath) || this.newMachineLibvirtExistingDiskPath) &&
+                    this.newMachineName && this.newMachineSize.id) {
+                        formReady = true;
+                }
+
                 if (formReady && this.addingMachine) {
                     formReady = false;
                 }
@@ -248,7 +265,11 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineDockerCommand', '')
                     .set('newMachineScriptParams', '')
                     .set('newMachineDockerPorts', '')
-                    .set('newMachineAzurePorts', '');
+                    .set('newMachineAzurePorts', '')
+                    .set('newMachineLibvirtDiskSize', 4)
+                    .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
+                    .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineLibvirtExistingDiskPath', '');
             },
 
             _selectUnique: function() {
@@ -270,6 +291,30 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                 }
             },
 
+            _updateLibvirtPath: function() {
+                if (this.get('newMachineProvider.provider') == 'libvirt' && this.get('newMachineName')) {
+                    this.set('newMachineLibvirtDiskPath', '/var/lib/libvirt/images/' + this.get('newMachineName').trim() + '.img');
+                }
+            },
+
+            _removeFieldsBlanks: function() {
+                if (this.get('newMachineName')) {
+                    this.set('newMachineName', this.get('newMachineName').trim());
+                }
+
+                if (this.get('newMachineLibvirtDiskPath')) {
+                    this.set('newMachineLibvirtDiskPath', this.get('newMachineLibvirtDiskPath').trim());
+                }
+
+                if (this.get('newMachineLibvirtImagePath')) {
+                    this.set('newMachineLibvirtImagePath', this.get('newMachineLibvirtImagePath').trim());
+                }
+
+                if (this.get('newMachineLibvirtExistingDiskPath')) {
+                    this.set('newMachineLibvirtExistingDiskPath', this.get('newMachineLibvirtExistingDiskPath').trim());
+                }
+            },
+
             //
             //  Observers
             //
@@ -278,16 +323,32 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                 Ember.run.once(this, '_selectUnique');
             }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize', 'newMachineProject'),
 
+            sizeObserver: function() {
+                Ember.run.once(this, '_sizeError');
+            }.observes('newMachineLibvirtDiskSize'),
+
+            libvirtPathObserver: function() {
+                Ember.run.next(this, '_updateLibvirtPath');
+            }.observes('newMachineName', 'newMachineProvider.title'),
+
+            fieldsBlanksObserver: function() {
+                Ember.run.once(this, '_removeFieldsBlanks');
+            }.observes('newMachineName', 'newMachineLibvirtDiskPath', 'newMachineLibvirtImagePath', 'newMachineLibvirtExistingDiskPath'),
+
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
             }.observes('newMachineKey',
-                'newMachineName',
-                'newMachineSize',
-                'newMachineImage',
-                'newMachineScript',
-                'newMachineLocation',
-                'newMachineProvider',
-                'newMachineCloudInit')
+                       'newMachineName',
+                       'newMachineSize',
+                       'newMachineImage',
+                       'newMachineScript',
+                       'newMachineLocation',
+                       'newMachineProvider',
+                        'newMachineLibvirtDiskSize',
+                        'newMachineLibvirtDiskPath',
+                        'newMachineLibvirtImagePath',
+                        'newMachineLibvirtExistingDiskPath',
+                        'newMachineCloudInit')
         });
     }
 );

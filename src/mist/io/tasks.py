@@ -722,7 +722,7 @@ class ListImages(UserTask):
     result_expires = 60 * 60 * 24 * 7
     result_fresh = 60 * 60
     polling = False
-    soft_time_limit = 30
+    soft_time_limit = 60*2
 
     def execute(self, email, cloud_id):
         log.warn('Running list images for user %s cloud %s' % (email, cloud_id))
@@ -874,6 +874,7 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          quantity=1, persist=False, job_id=None,
                          docker_port_bindings={}, docker_exposed_ports={},
                          azure_port_bindings='', hostname='', plugins=None,
+                         disk_size=None, disk_path=None, create_from_existing=None,
                          cloud_init='', associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
@@ -912,6 +913,9 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
              'azure_port_bindings': azure_port_bindings,
              'associate_floating_ip': associate_floating_ip,
              'cloud_init': cloud_init,
+             'disk_size': disk_size,
+             'disk_path': disk_path,
+             'create_from_existing': create_from_existing,
              'project_id': project_id}
         ))
 

@@ -1,0 +1,32 @@
+<div id="machine-image-create-popup"
+     class="small-popup"
+     data-role="popup"
+     data-overlay-theme="b"
+     data-transition="slideup">
+
+    <div class="ui-header ui-bar-b ui-caps">
+        <h1 class="ui-title">Create Image</h1>
+
+        <a href="javascript:void(0)" class="close" {{action "backClicked" target=view}}>&#10005;</a>
+    </div>
+
+    <div data-role="content">
+
+        <form {{action "saveClicked" on="submit" target=view}}>
+            <div id="new-key-name-wrapper" class="required {{if Mist.machineImageCreateController.image.path 'filled' 'empty'}}">
+                <label for="new-machine-image-name">Image's path</label>
+                {{input id="new-machine-image-name" value=Mist.machineImageCreateController.image.path}}
+            </div>
+
+            {{#if Mist.machineImageCreateController.creatingImage}}
+                <div class="ajax-loader"></div>
+            {{/if}}     
+
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <button type="submit" id="create-image-ok" class="ui-btn ui-btn-d ui-caps">Save</button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
