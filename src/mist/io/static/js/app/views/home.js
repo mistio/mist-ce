@@ -16,6 +16,10 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
             templateName: 'home',
 
+            loadingIncidents: Ember.computed('Mist.openIncidents', function() {
+                return !Mist.openIncidents && Mist.isCore;
+            }),
+
             hasIncidents: function () {
                 if (Mist.openIncidents)
                     return !!Mist.openIncidents.length;
