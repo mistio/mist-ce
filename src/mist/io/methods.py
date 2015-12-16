@@ -1656,6 +1656,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         keypair = user.keypairs[key_id]
         private_key = keypair.private
         public_key = keypair.public
+    else:
+        public_key = None
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
@@ -1742,9 +1744,13 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         except:
             ram = 512
             cpu = 1
-        node = _create_machine_libvirt(conn, machine_name,
-                                       disk_size, ram, cpu,
-                                       image_id, disk_path, create_from_existing, networks)
+        node = _create_machine_libvirt(conn, name=machine_name,
+                                       disk_size=disk_size, ram=ram, cpu=cpu,
+                                       image=image_id, disk_path=disk_path,
+                                       create_from_existing=create_from_existing,
+                                       networks=networks,
+                                       public_key=public_key,
+                                       cloud_init=cloud_init)
     elif conn.type == Provider.PACKET:
         node = _create_machine_packet(conn, public_key, machine_name, image,
                                          size, location, cloud_init, project_id)
