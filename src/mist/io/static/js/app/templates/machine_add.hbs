@@ -145,23 +145,53 @@
         </div>
 
             {{#if view.hasLibvirtDiskNew}}
-                <label for="create-machine-disk-path">Path to create VM's disk</label>
-                {{view Mist.TextField
-                       id="create-machine-disk-path"
-                       data-theme="a"
-                       value=Mist.machineAddController.newMachineLibvirtDiskPath}}
+                <div class="field-wrapper">
+                    <div class="first-child">
+                        <label for="create-machine-disk-path">Path to create VM's disk</label>
+                        {{view Mist.TextField
+                           id="create-machine-disk-path"
+                           data-theme="a"
+                           value=Mist.machineAddController.newMachineLibvirtDiskPath}}
+                    </div>
+                    <div class="last-child">
+                        <a class="ui-btn ui-btn-a ui-btn-icon-notext ui-icon-question"
+                            id="create-machine-disk-path-helper"
+                            {{action "helpClicked" "disk-path" target=view}}>
+                        </a>
+                    </div>
+                </div>
 
-                <label for="create-machine-disk-size">Disk Size (GB)</label>
-                {{view Mist.TextField
-                       id="create-machine-disk-size"
-                       data-theme="a"
-                       value=Mist.machineAddController.newMachineLibvirtDiskSize}}
+                <div class="field-wrapper">
+                    <div class="first-child">
+                        <label for="create-machine-disk-size">Disk Size (GB)</label>
+                        {{view Mist.TextField
+                           id="create-machine-disk-size"
+                           data-theme="a"
+                           value=Mist.machineAddController.newMachineLibvirtDiskSize}}
+                    </div>
+                    <div class="last-child">
+                        <a class="ui-btn ui-btn-a ui-btn-icon-notext ui-icon-question"
+                            id="create-machine-disk-size-helper"
+                            {{action "helpClicked" "disk-size" target=view}}>
+                        </a>
+                    </div>
+                </div>
             {{else}}
-                <label for="create-machine-libvirt-existing-disk-path">Specify existing disk image path</label>
-                {{view Mist.TextField
-                       id="create-machine-libvirt-existing-disk-path"
-                       data-theme="a"
-                       value=Mist.machineAddController.newMachineLibvirtExistingDiskPath}}
+                <div class="field-wrapper">
+                    <div class="first-child">
+                       <label for="create-machine-libvirt-existing-disk-path">Specify existing disk image path</label>
+                        {{view Mist.TextField
+                               id="create-machine-libvirt-existing-disk-path"
+                               data-theme="a"
+                               value=Mist.machineAddController.newMachineLibvirtExistingDiskPath}}
+                    </div>
+                    <div class="last-child">
+                        <a class="ui-btn ui-btn-a ui-btn-icon-notext ui-icon-question"
+                            id="create-machine-existing-disk-path-helper"
+                            {{action "helpClicked" "existing-disk-path" target=view}}>
+                        </a>
+                    </div>
+                </div>
             {{/if}}
         {{/if}}
 
@@ -426,6 +456,35 @@
 
 <div id="create-machine-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
      {{action "clickOverlay" target=view}}></div>
+
+<div id="help-tooltip-screen"
+        class="ui-popup-screen
+            ui-overlay-b
+            ui-screen-hidden">
+    </div>
+    <div id="help-tooltip-popup"
+         class="pop
+            ui-popup-container
+            ui-popup-hidden
+            ui-popup-truncate">
+        <div id="help-tooltip"
+             class="ui-popup
+                ui-body-a
+                ui-overlay-shadow
+                ui-corner-all"
+             data-role="popup"
+             data-arrow="true"
+             data-enhanced="true"
+             data-transition="flip">
+            <p>{{view.helpText}}
+                {{#if view.helpHref}}
+                <a target="_blank" href={{view.helpHref}}>
+                    Read more...
+                </a>
+                {{/if}}
+            </p>
+        </div>
+    </div>
 
 {{component "key-add"}}
 

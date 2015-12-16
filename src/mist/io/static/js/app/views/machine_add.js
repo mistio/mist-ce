@@ -77,6 +77,23 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return Mist.email ? true : false;
             }),
 
+            helpOptions: [{
+                field: 'disk-path',
+                helpText: 'This is a demo text',
+                helpHref: 'http://arsenal.com'
+            }, {
+                field: 'disk-size',
+                helpText: 'This is a demo text',
+                helpHref: 'http://arsenal.com'
+            }, {
+                field: 'existing-disk-path',
+                helpText: 'This is a demo text',
+                helpHref: 'http://arsenal.com'
+            }],
+
+            helpText: '',
+            helpHref: '',
+
 
             /**
              *  Properties
@@ -380,6 +397,19 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                 launchClicked: function () {
                     Mist.machineAddController.add();
+                },
+
+                helpClicked: function(field) {
+                    var helper = this.get('helpOptions').findBy('field', field);
+                    this.setProperties({
+                        helpText: helper.helpText,
+                        helpHref: helper.helpHref
+                    });
+                    
+                    Ember.run.schedule('afterRender', this, function () {
+                        $('#help-tooltip').popup().popup('option', 'positionTo', '#create-machine-' + field + '-helper');
+                        $('#help-tooltip').popup('open');
+                    });
                 }
             },
 
