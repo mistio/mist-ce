@@ -1309,6 +1309,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.GCE:
         conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
     elif cloud.provider == Provider.DOCKER:
+        import libcloud.security
         libcloud.security.VERIFY_SSL_CERT = False;
         if cloud.key_file and cloud.cert_file:
             # tls auth, needs to pass the key and cert as files
