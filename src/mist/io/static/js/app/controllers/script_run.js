@@ -52,7 +52,7 @@ define('app/controllers/script_run', ['ember'],
                     script: {},
                     machine: '',
                     parameters: '',
-                    scheduler: this.view.scriptSchedulers[0],
+                    scheduler: '',
                     interval: {
                         every: '',
                         period: ''

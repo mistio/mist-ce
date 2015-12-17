@@ -148,3 +148,7 @@
 #single-script-page .command-container {
     white-space: pre !important;
 }
+
+#run-script .ui-slider {
+    width: 100%;
+}
