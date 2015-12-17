@@ -1808,14 +1808,13 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             post_script_params=post_script_params,
         )
     elif key_id:
-        if conn.type not in [Provider.LIBVIRT]:
-            mist.io.tasks.post_deploy_steps.delay(
-                user.email, cloud_id, node.id, monitoring, script, key_id,
-                script_id=script_id, script_params=script_params,
-                job_id=job_id, hostname=hostname, plugins=plugins,
-                post_script_id=post_script_id,
-                post_script_params=post_script_params,
-            )
+        mist.io.tasks.post_deploy_steps.delay(
+            user.email, cloud_id, node.id, monitoring, script, key_id,
+            script_id=script_id, script_params=script_params,
+            job_id=job_id, hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params,
+        )
 
 
     ret = {'id': node.id,
