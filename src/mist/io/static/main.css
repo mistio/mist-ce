@@ -1599,7 +1599,8 @@ ul.checkbox-list .ui-grid-b {
 }
 
 .field-wrapper.empty.required .ui-input-text,
-.empty.required .ui-input-text {
+.empty.required .ui-input-text,
+.empty.required .ui-select>.ui-btn {
     border-color: #0099cc !important;
 }
 
