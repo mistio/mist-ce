@@ -19,8 +19,8 @@ from pyramid.response import Response
 
 try:
     from mist.core import config
-    from mist.core.helpers import user_from_request
     from mist.core.helpers import view_config
+    from mist.core.auth.methods import user_from_request
 except ImportError:
     from mist.io import config
     from mist.io.helpers import user_from_request
