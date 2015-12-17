@@ -34,7 +34,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             newMachineLibvirtDiskPath: '/var/lib/libvirt/',
             newMachineLibvirtDiskSize: 4,
             newMachineLibvirtImagePath: null,
-            newMachineLibvirtExistingDiskPath: null,
 
 
             //
@@ -134,7 +133,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                         this.newMachineLibvirtDiskSize,
                         this.newMachineLibvirtDiskPath,
                         this.newMachineLibvirtImagePath,
-                        this.newMachineLibvirtExistingDiskPath,
 
                         function(success, machine) {
                             that._giveCallback(success, machine);
@@ -180,8 +178,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineAzurePorts', '')
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
-                    .set('newMachineLibvirtImagePath', '')
-                    .set('newMachineLibvirtExistingDiskPath', '');
+                    .set('newMachineLibvirtImagePath', '');
                 this.view.clear();
             },
 
@@ -227,7 +224,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
 
                 var re = /^[0-9]*$/;
                 if (this.newMachineProvider.provider == 'libvirt' &&
-                    ((this.newMachineImage.id || this.newMachineLibvirtImagePath) || this.newMachineLibvirtExistingDiskPath) &&
+                    (this.newMachineImage.id || this.newMachineLibvirtImagePath) &&
                     this.newMachineName && this.newMachineSize.id) {
                         formReady = true;
                 }
@@ -268,8 +265,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineAzurePorts', '')
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
-                    .set('newMachineLibvirtImagePath', '')
-                    .set('newMachineLibvirtExistingDiskPath', '');
+                    .set('newMachineLibvirtImagePath', '');
             },
 
             _selectUnique: function() {
@@ -317,10 +313,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                 if (this.get('newMachineLibvirtImagePath')) {
                     this.set('newMachineLibvirtImagePath', this.get('newMachineLibvirtImagePath').trim());
                 }
-
-                if (this.get('newMachineLibvirtExistingDiskPath')) {
-                    this.set('newMachineLibvirtExistingDiskPath', this.get('newMachineLibvirtExistingDiskPath').trim());
-                }
             },
 
             //
@@ -341,7 +333,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
 
             fieldsBlanksObserver: function() {
                 Ember.run.once(this, '_removeFieldsBlanks');
-            }.observes('newMachineName', 'newMachineLibvirtDiskPath', 'newMachineLibvirtImagePath', 'newMachineLibvirtExistingDiskPath'),
+            }.observes('newMachineName', 'newMachineLibvirtDiskPath', 'newMachineLibvirtImagePath'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
@@ -355,7 +347,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                         'newMachineLibvirtDiskSize',
                         'newMachineLibvirtDiskPath',
                         'newMachineLibvirtImagePath',
-                        'newMachineLibvirtExistingDiskPath',
                         'newMachineCloudInit')
         });
     }

@@ -13,7 +13,6 @@ define('app/views/machine_add', ['app/views/controlled'],
             changeProviderFlag: false,
             dockerNeedScript: false,
             hasAdvancedScript: false,
-            hasLibvirtDiskNew: true,
 
 
             hasLibvirt: function() {
@@ -280,14 +279,6 @@ define('app/views/machine_add', ['app/views/controlled'],
                     Mist.machineAddController.set('newMachineScriptParams', '');
                     Mist.machineAddController.set('hasScript', value == 'advanced');
                     this.set('hasAdvancedScript', value == 'advanced');
-                    this.renderFields();
-                },
-
-                switchLibvirtDiskType: function () {
-                    var value = this.$('#create-machine-libvirt-disk-type select').val();
-                    Mist.machineAddController.set('newMachineLibvirtImagePath', '');
-                    Mist.machineAddController.set('newMachineLibvirtExistingDiskPath', '');
-                    this.set('hasLibvirtDiskNew', value != 1);
                     this.renderFields();
                 },
 
