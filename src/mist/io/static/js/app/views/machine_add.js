@@ -84,10 +84,6 @@ define('app/views/machine_add', ['app/views/controlled'],
                 field: 'disk-size',
                 helpText: 'This is a demo text',
                 helpHref: 'http://arsenal.com'
-            }, {
-                field: 'existing-disk-path',
-                helpText: 'This is a demo text',
-                helpHref: 'http://arsenal.com'
             }],
 
             helpText: '',
