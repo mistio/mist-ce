@@ -1607,7 +1607,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
-                   disk_size=None, disk_path=None, create_from_existing=None,
+                   disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
 
@@ -1746,7 +1746,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         node = _create_machine_libvirt(conn, machine_name,
                                        disk_size=disk_size, ram=ram, cpu=cpu,
                                        image=image_id, disk_path=disk_path,
-                                       create_from_existing=create_from_existing,
                                        networks=networks,
                                        public_key=public_key,
                                        cloud_init=cloud_init)
@@ -2243,7 +2242,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
 
 
 def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
-                            image, disk_path, create_from_existing, networks, public_key, cloud_init):
+                            image, disk_path, networks, public_key, cloud_init):
     """Create a machine in Libvirt.
     """
 
@@ -2255,7 +2254,6 @@ def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
             cpu=cpu,
             image=image,
             disk_path=disk_path,
-            create_from_existing=create_from_existing,
             networks=networks,
             public_key=public_key,
             cloud_init=cloud_init
