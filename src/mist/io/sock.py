@@ -21,7 +21,7 @@ import tornado.iostream
 import requests
 
 try:
-    from mist.core.helpers import user_from_session_id
+    from mist.core.auth.methods import user_from_session_id
     from mist.core import config
     from mist.core.methods import get_stats
     multi_user = True
@@ -64,8 +64,8 @@ def get_conn_info(conn_info):
             user_agent = conn_info.headers[header]
     ip = real_ip or forwarded_for or conn_info.ip
     session_id = ''
-    if 'beaker.session.id' in conn_info.cookies.keys():
-        session_id = conn_info.cookies['beaker.session.id'].value
+    if 'session.id' in conn_info.cookies.keys():
+        session_id = conn_info.cookies['session.id'].value
     return ip, user_agent, session_id
 
 
