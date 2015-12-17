@@ -78,12 +78,12 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             helpOptions: [{
                 field: 'disk-path',
-                helpText: 'This is a demo text',
-                helpHref: 'http://arsenal.com'
+                helpText: 'Where the VM image disk file will be created',
+                helpHref: 'http://docs.mist.io/article/24-adding-kvm'
             }, {
                 field: 'disk-size',
-                helpText: 'This is a demo text',
-                helpHref: 'http://arsenal.com'
+                helpText: "The VM's size will be the size of the image plus the number in GBs provided here",
+                helpHref: 'http://docs.mist.io/article/24-adding-kvm'
             }],
 
             helpText: '',
@@ -392,7 +392,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                         helpText: helper.helpText,
                         helpHref: helper.helpHref
                     });
-                    
+
                     Ember.run.schedule('afterRender', this, function () {
                         $('#help-tooltip').popup().popup('option', 'positionTo', '#create-machine-' + field + '-helper');
                         $('#help-tooltip').popup('open');
