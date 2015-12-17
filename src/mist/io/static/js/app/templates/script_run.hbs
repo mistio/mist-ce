@@ -107,10 +107,9 @@
             {{/if}}
 
             {{#if view.isOneOff}}
-                <div class="form-field">
-                    <!-- <div class="form-field">
-                        <input id="datetimepicker" type="text" >
-                    </div> -->
+                <div class="form-field {{if Mist.scriptRunController.scriptToRun.run_at 'filled' 'empty'}} required">
+                    <label>Run at</label>
+                    {{input value=Mist.scriptRunController.scriptToRun.run_at}}
                 </div>
             {{/if}}
 
@@ -288,10 +287,10 @@
                 </div>
             {{/if}}
 
-            {{#if view.hasExpire}}
-                <div id="script-run-expire" class="form-field {{if Mist.scriptRunController.scriptToRun.expire 'filled' 'empty'}} required">
+            {{#if view.hasLastRunAt}}
+                <div id="script-run-expire" class="form-field {{if Mist.scriptRunController.scriptToRun.last_run_at 'filled' 'empty'}} required">
                     <label>Expiration date</label>
-                    <input type="text" value="expiration date here">
+                    {{input value=Mist.scriptRunController.scriptToRun.last_run_at}}
                 </div>
             {{/if}}
 
