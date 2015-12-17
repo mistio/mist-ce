@@ -71,27 +71,40 @@
                 Select script scheduler
             -->
 
-            <div id="script-run-scheduler" class="form-field {{if Mist.scriptRunController.scriptToRun.scheduler.label 'filled' 'empty'}} required">
-                <label>Scheduler</label>
-                <div  class="mist-select"
-                    data-role="collapsible"
-                    data-iconpos="right"
-                    data-collapsed-icon="carat-d"
-                    data-expanded-icon="carat-u">
-                        <h4>
-                            {{Mist.scriptRunController.scriptToRun.scheduler.label}}
-                        </h4>
-                        <ul data-role="listview">
-                            {{#each view.scriptSchedulers as |scriptSchedule|}}
-                                <li data-icon="false" data-theme="a">
-                                    <a {{action "selectScheduler" scriptSchedule target=view}}>{{scriptSchedule.label}}</a>
-                                </li>
-                            {{/each}}
-                        </ul>
-                </div>
+            <div class="form-field" id="script-run-type">
+                <label>Run</label>
+                <select class="toggle-field" data-role="slider"
+                {{action "switchScheduleRun" on="change" target=view}}>
+                    <option value="0">Now</option>
+                    <option value="1">Schedule</option>
+                </select>
             </div>
 
-
+            {{#if view.scheduleRun}}
+                <div id="script-run-scheduler" class="form-field {{if Mist.scriptRunController.scriptToRun.scheduler 'filled' 'empty'}} required">
+                    <label>Scheduler</label>
+                    <div  class="mist-select"
+                        data-role="collapsible"
+                        data-iconpos="right"
+                        data-collapsed-icon="carat-d"
+                        data-expanded-icon="carat-u">
+                            <h4>
+                                {{#if Mist.scriptRunController.scriptToRun.scheduler}}
+                                    {{Mist.scriptRunController.scriptToRun.scheduler.label}}
+                                {{else}}
+                                    Select scheduler
+                                {{/if}}
+                            </h4>
+                            <ul data-role="listview">
+                                {{#each view.scriptSchedulers as |scriptSchedule|}}
+                                    <li data-icon="false" data-theme="a">
+                                        <a {{action "selectScheduler" scriptSchedule target=view}}>{{scriptSchedule.label}}</a>
+                                    </li>
+                                {{/each}}
+                            </ul>
+                    </div>
+                </div>
+            {{/if}}
 
             {{#if view.isOneOff}}
                 <div class="form-field">

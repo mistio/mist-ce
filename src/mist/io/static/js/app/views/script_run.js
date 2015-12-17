@@ -14,9 +14,6 @@ define('app/views/script_run', ['app/views/popup'],
             popupId: '#script-run',
 
             scriptSchedulers: [{
-                label: 'Now',
-                value: 'now'
-            }, {
                 label: 'One-Off',
                 value: 'one_off',
             }, {
@@ -41,6 +38,7 @@ define('app/views/script_run', ['app/views/popup'],
                 limit: 30
             }],
             scriptEveryOptions: [],
+            scheduleRun: false,
 
             isReady: function () {
                 return Mist.scriptRunController.scriptToRun.machine.id;
@@ -173,6 +171,14 @@ define('app/views/script_run', ['app/views/popup'],
 
                 runClicked: function () {
                     Mist.scriptRunController.run();
+                },
+
+                switchScheduleRun: function() {
+                    var val = $('#script-run-type select').val();
+                    console.log(val);
+                    this.set('scheduleRun', val == 1);
+                    Mist.scriptRunController.get('scriptToRun').set('scheduler', '');
+                    this._renderFields();
                 },
 
                 selectScheduler: function(scheduler) {
