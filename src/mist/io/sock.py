@@ -12,6 +12,7 @@ import uuid
 import json
 import socket
 import random
+import traceback
 from time import time
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
@@ -70,6 +71,8 @@ def get_conn_info(conn_info):
 
 
 class MistConnection(SockJSConnection):
+    closed = False
+
     def on_open(self, conn_info):
         log.info("%s: Initializing", self.__class__.__name__)
         self.ip, self.user_agent, session_id = get_conn_info(conn_info)
@@ -81,10 +84,15 @@ class MistConnection(SockJSConnection):
         super(MistConnection, self).send(json.dumps({msg: data}))
 
     def on_close(self, stale=False):
-        log.info("%s: on_close event handler", self.__class__.__name__)
-        if stale:
-            log.warning("stale conn removed")
-        CONNECTIONS.remove(self)
+        if not self.closed:
+            log.info("%s: on_close event handler", self.__class__.__name__)
+            if stale:
+                log.warning("stale conn removed")
+            CONNECTIONS.remove(self)
+            self.closed = True
+        else:
+            log.warning("%s: called on_close AGAIN!", self.__class__.__name__)
+            traceback.print_stack()
 
 
 class ShellConnection(MistConnection):
