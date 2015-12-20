@@ -64,7 +64,7 @@ class MultiplexConnection(conn.SockJSConnection):
         self.handler = DummyHandler(self.session.conn_info)
 
     def on_message(self, msg):
-        last_rcv = time.time()
+        self.last_rcv = time.time()
         if msg == 'h':
             return
 
