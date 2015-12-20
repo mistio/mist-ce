@@ -80,8 +80,10 @@ class MistConnection(SockJSConnection):
     def send(self, msg, data=None):
         super(MistConnection, self).send(json.dumps({msg: data}))
 
-    def on_close(self):
+    def on_close(self, stale=False):
         log.info("%s: on_close event handler", self.__class__.__name__)
+        if stale:
+            log.warning("stale conn removed")
         CONNECTIONS.remove(self)
 
 
@@ -119,10 +121,10 @@ class ShellConnection(MistConnection):
     def emit_shell_data(self, data):
         self.send('shell_data', data)
 
-    def on_close(self):
+    def on_close(self, stale=False):
         if self.hub_client:
             self.hub_client.stop()
-        super(ShellConnection, self).on_close()
+        super(ShellConnection, self).on_close(stale=stale)
 
 
 class UserUpdatesConsumer(Consumer):
@@ -294,13 +296,13 @@ class MainConnection(MistConnection):
             if 'monitoring' in sections:
                 self.check_monitoring()
 
-    def on_close(self):
+    def on_close(self, stale=False):
         if self.consumer is not None:
             try:
                 self.consumer.stop()
             except Exception as exc:
                 log.error("Error closing pika consumer: %r", exc)
-        super(MainConnection, self).on_close()
+        super(MainConnection, self).on_close(stale=stale)
 
 
 def make_router():

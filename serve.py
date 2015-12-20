@@ -1,4 +1,5 @@
 import sys
+import time
 import signal
 import logging
 
@@ -13,9 +14,18 @@ log = logging.getLogger(__name__)
 
 def sig_handler(sig, frame):
     log.warning("SockJS-Tornado process received SIGTERM/SIGINT")
+    if heartbeat_pc.is_running():
+        heartbeat_pc.stop()
     for conn in list(mist.io.sock.CONNECTIONS):
         conn.on_close()
     tornado.ioloop.IOLoop.instance().stop()
+
+
+def heartbeat():
+    for conn in list(mist.io.sock.CONNECTIONS):
+        if conn.session.base.last_rcv < time.time() - 60:
+            log.warning("Closing stale conn %s.", conn)
+            conn.on_close(stale=True)
 
 
 if __name__ == '__main__':
@@ -26,6 +36,9 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)  # also catch KeyboardInterrupt
+
+    heartbeat_pc = tornado.ioloop.PeriodicCallback(heartbeat, 10 * 1000)
+    heartbeat_pc.start()
 
     app = tornado.web.Application(mist.io.sock.make_router().urls)
     app.listen(port)
