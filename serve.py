@@ -21,6 +21,12 @@ def sig_handler(sig, frame):
     tornado.ioloop.IOLoop.instance().stop()
 
 
+def usr1_handler(sig, frame):
+    log.warning("SockJS-Tornado process received SIGUSR1")
+    for conn in list(mist.io.sock.CONNECTIONS):
+        log.info(conn)
+
+
 def heartbeat():
     for conn in list(mist.io.sock.CONNECTIONS):
         if conn.session.base.last_rcv < time.time() - 60:
@@ -36,6 +42,7 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)  # also catch KeyboardInterrupt
+    signal.signal(signal.SIGUSR1, usr1_handler)
 
     heartbeat_pc = tornado.ioloop.PeriodicCallback(heartbeat, 10 * 1000)
     heartbeat_pc.start()
