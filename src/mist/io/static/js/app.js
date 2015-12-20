@@ -22,7 +22,6 @@ require.config({
         ember: '../dist/ember/ember.prod',
         elv: '../dist/ember-legacy-views',
         templates: '../dist/templates',
-        socket: '../dist/sockjs/sockjs.min',
         md5: '../dist/md5/build/md5.min',
         d3: '../dist/d3/d3.min',
         c3: '../dist/c3/c3.min',
