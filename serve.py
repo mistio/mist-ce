@@ -9,6 +9,12 @@ import tornado.ioloop
 import mist.io.sock
 
 
+try:
+    from mist.core.sock import make_router
+except ImportError:
+    from mist.io.sock import make_router
+
+
 log = logging.getLogger(__name__)
 
 
@@ -47,6 +53,6 @@ if __name__ == '__main__':
     heartbeat_pc = tornado.ioloop.PeriodicCallback(heartbeat, 10 * 1000)
     heartbeat_pc.start()
 
-    app = tornado.web.Application(mist.io.sock.make_router().urls)
+    app = tornado.web.Application(make_router().urls)
     app.listen(port)
     tornado.ioloop.IOLoop.instance().start()
