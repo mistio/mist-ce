@@ -25,6 +25,8 @@
     <meta name="msapplication-TileImage" content="/resources/images/favicons/mstile-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
+    <script src="//cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
+
     <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" type="text/css">
 
     <link rel="stylesheet" type='text/css' href="resources/main.css"
@@ -79,6 +81,7 @@
       ga('send', 'pageview');
     </script>
     <link rel="stylesheet" href="resources/jquery.mobile.icons.min.css" />
+
 </head>
 
 <body style="background-color: #c2c3c4; overflow:hidden">

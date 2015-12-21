@@ -49,7 +49,12 @@ var MultiplexedWebSocket = function(ws) {
     var that = this;
     this.ws = ws;
     this.channels = {};
+    this.ws.addEventListener('heartbeat', function(e) {
+        that.ws.send('h');
+    });
     this.ws.addEventListener('message', function(e) {
+        if (e.data.length < 5)
+            console.warn(e.data);
         var t = e.data.split(',');
         var type = t.shift(), name = t.shift(), payload = t.join();
         if(!(name in that.channels)) {
@@ -58,14 +63,14 @@ var MultiplexedWebSocket = function(ws) {
         var sub = that.channels[name];
 
         switch(type) {
-        case 'uns':
-            delete that.channels[name];
-            sub.emit('close', {});
-            break;
-        case 'msg':
-            sub.emit('message', {data: JSON.parse(payload)});
-            break
-        }
+            case 'uns':
+                delete that.channels[name];
+                sub.emit('close', {});
+                break;
+            case 'msg':
+                sub.emit('message', {data: JSON.parse(payload)});
+                break
+            }
     });
 };
 MultiplexedWebSocket.prototype.channel = function(raw_name) {
