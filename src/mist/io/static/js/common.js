@@ -403,6 +403,8 @@ function Socket (args) {
                       callback();
                   if (that.onConnect instanceof Function)
                       that.onConnect(that);
+                  if (appLoader)
+                      appLoader.complete('fetch first data');
               });
           }
           this.set('channel', channel)

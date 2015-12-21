@@ -138,7 +138,8 @@ var LOADER_STEPS = {
     'fetch first data': {
         before: ['init connections'],
         exec: function () {
-            appLoader.complete('fetch first data');
+            // step will completed by the list_clouds event handler
+            // appLoader.complete('fetch first data');
         }
     }
 };
