@@ -78,14 +78,6 @@ var LOADER_STEPS = {
             });
         }
     },
-    'load socket': {
-        before: [],
-        exec: function () {
-            require(['socket'], function () {
-                appLoader.complete('load socket');
-            });
-        }
-    },
     'load multiplex': {
         before: [],
         exec: function () {
@@ -119,7 +111,7 @@ var LOADER_STEPS = {
         }
     },
     'init connections': {
-        before: ['load socket', 'load ember', 'init app'],
+        before: ['load ember', 'init app'],
         exec: function () {
             Mist.set('ajax', Ajax(CSRF_TOKEN));
             Mist.set('main', new Socket({

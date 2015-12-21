@@ -325,7 +325,7 @@ function Socket (args) {
                 }
                 this.attempts++;
                 sockjs = new SockJS('/socket', null,
-                    {'protocols_whitelist':
+                    {'transports':
                         ['websocket', 'xhr-polling']}
                 );
                 sockjs.onopen = function() {
