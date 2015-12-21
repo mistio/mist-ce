@@ -135,36 +135,37 @@
 
         <!-- Libvirt Specific -->
         {{#if view.hasLibvirt}}
-        <label for="create-machine-libvirt-disk-type">Disk</label>
-        <div id="create-machine-libvirt-disk-type">
-            <select class="toggle-field" data-theme="a" data-role="slider"
-            {{action "switchLibvirtDiskType" field on="change" target="view"}}>
-                <option value="0">New</option>
-                <option value="1">Existing</option>
-            </select>
-        </div>
-
-            {{#if view.hasLibvirtDiskNew}}
+        <div class="field-wrapper">
+            <div class="first-child">
                 <label for="create-machine-disk-path">Path to create VM's disk</label>
                 {{view Mist.TextField
-                       id="create-machine-disk-path"
-                       data-theme="a"
-                       value=Mist.machineAddController.newMachineLibvirtDiskPath}}
+                   id="create-machine-disk-path"
+                   data-theme="a"
+                   value=Mist.machineAddController.newMachineLibvirtDiskPath}}
+            </div>
+            <div class="last-child">
+                <a class="ui-btn ui-btn-a ui-btn-icon-notext ui-icon-question"
+                    id="create-machine-disk-path-helper"
+                    {{action "helpClicked" "disk-path" target=view}}>
+                </a>
+            </div>
+        </div>
 
-                {{#if view.hasLibvirtDiskSize}}
+        <div class="field-wrapper">
+            <div class="first-child">
                 <label for="create-machine-disk-size">Disk Size (GB)</label>
                 {{view Mist.TextField
-                       id="create-machine-disk-size"
-                       data-theme="a"
-                       value=Mist.machineAddController.newMachineLibvirtDiskSize}}
-                {{/if}}
-            {{else}}
-                <label for="create-machine-libvirt-existing-disk-path">Specify existing disk image path</label>
-                {{view Mist.TextField
-                       id="create-machine-libvirt-existing-disk-path"
-                       data-theme="a"
-                       value=Mist.machineAddController.newMachineLibvirtExistingDiskPath}}
-            {{/if}}
+                   id="create-machine-disk-size"
+                   data-theme="a"
+                   value=Mist.machineAddController.newMachineLibvirtDiskSize}}
+            </div>
+            <div class="last-child">
+                <a class="ui-btn ui-btn-a ui-btn-icon-notext ui-icon-question"
+                    id="create-machine-disk-size-helper"
+                    {{action "helpClicked" "disk-size" target=view}}>
+                </a>
+            </div>
+        </div>
         {{/if}}
 
         <!-- Select Location -->
@@ -193,7 +194,7 @@
 
         <!-- Select Key -->
         {{#if view.hasKey}}
-        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.hasKey 'required'}}">
+        <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.needsKey 'required'}}">
             <div id="create-machine-key" >
                 <label>Key</label>
                 <div
@@ -428,6 +429,35 @@
 
 <div id="create-machine-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
      {{action "clickOverlay" target=view}}></div>
+
+<div id="help-tooltip-screen"
+        class="ui-popup-screen
+            ui-overlay-b
+            ui-screen-hidden">
+    </div>
+    <div id="help-tooltip-popup"
+         class="pop
+            ui-popup-container
+            ui-popup-hidden
+            ui-popup-truncate">
+        <div id="help-tooltip"
+             class="ui-popup
+                ui-body-a
+                ui-overlay-shadow
+                ui-corner-all"
+             data-role="popup"
+             data-arrow="true"
+             data-enhanced="true"
+             data-transition="flip">
+            <p>{{view.helpText}}
+                {{#if view.helpHref}}
+                <a target="_blank" href={{view.helpHref}}>
+                    Read more...
+                </a>
+                {{/if}}
+            </p>
+        </div>
+    </div>
 
 {{component "key-add"}}
 
