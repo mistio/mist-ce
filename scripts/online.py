@@ -12,11 +12,11 @@ def query(host='127.0.0.1:8081'):
     res['session'] = res.pop('main', [])
     for kind in res:
         conn_dicts = list(sorted(res[kind], key=lambda d: d.get('last_rcv')))
-        print ' %d %sS - %s '.center(80, '-') % (
-            len(conn_dicts), kind.upper(), host
-        )
+        title = ' %d %sS - %s ' % (len(conn_dicts), kind.upper(), host)
+        print title.center(80, '-')
         for i, conn_dict in enumerate(conn_dicts):
             print '%d: %s' % (i + 1, mist_conn_str(conn_dict))
+        print
 
 
 if __name__ == '__main__':
