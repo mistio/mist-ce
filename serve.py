@@ -30,13 +30,14 @@ def sig_handler(sig, frame):
 def usr1_handler(sig, frame):
     log.warning("SockJS-Tornado process received SIGUSR1")
     for conn in list(mist.io.sock.CONNECTIONS):
-        log.info("|%s|%s|%s|%s|%s|%s|%s|" % (conn.session_id, conn.user.email, conn.session.name, conn.session.base.last_rcv, conn.user_agent, conn.ip, conn.is_closed))
+        log.info(conn)
 
 
 def heartbeat():
+    now = time.time()
     connections = list(mist.io.sock.CONNECTIONS)
     for conn in connections:
-        if conn.session.base.last_rcv < time.time() - 60:
+        if conn.session.base.last_rcv < now - 60:
             log.warning("Closing stale conn %s.", conn)
             conn.on_close(stale=True)
     log.info("%d open connections in sockjs %d" % (len(connections), port))
@@ -44,11 +45,13 @@ def heartbeat():
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        ret = {'main': [],
-               'shell': [],
-               'logs': []}
-        for conn in list(mist.io.sock.CONNECTIONS):
-            ret[conn.session.name].append([conn.session_id, conn.user.email, conn.session.base.last_rcv, conn.ip, conn.user_agent])
+        ret = {}
+        for conn in mist.io.sock.CONNECTIONS:
+            conn_dict = conn.get_dict()
+            name = conn_dict.pop('name')
+            if name not in ret:
+                ret[name] = []
+            ret[name].append(conn_dict)
         self.write(ret)
 
 

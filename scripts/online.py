@@ -1,25 +1,30 @@
 import requests
-from datetime import datetime
 
-def getKey(item): 
-    return item[2]
+from mist.io.sock import mist_conn_str
 
-for port in [8081, 8082]:
-    try:
-        ret = requests.get('http://127.0.0.1:%d' % port)
-        res = ret.json()
-        print '-'*32 + ' SESSIONS: %s '%(port) + '-'*32
-        i = 1
-        for s in sorted(res['main'], key=getKey):
-            print '%d: %s - %s - %s - %s - %s' % (i, datetime.fromtimestamp(s[2]).strftime('%c'), s[1], s[3], s[4], s[0])
-            i+=1
-        print '-'*80
-	print ''
-        print '-'*33 + ' SHELLS: %s '%(port) + '-'*33
-        i = 1
-        for s in sorted(res['shell'], key=getKey):
-            print '%d: %s - %s - %s - %s - %s' % (i, datetime.fromtimestamp(s[2]).strftime('%c'), s[1], s[3], s[4], s[0])
-            i+=1
-        print '-'*80
-    except:
-        pass
+
+def query(host='127.0.0.1:8081'):
+    resp = requests.get('http://' + host)
+    if not resp.ok:
+        print "Error response from host '%s': %s" % (host, resp.body)
+        return
+    res = resp.json()
+    res['session'] = res.pop('main', [])
+    for kind in res:
+        conn_dicts = list(sorted(res[kind], key=lambda d: d.get('last_rcv')))
+        print ' %d %sS - %s '.center(80, '-') % (
+            len(conn_dicts), kind.upper(), host
+        )
+        for i, conn_dict in enumerate(conn_dicts):
+            print '%d: %s' % (i + 1, mist_conn_str(conn_dict))
+
+
+if __name__ == '__main__':
+    for port in (8081, 8082):
+        print
+        host = '127.0.0.1:%d' % port
+        try:
+            query(host)
+        except Exception as exc:
+            print "Error querying host '%s': %r" % (host, exc)
+        print

@@ -13,6 +13,7 @@ import json
 import socket
 import random
 import traceback
+import datetime
 from time import time
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
@@ -70,6 +71,18 @@ def get_conn_info(conn_info):
     return ip, user_agent, session_id
 
 
+def mist_conn_str(conn_dict):
+    parts = []
+    dt_last_rcv = datetime.datetime.fromtimestamp(conn_dict['last_rcv'])
+    conn_dict['last_rcv'] = dt_last_rcv
+    for key in ('name', 'last_rcv', 'user', 'ip', 'user_agent', 'closed',
+                'session_id'):
+        if key in conn_dict:
+            parts.append(conn_dict.pop(key))
+    parts.extend(conn_dict.values())
+    return ' - '.join(map(str, parts))
+
+
 class MistConnection(SockJSConnection):
     closed = False
 
@@ -93,6 +106,20 @@ class MistConnection(SockJSConnection):
         else:
             log.warning("%s: called on_close AGAIN!", self.__class__.__name__)
             traceback.print_stack()
+
+    def get_dict(self):
+        return {
+            'name': self.session.name,
+            'last_rcv': self.session.base.last_rcv,
+            'user': self.user.email,
+            'ip': self.ip,
+            'user_agent': self.user_agent,
+            'closed': self.is_closed,
+            'session_id': self.session_id,
+        }
+
+    def __repr__(self):
+        return mist_conn_str(self.get_dict())
 
 
 class ShellConnection(MistConnection):
