@@ -1,6 +1,10 @@
+import logging
 import requests
 
 from mist.io.sock import mist_conn_str
+
+
+logging.getLogger().setLevel(logging.CRITICAL)
 
 
 def query(host='127.0.0.1:8081'):
