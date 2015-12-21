@@ -64,6 +64,10 @@ If you are using Python 2.6 you'll have to install ipython version 1, otherwise 
 
    ./bin/pip install ipython==1
 
+In MacOSX in case you are using Xcode 7 buildout will fail. To solve this you need to::
+
+    CFLAGS='-std=c99' ./bin/buildout -v
+
 Deployment
 ----------
 

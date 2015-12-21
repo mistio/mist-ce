@@ -19,8 +19,8 @@ from pyramid.response import Response
 
 try:
     from mist.core import config
-    from mist.core.helpers import user_from_request
     from mist.core.helpers import view_config
+    from mist.core.auth.methods import user_from_request
 except ImportError:
     from mist.io import config
     from mist.io.helpers import user_from_request
@@ -474,7 +474,13 @@ def create_machine(request):
         key_id = request.json_body.get('key')
         machine_name = request.json_body['name']
         location_id = request.json_body.get('location', None)
-        image_id = request.json_body['image']
+        if request.json_body.get('provider') == 'libvirt':
+            image_id = request.json_body.get('image')
+            disk_size = int(request.json_body.get('libvirt_disk_size', 4))
+            disk_path = request.json_body.get('libvirt_disk_path', '')
+        else:
+            image_id = request.json_body['image']
+            disk_size = disk_path = None
         size_id = request.json_body['size']
         # deploy_script received as unicode, but ScriptDeployment wants str
         script = str(request.json_body.get('script', ''))
@@ -526,7 +532,8 @@ def create_machine(request):
               'azure_port_bindings': azure_port_bindings,
               'hostname': hostname, 'plugins': plugins,
               'post_script_id': post_script_id,
-              'post_script_params': post_script_params,
+              'post_script_params': post_script_params, 'disk_size': disk_size,
+              'disk_path': disk_path,
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet,
@@ -554,7 +561,7 @@ def machine_actions(request):
     # plan_id is the id of the plan to resize
     name = params.get('name', '')
 
-    if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename'):
+    if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename', 'undefine', 'suspend', 'resume'):
         if action == 'start':
             methods.start_machine(user, cloud_id, machine_id)
         elif action == 'stop':
@@ -567,6 +574,13 @@ def machine_actions(request):
             methods.resize_machine(user, cloud_id, machine_id, plan_id)
         elif action == 'rename':
             methods.rename_machine(user, cloud_id, machine_id, name)
+        elif action == 'undefine':
+            methods.undefine_machine(user, cloud_id, machine_id)
+        elif action == 'resume':
+            methods.resume_machine(user, cloud_id, machine_id)
+        elif action == 'suspend':
+            methods.suspend_machine(user, cloud_id, machine_id)
+
         # return OK
         return methods.list_machines(user, cloud_id)
     raise BadRequestError()

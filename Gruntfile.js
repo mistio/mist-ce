@@ -125,6 +125,14 @@ module.exports = function(grunt) {
                     force: true
                 }
             },
+            yamljs: {
+                target: '../node_modules/yamljs/',
+                link: 'dist/yamljs',
+                options: {
+                    overwrite: true,
+                    force: true
+                }
+            },
             images: {
                 target: '../src/mist/io/static/images',
                 link: 'dist/images',
@@ -207,6 +215,7 @@ module.exports = function(grunt) {
 		'symlink:images',
 		'symlink:fonts',
 		'symlink:states',
+		'symlink:yamljs',
 		'requirejs',
 		'symlink:mistjs',
 		'symlink:mistcss',

@@ -111,6 +111,7 @@ class Cloud(OODict):
     machines = make_field(Machines)()
     starred = ListField()
     unstarred = ListField()
+    images_location = StrField()
 
     def __repr__(self):
         print_fields = ['title', 'provider', 'region']

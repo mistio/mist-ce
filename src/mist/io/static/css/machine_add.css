@@ -134,7 +134,8 @@
     padding-top: 5.5px !important;
     padding-bottom: 5.5px !important;
     font-size: 14px;
-    white-space: normal;
+    white-space: initial;
+    word-break: break-all;
 }
 #machine-create .ok-cancel div:first-child .ui-btn {
     border-top-right-radius: 0px;
@@ -200,10 +201,19 @@
     color: #444444 !important;
 }
 
+#machine-create #create-machine-libvirt-disk-type .ui-slider {
+    width: 110px;
+}
+
 #create-machine-floating-ip {
     display: none;
 }
 
 #machine-create textarea {
 	max-height: 150px;
+}
+
+#create-machine .field-wrapper > div.last-child:not(.first-child) a {
+    margin-top: 44px;
+    margin-bottom: 0;
 }

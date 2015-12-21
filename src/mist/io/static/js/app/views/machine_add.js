@@ -14,6 +14,12 @@ define('app/views/machine_add', ['app/views/controlled'],
             dockerNeedScript: false,
             hasAdvancedScript: false,
 
+
+            hasLibvirt: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider && provider.provider == 'libvirt' ? true : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
             hasDocker: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
                 return provider ? (provider.provider && provider.provider == 'docker' ? true : false) : false;
@@ -35,35 +41,53 @@ define('app/views/machine_add', ['app/views/controlled'],
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasKey: function() {
-                var provider = Mist.machineAddController.newMachineProvider;
-                return provider ? (provider.provider ? (provider.provider != 'docker' || (provider.provider == 'docker' && this.get('dockerNeedScript')) ? true : false) : false) : false;
+                var provider = Mist.machineAddController.newMachineProvider,
+                invalids = ['docker'];
+                return provider ? (provider.provider ? (((invalids.indexOf(provider.provider) != -1 ? false : true) || (provider.provider == 'docker' && this.get('dockerNeedScript'))) ? true : false) : false) : false;
             }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
+
+            needsKey: function() {
+                return this.get('hasKey') && !this.get('hasLibvirt');
+            }.property('hasKey', 'hasLibvirt'),
 
             hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'azure', 'digitalocean', 'packet'];
+                valids = ['openstack', 'azure', 'digitalocean', 'packet', 'gce', 'rackspace', 'rackspace_first_gen', 'vultr', 'libvirt'];
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.provider.indexOf('ec2') > -1) ? true : false) : false) : false;
             }),
 
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
-                return this.get('hasKey') == true || this.get('dockerNeedScript');
+                return this.get('hasKey') || this.get('dockerNeedScript');
             }),
 
             hasLocation: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['docker', 'indonesiancloud', 'vcloud'];
-                return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.locations.model.length == 1) ? false : true) : false) : false;
+                invalids = ['docker', 'indonesiancloud', 'vcloud', 'libvirt'];
+                return provider ? (provider.provider ? ((invalids.indexOf(provider.provider) != -1 || provider.locations.model.length == 1) ? false : true) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasNetworks: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'hpcloud', 'vcloud'];
+                valids = ['openstack', 'hpcloud', 'vcloud', 'libvirt'];
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 && provider.networks.model.length) ? true : false) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasMonitoring: Ember.computed(function() {
                 return Mist.email ? true : false;
             }),
+
+            helpOptions: [{
+                field: 'disk-path',
+                helpText: 'Where the VM image disk file will be created',
+                helpHref: 'http://docs.mist.io/article/24-adding-kvm'
+            }, {
+                field: 'disk-size',
+                helpText: "The VM's size will be the size of the image plus the number in GBs provided here",
+                helpHref: 'http://docs.mist.io/article/24-adding-kvm'
+            }],
+
+            helpText: '',
+            helpHref: '',
 
 
             /**
@@ -254,6 +278,25 @@ define('app/views/machine_add', ['app/views/controlled'],
                     this.renderFields();
                 },
 
+                createLibvirtImage: function () {
+                    var that = this;
+                    Mist.machineImageCreateController.open(function(newImagePath) {
+                        if (newImagePath) {
+                            var imageFaker = Ember.Object.create({
+                                id: newImagePath,
+                                name: newImagePath
+                            });
+
+                            Mist.machineAddController.setProperties({
+                                'newMachineImage': imageFaker,
+                                'newMachineLibvirtImagePath': newImagePath
+                            });
+
+                            that.fieldIsReady('image');
+                        }
+                    });
+                },
+
 
                 selectProvider: function (cloud) {
 
@@ -284,7 +327,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineImage', image);
 
-                    this.set('dockerNeedScript', image.get('isMist'));
+                    this.set('dockerNeedScript', this.get('hasDocker') && image.get('isMist'));
                 },
 
 
@@ -341,6 +384,19 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                 launchClicked: function () {
                     Mist.machineAddController.add();
+                },
+
+                helpClicked: function(field) {
+                    var helper = this.get('helpOptions').findBy('field', field);
+                    this.setProperties({
+                        helpText: helper.helpText,
+                        helpHref: helper.helpHref
+                    });
+
+                    Ember.run.schedule('afterRender', this, function () {
+                        $('#help-tooltip').popup().popup('option', 'positionTo', '#create-machine-' + field + '-helper');
+                        $('#help-tooltip').popup('open');
+                    });
                 }
             },
 
@@ -357,6 +413,10 @@ define('app/views/machine_add', ['app/views/controlled'],
              *  Observers
              *
              */
+
+             monitoringObserver: function() {
+                Ember.run.once(this, 'renderFields');
+             }.observes('Mist.machineAddController.newMachineMonitoring'),
 
              bindingsObserver: function () {
                 Ember.run.once(this, 'renderFields');

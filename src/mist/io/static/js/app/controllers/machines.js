@@ -18,6 +18,9 @@ define('app/controllers/machines', ['app/models/machine'],
             addingMachine: null,
             startingMachine: null,
             rebootingMachine: null,
+            undefiningMachine: null,
+            resumingMachine: null,
+            suspendingMachine: null,
             destroyingMachine: null,
             shutingdownMachine: null,
 
@@ -41,8 +44,9 @@ define('app/controllers/machines', ['app/models/machine'],
             //  Methods
             //
 
-            newMachine: function(name, image, size, location, key, cloud_init, script, project, monitoring, associateFloatingIp,
-                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts) {
+
+            newMachine: function(provider, name, image, size, location, key, cloud_init, script, project, monitoring, associateFloatingIp,
+                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtDiskSize, libvirtDiskPath, libvirtImagePath) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
                 // the server
@@ -91,7 +95,9 @@ define('app/controllers/machines', ['app/models/machine'],
                 }
 
                 this.set('addingMachine', true);
+
                 Mist.ajax.POST('clouds/' + this.cloud.id + '/machines', {
+                        'provider': provider,
                         'name': name,
                         'key': key ? key.id : null,
                         'size': size.id,
@@ -119,7 +125,11 @@ define('app/controllers/machines', ['app/models/machine'],
                         'docker_command': dockerCommand,
                         'docker_exposed_ports': exposedPorts,
                         'docker_port_bindings': portBindings,
-                        'azure_port_bindings': azurePorts
+                        'azure_port_bindings': azurePorts,
+                        //Libvirt
+                        'libvirt_disk_size': libvirtDiskSize,
+                        'libvirt_disk_path': libvirtDiskPath,
+                        'libvirt_image_path': libvirtImagePath
                 }).success(function (machine) {
                     machine.cloud = that.cloud;
                     // Nephoscale returns machine id on request success,
@@ -196,6 +206,64 @@ define('app/controllers/machines', ['app/models/machine'],
                 }).complete(function(success) {
                     that.set('rebootingMachine', false);
                     that.trigger('onMachineReboot');
+                    if (callback) callback(success);
+                });
+            },
+
+            undefineMachine: function(machineId, callback) {
+                var that = this;
+                var machine = this.getMachine(machineId);
+                machine.waitFor('undefined');
+                machine.lockOn('pending');
+                this.set('undefiningMachine', true);
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    'action' : 'undefine'
+                }).success(function() {
+                    //that._destroyMachine(machineId);
+                }).error(function() {
+                    machine.restoreState();
+                    Mist.notificationController.notify('Failed to undefine machine');
+                }).complete(function(success) {
+                    that.set('undefiningMachine', false);
+                    that.trigger('onMachineUndefine');
+                    if (callback) callback(success);
+                });
+            },
+
+            suspendMachine: function(machineId, callback) {
+                var that = this;
+                var machine = this.getMachine(machineId);
+                machine.waitFor('suspended');
+                machine.lockOn('pending');
+                this.set('suspendingMachine', true);
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    'action' : 'suspend'
+                }).success(function() {
+                    //that._destroyMachine(machineId);
+                }).error(function() {
+                    machine.restoreState();
+                    Mist.notificationController.notify('Failed to suspend machine');
+                }).complete(function(success) {
+                    that.set('suspendingMachine', false);
+                    if (callback) callback(success);
+                });
+            },
+
+            resumeMachine: function(machineId, callback) {
+                var that = this;
+                var machine = this.getMachine(machineId);
+                machine.waitFor('running');
+                machine.lockOn('pending');
+                this.set('resumingMachine', true);
+                Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    'action' : 'resume'
+                }).success(function() {
+                    //that.startMachine(machineId);
+                }).error(function() {
+                    machine.restoreState();
+                    Mist.notificationController.notify('Failed to resume machine');
+                }).complete(function(success) {
+                    that.set('resumingMachine', false);
                     if (callback) callback(success);
                 });
             },

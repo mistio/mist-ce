@@ -1,6 +1,11 @@
 import re
 from random import randrange
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+
 from mist.io.tests.gui.features.steps.general import *
 
 
@@ -38,26 +43,31 @@ def clear_machines_search_bar(context):
     search_bar_machine.clear()
 
 
-@when(u'I fill in a "{name}" for specific machine name')
-def fill_specific_machine_name(context,name):
+@when(u'I fill in a "{name}" machine name')
+def fill_machine_mame(context, name):
+    """
+    This step will create a random machine name and a suitable name for an
+    accompanying ssh key and will update the context.
+    """
+    if 'random' in name or context.mist_config.get(name):
+        if not context.mist_config.get(name):
+            if 'random ' in name:
+                name = name.lstrip('random ')
+            machine_name = context.mist_config[name] = "testlikeapro%s" % randrange(10000)
+        else:
+            machine_name = context.mist_config[name]
+    else:
+        machine_name = name
     textfield = context.browser.find_element_by_id("create-machine-name")
-    specific_name = name
-    textfield.send_keys(specific_name)
-    sleep(1)
-
-
-@when(u'I fill in a random machine name')
-def fill_machine_mame(context):
-    textfield = context.browser.find_element_by_id("create-machine-name")
-    context.random_name = "testlikeapro%s" % randrange(10000)
-    textfield.send_keys(context.random_name)
+    textfield.send_keys(machine_name)
+    context.mist_config[name + "_machine_key"] = machine_name + "_key"
     sleep(1)
 
 
 @when(u'I choose the "{name}" machine')
 def choose_machine(context, name):
-    if "randomly_created" in name:
-        name = context.random_name
+    if context.mist_config.get(name):
+        name = context.mist_config.get(name)
 
     end_time = time() + 20
     while time() < end_time:
@@ -73,17 +83,12 @@ def choose_machine(context, name):
 
 @then(u'I should see the "{name}" machine added within {seconds} seconds')
 def assert_machine_added(context, name, seconds):
-    if "randomly_created" in name:
-        machine_name = context.random_name
-    else:
-        if context.mist_config.get(name):
-            machine_name = name
-        else:
-            machine_name = name
+    if context.mist_config.get(name):
+        name = context.mist_config.get(name)
 
     end_time = time() + int(seconds)
     while time() < end_time:
-        machine = get_machine(context, machine_name)
+        machine = get_machine(context, name)
         if machine:
             return
         sleep(2)
@@ -93,14 +98,12 @@ def assert_machine_added(context, name, seconds):
 
 @then(u'"{name}" machine state should be "{state}" within {seconds} seconds')
 def assert_machine_state(context, name, state, seconds):
-    if "randomly_created" in name:
-        machine_name = context.random_name
-    else:
-        machine_name = name
+    if context.mist_config.get(name):
+        name = context.mist_config.get(name)
 
     end_time = time() + int(seconds)
     while time() < end_time:
-        machine = get_machine(context, machine_name)
+        machine = get_machine(context, name)
         if machine:
             try:
                 if state in safe_get_element_text(machine):
@@ -111,19 +114,17 @@ def assert_machine_state(context, name, state, seconds):
                 pass
         sleep(2)
 
-    assert False, u'%s state is not "%s"' % (machine_name, state)
+    assert False, u'%s state is not "%s"' % (name, state)
 
 
 @then(u'"{name}" machine should be probed within {seconds} seconds')
 def assert_machine_probed(context, name, seconds):
-    if "randomly_created" in name:
-        machine_name = context.random_name
-    else:
-        machine_name = name
+    if context.mist_config.get(name):
+        name = context.mist_config.get(name)
 
     end_time = time() + int(seconds)
     while time() < end_time:
-        machine = get_machine(context, machine_name)
+        machine = get_machine(context, name)
         if machine:
             try:
                 probed = machine.find_element_by_class_name("probed")
@@ -135,7 +136,7 @@ def assert_machine_probed(context, name, seconds):
             sleep(3)
 
     assert False, u'%s machine is not probed within %s seconds' % (
-                    machine_name, seconds)
+                    name, seconds)
 
 
 def get_machine(context, name):
@@ -314,10 +315,20 @@ def ssh_key_is_added(context, ssh_key_name):
             context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
 
 
+def is_ssh_connection_up(lines):
+    errors = ['disconnected', 'timeout', 'timed out', 'closure', 'broken']
+    for line in lines:
+        for error in errors:
+            if error in line.lower():
+                return False
+    return True
+
+
 def update_lines(terminal, lines):
     """
     Cleans up the terminal from empty lines and marks down the last empty line.
     """
+    starting_lines = len(lines)
     all_lines = terminal.find_elements_by_tag_name('div')
     safety_counter = max_safety_count = 5
     for i in range(len(lines), len(all_lines)):
@@ -330,23 +341,10 @@ def update_lines(terminal, lines):
         safety_counter = safety_counter - 1 if not line else max_safety_count
         if safety_counter == 0:
             break
-    return len(lines)
+    return starting_lines < len(lines)
 
 
-def update_single_line(terminal, lines, index):
-    assert index >= 0 and index < len(lines), "Wrong single line index %s" % index
-    all_lines = terminal.find_elements_by_tag_name('div')
-    all_lines_text = safe_get_element_text(all_lines[index])
-    lines[index] = safe_get_element_text(all_lines_text).rstrip().lstrip()
-
-
-@then(u'I test the ssh connection')
-def check_ssh_connection(context):
-    """
-    This step will press the shell button and wait for the connection to be
-    established and then will try to execute a command in the server and
-    get some output.
-    """
+def check_ssh_connection_with_timeout(context, connection_timeout=200):
     end_time = time() + 10
     terminal = None
     while time() < end_time:
@@ -361,47 +359,70 @@ def check_ssh_connection(context):
     assert terminal, "Terminal has not opened 10 seconds after pressing the " \
                      "button. Aborting!"
 
-    connection_max_time = time() + 200
+    connection_max_time = time() + connection_timeout
     lines = []
 
-    # waiting for "Connecting bla bla bla" to be written
+    # waiting for input to become available
     while time() < connection_max_time:
-        update_lines(terminal, lines)
-        if len(lines) > 0:
-            assert re.match("Connecting\sto\s([0-9]{1,3}\.){4}\.\.", lines[0]),\
-                "Shell is not connecting to server"
-            break
+        if update_lines(terminal, lines):
+            assert is_ssh_connection_up(lines), "Error while using shell"
+            if re.search(":~#$", lines[-1]):
+                break
         assert time() + 1 < connection_max_time, "Shell hasn't connected after"\
-                                                 "60 seconds. Aborting!"
+                                                 "%s seconds. Aborting!"\
+                                                 % connection_timeout
         sleep(1)
 
-    # waiting for command input to become available
-    while time() < connection_max_time:
-        update_lines(terminal, lines)
-        if re.search(":~#$", lines[-1]):
-            break
-        assert time() + 1 < connection_max_time, "Error while connecting"
-        sleep(1)
-
-    expected_command_output = len(lines)
     terminal.send_keys("ls -l\n")
+    command_input_line = len(lines) - 1
     # terminal.send_keys("ls -l\n")
     command_end_time = time() + 20
     # waiting for command output to be returned
     while time() < command_end_time:
-        update_lines(terminal, lines)
-        if len(lines) > expected_command_output and re.search(":~#$", lines[-1]):
-            update_single_line(terminal, lines, expected_command_output - 1)
-            assert re.search("total\s\d{1,3}", lines[expected_command_output]), \
-                "Error while waiting for command output"
-            context.browser.find_element_by_id('shell-back').click()
-            return
+        # if the command output has finished being printed
+        if update_lines(terminal, lines):
+            assert is_ssh_connection_up(lines), "Connection is broken"
+            if re.search(":~#$", lines[-1]):
+                for i in range(len(lines)-2, command_input_line, -1):
+                    if re.search("total\s\d{1,3}", lines[i]):
+                        return
         sleep(1)
     assert False, "Command output took too long"
 
 
+@step(u'I test the ssh connection')
+def check_ssh_connection(context):
+    """
+    This step will press the shell button and wait for the connection to be
+    established and then will try to execute a command in the server and
+    get some output.
+    """
+    check_ssh_connection_with_timeout(context)
+
+
+@step('I test the ssh connection {times} times for max {seconds} seconds each'
+      ' time')
+def multi_ssh_test(context, times, seconds):
+    assert int(times) > 0, "You should test ssh a positive number of times"
+    for i in range(int(times)):
+        assertion_error = None
+        context.execute_steps(u'Then I click the button "Shell"')
+        try:
+            check_ssh_connection_with_timeout(context, int(seconds))
+        except AssertionError as e:
+            assertion_error = e
+            if i == int(times) - 1:
+                assert False, "Connection has not been established. Last error " \
+                              "encountered was:\n%s" % repr(assertion_error)
+        sleep(2)
+        clicketi_click(context, context.browser.find_element_by_id('shell-back'))
+        WebDriverWait(context.browser, 4).until(EC.invisibility_of_element_located((By.CLASS_NAME, 'terminal')))
+        if not assertion_error:
+            return
+
+
 @then(u'I search for the "{text}" Machine')
 def search_image(context, text):
-    if text == 'randomly_created':
-        text = context.random_name
+    if context.mist_config.get(text):
+        text = context.mist_config.get(text)
     search_for_something(context, text, 'machine')

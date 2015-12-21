@@ -102,25 +102,28 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         cloud.enabled = True
         cloud.machines[machine_id] = machine
         cloud_id = cloud.get_id()
+        if cloud_id in user.clouds:
+            raise CloudExistsError(cloud_id)
+
         with user.lock_n_load():
-            if cloud_id in user.clouds:
-                raise CloudExistsError(cloud_id)
             user.clouds[cloud_id] = cloud
-            # try to connect. this will either fail and we'll delete the
-            # cloud, or it will work and it will create the association
-            if remove_on_error:
-                try:
-                    ssh_command(
-                        user, cloud_id, machine_id, machine_hostname, 'uptime',
-                        key_id=machine_key, username=machine_user, password=None,
-                        port=port
-                    )
-                except MachineUnauthorizedError as exc:
-                    # remove cloud
+            user.save()
+
+        # try to connect. this will either fail and we'll delete the
+        # cloud, or it will work and it will create the association
+        if remove_on_error:
+            try:
+                ssh_command(
+                    user, cloud_id, machine_id, machine_hostname, 'uptime',
+                    key_id=machine_key, username=machine_user, password=None,
+                    port=port
+                )
+            except MachineUnauthorizedError as exc:
+                # remove cloud
+                with user.lock_n_load():
                     del user.clouds[cloud_id]
                     user.save()
-                    raise CloudUnauthorizedError(exc)
-            user.save()
+                raise CloudUnauthorizedError(exc)
     else:
         # if api secret not given, search if we already know it
         # FIXME: just pass along an empty apisecret
@@ -378,26 +381,27 @@ def _add_cloud_bare_metal(user, title, provider, params):
     cloud.enabled = True
     cloud.machines[machine_id] = machine
     cloud_id = cloud.get_id()
+    if cloud_id in user.clouds:
+        raise CloudExistsError(cloud_id)
 
     with user.lock_n_load():
-        if cloud_id in user.clouds:
-            raise CloudExistsError(cloud_id)
         user.clouds[cloud_id] = cloud
-        # try to connect. this will either fail and we'll delete the
-        # cloud, or it will work and it will create the association
-        if use_ssh:
-            try:
-                ssh_command(
-                    user, cloud_id, machine_id, machine_hostname, 'uptime',
-                    key_id=machine_key, username=machine_user, password=None,
-                    port=port
-                )
-            except MachineUnauthorizedError as exc:
-                raise CloudUnauthorizedError(exc)
-            except ServiceUnavailableError as exc:
-                raise MistError("Couldn't connect to host '%s'."
-                                % machine_hostname)
         user.save()
+
+    # try to connect. this will either fail and we'll delete the
+    # cloud, or it will work and it will create the association
+    if use_ssh:
+        try:
+            ssh_command(
+                user, cloud_id, machine_id, machine_hostname, 'uptime',
+                key_id=machine_key, username=machine_user, password=None,
+                port=port
+            )
+        except MachineUnauthorizedError as exc:
+            raise CloudUnauthorizedError(exc)
+        except ServiceUnavailableError as exc:
+            raise MistError("Couldn't connect to host '%s'."
+                            % machine_hostname)
     if params.get('monitoring'):
         try:
             from mist.core.methods import enable_monitoring as _en_monitoring
@@ -449,10 +453,13 @@ def _add_cloud_coreos(user, title, provider, params):
     cloud.machines[machine_id] = machine
     cloud_id = cloud.get_id()
 
+    if cloud_id in user.clouds:
+        raise CloudExistsError(cloud_id)
+
     with user.lock_n_load():
-        if cloud_id in user.clouds:
-            raise CloudExistsError(cloud_id)
         user.clouds[cloud_id] = cloud
+        user.save()
+
         # try to connect. this will either fail and we'll delete the
         # cloud, or it will work and it will create the association
         if use_ssh:
@@ -467,7 +474,6 @@ def _add_cloud_coreos(user, title, provider, params):
             except ServiceUnavailableError as exc:
                 raise MistError("Couldn't connect to host '%s'."
                                 % machine_hostname)
-        user.save()
 
     if params.get('monitoring'):
         try:
@@ -750,6 +756,8 @@ def _add_cloud_libvirt(user, title, provider, params):
     apikey = params.get('machine_user', 'root')
 
     apisecret = params.get('machine_key', '')
+    images_location = params.get('images_location', '/var/lib/libvirt/images')
+
     if apisecret:
         if apisecret not in user.keypairs:
             raise KeypairNotFoundError(apisecret)
@@ -759,6 +767,7 @@ def _add_cloud_libvirt(user, title, provider, params):
         port = int(params.get('ssh_port', 22))
     except:
         port = 22
+
     cloud = model.Cloud()
     cloud.title = title
     cloud.provider = provider
@@ -768,6 +777,7 @@ def _add_cloud_libvirt(user, title, provider, params):
     cloud.enabled = True
     cloud.ssh_port = port
     cloud_id = cloud.get_id()
+    cloud.images_location = images_location
 
     return cloud_id, cloud
 
@@ -1250,12 +1260,16 @@ def connect_provider(cloud):
     Cloud is expected to be a mist.io.model.Cloud
 
     """
+    import libcloud.security
+    if cloud.provider == Provider.LIBVIRT:
+        import libcloud.compute.drivers.libvirt_driver
+        libcloud.compute.drivers.libvirt_driver.ALLOW_LIBVIRT_LOCALHOST = config.ALLOW_LIBVIRT_LOCALHOST
     if cloud.provider not in ['bare_metal', 'coreos']:
         driver = get_driver(cloud.provider)
     if cloud.provider == Provider.AZURE:
-        #create a temp file and output the cert there, so that
-        #Azure driver is instantiated by providing a string with the key instead of
-        #a cert file
+        # create a temp file and output the cert there, so that
+        # Azure driver is instantiated by providing a string with the key instead of
+        # a cert file
         temp_key_file = NamedTemporaryFile(delete=False)
         temp_key_file.write(cloud.apisecret)
         temp_key_file.close()
@@ -1339,10 +1353,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if cloud.apisecret:
-            key_temp_file = NamedTemporaryFile(delete=False)
-            key_temp_file.write(cloud.apisecret)
-            key_temp_file.close()
-            conn = driver(cloud.apiurl, user=cloud.apikey, ssh_key=key_temp_file.name, ssh_port=cloud.ssh_port)
+           conn = driver(cloud.apiurl, user=cloud.apikey, ssh_key=cloud.apisecret, ssh_port=cloud.ssh_port)
         else:
             conn = driver(cloud.apiurl, user=cloud.apikey)
     else:
@@ -1370,6 +1381,10 @@ def get_machine_actions(machine_from_api, conn, extra):
     can_destroy = True
     can_reboot = True
     can_tag = True
+    can_undefine = False
+    can_resume = False
+    can_suspend = False
+    # resume, suspend and undefine are states related to KVM
 
     # tag allowed on mist.core only for all providers, mist.io
     # supports only EC2, RackSpace, GCE, OpenStack
@@ -1415,9 +1430,14 @@ def get_machine_actions(machine_from_api, conn, extra):
             can_start = True
 
     if conn.type in [Provider.LIBVIRT]:
+        can_undefine = True
         if machine_from_api.state is NodeState.TERMINATED:
         # in libvirt a terminated machine can be started
             can_start = True
+        if machine_from_api.state is NodeState.RUNNING:
+            can_suspend = True
+        if machine_from_api.state is NodeState.SUSPENDED:
+            can_resume = True
 
     if conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD] and machine_from_api.state is NodeState.PENDING:
         can_start = True
@@ -1428,6 +1448,9 @@ def get_machine_actions(machine_from_api, conn, extra):
         can_stop = False
         can_destroy = False
         can_start = False
+        can_undefine = False
+        can_suspend = False
+        can_resume = False
 
     if conn.type in (Provider.LINODE, Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
                      Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in config.EC2_PROVIDERS:
@@ -1441,7 +1464,10 @@ def get_machine_actions(machine_from_api, conn, extra):
             'can_destroy': can_destroy,
             'can_reboot': can_reboot,
             'can_tag': can_tag,
-            'can_rename': can_rename}
+            'can_undefine': can_undefine,
+            'can_rename': can_rename,
+            'can_suspend': can_suspend,
+            'can_resume': can_resume}
 
 
 def list_machines(user, cloud_id):
@@ -1458,7 +1484,6 @@ def list_machines(user, cloud_id):
     except Exception as exc:
         log.error("Error while running list_nodes: %r", exc)
         raise CloudUnavailableError(exc=exc)
-
     ret = []
     for m in machines:
         if m.driver.type == 'gce':
@@ -1583,6 +1608,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
+                   disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
 
@@ -1612,11 +1638,13 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         raise CloudNotFoundError(cloud_id)
     conn = connect_provider(user.clouds[cloud_id])
 
+    machine_name = machine_name_validator(conn.type, machine_name)
+
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
     # if key_id not provided, search for default key
-    if conn.type != Provider.DOCKER:
+    if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
         if not key_id:
             for kid in user.keypairs:
                 if user.keypairs[kid].default:
@@ -1629,12 +1657,14 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         keypair = user.keypairs[key_id]
         private_key = keypair.private
         public_key = keypair.public
+    else:
+        public_key = None
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
-    machine_name = machine_name_validator(conn.type, machine_name)
+
     if conn.type is Provider.DOCKER:
         if key_id:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
@@ -1680,7 +1710,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                 size = size
                 break
         node = _create_machine_gce(conn, key_id, private_key, public_key,
-                                         machine_name, image, size, location)
+                                         machine_name, image, size, location, cloud_init)
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
                                          machine_name, image, size,
@@ -1705,7 +1735,21 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                                          size, location)
     elif conn.type == Provider.VULTR:
         node = _create_machine_vultr(conn, public_key, machine_name, image,
-                                         size, location)
+                                         size, location, cloud_init)
+    elif conn.type is Provider.LIBVIRT:
+        try:
+            # size_id should have a format cpu:ram, eg 1:2048
+            cpu = size_id.split(':')[0]
+            ram = size_id.split(':')[1]
+        except:
+            ram = 512
+            cpu = 1
+        node = _create_machine_libvirt(conn, machine_name,
+                                       disk_size=disk_size, ram=ram, cpu=cpu,
+                                       image=image_id, disk_path=disk_path,
+                                       networks=networks,
+                                       public_key=public_key,
+                                       cloud_init=cloud_init)
     elif conn.type == Provider.PACKET:
         node = _create_machine_packet(conn, public_key, machine_name, image,
                                          size, location, cloud_init, project_id)
@@ -2198,6 +2242,30 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         return node
 
 
+def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
+                            image, disk_path, networks, public_key, cloud_init):
+    """Create a machine in Libvirt.
+    """
+
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            disk_size=disk_size,
+            ram=ram,
+            cpu=cpu,
+            image=image,
+            disk_path=disk_path,
+            networks=networks,
+            public_key=public_key,
+            cloud_init=cloud_init
+        )
+
+    except Exception as e:
+        raise MachineCreationError("KVM, got exception %s" % e, e)
+
+    return node
+
+
 def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, location):
     """Create a machine in HostVirtual.
 
@@ -2272,7 +2340,7 @@ def _create_machine_packet(conn, public_key, machine_name, image, size, location
     return node
 
 
-def _create_machine_vultr(conn, public_key, machine_name, image, size, location):
+def _create_machine_vultr(conn, public_key, machine_name, image, size, location, cloud_init):
     """Create a machine in Vultr.
 
     Here there is no checking done, all parameters are expected to be
@@ -2304,7 +2372,8 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location)
             size=size,
             image=image,
             location=location,
-            ssh_key=[server_key]
+            ssh_key=[server_key],
+            userdata=cloud_init
         )
     except Exception as e:
         raise MachineCreationError("Vultr, got exception %s" % e, e)
@@ -2412,7 +2481,7 @@ def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks
 
 
 def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
-                        image, size, location):
+                        image, size, location, cloud_init):
     """Create a machine in GCE.
 
     Here there is no checking done, all parameters are expected to be
@@ -2424,6 +2493,8 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
     metadata = {#'startup-script': script,
                 'sshKeys': 'user:%s' % key}
     #metadata for ssh user, ssh key and script to deploy
+    if cloud_init:
+        metadata['startup-script'] = cloud_init
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -2466,11 +2537,11 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
 
 
 def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None):
-    """Start, stop, reboot, resize and destroy have the same logic underneath, the only
+    """Start, stop, reboot, resize, undefine and destroy have the same logic underneath, the only
     thing that changes is the action. This helper function saves us some code.
 
     """
-    actions = ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename')
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename', 'undefine', 'suspend', 'resume')
 
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
@@ -2541,6 +2612,17 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 conn.ex_stop_node(machine, ex_cloud_service_name=cloud_service)
             else:
                 conn.ex_stop_node(machine)
+        elif action is 'undefine':
+            # In libcloud undefine means destroy machine and delete XML configuration
+            if conn.type == 'libvirt':
+                conn.ex_undefine_node(machine)
+        elif action is 'suspend':
+            if conn.type == 'libvirt':
+                conn.ex_suspend_node(machine)
+        elif action is 'resume':
+            if conn.type == 'libvirt':
+                conn.ex_resume_node(machine)
+
         elif action is 'resize':
             conn.ex_resize_node(node, plan_id)
         elif action is 'rename':
@@ -2634,6 +2716,21 @@ def stop_machine(user, cloud_id, machine_id):
 def reboot_machine(user, cloud_id, machine_id):
     """Reboots a machine on a certain cloud."""
     _machine_action(user, cloud_id, machine_id, 'reboot')
+
+
+def undefine_machine(user, cloud_id, machine_id):
+    """Undefines machine - used in KVM libvirt to destroy machine + delete XML conf"""
+    _machine_action(user, cloud_id, machine_id, 'undefine')
+
+
+def resume_machine(user, cloud_id, machine_id):
+    """Resumes machine - used in KVM libvirt to resume suspended machine"""
+    _machine_action(user, cloud_id, machine_id, 'resume')
+
+
+def suspend_machine(user, cloud_id, machine_id):
+    """Suspends machine - used in KVM libvirt to pause machine"""
+    _machine_action(user, cloud_id, machine_id, 'suspend')
 
 
 def rename_machine(user, cloud_id, machine_id, name):
@@ -2763,6 +2860,8 @@ def list_images(user, cloud_id, term=None):
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
                               for image, name in config.DOCKER_IMAGES.items()]
             rest_images += conn.list_images()
+        elif conn.type == Provider.LIBVIRT:
+            rest_images = conn.list_images(location=cloud.images_location)
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
@@ -2791,6 +2890,7 @@ def list_images(user, cloud_id, term=None):
             'name': image.name,
             'star': _image_starred(user, cloud_id, image.id)}
            for image in images]
+
     return ret
 
 
@@ -2903,7 +3003,6 @@ def list_sizes(user, cloud_id):
                     'name': size.name,
                     'price': size.price,
                     'ram': size.ram})
-
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()
@@ -2946,7 +3045,6 @@ def list_locations(user, cloud_id):
         ret.append({'id': location.id,
                     'name': name,
                     'country': location.country})
-
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()

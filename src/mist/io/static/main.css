@@ -1438,12 +1438,13 @@ ul.checkbox-list .ui-grid-b {
 #no-collection-inner {
     text-align: center;
     padding: 50px 20px !important;
-    background-color: #FAF9F4;
+    background-color: #FFF;
 }
 
 #no-collection-inner .icon-cloud-check:after {
     color: #A5A4A1;
     font-size: 150px;
+    opacity: 0.3;
 }
 
 #no-collection-inner .icon-machine:after {
@@ -1466,6 +1467,7 @@ ul.checkbox-list .ui-grid-b {
     font-weight: bold;
     margin: -5px auto 10px;
     color: #444;
+    letter-spacing: 0px;
 }
 
 #no-collection-inner h2 {
@@ -1647,7 +1649,8 @@ ul.checkbox-list .ui-grid-b {
 }
 
 .field-wrapper.empty.required .ui-input-text,
-.empty.required .ui-input-text {
+.empty.required .ui-input-text,
+.empty.required .ui-select>.ui-btn {
     border-color: #0099cc !important;
 }
 
