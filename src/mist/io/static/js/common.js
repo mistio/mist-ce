@@ -566,6 +566,28 @@ Date.prototype.getTimeFromNow = function () {
     return ret;
 }
 
+Array.prototype.containsPattern = function(args) {
+	var match = false, haystack = this, needle = args;
+	for (var i = 0, len1 = haystack.length; i < len1; i++) {
+		if (needle[0] == haystack[i]) {
+			for (var k = 1, len2 = needle.length; k < len2; k++) {
+				if ((needle[k] && haystack[i + k]) || (!needle[k] && !haystack[i + k])) {
+					if (k == len2 - 1) {
+						match = true;
+					}
+				} else {
+					break;
+				}
+			}
+
+			if (match) {
+				break;
+			}
+		}
+	}
+
+	return match;
+}
 
 Array.prototype.toStringByProperty = function (property) {
     return this.map(function (object) {
