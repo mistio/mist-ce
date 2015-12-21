@@ -1260,6 +1260,7 @@ def connect_provider(cloud):
     Cloud is expected to be a mist.io.model.Cloud
 
     """
+    import libcloud.security
     if cloud.provider == Provider.LIBVIRT:
         import libcloud.compute.drivers.libvirt_driver
         libcloud.compute.drivers.libvirt_driver.ALLOW_LIBVIRT_LOCALHOST = config.ALLOW_LIBVIRT_LOCALHOST
