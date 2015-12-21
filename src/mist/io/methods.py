@@ -1607,7 +1607,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
-                   disk_size=None, disk_path=None, create_from_existing=None,
+                   disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
 
@@ -1656,6 +1656,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         keypair = user.keypairs[key_id]
         private_key = keypair.private
         public_key = keypair.public
+    else:
+        public_key = None
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
@@ -1733,7 +1735,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif conn.type == Provider.VULTR:
         node = _create_machine_vultr(conn, public_key, machine_name, image,
                                          size, location, cloud_init)
-
     elif conn.type is Provider.LIBVIRT:
         try:
             # size_id should have a format cpu:ram, eg 1:2048
@@ -1743,8 +1744,11 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             ram = 512
             cpu = 1
         node = _create_machine_libvirt(conn, machine_name,
-                                       disk_size, ram, cpu,
-                                       image_id, disk_path, create_from_existing, networks)
+                                       disk_size=disk_size, ram=ram, cpu=cpu,
+                                       image=image_id, disk_path=disk_path,
+                                       networks=networks,
+                                       public_key=public_key,
+                                       cloud_init=cloud_init)
     elif conn.type == Provider.PACKET:
         node = _create_machine_packet(conn, public_key, machine_name, image,
                                          size, location, cloud_init, project_id)
@@ -2238,10 +2242,9 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
 
 
 def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
-                            image, disk_path, create_from_existing, networks):
+                            image, disk_path, networks, public_key, cloud_init):
     """Create a machine in Libvirt.
     """
-
 
     try:
         node = conn.create_node(
@@ -2251,8 +2254,9 @@ def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
             cpu=cpu,
             image=image,
             disk_path=disk_path,
-            create_from_existing=create_from_existing,
-            networks=networks
+            networks=networks,
+            public_key=public_key,
+            cloud_init=cloud_init
         )
 
     except Exception as e:
