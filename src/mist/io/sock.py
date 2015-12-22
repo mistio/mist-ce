@@ -311,16 +311,29 @@ class MainConnection(MistConnection):
                                  machine.get('public_ips', []))
                     if not ips:
                         continue
-                    cached = tasks.ProbeSSH().smart_delay(
-                        self.user.email, cloud_id, machine['id'], ips[0]
-                    )
-                    if cached is not None:
-                        self.send('probe', cached)
+
+                    has_key = False
+                    for k in self.user.keys():
+                        for m in k.machines:
+                            if m[:2] == [cloud_id, machine_id]:
+                                has_key = True
+                                break
+                        if has_key:
+                            break
+
+                    if has_key:
+                        cached = tasks.ProbeSSH().smart_delay(
+                            self.user.email, cloud_id, machine['id'], ips[0]
+                        )
+                        if cached is not None:
+                            self.send('probe', cached)
+
                     cached = tasks.Ping().smart_delay(
                         self.user.email, cloud_id, machine['id'], ips[0]
                     )
                     if cached is not None:
                         self.send('ping', cached)
+
         elif routing_key == 'update':
             self.user.refresh()
             sections = result
