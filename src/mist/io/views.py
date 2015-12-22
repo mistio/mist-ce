@@ -20,8 +20,8 @@ from pyramid.renderers import render_to_response
 
 try:
     from mist.core import config
-    from mist.core.helpers import user_from_request
     from mist.core.helpers import view_config
+    from mist.core.auth.methods import user_from_request
 except ImportError:
     from mist.io import config
     from mist.io.helpers import user_from_request
@@ -483,11 +483,9 @@ def create_machine(request):
             image_id = request.json_body.get('image')
             disk_size = int(request.json_body.get('libvirt_disk_size', 4))
             disk_path = request.json_body.get('libvirt_disk_path', '')
-            create_from_existing = request.json_body.get('libvirt_existing_disk_path')
-
         else:
             image_id = request.json_body['image']
-            disk_size = disk_path = create_from_existing = None
+            disk_size = disk_path = None
         size_id = request.json_body['size']
         # deploy_script received as unicode, but ScriptDeployment wants str
         script = str(request.json_body.get('script', ''))
@@ -541,7 +539,6 @@ def create_machine(request):
               'post_script_id': post_script_id,
               'post_script_params': post_script_params, 'disk_size': disk_size,
               'disk_path': disk_path,
-              'create_from_existing': create_from_existing,
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet,
