@@ -86,7 +86,7 @@ module.exports = function(grunt) {
                 }
             },
             sockjs: {
-                target: '../bower_components/sockjs/',
+                target: '../bower_components/sockjs-client/dist/',
                 link: 'dist/sockjs',
                 options: {
                     overwrite: true,

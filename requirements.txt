@@ -19,6 +19,6 @@ gevent-subprocess==0.1.1
 amqp==1.4.6
 netaddr==0.7.18
 websocket-client==0.29.0
-sockjs-tornado==1.0.1
+sockjs-tornado==1.0.2
 pika==0.10.0
 ansible==1.9.3

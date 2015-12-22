@@ -22,9 +22,9 @@
     "c3": "~0.4.11-rc4",
     "ember": "~1.13.9",
     "md5": "~0.3.0",
-    "sockjs": "~0.3.4",
+    "sockjs-client": "~1.0.3",
     "term.js": "https://github.com/chjj/term.js.git#0.0.x",
-    "requirejs": "~2.1.19",
+    "requirejs": "~2.1.22",
     "requirejs-text": "~2.0.14"
   },
   "resolutions": {
