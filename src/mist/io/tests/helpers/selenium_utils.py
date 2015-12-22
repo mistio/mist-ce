@@ -3,7 +3,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 try:
     from mist.io.tests.settings import selenium_hub, LOCAL, CHROMEDRIVER_PATH, \
-        PHANTOMJS_PATH, BROWSER_LOCAL, BROWSER_FLAVOR, BASE_DIR
+        PHANTOMJS_PATH, BROWSER_LOCAL, BROWSER_FLAVOR, BASE_DIR, SINGLE_RUN, EMAIL
 except ImportError:
     pass
 
@@ -20,7 +20,7 @@ def choose_driver(flavor="firefox"):
         if flavor == "firefox":
             driver = webdriver.Firefox()
         elif flavor == "chrome":
-            service_log_path = BASE_DIR + "/var/log/chromedriver.log"
+            service_log_path = BASE_DIR + "/var/log/chromedriver_" + EMAIL + ".log"
             service_args = ['--verbose']
             driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH,
                                       service_args=service_args,

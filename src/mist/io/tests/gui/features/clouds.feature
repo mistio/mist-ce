@@ -12,6 +12,7 @@ Feature: Add second-tier clouds
     And I click the button "<provider>"
     And I expect for "new-cloud-provider" panel to disappear within max 2 seconds
     Then I expect for "cloud-add-fields" to be visible within max 2 seconds
+    And I wait for 1 seconds
     When I use my "<credentials>" credentials
     And I click the button "Add"
     Then the "<provider>" cloud should be added within 60 seconds

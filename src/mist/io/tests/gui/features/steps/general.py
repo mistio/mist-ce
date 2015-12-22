@@ -226,19 +226,38 @@ def become_visible_waiting_with_timeout(context, element_id, seconds):
     try:
         WebDriverWait(context.browser, int(seconds)).until(EC.element_to_be_clickable((By.ID, element_id)))
     except TimeoutException:
-        raise TimeoutException("element with id %s did not become visible "
+        raise TimeoutException("element with id %s did not become clickable "
                                "after %s seconds" % (element_id, seconds))
 
 
 @then(u'I expect for buttons inside "{element_id}" to be '
       u'clickable within max {seconds} seconds')
-def become_visible_waiting_with_timeout(context, element_id, seconds):
+def become_clickable_waiting_with_timeout(context, element_id, seconds):
     try:
         wrapper = context.browser.find_element_by_id(element_id)
         WebDriverWait(wrapper, int(seconds)).until(EC.element_to_be_clickable((By.CLASS_NAME, 'ui-btn')))
     except TimeoutException:
         raise TimeoutException("element with id %s did not become visible "
                                "after %s seconds" % (element_id, seconds))
+
+
+@step(u'I click button "{button_text}" inside "{element_id}" when '
+      u'it is clickable within max {seconds} seconds')
+def button_become_clickable_waiting_with_timeout(context, button_text,
+                                                 element_id, seconds):
+    timeout = time() + int(seconds)
+    wrapper = context.browser.find_element_by_id(element_id)
+    button = search_for_button(context, button_text, wrapper.find_elements_by_class_name('ui-btn'))
+    while time() < timeout:
+        try:
+            button.click()
+            return
+        except:
+            pass
+        assert time() + 1 < timeout, "Button %s inside element %s did not " \
+                                     "become clickable after %s seconds" % \
+                                     (button_text, element_id, seconds)
+        sleep(1)
 
 
 @when(u'I click the button by "{id_name}" id_name')
