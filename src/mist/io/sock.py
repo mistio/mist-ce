@@ -315,7 +315,7 @@ class MainConnection(MistConnection):
                     has_key = False
                     for k in self.user.keypairs.values():
                         for m in k.machines:
-                            if m[:2] == [cloud_id, machine_id]:
+                            if m[:2] == [cloud_id, machine['id']]:
                                 has_key = True
                                 break
                         if has_key:
