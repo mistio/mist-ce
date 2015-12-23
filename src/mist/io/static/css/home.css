@@ -118,6 +118,7 @@
 
 .incidents.no-incidents .no-incident h4 {
     margin: 2px auto 0;
+    color: #444;
 }
 
 .incidents.no-incidents .no-incident .icon-check:after {

@@ -301,7 +301,9 @@ var setupLogChannel = function (socket, callback) {
     }).on('open_sessions', function(openSessions) {
         info('received open_sessions: ', openSessions);
     }).emit('ready');
-    Mist.set('openIncidents', []);
+    if (! Mist.isCore) {
+        Mist.set('openIncidents', []);
+    }    
     Mist.set('closedIncidents', [])
 
     if (callback)

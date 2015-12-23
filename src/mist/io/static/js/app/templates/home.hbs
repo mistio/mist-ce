@@ -111,52 +111,59 @@
                 <div class="ui-body ui-shadow">
                     <div class="incidents {{if view.hasIncidents '' 'no-incidents'}} {{if Mist.isCore 'is-core' '' }} {{if Mist.cloudsController.hasNetworks 'has-networks' ''}}">
                         <h4 class="ui-caps">Incidents</h4>
-                        {{#if view.hasIncidents}}
-                            <ul class="ui-listview ui-listview-inset incident-list">
-                                {{#unless Mist.openIncidents}}
-                                <li class="no incident">
-                                    <a href="javascript:void(0)" class="icon-check ui-btn ui-btn-icon-right ui-btn">No recent incidents</a>
-                                </li>
-                                {{/unless}}
-                                {{#each Mist.openIncidents as |incident|}}
-                                    {{#if incident.isClosed}}
-                                        <li class="incident">
-                                            <a class="icon-check ui-btn ui-btn-icon-right"
-                                                {{action "incidentClicked" incident target=view}}>
-                                                <span class="machine">
-                                                    {{incident.machineName}}:
-                                                </span>
-                                                <span class="rule-condition">
-                                                    {{incident.ruleText}}
-                                                </span>
-                                                <span class="time">
-                                                    {{incident.closed}} ago, for {{incident.duration}}
-                                                </span>
-                                            </a>
-                                        </li>
-                                    {{else}}
-                                        <li class="alert incident">
-                                            <a class="icon-alert-2 ui-btn ui-btn-icon-right"
-                                                {{action "incidentClicked" incident target=view}}>
-                                                <span class="machine">
-                                                    {{incident.machineName}}:
-                                                </span>
-                                                <span class="rule-condition">
-                                                    {{incident.ruleText}}
-                                                </span>
-                                                <span class="time">
-                                                    {{incident.prettyTime}}
-                                                </span>
-                                            </a>
-                                        </li>
-                                    {{/if}}
-                                {{/each}}
-                            </ul>
-                        {{else}}
+                        {{#if view.loadingIncidents}}
                             <div class="no-incident">
-                                <span class="icon-check"></span>
-                                <h4 class="ui-caps">No Recent Incidents</h4>
+                                <span class="ajax-loader-big"></span>
+                                <h4 class="ui-caps">Loading Incidents</h4>
                             </div>
+                        {{else}}
+                            {{#if view.hasIncidents}}
+                                <ul class="ui-listview ui-listview-inset incident-list">
+                                    {{#unless Mist.openIncidents}}
+                                    <li class="no incident">
+                                        <a href="javascript:void(0)" class="icon-check ui-btn ui-btn-icon-right ui-btn">No recent incidents</a>
+                                    </li>
+                                    {{/unless}}
+                                    {{#each Mist.openIncidents as |incident|}}
+                                        {{#if incident.isClosed}}
+                                            <li class="incident">
+                                                <a class="icon-check ui-btn ui-btn-icon-right"
+                                                    {{action "incidentClicked" incident target=view}}>
+                                                    <span class="machine">
+                                                        {{incident.machineName}}:
+                                                    </span>
+                                                    <span class="rule-condition">
+                                                        {{incident.ruleText}}
+                                                    </span>
+                                                    <span class="time">
+                                                        {{incident.closed}} ago, for {{incident.duration}}
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        {{else}}
+                                            <li class="alert incident">
+                                                <a class="icon-alert-2 ui-btn ui-btn-icon-right"
+                                                    {{action "incidentClicked" incident target=view}}>
+                                                    <span class="machine">
+                                                        {{incident.machineName}}:
+                                                    </span>
+                                                    <span class="rule-condition">
+                                                        {{incident.ruleText}}
+                                                    </span>
+                                                    <span class="time">
+                                                        {{incident.prettyTime}}
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        {{/if}}
+                                    {{/each}}
+                                </ul>
+                            {{else}}
+                                <div class="no-incident">
+                                    <span class="icon-check"></span>
+                                    <h4 class="ui-caps">No Recent Incidents</h4>
+                                </div>
+                            {{/if}}
                         {{/if}}
                     </div>
                 </div>

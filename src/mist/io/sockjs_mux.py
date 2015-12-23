@@ -1,11 +1,11 @@
 import json
+import time
 import logging
 
 from sockjs.tornado import conn, session
 from sockjs.tornado.transports import base
 
 
-session.ConnectionInfo._exposed_headers.add('user-agent')
 log = logging.getLogger(__name__)
 
 
@@ -57,11 +57,17 @@ class DummyHandler(base.BaseTransportMixin):
 class MultiplexConnection(conn.SockJSConnection):
     channels = dict()
 
+    last_rcv = 0
+
     def on_open(self, info):
         self.endpoints = dict()
         self.handler = DummyHandler(self.session.conn_info)
 
     def on_message(self, msg):
+        self.last_rcv = time.time()
+        if msg == 'h':
+            return
+
         parts = msg.split(',', 2)
         op, chan = parts[0], parts[1]
 
