@@ -170,13 +170,29 @@ Polymer({
     },
 
     _updateImages: function (data) {
+        self = this;
         this.set('model.clouds.' + data.cloud_id + '.images', _generateMap(data.images));
         this.set('model.clouds.' + data.cloud_id + '.imagesArray', data.images);
         var allImages = [];
-        this.model.cloudsArray.forEach(
-          function(cloud){
-            return allImages = allImages.concat(cloud.imagesArray != undefined ? cloud.imagesArray : [])}
-        );
+        if (this.model.cloudsArray) {
+        
+            this.model.cloudsArray.forEach(
+              function(cloud){
+                
+                if (cloud.imagesArray != undefined ) {
+                    cloud.imagesArray.forEach(function (image,index,arr) {
+
+                        arr[index].icons = self._generateIcon(image);
+                        self.model.imagesArray.push(arr[index])
+                        });
+                    }
+                
+                return allImages = allImages.concat(cloud.imagesArray != undefined ? cloud.imagesArray : [])
+            });
+
+        }
+
+
         this.set('model.imagesArray', allImages);
     },
 
@@ -219,7 +235,20 @@ Polymer({
 
     _ping: function (data) {
         // TODO
+    },
+
+    _generateIcon: function (data) {
+        var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora"];
+        var keywords = [];
+        for (var i = 0; i < lexicon.length; i++) {
+            if ( data.name.toLowerCase().search(lexicon[i]) > -1 )
+            {
+                keywords.push(lexicon[i]);
+            }
+        }
+        return keywords;    
     }
+
 
 })
 

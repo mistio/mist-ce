@@ -22,6 +22,7 @@
 <link rel="import" href="../app-styles/app-styles.html">
 <link rel="import" href="../app-logo/app-logo.html">
 <link rel="import" href="../app-icons/app-icons.html">
+<link rel="import" href="../app-image-icons/app-image-icons.html">
 
 <link rel="import" href="../pages/page-dashboard.html">
 <link rel="import" href="../pages/page-list.html">
@@ -77,6 +78,12 @@
           type: Array
         }
     },
+    observers: [
+      'modelChanged(cloudsArray.*,0)',
+      'modelChanged(scriptsArray.*,0)',
+      'modelChanged(imagesArray.*,0)',
+      'modelChanged(networksArray.*,0)',
+    ],
     listeners: {
       'page-meta': 'updateTitle',
       'toast': 'showToast'
@@ -112,8 +119,9 @@
         ];
         this.sections = _generateMap(this.sectionsArray);
     },
-    modelChanged: function (yo) {
-        console.warn('model changed', yo);
+    modelChanged: function (changedRecord, index) {
+        this.model.cloudsArray.unshift(changedRecord.base(index));
+        console.log('model changed', index);
     },
     attributeChanged: function (attrName, oldVal, newVal) {
         console.warn('attrChanged', attrName, oldVal, newVal);

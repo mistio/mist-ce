@@ -1,0 +1,35 @@
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+
+<dom-module id="app-image-icons">
+  <style>
+
+  </style>
+    <template>
+      {{imageicons.0}}
+    </template>
+</dom-module>
+
+<script>
+Polymer({
+  is: 'app-image-icons',
+  properties: {
+    imageicons: {
+        type: Array,
+        value: function() {
+          return ['one', 'two', 'three']
+        }
+      },
+    _img: String
+  },
+  ready: function() {
+    this._update();
+  },
+  _update: function(imageicons) {
+    if (imageicons)
+    this._img.toString(imageicons);
+  }
+});
+</script>

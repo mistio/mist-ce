@@ -1,7 +1,8 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
-
 <link rel="import" href="../element-action-menu/element-action-menu.html">
+<link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
+
 
 <dom-module id="element-table">
   <template>
@@ -114,7 +115,7 @@
       <div class="name">Name <span class="narrow">/ Description</span></div>
       <div class="description">Description</div>
     </div>
-    <div class="row no-data" hidden$="[[elements]]">
+    <div class="row no-data" hidden$="[[elements.length]]">
         no data yet
     </div>
     <template is="dom-repeat" items="[[elements]]">      
@@ -125,6 +126,15 @@
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
             <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
             <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
+            <div class="icon" hidden$="[[!item.icons.length]]">
+              <template is="dom-if" if="[[item.icons]]">    
+                <app-image-icons></app-image-icons>     
+                  <template is="dom-repeat" items="[[item.icons]]">  
+                    <div class="icons icon-[[item]]">[[item]]</div>
+                  </template>
+                           
+              </template>              
+            </div>
         </a>
       </div>
     </template>
@@ -139,6 +149,9 @@
       elements: {
         type: Array,
         observer: '_elementsChanged'
+      },
+      icons: {
+        type: Array
       },
       section: {
         type: Object
