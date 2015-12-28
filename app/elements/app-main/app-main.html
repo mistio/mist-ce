@@ -78,12 +78,6 @@
           type: Array
         }
     },
-    observers: [
-      'modelChanged(cloudsArray.*,0)',
-      'modelChanged(scriptsArray.*,0)',
-      'modelChanged(imagesArray.*,0)',
-      'modelChanged(networksArray.*,0)',
-    ],
     listeners: {
       'page-meta': 'updateTitle',
       'toast': 'showToast'
@@ -118,10 +112,6 @@
           icon: 'device:widgets'}*/
         ];
         this.sections = _generateMap(this.sectionsArray);
-    },
-    modelChanged: function (changedRecord, index) {
-        this.model.cloudsArray.unshift(changedRecord.base(index));
-        console.log('model changed', index);
     },
     attributeChanged: function (attrName, oldVal, newVal) {
         console.warn('attrChanged', attrName, oldVal, newVal);

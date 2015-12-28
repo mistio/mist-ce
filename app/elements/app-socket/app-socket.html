@@ -181,7 +181,6 @@ Polymer({
                 
                 if (cloud.imagesArray != undefined ) {
                     cloud.imagesArray.forEach(function (image,index,arr) {
-
                         arr[index].icons = self._generateIcon(image);
                         self.model.imagesArray.push(arr[index])
                         });
@@ -238,7 +237,7 @@ Polymer({
     },
 
     _generateIcon: function (data) {
-        var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora"];
+        var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora", "linux"];
         var keywords = [];
         for (var i = 0; i < lexicon.length; i++) {
             if ( data.name.toLowerCase().search(lexicon[i]) > -1 )

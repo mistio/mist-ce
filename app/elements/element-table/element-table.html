@@ -69,7 +69,7 @@
       }
 
       .name {
-        min-width: 250px;
+        width: 250px;
         font-weight: 500;
       }
 
@@ -128,11 +128,7 @@
             <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
             <div class="icon" hidden$="[[!item.icons.length]]">
               <template is="dom-if" if="[[item.icons]]">    
-                <app-image-icons></app-image-icons>     
-                  <template is="dom-repeat" items="[[item.icons]]">  
-                    <div class="icons icon-[[item]]">[[item]]</div>
-                  </template>
-                           
+                <app-image-icons elements="[[item.icons]]"></app-image-icons>
               </template>              
             </div>
         </a>

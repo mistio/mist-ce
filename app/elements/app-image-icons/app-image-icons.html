@@ -1,14 +1,43 @@
-<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<!-- <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
-<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html"> -->
 
 <dom-module id="app-image-icons">
-  <style>
-
-  </style>
+    <style>
+      span {
+        width: 60px;
+        display: inline-block;
+      }
+      /*var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora", "linux"];*/
+      span.icon {
+        border: 1px solid grey;
+      }
+      span.icon-ubuntu {
+        border: 1px solid green;
+      }
+      span.icon-mongo {
+        border: 1px solid yellow;
+      }
+      span.icon-aws {
+        border: 1px solid tomato;
+      }
+      span.icon-suse {
+        border: 1px solid darkgreen;
+      }
+      span.icon-fedora {
+        border: 1px solid black;
+      }
+      span.icon-linux {
+        border: 1px solid blue;
+      }
+    </style>
     <template>
-      {{imageicons.0}}
+
+      <template is="dom-repeat" items="[[elements]]">  
+        <span class$="icon icon-{{item}}">[[item]]</span>
+      </template>
+    
     </template>
 </dom-module>
 
@@ -16,20 +45,8 @@
 Polymer({
   is: 'app-image-icons',
   properties: {
-    imageicons: {
-        type: Array,
-        value: function() {
-          return ['one', 'two', 'three']
-        }
-      },
-    _img: String
-  },
-  ready: function() {
-    this._update();
-  },
-  _update: function(imageicons) {
-    if (imageicons)
-    this._img.toString(imageicons);
+    elements: Array,
+    enableCustomStyleProperties: true
   }
 });
 </script>
