@@ -50,9 +50,9 @@
 
     <iron-pages id="app-main">
       <section><page-dashboard model="{{model}}" sections="[[sections]]"><title>Dashboard</title></page-dashboard></section>
-      <section><page-list model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]"></page-list></section>
+      <section id="machines"><page-list model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]"></page-list></section>
       <section params="{{params}}">
-        <page-machine model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]">
+        <page-machine params="{{params}}" model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]">
         </page-machine>
       </section>
       <section><page-list model="{{model}}" elements="{{model.imagesArray}}" sections="[[sectionsArray]]" section="[[sections.images]]"></page-list></section>

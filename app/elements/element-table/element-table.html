@@ -81,6 +81,14 @@
         min-width: 100px;
       }
 
+      .tag {
+        background-color: #888;
+        color: #fff;
+        padding: 2px 6px;
+        margin: 0 6px;
+        border-radius: 2px;
+      }
+
       .no-data{
         font-style: italic;
         padding: 15px 24px;
@@ -129,7 +137,15 @@
             <div class="icon" hidden$="[[!item.icons.length]]">
               <template is="dom-if" if="[[item.icons]]">    
                 <app-image-icons elements="[[item.icons]]"></app-image-icons>
-              </template>              
+              </template>      
+            </div>
+            <div class="tags" hidden$="[[!item.tags]]">
+              <template is="dom-repeat" items="[[item.tags]]">
+                <span class="tag">
+                  <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>
+                  [[item.value]]
+                </span>
+              </template>
             </div>
         </a>
       </div>

@@ -12,6 +12,7 @@
 
 <dom-module id="page-machine">
   <link rel="import" type="css" href="page-machine.css">
+
   <template>
       <app-socket model="{{model}}"></app-socket>
       <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
@@ -40,7 +41,7 @@
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex">Machine page [[arrayParam]]</h2>
+            <h2 class="flex">Machine page</h2>
             <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
             <paper-icon-button icon="icons:sort"></paper-icon-button>
             <paper-icon-button icon="account-circle"></paper-icon-button>
@@ -56,152 +57,27 @@
 </dom-module>
 
 <script>
-  (function() {
-    var _lastNavigated = null;
     Polymer({
       is: 'page-machine',
       enableCustomStyleProperties: true,
       properties: {
         router: Object,
         pageTitle: {type: String},
+        params: Object,
 
         sections: Array,
-        section: {type: Object, notify: true, value: {}},
+        // section: {type: Object, notify: true, value: {}},
         elements: Array,
 
-      },
-      observers: [
-        'updateURL(q, section, elements)',
-        'updateMeta(section)',
-        'scrollToTop(section)'
-      ],
-      listeners: {
-        'update-params': '_handleParamsUpdate'
-      },
-
-      ready: function() {
-       
-      },
-      _sectionCount: function(section) {
-        var a = this.model[section+'Array'];
-        return a == undefined ? 0 : a.length;
-      },
-      updateSection: function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        var newPkg = e.currentTarget.name;
-        var p = this.sections.slice(0);
-        if (p.indexOf(newPkg) < 0) p.push(newPkg);
-        this.section = p.join(',');
-      },
-      clearSection: function() { this.section = null; },
-      toggleSections: function() {
-        if (this.section) {
-          this.prevSection = this.section;
-          this.clearSection();
-        } else {
-          this.section = this.prevSection;
-        }
-      },
-      _parseQueryString: function() {
-        var query = window.location.search.substring(1);
-        var params = query.split('&');
-        var results = [];
-        for (var i = 0; i < params.length; i++) {
-          var pair = params[i].split('=');
-          results[pair[0]] = pair[1];
-        }
-        return results;
-      },
-      _buildQueryString: function() {
-        var out = [];
-        if (this.q && this.q.length) out.push("q=" + this.q);
-        if (this.tag && this.tag.length) out.push("tag=" + this.tag);
-        if (this.section && this.section.id && this.section.id.length) out.push("section=" + this.section.id);
-        if (this.view !== 'table') out.push("view=" + this.view);
-
-        return out.join("&");
-      },
-      _handleParamsUpdate: function(_, params) {
-        for (var key in params) {
-          this[key] = params[key];
-        }
       },
       _sectionLink: function(name) {
         return '/' + name;
       },
-      _qChanged: function(q) {
-        if (q) {
-          this.async(function() {
-            this.$.query.focus();
+      ready: function() {
 
-            // make sure to force the cursor to the end of the
-            // input. Only an issue in Firefox.
-            this.$.query.setSelectionRange(q.length, q.length);
-          });
-        }
       },
-      updateURL: function(q, section, elements) {
-        var qs = this._buildQueryString();
-        if (qs !== _lastNavigated && this.router) {
-          _lastNavigated = qs;
-          this.router.go(section.id + (qs.length ? '?' + qs : ''), {replace: true});
-        }
-        this.updateMeta(section);
+      attached: function() {
 
-        this.scrollToTop();
-      },
-      updateMeta: function(section) {
-        if (this.q && this.q.length) {
-          var t = "'" + this.q + "' ";
-          t += (section && section.id) ? section.id : "";
-          this.pageTitle = t;
-        } else if (section && section.id) {
-          this.pageTitle = section.id;
-        } else {
-          this.pageTitle = "All";
-        }
-
-        this.fire('page-meta', { title: this.pageTitle });
-        this.$.drawerPanel.closeDrawer();
-      },
-      arrayParam: function(params) {
-        if (!param || !param.length) { return []; }
-        return param.toString().split(',');
-      },
-      cartOpen: function(e) {
-        this.fire('cart-open');
-      },
-      onSearch: function(e) {
-        // when a user clicks on the (x) button we need to be sure to
-        // clear the query
-        this.q = this.$.query.value;
-      },
-      scrollToTop: function() {
-        this.$.container.scroller.scrollTop = 0;
-      },
-      _stampCards: function(view) {
-        return view === 'cards';
-      },
-      _stampTable: function(view) {
-        return view === 'table';
-      },
-      closeDrawer: function() {
-        this.$.drawerPanel.closeDrawer();
-      },
-      _actualView: function(view, force) {
-        return force ? 'cards' : view;
-      },
-      _isEqual: function(a,b) {
-        return a === b;
-      },
-      _getColor: function() {
-        return this.section && this.section.color ? this.section.color : '';
-      },
-
-      _getMode: function(narrow) {
-        return narrow ? 'waterfall' : 'scroll';
       }
     });
-  })();
 </script>
