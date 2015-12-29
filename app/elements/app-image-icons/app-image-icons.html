@@ -5,36 +5,50 @@
 
 <dom-module id="app-image-icons">
     <style>
+      :root {
+        --ubuntu-color: rgba(100, 100, 100, .5);
+        --mongo-color: rgba(150, 150, 150, .5);
+        --aws-color: rgba(80, 80, 80, .5);
+        --suse-color: rgba(20, 20, 20, .5);
+        --fedora-color: rgba(0, 0, 0, .5);
+        --linux-color: rgba(50, 50, 50, .5);
+      }
       span {
         width: 60px;
         display: inline-block;
       }
       /*var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora", "linux"];*/
       span.icon {
-        border: 1px solid grey;
+        border-radius: 100px;
+        width: 50px;
+        height: 50px;
+        line-height: 50px; 
+        color: #fff;
+        overflow: hidden; 
+        text-align: center;        
       }
       span.icon-ubuntu {
-        border: 1px solid green;
+        background: var(--ubuntu-color);
       }
       span.icon-mongo {
-        border: 1px solid yellow;
+        background: var(--mongo-color);
       }
       span.icon-aws {
-        border: 1px solid tomato;
+        background: var(--aws-color);
       }
       span.icon-suse {
-        border: 1px solid darkgreen;
+        background: var(--suse-color);
       }
       span.icon-fedora {
-        border: 1px solid black;
+        background: var(--fedora-color);
       }
       span.icon-linux {
-        border: 1px solid blue;
+        background: var(--linux-color);
       }
     </style>
     <template>
 
-      <template is="dom-repeat" items="[[elements]]">  
+      <template is="dom-repeat" items="[[feed]]">  
         <span class$="icon icon-{{item}}">[[item]]</span>
       </template>
     
@@ -45,7 +59,7 @@
 Polymer({
   is: 'app-image-icons',
   properties: {
-    elements: Array,
+    feed: Array,
     enableCustomStyleProperties: true
   }
 });

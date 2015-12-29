@@ -137,15 +137,16 @@
             <div class="state" hidden$="[[!item.state]]">[[item.state]]</div>
             <div class="icon" hidden$="[[!item.icons.length]]">
               <template is="dom-if" if="[[item.icons]]">    
-                <app-image-icons elements="[[item.icons]]"></app-image-icons>
+                <app-image-icons feed="[[item.icons]]"></app-image-icons>
               </template>      
             </div>
-            <div class="tags" hidden$="[[!item.tags]]">
-              <template is="dom-repeat" items="[[item.tags]]">
-                <span class="tag">
-                  <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>
-                  [[item.value]]
-                </span>
+            <div class="tags" hidden$="[[!item.tags.length]]">
+              <template is="dom-if" if="[[item.tags.length]]"> 
+                <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
+                  <span class="tag">
+                    <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>[[item.value]]
+                  </span>
+                </template>
               </template>
             </div>
         </a>
@@ -166,6 +167,9 @@
       icons: {
         type: Array
       },
+      tags: {
+        type: Array
+      },
       section: {
         type: Object
       },
@@ -181,6 +185,16 @@
       'mouseleave': '_mouseLeave'
     },
 
+    _itemTagsArray: function(tagsobject) {
+      var tagsArray = [];
+      if (tagsobject.length > 0) {
+        for (i=0; i<tagsobject.length; i++){
+          tagsArray.unshift(tagsobject[i]);
+        }
+      }
+      return tagsArray;
+    },
+    
     _currentRowIndex: -1,
 
     _sharedActionMenu: null,
@@ -282,4 +296,16 @@
       return el.offsetTop;
     }
   });
+
+
+    var _generateMap = function(list) {
+      var out = {};
+      for (var i = 0; i < list.length; i++) {
+        out[list[i].id] = list[i];
+      }
+      return out;
+    };
+
+
+
 </script>

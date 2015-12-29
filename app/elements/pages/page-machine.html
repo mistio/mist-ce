@@ -47,7 +47,7 @@
             <paper-icon-button icon="account-circle"></paper-icon-button>
           </div>
           <div id="content">
-            machine stuff
+            machine stuff 
           </div>
         </paper-header-panel>
       </paper-drawer-panel>
@@ -62,22 +62,56 @@
       enableCustomStyleProperties: true,
       properties: {
         router: Object,
-        pageTitle: {type: String},
+        pageTitle: {type: String},        
         params: Object,
-
         sections: Array,
-        // section: {type: Object, notify: true, value: {}},
-        elements: Array,
-
+        section: {type: Object, notify: true, value: {}},
+        elements: Array
       },
+      
       _sectionLink: function(name) {
         return '/' + name;
       },
+      
       ready: function() {
-
+        this.sectionsArray = [
+          {id: 'machines',
+          color: '#8c76d1',
+          icon: 'hardware:computer'},
+          {id: 'images',
+          color: '#0099cc',
+          icon: 'image:photo'},
+          {id: 'keys',
+          color: '#009688',
+          icon: 'communication:vpn-key'},
+          {id: 'networks',
+          color: '#795548',
+          icon: 'hardware:device-hub'},
+          {id: 'scripts',
+          color: '#D48900',
+          icon: 'image:movie-creation'}]
       },
+      
       attached: function() {
 
-      }
+      },
+      
+      _handleParamsUpdate: function(_, params) {
+        for (var key in params) {
+          this[key] = params[key];
+        }
+      },
+
+      _getColor: function() {
+        return this.section && this.section.color ? this.section.color : '';
+      },
+
+      _getMode: function(narrow) {
+        return narrow ? 'waterfall' : 'scroll';
+      },
+
+      _actualView: function(view, force) {
+        return force ? 'cards' : view;
+      },
     });
 </script>
