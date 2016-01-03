@@ -37,21 +37,22 @@
   </style>
   <template>
     <app-socket model="{{model}}"></app-socket>
-    <iron-routes for="app-main">
-      <iron-route path="/"></iron-route>
-      <iron-route path="/machines"></iron-route>
-      <iron-route path="/machines/:uuid"></iron-route>
-      <iron-route path="/images"></iron-route>
-      <iron-route path="/keys"></iron-route>
-      <iron-route path="/networks"></iron-route>
-      <iron-route path="/scripts"></iron-route>
+
+    <iron-routes for="app-main" selected="{{section}}">
+      <iron-route path="/" title=""></iron-route>
+      <iron-route path="/machines" title="machines"></iron-route>
+      <iron-route path="/machines/:uuid" title="machine"></iron-route>
+      <iron-route path="/images" title="images"></iron-route>
+      <iron-route path="/keys" title="keys"></iron-route>
+      <iron-route path="/networks" title="networks"></iron-route>
+      <iron-route path="/scripts" title="scripts"></iron-route>
       <iron-route path="*"></iron-route>
     </iron-routes>
 
     <iron-pages id="app-main">
       <section><page-dashboard model="{{model}}" sections="[[sections]]"><title>Dashboard</title></page-dashboard></section>
-      <section id="machines"><page-list model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]"></page-list></section>
-      <section params="{{params}}">
+      <section><page-list model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]"></page-list></section>
+      <section id="machines" params="{{params}}">
         <page-machine params="{{params}}" model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]">
         </page-machine>
       </section>
@@ -79,6 +80,7 @@
         }
     },
     listeners: {
+      'iron-activate': 'updateDocTitle',
       'page-meta': 'updateTitle',
       'toast': 'showToast'
     },
@@ -119,6 +121,13 @@
     updateTitle: function(_, detail) {
       if (detail.title && detail.title.length) {
         document.title = detail.title + " - mist.io";
+      } else {
+        document.title = "mist.io";
+      }
+    },
+    updateDocTitle: function(e, details) {
+      if ( details.item.title &&  details.item.title.length) {
+        document.title =  details.item.title + " - mist.io";
       } else {
         document.title = "mist.io";
       }

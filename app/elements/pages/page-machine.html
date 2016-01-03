@@ -62,7 +62,7 @@
       enableCustomStyleProperties: true,
       properties: {
         router: Object,
-        pageTitle: {type: String},        
+        pageTitle: {type: String},
         params: Object,
         sections: Array,
         section: {type: Object, notify: true, value: {}},
@@ -100,6 +100,10 @@
         for (var key in params) {
           this[key] = params[key];
         }
+      },
+      
+      _isEqual: function(a,b) {
+        return a === b;
       },
 
       _getColor: function() {

@@ -24,7 +24,7 @@
       <section main class="fit">
         <h1>There is no such page yet</h1>
         <p>It seems like you may have misspelled that URL...</p>
-        <a href="/">Take me to the front page</a>
+        <a href="/?poly=1">Take me to the front page</a>
       </section>
     </paper-drawer-panel>
   </template>
@@ -34,7 +34,7 @@
   Polymer({
     is: 'page-not-found',
     attached: function() {
-      this.fire('page-meta', { title: 'Page not found' });
+      // this.fire('page-meta', { title: 'Page not found' });
     }
   });
 </script>

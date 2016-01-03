@@ -14,7 +14,7 @@
   <link rel="import" type="css" href="page-list.css">
   <template>
       <app-socket model="{{model}}"></app-socket>
-      <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
+      <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
         <app-sidebar drawer>
           <div class="content">
             <div id="section-tag" hidden$="[[!tag]]">
@@ -29,7 +29,7 @@
                   </div>
                 </a>
                 <template is="dom-repeat" items="[[sections]]">
-                  <a class="section" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(section.id,item.id)]]" tabindex="1">
+                  <a class="section" is="pushstate-anchor" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(section.id,item.id)]]" tabindex="1">
                     <div class="layout horizontal center">
                         <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
                         <span class="title flex">[[item.id]]</span>
@@ -105,7 +105,6 @@
       listeners: {
         'update-params': '_handleParamsUpdate'
       },
-
       ready: function() {
         this.view = this._forceCards ? 'cards' : 'table';
       },
@@ -222,9 +221,6 @@
         else {
           this.pageTitle = "All";
         }
-        
-
-        this.fire('page-meta', { title: this.pageTitle });
         this.$.drawerPanel.closeDrawer();
       },
       toggleView: function() {

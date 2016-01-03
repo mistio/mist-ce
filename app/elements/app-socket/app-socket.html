@@ -69,47 +69,47 @@ Polymer({
 
         if (namespace == 'main') {
             channel.on('list_keys', function (data) {
-                console.debug('list_keys', data);
+                // console.debug('list_keys', data);
                 that._updateKeys(data);
             });
             channel.on('list_clouds', function (data) {
-                console.debug('list_clouds', data);
+                // console.debug('list_clouds', data);
                 that._updateClouds(data);
             });
             channel.on('list_machines', function (data) {
-                console.debug('list_machines', data);
+                // console.debug('list_machines', data);
                 that._updateMachines(data);
             });
             channel.on('list_sizes', function (data) {
-                console.debug('list_sizes', data);
+                // console.debug('list_sizes', data);
                 that._updateSizes(data);
             });
             channel.on('list_locations', function (data) {
-                console.debug('list_locations', data);
+                // console.debug('list_locations', data);
                 that._updateLocations(data);
             });
             channel.on('list_images', function (data) {
-                console.debug('list_images', data);
+                // console.debug('list_images', data);
                 that._updateImages(data);
             });
             channel.on('list_networks', function (data) {
-                console.debug('list_networks', data);
+                // console.debug('list_networks', data);
                 that._updateNetworks(data);
             });
             channel.on('list_projects', function (data) {
-                console.debug('list_projects', data);
+                // console.debug('list_projects', data);
                 that._updateProjects(data);
             });
             channel.on('probe', function (data) {
-                console.debug('probe', data);
+                // console.debug('probe', data);
                 that._probe(data);
             });
             channel.on('ping', function (data) {
-                console.debug('ping', data);
+                // console.debug('ping', data);
                 that._ping(data);
             });
             channel.on('monitoring', function (data) {
-                console.debug('monitoring', data);
+                // console.debug('monitoring', data);
                 that._updateMonitoring(data);
             });
         } else if (namespace == 'logs') {
@@ -352,7 +352,7 @@ var Channel = function(ws, name, channels) {
     }
 };
 
-Channel.prototype = new DumbEventTarget()
+Channel.prototype = new DumbEventTarget();
 Channel.prototype.send = function(data) {
     this.ws.send('msg,' + this.name + ',' + data);
 };
