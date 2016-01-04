@@ -84,6 +84,14 @@ define('app/views/machine_add', ['app/views/controlled'],
                 field: 'disk-size',
                 helpText: "The VM's size will be the size of the image plus the number in GBs provided here",
                 helpHref: 'http://docs.mist.io/article/24-adding-kvm'
+            }, {
+                field: 'key',
+                helpText: 'demo text for key',
+                helpHref: 'http://arsenal.com'
+            }, {
+                field: 'image',
+                helpText: 'demo text for image',
+                helpHref: 'http://arsenal.com'
             }],
 
             helpText: '',
