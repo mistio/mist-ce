@@ -325,7 +325,7 @@ function Socket (args) {
                 }
                 this.attempts++;
                 sockjs = new SockJS('/socket', null,
-                    {'protocols_whitelist':
+                    {'transports':
                         ['websocket', 'xhr-polling']}
                 );
                 sockjs.onopen = function() {
@@ -403,6 +403,8 @@ function Socket (args) {
                       callback();
                   if (that.onConnect instanceof Function)
                       that.onConnect(that);
+                  if (appLoader)
+                      appLoader.complete('fetch first data');
               });
           }
           this.set('channel', channel)
@@ -566,6 +568,28 @@ Date.prototype.getTimeFromNow = function () {
     return ret;
 }
 
+Array.prototype.containsPattern = function(args) {
+	var match = false, haystack = this, needle = args;
+	for (var i = 0, len1 = haystack.length; i < len1; i++) {
+		if (needle[0] == haystack[i]) {
+			for (var k = 1, len2 = needle.length; k < len2; k++) {
+				if ((needle[k] && haystack[i + k]) || (!needle[k] && !haystack[i + k])) {
+					if (k == len2 - 1) {
+						match = true;
+					}
+				} else {
+					break;
+				}
+			}
+
+			if (match) {
+				break;
+			}
+		}
+	}
+
+	return match;
+}
 
 Array.prototype.toStringByProperty = function (property) {
     return this.map(function (object) {
@@ -769,6 +793,26 @@ var PROVIDER_MAP = {
             helpText: 'You can find your API Token on the Vultr portal',
             helpHref: 'http://docs.mist.io/article/72-adding-vultr'
         },
+    ],
+
+    packet: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Packet.net',
+        },
+        {
+            name: 'api_key',
+            type: 'password',
+            helpText: 'You can find your API Token on the Packet.net portal'
+        },
+        {
+            name: 'project_id',
+            type: 'text',
+            label: 'Project',
+            optional: true,
+            helpText: 'Optionally specify the project name'
+        }
     ],
 
     docker: [
@@ -1059,6 +1103,15 @@ var PROVIDER_MAP = {
             optional: true,
             defaultValue: '22',
         },
+        {
+            name: 'images_location',
+            type: 'text',
+            label: 'Path for *.iso images',
+            optional: true,
+            defaultValue: '/var/lib/libvirt/images',
+            helpText: 'The path that your *.iso images are located, example /var/lib/libvirt/images',
+        },
+
     ],
 
     vcloud: [
@@ -1194,5 +1247,11 @@ var OS_MAP = [
     ],
     [
         ['windows'], 'windows'
+    ],
+    [
+        ['cirros'], 'cirros'
+    ],
+    [
+        ['packet', 'packet']
     ]
 ];

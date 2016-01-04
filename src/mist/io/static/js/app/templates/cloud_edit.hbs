@@ -1,0 +1,98 @@
+<!-- Popup Overlay -->
+
+<div id="cloud-edit-screen"
+    class="ui-popup-screen
+        ui-overlay-b
+        ui-screen-hidden">
+</div>
+
+<!-- Popup Wrapper -->
+<div id="cloud-edit-popup"
+     class="pop
+        ui-popup-container
+        ui-popup-hidden
+        ui-popup-truncate">
+
+    <!-- Popup -->
+
+    <div id="cloud-edit"
+         class="mid-popup
+            ui-popup
+            ui-body-a
+            ui-overlay-shadow"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip">
+
+         <!-- Header -->
+
+        <div class="ui-header ui-bar-b ui-caps">
+
+            <h1 class="ui-title">Edit cloud</h1>
+
+            <a {{action "backClicked" target=view}} class="close">&#10005;</a>
+
+        </div>
+
+        <!-- Body -->
+
+        <div role="main" class="ui-content" data-theme="a">
+
+            <!-- New cloud title text field -->
+
+            <label for=newTitle>Title</label>
+            <form {{action "renameClicked" on="submit" target=view}}>
+                <div class="field-wrapper {{if Mist.cloudEditController.newTitle 'filled' 'empty'}} required">
+                    {{view Mist.TextField value=Mist.cloudEditController.newTitle}}
+
+                    <button type="submit" id="edit-title-ok" class="ui-btn ui-btn-d ui-caps">Ok</button>
+                </div>
+            </form>      
+
+            <!-- Cloud state toggle switch -->
+
+            <label for=newTitle>State</label>
+            <div class="ui-field-contain">
+                <select id="cloud-toggle" data-role="slider"
+                    {{action "stateToggleSwitched" target=view on="change"}}>
+                        <option value="0">Disabled</option>
+                        <option value="1">Enabled</option>
+                </select>
+                <span class="state">{{Mist.cloudEditController.cloud.state}}</span>
+            </div>
+
+            {{#if Mist.cloudsController.deletingCloud}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+
+            <!-- Copyable cloud ID -->
+
+            <label >ID</label>
+            <input type="text" readonly="readonly"  value={{Mist.cloudEditController.cloud.id}}>
+
+            <!-- Delete button - Back button -->
+
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <a class="ui-btn ui-caps ui-shadow ui-corner-all half no"
+                    {{action "deleteClicked" target=view}}>
+                    Delete
+                </a>
+            </div>
+
+            <!-- Delete confirmation -->
+
+            <div id="cloud-delete-confirm" style="display:none">
+                <label>Confirm cloud removal?</label>
+                <label id="monitoring-message" style="display:none">There are monitored machines.
+                    <br />Monitoring for these will be disabled
+                </label>
+                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                    <a class="ui-btn ui-btn-d ui-shadow ui-caps back"
+                        {{action "noClicked" target=view}}>No</a>
+                    <a class="ui-btn ui-shadow ui-caps no" id="button-confirm-disable"
+                        {{action "yesClicked" target=view}}>Yes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

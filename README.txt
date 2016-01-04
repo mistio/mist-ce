@@ -34,7 +34,7 @@ For vSphere support, you should install pyvmomi library::
 
 In Red Hat based systems the following packages need to be installed::
 
-    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel
+    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel python-zc-buildout
 
 For openSUSE distibution, you'll have to additionally install::
 
@@ -63,6 +63,10 @@ solve this you need to::
 If you are using Python 2.6 you'll have to install ipython version 1, otherwise buildout will fail::
 
    ./bin/pip install ipython==1
+
+In MacOSX in case you are using Xcode 7 buildout will fail. To solve this you need to::
+
+    CFLAGS='-std=c99' ./bin/buildout -v
 
 Deployment
 ----------

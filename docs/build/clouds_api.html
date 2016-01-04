@@ -1,0 +1,790 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; mist.io 1.0b1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.2.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0b1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/myscript.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img src="_static/logo.png">
+          mist.io</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul class="simple">
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/clouds_api.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <dl class="get">
+<dt id="get--clouds">
+<code class="descname">GET </code><code class="descname">/clouds</code><a class="headerlink" href="#get--clouds" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all added clouds</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /clouds
+Host: mist.io
+Accept: application/json; charset=UTF-8
+</pre></div>
+</div>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>[
+   {
+       &quot;state&quot;: &quot;wait&quot;,
+       &quot;apikey&quot;: &quot;A09009NUMIQCIHA&quot;,
+       &quot;title&quot;: &quot;EC2 AP NORTHEAST&quot;,
+       &quot;enabled&quot;: true,
+       &quot;region&quot;: &quot;&quot;,
+       &quot;provider&quot;: &quot;ec2_ap_northeast&quot;,
+       &quot;poll_interval&quot;: 10000,
+       &quot;id&quot;: &quot;2tK74h4mXbj8nNohljLIzqc4SHn3&quot;
+   },
+   {
+       &quot;state&quot;: &quot;wait&quot;,
+       &quot;apikey&quot;: &quot;myapikey&quot;,
+       &quot;title&quot;: &quot;Rackspace DFW&quot;,
+       &quot;enabled&quot;: true,
+       &quot;region&quot;: &quot;dfw&quot;,
+       &quot;provider&quot;: &quot;rackspace&quot;,
+       &quot;poll_interval&quot;: 10000,
+       &quot;id&quot;: &quot;3po809NuIjqiNgqqmDJAKSLWp6&quot;
+   }
+]
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--clouds">
+<code class="descname">POST </code><code class="descname">/clouds</code><a class="headerlink" href="#post--clouds" title="Permalink to this definition">¶</a></dt>
+<dd><p>In each POST API request, you have to include the <code class="docutils literal"><span class="pre">`Api-Version`</span></code> header</p>
+<div class="highlight-http"><div class="highlight"><pre>{&#39;Api-Version&#39;:2}
+</pre></div>
+</div>
+<p><strong>Add EC2 Cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;EC2 Ireland&quot;,
+    &quot;provider&quot;:&quot;ec2&quot;,
+    &quot;region&quot;:&quot;ec2_eu_west&quot;
+    &quot;api_key&quot;:&quot;POIHJOINPOIMIQCIHA&quot;,
+    &quot;api_secret&quot;:&quot;09jLlilkjIU087JKHgjhguy90ur&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>region</strong> (<em>string</em>) &#8211; <em>(required)</em> Region Id, as found in the supported providers list</li>
+<li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> EC2 API Key</li>
+<li><strong>api_secret</strong> (<em>string</em>) &#8211; <em>(required)</em> EC2 API Secret</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Openstack Cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;OpenStack&quot;,
+    &quot;provider&quot;:&quot;openstack&quot;,
+    &quot;username&quot;:&quot;myuser&quot;,
+    &quot;password&quot;:&quot;superstronpassword&quot;,
+    &quot;auth_url&quot;:&quot;http://31.53.71.90:5000/v2.0&quot;,
+    &quot;tenant_name&quot;:&quot;mist&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Username for Openstack</li>
+<li><strong>password</strong> (<em>string</em>) &#8211; <em>(required)</em> Password for Openstack</li>
+<li><strong>auth_url</strong> (<em>string</em>) &#8211; <em>(required)</em> Openstack Auth URL</li>
+<li><strong>tenant_name</strong> (<em>string</em>) &#8211; <em>(required)</em> Tenant name</li>
+<li><strong>compute_endpoint</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have a custom endpoint for your Openstack installation</li>
+<li><strong>region</strong> (<em>string</em>) &#8211; <em>(optional)</em> Specify a region of your Openstack installation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Rackspace cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;Rackspace Chicago&quot;,
+    &quot;provider&quot;:&quot;rackspace&quot;,
+    &quot;region&quot;:&quot;ord&quot;,
+    &quot;username&quot;:&quot;myuser&quot;,
+    &quot;api_key&quot;:&quot;oinoh*jhbJHVJHV77t8&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>region</strong> (<em>string</em>) &#8211; <em>(required)</em> Region Id as found in supported providers list</li>
+<li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Rackspace username</li>
+<li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> Rackspace API Key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Nephoscale cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;MyNephoCloud&quot;,
+    &quot;provider&quot;:&quot;nephoscale&quot;,
+    &quot;username&quot;:&quot;myuser&quot;,
+    &quot;password&quot;:&quot;nephopass&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Nephoscale username</li>
+<li><strong>password</strong> (<em>string</em>) &#8211; <em>(required)</em> Nephoscale password</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Softlayer cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;MySoftLayerCloud&quot;,
+    &quot;provider&quot;:&quot;softlayer&quot;,
+    &quot;username&quot;:&quot;myuser&quot;,
+    &quot;api_key&quot;:&quot;oinoh*jhbJHVJHV77t8&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Softlayer username</li>
+<li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> Softlayer API Key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Digital Ocean cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;DigiCloud&quot;,
+    &quot;provider&quot;:&quot;digitalocean&quot;,
+    &quot;token&quot;:&quot;dodjhLKJHiuyghv98756fugjhg7687uygjhgjgj&quot;,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>token</strong> (<em>string</em>) &#8211; <em>(required)</em> Generated Token from Digital Ocean</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Google Compute Engine cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;MyGCE&quot;,
+    &quot;provider&quot;:&quot;gce&quot;,
+    &quot;email&quot;:&quot;0728979879798-908uioiui098098um0h75hb3l7lpj49r2q@developer.gserviceaccount.com&quot;,
+    &quot;project_id&quot;:&quot;gifted-electron-100&quot;,
+    &quot;private_key&quot;:&quot;-----BEGIN RSA PRIVATE KEY-----MIICXQIBAAKBgQDhU3C5COPsJ2XQadX6g1xAt6JCxW5CNkTnN81Z6RwBf6HeMUah...&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>email</strong> (<em>string</em>) &#8211; <em>(required)</em> Email Address generated by your GCE account</li>
+<li><strong>project_id</strong> (<em>string</em>) &#8211; <em>(required)</em> You GCE Project&#8217;s ID</li>
+<li><strong>private_key</strong> (<em>string</em>) &#8211; <em>(required)</em> The Private Key you have generated for your GCE account</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Azure cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;MyAzure&quot;,
+    &quot;provider&quot;:&quot;azure&quot;,
+    &quot;subscription_id&quot;:&quot;9087dsfhkjhakjfh-0987098hhjk-ohafkjhkjhkjah&quot;,
+    &quot;certificate&quot;:&quot;-----BEGIN.......&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>subscription_id</strong> (<em>string</em>) &#8211; <em>(required)</em> Subscription ID for your Azure account</li>
+<li><strong>certificate</strong> (<em>string</em>) &#8211; <em>(required)</em> The Certificate you have generated for your Azure account</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Linode cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;Linode&quot;,
+    &quot;provider&quot;:&quot;linode&quot;,
+    &quot;api_key&quot;:&quot;dodjhLKJHiuyghv98756fugjhg7687uygjhgjgj&quot;,
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>api_key</strong> (<em>string</em>) &#8211; <em>(required)</em> The API Key for your Linode account</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Docker cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;MyDocher&quot;,
+    &quot;provider&quot;:&quot;docker&quot;,
+    &quot;docker_host&quot;:&quot;http://10.0.0.1&quot;,
+    &quot;docker_port&quot;:&quot;2375&quot;,
+    &quot;key_file&quot;:&quot;-----BEGIN RSA PRIVATE KEY-----...&quot;,
+    &quot;cert_file&quot;:&quot;-----BEGIN CERTIFICATE-----....&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>docker_host</strong> (<em>string</em>) &#8211; <em>(required)</em> The host of your Docker</li>
+<li><strong>docker_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> The port on which your Docker API is exposed to. By default will be <code class="docutils literal"><span class="pre">`4243`</span></code></li>
+<li><strong>key_file</strong> (<em>string</em>) &#8211; <em>(optional)</em> For TLS connections, this is the content of your corresponding key.pem file</li>
+<li><strong>cert_file</strong> (<em>string</em>) &#8211; <em>(optional)</em> For TLS connections, this is the content of your corresponding cert.pem file</li>
+<li><strong>auth_user</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth User</li>
+<li><strong>auth_password</strong> (<em>string</em>) &#8211; <em>(optional)</em> In case you have set up a basic auth in front of Docker, this will be the Auth Password</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add CoreOS cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;Core OS&quot;,
+    &quot;provider&quot;:&quot;coreos&quot;,
+    &quot;machine_ip&quot;:&quot;10.0.0.1&quot;,
+    &quot;machine_user&quot;:&quot;root&quot;,
+    &quot;machine_key&quot;:&quot;mySSHKey&quot;,
+    &quot;machine_port&quot;:&quot;22&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
+<li><strong>machine_user</strong> (<em>string</em>) &#8211; <em>(optional)</em> User to connect with your server</li>
+<li><strong>machine_key</strong> (<em>string</em>) &#8211; <em>(optional)</em> The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.</li>
+<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <code class="docutils literal"><span class="pre">`22`</span></code>, but you can alter this if your ssh-server listen to another port</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add HP Cloud cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;HP&quot;,
+    &quot;provider&quot;:&quot;hpcloud:region-a.geo-1&quot;,
+    &quot;username&quot;:&quot;myuser&quot;,
+    &quot;password&quot;:&quot;hppass&quot;,
+    &quot;tenant_name&quot;:&quot;mytenant&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>username</strong> (<em>string</em>) &#8211; <em>(required)</em> Username for your HP Cloud Account</li>
+<li><strong>password</strong> (<em>string</em>) &#8211; <em>(required)</em> Password for your HP Cloud Account</li>
+<li><strong>tenant_name</strong> (<em>string</em>) &#8211; <em>(required)</em> Tenant name for your HP Cloud Account</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Single Server/Bare Metal Unix cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;MyServer&quot;,
+    &quot;provider&quot;:&quot;bare_metal&quot;,
+    &quot;machine_ip&quot;:&quot;10.0.0.1&quot;,
+    &quot;machine_user&quot;:&quot;root&quot;,
+    &quot;machine_key&quot;:&quot;mySSHKey&quot;,
+    &quot;machine_port&quot;:&quot;22&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
+<li><strong>machine_user</strong> (<em>string</em>) &#8211; <em>(required)</em> User to connect with your server</li>
+<li><strong>machine_key</strong> (<em>string</em>) &#8211; <em>(required)</em> The SSH Key to connect with. This is the name of the Key you have previously added to mist.io.</li>
+<li><strong>machine_port</strong> (<em>string</em>) &#8211; <em>(optional)</em> By default it will be <code class="docutils literal"><span class="pre">`22`</span></code>, but you can alter this if your ssh-server listen to another port</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add Windows Server cloud</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;MyWindows&quot;,
+    &quot;provider&quot;:&quot;bare_metal&quot;,
+    &quot;machine_ip&quot;:&quot;10.0.0.1&quot;,
+    &quot;windows&quot;:true,
+    &quot;remote_desktop_port&quot;:&quot;3389&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>(required)</em> Title of the cloud</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>(required)</em> Provider as found in supported providers list</li>
+<li><strong>machine_ip</strong> (<em>string</em>) &#8211; <em>(required)</em> IP of your server</li>
+<li><strong>windows</strong> (<em>boolean</em>) &#8211; <em>(required)</em>  This boolean informs mist.io that this Bare Metal server is a Windows Server</li>
+<li><strong>remote_desktop_port</strong> (<em>string</em>) &#8211; <em>(required)</em> The Remote Desktop Port of your Windows Server</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="delete">
+<dt id="delete--clouds-cloud_id">
+<code class="descname">DELETE </code><code class="descname">/clouds/{cloud_id}</code><a class="headerlink" href="#delete--clouds-cloud_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete cloud</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>DELETE /clouds/2tK74h4mXbjjLlkjjO4SHn3
+Host: mist.io
+Accept: application/json; charset=UTF-8
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="put">
+<dt id="put--clouds-cloud_id">
+<code class="descname">PUT </code><code class="descname">/clouds/{cloud_id}</code><a class="headerlink" href="#put--clouds-cloud_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename cloud</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>PUT /clouds
+Host: mist.io
+Accept: application/json; charset=UTF-8
+
+{
+  &quot;new_name&quot;:&quot;Renamed Cloud&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>new_name</strong> (<em>string</em>) &#8211; <em>required</em> New name for cloud</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--clouds-cloud_id">
+<code class="descname">POST </code><code class="descname">/clouds/{cloud_id}</code><a class="headerlink" href="#post--clouds-cloud_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggle state of cloud between enabled and disabled</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>POST /clouds/2tK74h4mXbjjLlkjjO4SHn3
+Host: mist.io
+Accept: application/json; charset=UTF-8
+
+{
+  &quot;newState&quot;:&quot;False&quot;
+}
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>newState</strong> (<em>string</em>) &#8211; <em>required</em> True to enable, False to disable cloud</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--clouds-cloud_id-sizes">
+<code class="descname">GET </code><code class="descname">/clouds/{cloud_id}/sizes</code><a class="headerlink" href="#get--clouds-cloud_id-sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all sizes provided by cloud</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/sizes
+Host: mist.io
+Accept: application/json; charset=UTF-8
+</pre></div>
+</div>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>[
+   {
+       &quot;name&quot;: &quot;Micro Instance&quot;,
+       &quot;price&quot;:
+       {
+           &quot;mswin&quot;: &quot;$0.035/hour&quot;,
+           &quot;sles&quot;: &quot;$0.037/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.081/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.087/hour&quot;,
+           &quot;linux&quot;: &quot;$0.027/hour&quot;
+       },
+       &quot;ram&quot;: 613,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 15,
+       &quot;id&quot;: &quot;t1.micro&quot;
+   },
+   {
+       &quot;name&quot;: &quot;Small Instance&quot;,
+       &quot;price&quot;:
+       {
+           &quot;mswinSQL&quot;: &quot;$0.706/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.161/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.115/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.155/hour&quot;,
+           &quot;linux&quot;: &quot;$0.088/hour&quot;,
+           &quot;sles&quot;: &quot;$0.122/hour&quot;
+       },
+       &quot;ram&quot;: 1740,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 160,
+       &quot;id&quot;: &quot;m1.small&quot;
+   },
+   {
+       &quot;name&quot;: &quot;Medium Instance&quot;,
+       &quot;price&quot;:
+       {
+           &quot;mswinSQL&quot;: &quot;$0.821/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.276/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.23/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.22/hour&quot;,
+           &quot;linux&quot;: &quot;$0.175/hour&quot;,
+           &quot;sles&quot;: &quot;$0.234/hour&quot;
+       },
+       &quot;ram&quot;: 3700,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 410,
+       &quot;id&quot;: &quot;m1.medium&quot;
+   },
+   {
+       &quot;name&quot;: &quot;Large Instance&quot;,
+       &quot;price&quot;:
+       {
+           &quot;mswinSQL&quot;: &quot;$1.051/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.506/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.46/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.419/hour&quot;,
+           &quot;linux&quot;: &quot;$0.35/hour&quot;,
+           &quot;sles&quot;: &quot;$0.465/hour&quot;
+       },
+       &quot;ram&quot;: 7680,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 850,
+       &quot;id&quot;: &quot;m1.large&quot;
+   },
+   {
+       &quot;name&quot;: &quot;Extra Large Instance&quot;,
+       &quot;price&quot;:
+       {
+           &quot;mswinSQL&quot;: &quot;$1.511/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.966/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.92/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.769/hour&quot;,
+           &quot;linux&quot;: &quot;$0.7/hour&quot;,
+           &quot;sles&quot;: &quot;$0.815/hour&quot;
+       },
+       &quot;ram&quot;: 15360,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 1690,
+       &quot;id&quot;: &quot;m1.xlarge&quot;
+   },
+   {
+       &quot;name&quot;: &quot;High-Memory Extra Large Instance&quot;,
+       &quot;price&quot;:
+       {
+           &quot;mswinSQL&quot;: &quot;$1.161/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.616/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.57/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.574/hour&quot;,
+           &quot;linux&quot;: &quot;$0.505/hour&quot;,
+           &quot;sles&quot;: &quot;$0.62/hour&quot;
+       },
+       &quot;ram&quot;: 17510,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 420,
+       &quot;id&quot;: &quot;m2.xlarge&quot;
+   },
+   {
+       &quot;name&quot;: &quot;High-Memory Double Extra Large Instance&quot;,
+       &quot;price&quot;:
+       {
+           &quot;mswinSQL&quot;: &quot;$1.731/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$1.186/hour&quot;,
+           &quot;mswin&quot;: &quot;$1.14/hour&quot;,
+           &quot;rhel&quot;: &quot;$1.079/hour&quot;,
+           &quot;linux&quot;: &quot;$1.01/hour&quot;,
+           &quot;sles&quot;: &quot;$1.125/hour&quot;
+       },
+       &quot;ram&quot;: 35021,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 850,
+       &quot;id&quot;: &quot;m2.2xlarge&quot;
+   }
+]
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--clouds-cloud_id-locations">
+<code class="descname">GET </code><code class="descname">/clouds/{cloud_id}/locations</code><a class="headerlink" href="#get--clouds-cloud_id-locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>List locations provided by cloud</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/locations
+Host: mist.io
+Accept: application/json; charset=UTF-8
+</pre></div>
+</div>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><div class="highlight"><pre>[
+   {
+       &quot;country&quot;: &quot;Japan&quot;,
+       &quot;id&quot;: &quot;0&quot;,
+       &quot;name&quot;: &quot;ap-northeast-1a&quot;
+   },
+   {
+       &quot;country&quot;: &quot;Japan&quot;,
+       &quot;id&quot;: &quot;1&quot;,
+       &quot;name&quot;: &quot;ap-northeast-1b&quot;
+   },
+   {
+       &quot;country&quot;: &quot;Japan&quot;,
+       &quot;id&quot;: &quot;2&quot;,
+       &quot;name&quot;: &quot;ap-northeast-1c&quot;
+   }
+]
+</pre></div>
+</div>
+</dd></dl>
+
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Mist.io Inc.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

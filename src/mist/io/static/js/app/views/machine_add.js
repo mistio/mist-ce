@@ -14,6 +14,12 @@ define('app/views/machine_add', ['app/views/controlled'],
             dockerNeedScript: false,
             hasAdvancedScript: false,
 
+
+            hasLibvirt: function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider && provider.provider == 'libvirt' ? true : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
             hasDocker: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
                 return provider ? (provider.provider && provider.provider == 'docker' ? true : false) : false;
@@ -29,30 +35,59 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider && provider.provider == 'azure' ? true : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
-            hasKey: function() {
+            hasPacket: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
-                return provider ? (provider.provider ? (provider.provider != 'docker' || (provider.provider == 'docker' && this.get('dockerNeedScript')) ? true : false) : false) : false;
+                return provider ? (provider.provider && provider.provider == 'packet' ? true : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
+
+            hasKey: function() {
+                var provider = Mist.machineAddController.newMachineProvider,
+                invalids = ['docker'];
+                return provider ? (provider.provider ? (((invalids.indexOf(provider.provider) != -1 ? false : true) || (provider.provider == 'docker' && this.get('dockerNeedScript'))) ? true : false) : false) : false;
             }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
 
+            needsKey: function() {
+                return this.get('hasKey') && !this.get('hasLibvirt');
+            }.property('hasKey', 'hasLibvirt'),
+
+            hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
+                var provider = Mist.machineAddController.newMachineProvider,
+                valids = ['openstack', 'azure', 'digitalocean', 'packet', 'gce', 'rackspace', 'rackspace_first_gen', 'vultr', 'libvirt'];
+                return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.provider.indexOf('ec2') > -1) ? true : false) : false) : false;
+            }),
+
             hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
-                return this.get('hasKey') == true || this.get('dockerNeedScript');
+                return this.get('hasKey') || this.get('dockerNeedScript');
             }),
 
             hasLocation: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['docker', 'indonesiancloud', 'vcloud'];
-                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? false : true) : false) : false;
+                invalids = ['docker', 'indonesiancloud', 'vcloud', 'libvirt'];
+                return provider ? (provider.provider ? ((invalids.indexOf(provider.provider) != -1 || provider.locations.model.length == 1) ? false : true) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasNetworks: function() {
                 var provider = Mist.machineAddController.newMachineProvider,
-                valids = ['openstack', 'hpcloud', 'vcloud'];
-                return provider ? (provider.provider ? (valids.indexOf(provider.provider) != -1 ? true : false) : false) : false;
+                valids = ['openstack', 'hpcloud', 'vcloud', 'libvirt'];
+                return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 && provider.networks.model.length) ? true : false) : false) : false;
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasMonitoring: Ember.computed(function() {
                 return Mist.email ? true : false;
             }),
+
+            helpOptions: [{
+                field: 'disk-path',
+                helpText: 'Where the VM image disk file will be created',
+                helpHref: 'http://docs.mist.io/article/24-adding-kvm'
+            }, {
+                field: 'disk-size',
+                helpText: "The VM's size will be the size of the image plus the number in GBs provided here",
+                helpHref: 'http://docs.mist.io/article/24-adding-kvm'
+            }],
+
+            helpText: '',
+            helpHref: '',
 
 
             /**
@@ -129,7 +164,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                 // Add event listeners
                 Mist.scriptsController.on('onChange', this, 'renderFields');
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.on('onImagesChange', this, 'renderFields');
+                Mist.cloudsController.on('onImagesChange', this, 'renderFields');
 
              }.on('didInsertElement'),
 
@@ -151,7 +186,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                 // Remove event listeners
                 Mist.scriptsController.off('onChange', this, 'renderFields');
                 Mist.keysController.off('onKeyListChange', this, 'renderFields');
-                Mist.backendsController.off('onImagesChange', this, 'renderFields');
+                Mist.cloudsController.off('onImagesChange', this, 'renderFields');
 
              }.on('willDestroyElement'),
 
@@ -171,6 +206,9 @@ define('app/views/machine_add', ['app/views/controlled'],
                     dockerNeedScript: false,
                     hasAdvancedScript: false
                 });
+                $('#create-machine-floating-ip .ui-checkbox > .ui-btn')
+                    .removeClass('ui-checkbox-off')
+                    .addClass('ui-checkbox-on');
              },
 
              checkImageSelected: function(image) {
@@ -178,7 +216,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                     this.triggerAction({
                         action:'selectProvider',
                         target: this,
-                        actionContext: image.backend
+                        actionContext: image.cloud
                     });
 
                     this.triggerAction({
@@ -199,7 +237,7 @@ define('app/views/machine_add', ['app/views/controlled'],
 
 
              renderFields: function () {
-                Ember.run.next(function () {
+                Ember.run.schedule('afterRender', this, function() {
 
                     // Render collapsibles
                     if ($('.ui-collapsible').collapsible) {
@@ -209,6 +247,11 @@ define('app/views/machine_add', ['app/views/controlled'],
                     // Render listviews
                     if ($('.ui-listview').listview) {
                         $('.ui-listview').listview().listview('refresh');
+                    }
+
+                    // Render checkboxes
+                    if ($('.ember-checkbox').checkboxradio) {
+                        $('.ember-checkbox').checkboxradio().checkboxradio('refresh');
                     }
                 });
              },
@@ -235,20 +278,39 @@ define('app/views/machine_add', ['app/views/controlled'],
                     this.renderFields();
                 },
 
+                createLibvirtImage: function () {
+                    var that = this;
+                    Mist.machineImageCreateController.open(function(newImagePath) {
+                        if (newImagePath) {
+                            var imageFaker = Ember.Object.create({
+                                id: newImagePath,
+                                name: newImagePath
+                            });
 
-                selectProvider: function (backend) {
+                            Mist.machineAddController.setProperties({
+                                'newMachineImage': imageFaker,
+                                'newMachineLibvirtImagePath': newImagePath
+                            });
+
+                            that.fieldIsReady('image');
+                        }
+                    });
+                },
+
+
+                selectProvider: function (cloud) {
 
                     if (this.fieldIsReady) {
                         this.fieldIsReady('provider');
                     }
 
-                    backend.networks.model.forEach(function (network, index) {
+                    cloud.networks.model.forEach(function (network, index) {
                         network.set('selected', false);
                     });
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineImage', {'name' : 'Select Image'})
                                              .set('newMachineSize', {'name' : 'Select Size'})
-                                             .set('newMachineProvider', backend);
+                                             .set('newMachineProvider', cloud);
 
                     // Check we are not on single image page
                     if(! Mist.machineAddController.get('selectedImage')) this.set('changeProviderFlag', true);
@@ -265,7 +327,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineImage', image);
 
-                    this.set('dockerNeedScript', image.get('isMist'));
+                    this.set('dockerNeedScript', this.get('hasDocker') && image.get('isMist'));
                 },
 
 
@@ -288,16 +350,22 @@ define('app/views/machine_add', ['app/views/controlled'],
                     this._selectKey(key)
                 },
 
+
+                selectProject: function(project) {
+                    this.fieldIsReady('project');
+
+                    Mist.machineAddController.set('newMachineProject', project);
+                },
+
+
                 selectScript: function (script) {
                     Mist.machineAddController.set('newMachineScript', script);
                     $('#create-machine-script-select').collapsible().collapsible('collapse');
                 },
 
+
                 toggleNetworkSelection: function (network) {
                     network.set('selected', !network.selected);
-                    $('#create-machine-machine')
-                        .collapsible('option', 'collapsedIcon', 'check')
-                        .collapsible('collapse');
                 },
 
 
@@ -316,6 +384,19 @@ define('app/views/machine_add', ['app/views/controlled'],
 
                 launchClicked: function () {
                     Mist.machineAddController.add();
+                },
+
+                helpClicked: function(field) {
+                    var helper = this.get('helpOptions').findBy('field', field);
+                    this.setProperties({
+                        helpText: helper.helpText,
+                        helpHref: helper.helpHref
+                    });
+
+                    Ember.run.schedule('afterRender', this, function () {
+                        $('#help-tooltip').popup().popup('option', 'positionTo', '#create-machine-' + field + '-helper');
+                        $('#help-tooltip').popup('open');
+                    });
                 }
             },
 
@@ -333,6 +414,10 @@ define('app/views/machine_add', ['app/views/controlled'],
              *
              */
 
+             monitoringObserver: function() {
+                Ember.run.once(this, 'renderFields');
+             }.observes('Mist.machineAddController.newMachineMonitoring'),
+
              bindingsObserver: function () {
                 Ember.run.once(this, 'renderFields');
              }.observes('Mist.machineAddController.newMachineSize',
@@ -345,6 +430,18 @@ define('app/views/machine_add', ['app/views/controlled'],
                     if (this.changeProviderFlag) Mist.machineAddController._resetProvider();
                  });
              }.observes('Mist.machineAddController.newMachineProvider'),
+
+             networksObserver: function() {
+                 Ember.run.once(this, function () {
+                    if (this.get('hasOpenstack')) {
+                        if (Mist.machineAddController.newMachineProvider.networks.model.filterBy('selected', true).length) {
+                            $('#create-machine-floating-ip').slideDown();
+                        } else {
+                            $('#create-machine-floating-ip').slideUp();
+                        }
+                    }
+                 });
+             }.observes('hasOpenstack', 'Mist.machineAddController.newMachineProvider.networks.model.@each.selected')
         });
     }
 );

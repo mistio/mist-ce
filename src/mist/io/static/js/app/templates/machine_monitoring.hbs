@@ -18,7 +18,9 @@
                 {{component "graph-list" actionProxy=view}}
         </div>
 
-        {{component "rule-list" rules=view.rules}}
+        {{#unless view.pendingFirstStats}}
+            {{component "rule-list" rules=view.rules}}
+        {{/unless}}
 
         <div id="monitoring-bottom-btns">
             <div data-rule="ui-grid-a">
@@ -65,7 +67,7 @@
             {{else}}
                 {{#if view.machine.cannotHaveMonitoring}}
                     <label id="enable-monitoring-label">
-                        This machine cannot have monitoring since it is "<span class="ui-caps">{{view.machine.state}}</span>".
+                        This machine cannot have monitoring since it is in "<span class="ui-caps">{{view.machine.state}}</span>" state.
                     </label>
 
                 {{else}}

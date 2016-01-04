@@ -1,0 +1,51 @@
+
+/* Cloud Edit Popup CSS
+-----------------------------------------------------------------------------------------------------------*/
+#cloud-edit .ui-slider {
+    width: 120px;
+}
+#cloud-edit .state {
+    position: relative;
+    bottom: 11px;
+    left: 24px;
+}
+#cloud-edit .field-wrapper .ui-input-text,
+#cloud-edit .field-wrapper #edit-title-ok {
+    float: left;
+    display: block;
+    box-sizing: border-box;
+    margin: .4em 0 1em;
+}
+#cloud-edit .field-wrapper .ui-input-text {
+    width: calc(100% - 51px);
+}
+#cloud-edit .field-wrapper #edit-title-ok {
+    padding: 5.5px 10px;
+    width: initial;
+    line-height: 21px;
+}
+#cloud-edit .field-wrapper:after {
+    content: '';
+    clear: both;
+    display: table;
+}
+
+#cloud-edit .ui-field-contain {
+    overflow: visible;
+    height: 50px;
+    border-bottom: none;
+    margin: 6px 0;
+}
+
+#cloud-edit .button-back {
+    margin: 0 auto;
+}
+
+#cloud-edit .ui-input-text {
+    margin: .4em 0 1em;
+}
+
+#cloud-delete-confirm label {
+    margin: 10px 0;
+    text-align: center;
+}

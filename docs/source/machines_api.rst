@@ -1,12 +1,12 @@
-.. http:get:: /backends/{backend_id}/machines
+.. http:get:: /clouds/{cloud_id}/machines
 
-   List of all added machines for this backend
+   List of all added machines for this cloud
 
    **Example request**:
 
    .. sourcecode:: http
 
-      GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+      GET /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines
       Host: mist.io
       Accept: application/json; charset=UTF-8
 
@@ -69,7 +69,7 @@
        }
     ]
 
-.. http:post:: /backends/{backend_id}/machines
+.. http:post:: /clouds/{cloud_id}/machines
 
    Create machine
 
@@ -77,7 +77,7 @@
 
    .. sourcecode:: http
 
-    POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+    POST /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines
     Host: mist.io
     Accept: application/json; charset=UTF-8
 
@@ -274,7 +274,7 @@
    :jsonparam boolean monitoring: *optional* If true, Mist will enable monitoring for this machine
 
 
-.. http:post:: /backends/{backend_id}/machines/{machine_id}
+.. http:post:: /clouds/{cloud_id}/machines/{machine_id}
 
    Machine actions like reboot, destroy, shutdown and start
 
@@ -282,7 +282,7 @@
 
    .. sourcecode:: http
 
-      POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
+      POST /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
       Host: mist.io
       Accept: application/json; charset=UTF-8
 
@@ -293,7 +293,7 @@
 
    :jsonparam string action: *required* Can be reboot, shutdown, start or destroy depending on the available actions for each machine
 
-.. http:post:: /backends/{backend_id}/machines/{machine_id}/metadata
+.. http:post:: /clouds/{cloud_id}/machines/{machine_id}/metadata
 
    Add tags/metadata for machine
 
@@ -301,7 +301,7 @@
 
    .. sourcecode:: http
 
-      POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
+      POST /clouds/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
       Host: mist.io
       Accept: application/json; charset=UTF-8
 

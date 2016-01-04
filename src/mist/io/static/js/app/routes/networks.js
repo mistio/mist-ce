@@ -13,8 +13,8 @@ define('app/routes/networks', ['app/routes/base'],
             documentTitle: 'mist.io - networks',
 
             exit: function() {
-                Mist.backendsController.model.forEach(function (backend) {
-                    backend.networks.model.setEach('selected', false);
+                Mist.cloudsController.model.forEach(function (cloud) {
+                    cloud.networks.model.setEach('selected', false);
                 });
             }
         });

@@ -43,9 +43,9 @@ def main(global_config, **settings):
 
         from mist.io.model import Machine
         with user.lock_n_load():
-            for backend in user.backends.values():
-                if 'list_of_machines' in backend._dict:
-                    list_of_machines = backend._dict['list_of_machines']
+            for cloud in user.clouds.values():
+                if 'list_of_machines' in cloud._dict:
+                    list_of_machines = cloud._dict['list_of_machines']
                     for old_machine in list_of_machines:
                         machine_id = old_machine.get('id')
                         machine_hostname = old_machine.get('hostname')
@@ -54,13 +54,13 @@ def main(global_config, **settings):
                         if not machine_id or not machine_hostname:
                             print " *** ERROR MIGRATING, SKIPPING *** "
                             continue
-                        if machine_id not in backend.machines:
-                            backend.machines[machine_id] = Machine()
-                        machine = backend.machines[machine_id]
+                        if machine_id not in cloud.machines:
+                            cloud.machines[machine_id] = Machine()
+                        machine = cloud.machines[machine_id]
                         machine.dns_name = machine_hostname
                         machine.public_ips.append(machine_hostname)
                         machine.name = machine_hostname
-                    del backend._dict['list_of_machines']
+                    del cloud._dict['list_of_machines']
             user.save()
     except IOError as exc:
         # settings.yaml doesn't exist, continue
@@ -96,46 +96,46 @@ def add_routes(configurator):
 
     configurator.add_route('home', '/')
     configurator.add_route('providers', '/providers')
-    configurator.add_route('backends', '/backends')
-    configurator.add_route('backend_action', '/backends/{backend}')
+    configurator.add_route('clouds', '/clouds')
+    configurator.add_route('cloud_action', '/clouds/{cloud}')
 
-    configurator.add_route('machines', '/backends/{backend}/machines')
-    configurator.add_route('machine', '/backends/{backend}/machines/{machine}')
+    configurator.add_route('machines', '/clouds/{cloud}/machines')
+    configurator.add_route('machine', '/clouds/{cloud}/machines/{machine}')
     configurator.add_route('machine_rdp',
-                           '/backends/{backend}/machines/{machine}/rdp')
+                           '/clouds/{cloud}/machines/{machine}/rdp')
     configurator.add_route('machine_tags',
-                           '/backends/{backend}/machines/{machine}/tags')
+                           '/clouds/{cloud}/machines/{machine}/tags')
     configurator.add_route('machine_tag',
-                     '/backends/{backend}/machines/{machine}/tags/{tag}')
+                     '/clouds/{cloud}/machines/{machine}/tags/{tag}')
     configurator.add_route('probe',
-                           '/backends/{backend}/machines/{machine}/probe')
+                           '/clouds/{cloud}/machines/{machine}/probe')
 
     configurator.add_route('monitoring', '/monitoring')
     configurator.add_route('update_monitoring',
-                           '/backends/{backend}/machines/{machine}/monitoring')
+                           '/clouds/{cloud}/machines/{machine}/monitoring')
     configurator.add_route('stats',
-                           '/backends/{backend}/machines/{machine}/stats')
+                           '/clouds/{cloud}/machines/{machine}/stats')
     configurator.add_route('metrics',
-                           '/backends/{backend}/machines/{machine}/metrics')
+                           '/clouds/{cloud}/machines/{machine}/metrics')
     configurator.add_route('metric', '/metrics/{metric}')
     configurator.add_route(
         'deploy_plugin',
-        '/backends/{backend}/machines/{machine}/plugins/{plugin}'
+        '/clouds/{cloud}/machines/{machine}/plugins/{plugin}'
     )
 
-    configurator.add_route('images', '/backends/{backend}/images')
-    configurator.add_route('image', '/backends/{backend}/images/{image:.*}')
-    configurator.add_route('sizes', '/backends/{backend}/sizes')
-    configurator.add_route('locations', '/backends/{backend}/locations')
-    configurator.add_route('networks', '/backends/{backend}/networks')
-    configurator.add_route('network', '/backends/{backend}/networks/{network}')
+    configurator.add_route('images', '/clouds/{cloud}/images')
+    configurator.add_route('image', '/clouds/{cloud}/images/{image:.*}')
+    configurator.add_route('sizes', '/clouds/{cloud}/sizes')
+    configurator.add_route('locations', '/clouds/{cloud}/locations')
+    configurator.add_route('networks', '/clouds/{cloud}/networks')
+    configurator.add_route('network', '/clouds/{cloud}/networks/{network}')
 
     configurator.add_route('keys', '/keys')
     configurator.add_route('key_action', '/keys/{key}')
     configurator.add_route('key_public', '/keys/{key}/public')
     configurator.add_route('key_private', 'keys/{key}/private')
     configurator.add_route('key_association',
-                           '/backends/{backend}/machines/{machine}/keys/{key}')
+                           '/clouds/{cloud}/machines/{machine}/keys/{key}')
 
     configurator.add_route('rules', '/rules')
     configurator.add_route('rule', '/rules/{rule}')

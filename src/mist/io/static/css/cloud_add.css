@@ -1,0 +1,296 @@
+
+#add-cloud.ui-collapsible-collapsed {
+    width: 215px;
+}
+
+#add-cloud {
+    width: 281px;
+    margin:  0 0 6px 0 !important;
+}
+
+#add-cloud-overlay {
+    z-index: 899;
+    min-height: 800px;
+}
+
+#no-collection #add-cloud-overlay {
+    min-height: 1200px;
+}
+
+h4.pendingSelect > a {
+    background-color: #0099cc !important;
+    color: #fff !important;
+    text-transform: uppercase;
+}
+
+.mist-select + div#cloud-add-fields {
+    display: none !important;
+    background-color: #FAF9F4;
+    padding: 0 1em 1em;
+}
+
+.mist-select.ui-collapsible-collapsed + div#cloud-add-fields {
+    display: block !important;
+}
+
+#cloud-add-fields .ui-listview {
+    margin: 0;
+}
+
+#cloud-add #new-cloud-provider .ui-listview {
+    border-radius: 0;
+}
+
+#cloud-add #new-cloud-provider .ui-collapsible-heading {
+    text-transform: none;
+}
+
+#cloud-add h4.select-provider a,
+#cloud-add h4 a:hover,
+#cloud-add ul li a:hover {
+    background-color: #66C2E0;
+    border-color: #66C2E0;
+    color: #fff !important;
+    text-shadow: 0 0 0 #66C2E0;
+}
+
+#cloud-add h4.select-provider a:active,
+#cloud-add h4 a:active,
+#cloud-add ul li a:active {
+    background-color: #66C2E0;
+    border-color: #66C2E0;
+    text-shadow: 0 0 0 #66C2E0;
+}
+
+#cloud-add #new-cloud-provider h4.ui-collapsible-heading {
+    display: none;
+}
+
+#cloud-add #new-cloud-provider h4.ui-collapsible-heading.ui-collapsible-heading-collapsed {
+    display: block;
+}
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview {
+    margin: 0;
+    max-height: 120px;
+    overflow-y: auto;
+}
+#cloud-add #new-cloud-provider h4.ui-collapsible-heading.ui-collapsible-heading-collapsed > a{
+    text-align: center !important;
+    padding-right: 22px;
+    padding-left: 42px;
+}
+
+#cloud-add .field-wrapper .ui-collapsible-heading > a {
+    background-color: #fff !important;
+    border-color: #b5b5b5 !important;
+    color: #444 !important;
+    font-size: 14px;
+    padding-left: .75em !important;
+    text-transform: none;
+}
+#cloud-add .field-wrapper .ui-collapsible-heading > a:after {
+    background-image: none;
+    font-size: 14px;
+    margin-top: -6px;
+    color: #444;
+}
+#cloud-add .field-wrapper .ui-collapsible-heading.ui-collapsible-heading-collapsed > a:after {
+    content: '\0072';
+}
+#cloud-add .field-wrapper .ui-collapsible-heading > a:after {
+    content: '\0073';
+}
+#cloud-add .field-wrapper.is-file.filled .ui-btn {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    color: #444;
+    font-size: 16px;
+}
+#cloud-add .field-wrapper.is-file.filled .last-child .ui-btn {
+    text-indent: initial;
+}
+#cloud-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn:hover,
+#cloud-add .field-wrapper.is-file.filled .first-child .ui-btn:hover {
+    color: #444 !important;
+}
+#cloud-add .field-wrapper.is-file.filled .first-child.last-child .ui-btn:after,
+#cloud-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
+    font-family: 'MistIcons';
+    content: '\0047';
+    right: 7px;
+    top: 17px;
+    font-size: 19px;
+    margin-top: -10px;
+    position: absolute;
+    text-transform: none;
+    background-image: none;
+}
+#cloud-add .field-wrapper.is-file.filled .last-child .ui-btn:after {
+    margin-left: -10px;
+    color: #b5b5b5;
+}
+#cloud-add .field-wrapper .filled .ui-collapsible-heading-toggle {
+    color: #444 !important;
+    background-color: #fff !important;
+    border-color: #b5b5b5 !important;
+}
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview {
+    margin: 0;
+    border: 1px solid #b5b5b5;
+    margin: -1px 0 0 !important;
+}
+#cloud-add .field-wrapper.empty.required .ui-collapsible-heading > a {
+    text-transform: titlecase;
+    text-align: left !important;
+    color: #7f7f7f !important;
+}
+#cloud-add .field-wrapper.empty.required .ui-collapsible-heading > a,
+#cloud-add .field-wrapper.empty.required .ui-collapsible-content > .ui-listview {
+    border-color: #0099cc !important;
+}
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn {
+    background-color: #fff;
+    padding-left: .75em !important;
+    border: none;
+}
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn.ui-btn-d {
+    background-color: #0099cc;
+    color: #fff !important;
+}
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn:hover {
+    background-color: #66C2E0;
+    color: #fff !important;
+}
+#cloud-add .field-wrapper .ui-collapsible-content .ui-listview .ui-btn,
+#cloud-add .field-wrapper .ui-collapsible-heading-toggle {
+    line-height: 21px;
+    padding-top: 5.5px !important;
+    padding-bottom: 5.5px !important;
+    font-size: 14px;
+}
+#cloud-add ul {
+    border-top-width: 0px;
+}
+
+#cloud-add.ui-content {
+    background-color: #FAF9F4;
+    padding: 0;
+    width: 281px;
+    margin-top: -8px;
+}
+
+#cloud-add label {
+    margin-top: 1em;
+}
+#cloud-add ul.mist-select {
+    max-height: 400px;
+    min-width: 280px;
+    overflow-y: scroll;
+    margin: 0;
+    border-radius: 0 0 .5em .5em;
+}
+
+#cloud-add .ui-slider {
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    border-color: #A4A39F;
+    box-shadow: none;
+    border-radius: 0;
+    box-sizing: border-box;
+    height: 34px;
+}
+
+#cloud-add .docker .first-child .ui-slider {
+    width: 100%;
+    margin-top: 8px;
+}
+
+#cloud-add-advanced {
+	display: none;
+}
+
+#cloud-add #opentack-advanced-wrapper {
+    text-align: center;
+    margin-bottom: -20px;
+}
+
+#cloud-add .toggle-field {
+    width: 100%;
+}
+
+#cloud-add .on,
+#cloud-add .off {
+    display: block;
+    width: 100%;
+}
+
+#cloud-add .on {
+    display: none;
+}
+
+#cloud-add .on {
+    margin-top: 20px;
+}
+
+#cloud-add .docker.on label {
+    display: none;
+}
+
+#cloud-add .label-wrapper {
+    display: table;
+    width: 100%;
+}
+
+
+#help-tooltip {
+    font-size: 14px;
+    padding: .5em;
+}
+
+#help-tooltip a {
+    font-weight: normal;
+}
+
+#cloud-add .ui-checkbox label:hover {
+    background-color: #FAF9F4;
+    border-color: #FAF9F4;
+    color: #000000 !important;
+}
+
+#cloud-add .ui-checkbox label:after {
+    background-image: none !important;
+    background-color: transparent !important;
+    opacity: 1;
+    -webkit-transition: color .2s linear;
+    transition: color .2s linear;
+}
+
+#cloud-add .ui-checkbox label.ui-checkbox-on:after {
+    color: #000;
+}
+
+#cloud-add .ui-checkbox label.ui-checkbox-off:after {
+    color: #d1d1d1;
+}
+
+#cloud-add .ui-checkbox label.ui-checkbox-off:hover:after {
+    color: #444444 !important;
+}
+
+#cloud-add .ok-cancel {
+    margin-top: 16px;
+}
+
+#cloud-add-fields .ui-collapsible-heading-toggle {
+    font-size: 16px;
+}
+
+#cloud-add-fields .ui-collapsible-heading-toggle:hover {
+    border-color: #0099cc;
+}
+
+#certificate,
+#private_key {
+    text-transform: capitalize;
+}

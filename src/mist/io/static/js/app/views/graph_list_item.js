@@ -196,7 +196,7 @@ define('app/views/graph_list_item', ['d3', 'c3'],
                                 }
                             },
                             point: {
-                                r: 0,
+                                r: cols[1].containsPattern([null, null, 'pattern', null, null]) ? 3 : 0,
                                 focus: {
                                     expand: {
                                         r: 3

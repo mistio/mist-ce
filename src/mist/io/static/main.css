@@ -21,10 +21,10 @@
 @import url("css/metric_add.css");
 @import url("css/machine_monitoring.css");
 @import url("css/file_upload.css");
-@import url("css/backend_add.css");
+@import url("css/cloud_add.css");
 @import url("css/machine_add.css");
 @import url("css/machine_keys.css");
-@import url("css/backend_edit.css");
+@import url("css/cloud_edit.css");
 @import url("css/machine_tags.css");
 @import url("css/machine_list.css");
 @import url("css/machine_run_script.css");
@@ -32,7 +32,7 @@
 @import url("css/network_create.css");
 @import url("css/machine_power.css");
 @import url("css/machine_shell.css");
-@import url("css/backend_button.css");
+@import url("css/cloud_button.css");
 @import url("css/graph_list.css");
 @import url("css/metric_add_custom.css");
 @import url("css/script.css");
@@ -48,11 +48,20 @@
 }
 
 #banner-logo {
-    width: 121px;
+    display: inline-block;
+    width: 120px;
+    height: 54px;
+    background: transparent url(images/logo.png) no-repeat left center;
+}
+@media (min-device-pixel-ratio: 2), (-webkit-min-resolution: 192dpi), (min-resolution: 192dpi) {
+    #banner-logo {
+        background: url(images/logo@2x.png) no-repeat left center;
+        background-size: 120px;
+    }
 }
 
 .user-menu {
-    height: auto;
+    height: 56px;
     text-align: right;
 }
 
@@ -390,6 +399,17 @@ body {
     height: 16px;
     width: 16px;
 }
+/* TODO spinner-large@2x.gif */
+.ajax-loader-big {
+    background-image: url("/resources/images/spinner-large.gif");
+    background-position: center center !important;
+    background-repeat: no-repeat;
+    background-size: 64px auto;
+    display: block;
+    height: 64px;
+    margin: 0 auto;
+    width: 64px;
+}
 
 @media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
     .ajax-loader {
@@ -450,6 +470,7 @@ textarea {
 }
 #dialog .ui-content{
     text-align: center;
+    word-wrap: break-word;
 }
 .tiny-popup {
     min-width: 150px !important;
@@ -1132,12 +1153,22 @@ ul.checkbox-list .ui-grid-b {
 /* User menu
 -----------------------------------------------------------------------------------------------------------*/
 #me-btn {
-    display: block;
+    width: 100%;
+    display: inline-block;
     background: transparent;
-    height: 48px;
+    height: 56px;
     padding: 0px;
     border-width: 0px;
     box-shadow: 0 0 0 0;
+}
+
+#me-btn:hover {
+    cursor: pointer;
+}
+
+#me-btn:hover .gravatar-image,
+#me-btn:active .gravatar-image {
+    border-color: #0099cc;
 }
 
 #me-btn .owner {
@@ -1148,6 +1179,9 @@ ul.checkbox-list .ui-grid-b {
     font-weight: 400;
     text-shadow: none;
     text-transform: uppercase;
+    max-width: calc(100% - 60px);
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 #me-btn .owner.name {
@@ -1257,7 +1291,7 @@ ul.checkbox-list .ui-grid-b {
 
 .loadleds {
     position: relative;
-    left: -5px
+    right: 8px
 }
 
 .led {
@@ -1352,7 +1386,7 @@ ul.checkbox-list .ui-grid-b {
     box-sizing: border-box;
 }
 
-#backend-delete-confirm .ok-cancel {
+#cloud-delete-confirm .ok-cancel {
     margin-bottom: 1em;
 }
 
@@ -1395,12 +1429,13 @@ ul.checkbox-list .ui-grid-b {
 #no-collection-inner {
     text-align: center;
     padding: 50px 20px !important;
-    background-color: #FAF9F4;
+    background-color: #FFF;
 }
 
 #no-collection-inner .icon-cloud-check:after {
     color: #A5A4A1;
     font-size: 150px;
+    opacity: 0.3;
 }
 
 #no-collection-inner .icon-machine:after {
@@ -1423,6 +1458,7 @@ ul.checkbox-list .ui-grid-b {
     font-weight: bold;
     margin: -5px auto 10px;
     color: #444;
+    letter-spacing: 0px;
 }
 
 #no-collection-inner h2 {
@@ -1574,7 +1610,8 @@ ul.checkbox-list .ui-grid-b {
 }
 
 .field-wrapper.empty.required .ui-input-text,
-.empty.required .ui-input-text {
+.empty.required .ui-input-text,
+.empty.required .ui-select>.ui-btn {
     border-color: #0099cc !important;
 }
 

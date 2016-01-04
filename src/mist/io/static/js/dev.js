@@ -22,11 +22,11 @@ require.config({
         ember: '../dist/ember/ember.debug',
         elv: '../dist/ember-legacy-views',
         compiler: '../dist/ember/ember-template-compiler',
-        socket: '../dist/sockjs/sockjs',
         md5: '../dist/md5/build/md5.min',
         d3: '../dist/d3/d3.min',
         c3: '../dist/c3/c3.min',
         term: '../dist/term.js/src/term',
+        yamljs: '../dist/yamljs/dist/yaml.min',
         init: 'init',
         common: 'common',
         multiplex: 'multiplex'
@@ -78,14 +78,6 @@ var LOADER_STEPS = {
             });
         }
     },
-    'load socket': {
-        before: [],
-        exec: function () {
-            require(['socket'], function () {
-                appLoader.complete('load socket');
-            });
-        }
-    },
     'load multiplex': {
         before: [],
         exec: function () {
@@ -119,7 +111,7 @@ var LOADER_STEPS = {
         }
     },
     'init connections': {
-        before: ['load socket', 'load ember', 'init app'],
+        before: ['load ember', 'init app'],
         exec: function () {
             Mist.set('ajax', Ajax(CSRF_TOKEN));
             Mist.set('main', new Socket({
@@ -137,7 +129,8 @@ var LOADER_STEPS = {
     'fetch first data': {
         before: ['init connections'],
         exec: function () {
-            appLoader.complete('fetch first data');
+            // step will completed by the list_clouds event handler
+            // appLoader.complete('fetch first data');
         }
     }
 };
@@ -146,9 +139,9 @@ var LOADER_STEPS = {
 var loadFiles = function (callback) {
     require([
         'app/templates/templates',
-        'app/controllers/backend_add',
-        'app/controllers/backend_edit',
-        'app/controllers/backends',
+        'app/controllers/cloud_add',
+        'app/controllers/cloud_edit',
+        'app/controllers/clouds',
         'app/controllers/cookies',
         'app/controllers/datasources',
         'app/controllers/dialog',
@@ -169,6 +162,7 @@ var loadFiles = function (callback) {
         'app/controllers/machine_shell',
         'app/controllers/machine_tags',
         'app/controllers/machine_run_script',
+        'app/controllers/machine_image_create',
         'app/controllers/metric_add',
         'app/controllers/metric_add_custom',
         'app/controllers/metrics',
@@ -196,9 +190,9 @@ var loadFiles = function (callback) {
         'app/routes/scripts',
 
         'app/views/home',
-        'app/views/backend_add',
-        'app/views/backend_button',
-        'app/views/backend_edit',
+        'app/views/cloud_add',
+        'app/views/cloud_button',
+        'app/views/cloud_edit',
         'app/views/dialog',
         'app/views/file_upload',
         'app/views/graph_button',
@@ -231,6 +225,7 @@ var loadFiles = function (callback) {
         'app/views/machine_tags',
         'app/views/machine_tags_list_item',
         'app/views/machine_run_script',
+        'app/views/machine_image_create',
         'app/views/messagebox',
         'app/views/metric_add',
         'app/views/metric_add_custom',

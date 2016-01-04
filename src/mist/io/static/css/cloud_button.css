@@ -1,0 +1,95 @@
+
+/* Cloud Button CSS
+-----------------------------------------------------------------------------------------------------------*/
+#cloud-buttons {
+    margin-bottom: 32px;
+    margin-top: 8px;
+}
+
+#cloud-buttons a:after {
+    margin-top: -5px;
+    border-radius: 1em;
+    width: 12px;
+    height: 12px;
+}
+
+#cloud-buttons a.online:after {
+    background-color: #64b247;
+}
+#cloud-buttons a.online:hover:after {
+    background-color: #fff !important;
+}
+#cloud-buttons a.online:hover {
+    background-color: #64b247;
+}
+
+
+#cloud-buttons a.offline:after {
+    background-color: #d96557;
+}
+#cloud-buttons a.offline:hover:after {
+    background-color: #fff !important;
+}
+#cloud-buttons a.offline:hover {
+    background-color: #d96557;
+}
+
+#cloud-buttons a.waiting:after {
+    background-color: #d48900;
+}
+#cloud-buttons a.waiting:hover:after {
+    background-color: #fff !important;
+}
+#cloud-buttons a.waiting:hover {
+    background-color: #d48900;
+}
+
+#cloud-buttons .ui-controlgroup-controls a {
+    padding: 13px 10px 10px 30px !important;
+    color: black;
+    position: relative;
+    font-size: 16px;
+}
+@-moz-document url-prefix() {
+    #cloud-buttons .ui-controlgroup-controls a  {
+        top: 1px;
+    }
+}
+#cloud-buttons .ui-controlgroup-controls {
+    margin-bottom: 18px;
+    display: block;
+}
+#cloud-buttons .ui-controlgroup-controls .ui-btn {
+    border-width: 0;
+    margin-top: 10px;
+    margin-bottom: 18px;
+    margin-right: .5em;
+    padding: 6px 0 6px !important;
+    background-color: #fff;
+    webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    -moz-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+#cloud-buttons .ui-controlgroup-controls .ui-btn:hover {
+    background-color: #eee;
+}
+#cloud-buttons .ui-controlgroup-controls .ui-btn:active {
+    background-color: #fff;
+}
+
+#cloud-buttons .ui-icon-waiting {
+    background-image: url("../states/load-white-solid.gif") !important;
+    background-position: 9px 9px !important;
+    background-repeat: no-repeat !important;
+    background-size: 22px 22px !important;
+}
+
+#cloud-buttons .ui-icon-offline {
+    background-image: url(../states/state-yellow-solid.png) !important;
+    background-position: 9px 9px !important;
+    background-repeat: no-repeat !important;
+}
+
+#cloud-buttons .ui-icon-offline:after, .ui-icon-waiting:after {
+    background-color: rgba(0,0,0,0);
+}

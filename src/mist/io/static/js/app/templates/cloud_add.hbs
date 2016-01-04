@@ -1,0 +1,179 @@
+<!-- Add cloud button -->
+<div id="add-cloud" class="ui-link ui-btn ui-btn-add ui-btn-d ui-shadow floating-collapsible"
+     data-role="collapsible"
+     data-collapsed="true">
+
+   <h4>Add cloud</h4>
+
+    <div id="cloud-add" class="ui-content">
+        <div id="new-cloud-provider"
+            class="mist-select"
+            data-role="collapsible"
+            data-collapsed-icon="noicon"
+            data-expanded-icon="noicon"
+            data-iconpos="none"
+            data-collapsed="false">
+            <h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed {{if view.provider '' 'select-provider hidden'}}" data-icon="false">
+                   <span class="provider-icon-small">
+                        <span class={{view.provider.className}}></span>
+                    </span>
+                    {{view.provider.title}}
+            </h4>
+
+            <ul class="mist-select" data-role="listview">
+                {{#each view.providerList as |prov|}}
+                    <li data-icon="false">
+                        <a {{action "selectProvider" prov target=view}}>
+                            <span class="provider-icon-small">
+                                <span class={{prov.className}}></span>
+                            </span>
+                            {{prov.title}}
+                        </a>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+        {{#if view.provider.title}}
+        <div id="cloud-add-fields">
+            {{#each view.providerFields as |field|}}
+                {{#if field.show}}
+                <div class="{{field.className}} field {{view.provider.provider}}">
+
+                    <!-- Field Label -->
+                    {{#if field.label}}
+                        {{#unless field.isCheckbox}}
+                            <label for={{field.name}}>
+                                {{unbound field.label}}
+                            </label>
+                        {{/unless}}
+                    {{/if}}
+
+                    <!-- Field Wrapper -->
+                    <div class="field-wrapper {{if field.isFile 'is-file'}} {{if field.value 'filled' 'empty'}} {{if field.optional '' 'required'}}">
+                        <div class="first-child {{if field.helpText '' 'last-child'}}">
+                            {{#if field.isText}}
+                                {{input type="text"
+                                    type=field.type
+                                    id=field.name
+                                    placeholder=field.placeholder
+                                    value=field.value}}
+                            {{/if}}
+                            {{#if field.isFile}}
+                                <a class="ui-btn ui-btn-d"
+                                    id={{field.name}}
+                                    {{action "uploadFile" field target=view}}>
+                                    {{#if field.value}}
+                                        {{field.buttonFilledText}}
+                                    {{else}}
+                                        {{field.buttonText}}
+                                    {{/if}}
+                                </a>
+                            {{/if}}
+                            {{#if field.isCheckbox}}
+                                <label>
+                                    {{view Mist.Checkbox
+                                        checked=field.value}}
+                                    {{field.label}}
+                                </label>
+                            {{/if}}
+                            {{#if field.isKey}}
+                                <div id={{field.name}}
+                                    class="mist-select"
+                                    data-role="collapsible"
+                                    data-collapsed-icon="noicon"
+                                    data-expanded-icon="noicon"
+                                    data-iconpos="right">
+                                    <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
+                                    <ul data-role="listview">
+                                        <li data-icon="false">
+                                            <a {{action "selectKey" "" field target=view}}>-- None --</a>
+                                        </li>
+                                        {{#each Mist.keysController.model as |key|}}
+                                            <li data-icon="false">
+                                                <a {{action "selectKey" key field target=view}}>{{key.id}}</a>
+                                            </li>
+                                        {{/each}}
+                                        <li data-icon="false" data-theme="d">
+                                            <a {{action "createKeyClicked" field target=view}}>Add Key</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {{/if}}
+                            {{#if field.isRegion}}
+                                <div id={{field.name}}
+                                    class="mist-select"
+                                    data-role="collapsible"
+                                    data-iconpos="right"
+                                    data-collapsed-icon="noicon"
+                                    data-expanded-icon="noicon">
+                                    <h4>{{#if field.value}}{{view.selectedRegion}}{{else}}Select Region{{/if}}</h4>
+                                    <ul data-role="listview">
+                                        {{#each view.provider.regions as |region|}}
+                                            <li data-icon="false">
+                                                <a {{action "selectRegion" region field target=view}}>
+                                                    {{region.location}}
+                                                </a>
+                                            </li>
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            {{/if}}
+                            {{#if field.isIndonesianRegion}}
+                                <div id={{field.name}}
+                                    class="mist-select"
+                                    data-role="collapsible"
+                                    data-iconpos="right"
+                                    data-collapsed-icon="noicon"
+                                    data-expanded-icon="noicon">
+                                    <h4>{{view.selectedIndonesianRegion}}</h4>
+                                    <ul data-role="listview">
+                                        <li data-icon="false">
+                                            <a {{action "selectIndonesianRegion" "my.idcloudonline.com" field target=view}}>
+                                                my.idcloudonline.com
+                                            </a>
+                                        </li>
+                                        <li data-icon="false">
+                                            <a {{action "selectIndonesianRegion" "compute.idcloudonline.com" field target=view}}>
+                                                compute.idcloudonline.com
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {{/if}}
+                            {{#if field.isSlider}}
+                                <select class="toggle-field" data-role="slider"
+                                {{action "switchToggled" field on="change" target=view}}>
+                                    <option value="0">{{unbound field.offLabel}}</option>
+                                    <option value="1">{{unbound field.onLabel}}</option>
+                                </select>
+                            {{/if}}
+                        </div>
+                        {{#if field.helpText}}
+                            <div class="last-child">
+                                <a class="ui-btn ui-btn-a ui-btn-icon-notext ui-icon-question"
+                                    id={{field.helpId}}
+                                    {{action "helpClicked" field target=view}}>
+                                </a>
+                            </div>
+                        {{/if}}
+                    </div>
+                </div>
+                {{/if}}
+            {{/each}}
+
+            {{#if Mist.cloudsController.addingCloud}}
+                <div id="cloud-add-loader" class="ajax-loader"></div>
+            {{/if}}
+
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <a id="new-cloud-ok"
+                    class="{{if view.isReady '' 'ui-state-disabled'}} {{if Mist.cloudsController.addingCloud 'ui-state-disabled'}} ui-btn ui-btn-d ui-shadow ui-caps ok-only"
+                    {{action "addClicked" target=view}}>Add</a>
+            </div>
+        </div>
+        {{/if}}
+    </div>
+</div>
+
+<div id="add-cloud-overlay" class="ui-popup-screen ui-overlay-b ui-screen-hidden"
+     {{action "clickOverlay" target=view}}></div>

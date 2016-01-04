@@ -1,4 +1,4 @@
-define('app/controllers/machine_add', ['ember'],
+define('app/controllers/machine_add', ['ember', 'yamljs'],
     /**
      *  Machine Add Controller
      *
@@ -20,14 +20,20 @@ define('app/controllers/machine_add', ['ember'],
             newMachineName: null,
             newMachineSize: null,
             newMachineImage: null,
+            newMachineCloudInit: null,
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
-            newMachineMonitoring: true,
+            newMachineProject: null,
+            newMachineMonitoring: null,
+            newMachineAssociateFloatingIp: true,
             newMachineDockerCommand: null,
             newMachineDockerEnvironment: null,
             newMachineDockerPorts: null,
             newMachineAzurePorts: null,
+            newMachineLibvirtDiskPath: '/var/lib/libvirt/',
+            newMachineLibvirtDiskSize: 4,
+            newMachineLibvirtImagePath: null,
 
 
             //
@@ -64,7 +70,7 @@ define('app/controllers/machine_add', ['ember'],
 
                 if (providerName == 'NephoScale') {
                     var re = /^[0-9a-z_-]*$/;
-                    if ( machineName.length > 64 || !re.test(machineName)) {
+                    if (machineName.length > 64 || !re.test(machineName)) {
 
                         Mist.notificationController.timeNotify(
                             'Server name in NephoScale may have lower-case letters, numbers, hyphen (\'-\') and underscore (\'_\') characters, cannot exceed 64 ' +
@@ -73,12 +79,12 @@ define('app/controllers/machine_add', ['ember'],
                     }
                     if (machineSize.indexOf('CS025') > -1) {
                         if ((machineImage != 'Linux Ubuntu Server 10.04 LTS 64-bit') &&
-                            (machineImage !='Linux CentOS 6.2 64-bit')) {
+                            (machineImage != 'Linux CentOS 6.2 64-bit')) {
 
-                                Mist.notificationController.timeNotify(
-                                    'On CS025 size you can only create one of the two images: ' +
-                                    'Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit', 7000);
-                                return;
+                            Mist.notificationController.timeNotify(
+                                'On CS025 size you can only create one of the two images: ' +
+                                'Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit', 7000);
+                            return;
                         }
                     }
                 }
@@ -108,29 +114,32 @@ define('app/controllers/machine_add', ['ember'],
 
                 var that = this;
                 this.newMachineProvider.machines.newMachine(
+                        this.newMachineProvider.provider,
                         this.newMachineName,
                         this.newMachineImage,
                         this.newMachineSize,
                         this.newMachineLocation,
                         this.newMachineKey,
+                        this.newMachineCloudInit,
                         this.newMachineScript,
+                        this.newMachineProject,
                         this.newMachineMonitoring,
+                        this.newMachineAssociateFloatingIp,
                         this.newMachineDockerEnvironment.trim(),
                         this.newMachineDockerCommand,
                         this.newMachineScriptParams,
                         this.newMachineDockerPorts,
                         this.newMachineAzurePorts,
+                        this.newMachineLibvirtDiskSize,
+                        this.newMachineLibvirtDiskPath,
+                        this.newMachineLibvirtImagePath,
+
                         function(success, machine) {
                             that._giveCallback(success, machine);
                         }
                 );
 
                 this.close();
-
-                // Redirect to machine list view if user is in image list view
-                if ($('#image-list-page').length) {
-                    Mist.__container__.lookup('router:main').transitionTo('machines');
-                }
             },
 
 
@@ -138,22 +147,40 @@ define('app/controllers/machine_add', ['ember'],
             //  Pseudo-Private Methods
             //
 
-             _clear: function() {
+            _clear: function() {
                 this.set('callback', null)
                     .set('newMachineName', '')
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
-                    .set('newMachineKey', {'title' : 'Select Key'})
-                    .set('newMachineSize', {'name' : 'Select Size'})
-                    .set('newMachineImage', {'name' : 'Select Image'})
-                    .set('newMachineLocation', {'name' : 'Select Location'})
-                    .set('newMachineProvider', {'title' : 'Select Provider'})
+                    .set('newMachineKey', {'id' : 'Select Key'})
+                    .set('newMachineProject', '')
+                    .set('newMachineKey', {
+                        'title': 'Select Key'
+                    })
+                    .set('newMachineSize', {
+                        'name': 'Select Size'
+                    })
+                    .set('newMachineImage', {
+                        'name': 'Select Image'
+                    })
+                    .set('newMachineLocation', {
+                        'name': 'Select Location'
+                    })
+                    .set('newMachineProvider', {
+                        'title': 'Select Provider'
+                    })
+                    .set('newMachineMonitoring', Mist.email ? true : false)
+                    .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
                     .set('newMachineScriptParams', '')
                     .set('newMachineDockerPorts', '')
-                    .set('newMachineAzurePorts', '');
+                    .set('newMachineAzurePorts', '')
+                    .set('newMachineLibvirtDiskSize', 4)
+                    .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
+                    .set('newMachineLibvirtImagePath', '');
                 this.view.clear();
-             },
+            },
 
             _updateFormReady: function() {
                 var formReady = false;
@@ -164,24 +191,42 @@ define('app/controllers/machine_add', ['ember'],
                     formReady = true;
                 }
 
-                // SSH key and location are optional for docker
+                // SSH key is optional for docker
                 if (this.newMachineProvider.provider != 'docker') {
-                    if (!(Mist.keysController.keyExists(this.newMachineKey.id) &&
-                        this.newMachineLocation.id)) {
+                    if (!Mist.keysController.keyExists(this.newMachineKey.id)) {
                         formReady = false;
                     }
                 }
 
                 if (this.newMachineProvider.provider == 'docker' && !this.view.dockerNeedScript) {
-                    if(! this.newMachineDockerCommand) {
+                    if (!this.newMachineDockerCommand) {
                         formReady = false;
                     }
                 }
 
                 if (this.newMachineImage.id &&
                     this.newMachineImage.get('isMist')) {
-                        if (!Mist.keysController.keyExists(this.newMachineKey.id))
+                    if (!Mist.keysController.keyExists(this.newMachineKey.id))
+                        formReady = false;
+                }
+
+                var cloudInit = this.get('newMachineCloudInit').trim();
+                if (cloudInit) {
+                    try {
+                        if ( ! (cloudInit.substring(0, 12) == "#!/bin/bash\n" || (YAML.parse(cloudInit) && cloudInit.substring(0, 13) == '#cloud-config'))) {
                             formReady = false;
+                            Mist.notificationController.timeNotify('Please start your cloud init script with #!/bin/bash or use a valid yaml configuration file (should start with #cloud-config)', 4000);
+                        }
+                    } catch (err) {
+
+                    }
+                }
+
+                var re = /^[0-9]*$/;
+                if (this.newMachineProvider.provider == 'libvirt' &&
+                    (this.newMachineImage.id || this.newMachineLibvirtImagePath) &&
+                    this.newMachineName && this.newMachineSize.id) {
+                        formReady = true;
                 }
 
                 if (formReady && this.addingMachine) {
@@ -197,27 +242,76 @@ define('app/controllers/machine_add', ['ember'],
 
             _resetProvider: function() {
                 this.set('callback', null)
+                    .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
-                    .set('newMachineKey', {'title' : 'Select Key'})
-                    .set('newMachineSize', {'name' : 'Select Size'})
-                    .set('newMachineImage', {'name' : 'Select Image'})
-                    .set('newMachineLocation', {'name' : 'Select Location'})
+                    .set('newMachineProject', '')
+                    .set('newMachineKey', {
+                        'title': 'Select Key'
+                    })
+                    .set('newMachineSize', {
+                        'name': 'Select Size'
+                    })
+                    .set('newMachineImage', {
+                        'name': 'Select Image'
+                    })
+                    .set('newMachineLocation', {
+                        'name': 'Select Location'
+                    })
+                    .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
                     .set('newMachineScriptParams', '')
                     .set('newMachineDockerPorts', '')
-                    .set('newMachineAzurePorts', '');
+                    .set('newMachineAzurePorts', '')
+                    .set('newMachineLibvirtDiskSize', 4)
+                    .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
+                    .set('newMachineLibvirtImagePath', '');
             },
 
             _selectUnique: function() {
                 // Locations Check
                 if (this.newMachineProvider.locations) {
-                    if (this.newMachineProvider.locations.model.length == 1) this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                    if (this.newMachineProvider.locations.model.length == 1) {
+                        this.set('newMachineLocation', this.newMachineProvider.locations.model[0]);
+                    }
                 }
 
                 // Sizes Check
                 if (this.newMachineProvider.sizes) {
                     if (this.newMachineProvider.sizes.model.length == 1) this.set('newMachineSize', this.newMachineProvider.sizes.model[0]);
+                }
+
+                // Projects Check
+                if (this.newMachineProvider.projects) {
+                    if (this.newMachineProvider.projects.model.length == 1) this.set('newMachineProject', this.newMachineProvider.projects.model[0]);
+                }
+            },
+
+            _updateLibvirtPath: function() {
+                if (this.get('newMachineProvider.provider') == 'libvirt' && this.get('newMachineName')) {
+                    this.set('newMachineLibvirtDiskPath', '/var/lib/libvirt/images/' + this.get('newMachineName').trim() + '.img');
+                }
+            },
+
+            _updateProvidersMonitoring: function() {
+                if (this.get('newMachineProvider.provider') == 'libvirt') {
+                    this.set('newMachineMonitoring', false);
+                } else {
+                    this.set('newMachineMonitoring', Mist.email ? true : false);
+                }
+            },
+
+            _removeFieldsBlanks: function() {
+                if (this.get('newMachineName')) {
+                    this.set('newMachineName', this.get('newMachineName').trim());
+                }
+
+                if (this.get('newMachineLibvirtDiskPath')) {
+                    this.set('newMachineLibvirtDiskPath', this.get('newMachineLibvirtDiskPath').trim());
+                }
+
+                if (this.get('newMachineLibvirtImagePath')) {
+                    this.set('newMachineLibvirtImagePath', this.get('newMachineLibvirtImagePath').trim());
                 }
             },
 
@@ -227,7 +321,19 @@ define('app/controllers/machine_add', ['ember'],
 
             providerObserver: function() {
                 Ember.run.once(this, '_selectUnique');
-            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize'),
+            }.observes('newMachineProvider', 'newMachineImage', 'newMachineSize', 'newMachineProject'),
+
+            libvirtPathObserver: function() {
+                Ember.run.next(this, '_updateLibvirtPath');
+            }.observes('newMachineName', 'newMachineProvider.title'),
+
+            providersMonitoringObserver: function() {
+                Ember.run.next(this, '_updateProvidersMonitoring');
+            }.observes('newMachineProvider.provider'),
+
+            fieldsBlanksObserver: function() {
+                Ember.run.once(this, '_removeFieldsBlanks');
+            }.observes('newMachineName', 'newMachineLibvirtDiskPath', 'newMachineLibvirtImagePath'),
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
@@ -237,7 +343,11 @@ define('app/controllers/machine_add', ['ember'],
                        'newMachineImage',
                        'newMachineScript',
                        'newMachineLocation',
-                       'newMachineProvider')
+                       'newMachineProvider',
+                        'newMachineLibvirtDiskSize',
+                        'newMachineLibvirtDiskPath',
+                        'newMachineLibvirtImagePath',
+                        'newMachineCloudInit')
         });
     }
 );

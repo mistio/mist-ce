@@ -12,6 +12,8 @@ import uuid
 import json
 import socket
 import random
+import traceback
+import datetime
 from time import time
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
@@ -21,7 +23,7 @@ import tornado.iostream
 import requests
 
 try:
-    from mist.core.helpers import user_from_session_id
+    from mist.core.auth.methods import user_from_session_id
     from mist.core import config
     from mist.core.methods import get_stats
     multi_user = True
@@ -64,12 +66,26 @@ def get_conn_info(conn_info):
             user_agent = conn_info.headers[header]
     ip = real_ip or forwarded_for or conn_info.ip
     session_id = ''
-    if 'beaker.session.id' in conn_info.cookies.keys():
-        session_id = conn_info.cookies['beaker.session.id'].value
+    if 'session.id' in conn_info.cookies.keys():
+        session_id = conn_info.cookies['session.id'].value
     return ip, user_agent, session_id
 
 
+def mist_conn_str(conn_dict):
+    parts = []
+    dt_last_rcv = datetime.datetime.fromtimestamp(conn_dict['last_rcv'])
+    conn_dict['last_rcv'] = dt_last_rcv
+    for key in ('name', 'last_rcv', 'user', 'ip', 'user_agent', 'closed',
+                'session_id'):
+        if key in conn_dict:
+            parts.append(conn_dict.pop(key))
+    parts.extend(conn_dict.values())
+    return ' - '.join(map(str, parts))
+
+
 class MistConnection(SockJSConnection):
+    closed = False
+
     def on_open(self, conn_info):
         log.info("%s: Initializing", self.__class__.__name__)
         self.ip, self.user_agent, session_id = get_conn_info(conn_info)
@@ -80,9 +96,30 @@ class MistConnection(SockJSConnection):
     def send(self, msg, data=None):
         super(MistConnection, self).send(json.dumps({msg: data}))
 
-    def on_close(self):
-        log.info("%s: on_close event handler", self.__class__.__name__)
-        CONNECTIONS.remove(self)
+    def on_close(self, stale=False):
+        if not self.closed:
+            log.info("%s: on_close event handler", self.__class__.__name__)
+            if stale:
+                log.warning("stale conn removed")
+            CONNECTIONS.remove(self)
+            self.closed = True
+        else:
+            log.warning("%s: called on_close AGAIN!", self.__class__.__name__)
+            traceback.print_stack()
+
+    def get_dict(self):
+        return {
+            'name': self.session.name,
+            'last_rcv': self.session.base.last_rcv,
+            'user': self.user.email,
+            'ip': self.ip,
+            'user_agent': self.user_agent,
+            'closed': self.is_closed,
+            'session_id': self.session_id,
+        }
+
+    def __repr__(self):
+        return mist_conn_str(self.get_dict())
 
 
 class ShellConnection(MistConnection):
@@ -95,7 +132,7 @@ class ShellConnection(MistConnection):
         if self.ssh_info:
             self.close()
         self.ssh_info = {
-            'backend_id': data['backend_id'],
+            'cloud_id': data['cloud_id'],
             'machine_id': data['machine_id'],
             'host': data['host'],
             'columns': data['cols'],
@@ -119,10 +156,10 @@ class ShellConnection(MistConnection):
     def emit_shell_data(self, data):
         self.send('shell_data', data)
 
-    def on_close(self):
+    def on_close(self, stale=False):
         if self.hub_client:
             self.hub_client.stop()
-        super(ShellConnection, self).on_close()
+        super(ShellConnection, self).on_close(stale=stale)
 
 
 class UserUpdatesConsumer(Consumer):
@@ -168,23 +205,23 @@ class MainConnection(MistConnection):
 
     def start(self):
         self.list_keys()
-        self.list_backends()
+        self.list_clouds()
         self.check_monitoring()
 
     def list_keys(self):
         self.send('list_keys', methods.list_keys(self.user))
 
-    def list_backends(self):
-        backends = methods.list_backends(self.user)
-        self.send('list_backends', backends)
+    def list_clouds(self):
+        clouds = methods.list_clouds(self.user)
+        self.send('list_clouds', clouds)
         for key, task in (('list_machines', tasks.ListMachines()),
                           ('list_images', tasks.ListImages()),
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
-                          ('list_locations', tasks.ListLocations()),):
-            for backend_id in self.user.backends:
-                if self.user.backends[backend_id].enabled:
-                    cached = task.smart_delay(self.user.email, backend_id)
+                          ('list_locations', tasks.ListLocations()), ('list_projects', tasks.ListProjects()),):
+            for cloud_id in self.user.clouds:
+                if self.user.clouds[cloud_id].enabled:
+                    cached = task.smart_delay(self.user.email, cloud_id)
                     if cached is not None:
                         log.info("Emitting %s from cache", key)
                         self.send(key, cached)
@@ -200,11 +237,11 @@ class MainConnection(MistConnection):
         except Exception as exc:
             log.warning("Check monitoring failed with: %r", exc)
 
-    def on_stats(self, backend_id, machine_id, start, stop, step, request_id,
+    def on_stats(self, cloud_id, machine_id, start, stop, step, request_id,
                  metrics):
         error = False
         try:
-            data = get_stats(self.user, backend_id, machine_id,
+            data = get_stats(self.user, cloud_id, machine_id,
                              start, stop, step)
         except BadRequestError as exc:
             error = str(exc)
@@ -214,7 +251,7 @@ class MainConnection(MistConnection):
             return
 
         ret = {
-            'backend_id': backend_id,
+            'cloud_id': cloud_id,
             'machine_id': machine_id,
             'start': start,
             'stop': stop,
@@ -234,31 +271,31 @@ class MainConnection(MistConnection):
         log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_networks', 'list_machines',
-                               'list_locations', 'ping']):
+                               'list_locations', 'list_projects', 'ping']):
             self.send(routing_key, result)
             if routing_key == 'probe':
                 log.warn('send probe')
 
             if routing_key == 'list_networks':
-                backend_id = result['backend_id']
+                cloud_id = result['cloud_id']
                 log.warn('Got networks from %s',
-                         self.user.backends[backend_id].title)
+                         self.user.clouds[cloud_id].title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = result['machines']
-                backend_id = result['backend_id']
-                # update backend machine count in multi-user setups
+                cloud_id = result['cloud_id']
+                # update cloud machine count in multi-user setups
                 try:
-                    mcount = self.user.backends[backend_id].machine_count
+                    mcount = self.user.clouds[cloud_id].machine_count
                     if multi_user and len(machines) != mcount:
                         tasks.update_machine_count.delay(self.user.email,
-                                                         backend_id,
+                                                         cloud_id,
                                                          len(machines))
                 except Exception as exc:
                     log.warning("Error while update_machine_count.delay: %r",
                                 exc)
                 for machine in machines:
-                    bmid = (backend_id, machine['id'])
+                    bmid = (cloud_id, machine['id'])
                     if bmid in self.running_machines:
                         # machine was running
                         if machine['state'] != 'running':
@@ -274,33 +311,46 @@ class MainConnection(MistConnection):
                                  machine.get('public_ips', []))
                     if not ips:
                         continue
-                    cached = tasks.ProbeSSH().smart_delay(
-                        self.user.email, backend_id, machine['id'], ips[0]
-                    )
-                    if cached is not None:
-                        self.send('probe', cached)
+
+                    has_key = False
+                    for k in self.user.keypairs.values():
+                        for m in k.machines:
+                            if m[:2] == [cloud_id, machine['id']]:
+                                has_key = True
+                                break
+                        if has_key:
+                            break
+
+                    if has_key:
+                        cached = tasks.ProbeSSH().smart_delay(
+                            self.user.email, cloud_id, machine['id'], ips[0]
+                        )
+                        if cached is not None:
+                            self.send('probe', cached)
+
                     cached = tasks.Ping().smart_delay(
-                        self.user.email, backend_id, machine['id'], ips[0]
+                        self.user.email, cloud_id, machine['id'], ips[0]
                     )
                     if cached is not None:
                         self.send('ping', cached)
+
         elif routing_key == 'update':
             self.user.refresh()
             sections = result
-            if 'backends' in sections:
-                self.list_backends()
+            if 'clouds' in sections:
+                self.list_clouds()
             if 'keys' in sections:
                 self.list_keys()
             if 'monitoring' in sections:
                 self.check_monitoring()
 
-    def on_close(self):
+    def on_close(self, stale=False):
         if self.consumer is not None:
             try:
                 self.consumer.stop()
             except Exception as exc:
                 log.error("Error closing pika consumer: %r", exc)
-        super(MainConnection, self).on_close()
+        super(MainConnection, self).on_close(stale=stale)
 
 
 def make_router():

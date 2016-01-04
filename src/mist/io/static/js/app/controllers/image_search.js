@@ -129,22 +129,22 @@ define('app/controllers/image_search', ['ember'],
             searchOnServer: function () {
 
                 var that = this;
-                var searchingBackends = [];
-                Mist.backendsController.model.forEach(function(backend, index) {
+                var searchingClouds = [];
+                Mist.cloudsController.model.forEach(function(cloud, index) {
 
-                    if (!backend.enabled)
+                    if (!cloud.enabled)
                         return;
-                    if (backend.get('isBareMetal'))
+                    if (cloud.get('isBareMetal'))
                         return;
 
-                    searchingBackends.push(index);
-                    backend.searchImages(that.searchTerm, function(success, images) {
+                    searchingClouds.push(index);
+                    cloud.searchImages(that.searchTerm, function(success, images) {
 
                         if (success)
                             that.searchResults.addObjects(images);
 
-                        searchingBackends.removeObject(index);
-                        if (!searchingBackends.length)
+                        searchingClouds.removeObject(index);
+                        if (!searchingClouds.length)
                             that.endSearch();
                     });
                 });
