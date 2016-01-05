@@ -20,6 +20,7 @@
 .card-actions {
 	overflow: hidden;
 }
-paper-button {
-  float: right;
+paper-button.custom.blue {
+  line-height: 24px;
+  padding-right: 15px;
 }

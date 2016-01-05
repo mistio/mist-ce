@@ -191,8 +191,6 @@ paper-button {
 paper-button.custom.blue {
   background-color: #0099cc;
   color: #fff;
-  line-height: 24px;
-  padding-right: 10px;
 }
 paper-button.custom.blue > * {
   color: #fff;
