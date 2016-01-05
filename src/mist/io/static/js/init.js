@@ -441,6 +441,7 @@ var setupMainChannel = function(socket, callback) {
             }
 
             Mist.dialogController.open({
+                size: 'large-modal',
                 type: DIALOG_TYPES.IS_PLAIN,
                 head: data.error ? 'Error' : 'Success',
                 body: dialogBody

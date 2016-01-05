@@ -356,6 +356,7 @@ define('app/views/machine_monitoring',
 
                 function showCommand (args) {
                     Mist.dialogController.open({
+                        size: 'large-modal',
                         type: DIALOG_TYPES.OK_CANCEL,
                         head: 'Enable monitoring',
                         body: args.body,

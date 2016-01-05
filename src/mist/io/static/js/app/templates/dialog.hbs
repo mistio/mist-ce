@@ -1,40 +1,15 @@
-<!-- Popup Overlay -->
-
-<div id="dialog-screen" class="ui-popup-screen ui-overlay-b ui-screen-hidden">
-</div>
-
 <!-- Popup Wrapper -->
-
-<div id="dialog-popup" class="flip
-        ui-popup-container
-        ui-popup-hidden
-        ui-popup-truncate">
-
-    <!-- Popup -->
-
-    <div id="dialog" class="large-popup
-            ui-popup
-            ui-body-inherit
-            ui-overlay-shadow" data-role="popup" data-enhanced="true" data-transition="flip" data-dismissible="false">
-
-        <!-- Header -->
-
-        <div class="ui-header ui-bar-b {{if view.hasError 'failure'}} {{if view.hasSuccess 'success'}}" role="banner">
-
-            <h1 class="ui-title ui-caps">
-                {{Mist.dialogController.options.head}}
-            </h1>
+<div class="md-modal {{Mist.dialogController.options.size}} md-effect-1" id="dialog-popup">
+    <div class="md-content">
+        <div class="md-title {{if view.hasError 'failure'}} {{if view.hasSuccess 'success'}}">
+            <h1>{{Mist.dialogController.options.head}}</h1>
 
             {{#unless view.isYesNo}}
-                <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+                <a href="javascript:void(0)" class="close" {{action "close" target=view}}>&#10005;</a>
             {{/unless}}
-
         </div>
 
-        <!-- Body -->
-
-        <div class="ui-content ui-body-a" role="main">
-
+        <div class="md-body">
             {{#each Mist.dialogController.options.body as |optionBody|}}
 
                 {{#if optionBody.paragraph}}
@@ -55,7 +30,6 @@
                 {{/if}}
 
             {{/each}}
-
 
             <!-- Buttons -->
 
@@ -94,7 +68,9 @@
                     {{/unless}}
                 {{/if}}
             {{/if}}
-
         </div>
     </div>
 </div>
+
+<!-- Popup Overlay -->
+<div class="md-overlay"></div>

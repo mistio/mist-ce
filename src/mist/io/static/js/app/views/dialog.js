@@ -13,7 +13,7 @@ define('app/views/dialog', ['app/views/popup'],
 
             layoutName: 'dialog',
             controllerName: 'dialogController',
-            popupId: "#dialog",
+            popupId: "#dialog-popup",
 
             //
             //
@@ -68,14 +68,13 @@ define('app/views/dialog', ['app/views/popup'],
             open: function() {
                 Ember.run.later(this, function() {
                     $('body').enhanceWithin();
-                    
-                    $(this.popupId)
-                        .popup()
-                        .popup('reposition', {
-                            positionTo: 'window'
-                        })
-                        .popup('open');
+
+                    $(this.popupId).mdPopup('open');
                 }, 300);
+            },
+
+            close: function () {
+                $(this.popupId).mdPopup('close');
             },
 
 
@@ -87,23 +86,23 @@ define('app/views/dialog', ['app/views/popup'],
 
 
             actions: {
+                close: function() {
+                    Mist.dialogController.close();
+                },
 
                 reject: function() {
                     Mist.dialogController.reject();
                 },
 
-
                 confirm: function() {
                     Mist.dialogController.confirm();
                 },
-
 
                 linkClicked: function(link) {
                     if (link.closeDialog)
                         Mist.dialogController.close();
                     window.location = link.href;
                 },
-
 
                 commandClicked: function(e) {
                     $(this.popupId + ' .command-container')
@@ -115,7 +114,7 @@ define('app/views/dialog', ['app/views/popup'],
                                 return true;
                             }
                         });
-                },
+                }
             }
         });
     }

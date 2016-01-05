@@ -38,6 +38,7 @@
 @import url("css/script.css");
 @import url("css/script_list.css");
 @import url("css/script_add.css");
+@import url("css/modals.css");
 
 
 .ui-content, .header-grid {
@@ -1537,7 +1538,7 @@ ul.checkbox-list .ui-grid-b {
 #dialog-popup .ui-popup-link.icon-machine:hover {
     color: #000000 !important;
     background: 0 none !important;
-    border-color: transparent; !important; 
+    border-color: transparent; !important;
 }
 #dialog-popup #command-collapsible .ui-btn-icon-left {
     padding: 0.6em 1.1em 0.6em 2.9em !important;
