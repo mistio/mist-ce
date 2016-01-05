@@ -6,8 +6,6 @@ import logging
 import argparse
 import traceback
 
-from time import sleep
-
 import amqp
 
 import gevent
@@ -86,9 +84,9 @@ class AmqpGeventBase(object):
                     conn = self.conn
                 except:
                     i += 1
-                    if i > 5:
+                    if i > 50:
                         raise
-                    sleep(3)
+                    gevent.sleep(5)
                 else:
                     break
             log.debug("%s: Opening new AMQP channel.", self.lbl)
