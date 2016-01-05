@@ -1659,8 +1659,9 @@ def undeploy_plugin(request):
 
 @view_config(route_name='rules', request_method='POST', renderer='json')
 def update_rule(request):
-    """Creates or updates a rule.
-
+    """
+    Creates or updates a rule.
+    ---
     """
     user = user_from_request(request)
     params = params_from_request(request)
