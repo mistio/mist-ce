@@ -36,6 +36,11 @@
                     </div>
                   </a>
                 </template>
+                <a href="/elements" class="section flex">
+                  <div class="layout horizontal center">
+                    _elements
+                  </div>
+                </a>
               </nav>
             </div>
             <div hidden$="[[!tag]]" id="current-tag" class="horizontal layout center">
@@ -185,6 +190,7 @@
       _qChanged: function(q) {
         if (q) {
           this.async(function() {
+            //this.$.query refers to another templates #query and so throws error on focus
             this.$.query.focus();
             // make sure to force the cursor to the end of the
             // input. Only an issue in Firefox.
