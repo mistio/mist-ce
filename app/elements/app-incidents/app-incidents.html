@@ -1,0 +1,77 @@
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<dom-module id="app-incidents">
+  <link rel="import" type="css" href="app-incidents.css">
+  <template>
+    <paper-card heading="{{title}}">  <!-- title goes here, should change on stateChanged-->
+      <div class="layout vertical wrap">
+          <h3>Now active</h3>
+          <!-- state FULL > there a re incidents to display -->
+          <a class="list-item layout horizontal wrap red" href$="[[whatTriggeredIt]]"> <!-- class red should come from alertstateclass -->
+            <div class="flexchild expression">
+              <iron-icon icon="icons:report-problem"></iron-icon>
+              an incident expression
+            </div>
+            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
+          </a>
+          <a class="list-item layout horizontal wrap red" href$="[[whatTriggeredIt]]"> <!-- class red should come from alertstateclass -->
+            <div class="flexchild expression">
+              <iron-icon icon="icons:report-problem"></iron-icon>
+              an incident expression
+            </div>
+            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
+          </a>
+
+          <h3>Resolved</h3>
+          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
+            <div class="flexchild expression">
+              <iron-icon icon="icons:check"></iron-icon>
+              an incident expression
+            </div>
+            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
+          </a>
+          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
+            <div class="flexchild expression">
+              <iron-icon icon="icons:check"></iron-icon>
+              an incident expression
+            </div>
+            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
+          </a>
+          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
+            <div class="flexchild expression">
+              <iron-icon icon="icons:check"></iron-icon>
+              an incident expression
+            </div>
+            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
+          </a>
+
+          <!-- state MIDDLE : urge user to add rules -->
+
+
+          <!-- state ONBOARD : urge user to add machine monitoring -->
+
+      </div>
+    </paper-card>      
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'app-incidents',
+    properties: {
+      title: {String, value:"Incidents"},
+      state: {String, value:"ONBOARD"},
+      whatTriggeredIt :  {String, value:"#"},  // whatTriggeredIt will be func(machine,rule) to find url#anchore to the machine page and specific rule that trigered the alert
+      alertstateclass: {String, value:"red"} // alert > red, resolved > green
+    },
+    stateChanged: function(newstate) {
+    //newstate ONBOARD > title Welcome
+    //newstate MIDDLE > title Add your rules
+    //newstate FULL > title Incidents
+    //default > title Incidents
+    }    
+  });
+</script>

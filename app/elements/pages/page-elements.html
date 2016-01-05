@@ -11,6 +11,8 @@
 <link rel="import" href="../responsive-element/responsive-element.html">
 
 <link rel="import" href="../app-graph/app-graph.html">
+<link rel="import" href="../app-rules/app-rules.html">
+<link rel="import" href="../app-incidents/app-incidents.html">
 
 <dom-module id="page-elements">
   <style>
@@ -234,6 +236,10 @@ app-sidebar paper-toolbar {
   display: none;
 }
 
+app-incidents {
+  width: 50%;
+}
+
   </style>
 
   <template>
@@ -271,11 +277,14 @@ app-sidebar paper-toolbar {
             <ul>
               <li><a href="#app-graph-demo">app-graph</a></li>
               <li><a href="#app-rules-demo">app-rules</a></li>
-              <li><a href="#app-shell-demo">app-shell</a></li>
+              <li><a href="#app-incidents-demo">app-incidents</a></li>
             </ul>
 
             <h3>Helper elements</h3>
-            <app-form>app-form</app-form> <br/>
+            <ul>
+              <li>app-form</li>
+              <li>app-notifications</li>
+            </ul>            
 
             <h3>also: Pages</h3>
             <ul>
@@ -285,20 +294,22 @@ app-sidebar paper-toolbar {
               <li>page-script</li>
               <li>page-network</li>
             </ul>
+            
+            <h3>Demos</h3>
 
             <div id="app-graph-demo">
               <h3>app-graph</h3>
-              <app-graph title="TEST"></app-graph>
+              <app-graph title="TEST"></app-graph> 
             </div>
             <div id="app-rules-demo">
               <h3>app-rules</h3>
-              <app-rules>app-rules</app-rules>
+              <app-rules></app-rules>
             </div>
 
             <div id="app-incidents-demo">
               <h3>app-incidents</h3>
-              <app-incidents>app-incidents</app-incidents> 
-            </div>
+              <app-incidents></app-incidents> 
+            </div>          
 
             <div id="app-shell-demo">
               <h3>app-shell</h3>
@@ -309,6 +320,16 @@ app-sidebar paper-toolbar {
               <h3>app-account</h3>
               <app-account>app-account</app-account>
             </div>
+
+            <div id="app-form-demo">
+              <h3>app-form</h3>
+              <app-form></app-form> 
+            </div>
+
+            <div id="app-notifications-demo">
+              <h3>app-notifications</h3>
+              <app-notifications></app-notifications>
+            </div>  
             
           </div>
         </paper-header-panel>

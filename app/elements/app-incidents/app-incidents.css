@@ -1,0 +1,27 @@
+:host paper-card {
+	min-width: 100%;
+}
+h3 {
+	text-transform: uppercase;
+	font-size: 13px;
+	color: rgba(0,0,0,0.54);
+	padding: 0 10px;
+	border-bottom: 1px solid #eee;
+}
+.list-item {
+	border-bottom: 1px solid #eee;
+	padding: 10px;
+}
+.list-item.red {
+	background-color: #F44336;
+	color: #fff;
+}
+.list-item.red .expression > iron-icon {
+	color: #fff;
+}
+.list-item.green .expression > iron-icon {
+	color: green;
+}
+.flexchild {
+	@apply(--layout-flex);
+}

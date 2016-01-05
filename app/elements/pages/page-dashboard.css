@@ -3,13 +3,22 @@ paper-header-panel {
 }
 
 span.cloud-title {
-    bottom: -2px;
-    position: relative;
+  bottom: -2px;
+  position: relative;
 }
 
 paper-header-panel .fit.style-scope.page-dashboard {
-    max-width: 1100px;
-    margin: 0 auto;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.pad {
+  padding: 8px;
+}
+
+app-incidents {
+  margin: 0 0 0 8px;
+  width: 39.3%;
 }
 
 google-chart {
