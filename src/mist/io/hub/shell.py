@@ -111,9 +111,13 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
             self.channel.close()
 
     def stop(self):
+        super(ShellHubWorker, self).stop()
         if self.channel is not None:
             self.channel.close()
-        super(ShellHubWorker, self).stop()
+            self.channel = None
+        if self.shell is not None:
+            self.shell.disconnect()
+            self.shell = None
 
 
 class ShellHubClient(mist.io.hub.main.HubClient):
