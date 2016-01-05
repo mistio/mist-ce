@@ -221,7 +221,7 @@
 
 .log-list .details td > div, td > div.df {
     max-height: 310px;
-    white-space: pre;
+    white-space: pre-wrap;
     overflow: auto;
 }
 
