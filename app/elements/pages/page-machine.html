@@ -10,6 +10,8 @@
 <link rel="import" href="../element-table-cards/element-table-cards.html">
 <link rel="import" href="../responsive-element/responsive-element.html">
 
+<link rel="import" href="../app-graph/app-graph.html">
+
 <dom-module id="page-machine">
   <link rel="import" type="css" href="page-machine.css">
 
@@ -47,7 +49,12 @@
             <paper-icon-button icon="account-circle"></paper-icon-button>
           </div>
           <div id="content">
-            machine stuff 
+            <app-graph title="CPU"></app-graph>
+            <app-graph title="DISKS READ"></app-graph>
+            <app-graph title="IFACES RX"></app-graph>
+            <app-graph title="DISKS WRITE"></app-graph>
+            <app-graph title="RAM"></app-graph>
+            <app-graph title="LOAD"></app-graph>
           </div>
         </paper-header-panel>
       </paper-drawer-panel>

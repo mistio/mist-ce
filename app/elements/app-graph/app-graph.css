@@ -1,0 +1,13 @@
+:host paper-card {
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+.card-content {
+  min-width: 50%; 
+}
+.graph {
+  min-width: 400px;
+}
+paper-icon-button {
+  float: right;
+}

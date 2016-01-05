@@ -1,0 +1,28 @@
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<dom-module id="app-graph">
+  <link rel="import" type="css" href="app-graph.css">
+  <template>
+    <paper-card heading="{{title}}">  <!-- graph title goes here, comes in with title as a parameter in app-graph element-->
+      <div class="card-content">
+        <div class="graph">
+          graph here
+        </div>
+      </div>
+      <div class="card-actions">
+        <paper-icon-button icon="close" paper-card-toggle>close</paper-icon-button>
+        <paper-icon-button icon="hardware:keyboard-arrow-down" paper-card-toggle>miniimise</paper-icon-button>
+      </div>
+    </paper-card>      
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'app-graph',
+    properties: {
+      title: {String, value:"A GRAPH"} 
+    }
+  });
+</script>

@@ -10,6 +10,8 @@
 <link rel="import" href="../element-table-cards/element-table-cards.html">
 <link rel="import" href="../responsive-element/responsive-element.html">
 
+<link rel="import" href="../app-graph/app-graph.html">
+
 <dom-module id="page-elements">
   <style>
     :host {
@@ -266,11 +268,10 @@ app-sidebar paper-toolbar {
           <div id="content">
 
             <h3>Base elements</h3>
-            <app-graph>app-graph<app-graph> <br/>
-            <app-rules>app-rules</app-rules> <br/>
-            <app-incidents>app-incidents</app-incidents> <br/>
-            <app-shell>app-shell</app-shell> <br/>
-            <app-account>app-account</app-account> <br/>
+            <ul>
+              <li><a href="#app-graph-demo">app-graph</a></li>
+              <li><a href="#app-rules-demo">app-rules</a></li>
+            <ul>
 
             <h3>Helper elements</h3>
             <app-form>app-form</app-form> <br/>
@@ -283,6 +284,19 @@ app-sidebar paper-toolbar {
               <li>page-script</li>
               <li>page-network</li>
             </ul>
+
+            <div id="app-graph-demo">
+              <h3>app-graph</h3>
+              <app-graph title="TEST"></app-graph>
+            </div>
+            <div id="app-rules-demo">
+              <h3>app-rules</h3>
+              <app-rules>app-rules</app-rules>              
+            </div>
+
+            <app-incidents>app-incidents</app-incidents> <br/>
+            <app-shell>app-shell</app-shell> <br/>
+            <app-account>app-account</app-account> <br/>
             
           </div>
         </paper-header-panel>

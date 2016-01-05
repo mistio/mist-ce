@@ -37,7 +37,7 @@ a {
 #content {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0 10px;
+  padding: 20px;
 }
 
 app-bar .menu-icon {
