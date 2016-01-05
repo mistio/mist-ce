@@ -84,6 +84,7 @@ class AmqpGeventBase(object):
                     conn = self.conn
                 except:
                     i += 1
+                    log.error("Connecting to amqp has failed %d times.", i)
                     if i > 50:
                         raise
                     gevent.sleep(5)
