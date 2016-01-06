@@ -1,0 +1,46 @@
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<!-- needed for the forms' inputs -->
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-behavior.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-addon-behavior.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<!-- iron-form-element-behavior misses, gives error of cannot be found-->
+<!-- <link rel="import" href="../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html"> -->
+
+<dom-module id="app-forms">
+  <link rel="import" type="css" href="app-forms.css">        
+  <template>    
+
+    <paper-card heading="{{formtitle}}"> <!-- form title -->
+      <paper-icon-button id="close-this-form" suffix icon="clear"></paper-icon-button>
+      <div class="card-content">
+
+        <!-- in <content> comes what <app-forms> tag has inside when called -->
+        <content></content>
+
+      </div>
+    </paper-card>
+
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'app-forms',
+    properties: {
+      formtitle:{ String, value:"My Form" }, //default value of form
+    },
+    behaviors: [Polymer.PaperInputBehavior, Polymer.PaperInputAddonBehavior]
+  });
+  function submitForm() {
+    // document.getElementById('form').submit();
+  }
+</script>

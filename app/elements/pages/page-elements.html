@@ -4,18 +4,16 @@
 
 <link rel="import" href="../section-symbol/section-symbol.html">
 <link rel="import" href="../theme-color/theme-color.html">
-<link rel="import" href="../element-action-menu/element-action-menu.html">
-<link rel="import" href="../element-table/element-table.html">
-<link rel="import" href="../element-table-cards/element-table-cards.html">
-<link rel="import" href="../responsive-element/responsive-element.html">
 
 <link rel="import" href="../app-graph/app-graph.html">
 <link rel="import" href="../app-rules/app-rules.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
+<link rel="import" href="../app-forms/app-forms.html">
 
 <dom-module id="page-elements">
-  <style>
-    :host {
+  
+<style>
+:host {
   background: #fafafa;
 }
 
@@ -281,6 +279,7 @@ app-incidents {
               <li><a href="#app-graph-demo">app-graph</a></li>
               <li><a href="#app-rules-demo">app-rules</a></li>
               <li><a href="#app-incidents-demo">app-incidents</a></li>
+              <li><a href="#app-forms-demo">app-forms</a></li>
             </ul>
 
             <h3>Helper elements</h3>
@@ -324,14 +323,91 @@ app-incidents {
               <app-account>app-account</app-account>
             </div>
 
-            <div id="app-form-demo">
-              <h3>app-form</h3>
-              <app-form></app-form> 
+            <div id="app-forms-demo">
+              <h3>app-forms</h3>
+              <p>
+                mist has a number of different purpose forms, namely:
+              </p>
+              <ul>
+                <li>addCloud</li>
+                <li>addMachine</li>
+                <li>addMonitoring</li>
+                <li>addRule</li>
+                <li>addKey</li>
+                <li>addScript</li>
+                <li>addTemplate</li>
+                <li>addUser</li>
+              </ul>
+              <p>
+                we can either make a form-element for each with an easy name if possible (ex. call 
+                <code>&lt;app-form-add-cloud>&lt;/app-form-add-cloud&gt;</code>), <br/>
+                we can manage fields in 
+                <code>app-forms</code> 
+                element depending on custom atribute ie. 
+                <code>to</code> :
+                <code>&lt;app-forms to="addMachine"&gt;&lt;/app-forms&gt;</code>
+                ), <br/>
+                or we can just loosly allow for fields to be imported through <code>&lt;content&gt;&lt;/content&gt;</code>. last is now implemented.
+              </p>
+
+              <app-forms formtitle="Add Cloud">
+
+                <!-- ADD CLOUD FORM --> <!--method="post" action="/form/handler" -->
+                <form is="iron-form" id="form1"> 
+                  <paper-input name="name" label="name" error-message="Invalid input!"></paper-input>
+                  <paper-dropdown-menu label="Provider">
+                    <paper-menu class="dropdown-content">
+                      <!-- a dom repeat here with supported providers -->
+                      <paper-item>EC2</paper-item> 
+                      <paper-item>Docker</paper-item> 
+                      <paper-item>Openstack</paper-item> 
+                      <paper-item>Linode</paper-item> 
+                    </paper-menu>
+                  </paper-dropdown-menu>
+                  <hr/>
+                  <paper-button onclick="submitForm()">add cloud</paper-button>   
+                </form>
+
+              </app-forms> 
+
+              <app-forms formtitle="Create Machine">
+
+                <!-- ADD MACHINE FORM --> <!--method="post" action="/form/handler" -->
+                <form is="iron-form" id="form2"> 
+                  <paper-input name="name" label="name" error-message="Invalid input!"></paper-input>
+                  <paper-dropdown-menu label="Provider">
+                    <paper-menu class="dropdown-content">
+                      <!-- a dom repeat here with supported providers -->
+                      <paper-item>EC2</paper-item> 
+                      <paper-item>Docker</paper-item> 
+                      <paper-item>Openstack</paper-item> 
+                      <paper-item>Linode</paper-item> 
+                    </paper-menu>
+                  </paper-dropdown-menu>
+                  <hr/>
+                  <paper-button onclick="submitForm()">create machine</paper-button>   
+                </form>
+
+              </app-forms> 
+
+              <app-forms formtitle="Add Key">
+
+                <!-- ADD KEY FORM --> <!--method="post" action="/form/handler" -->
+                <form is="iron-form" id="form3"> 
+                  <paper-input name="name" label="name" error-message="Invalid input!"></paper-input>
+                  <paper-textarea name="pubkey" label="public key"></paper-textarea>
+                  <paper-textarea name="privkey" label="private key"></paper-textarea>
+                  <hr/>
+                  <paper-button onclick="generateKey()">generate</paper-button>   
+                  <paper-button onclick="submitForm()">add key</paper-button>                     
+                </form>
+
+              </app-forms> 
             </div>
 
             <div id="app-notifications-demo">
               <h3>app-notifications</h3>
-              <app-notifications></app-notifications>
+              <app-notifications>app-notifications</app-notifications>
             </div>  
             
           </div>
@@ -345,7 +421,7 @@ app-incidents {
 <script>
     Polymer({
       is: 'page-elements',
-      enableCustomStyleProperties: true,
+      enableCustomStyleProperties: false,
       tag: {String, value:""},
 
       _sectionLink: function(name) {
