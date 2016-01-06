@@ -1,70 +1,64 @@
 paper-header-panel {
-  background: rgb(245, 245, 245);
+    background: rgb(245, 245, 245);
 }
-
 span.cloud-title {
-  bottom: -2px;
-  position: relative;
+    bottom: -2px;
+    position: relative;
 }
-
 paper-header-panel .fit.style-scope.page-dashboard {
-  max-width: 1100px;
-  margin: 0 auto;
+    max-width: 1100px;
+    margin: 0 auto;
 }
-
+paper-header-panel {
+    --paper-header-panel-shadow: {
+        height: 6px;
+        bottom: -6px;
+        box-shadow: inset 0px 2px 6px -3px rgba(0, 0, 0, 0.4);
+    }
+}
 .pad {
-  padding: 8px;
+    padding: 8px;
 }
-
 app-incidents {
-  margin: 0 0 0 8px;
-  width: 39.3%;
+    margin: 0 0 0 8px;
+    width: 39.3%;
 }
-
 google-chart {
-  height: 300px;
-  width: 50em;
+    height: 300px;
+    width: 50em;
 }
-
 .clouds {
-  display: inline;
+    display: inline;
 }
-
 .content {
-  display: block;
-  padding: 50px 0;
+    display: block;
+    padding: 50px 0;
 }
-
 a.main-section {
-  min-width: 200px;
-  margin: 8px;
+    min-width: 200px;
+    margin: 8px;
 }
-
 paper-button {
-  background-color: #fff;
-  margin: 0 0.5em 10px 10px;  
+    background-color: #fff;
+    margin: 0 0.5em 10px 10px;
 }
-
 paper-toolbar {
-  background-color: #fff;
+    background-color: #fff;
 }
-
 @media (max-width: 489px) {
-  a.main-section {
-    width: calc(100% - 16px);
-  }
+    a.main-section {
+        width: calc(100% - 16px);
+    }
 }
-
 .search.active {
-  left: 15px;
+    left: 15px;
 }
-
 @media (max-width: 639px) {
-  paper-toolbar /deep/ #topBar {
-    margin-top: 4px;
-    padding: 0 16px;
-  }
-  a.main-section:first-child {
-    min-width: calc(100% - 16px);
-  }
+    paper-toolbar /deep/ #topBar {
+        margin-top: 4px;
+        padding: 0 16px;
+    }
+    a.main-section:first-child {
+        min-width: calc(100% - 16px);
+    }
 }

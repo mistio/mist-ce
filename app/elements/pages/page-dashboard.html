@@ -5,111 +5,117 @@
 <link rel="import" href="../app-incidents/app-incidents.html">
 
 <dom-module id="page-dashboard">
-  <link rel="import" type="css" href="page-dashboard.css">
-  <template>
-    <paper-header-panel mode="seamed" class="fit">
-      <paper-toolbar class="paper-header">
-        <app-logo full class="flex"></app-logo>
-        <app-bar class="horizontal layout center end-justified" no-search></app-bar>
-        <paper-icon-button icon="account-circle"></paper-icon-button>
-      </paper-toolbar>
-      <div class="content fit">
-        <div class="clouds layout horizontal wrap">
-          <paper-fab icon="add">Add cloud</paper-fab>
-          <template is="dom-repeat" items="{{model.cloudsArray}}">
-              <paper-button>
-                <template is="dom-if" if="{{isOnline(item)}}">
-                  <iron-icon icon="check"></iron-icon>
-                </template>
-                <template is="dom-if" if="{{isOffline(item)}}">
-                  <iron-icon icon="clear"></iron-icon>
-                </template>
-              <span class="cloud-title">{{item.title}}</span>
-              </paper-button>
-          </template>
-      </div>
-      <div class="sections layout horizontal wrap">
-        <a href="/machines" class="main-section flex">
-          <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
-          </section-tile>
-        </a>
-        <a href="/images" class="main-section flex">
-          <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="{{model.imagesArray.length}}">
-          </section-tile>
-        </a>
-        <a href="/keys" class="main-section flex">
-          <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="{{model.keysArray.length}}">
-          </section-tile>
-        </a>
-        <a href="/networks" class="main-section flex">
-          <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="{{model.networksArray.length}}">
-          </section-tile>
-        </a>
-        <a href="/scripts" class="main-section flex">
-          <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="{{model.scriptsArray.length}}">
-          </section-tile>
-        </a>
-        <!-- <a href="/elements" class="main-section flex">
+    <link rel="import" type="css" href="page-dashboard.css">
+    <template>
+        <paper-header-panel mode="standard" class="fit">
+            <paper-toolbar class="paper-header">
+                <app-logo full class="flex"></app-logo>
+                <app-bar class="horizontal layout center end-justified" no-search></app-bar>
+                <paper-icon-button icon="account-circle"></paper-icon-button>
+            </paper-toolbar>
+            <div class="content fit">
+                <div class="clouds layout horizontal wrap">
+                    <paper-fab icon="add">Add cloud</paper-fab>
+                    <template is="dom-repeat" items="{{model.cloudsArray}}">
+                        <paper-button>
+                            <template is="dom-if" if="{{isOnline(item)}}">
+                                <iron-icon icon="check"></iron-icon>
+                            </template>
+                            <template is="dom-if" if="{{isOffline(item)}}">
+                                <iron-icon icon="clear"></iron-icon>
+                            </template>
+                            <span class="cloud-title">{{item.title}}</span>
+                        </paper-button>
+                    </template>
+                </div>
+                <div class="sections layout horizontal wrap">
+                    <a href="/machines" class="main-section flex">
+                        <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
+                        </section-tile>
+                    </a>
+                    <a href="/images" class="main-section flex">
+                        <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="{{model.imagesArray.length}}">
+                        </section-tile>
+                    </a>
+                    <a href="/keys" class="main-section flex">
+                        <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="{{model.keysArray.length}}">
+                        </section-tile>
+                    </a>
+                    <a href="/networks" class="main-section flex">
+                        <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="{{model.networksArray.length}}">
+                        </section-tile>
+                    </a>
+                    <a href="/scripts" class="main-section flex">
+                        <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="{{model.scriptsArray.length}}">
+                        </section-tile>
+                    </a>
+                    <!-- <a href="/elements" class="main-section flex">
           <section-tile name="elements" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="3">
           </section-tile>
         </a> -->
-      </div>
-      <div class="layout horizontal wrap pad">
-        <google-chart
-            id="mutating_gauge"
-            type="line"
-            data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]'
-            options='{"width": "650",
+                </div>
+                <div class="layout horizontal wrap pad">
+                    <google-chart id="mutating_gauge" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{"width": "650",
                       "height": 240,
                       "redFrom": 90,
                       "redTo": 100,
                       "yellowFrom": 75,
                       "yellowTo": 90,
                       "minorTicks": 5}'>
-        </google-chart>
+                    </google-chart>
 
-        <app-incidents></app-incidents>
-        
-      </div>
+                    <app-incidents></app-incidents>
 
-    </paper-header-panel>
-  </template>
+                </div>
+
+        </paper-header-panel>
+    </template>
 </dom-module>
 
 <script>
-  function getRandomGaugeValue(offset, factor) {
-    return offset + Math.round(factor * Math.random());
-  }
-
-  window.setInterval(function() {
-    var gauge = document.getElementById('mutating_gauge');
-
-    gauge.data = [["Label", "Value"],["Memory", getRandomGaugeValue(40, 60)],["CPU", getRandomGaugeValue(40, 60)],["Network", getRandomGaugeValue(60, 20)]];
-
-  }, 3000);
-
-  Polymer({
-    is: 'page-dashboard',
-    enableCustomStyleProperties: true,
-    properties: {
-        sections: {
-            type: Array
-        },
-        model: {
-            type: Object,
-            notify: true
-        },
-        q: { type: String, notify: true }
-    },
-    attached: function() {
-      // reset page title since this is the default page
-      this.fire('page-meta', {title: null});
-    },
-    isOnline: function(cloud) {
-      return cloud.state == 'online';
-    },
-    isOffline: function(cloud) {
-      return cloud.state == 'offline';
+    function getRandomGaugeValue(offset, factor) {
+        return offset + Math.round(factor * Math.random());
     }
-  });
+
+    window.setInterval(function() {
+        var gauge = document.getElementById('mutating_gauge');
+
+        gauge.data = [
+            ["Label", "Value"],
+            ["Memory", getRandomGaugeValue(40, 60)],
+            ["CPU", getRandomGaugeValue(40, 60)],
+            ["Network", getRandomGaugeValue(60, 20)]
+        ];
+
+    }, 3000);
+
+    Polymer({
+        is: 'page-dashboard',
+        enableCustomStyleProperties: true,
+        properties: {
+            sections: {
+                type: Array
+            },
+            model: {
+                type: Object,
+                notify: true
+            },
+            q: {
+                type: String,
+                notify: true
+            }
+        },
+        attached: function() {
+            // reset page title since this is the default page
+            this.fire('page-meta', {
+                title: null
+            });
+        },
+        isOnline: function(cloud) {
+            return cloud.state == 'online';
+        },
+        isOffline: function(cloud) {
+            return cloud.state == 'offline';
+        }
+    });
 </script>
