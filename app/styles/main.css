@@ -183,7 +183,7 @@ aside {
 }
 paper-material {
   background-color: #fff;
-  padding: 20px;
+  /*padding: 20px;*/
 }
 paper-button {
   font-size: 14px;

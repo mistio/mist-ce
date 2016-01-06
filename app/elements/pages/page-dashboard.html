@@ -1,8 +1,8 @@
 <link rel="import" href="../../bower_components/google-chart/google-chart.html">
 <link rel="import" href="../section-tile/section-tile.html">
-<!-- <link rel="import" href="../section-incidents/section-incidents.html"> -->
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
+<link rel="import" href="../app-forms/app-forms.html">
 
 <dom-module id="page-dashboard">
   <link rel="import" type="css" href="page-dashboard.css">
@@ -49,11 +49,12 @@
           <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="{{model.scriptsArray.length}}">
           </section-tile>
         </a>
-        <!-- <a href="/elements" class="main-section flex">
-          <section-tile name="elements" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="3">
+        <a href="/elements" class="main-section flex">
+          <section-tile name="elements" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="6">
           </section-tile>
-        </a> -->
+        </a>
       </div>
+      
       <div class="layout horizontal wrap pad">
         <google-chart
             id="mutating_gauge"
