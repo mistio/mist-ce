@@ -3,7 +3,6 @@
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 
 <link rel="import" href="../section-symbol/section-symbol.html">
-<link rel="import" href="../tag-link/tag-link.html">
 <link rel="import" href="../theme-color/theme-color.html">
 <link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../element-table/element-table.html">
@@ -240,12 +239,16 @@ app-incidents {
   width: 50%;
 }
 
+#current-tag {
+  display: none;
+}
+
   </style>
 
   <template>
       <app-socket model="{{model}}"></app-socket>
       <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
-         <app-sidebar drawer>
+         <app-sidebar tag="" drawer>
           <div class="content">
             <div id="section-list">
               <nav>
@@ -343,6 +346,7 @@ app-incidents {
     Polymer({
       is: 'page-elements',
       enableCustomStyleProperties: true,
+      tag: {String, value:""},
 
       _sectionLink: function(name) {
         return '/' + name;

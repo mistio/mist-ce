@@ -1,3 +1,10 @@
+<link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../section-symbol/section-symbol.html">
+<link rel="import" href="../tag-link/tag-link.html">
+<link rel="import" href="../theme-color/theme-color.html">
+
 <style is="custom-style">
   :root {
     --app-sidebar-width: 272px;
@@ -8,13 +15,51 @@
 <dom-module id="app-sidebar">
   <link rel="import" type="css" href="app-sidebar.css">
   <template>
-    <content></content>
+    <app-socket model="{{model}}"></app-socket>
+    <div class="content">
+        <div id="section-tag" hidden$="[[!tag]]">
+          <span>[[tag]]</span> <iron-icon icon="clear" on-tap="clearTag"></iron-icon>
+        </div>
+        <div id="section-list">
+          <nav>
+            <a href="/?poly=1" is="pushstate-anchor" class="section" tabindex="1">
+              <div class="layout horizontal center">
+                <div class="all-symbol" aria-hidden="true"><iron-icon icon="apps"></iron-icon></div>
+                <span class="title flex">dashboard</span>
+              </div>
+            </a>
+            <template is="dom-repeat" items="[[sections]]">
+              <a class="section" is="pushstate-anchor" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(current,item.id)]]" tabindex="1">
+                <div class="layout horizontal center">
+                    <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
+                    <span class="title flex">[[item.id]]</span>
+                </div>
+              </a>
+            </template>
+            <a href="/elements" class="section flex">
+              <div class="layout horizontal center">
+                _elements
+              </div>
+            </a>
+          </nav>
+        </div>
+        <div hidden$="[[!tag]]" id="current-tag" class="horizontal layout center">
+          <b>Tag:</b> <span class="flex">[[tag]]</span> <iron-icon icon="clear" on-tap="clearTag"></iron-icon>
+        </div>
+      </div>
   </template>
 </dom-module>
 
 <script>
   Polymer({
     is: 'app-sidebar',
-    enableCustomStyleProperties: true
+    enableCustomStyleProperties: true,
+    current: String,
+    _sectionLink: function(name) {
+      return '/' + name;
+    },
+    _isEqual: function(a,b) {
+      return a === b;
+    },
   });
 </script>

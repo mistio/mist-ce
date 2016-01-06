@@ -19,28 +19,7 @@
   <template>
       <app-socket model="{{model}}"></app-socket>
       <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
-        <app-sidebar drawer>
-          <div class="content">
-            <div id="section-list">
-              <nav>
-                <a href="/?poly=1" is="pushstate-anchor" class="section" tabindex="1">
-                  <div class="layout horizontal center">
-                    <div class="all-symbol" aria-hidden="true"><iron-icon icon="apps"></iron-icon></div>
-                    <span class="title flex">dashboard</span>
-                  </div>
-                </a>
-                <template is="dom-repeat" items="[[sections]]">
-                  <a class="section" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(section.id,item.id)]]" tabindex="1">
-                    <div class="layout horizontal center">
-                        <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
-                        <span class="title flex">[[item.id]]</span>
-                    </div>
-                  </a>
-                </template>
-              </nav>
-            </div>
-          </div>
-        </app-sidebar>
+        <app-sidebar tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
