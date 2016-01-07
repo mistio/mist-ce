@@ -12,7 +12,7 @@
             <paper-toolbar class="paper-header">
                 <app-logo full class="flex"></app-logo>
                 <app-bar class="horizontal layout center end-justified" no-search></app-bar>
-                <app-user-menu></app-user-menu>
+                <app-user-menu email="marios@mist.io"></app-user-menu>
             </paper-toolbar>
             <div class="content fit">
                 <div class="clouds layout horizontal wrap">
@@ -30,10 +30,13 @@
                     </template>
                 </div>
                 <div class="sections layout horizontal wrap">
-                    <a href="/machines" class="main-section flex">
-                        <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
-                        </section-tile>
-                    </a>
+                    <paper-button class="main-section flex" raised>
+                        <a href="/machines">
+                            <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
+                            </section-tile>
+                        </a>
+                    </paper-button>
+
                     <a href="/images" class="main-section flex">
                         <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="{{model.imagesArray.length}}">
                         </section-tile>

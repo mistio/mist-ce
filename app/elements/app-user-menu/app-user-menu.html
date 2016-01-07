@@ -10,7 +10,7 @@
 	<template>
 
 		<paper-menu-button horizontal-align="right">
-			<paper-icon-button icon="account-circle" class="dropdown-trigger"></paper-icon-button>
+			<paper-icon-button src="[[gravatar]]" class="gravatar dropdown-trigger"></paper-icon-button>
 			<paper-menu class="dropdown-content">
 				<paper-item>
 					<a href="http://docs.mist.io/contact" target="_blank" class="flex">
@@ -34,11 +34,34 @@
 	</template>
 </dom-module>
 
+<script type="text/javascript" src="../../bower_components/md5/build/md5.min.js"></script>
+
 <script>
 	Polymer({
 		is: 'app-user-menu',
 		properties: {
+			email: {
+				type: String,
+				value: null
+			},
+			size: {
+				type: Number,
+				value: 40
+			},
+			placeholder: {
+				type: String,
+				value: 'http://findicons.com/files/icons/1072/face_avatars/300/i04.png'
+			},
+			gravatar: {
+				type: String,
+				computed: 'computeGravatar(email, size)'
+			}
+		},
+		computeGravatar: function(email, size) {
+			var avatarString = md5(email),
+				url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + this.placeholder;
 
+			return url;
 		}
 	});
 </script>
