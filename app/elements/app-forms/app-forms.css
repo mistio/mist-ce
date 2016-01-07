@@ -1,26 +1,20 @@
 :host {
-	margin: 16px;
+	padding: 16px;
 	display: block;
+	/*custom css color variables*/
+  	--mist-blue: #0099cc;
 }
-:host paper-card {
-	min-width: 100%;
+:host paper-material {
+	padding: 16px;
 }
-:host paper-card .card-content {
-	padding-bottom: 10px;
-}
-#close-this-form {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-}
-::content form > paper-button {
+::content form paper-button {
 	background-color: #0099cc;
   	color: #fff;
   	margin: 8px 0;
   	padding: 0.7em 1.7em;
 }
-::content form > paper-button > * {
-  color: #fff;
+::content form paper-button > * {
+   color: #fff;
 }
 ::content hr {
 	height: 0;
@@ -29,3 +23,16 @@
     background: transparent;
     border-width: 0 0 1px 0;
 }
+paper-material > h3 {
+	margin: 0;
+}
+#close-this-form {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+/*::content paper-menu.dropdown-content paper-button {
+	color: var(--mist-blue);
+	margin: 0;
+	padding: 0;
+}*/

@@ -363,7 +363,7 @@ app-incidents {
                       <paper-item>Openstack</paper-item> 
                       <paper-item>Linode</paper-item> 
                     </paper-menu>
-                  </paper-dropdown-menu>
+                  </paper-dropdown-menu>                  
                   <hr/>
                   <paper-button onclick="submitForm()">add cloud</paper-button>   
                 </form>
@@ -375,13 +375,38 @@ app-incidents {
                 <!-- ADD MACHINE FORM --> <!--method="post" action="/form/handler" -->
                 <form is="iron-form" id="form2"> 
                   <paper-input name="name" label="name" error-message="Invalid input!"></paper-input>
+                  <!-- a dom repeat here with supported providers -->
                   <paper-dropdown-menu label="Provider">
-                    <paper-menu class="dropdown-content">
-                      <!-- a dom repeat here with supported providers -->
+                    <paper-menu class="dropdown-content">                      
                       <paper-item>EC2</paper-item> 
                       <paper-item>Docker</paper-item> 
                       <paper-item>Openstack</paper-item> 
                       <paper-item>Linode</paper-item> 
+                    </paper-menu>
+                  </paper-dropdown-menu>
+                  <!-- a dom repeat here with supported images -->
+                  <paper-dropdown-menu label="Image">
+                    <paper-menu class="dropdown-content">
+                      <paper-item>CoreOS</paper-item> 
+                      <paper-item>Centos 7</paper-item> 
+                      <paper-item>Debian Jessie 7</paper-item> 
+                      <paper-item>Ubuntu 14.04</paper-item> 
+                    </paper-menu>
+                  </paper-dropdown-menu>
+                  <!-- a dom repeat here with supported sizes -->
+                  <paper-dropdown-menu label="Size">
+                    <paper-menu class="dropdown-content">                      
+                      <paper-item>small</paper-item> 
+                      <paper-item>medium</paper-item> 
+                      <paper-item>large</paper-item> 
+                    </paper-menu>
+                  </paper-dropdown-menu>
+                  <!-- a dom repeat here with available keys -->
+                  <paper-dropdown-menu label="Key">
+                    <paper-menu class="dropdown-content">                      
+                      <paper-item>my key</paper-item> 
+                      <paper-item>my other key</paper-item> 
+                      <paper-item><paper-button>add key</paper-button></paper-item>
                     </paper-menu>
                   </paper-dropdown-menu>
                   <hr/>
@@ -399,7 +424,7 @@ app-incidents {
                   <paper-textarea name="privkey" label="private key"></paper-textarea>
                   <hr/>
                   <paper-button onclick="generateKey()">generate</paper-button>   
-                  <paper-button onclick="submitForm()">add key</paper-button>                     
+                  <paper-button onclick="submitForm()" disabled>add key</paper-button>                     
                 </form>
 
               </app-forms> 

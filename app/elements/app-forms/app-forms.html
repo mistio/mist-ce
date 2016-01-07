@@ -19,15 +19,16 @@
   <link rel="import" type="css" href="app-forms.css">        
   <template>    
 
-    <paper-card heading="{{formtitle}}"> <!-- form title -->
+    <paper-material> <!-- form title -->
+      <h3>{{formtitle}}</h3>
       <paper-icon-button id="close-this-form" suffix icon="clear"></paper-icon-button>
-      <div class="card-content">
+      <!-- <div class="card-content"> -->
 
         <!-- in <content> comes what <app-forms> tag has inside when called -->
         <content></content>
 
-      </div>
-    </paper-card>
+      <!-- </div> -->
+    </paper-material>
 
   </template>
 </dom-module>
