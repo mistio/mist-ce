@@ -3,21 +3,22 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 
 <dom-module id="page-dashboard">
     <link rel="import" type="css" href="page-dashboard.css">
     <template>
-        <paper-header-panel mode="seamed" class="fit">
+        <paper-header-panel mode="standard" class="fit">
             <paper-toolbar class="paper-header">
                 <app-logo full class="flex"></app-logo>
                 <app-bar class="horizontal layout center end-justified" no-search></app-bar>
-                <paper-icon-button icon="account-circle"></paper-icon-button>
+                <app-user-menu></app-user-menu>
             </paper-toolbar>
             <div class="content fit">
                 <div class="clouds layout horizontal wrap">
                     <paper-fab icon="add">Add cloud</paper-fab>
                     <template is="dom-repeat" items="{{model.cloudsArray}}">
-                        <paper-button>
+                        <paper-button raised>
                             <template is="dom-if" if="{{isOnline(item)}}">
                                 <iron-icon icon="check"></iron-icon>
                             </template>

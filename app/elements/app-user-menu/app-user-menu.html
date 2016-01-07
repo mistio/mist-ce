@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+
+<dom-module id="app-user-menu">
+	<link rel="import" type="css" href="app-user-menu.css">
+	<template>
+
+		<paper-menu-button horizontal-align="right">
+			<paper-icon-button icon="account-circle" class="dropdown-trigger"></paper-icon-button>
+			<paper-menu class="dropdown-content">
+				<paper-item>
+					<a href="http://docs.mist.io/contact" target="_blank" class="flex">
+						<iron-icon class="user-menu-icon" icon="question-answer"></iron-icon> Support</a>
+				</paper-item>
+				<paper-item>
+					<a href="http://docs.mist.io/" target="_blank" class="flex">
+						<iron-icon class="user-menu-icon" icon="description"></iron-icon> Docs</a>
+				</paper-item>
+				<paper-item>
+					<a href="/" class="flex">
+						<iron-icon class="user-menu-icon" icon="account-circle"></iron-icon> Account</a>
+				</paper-item>
+				<paper-item>
+					<a href="/" class="flex">
+						<iron-icon class="user-menu-icon" icon="power-settings-new"></iron-icon> Logout</a>
+				</paper-item>
+			</paper-menu>
+		</paper-menu-button>
+
+	</template>
+</dom-module>
+
+<script>
+	Polymer({
+		is: 'app-user-menu',
+		properties: {
+
+		}
+	});
+</script>
