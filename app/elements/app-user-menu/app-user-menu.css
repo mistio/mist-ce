@@ -1,0 +1,15 @@
+.user-menu-icon {
+    --iron-icon-height: 18px;
+    --iron-icon-width: 18px;
+}
+
+paper-item {
+    --paper-menu-focused-item {
+        background-color: #fff;
+    }
+}
+
+paper-icon-button.gravatar {
+    border-radius: 50%;
+    border: 2px solid #212121;
+}
