@@ -30,12 +30,10 @@
                     </template>
                 </div>
                 <div class="sections layout horizontal wrap">
-                    <paper-button class="main-section flex" raised>
-                        <a href="/machines">
-                            <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
-                            </section-tile>
-                        </a>
-                    </paper-button>
+                    <a href="/machines" class="main-section flex">
+                        <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
+                        </section-tile>
+                    </a>
 
                     <a href="/images" class="main-section flex">
                         <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="{{model.imagesArray.length}}">
