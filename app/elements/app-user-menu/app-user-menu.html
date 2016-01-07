@@ -21,7 +21,7 @@
                         <iron-icon class="user-menu-icon" icon="description"></iron-icon> Docs</a>
                 </paper-item>
                 <paper-item>
-                    <a href="/" class="flex">
+                    <a href="/account" class="flex">
                         <iron-icon class="user-menu-icon" icon="account-circle"></iron-icon> Account</a>
                 </paper-item>
                 <paper-item>
@@ -41,8 +41,7 @@
         is: 'app-user-menu',
         properties: {
             email: {
-                type: String,
-                value: null
+                type: String
             },
             size: {
                 type: Number,
@@ -56,10 +55,10 @@
             },
             gravatar: {
                 type: String,
-                computed: 'computeGravatar(email, size, placeholder)'
+                computed: '_computeGravatar(email, size, placeholder)'
             }
         },
-        computeGravatar: function(email, size, placeholder) {
+        _computeGravatar: function(email, size, placeholder) {
             var avatarString = md5(email),
                 url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + placeholder;
 

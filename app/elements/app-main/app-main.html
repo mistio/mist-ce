@@ -1,11 +1,10 @@
-
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/image-icons.html">
 
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../../bower_components/iron-routes/iron-routes.html"/>
+<link rel="import" href="../../bower_components/iron-routes/iron-routes.html" />
 
 <link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
 
@@ -29,131 +28,163 @@
 <link rel="import" href="../pages/page-list.html">
 <link rel="import" href="../pages/page-machine.html">
 <link rel="import" href="../pages/page-elements.html">
+<link rel="import" href="../pages/page-account.html">
 <link rel="import" href="../pages/page-not-found.html">
 
 <dom-module id="app-main">
-  <style>
-    paper-toast {
-      z-index: 5;
-    }
-  </style>
-  <template>
-    <app-socket model="{{model}}"></app-socket>
+    <style>
+        paper-toast {
+            z-index: 5;
+        }
+    </style>
+    <template>
+        <app-socket model="{{model}}"></app-socket>
 
-    <iron-routes for="app-main" selected="{{section}}">
-      <iron-route path="/" title=""></iron-route>
-      <iron-route path="/machines" title="machines"></iron-route>
-      <iron-route path="/machines/:uuid" title="machine"></iron-route>
-      <iron-route path="/images" title="images"></iron-route>
-      <iron-route path="/keys" title="keys"></iron-route>
-      <iron-route path="/networks" title="networks"></iron-route>
-      <iron-route path="/scripts" title="scripts"></iron-route>
-      <iron-route path="/elements" title="elements"></iron-route>
-      <iron-route path="*"></iron-route>
-    </iron-routes>
+        <iron-routes for="app-main" selected="{{section}}">
+            <iron-route path="/" title=""></iron-route>
+            <iron-route path="/machines" title="machines"></iron-route>
+            <iron-route path="/machines/:uuid" title="machine"></iron-route>
+            <iron-route path="/images" title="images"></iron-route>
+            <iron-route path="/keys" title="keys"></iron-route>
+            <iron-route path="/networks" title="networks"></iron-route>
+            <iron-route path="/scripts" title="scripts"></iron-route>
+            <iron-route path="/elements" title="elements"></iron-route>
+            <iron-route path="/account" title="account"></iron-route>
+            <iron-route path="*"></iron-route>
+        </iron-routes>
 
-    <iron-pages id="app-main">
-      <section><page-dashboard model="{{model}}" sections="[[sections]]"><title>Dashboard</title></page-dashboard></section>
-      <section><page-list model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]"></page-list></section>
-      <section id="machines" params="{{params}}">
-        <page-machine params="{{params}}" model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]">
-        </page-machine>
-      </section>
-      <section><page-list model="{{model}}" elements="{{model.imagesArray}}" sections="[[sectionsArray]]" section="[[sections.images]]"></page-list></section>
-      <section><page-list model="{{model}}" elements="{{model.keysArray}}" sections="[[sectionsArray]]" section="[[sections.keys]]"></page-list></section>
-      <section><page-list model="{{model}}" elements="{{model.networksArray}}" sections="[[sectionsArray]]" section="[[sections.networks]]"></page-list></section>
-      <section><page-list model="{{model}}" sections="[[sectionsArray]]" section="[[sections.scripts]]"></page-list></section>
-      <section><page-elements></page-elements></section>
-      <section><page-not-found></page-not-found></section>
-    </iron-pages>
-  </template>
+        <iron-pages id="app-main">
+            <section>
+                <page-dashboard model="{{model}}" sections="[[sections]]">
+                    <title>Dashboard</title>
+                </page-dashboard>
+            </section>
+            <section>
+                <page-list model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]"></page-list>
+            </section>
+            <section id="machines" params="{{params}}">
+                <page-machine params="{{params}}" model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]">
+                </page-machine>
+            </section>
+            <section>
+                <page-list model="{{model}}" elements="{{model.imagesArray}}" sections="[[sectionsArray]]" section="[[sections.images]]"></page-list>
+            </section>
+            <section>
+                <page-list model="{{model}}" elements="{{model.keysArray}}" sections="[[sectionsArray]]" section="[[sections.keys]]"></page-list>
+            </section>
+            <section>
+                <page-list model="{{model}}" elements="{{model.networksArray}}" sections="[[sectionsArray]]" section="[[sections.networks]]"></page-list>
+            </section>
+            <section>
+                <page-list model="{{model}}" sections="[[sectionsArray]]" section="[[sections.scripts]]"></page-list>
+            </section>
+            <section>
+                <page-elements></page-elements>
+            </section>
+            <section>
+                <page-account></page-account>
+            </section>
+            <section>
+                <page-not-found></page-not-found>
+            </section>
+        </iron-pages>
+    </template>
 </dom-module>
 <script>
-  var app = Polymer({
-    is: 'app-main',
-    properties: {
-        model: {
-            type: Object,
-            notify: true
+    var app = Polymer({
+        is: 'app-main',
+        properties: {
+            model: {
+                type: Object,
+                notify: true
+            },
+            sections: {
+                type: Object
+            },
+            sectionsArray: {
+                type: Array
+            }
         },
-        sections: {
-          type: Object
+        listeners: {
+            'iron-activate': 'updateDocTitle',
+            'page-meta': 'updateTitle',
+            'toast': 'showToast'
         },
-        sectionsArray: {
-          type: Array
+        _toast: null,
+        ready: function() {
+            this.model = {
+                cloudsArray: [],
+                scriptsArray: [],
+                imagesArray: [],
+                networksArray: [],
+                pending: {
+                    clouds: true,
+                    monitoring: true
+                }
+            };
+            this.sectionsArray = [{
+                    id: 'machines',
+                    color: '#8c76d1',
+                    icon: 'hardware:computer'
+                }, {
+                    id: 'images',
+                    color: '#0099cc',
+                    icon: 'image:photo'
+                }, {
+                    id: 'keys',
+                    color: '#009688',
+                    icon: 'communication:vpn-key'
+                }, {
+                    id: 'networks',
+                    color: '#795548',
+                    icon: 'hardware:device-hub'
+                }, {
+                    id: 'scripts',
+                    color: '#D48900',
+                    icon: 'image:movie-creation'
+                }
+                /*,
+                          {id: 'templates',
+                          color: '',
+                          icon: 'device:widgets'}*/
+            ];
+            this.sections = _generateMap(this.sectionsArray);
+        },
+        attributeChanged: function(attrName, oldVal, newVal) {
+            console.warn('attrChanged', attrName, oldVal, newVal);
+        },
+        updateTitle: function(_, detail) {
+            if (detail.title && detail.title.length) {
+                document.title = detail.title + " - mist.io";
+            } else {
+                document.title = "mist.io";
+            }
+        },
+        updateDocTitle: function(e, details) {
+            if (details.item.title && details.item.title.length) {
+                document.title = details.item.title + " - mist.io";
+            } else {
+                document.title = "mist.io";
+            }
+        },
+        showToast: function(e, detail) {
+            if (!this._toast) {
+                this._toast = document.createElement('paper-toast');
+                Polymer.dom(this.$.router).appendChild(this._toast);
+            }
+            this._toast.text = detail.text;
+            this.async(this._toast.show.bind(this._toast), 1);
+        },
+        trackPageview: function(e, detail) {
+            return;
+            this.debounce('pageview', function() {
+                var loc = window.location.pathname + window.location.search;
+                ga('send', 'pageview', {
+                    location: loc,
+                    title: document.title
+                });
+                ga('set', 'page', loc);
+            }, 2000);
         }
-    },
-    listeners: {
-      'iron-activate': 'updateDocTitle',
-      'page-meta': 'updateTitle',
-      'toast': 'showToast'
-    },
-    _toast: null,
-    ready: function() {
-        this.model = {cloudsArray: [],
-                      scriptsArray: [],
-                      imagesArray: [],
-                      networksArray: [],
-                      pending: {clouds: true,
-                                monitoring: true}
-                     };
-        this.sectionsArray = [
-          {id: 'machines',
-          color: '#8c76d1',
-          icon: 'hardware:computer'},
-          {id: 'images',
-          color: '#0099cc',
-          icon: 'image:photo'},
-          {id: 'keys',
-          color: '#009688',
-          icon: 'communication:vpn-key'},
-          {id: 'networks',
-          color: '#795548',
-          icon: 'hardware:device-hub'},
-          {id: 'scripts',
-          color: '#D48900',
-          icon: 'image:movie-creation'}/*,
-          {id: 'templates',
-          color: '',
-          icon: 'device:widgets'}*/
-        ];
-        this.sections = _generateMap(this.sectionsArray);
-    },
-    attributeChanged: function (attrName, oldVal, newVal) {
-        console.warn('attrChanged', attrName, oldVal, newVal);
-    },
-    updateTitle: function(_, detail) {
-      if (detail.title && detail.title.length) {
-        document.title = detail.title + " - mist.io";
-      } else {
-        document.title = "mist.io";
-      }
-    },
-    updateDocTitle: function(e, details) {
-      if ( details.item.title &&  details.item.title.length) {
-        document.title =  details.item.title + " - mist.io";
-      } else {
-        document.title = "mist.io";
-      }
-    },
-    showToast: function(e, detail) {
-      if (!this._toast) {
-        this._toast = document.createElement('paper-toast');
-        Polymer.dom(this.$.router).appendChild(this._toast);
-      }
-      this._toast.text = detail.text;
-      this.async(this._toast.show.bind(this._toast), 1);
-    },
-    trackPageview: function(e, detail) {
-      return;
-      this.debounce('pageview', function() {
-        var loc = window.location.pathname + window.location.search;
-        ga('send', 'pageview', {
-          location: loc,
-          title: document.title
-        });
-        ga('set', 'page', loc);
-      }, 2000);
-    }
-  });
+    });
 </script>
