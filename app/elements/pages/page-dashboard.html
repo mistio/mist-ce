@@ -9,67 +9,72 @@
     <link rel="import" type="css" href="page-dashboard.css">
     <template>
         <paper-header-panel mode="standard" class="fit">
-            <paper-toolbar class="paper-header">
-                <app-logo full class="flex"></app-logo>
-                <app-bar class="horizontal layout center end-justified" no-search></app-bar>
-                <app-user-menu email="marios@mist.io"></app-user-menu>
-            </paper-toolbar>
-            <div class="content fit">
-                <div class="clouds layout horizontal wrap">
-                    <paper-fab icon="add">Add cloud</paper-fab>
-                    <template is="dom-repeat" items="{{model.cloudsArray}}">
-                        <paper-button raised>
-                            <template is="dom-if" if="{{isOnline(item)}}">
-                                <iron-icon icon="check"></iron-icon>
-                            </template>
-                            <template is="dom-if" if="{{isOffline(item)}}">
-                                <iron-icon icon="clear"></iron-icon>
-                            </template>
-                            <span class="cloud-title">{{item.title}}</span>
-                        </paper-button>
-                    </template>
-                </div>
-                <div class="sections layout horizontal wrap">
-                    <a href="/machines" class="main-section flex">
-                        <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
-                        </section-tile>
-                    </a>
-
-                    <a href="/images" class="main-section flex">
-                        <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="{{model.imagesArray.length}}">
-                        </section-tile>
-                    </a>
-                    <a href="/keys" class="main-section flex">
-                        <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="{{model.keysArray.length}}">
-                        </section-tile>
-                    </a>
-                    <a href="/networks" class="main-section flex">
-                        <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="{{model.networksArray.length}}">
-                        </section-tile>
-                    </a>
-                    <a href="/scripts" class="main-section flex">
-                        <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="{{model.scriptsArray.length}}">
-                        </section-tile>
-                    </a>
-                    <a href="/elements" class="main-section flex">
-                        <section-tile name="elements" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="6">
-                        </section-tile>
-                    </a>
-                </div>
-                <div class="layout horizontal wrap pad">
-                    <google-chart id="mutating_gauge" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{"width": "650",
-                      "height": 240,
-                      "redFrom": 90,
-                      "redTo": 100,
-                      "yellowFrom": 75,
-                      "yellowTo": 90,
-                      "minorTicks": 5}'>
-                    </google-chart>
-
+          <paper-toolbar class="paper-header">
+              <app-logo full class="flex"></app-logo>
+              <app-bar class="horizontal layout center end-justified" no-search></app-bar>
+              <app-user-menu email="marios@mist.io"></app-user-menu>
+          </paper-toolbar>
+          <div class="content">
+            <!--  -->
+            <div class="clouds">
+              <paper-fab icon="add">Add cloud</paper-fab>
+              <template is="dom-repeat" items="{{model.cloudsArray}}">
+                  <paper-button raised>
+                      <template is="dom-if" if="{{isOnline(item)}}">
+                          <iron-icon icon="check"></iron-icon>
+                      </template>
+                      <template is="dom-if" if="{{isOffline(item)}}">
+                          <iron-icon icon="clear"></iron-icon>
+                      </template>
+                      <span class="cloud-title">{{item.title}}</span>
+                  </paper-button>
+              </template>
+              <paper-button raised><a href="/machines/674595f7b18cb6ef30a2119b9e083a8526a2f169">elements</a></paper-button>
+            </div>
+            <div class="container flex-horizontal-with-ratios">
+              <div class="flex2child top right">
+                <div class="incidents">
                     <app-incidents></app-incidents>
-
                 </div>
-
+              </div>
+              <div class="flex3child top left">                  
+                  <div class="sections layout horizontal wrap">
+                      <a href="/machines" class="main-section flex">
+                          <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
+                          </section-tile>
+                      </a>
+                      <a href="/images" class="main-section flex">
+                          <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="{{model.imagesArray.length}}">
+                          </section-tile>
+                      </a>
+                      <a href="/keys" class="main-section flex">
+                          <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="{{model.keysArray.length}}">
+                          </section-tile>
+                      </a>
+                      <a href="/networks" class="main-section flex">
+                          <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="{{model.networksArray.length}}">
+                          </section-tile>
+                      </a>
+                      <a href="/scripts" class="main-section flex">
+                          <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="{{model.scriptsArray.length}}">
+                          </section-tile>
+                      </a>
+                  </div>
+              </div>
+              
+            </div>
+            <div class="bottom full">
+              <div class="graphs">
+               <google-chart id="mutating_gauge" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{"width": "650",
+                  "height": 240,
+                  "redFrom": 90,
+                  "redTo": 100,
+                  "yellowFrom": 75,
+                  "yellowTo": 90,
+                  "minorTicks": 5}'>
+                </google-chart>
+              </div>
+            </div>            
         </paper-header-panel>
     </template>
 </dom-module>

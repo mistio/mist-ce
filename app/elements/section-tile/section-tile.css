@@ -83,10 +83,6 @@ h3 {
   line-height: 28px;
 }
 
-.title[extended] {
-  display: block;
-}
-
 .tagline {
   transition: all 700ms 320ms;
   transition-timing-function: var(--material-curve-320);
@@ -101,4 +97,10 @@ h3 {
 :host(.active) .tagline {
   transform: translate(0, 0);
   opacity: 1;
+}
+
+@media (max-width: 439px) {
+    .sections {
+        @apply(--layout-vertical);
+    }
 }
