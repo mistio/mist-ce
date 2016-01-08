@@ -15,7 +15,6 @@
               <app-user-menu email="marios@mist.io"></app-user-menu>
           </paper-toolbar>
           <div class="content">
-            <!--  -->
             <div class="clouds">
               <paper-fab icon="add">Add cloud</paper-fab>
               <template is="dom-repeat" items="{{model.cloudsArray}}">
@@ -32,12 +31,8 @@
               <paper-button raised><a href="/machines/674595f7b18cb6ef30a2119b9e083a8526a2f169">elements</a></paper-button>
             </div>
             <div class="container flex-horizontal-with-ratios">
-              <div class="flex2child top right">
-                <div class="incidents">
-                    <app-incidents></app-incidents>
-                </div>
-              </div>
-              <div class="flex3child top left">                  
+              <app-incidents class="flex2child incidents"></app-incidents>
+              <div class="flex3child top left">
                   <div class="sections layout horizontal wrap">
                       <a href="/machines" class="main-section flex">
                           <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
@@ -65,16 +60,18 @@
             </div>
             <div class="bottom full">
               <div class="graphs">
-               <google-chart id="mutating_gauge" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{"width": "650",
-                  "height": 240,
-                  "redFrom": 90,
-                  "redTo": 100,
-                  "yellowFrom": 75,
-                  "yellowTo": 90,
-                  "minorTicks": 5}'>
-                </google-chart>
+                <paper-material>
+                  <h3>Load on all monitored machines</h3>
+                  <google-chart id="mutating_gauge" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
+                    "redFrom": 90,
+                    "redTo": 100,
+                    "yellowFrom": 75,
+                    "yellowTo": 90,
+                    "minorTicks": 5}'>
+                  </google-chart>
+                </paper-material>
               </div>
-            </div>            
+            </div>
         </paper-header-panel>
     </template>
 </dom-module>
@@ -86,7 +83,8 @@
 
     window.setInterval(function() {
         var gauge = document.getElementById('mutating_gauge');
-
+        var gauge2 = document.getElementById('mutating_gauge2');
+        gauge2.data =
         gauge.data = [
             ["Label", "Value"],
             ["Memory", getRandomGaugeValue(40, 60)],

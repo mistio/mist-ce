@@ -20,6 +20,7 @@ paper-header-panel {
 }
 .flex-horizontal-with-ratios {
     @apply(--layout-horizontal);
+    justify-content: stretch;
 }
 .flexchild {
     @apply(--layout-flex);
@@ -29,7 +30,7 @@ paper-header-panel {
     order: 2;
 }
 .flex3child {
-    @apply(--layout-flex-3);
+    @apply(--layout-flex-2);
     order: 1;
 }
 .pad {
@@ -55,17 +56,32 @@ paper-toolbar {
     margin: var(--layout-margin);
 }
 /* sections */
+.sections {
+    align-items:stretch;
+}
 a.main-section {
     min-width: 200px;
     margin: var(--layout-margin);
 }
 /* incidents */
 .incidents {
+    margin: var(--layout-margin);    
+    @apply(--layout-horizontal);
+    align-items:stretch;
+}
+/* graphs */
+.graphs {
     margin: var(--layout-margin);
+}
+.graphs paper-material {
+    padding: 1em;
+}
+.graphs h3, .graphs h6 {
+    text-align: center;
 }
 google-chart {
     height: 300px;
-    width: 50em;
+    width: 100%;
 }
 @media (max-width: 489px) {
     a.main-section {
