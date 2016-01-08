@@ -1,7 +1,9 @@
 :host {
   background: #fafafa;
 }
-
+:host #current-tag {
+  display: none;
+}
 a {
   color: black;
   text-decoration: none;
@@ -236,6 +238,8 @@ app-sidebar paper-toolbar {
 #section-list .section section-symbol, #section-list .section .all-symbol {
   margin-right: 15px;
 }
+
+
 
 #current-tag {
   background: #2196F3;

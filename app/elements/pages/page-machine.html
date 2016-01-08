@@ -56,7 +56,7 @@
         params: Object,
         sections: Array,
         section: {type: Object, notify: true, value: {}},
-        elements: Array
+        tag: {String, value: ""}
       },
       
       _sectionLink: function(name) {
@@ -64,22 +64,7 @@
       },
       
       ready: function() {
-        this.sectionsArray = [
-          {id: 'machines',
-          color: '#8c76d1',
-          icon: 'hardware:computer'},
-          {id: 'images',
-          color: '#0099cc',
-          icon: 'image:photo'},
-          {id: 'keys',
-          color: '#009688',
-          icon: 'communication:vpn-key'},
-          {id: 'networks',
-          color: '#795548',
-          icon: 'hardware:device-hub'},
-          {id: 'scripts',
-          color: '#D48900',
-          icon: 'image:movie-creation'}]
+
       },
       
       attached: function() {
