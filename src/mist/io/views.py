@@ -810,7 +810,7 @@ def update_monitoring(request):
             ret_dict = json.loads(ret.content)
             with user.lock_n_load():
                 user.email = email
-                user.mist_api_token = ret_dict.pop('mist_api_token', '')
+                user.mist_api_token = ret_dict.pop('token', '')
                 user.save()
             log.info("succesfully check_authed")
         else:
