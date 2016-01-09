@@ -73,11 +73,19 @@ a.main-section {
 .graphs {
     margin: var(--layout-margin);
 }
-.graphs paper-material {
-    padding: 1em;
-}
-.graphs h3, .graphs h6 {
+.graphs h6 {
     text-align: center;
+}
+.graphs h2 {
+    color: rgba(255,255,255,0.87);
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 1.5em;
+    background-color: slategray;
+    text-align: center;
+    padding: 0 0.5em;
+    margin: 0;
+    font-weight: 500;
 }
 google-chart {
     height: 300px;

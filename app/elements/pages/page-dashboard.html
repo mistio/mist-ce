@@ -31,8 +31,8 @@
               <paper-button raised><a href="/machines/674595f7b18cb6ef30a2119b9e083a8526a2f169">elements</a></paper-button>
             </div>
             <div class="container flex-horizontal-with-ratios">
-              <app-incidents class="flex2child incidents"></app-incidents>
-              <div class="flex3child top left">
+              <app-incidents id="right" class="flex2child incidents top right"></app-incidents>
+              <div id="left" class="flex3child top left">
                   <div class="sections layout horizontal wrap">
                       <a href="/machines" class="main-section flex">
                           <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
@@ -61,7 +61,7 @@
             <div class="bottom full">
               <div class="graphs">
                 <paper-material>
-                  <h3>Load on all monitored machines</h3>
+                  <h2>Load on all monitored machines</h2>
                   <google-chart id="mutating_gauge" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
                     "redFrom": 90,
                     "redTo": 100,
@@ -112,9 +112,7 @@
         },
         attached: function() {
             // reset page title since this is the default page
-            this.fire('page-meta', {
-                title: null
-            });
+            this.fire('page-meta', { title: null });            
         },
         isOnline: function(cloud) {
             return cloud.state == 'online';
