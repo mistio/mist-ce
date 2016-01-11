@@ -6,8 +6,6 @@ import logging
 import argparse
 import traceback
 
-from time import sleep
-
 import amqp
 
 import gevent
@@ -86,9 +84,10 @@ class AmqpGeventBase(object):
                     conn = self.conn
                 except:
                     i += 1
-                    if i > 5:
+                    log.error("Connecting to amqp has failed %d times.", i)
+                    if i > 50:
                         raise
-                    sleep(3)
+                    gevent.sleep(5)
                 else:
                     break
             log.debug("%s: Opening new AMQP channel.", self.lbl)
@@ -123,6 +122,7 @@ class AmqpGeventBase(object):
             log.error("%s: AMQP consumer exception %r, stopping.",
                       self.lbl, exc)
             self.close_chan()
+            self.close_conn()
 
     def parse_json_msg(self, msg):
         if msg.properties.get('content_type') == 'application/json':
@@ -187,12 +187,6 @@ class AmqpGeventBase(object):
         if self.stopped:
             log.warning("%s: Already stopped, can't stop again.", self.lbl)
             return
-        if self.greenlets:
-            log.debug("%s: Stopping all greenlets %s.",
-                      self.lbl, tuple(self.greenlets.keys()))
-            gevent.killall(self.greenlets.values())
-            gevent.joinall(self.greenlets.values())
-            self.greenlets.clear()
         log.debug("%s: Closing all AMQP channels.", self.lbl)
         for gid in self.chans.keys():
             try:
@@ -207,6 +201,12 @@ class AmqpGeventBase(object):
             except Exception as exc:
                 log.warning("%s: Closing AMQP connection exception %r.",
                             self.lbl, exc)
+        if self.greenlets:
+            log.debug("%s: Stopping all greenlets %s.",
+                      self.lbl, tuple(self.greenlets.keys()))
+            gevent.killall(self.greenlets.values())
+            gevent.joinall(self.greenlets.values())
+            self.greenlets.clear()
         self.stopped = True
 
     def __del__(self):
@@ -276,7 +276,8 @@ class HubServer(AmqpGeventBase):
         worker_cls = self.worker_cls[route_parts[2]]
         self.parse_json_msg(msg)
         correlation_id, reply_to = self.get_resp_details(msg)
-        worker = worker_cls(reply_to, correlation_id, msg.body, self.exchange)
+        worker = worker_cls(self, reply_to, correlation_id, msg.body,
+                            self.exchange)
         self.workers[worker.uuid] = worker
         worker.start()
 
@@ -300,7 +301,7 @@ class HubServer(AmqpGeventBase):
     def on_stop_worker(self, msg):
         log.info("%s: Received STOP %s message, stopping.", self.lbl, msg.body)
         if msg.body in self.workers:
-            self.workers.pop(msg.body).stop()
+            self.workers[msg.body].stop()
         self.send_rpc_response(msg)
 
     def stop(self):
@@ -312,16 +313,18 @@ class HubServer(AmqpGeventBase):
             log.debug("%s: Stopping all workers %s.",
                       self.lbl, tuple(self.workers.keys()))
             for worker_id in self.workers.keys():
-                self.workers.pop(worker_id).stop()
+                self.workers[worker_id].stop()
         super(HubServer, self).stop()
 
 
 class HubWorker(AmqpGeventBase):
     """Hub Worker"""
 
-    def __init__(self, reply_to, correlation_id, params, exchange=EXCHANGE):
+    def __init__(self, server, reply_to, correlation_id, params,
+                 exchange=EXCHANGE):
         """Initialize a worker proxying a connection"""
         super(HubWorker, self).__init__(exchange=exchange)
+        self.server = server
         self.reply_to = reply_to
         self.correlation_id = correlation_id
         self.params = params
@@ -359,6 +362,11 @@ class HubWorker(AmqpGeventBase):
     def send_to_client(self, action, msg=''):
         """Send AMQP message to clients"""
         self.amqp_send_msg(msg, routing_key='from_%s.%s' % (self.uuid, action))
+
+    def stop(self):
+        if self.uuid in self.server.workers:
+            self.server.workers.pop(self.uuid)
+        super(HubWorker, self).stop()
 
     def on_close(self, msg=''):
         """Stop self when msg with routing suffix 'close' received"""
