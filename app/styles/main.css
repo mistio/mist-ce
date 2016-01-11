@@ -75,6 +75,18 @@ a {
   line-height: 24px;
 }
 
+h2.app-title {
+    color: rgba(255,255,255,0.87);
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 1.5em;
+    background-color: slategray;
+    text-align: center;
+    padding: 0 0.5em;
+    margin: 0;
+    font-weight: 500;
+}
+
 catalog-app {
   overflow: hidden;
 }

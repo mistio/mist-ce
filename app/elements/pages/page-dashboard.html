@@ -4,6 +4,7 @@
 <link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <dom-module id="page-dashboard">
     <link rel="import" type="css" href="page-dashboard.css">
@@ -56,12 +57,11 @@
                       </a>
                   </div>
               </div>
-              
             </div>
             <div class="bottom full">
               <div class="graphs">
                 <paper-material>
-                  <h2>Load on all monitored machines</h2>
+                  <h2 class="app-title">Load on all monitored machines</h2>
                   <google-chart id="mutating_gauge" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
                     "redFrom": 90,
                     "redTo": 100,
@@ -110,9 +110,11 @@
                 notify: true
             }
         },
+        ready: function() {
+        },
         attached: function() {
             // reset page title since this is the default page
-            this.fire('page-meta', { title: null });            
+            this.fire('page-meta', { title: null });
         },
         isOnline: function(cloud) {
             return cloud.state == 'online';
