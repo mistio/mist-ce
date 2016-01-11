@@ -3628,9 +3628,13 @@ def check_monitoring(user):
         raise SSLError()
     if ret.status_code == 200:
         return ret.json()
-    else:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
+    elif ret.status_code in [400, 401]:
+        with user.lock_n_load():
+            user.email = ""
+            user.mist_api_token = ""
+            user.save()
+    log.error("Error getting stats %d:%s", ret.status_code, ret.text)
+    raise ServiceUnavailableError()
 
 
 def enable_monitoring(user, cloud_id, machine_id,

@@ -120,7 +120,7 @@ def check_auth(request):
         user = user_from_request(request)
         with user.lock_n_load():
             user.email = email
-            user.mist_api_token = ret_dict.pop('mist_api_token', '')
+            user.mist_api_token = ret_dict.pop('token', '')
             user.save()
         log.info("succesfully check_authed")
         return ret_dict
@@ -813,6 +813,12 @@ def update_monitoring(request):
                 user.mist_api_token = ret_dict.pop('token', '')
                 user.save()
             log.info("succesfully check_authed")
+        elif ret.status_code in [400, 401]:
+            with user.lock_n_load():
+                user.email = ""
+                user.mist_api_token = ""
+                user.save()
+            raise UnauthorizedError("You need to authenticate to mist.io.")
         else:
             raise UnauthorizedError("You need to authenticate to mist.io.")
 
