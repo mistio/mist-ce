@@ -15,7 +15,7 @@
 <dom-module id="app-sidebar">
   <link rel="import" type="css" href="app-sidebar.css">
   <template>
-    <app-socket model="{{model}}"></app-socket>
+    <!-- <app-socket model="{{model}}"></app-socket> -->
     <div class="content">
         <div id="section-tag" hidden$="[[!tag]]">
           <span>[[tag]]</span> <iron-icon icon="clear" on-tap="clearTag"></iron-icon>
@@ -32,7 +32,10 @@
               <a class="section" is="pushstate-anchor" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(current,item.id)]]" tabindex="1">
                 <div class="layout horizontal center">
                     <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
-                    <span class="title flex">[[item.id]]</span>
+                    <span class="title flex">
+                      <span>[[item.id]]</span>
+                      <span>({{ _sectionCount(item.id) }})</span>
+                    </span>
                 </div>
               </a>
             </template>
@@ -53,13 +56,23 @@
 <script>
   Polymer({
     is: 'app-sidebar',
-    enableCustomStyleProperties: true,
-    current: String,
+    enableCustomStyleProperties: true,    
+    properties : {
+      current: String
+    },
+    listeners: {
+    },
+    ready: function(){
+    },
     _sectionLink: function(name) {
       return '/' + name;
     },
     _isEqual: function(a,b) {
       return a === b;
+    },
+    _sectionCount: function(name) {
+      a = this.model[name+'Array'];
+      return a == undefined ? 0 : a.length;
     },
   });
 </script>
