@@ -200,10 +200,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     }
                 }
 
-                if (this.newMachineImage.id) {
-                    console.log(this.newMachineImage.get('isMist'));
-                }
-
                 if (this.newMachineImage.id &&
                     this.newMachineImage.get('isMist')) {
                     if (!Mist.keysController.keyExists(this.newMachineKey.id))

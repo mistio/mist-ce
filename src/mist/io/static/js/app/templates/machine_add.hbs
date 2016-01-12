@@ -57,7 +57,6 @@
                  data-iconpos="right"
                  data-collapsed-icon="carat-d"
                  data-expanded-icon="carat-u"
-
                  class="mist-select">
                 <h4>
                     {{#if Mist.machineAddController.newMachineImage.id}}
@@ -114,7 +113,6 @@
                      data-iconpos="right"
                      data-collapsed-icon="carat-d"
                      data-expanded-icon="carat-u"
-
                      class="mist-select">
                     <h4>{{Mist.machineAddController.newMachineSize.name}}</h4>
 
@@ -192,12 +190,6 @@
         </div>
         {{/if}}
 
-        Docker: {{view.hasDocker}} <br>
-
-        Docker needs key: {{view.dockerNeedsKey}} <br>
-
-        Key: {{view.needsKey}}
-
         <!-- Select Key -->
         {{#if view.hasKey}}
         <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.needsKey 'required'}}">
@@ -208,7 +200,6 @@
                      data-iconpos="right"
                      data-collapsed-icon="carat-d"
                      data-expanded-icon="carat-u"
-
                      class="mist-select">
                     <h4>
                         {{#if Mist.machineAddController.newMachineKey.id}}
@@ -242,7 +233,6 @@
                      data-iconpos="right"
                      data-collapsed-icon="carat-d"
                      data-expanded-icon="carat-u"
-
                      class="mist-select">
                     <h4>
                         {{#if Mist.machineAddController.newMachineProject.name}}
