@@ -11,9 +11,8 @@ define('app/views/machine_add', ['app/views/controlled'],
             controllerName: 'machineAddController',
 
             changeProviderFlag: false,
-            dockerNeedScript: false,
+            dockerNeedsKey: false,
             hasAdvancedScript: false,
-
 
             hasLibvirt: function() {
                 var provider = Mist.machineAddController.newMachineProvider;
@@ -41,14 +40,13 @@ define('app/views/machine_add', ['app/views/controlled'],
             }.property('Mist.machineAddController.newMachineProvider'),
 
             hasKey: function() {
-                var provider = Mist.machineAddController.newMachineProvider,
-                invalids = ['docker'];
-                return provider ? (provider.provider ? (((invalids.indexOf(provider.provider) != -1 ? false : true) || (provider.provider == 'docker' && this.get('dockerNeedScript'))) ? true : false) : false) : false;
-            }.property('hasDocker', 'dockerNeedScript', 'Mist.machineAddController.newMachineProvider'),
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider ? true : false) : false;
+            }.property('Mist.machineAddController.newMachineProvider'),
 
             needsKey: function() {
-                return this.get('hasKey') && !this.get('hasLibvirt');
-            }.property('hasKey', 'hasLibvirt'),
+                return this.get('hasKey') && !this.get('hasDocker') && !this.get('hasLibvirt') || (this.get('hasDocker') && this.get('dockerNeedsKey'));
+            }.property('hasKey', 'hasLibvirt', 'hasDocker', 'dockerNeedsKey'),
 
             hasCloudInit: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
                 var provider = Mist.machineAddController.newMachineProvider,
@@ -56,8 +54,8 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider ? ((valids.indexOf(provider.provider) != -1 || provider.provider.indexOf('ec2') > -1) ? true : false) : false) : false;
             }),
 
-            hasScript: Ember.computed('hasKey', 'dockerNeedScript', function() {
-                return this.get('hasKey') || this.get('dockerNeedScript');
+            hasScript: Ember.computed('hasKey', 'dockerNeedsKey', function() {
+                return this.get('hasKey') || this.get('dockerNeedsKey');
             }),
 
             hasLocation: function() {
@@ -203,7 +201,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                  this.$('.ui-collapsible').removeClass('selected');
                  this.setProperties({
                     changeProviderFlag: false,
-                    dockerNeedScript: false,
+                    dockerNeedsKey: false,
                     hasAdvancedScript: false
                 });
                 $('#create-machine-floating-ip .ui-checkbox > .ui-btn')
@@ -327,7 +325,7 @@ define('app/views/machine_add', ['app/views/controlled'],
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineImage', image);
 
-                    this.set('dockerNeedScript', this.get('hasDocker') && image.get('isMist'));
+                    this.set('dockerNeedsKey', this.get('hasDocker') && image.get('isMist'));
                 },
 
 

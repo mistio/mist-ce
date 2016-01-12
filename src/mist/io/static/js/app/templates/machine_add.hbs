@@ -270,7 +270,7 @@
                        value=Mist.machineAddController.newMachineDockerEnvironment}}
             </div>
 
-            {{#unless view.dockerNeedScript}}
+            {{#unless view.dockerNeedsKey}}
             <!-- Command -->
             <div id="create-machine-command" class="{{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
                 <label for="create-machine-command">Command</label>
