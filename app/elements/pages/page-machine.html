@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 
@@ -43,9 +44,7 @@
             <paper-menu-button vertical-align="bottom" horizontal-align="right">
               <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
               <paper-menu class="dropdown-content">
-                <paper-item>
-                    <a href="#" target="_blank" class="flex">Add Key</a>
-                </paper-item>
+                <paper-button on-click="addKey" class="flex">Add Key</paper-button>
                 <paper-item>
                     <a href="#" target="_blank" class="flex">Rename Machine</a>
                 </paper-item>
@@ -112,5 +111,8 @@
       _actualView: function(view, force) {
         return force ? 'cards' : view;
       },
+      addKey: function (_,params) {
+        console.log("clicked");
+      }
     });
 </script>
