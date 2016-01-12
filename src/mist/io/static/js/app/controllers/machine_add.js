@@ -290,7 +290,8 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             },
 
             _updateProvidersMonitoring: function() {
-                if (this.get('newMachineProvider.provider') == 'libvirt') {
+                var invalids = ['libvirt', 'docker'];
+                if (invalids.indexOf(this.get('newMachineProvider.provider')) != -1) {
                     this.set('newMachineMonitoring', false);
                 } else {
                     this.set('newMachineMonitoring', Mist.email ? true : false);
