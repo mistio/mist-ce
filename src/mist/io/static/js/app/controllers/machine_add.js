@@ -198,12 +198,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     }
                 }
 
-                if (this.newMachineProvider.provider == 'docker' && !this.view.dockerNeedScript) {
-                    if (!this.newMachineDockerCommand) {
-                        formReady = false;
-                    }
-                }
-
                 if (this.newMachineImage.id &&
                     this.newMachineImage.get('isMist')) {
                     if (!Mist.keysController.keyExists(this.newMachineKey.id))

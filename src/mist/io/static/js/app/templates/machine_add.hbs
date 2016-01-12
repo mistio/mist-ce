@@ -272,7 +272,7 @@
 
             {{#unless view.dockerNeedScript}}
             <!-- Command -->
-            <div id="create-machine-command" class="required {{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
+            <div id="create-machine-command" class="{{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
                 <label for="create-machine-command">Command</label>
                 {{view Mist.TextArea
                        id="create-machine-command"
