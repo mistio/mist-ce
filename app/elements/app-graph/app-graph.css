@@ -1,13 +1,25 @@
+:host {
+   padding: 0 0 20px 0;
+   position: relative;
+   float: none;
+   width: calc(50% - 2px);
+   display: inline-block;
+}
 :host paper-card {
-  margin-right: 20px;
-  margin-bottom: 20px;
+	width: 100%;
 }
 .card-content {
-  min-width: 50%; 
+  width: 100%;
+  display: block;
 }
 .graph {
-  min-width: 400px;
+  min-width: 100%;
 }
 paper-icon-button {
   float: right;
+}
+@media (max-width: 600px){
+	:host {
+		width: 100%;
+	}
 }
