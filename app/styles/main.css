@@ -163,10 +163,13 @@ paper-toolbar nav .active {
 }
 
 paper-fab {
+    background-color: #D96557;
+}
+
+.mist-fab-button {
     position: fixed;
     right: 32px;
     bottom: 16px;
-    background-color: #D96557;
     z-index: 10;
 }
 

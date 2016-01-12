@@ -4,6 +4,9 @@
 <link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <dom-module id="page-dashboard">
@@ -15,9 +18,8 @@
               <app-bar class="horizontal layout center end-justified" no-search></app-bar>
               <app-user-menu email="marios@mist.io"></app-user-menu>
           </paper-toolbar>
-          <div class="content">
-            <div class="clouds">
-              <paper-fab icon="add">Add cloud</paper-fab>
+          <div class="content"> 
+            <div class="clouds">      
               <template is="dom-repeat" items="{{model.cloudsArray}}">
                   <paper-button raised>
                       <template is="dom-if" if="{{isOnline(item)}}">
@@ -29,7 +31,20 @@
                       <span class="cloud-title">{{item.title}}</span>
                   </paper-button>
               </template>
-              <paper-button raised><a href="/machines/674595f7b18cb6ef30a2119b9e083a8526a2f169">elements</a></paper-button>
+              <paper-button raised><a href="/elements">elements</a></paper-button>
+              <div class="mist-fab-button">
+                <paper-menu-button vertical-align="bottom" horizontal-align="right">
+                  <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
+                  <paper-menu class="dropdown-content">
+                    <paper-item>
+                        <a href="#" target="_blank" class="flex">Add Cloud</a>
+                    </paper-item>
+                    <paper-item>
+                        <a href="#" target="_blank" class="flex">Add Cloud</a>
+                    </paper-item>
+                  </paper-menu>
+                </paper-menu-button>
+              </div>
             </div>
             <div class="container flex-horizontal-with-ratios">
               <app-incidents id="right" class="flex2child incidents top right"></app-incidents>
@@ -72,7 +87,7 @@
                 </paper-material>
               </div>
             </div>
-        </paper-header-panel>
+        </paper-header-panel>        
     </template>
 </dom-module>
 

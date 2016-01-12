@@ -39,7 +39,19 @@
           </div>
         </paper-header-panel>
       </paper-drawer-panel>
-      <paper-fab icon="add"></paper-fab>
+      <div class="mist-fab-button">
+        <paper-menu-button vertical-align="bottom" horizontal-align="right">
+          <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
+          <paper-menu class="dropdown-content">
+            <paper-item>
+                <a href="#" target="_blank" class="flex">Add Machine</a>
+            </paper-item>
+            <paper-item>
+                <a href="#" target="_blank" class="flex">Add Key</a>
+            </paper-item>
+          </paper-menu>
+        </paper-menu-button>
+      </div>
 
   </template>
 </dom-module>
