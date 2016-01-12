@@ -192,6 +192,12 @@
         </div>
         {{/if}}
 
+        Docker: {{view.hasDocker}} <br>
+
+        Docker needs key: {{view.dockerNeedsKey}} <br>
+
+        Key: {{view.needsKey}}
+
         <!-- Select Key -->
         {{#if view.hasKey}}
         <div id="key" class="{{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineKey.id 'filled' 'empty'}} {{if view.needsKey 'required'}}">
@@ -260,6 +266,7 @@
 
         <!-- Docker Specific -->
         {{#if view.hasDocker}}
+        {{#if view.dockerOptionalCommand}}
         <div class="docker">
 
             <!-- Environment Vars -->
@@ -270,7 +277,6 @@
                        value=Mist.machineAddController.newMachineDockerEnvironment}}
             </div>
 
-            {{#unless view.dockerNeedsKey}}
             <!-- Command -->
             <div id="create-machine-command" class="{{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
                 <label for="create-machine-command">Command</label>
@@ -278,9 +284,9 @@
                        id="create-machine-command"
                        value=Mist.machineAddController.newMachineDockerCommand}}
             </div>
-            {{/unless}}
 
         </div>
+        {{/if}}
         {{/if}}
 
         <!-- Select Networks -->
