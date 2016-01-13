@@ -78,11 +78,19 @@ define('app/views/machine_add', ['app/views/controlled'],
 
             helpOptions: [{
                 field: 'disk-path',
-                helpText: 'Where the VM image disk file will be created',
+                helpText: 'Where the VM disk file will be created',
                 helpHref: 'http://docs.mist.io/article/24-adding-kvm'
             }, {
                 field: 'disk-size',
                 helpText: "The VM's size will be the size of the image plus the number in GBs provided here",
+                helpHref: 'http://docs.mist.io/article/24-adding-kvm'
+            }, {
+                field: 'key',
+                helpText: 'Αn ssh key to deploy if using a cloudinit based Linux image',
+                helpHref: 'http://docs.mist.io/article/24-adding-kvm'
+            }, {
+                field: 'image',
+                helpText: 'Α disk image to be used as the base for the VM, or an .iso image to create a VM from',
                 helpHref: 'http://docs.mist.io/article/24-adding-kvm'
             }],
 
