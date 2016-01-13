@@ -39,19 +39,13 @@
           </div>
         </paper-header-panel>
       </paper-drawer-panel>
-      <div class="mist-fab-button">
+      <div class="absolute-bottom-right">
         <paper-menu-button vertical-align="bottom" horizontal-align="right">
           <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
           <paper-menu class="dropdown-content">
-            <paper-item>
-                <a href="#" target="_blank" class="flex">Add Machine</a>
-            </paper-item>
-            <paper-item>
-                <a href="#" target="_blank" class="flex">Add Key</a>
-            </paper-item>
-            <paper-item>
-                <a href="#" target="_blank" class="flex">Add Cloud</a>
-            </paper-item>
+            <paper-button on-tap="addMachine">Add Machine</paper-button>
+            <paper-button on-tap="addKey">Add Key</paper-button>
+            <paper-button on-tap="addCloud">Add Cloud</paper-button>
           </paper-menu>
         </paper-menu-button>
       </div>

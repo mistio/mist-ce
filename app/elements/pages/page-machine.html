@@ -30,33 +30,57 @@
             <paper-icon-button icon="account-circle"></paper-icon-button>
           </div>
           <div id="content">
-            <app-graph title="CPU"></app-graph>
-            <app-graph title="DISKS READ"></app-graph>
-            <app-graph title="IFACES RX"></app-graph>
-            <app-graph title="DISKS WRITE"></app-graph>
+            <app-graph title="CPU">
+              <google-chart id="mutating_gauge0" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
+                "redFrom": 90,
+                "redTo": 100,
+                "yellowFrom": 75,
+                "yellowTo": 90,
+                "minorTicks": 5}'>
+              </google-chart>
+            </app-graph>
+            <app-graph title="DISKS READ">
+              <google-chart id="mutating_gauge1" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
+                "redFrom": 90,
+                "redTo": 100,
+                "yellowFrom": 75,
+                "yellowTo": 90,
+                "minorTicks": 5}'>
+              </google-chart>
+            </app-graph>
+            <app-graph title="IFACES RX">
+              <google-chart id="mutating_gauge2" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
+                "redFrom": 90,
+                "redTo": 100,
+                "yellowFrom": 75,
+                "yellowTo": 90,
+                "minorTicks": 5}'>
+              </google-chart>
+            </app-graph>
+            <app-graph title="DISKS WRITE">
+              <google-chart id="mutating_gauge3" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
+                "redFrom": 90,
+                "redTo": 100,
+                "yellowFrom": 75,
+                "yellowTo": 90,
+                "minorTicks": 5}'>
+              </google-chart>
+            </app-graph>
             <app-graph title="RAM"></app-graph>
             <app-graph title="LOAD"></app-graph>
 
             <app-rules></app-rules>
 
           </div>
-          <div class="mist-fab-button">
+          <div class="absolute-bottom-right">
             <paper-menu-button vertical-align="bottom" horizontal-align="right">
               <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
               <paper-menu class="dropdown-content">
-                <paper-button on-click="addKey" class="flex">Add Key</paper-button>
-                <paper-item>
-                    <a href="#" target="_blank" class="flex">Rename Machine</a>
-                </paper-item>
-                <paper-item>
-                    <a href="#" target="_blank" class="flex">Restart Machine</a>
-                </paper-item>
-                <paper-item>
-                    <a href="#" target="_blank" class="flex">Shutdown Machine</a>
-                </paper-item>
-                <paper-item>
-                    <a href="#" target="_blank" class="flex">Destroy Machine</a>
-                </paper-item>                
+                <paper-button on-click="addKey">Add Key</paper-button>
+                <paper-button on-click="rename">Rename Machine</paper-button>
+                <paper-button on-click="restart">Restart Machine</paper-button>
+                <paper-button on-click="shutdown">Shutdown Machine</paper-button>
+                <paper-button on-click="destroy">Destroy Machine</paper-button>
               </paper-menu>
             </paper-menu-button>
           </div>
@@ -66,6 +90,20 @@
 </dom-module>
 
 <script>
+    window.setInterval(function() {
+        var gauges = [];
+        for (var i=0; i<4; i++) {
+        gauges[i] = document.getElementById('mutating_gauge'+i);
+        gauges[i].data = [
+            ["Label", "Value"],
+            ["Memory", getRandomGaugeValue(40, 60)],
+            ["CPU", getRandomGaugeValue(40, 60)],
+            ["Network", getRandomGaugeValue(60, 20)]
+        ];
+      }
+
+    }, 3000);
+    
     Polymer({
       is: 'page-machine',
       enableCustomStyleProperties: true,
@@ -77,42 +115,46 @@
         section: {type: Object, notify: true, value: {}},
         tag: {String, value: ""}
       },
-      
       _sectionLink: function(name) {
         return '/' + name;
       },
-      
       ready: function() {
 
       },
-      
       attached: function() {
 
       },
-      
       _handleParamsUpdate: function(_, params) {
         for (var key in params) {
           this[key] = params[key];
         }
       },
-      
       _isEqual: function(a,b) {
         return a === b;
       },
-
       _getColor: function() {
         return this.section && this.section.color ? this.section.color : '';
       },
-
       _getMode: function(narrow) {
         return narrow ? 'waterfall' : 'scroll';
       },
-
       _actualView: function(view, force) {
         return force ? 'cards' : view;
       },
       addKey: function (_,params) {
-        console.log("clicked");
+        console.log("clicked addKey");
+      },
+      rename: function(_,params){
+        console.log("clicked rename");
+      },
+      restart: function(_,params){
+        console.log("clicked restart");
+      },
+      shutdown: function(_,params){
+        console.log("clicked shutdown");
+      },
+      destroy: function(_,params){
+        console.log("clicked destroy");
       }
     });
 </script>

@@ -166,7 +166,7 @@ paper-fab {
     background-color: #D96557;
 }
 
-.mist-fab-button {
+.absolute-bottom-right {
     position: fixed;
     right: 32px;
     bottom: 16px;
@@ -199,6 +199,9 @@ aside {
 paper-material {
   background-color: #fff;
   /*padding: 20px;*/
+}
+paper-menu.dropdown-content paper-button {
+  display: block;
 }
 paper-button {
   font-size: 14px;
