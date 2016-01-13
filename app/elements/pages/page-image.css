@@ -244,6 +244,7 @@ app-sidebar paper-toolbar {
   color: rgba(255,255,255,0.87);
   padding: 12px;
   font-size: 16px;
+  display: none;
 }
 
 #current-tag b {

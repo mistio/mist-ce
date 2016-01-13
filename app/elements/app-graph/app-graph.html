@@ -1,16 +1,19 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../responsive-element/responsive-element.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 
 <dom-module id="app-graph">
   <link rel="import" type="css" href="app-graph.css">
   <template>
-  <iron-media-query query="(max-width: 600px)" query-matches="{{queryMatches}}"></iron-media-query>
+    <iron-media-query query="(max-width: 600px)" query-matches="{{queryMatches}}"></iron-media-query>
 
     <paper-card heading="{{title}}">  <!-- graph title goes here, comes in with title as a parameter in app-graph element-->
       <div class="card-content">
-        <div class="graph">
-          <content></content>
+        <div class="graph">          
+            <responsive-element>
+              <content></content>
+            </responsive-element>
         </div>
       </div>
       <div class="card-actions">
@@ -25,20 +28,19 @@
   Polymer({
     is: 'app-graph',
     properties: {
-      title: {String, value:"A GRAPH"},
-      queryMatches: Boolean
+      title: {String, value:"A GRAPH"}
     },
     //need to resize graphs on window resize
-    listeners: {"windowResized":"redraw"},
+    listeners: {"resize":"redraw"},
     resizeEvent: function(){
       this.queryChanged(function(){
-        this.fire("windowResized");
+        this.fire("resize");
       })
     },
     redraw: function(){
-      if (this.queryMatches) {        
-        // Polymer.dom("content").getDistributedNodes("google-chart")[0].drawChart();
-      }
+      console.log("resize");
+      // Polymer.dom("content").getDistributedNodes("google-chart")[0].drawChart();
+      
     }
   });
 </script>
