@@ -78,7 +78,7 @@ def wait_for_splash_to_appear(context, timeout=20):
             return
         except NoSuchElementException:
             sleep(1)
-    assert False, 'Splash did not appear after %s seconds' % str(timeout)
+    assert False, 'Splash did not appear after %s seconds' % timeout
 
 
 def wait_for_splash_to_load(context, timeout=60):
@@ -89,7 +89,7 @@ def wait_for_splash_to_load(context, timeout=60):
 
         if 'none' in display:
             return
-    assert False, 'Page took longer than %s seconds to load' % str(timeout)
+    assert False, 'Page took longer than %s seconds to load' % timeout
 
 
 @step(u'I wait for {seconds} seconds')
@@ -207,7 +207,7 @@ def loader_name_waiting_with_timeout(context, loader_name, seconds):
         except NoSuchElementException:
             return
     assert False, 'Loader %s did not finish after %s seconds' % (loader_name,
-                                                                  seconds)
+                                                                 seconds)
 
 
 @then(u'I expect for "{element_id}" to be visible within max {seconds} '
@@ -339,8 +339,8 @@ def click_button_within_panel(context, text, panel_title):
                                   panel.get_attribute('class'),
                     context.browser.find_elements_by_class_name(
                         "ui-collapsible"))
-    assert panels, u'No open panels found. Maybe the driver got refocused ' \
-                   u'or the panel failed to open'
+    assert panels, 'No open panels found. Maybe the driver got refocused ' \
+                   'or the panel failed to open'
 
     found_panel = None
     for panel in panels:
@@ -372,7 +372,8 @@ def click_button_from_collection(context, text, button_collection=None,
             return
         except WebDriverException:
             sleep(1)
-        assert False, 'Could not click button that says %s(%s)' % (safe_get_element_text(button), text)
+        assert False, 'Could not click button that says %s(%s)' % \
+                      (safe_get_element_text(button), text)
 
 
 def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
