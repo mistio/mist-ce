@@ -133,7 +133,7 @@ def add_routes(configurator):
     configurator.add_route('keys', '/keys')
     configurator.add_route('key_action', '/keys/{key}')
     configurator.add_route('key_public', '/keys/{key}/public')
-    configurator.add_route('key_private', 'keys/{key}/private')
+    configurator.add_route('key_private', '/keys/{key}/private')
     configurator.add_route('key_association',
                            '/clouds/{cloud}/machines/{machine}/keys/{key}')
 

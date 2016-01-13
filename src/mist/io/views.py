@@ -1048,7 +1048,7 @@ def star_image(request):
       required: true
       type: string
     image:
-      description: ' Id of image to be used with the creation'
+      description: Id of image to be used with the creation
       in: path
       required: true
       type: string
