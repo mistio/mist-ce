@@ -16,6 +16,9 @@
 .graph {
   min-width: 100%;
 }
+google-chart {
+	max-width: 100%;
+}
 paper-icon-button {
   float: right;
 }
