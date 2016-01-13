@@ -27,6 +27,7 @@
 <link rel="import" href="../pages/page-dashboard.html">
 <link rel="import" href="../pages/page-list.html">
 <link rel="import" href="../pages/page-machine.html">
+<link rel="import" href="../pages/page-image.html">
 <link rel="import" href="../pages/page-elements.html">
 <link rel="import" href="../pages/page-account.html">
 <link rel="import" href="../pages/page-not-found.html">
@@ -41,10 +42,11 @@
         <app-socket model="{{model}}"></app-socket>
 
         <iron-routes for="app-main" selected="{{section}}">
-            <iron-route path="/" title=""></iron-route>
-            <iron-route path="/machines" title="machines"></iron-route>
-            <iron-route path="/machines/:uuid" title="machine"></iron-route>
-            <iron-route path="/images" title="images"></iron-route>
+            <iron-route path="/" title=""></iron-route>                         <!-- 1 -->
+            <iron-route path="/machines" title="machines"></iron-route>         <!-- 2 -->
+                <iron-route path="/machines/:uuid" title="machine"></iron-route><!-- 3 -->
+            <iron-route path="/images" title="images"></iron-route>             <!-- 4 -->
+                <iron-route path="/images/:id" title="images"></iron-route>     <!-- 5 -->
             <iron-route path="/keys" title="keys"></iron-route>
             <iron-route path="/networks" title="networks"></iron-route>
             <iron-route path="/scripts" title="scripts"></iron-route>
@@ -54,20 +56,29 @@
         </iron-routes>
 
         <iron-pages id="app-main">
+            <!-- 1 -->
             <section>
                 <page-dashboard model="{{model}}" sections="[[sections]]">
                     <title>Dashboard</title>
                 </page-dashboard>
             </section>
+            <!-- 2 -->
             <section>
                 <page-list model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]"></page-list>
             </section>
-            <section id="machines" params="{{params}}">
+            <!-- 3 -->
+            <section params="{{params}}">
                 <page-machine params="{{params}}" model="{{model}}" elements="{{model.machinesArray}}" sections="[[sectionsArray]]" section="[[sections.machines]]">
                 </page-machine>
             </section>
+            <!-- 4 -->
             <section>
                 <page-list model="{{model}}" elements="{{model.imagesArray}}" sections="[[sectionsArray]]" section="[[sections.images]]"></page-list>
+            </section>
+            <!-- 5 -->
+            <section params="{{params}}">
+                <page-image params="{{params}}" model="{{model}}" elements="{{model.imagesArray}}" sections="[[sectionsArray]]" section="[[sections.images]]">
+                </page-image>
             </section>
             <section>
                 <page-list model="{{model}}" elements="{{model.keysArray}}" sections="[[sectionsArray]]" section="[[sections.keys]]"></page-list>

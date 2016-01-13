@@ -128,18 +128,21 @@
     </div>
     <template is="dom-repeat" items="[[elements]]">      
       <div class="row" data-index$="[[index]]">
-        <a href$="[[_elementLink(item.uuid)]]">          
+        <a href$="[[_elementLink(item.id)]]">
+
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
             <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
             <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
             <div class="state" hidden$="[[!item.state]]">[[item.state]]</div>
+
             <div class="icon" hidden$="[[!item.icons.length]]">
               <template is="dom-if" if="[[item.icons]]">    
                 <app-image-icons feed="[[item.icons]]"></app-image-icons>
               </template>      
             </div>
+
             <div class="tags" hidden$="[[!item.tags.length]]">
               <template is="dom-if" if="[[item.tags.length]]"> 
                 <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
@@ -149,6 +152,7 @@
                 </template>
               </template>
             </div>
+
         </a>
       </div>
     </template>
