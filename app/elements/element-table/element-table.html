@@ -128,7 +128,7 @@
     </div>
     <template is="dom-repeat" items="[[elements]]">      
       <div class="row" data-index$="[[index]]">
-        <a href$="[[_elementLink(item.uuid)]]" is="pushstate-anchor">
+        <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
 
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
@@ -282,8 +282,20 @@
       }
     },
 
-    _elementLink: function(uuid) {
-      return "/" + this.section.id + "/" + uuid;
+    _elementLink: function(item) {
+      var p, s = this.section.id;
+      if (s == "machines")
+        p = item.uuid
+      else if (s == "images")
+        p = item.id
+      else if (s == "keys")
+        p = item.id
+      else if (s == "networks")
+        p = item.name
+      else if (s == "scripts")
+        p = item.id           //??
+
+      return "/" + this.section.id + "/" + p;
     },
 
     _getHeaderStyle: function(color) {

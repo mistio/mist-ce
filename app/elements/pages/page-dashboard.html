@@ -48,23 +48,23 @@
               <app-incidents id="right" class="flex2child incidents top right"></app-incidents>
               <div id="left" class="flex3child top left">
                   <div class="sections layout horizontal wrap">
-                      <a href="/machines" class="main-section flex">
+                      <a href="/machines" class="main-section flex" is="pushstate-anchor">
                           <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
                           </section-tile>
                       </a>
-                      <a href="/images" class="main-section flex">
+                      <a href="/images" class="main-section flex" is="pushstate-anchor">
                           <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="{{model.imagesArray.length}}">
                           </section-tile>
                       </a>
-                      <a href="/keys" class="main-section flex">
+                      <a href="/keys" class="main-section flex" is="pushstate-anchor">
                           <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="{{model.keysArray.length}}">
                           </section-tile>
                       </a>
-                      <a href="/networks" class="main-section flex">
+                      <a href="/networks" class="main-section flex" is="pushstate-anchor">
                           <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="{{model.networksArray.length}}">
                           </section-tile>
                       </a>
-                      <a href="/scripts" class="main-section flex">
+                      <a href="/scripts" class="main-section flex is="pushstate-anchor"">
                           <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="{{model.scriptsArray.length}}">
                           </section-tile>
                       </a>

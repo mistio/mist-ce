@@ -28,6 +28,8 @@
 <link rel="import" href="../pages/page-list.html">
 <link rel="import" href="../pages/page-machine.html">
 <link rel="import" href="../pages/page-image.html">
+<link rel="import" href="../pages/page-key.html">
+<link rel="import" href="../pages/page-network.html">
 <link rel="import" href="../pages/page-elements.html">
 <link rel="import" href="../pages/page-account.html">
 <link rel="import" href="../pages/page-not-found.html">
@@ -48,8 +50,11 @@
             <iron-route path="/images" title="images"></iron-route>             <!-- 4 -->
             <iron-route path="/images/:id" title="images"></iron-route>         <!-- 5 -->
             <iron-route path="/keys" title="keys"></iron-route>
+            <iron-route path="/keys/:id" title="keys"></iron-route>
             <iron-route path="/networks" title="networks"></iron-route>
+            <iron-route path="/networks/:name" title="networks"></iron-route>
             <iron-route path="/scripts" title="scripts"></iron-route>
+            <iron-route path="/scripts/:id" title="scripts"></iron-route>       <!-- id? -->
             <iron-route path="/elements" title="elements"></iron-route>
             <iron-route path="/account" title="account"></iron-route>
             <iron-route path="*"></iron-route>
@@ -64,8 +69,7 @@
                                 sections="[[sectionsArray]]" 
                                 section="[[sections.machines]]"></page-list>
 
-            <page-machine       id="singlemachine"
-                                params="{{params}}" 
+            <page-machine       params="{{params}}" 
                                 model="{{model}}" 
                                 machine="{{getMachine(params)}}"
                                 elements="{{model.machinesArray}}" 
@@ -79,6 +83,7 @@
 
             <page-image         params="{{params}}" 
                                 model="{{model}}" 
+                                image="{{getImage(params)}}"
                                 elements="{{model.imagesArray}}" 
                                 sections="[[sectionsArray]]" 
                                 section="[[sections.images]]"></page-image>
@@ -87,15 +92,36 @@
                                 elements="{{model.keysArray}}" 
                                 sections="[[sectionsArray]]" 
                                 section="[[sections.keys]]"></page-list>
+
+            <page-key           model="{{model}}" 
+                                params="{{params}}"
+                                key="{{getKey(params)}}"
+                                elements="{{model.keysArray}}" 
+                                sections="[[sectionsArray]]" 
+                                section="[[sections.keys]]"></page-key>
             <!-- networks -->
             <page-list          model="{{model}}"  
                                 elements="{{model.networksArray}}" 
                                 sections="[[sectionsArray]]" 
                                 section="[[sections.networks]]"></page-list>
+
+            <page-network       model="{{model}}" 
+                                params="{{params}}"
+                                network="{{getNetwork(params)}}"
+                                elements="{{model.networksArray}}" 
+                                sections="[[sectionsArray]]" 
+                                section="[[sections.networks]]"></page-network>
             <!-- scripts -->
             <page-list          model="{{model}}" 
                                 sections="[[sectionsArray]]" 
                                 section="[[sections.scripts]]"></page-list>
+
+            <page-script       model="{{model}}" 
+                                params="{{params}}"
+                                network="{{getScript(params)}}"
+                                elements="{{model.scriptsArray}}" 
+                                sections="[[sectionsArray]]" 
+                                section="[[sections.scripts]]"></page-network>
 
             <page-elements></page-elements>            
             <page-account></page-account>
@@ -183,8 +209,52 @@
               if( ma[i].uuid == p ) 
                 return m = ma[i];
             };
-            //return machine object with the right uuid from model.machinesArray
+            //return machine object with the right 'uuid' from model.machinesArray
             return m;
+        },
+        getImage: function(params){
+            var ima = this.model.imagesArray;
+            var p  = params.id;
+            var im  = {};
+            for ( var i = 0; i < ima.length; i++ ) {
+              if( ima[i].id == p ) 
+                return im = ima[i];
+            };
+            //return image object with the right 'id' from model.imagesArray
+            return im;
+        },
+        getKey: function(params){
+            var ka = this.model.keysArray;
+            var p  = params.id;
+            var k  = {};
+            for ( var i = 0; i < ka.length; i++ ) {
+              if( ka[i].id == p ) 
+                return k = ka[i];
+            };
+            //return key object with the right 'id' from model.keysArray
+            return k;
+        },
+        getNetwork: function(params){
+            var na = this.model.networksArray;
+            var p  = params.name;
+            var n  = {};
+            for ( var i = 0; i < na.length; i++ ) {
+              if( na[i].name == p ) 
+                return n = na[i];
+            };
+            //return network object with the right 'name' from model.networksArray
+            return n;
+        },
+        getScript: function(params){
+            var sa = this.model.networksArray;
+            var p  = params.id;
+            var s  = {};
+            for ( var i = 0; i < sa.length; i++ ) {
+              if( sa[i].id == p ) 
+                return s = sa[i];
+            };
+            //return script object with the right 'id' (???) from model.scriptsArray
+            return s;
         },
         updateDocTitle: function(e, details) {
             if (details.item.title && details.item.title.length) {
