@@ -3622,9 +3622,13 @@ def check_monitoring(user):
         raise SSLError()
     if ret.status_code == 200:
         return ret.json()
-    else:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
+    elif ret.status_code in [400, 401]:
+        with user.lock_n_load():
+            user.email = ""
+            user.mist_api_token = ""
+            user.save()
+    log.error("Error getting stats %d:%s", ret.status_code, ret.text)
+    raise ServiceUnavailableError()
 
 
 def enable_monitoring(user, cloud_id, machine_id,
@@ -4312,18 +4316,28 @@ def undeploy_collectd(user, cloud_id, machine_id):
 
 def get_deploy_collectd_command_unix(uuid, password, monitor):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
+    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) " \
+          "python mist_collectd.py %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
 
 
 def get_deploy_collectd_command_windows(uuid, password, monitor):
-     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:25826"""""") -interval 10'"''' % (uuid, password, monitor)
+    return 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned ' \
+           '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
+           'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
+           'deploy_collectm/master/collectm.remote.install.ps1\',' \
+           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
+           '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
+           '-servers @("%s:25826")\''  % (uuid, password, monitor)
 
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor):
-    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
+    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup " \
+           "-e COLLECTD_USERNAME=%s " \
+           "-e COLLECTD_PASSWORD=%s " \
+           "-e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
 
 
 def machine_name_validator(provider, name):
@@ -4347,7 +4361,10 @@ def machine_name_validator(provider, name):
     elif provider is Provider.NEPHOSCALE:
         pass
     elif provider is Provider.GCE:
-        pass
+        if not re.search(r'^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', name):
+            raise MachineNameValidationError("name must be 1-63 characters long, with the first " + \
+                "character being a lowercase letter, and all following characters must be a dash, " + \
+                "lowercase letter, or digit, except the last character, which cannot be a dash.")
     elif provider is Provider.SOFTLAYER:
         pass
     elif provider is Provider.DIGITAL_OCEAN:
