@@ -67,7 +67,8 @@ def check_the_tags(context,my_key,my_value):
     if [my_key,my_value] in words:
         pass
     else:
-        assert False, u'tag is not pair of %s key and %s value' % (my_key, my_value)
+        assert False, u'tag is not pair of %s key and %s value' % (my_key,
+                                                                   my_value)
 
 
 @step(u'the "{name}" machine in the list should have a tag with key "{key}"'
