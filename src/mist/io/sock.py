@@ -12,6 +12,8 @@ import uuid
 import json
 import socket
 import random
+import traceback
+import datetime
 from time import time
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
@@ -69,7 +71,21 @@ def get_conn_info(conn_info):
     return ip, user_agent, session_id
 
 
+def mist_conn_str(conn_dict):
+    parts = []
+    dt_last_rcv = datetime.datetime.fromtimestamp(conn_dict['last_rcv'])
+    conn_dict['last_rcv'] = dt_last_rcv
+    for key in ('name', 'last_rcv', 'user', 'ip', 'user_agent', 'closed',
+                'session_id'):
+        if key in conn_dict:
+            parts.append(conn_dict.pop(key))
+    parts.extend(conn_dict.values())
+    return ' - '.join(map(str, parts))
+
+
 class MistConnection(SockJSConnection):
+    closed = False
+
     def on_open(self, conn_info):
         log.info("%s: Initializing", self.__class__.__name__)
         self.ip, self.user_agent, session_id = get_conn_info(conn_info)
@@ -80,9 +96,30 @@ class MistConnection(SockJSConnection):
     def send(self, msg, data=None):
         super(MistConnection, self).send(json.dumps({msg: data}))
 
-    def on_close(self):
-        log.info("%s: on_close event handler", self.__class__.__name__)
-        CONNECTIONS.remove(self)
+    def on_close(self, stale=False):
+        if not self.closed:
+            log.info("%s: on_close event handler", self.__class__.__name__)
+            if stale:
+                log.warning("stale conn removed")
+            CONNECTIONS.remove(self)
+            self.closed = True
+        else:
+            log.warning("%s: called on_close AGAIN!", self.__class__.__name__)
+            traceback.print_stack()
+
+    def get_dict(self):
+        return {
+            'name': self.session.name,
+            'last_rcv': self.session.base.last_rcv,
+            'user': self.user.email,
+            'ip': self.ip,
+            'user_agent': self.user_agent,
+            'closed': self.is_closed,
+            'session_id': self.session_id,
+        }
+
+    def __repr__(self):
+        return mist_conn_str(self.get_dict())
 
 
 class ShellConnection(MistConnection):
@@ -119,10 +156,10 @@ class ShellConnection(MistConnection):
     def emit_shell_data(self, data):
         self.send('shell_data', data)
 
-    def on_close(self):
+    def on_close(self, stale=False):
         if self.hub_client:
             self.hub_client.stop()
-        super(ShellConnection, self).on_close()
+        super(ShellConnection, self).on_close(stale=stale)
 
 
 class UserUpdatesConsumer(Consumer):
@@ -274,16 +311,29 @@ class MainConnection(MistConnection):
                                  machine.get('public_ips', []))
                     if not ips:
                         continue
-                    cached = tasks.ProbeSSH().smart_delay(
-                        self.user.email, cloud_id, machine['id'], ips[0]
-                    )
-                    if cached is not None:
-                        self.send('probe', cached)
+
+                    has_key = False
+                    for k in self.user.keypairs.values():
+                        for m in k.machines:
+                            if m[:2] == [cloud_id, machine['id']]:
+                                has_key = True
+                                break
+                        if has_key:
+                            break
+
+                    if has_key:
+                        cached = tasks.ProbeSSH().smart_delay(
+                            self.user.email, cloud_id, machine['id'], ips[0]
+                        )
+                        if cached is not None:
+                            self.send('probe', cached)
+
                     cached = tasks.Ping().smart_delay(
                         self.user.email, cloud_id, machine['id'], ips[0]
                     )
                     if cached is not None:
                         self.send('ping', cached)
+
         elif routing_key == 'update':
             self.user.refresh()
             sections = result
@@ -294,13 +344,13 @@ class MainConnection(MistConnection):
             if 'monitoring' in sections:
                 self.check_monitoring()
 
-    def on_close(self):
+    def on_close(self, stale=False):
         if self.consumer is not None:
             try:
                 self.consumer.stop()
             except Exception as exc:
                 log.error("Error closing pika consumer: %r", exc)
-        super(MainConnection, self).on_close()
+        super(MainConnection, self).on_close(stale=stale)
 
 
 def make_router():

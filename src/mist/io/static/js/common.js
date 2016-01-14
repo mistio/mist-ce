@@ -325,7 +325,7 @@ function Socket (args) {
                 }
                 this.attempts++;
                 sockjs = new SockJS('/socket', null,
-                    {'protocols_whitelist':
+                    {'transports':
                         ['websocket', 'xhr-polling']}
                 );
                 sockjs.onopen = function() {
@@ -403,6 +403,8 @@ function Socket (args) {
                       callback();
                   if (that.onConnect instanceof Function)
                       that.onConnect(that);
+                  if (appLoader)
+                      appLoader.complete('fetch first data');
               });
           }
           this.set('channel', channel)

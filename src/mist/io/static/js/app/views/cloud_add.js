@@ -80,6 +80,13 @@ define('app/views/cloud_add', ['app/views/controlled'],
                 $('#add-cloud').collapsible('collapse');
                 $('#new-cloud-provider').collapsible('expand');
                 $('#new-cloud-provider ul').animate({scrollTop: 0}, 100);
+                this.renderFields();
+            },
+
+            renderFields: function() {
+                Ember.run.scheduleOnce('afterRender', this, function() {
+                    $('body').enhanceWithin();
+                });
             },
 
             autocompleteCredentials: function (provider) {
@@ -167,9 +174,7 @@ define('app/views/cloud_add', ['app/views/controlled'],
                 selectKey: function (key, field) {
                     $('#' + field.name).collapsible('collapse');
                     field.set('value', key.id || key);
-                    Ember.run.next(this, function () {
-                        this.$().enhanceWithin();
-                    });
+                    this.renderFields();
                 },
 
                 createKeyClicked: function (field) {
