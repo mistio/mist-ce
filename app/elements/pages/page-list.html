@@ -13,7 +13,6 @@
 <dom-module id="page-list">
   <link rel="import" type="css" href="page-list.css">
   <template>
-      <!-- <app-socket model="{{model}}"></app-socket> -->
       <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
         <app-sidebar tag="[[tag]]" sections="[[sections]]" current="{{section.id}}" model="{{model}}" drawer></app-sidebar>
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>

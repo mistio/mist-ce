@@ -64,8 +64,10 @@
                                 sections="[[sectionsArray]]" 
                                 section="[[sections.machines]]"></page-list>
 
-            <page-machine       params="{{params}}" 
+            <page-machine       id="singlemachine"
+                                params="{{params}}" 
                                 model="{{model}}" 
+                                machine="{{getMachine(params)}}"
                                 elements="{{model.machinesArray}}" 
                                 sections="[[sectionsArray]]" 
                                 section="[[sections.machines]]"></page-machine>
@@ -172,6 +174,17 @@
             } else {
                 document.title = "mist.io";
             }
+        },
+        getMachine: function(params){
+            var ma = this.model.machinesArray;
+            var p  = params.uuid;
+            var m  = {};
+            for ( var i = 0; i < ma.length; i++ ) {
+              if( ma[i].uuid == p ) 
+                return m = ma[i];
+            };
+            //return machine object with the right uuid from model.machinesArray
+            return m;
         },
         updateDocTitle: function(e, details) {
             if (details.item.title && details.item.title.length) {

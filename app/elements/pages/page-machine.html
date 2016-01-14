@@ -18,18 +18,24 @@
   <link rel="import" type="css" href="page-machine.css">
 
   <template>
-      <app-socket model="{{model}}"></app-socket>
       <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
         <app-sidebar tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex">Machine page [[params.uuid]]</h2>
+            <h2 class="flex"> {{machine.name}} : {{machine.state}} </h2>
             <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
             <paper-icon-button icon="icons:sort"></paper-icon-button>
             <paper-icon-button icon="account-circle"></paper-icon-button>
           </div>
           <div id="content">
+            <div class="machine-info">
+              uuid = [[params.uuid]] <br/>
+              id   = {{machine.id}} <br/>
+              name = {{machine.name}} <br/>
+              <paper-button on-tap="listInfo">temp machine info helper</paper-button>
+              <div id="machineproperties"></div>
+            </div>
             <app-graph title="CPU">
               <google-chart id="mutating_gauge0" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
                 "redFrom": 90,
@@ -48,7 +54,7 @@
                 "minorTicks": 5}'>
               </google-chart>
             </app-graph>
-            <app-graph title="IFACES RX">
+           <!--  <app-graph title="IFACES RX">
               <google-chart id="mutating_gauge2" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
                 "redFrom": 90,
                 "redTo": 100,
@@ -67,7 +73,7 @@
               </google-chart>
             </app-graph>
             <app-graph title="RAM"></app-graph>
-            <app-graph title="LOAD"></app-graph>
+            <app-graph title="LOAD"></app-graph> -->
 
             <app-rules></app-rules>
 
@@ -92,7 +98,7 @@
 <script>
     window.setInterval(function() {
         var gauges = [];
-        for (var i=0; i<4; i++) {
+        for (var i=0; i<2; i++) {
         gauges[i] = document.getElementById('mutating_gauge'+i);
         gauges[i].data = [
             ["Label", "Value"],
@@ -109,24 +115,39 @@
       properties: {
         router: Object,
         pageTitle: {type: String},
-        params: Object,
+        params: {type: Object, notify: true},
         sections: Array,
         section: {type: Object, notify: true, value: {}},
-        tag: {String, value: ""}
+        tag: {type: String, value: ""},
+        
+        model: Object,
+        machine: Object
       },
-      _sectionLink: function(name) {
-        return '/' + name;
+      listeners: {
+
       },
-      ready: function() {
+      ready: function(){
 
       },
       attached: function() {
 
       },
+      listInfo: function(e) {
+        console.log("ttt clicked");
+
+        var info = '';
+        for(var prop in this.machine){
+          info+=prop+" : "+this.machine[prop]+", ";
+        }
+        this.$.machineproperties.textContent = info;        
+      },
+      _sectionLink: function(name) {
+        return '/' + name;
+      },
       _handleParamsUpdate: function(_, params) {
         for (var key in params) {
           this[key] = params[key];
-        }
+        }        
       },
       _isEqual: function(a,b) {
         return a === b;

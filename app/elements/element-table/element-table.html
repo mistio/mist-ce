@@ -128,7 +128,7 @@
     </div>
     <template is="dom-repeat" items="[[elements]]">      
       <div class="row" data-index$="[[index]]">
-        <a href$="[[_elementLink(item.id)]]">
+        <a href$="[[_elementLink(item.uuid)]]" is="pushstate-anchor">
 
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
@@ -221,9 +221,10 @@
           window.open(A.href);
         } else {
           this.fire('nav', {url: A.href});
-        }
+        }        
         //e.preventDefault();
       }
+      this.fire('update-params');
     },
 
     _mouseOver: function(e) {
