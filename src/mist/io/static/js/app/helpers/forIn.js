@@ -34,8 +34,8 @@ define('app/helpers/forIn', [],
 
                     for (var i = 0, len = data.length; i < len; i++) {
                         if (data[i].key == 'xml_description') {
-                            tpl += "<tr><td>" + processKeys(data[i].key) + "</td><td>...</td></tr>";
-                            tpl += "<tr><td colspan='2'><pre class='plain_code'>" + data[i].value + "</pre></td></tr>";
+                            tpl += "<tr><td>" + processKeys(data[i].key) + "</td>";
+                            tpl += "<td><pre class='plain_code'>" + data[i].value + "</pre></td></tr>";
                         } else {
                             tpl += "<tr><td>" + processKeys(data[i].key) + "</td><td>" + data[i].value + "</td></tr>";
                         }
