@@ -377,3 +377,10 @@
 div.df {
 	font-family: monospace;
 }
+
+.plain_code {
+    white-space: pre-wrap;
+    text-align: left;
+    overflow-x: auto;
+    word-break: break-all;
+}
