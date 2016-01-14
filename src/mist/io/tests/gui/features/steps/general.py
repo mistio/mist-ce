@@ -384,11 +384,10 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # element of the list
     # also doing some cleaning if the text attribute also sends back texts
     # of sub elements
+    text = text.lower()
 
     button = filter(
-        lambda b: safe_get_element_text(b).rstrip().lstrip().split('\n')[
-                      0].lower() == text.lower()
-                  and b.value_of_css_property('display') == 'block',
+        lambda b: safe_get_element_text(b).rstrip().lstrip().split('\n')[0].lower() == text,
         button_collection)
     if len(button) > 0:
         return button[0]
@@ -397,7 +396,7 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # looks like it
     for button in button_collection:
         button_text = safe_get_element_text(button).split('\n')
-        if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
+        if len(filter(lambda b: text in b.lower(), button_text)) > 0:
             return button
 
     return None

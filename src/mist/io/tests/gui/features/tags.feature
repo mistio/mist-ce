@@ -14,7 +14,7 @@ Feature: Tags
     Then I expect for "single-machine-page" page to appear within max 5 seconds
     When I click the button "TAGS"
     Then I expect for "machine-tags-popup-popup" popup to appear within max 10 seconds
-    When I check the machine for previous tags
+    When I remove all the previous tags
     And I click the button "SAVE TAGS"
     Then I expect for "machine-tags-popup-popup" popup to disappear within max 30 seconds
     When I click the button "TAGS"
