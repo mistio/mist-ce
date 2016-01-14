@@ -4367,7 +4367,10 @@ def machine_name_validator(provider, name):
     elif provider is Provider.NEPHOSCALE:
         pass
     elif provider is Provider.GCE:
-        pass
+        if not re.search(r'^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', name):
+            raise MachineNameValidationError("name must be 1-63 characters long, with the first " + \
+                "character being a lowercase letter, and all following characters must be a dash, " + \
+                "lowercase letter, or digit, except the last character, which cannot be a dash.")
     elif provider is Provider.SOFTLAYER:
         pass
     elif provider is Provider.DIGITAL_OCEAN:
