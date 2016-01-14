@@ -23,10 +23,9 @@
                 {{/if}}
 
                 {{#if optionBody.command}}
-                    <div id="command-collapsible" data-role="collapsible" data-collapsed="true" class="ui-popup-toggle">
-                        <h4>Output</h4>
-                        <pre class="command-container" {{action "commandClicked" optionBody on="click" target=view}}>{{optionBody.command}}</pre>
-                    </div>
+                    <pre class="command-container" {{action "commandClicked" optionBody on="click" target=view}}>
+                        {{optionBody.command}}
+                    </pre>
                 {{/if}}
 
             {{/each}}
