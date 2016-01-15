@@ -31,7 +31,7 @@
             <h2 class="flex"> {{machine.name}} : {{machine.state}} </h2>
             <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
             <paper-icon-button icon="icons:sort"></paper-icon-button>
-            <paper-icon-button icon="account-circle"></paper-icon-button>
+            <app-user-menu email="marios@mist.io"></app-user-menu>
           </div>
           <div id="content">
             <div class="machine-info">
@@ -135,7 +135,7 @@
 
       },
       attached: function() {
-        this.fire('sidebar-attached');
+
       },
       listInfo: function(e) {
         var info = '';
