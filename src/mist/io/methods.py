@@ -247,12 +247,12 @@ def add_cloud_v_2(user, title, provider, params):
 
     if provider == 'bare_metal':
         cloud_id, mon_dict = _add_cloud_bare_metal(user, title, provider, params)
-        log.info("Cloud with id '%s' added succesfully.", cloud_id)
+        log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user.email, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'coreos':
         cloud_id, mon_dict = _add_cloud_coreos(user, title, provider, params)
-        log.info("Cloud with id '%s' added succesfully.", cloud_id)
+        log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user.email, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'ec2':
