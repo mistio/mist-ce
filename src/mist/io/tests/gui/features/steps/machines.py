@@ -123,7 +123,7 @@ def assert_machine_probed(context, name, seconds):
         machine = get_machine(context, name)
         if machine:
             try:
-                probed = machine.find_element_by_class_name("probed")
+                machine.find_element_by_class_name("probed")
                 return
             except NoSuchElementException:
                 pass
@@ -228,3 +228,92 @@ def search_image(context, text):
     if context.mist_config.get(text):
         text = context.mist_config.get(text)
     search_for_something(context, text, 'machine')
+
+
+@given(u'ssh key with name "{ssh_key_name}" is added')
+def ssh_key_is_added(context, ssh_key_name):
+    # first we have to find the keys button
+    buttons = context.browser.find_elements_by_class_name('ui-btn')
+    for button in buttons:
+        button_text = safe_get_element_text(button)
+        if 'add key' in button_text.lower():
+            # if there no keys then it will be called "Add key"
+            context.execute_steps(u"""
+                Then I click the button "Add key"
+                And I expect for "non-associated-keys-popup-popup" popup to appear within max 4 seconds
+            """)
+            # check if the key is already uploaded but not associated
+            key_already_associated = False
+            non_associated_keys = context.browser.find_element_by_id('non-associated-keys-popup').find_elements_by_tag_name('li')
+            for non_associated_key in non_associated_keys:
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in safe_get_element_text(non_associated_key).lower():
+                    non_associated_key.click()
+                    key_already_associated = True
+                    break
+
+            if not key_already_associated:
+                context.execute_steps(u"""
+                    When I click the "New key" button inside the "Add key" popup
+                    Then I expect for "key-add-popup" popup to appear within max 2 seconds
+                    And I upload the ssh key with name "%s"
+                """ % ssh_key_name)
+
+            context.execute_steps(u"""
+                Then I expect for "machine-keys-panel" side panel to appear within max 4 seconds
+                And I expect for "machine-associating-key-loader" loader to finish within max 100 seconds
+                Then If the key addition was successful
+            """)
+            context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
+            return
+        elif 'keys' in button_text.lower():
+            # otherwise it will be called "? keys" where ? is the number of
+            # saved keys. before adding the key we need to check if it's already
+            # saved
+            context.execute_steps(u'''
+                Then I click the button "%s"
+                And I expect for "machine-keys-panel" side panel to appear within max 4 seconds
+            ''' % safe_get_element_text(button))
+            machine_keys_list = context.browser.find_element_by_id("machine-keys")
+            machines_keys = machine_keys_list.find_elements_by_class_name(
+                "small-list-item")
+            checked_texts = []
+            for machines_key in machines_keys:
+                machines_key_text = safe_get_element_text(machines_key)
+                if not machines_key_text or not machines_key_text.strip():
+                    # sometimes the code checks for the texts too fast and they
+                    # haven't been fetched yet so we do a sleep
+                    sleep(1)
+                checked_texts.append(machines_key_text)
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']\
+                        in machines_key_text:
+                    context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
+                    context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
+                    return
+            context.execute_steps(u"""
+                When I click the "New key" button inside the "Manage Keys" panel
+                And I expect for "non-associated-keys-popup" popup to appear within max 4 seconds
+            """)
+            # check if the key is already uploaded but not associated
+            key_already_associated = False
+            non_associated_keys = context.browser.find_element_by_id('non-associated-keys-popup').find_elements_by_tag_name('li')
+            for non_associated_key in non_associated_keys:
+                if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name'].lower() in safe_get_element_text(non_associated_key).lower():
+                    non_associated_key.click()
+                    key_already_associated = True
+                    break
+
+            if not key_already_associated:
+                context.execute_steps(u"""
+                    When I click the "New key" button inside the "Add Key" popup
+                    Then I expect for "key-add-popup" popup to appear within max 2 seconds
+                    And I upload the ssh key with name "%s"
+                """ % ssh_key_name)
+
+            context.execute_steps(u"""
+                Then I expect for "key-generate-loader" loader to finish within max 5 seconds
+                And I expect for "machine-associating-key-loader" loader to finish within max 100 seconds
+                And If the key addition was successful
+            """)
+            context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
+            context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
+
