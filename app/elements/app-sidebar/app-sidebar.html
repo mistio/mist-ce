@@ -61,10 +61,10 @@
       current: { type: String, notify: true },
     },
     observers: [
-      'updateCount(model)'
+      // 'updateCount()'
     ],
     ready: function(){
-      
+
     },
     attached: function(){
 
@@ -75,12 +75,13 @@
     _isEqual: function(a,b) {
       return a === b;
     },
-    updateCount: function(model,sectionsArray) {
+    updateCount: function() {
 
     },
     _sectionCount: function(name) {
-      a = this.model[name+'Array'];
-      return a == undefined ? 0 : a.length;
+      // a = this.model[name+'Array'];
+      // return a == undefined ? 0 : a.length;
+      return "0";
     },
   });
 </script>
