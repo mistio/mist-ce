@@ -1,5 +1,7 @@
 body {
+  /* takes too long. we can add later */
   font-family: Roboto, 'Noto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /*font-family: Helvetica, Arial, sans-serif;*/
   -webkit-font-smoothing: antialiased;
   font-weight: 400;
   color: #424242;

@@ -160,6 +160,11 @@ app-sidebar paper-toolbar {
   margin-right: 15px;
 }
 
+#section-list span.count {  
+  float: right;
+  opacity: 0.54;
+}
+
 #current-tag {
   background: #2196F3;
   color: rgba(255,255,255,0.87);

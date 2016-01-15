@@ -28,13 +28,13 @@
                 <span class="title flex">dashboard</span>
               </div>
             </a>
-            <template is="dom-repeat" items="[[sections]]">
+            <template is="dom-repeat" items="{{sections}}">
               <a class="section" is="pushstate-anchor" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(current,item.id)]]" tabindex="1">
                 <div class="layout horizontal center">
                     <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
                     <span class="title flex">
                       <span>[[item.id]]</span>
-                      <span id="[[item.id]]">({{ _sectionCount(item.id) }})</span>
+                      <span class="count">{{item.count}}</span>
                     </span>
                 </div>
               </a>
@@ -59,10 +59,12 @@
     enableCustomStyleProperties: true,    
     properties : {
       current: { type: String, notify: true },
+      sections : { type: Array, notify: true, value: []}
     },
     observers: [
-      // 'updateCount()'
     ],
+    listeners: {
+    },
     ready: function(){
 
     },
@@ -74,14 +76,6 @@
     },
     _isEqual: function(a,b) {
       return a === b;
-    },
-    updateCount: function() {
-
-    },
-    _sectionCount: function(name) {
-      // a = this.model[name+'Array'];
-      // return a == undefined ? 0 : a.length;
-      return "0";
-    },
+    }
   });
 </script>

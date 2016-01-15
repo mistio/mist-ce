@@ -21,7 +21,7 @@
       <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
         
         <app-sidebar  tag="[[tag]]" 
-                      sections="[[sections]]" 
+                      sections="{{sections}}" 
                       current="machines" 
                       drawer></app-sidebar>
 
@@ -121,7 +121,7 @@
         router: Object,
         pageTitle: {type: String},
         params: {type: Object, notify: true},
-        sections: Array,
+        sections: {type: Array, notify: true},
         section: {type: Object, notify: true, value: {}},
         tag: {type: String, value: ""},
         
@@ -135,7 +135,7 @@
 
       },
       attached: function() {
-
+        this.fire('sidebar-attached');
       },
       listInfo: function(e) {
         var info = '';

@@ -66,62 +66,62 @@
             <!-- machines -->
             <page-list          model="{{model}}" 
                                 elements="{{model.machinesArray}}" 
-                                sections="[[sectionsArray]]" 
+                                sections="{{sectionsArray}}" 
                                 section="[[sections.machines]]"></page-list>
 
             <page-machine       params="{{params}}" 
                                 model="{{model}}" 
                                 machine="{{getMachine(params)}}"
                                 elements="{{model.machinesArray}}" 
-                                sections="[[sectionsArray]]" 
+                                sections="{{sectionsArray}}" 
                                 section="[[sections.machines]]"></page-machine>
             <!-- images -->
             <page-list          model="{{model}}" 
                                 elements="{{model.imagesArray}}" 
-                                sections="[[sectionsArray]]" 
+                                sections="{{sectionsArray}}" 
                                 section="[[sections.images]]"></page-list>
 
             <page-image         params="{{params}}" 
                                 model="{{model}}" 
                                 image="{{getImage(params)}}"
                                 elements="{{model.imagesArray}}" 
-                                sections="[[sectionsArray]]" 
+                                sections="{{sectionsArray}}" 
                                 section="[[sections.images]]"></page-image>
             <!-- keys -->
             <page-list          model="{{model}}" 
                                 elements="{{model.keysArray}}" 
-                                sections="[[sectionsArray]]" 
+                                sections="{{sectionsArray}}" 
                                 section="[[sections.keys]]"></page-list>
 
             <page-key           model="{{model}}" 
                                 params="{{params}}"
                                 key="{{getKey(params)}}"
                                 elements="{{model.keysArray}}" 
-                                sections="[[sectionsArray]]" 
+                                sections="{{sectionsArray}}" 
                                 section="[[sections.keys]]"></page-key>
             <!-- networks -->
             <page-list          model="{{model}}"  
                                 elements="{{model.networksArray}}" 
-                                sections="[[sectionsArray]]" 
+                                sections="{{sectionsArray}}" 
                                 section="[[sections.networks]]"></page-list>
 
             <page-network       model="{{model}}" 
                                 params="{{params}}"
                                 network="{{getNetwork(params)}}"
                                 elements="{{model.networksArray}}" 
-                                sections="[[sectionsArray]]" 
+                                sections="{{sectionsArray}}" 
                                 section="[[sections.networks]]"></page-network>
             <!-- scripts -->
             <page-list          model="{{model}}" 
-                                sections="[[sectionsArray]]" 
+                                sections="{{sectionsArray}}" 
                                 section="[[sections.scripts]]"></page-list>
 
             <page-script       model="{{model}}" 
                                 params="{{params}}"
                                 network="{{getScript(params)}}"
                                 elements="{{model.scriptsArray}}" 
-                                sections="[[sectionsArray]]" 
-                                section="[[sections.scripts]]"></page-network>
+                                sections="{{sectionsArray}}" 
+                                section="[[sections.scripts]]"></page-script>
 
             <page-elements></page-elements>            
             <page-account></page-account>
@@ -141,11 +141,16 @@
                 type: Object
             },
             sectionsArray: {
-                type: Array
+                type: Array,
+                notify: true
             }
         },
-        listeners: {
+        observers: [
+            
+        ],
+        listeners: {            
             'iron-activate': 'updateDocTitle',
+            'iron-activate': 'updateCount',
             'page-meta': 'updateTitle',
             'toast': 'showToast'
         },
@@ -166,33 +171,50 @@
             this.sectionsArray = [{
                     id: 'machines',
                     color: '#8c76d1',
-                    icon: 'hardware:computer'
+                    icon: 'hardware:computer',
+                    count: '0'
                 }, {
                     id: 'images',
                     color: '#0099cc',
-                    icon: 'image:photo'
+                    icon: 'image:photo',
+                    count: '0'
                 }, {
                     id: 'keys',
                     color: '#009688',
-                    icon: 'communication:vpn-key'
+                    icon: 'communication:vpn-key',
+                    count: '0'
                 }, {
                     id: 'networks',
                     color: '#795548',
-                    icon: 'hardware:device-hub'
+                    icon: 'hardware:device-hub',
+                    count: '0'
                 }, {
                     id: 'scripts',
                     color: '#D48900',
-                    icon: 'image:movie-creation'
+                    icon: 'image:movie-creation',
+                    count: '0'
                 }
                 /*,
                           {id: 'templates',
                           color: '',
                           icon: 'device:widgets'}*/
             ];
+            
             this.sections = _generateMap(this.sectionsArray);
         },
         attributeChanged: function(attrName, oldVal, newVal) {
             console.warn('attrChanged', attrName, oldVal, newVal);
+        },
+        updateCount : function() {
+            var sec = this.sectionsArray;
+            var mod = this.model;
+            for (var i = 0; i<sec.length; i++){
+                var c = mod[sec[i].id+'Array'].length;
+                this.set('sectionsArray.'+i+'.count', c);
+
+                // Notification required for binding to update!
+                this.notifyPath(sec[i].count, c);                
+            }
         },
         updateTitle: function(_, detail) {
             if (detail.title && detail.title.length) {
