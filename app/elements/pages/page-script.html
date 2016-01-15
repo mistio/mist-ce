@@ -16,7 +16,13 @@
 
   <template>
       <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
-        <app-sidebar tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
+        
+        <app-sidebar  tag="[[tag]]" 
+                      sections="[[sections]]" 
+                      current="[[section.id]]" 
+                      drawer></app-sidebar>
+
+
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
