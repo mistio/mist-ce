@@ -28,19 +28,22 @@
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex"> {{machine.name}} : {{machine.state}} </h2>
+            <h2 class="flex"> 
+              {{machine.name}}
+              <span id="machine-state">{{machine.state}}</span>
+            </h2>
             <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
             <paper-icon-button icon="icons:sort"></paper-icon-button>
             <app-user-menu email="marios@mist.io"></app-user-menu>
           </div>
           <div id="content">
-            <div class="machine-info">
+            <!-- <div class="machine-info">
               uuid = [[params.uuid]] <br/>
               id   = {{machine.id}} <br/>
-              name = {{machine.name}} <br/>
-              <paper-button on-tap="listInfo">temp machine info helper</paper-button>
-              <div id="machineproperties"></div>
-            </div>
+              name = {{machine.name}} <br/> -->
+              <!-- <paper-button on-tap="listInfo">temp machine info helper</paper-button>
+              <div id="machineproperties"></div> -->
+            <!-- </div> -->
             <app-graph title="CPU">
               <google-chart id="mutating_gauge0" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
                 "redFrom": 90,
@@ -116,7 +119,7 @@
     
     Polymer({
       is: 'page-machine',
-      enableCustomStyleProperties: true,
+      // enableCustomStyleProperties: true,
       properties: {
         router: Object,
         pageTitle: {type: String},
@@ -129,7 +132,7 @@
         machine: Object
       },
       listeners: {
-
+        'machine-changed' : '_machineStateLabel'
       },
       ready: function(){
 
@@ -143,6 +146,9 @@
           info+=prop+" : "+this.machine[prop]+", ";
         }
         this.$.machineproperties.textContent = info;        
+      },
+      _machineStateLabel: function() {
+        Polymer.dom('machine-state').setAttr('class',this.machine.state);
       },
       _sectionLink: function(name) {
         return '/' + name;

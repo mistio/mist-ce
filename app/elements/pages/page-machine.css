@@ -27,6 +27,30 @@ a {
   @apply(--layout-flex);
   text-transform: capitalize;
 }
+.paper-header #machine-state {
+   padding: 2px;
+   font-size: 12px;
+}
+.paper-header #machine-state.unknown {
+    background-color: lightgray;
+    color: #fff;
+}
+.paper-header #machine-state.running {
+    background-color: green;
+    color: #fff;
+}
+.paper-header #machine-state.terminated {
+    background-color: black;
+    color: #fff;
+}
+.paper-header #machine-state.stopped {
+    background-color: orange;
+    color: #fff;
+}
+.paper-header #machine-state.error {
+    background-color: red;
+    color: #fff;
+}
 
 .paper-header .toggleViewButton {
   --paper-icon-button-ink-color: transparent;
