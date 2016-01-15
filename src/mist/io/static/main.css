@@ -400,6 +400,17 @@ body {
     height: 16px;
     width: 16px;
 }
+/* TODO spinner-large@2x.gif */
+.ajax-loader-big {
+    background-image: url("/resources/images/spinner-large.gif");
+    background-position: center center !important;
+    background-repeat: no-repeat;
+    background-size: 64px auto;
+    display: block;
+    height: 64px;
+    margin: 0 auto;
+    width: 64px;
+}
 
 @media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
     .ajax-loader {

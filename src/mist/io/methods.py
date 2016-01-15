@@ -1260,6 +1260,7 @@ def connect_provider(cloud):
     Cloud is expected to be a mist.io.model.Cloud
 
     """
+    import libcloud.security
     if cloud.provider == Provider.LIBVIRT:
         import libcloud.compute.drivers.libvirt_driver
         libcloud.compute.drivers.libvirt_driver.ALLOW_LIBVIRT_LOCALHOST = config.ALLOW_LIBVIRT_LOCALHOST
@@ -1607,7 +1608,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
-                   disk_size=None, disk_path=None, create_from_existing=None,
+                   disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
 
@@ -1656,6 +1657,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         keypair = user.keypairs[key_id]
         private_key = keypair.private
         public_key = keypair.public
+    else:
+        public_key = None
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
@@ -1733,7 +1736,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif conn.type == Provider.VULTR:
         node = _create_machine_vultr(conn, public_key, machine_name, image,
                                          size, location, cloud_init)
-
     elif conn.type is Provider.LIBVIRT:
         try:
             # size_id should have a format cpu:ram, eg 1:2048
@@ -1743,8 +1745,11 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             ram = 512
             cpu = 1
         node = _create_machine_libvirt(conn, machine_name,
-                                       disk_size, ram, cpu,
-                                       image_id, disk_path, create_from_existing, networks)
+                                       disk_size=disk_size, ram=ram, cpu=cpu,
+                                       image=image_id, disk_path=disk_path,
+                                       networks=networks,
+                                       public_key=public_key,
+                                       cloud_init=cloud_init)
     elif conn.type == Provider.PACKET:
         node = _create_machine_packet(conn, public_key, machine_name, image,
                                          size, location, cloud_init, project_id)
@@ -2238,10 +2243,9 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
 
 
 def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
-                            image, disk_path, create_from_existing, networks):
+                            image, disk_path, networks, public_key, cloud_init):
     """Create a machine in Libvirt.
     """
-
 
     try:
         node = conn.create_node(
@@ -2251,8 +2255,9 @@ def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
             cpu=cpu,
             image=image,
             disk_path=disk_path,
-            create_from_existing=create_from_existing,
-            networks=networks
+            networks=networks,
+            public_key=public_key,
+            cloud_init=cloud_init
         )
 
     except Exception as e:
@@ -3623,9 +3628,13 @@ def check_monitoring(user):
         raise SSLError()
     if ret.status_code == 200:
         return ret.json()
-    else:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
+    elif ret.status_code in [400, 401]:
+        with user.lock_n_load():
+            user.email = ""
+            user.mist_api_token = ""
+            user.save()
+    log.error("Error getting stats %d:%s", ret.status_code, ret.text)
+    raise ServiceUnavailableError()
 
 
 def enable_monitoring(user, cloud_id, machine_id,
@@ -4313,18 +4322,28 @@ def undeploy_collectd(user, cloud_id, machine_id):
 
 def get_deploy_collectd_command_unix(uuid, password, monitor):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
+    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) " \
+          "python mist_collectd.py %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
 
 
 def get_deploy_collectd_command_windows(uuid, password, monitor):
-     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:25826"""""") -interval 10'"''' % (uuid, password, monitor)
+    return 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned ' \
+           '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
+           'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
+           'deploy_collectm/master/collectm.remote.install.ps1\',' \
+           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
+           '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
+           '-servers @("%s:25826")\''  % (uuid, password, monitor)
 
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor):
-    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
+    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup " \
+           "-e COLLECTD_USERNAME=%s " \
+           "-e COLLECTD_PASSWORD=%s " \
+           "-e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
 
 
 def machine_name_validator(provider, name):
@@ -4348,7 +4367,10 @@ def machine_name_validator(provider, name):
     elif provider is Provider.NEPHOSCALE:
         pass
     elif provider is Provider.GCE:
-        pass
+        if not re.search(r'^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', name):
+            raise MachineNameValidationError("name must be 1-63 characters long, with the first " + \
+                "character being a lowercase letter, and all following characters must be a dash, " + \
+                "lowercase letter, or digit, except the last character, which cannot be a dash.")
     elif provider is Provider.SOFTLAYER:
         pass
     elif provider is Provider.DIGITAL_OCEAN:

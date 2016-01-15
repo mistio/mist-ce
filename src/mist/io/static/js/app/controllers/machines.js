@@ -46,7 +46,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             newMachine: function(provider, name, image, size, location, key, cloud_init, script, project, monitoring, associateFloatingIp,
-                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtDiskSize, libvirtDiskPath, libvirtImagePath, libvirtExistingDiskPath) {
+                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtDiskSize, libvirtDiskPath, libvirtImagePath) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
                 // the server
@@ -129,8 +129,7 @@ define('app/controllers/machines', ['app/models/machine'],
                         //Libvirt
                         'libvirt_disk_size': libvirtDiskSize,
                         'libvirt_disk_path': libvirtDiskPath,
-                        'libvirt_image_path': libvirtImagePath,
-                        'libvirt_existing_disk_path': libvirtExistingDiskPath
+                        'libvirt_image_path': libvirtImagePath
                 }).success(function (machine) {
                     machine.cloud = that.cloud;
                     // Nephoscale returns machine id on request success,
@@ -152,7 +151,10 @@ define('app/controllers/machines', ['app/models/machine'],
             shutdownMachine: function(machineId, callback) {
                 var that = this;
                 var machine = this.getMachine(machineId);
-                machine.waitFor('stopped');
+
+                // Be careful libvirt machines go to 'terminated'
+                // while others to 'stopped' state
+                machine.waitFor(machine.cloud.provider == 'libvirt' ? 'terminated' : 'stopped');
                 machine.lockOn('pending');
                 this.set('shutingdownMachine', true);
                 Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {

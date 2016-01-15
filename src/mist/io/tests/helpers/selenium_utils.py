@@ -1,3 +1,5 @@
+import os
+
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
@@ -20,7 +22,8 @@ def choose_driver(flavor="firefox"):
         if flavor == "firefox":
             driver = webdriver.Firefox()
         elif flavor == "chrome":
-            service_log_path = BASE_DIR + "/var/log/chromedriver.log"
+            service_log_path = os.path.join(BASE_DIR,
+                                            "var/log/chromedriver.log")
             service_args = ['--verbose']
             driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH,
                                       service_args=service_args,

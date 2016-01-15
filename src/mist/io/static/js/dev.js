@@ -22,7 +22,6 @@ require.config({
         ember: '../dist/ember/ember.debug',
         elv: '../dist/ember-legacy-views',
         compiler: '../dist/ember/ember-template-compiler',
-        socket: '../dist/sockjs/sockjs',
         md5: '../dist/md5/build/md5.min',
         d3: '../dist/d3/d3.min',
         c3: '../dist/c3/c3.min',
@@ -80,14 +79,6 @@ var LOADER_STEPS = {
             });
         }
     },
-    'load socket': {
-        before: [],
-        exec: function () {
-            require(['socket'], function () {
-                appLoader.complete('load socket');
-            });
-        }
-    },
     'load multiplex': {
         before: [],
         exec: function () {
@@ -121,7 +112,7 @@ var LOADER_STEPS = {
         }
     },
     'init connections': {
-        before: ['load socket', 'load ember', 'init app'],
+        before: ['load ember', 'init app'],
         exec: function () {
             Mist.set('ajax', Ajax(CSRF_TOKEN));
             Mist.set('main', new Socket({
@@ -139,7 +130,8 @@ var LOADER_STEPS = {
     'fetch first data': {
         before: ['init connections'],
         exec: function () {
-            appLoader.complete('fetch first data');
+            // step will completed by the list_clouds event handler
+            // appLoader.complete('fetch first data');
         }
     }
 };
