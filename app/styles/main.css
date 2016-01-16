@@ -215,3 +215,34 @@ paper-button.custom.blue {
 paper-button.custom.blue > * {
   color: #fff;
 }
+a {
+  color: black;
+  text-decoration: none;
+}
+
+#container {
+  background: #fafafa;
+}
+
+.paper-header [paper-drawer-toggle] {
+  margin-left: 10px;
+}
+
+.paper-header {
+  @apply(--layout-horizontal);
+  @apply(--layout-center);
+}
+
+.paper-header h2 {
+  margin-left: 20px;
+  @apply(--layout-flex);
+  text-transform: capitalize;
+}
+
+.paper-header .toggleViewButton {
+  --paper-icon-button-ink-color: transparent;
+}
+
+.paper-header .cartButton {
+  margin-right: 10px;
+}

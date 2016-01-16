@@ -15,6 +15,7 @@
 <link rel="import" href="../app-rules/app-rules.html">
 
 <dom-module id="page-machine">
+  <link rel="import" type="css" href="../../styles/main.css">
   <link rel="import" type="css" href="page-machine.css">
 
   <template>
@@ -28,10 +29,12 @@
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex"> 
-              {{machine.name}}
-              <span id="machine-state">{{machine.state}}</span>
+            <h2> 
+              {{machine.name}}              
             </h2>
+            <div class="machine-state flex">
+              <span class$="{{machine.state}}" title="machine state">{{machine.state}}</span>
+            </div>
             <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
             <paper-icon-button icon="icons:sort"></paper-icon-button>
             <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -84,7 +87,6 @@
             <app-graph title="LOAD"></app-graph> -->
 
             <app-rules></app-rules>
-
           </div>
           <div class="absolute-bottom-right">
             <paper-menu-button vertical-align="bottom" horizontal-align="right">
