@@ -9,7 +9,6 @@
       line-height: 34px;
       width: 34px;
       height: 34px;
-      background: #ccc;
       text-align: center;
       font-weight: 500;
       font-size: 18px;
@@ -30,9 +29,7 @@
     }
   </style>
   <template>
-    <div style$="[[_getComputedStyle(color)]]">
-      <iron-icon icon="[[icon]]"></iron-icon>
-    </div>
+      <iron-icon icon="[[icon]]" style$="[[_getComputedStyle(color)]]"></iron-icon>
   </template>
 </dom-module>
 
@@ -45,7 +42,7 @@
     },
 
     _getComputedStyle: function(color) {
-      return 'background-color: ' + color + ';';
+      return 'color: ' + color + ';';
     }
   });
 </script>

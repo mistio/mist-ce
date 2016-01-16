@@ -157,12 +157,26 @@ app-sidebar paper-toolbar {
 }
 
 #section-list .section section-symbol, #section-list .section .all-symbol {
-  margin-right: 15px;
+  margin-right: 10px;
 }
 
 #section-list span.count {  
   float: right;
   opacity: 0.54;
+}
+
+#section-list #dashboard {
+  background-color: slategrey;
+  color: #fff;
+  border-top: 1px solid #999;
+}
+
+#section-list #dashboard iron-icon {
+  color: #fff;
+}
+
+#section-list .section:last-of-type {
+  border-bottom: 1px solid #ddd;
 }
 
 #current-tag {
@@ -183,3 +197,18 @@ app-sidebar paper-toolbar {
 .tags tag-link:last-of-type + span {
   display: none;
 }
+
+#mist-side-head {
+  min-height: 48px;
+  padding: 2px;
+}
+
+
+
+
+
+
+
+
+
+

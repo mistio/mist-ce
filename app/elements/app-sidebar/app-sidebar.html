@@ -17,12 +17,15 @@
   <template>
     <app-socket id="appsocket" model="{{model}}"></app-socket>
     <div class="content">
+        <!-- <div id="mist-side-head">
+          <app-logo full class="flex"></app-logo>
+        </div> -->
         <div id="section-tag" hidden$="[[!tag]]">
           <span>[[tag]]</span> <iron-icon icon="clear" on-tap="clearTag"></iron-icon>
         </div>
         <div id="section-list">
           <nav>
-            <a href="/?poly=1" is="pushstate-anchor" class="section" tabindex="1">
+            <a href="/?poly=1" is="pushstate-anchor" id="dashboard" class="section" tabindex="1">
               <div class="layout horizontal center">
                 <div class="all-symbol" aria-hidden="true"><iron-icon icon="apps"></iron-icon></div>
                 <span class="title flex">dashboard</span>
@@ -39,12 +42,13 @@
                 </div>
               </a>
             </template>
-            <a href="/elements" class="section flex">
-              <div class="layout horizontal center">
-                _elements
-              </div>
-            </a>
           </nav>
+          <a href="/elements" class="flex section">
+            <div class="layout horizontal center">
+              <div class="all-symbol" aria-hidden="true"><iron-icon icon="add-circle-outline"></iron-icon></div>
+              <span class="title flex">_elements</span>
+            </div>
+          </a>
         </div>
         <div hidden$="[[!tag]]" id="current-tag" class="horizontal layout center">
           <b>Tag:</b> <span class="flex">[[tag]]</span> <iron-icon icon="clear" on-tap="clearTag"></iron-icon>
