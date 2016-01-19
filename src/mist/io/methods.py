@@ -2884,7 +2884,6 @@ def list_images(user, cloud_id, term=None):
     except Exception as e:
         log.error(repr(e))
         raise CloudUnavailableError(cloud_id, e)
-
     ret = [{'id': image.id,
             'extra': image.extra,
             'name': image.name,
@@ -2902,11 +2901,6 @@ def _image_starred(user, cloud_id, image_id):
         if cloud.provider in config.EC2_IMAGES:
             if image_id in config.EC2_IMAGES[cloud.provider]:
                 default = True
-    elif cloud.provider == 'docker':
-        # do not consider docker cloud's images as default
-        default = False
-        if image_id in config.DOCKER_IMAGES:
-            default = True
     else:
         # consider all images default for clouds with few images
         default = True
