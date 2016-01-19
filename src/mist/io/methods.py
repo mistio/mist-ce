@@ -14,6 +14,7 @@ from hashlib import sha256
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
 from netaddr import IPSet, IPNetwork
+from xml.sax.saxutils import escape
 
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -1579,6 +1580,10 @@ def list_machines(user, cloud_id):
             # this is windows for windows servers and None for Linux
             m.extra['os_type'] = m.extra.get('platform', 'linux')
 
+        if m.driver.type is Provider.LIBVIRT:
+            if m.extra.get('xml_description'):
+                m.extra['xml_description'] = escape(m.extra['xml_description'])
+
         # tags should be a list
         if not tags:
             tags = []
@@ -2884,7 +2889,6 @@ def list_images(user, cloud_id, term=None):
     except Exception as e:
         log.error(repr(e))
         raise CloudUnavailableError(cloud_id, e)
-
     ret = [{'id': image.id,
             'extra': image.extra,
             'name': image.name,
@@ -2902,11 +2906,6 @@ def _image_starred(user, cloud_id, image_id):
         if cloud.provider in config.EC2_IMAGES:
             if image_id in config.EC2_IMAGES[cloud.provider]:
                 default = True
-    elif cloud.provider == 'docker':
-        # do not consider docker cloud's images as default
-        default = False
-        if image_id in config.DOCKER_IMAGES:
-            default = True
     else:
         # consider all images default for clouds with few images
         default = True
@@ -4322,18 +4321,28 @@ def undeploy_collectd(user, cloud_id, machine_id):
 
 def get_deploy_collectd_command_unix(uuid, password, monitor):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
+    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) " \
+          "python mist_collectd.py %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
     return cmd
 
 
 def get_deploy_collectd_command_windows(uuid, password, monitor):
-     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:25826"""""") -interval 10'"''' % (uuid, password, monitor)
+    return 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned ' \
+           '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
+           'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
+           'deploy_collectm/master/collectm.remote.install.ps1\',' \
+           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
+           '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
+           '-servers @("%s:25826")\''  % (uuid, password, monitor)
 
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor):
-    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
+    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup " \
+           "-e COLLECTD_USERNAME=%s " \
+           "-e COLLECTD_PASSWORD=%s " \
+           "-e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
 
 
 def machine_name_validator(provider, name):
@@ -4357,7 +4366,10 @@ def machine_name_validator(provider, name):
     elif provider is Provider.NEPHOSCALE:
         pass
     elif provider is Provider.GCE:
-        pass
+        if not re.search(r'^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', name):
+            raise MachineNameValidationError("name must be 1-63 characters long, with the first " + \
+                "character being a lowercase letter, and all following characters must be a dash, " + \
+                "lowercase letter, or digit, except the last character, which cannot be a dash.")
     elif provider is Provider.SOFTLAYER:
         pass
     elif provider is Provider.DIGITAL_OCEAN:

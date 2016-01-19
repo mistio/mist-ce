@@ -50,6 +50,7 @@ define('app/views/key_list', ['app/views/page'],
                     default:
                         $('#key-list-page .ui-footer')
                         .slideDown()
+                        .find('#keys-delete-btn').removeClass('ui-state-disabled').end()
                         .find('#keys-rename-btn').addClass('ui-state-disabled').end()
                         .find('#keys-default-btn').addClass('ui-state-disabled');
                 }
