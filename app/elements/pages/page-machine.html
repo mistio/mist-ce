@@ -40,13 +40,13 @@
             <app-user-menu email="marios@mist.io"></app-user-menu>
           </div>
           <div id="content">
-            <!-- <div class="machine-info">
+            <div class="machine-info">
               uuid = [[params.uuid]] <br/>
               id   = {{machine.id}} <br/>
-              name = {{machine.name}} <br/> -->
-              <!-- <paper-button on-tap="listInfo">temp machine info helper</paper-button>
-              <div id="machineproperties"></div> -->
-            <!-- </div> -->
+              name = {{machine.name}} <br/>
+              <paper-button on-tap="listInfo">temp machine info helper</paper-button>
+              <div id="machineproperties"></div>
+            </div>
             <app-graph title="CPU">
               <google-chart id="mutating_gauge0" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
                 "redFrom": 90,

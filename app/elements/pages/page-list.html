@@ -95,10 +95,6 @@
       ready: function() {
         this.view = this._forceCards ? 'cards' : 'table';
       },
-      _sectionCount: function(section) {
-        var a = this.model[section+'Array'];
-        return a == undefined ? 0 : a.length;
-      },
       filter: function(element) {
         if (this.q && this.q.length && element.name.indexOf(this.q) < 0) {
           return false;

@@ -12,11 +12,13 @@
 .card-content {
   width: 100%;
   display: block;
+  padding: 0;
 }
 .graph {
   min-width: 100%;
 }
 google-chart {
+  width: 100%;
 	max-width: 100%;
 }
 paper-icon-button {
