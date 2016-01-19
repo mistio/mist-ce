@@ -65,7 +65,7 @@ h3 {
 .title iron-icon {
     width: 24px;
     height: 24px;
-    color: #fff;
+    color: inherit;
     opacity: .8;
     vertical-align: text-top;
     margin-left: 6px;
@@ -97,6 +97,10 @@ h3 {
 :host(.active) .tagline {
   transform: translate(0, 0);
   opacity: 1;
+}
+
+:host(.active) theme-color {
+  border: 1px solid #000;
 }
 
 @media (max-width: 439px) {
