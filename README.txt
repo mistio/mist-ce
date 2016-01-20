@@ -51,7 +51,6 @@ create a virtualenv and run buildout. This will fail if you run it as root or wi
     git clone https://github.com/mistio/mist.io.git
     cd mist.io
     virtualenv --no-site-packages .
-    ./bin/pip install ansible
     ./bin/python bootstrap.py
     ./bin/buildout -v
 
