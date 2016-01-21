@@ -213,7 +213,7 @@
                 this.set('sectionsArray.'+i+'.count', c);
 
                 // Notification required for binding to update!
-                this.notifyPath(sec[i].count, c);                
+                this.notifyPath(sec[i].count, c);
             }
         },
         updateTitle: function(_, detail) {
@@ -244,6 +244,9 @@
             };
             //return image object with the right 'id' from model.imagesArray
             return im;
+
+            // var index = params.id;
+            // return this.model.images.index;
         },
         getKey: function(params){
             var ka = this.model.keysArray;
@@ -255,6 +258,10 @@
             };
             //return key object with the right 'id' from model.keysArray
             return k;
+
+            // //altertenative way to get object from map
+            // var index = params.id;
+            // return this.model.keys.index;
         },
         getNetwork: function(params){
             var na = this.model.networksArray;

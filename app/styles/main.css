@@ -183,6 +183,10 @@ iron-icon {
   color: rgba(0,0,0,0.54);
 }
 
+.gold iron-icon {
+  color: goldenrod;
+}
+
 p a {
     text-transform: none;
     color: rgb(85,114,250);

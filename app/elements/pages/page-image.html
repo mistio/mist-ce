@@ -26,7 +26,15 @@
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex">{{image.name}}</h2>
+            <h2 class="flex">
+              {{image.name}}
+              <template is="dom-if" if$="{{image.star}}">
+                <paper-icon-button on-tap="unstarthis" class="gold" icon="icons:star" title="image is starred and appears in machine creation"></paper-icon-button>
+              </template>
+              <template is="dom-if" if$="{{!image.star}}">
+                <paper-icon-button on-tap="starthis" icon="icons:star-border" title="image does not appear in machine creation"></paper-icon-button>
+              </template>
+            </h2>
             <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
             <paper-icon-button icon="icons:sort"></paper-icon-button>
             <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -54,13 +62,13 @@
       is: 'page-image',
       enableCustomStyleProperties: true,
       properties: {
-        router: Object,
+        router:   Object,
         pageTitle: {type: String},
         params: {type: Object, notify: true},
         sections: Array,
         section: {type: Object, notify: true, value: {}},
-        tag: {String, value: ""},
-        image: Object
+        tag: {type:String, value: ""},
+        image: {type:Object, notify:true}
       },
       ready: function() {
 
@@ -73,10 +81,16 @@
         for(var prop in this.image){
           info+=prop+" : "+this.image[prop]+", ";
         }
-        this.$.imageproperties.textContent = info;        
+        this.$.imageproperties.textContent = info;
       },
       addMachine: function (_,params) {
         console.log("clicked Add Machine");
       },
+      starthis: function() {
+        this.set('image.star', true);
+      },
+      unstarthis: function() {
+        this.set('image.star', false);
+      }
     });
 </script>
