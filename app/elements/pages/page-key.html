@@ -29,7 +29,7 @@
             <h2>{{params.id}}</h2> 
             <span class="key-is-default flex">
               <template is="dom-if" if="{{key.isDefault}}">
-                Default Key               
+                Default Key
               </template>
             </span>
             <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
@@ -72,40 +72,40 @@
 
 <script>
     Polymer({
-      is: 'page-key',
-      enableCustomStyleProperties: true,
-      properties: {
-        router: Object,
-        pageTitle: {type: String},
-        params: {type: Object, notify: true},
-        sections: Array,
-        section: {type: Object, notify: true, value: {}},
-        tag: {type:String, value: ""},
-        key: {type:Object, notify: true}
-      },
-      ready: function() {
+        is: 'page-key',
+        enableCustomStyleProperties: true,
+        properties: {
+            router: Object,
+            pageTitle: {type: String},
+            params: {type: Object, notify: true},
+            sections: Array,
+            section: {type: Object, notify: true, value: {}},
+            tag: {type:String, value: ""},
+            key: {type:Object, notify: true}
+        },
+        ready: function() {
 
-      },
-      attached: function() {
+        },
+        attached: function() {
 
-      },
-      listInfo: function(e) {
-        var info = '';
-        for(var prop in this.key){
-          info+=prop+" : "+this.key[prop]+", ";
+        },
+        listInfo: function(e) {
+            var info = '';
+            for(var prop in this.key){
+                info+=prop+" : "+this.key[prop]+", ";
+            }
+            this.$.keyproperties.textContent = info;
+        },
+        addMachine: function (_,params) {
+            // console.log("clicked Add Machine");
+        },
+        makeDefault: function(){
+            //needs to update the previous default key that it's not the default key anymore
+            var k = this.model.keysArray;
+            for (var i =0 ; i<k.length; i++ ){
+                if (k[i].isDefault) k[i].isDefault = false
+            }
+            this.set('key.isDefault', true);
         }
-        this.$.keyproperties.textContent = info;        
-      },
-      addMachine: function (_,params) {
-        // console.log("clicked Add Machine");
-      },
-      makeDefault: function(){
-        //needs to update the previous default key that it's not the default key anymore
-        var k = this.model.keysArray;
-        for (var i =0 ; i<k.length; i++ ){
-          if (k[i].isDefault) k[i].isDefault = false
-        }
-        this.set('key.isDefault', true);
-      }
     });
 </script>

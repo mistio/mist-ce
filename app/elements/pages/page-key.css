@@ -1,22 +1,27 @@
 :host {
   background: #fafafa;
 }
+
 #content {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 20px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px;
 }
+
 #container {
   background: #fafafa;
 }
+
 paper-material {
 	padding: 0 20px;
 	overflow: hidden;
 	margin-bottom: 20px;
 }
+
 .paper-header h2 {
-    @apply(--layout-flex-none);
+  @apply(--layout-flex-none);
 }
-.key-is-default {
-    padding-left: 10px;
+
+.machine-state {
+  padding-left: 10px;
 }
