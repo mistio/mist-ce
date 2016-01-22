@@ -580,3 +580,21 @@ def give_some_input(context, some_text, element_id):
     if context.mist_config.get(some_text):
         some_text = context.mist_config[some_text]
     input_element.send_keys(some_text)
+
+
+def focus_on_element(context, element):
+    position = element.location
+    context.browser.execute_script("window.scrollTo(0, %s)" % position['y'])
+
+
+@step(u'I focus on the "{name}" button')
+def focus_on_add_rule(context, name):
+    if context.mist_config.get(name):
+        name = context.mist_config[name]
+    if "Add Rule" in name:
+        button = context.browser.find_element_by_id("add-rule-button")
+        focus_on_element(context, button)
+    elif "Add Graph" in name:
+        button = context.browser.find_element_by_id("add-metric-btn")
+        focus_on_element(context, button)
+    return
