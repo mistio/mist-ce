@@ -9,3 +9,8 @@
 #container {
   background: #fafafa;
 }
+paper-material {
+	padding: 0 20px;
+	overflow: hidden;
+	margin-bottom: 20px;
+}

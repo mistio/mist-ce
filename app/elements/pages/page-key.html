@@ -32,7 +32,26 @@
             <app-user-menu email="marios@mist.io"></app-user-menu>
           </div>
           <div id="content">
-            Key ID: {{params.id}}
+            <paper-material>
+              <h2>Key ID: {{key.id}}</h2>
+              <template is="dom-if" if="{{key.isDefault}}">
+                <p>Default Key</p>
+              </template>
+            </paper-material>
+            <paper-material>
+              <template is="dom-if" if="{{!key.machines.length}}">
+                <p>The key is not used at any machine.</p>
+              </template>
+              <template is="dom-if" if="{{key.machines.length}}">
+                <h2>Machines</h2>
+                <p>Machines using this key:</p>
+                <ul>
+                  <template is="dom-repeat" items="{{key.machines}}">
+                    <li>{{item}}</li>
+                  </template>
+                </ul>
+              </template>
+            </paper-material>
             <paper-button on-tap="listInfo">temp key info helper</paper-button>
             <div id="keyproperties"></div>
           </div>
@@ -59,8 +78,8 @@
         params: {type: Object, notify: true},
         sections: Array,
         section: {type: Object, notify: true, value: {}},
-        tag: {String, value: ""},
-        key: Object
+        tag: {type:String, value: ""},
+        key: {type:Object, notify: true}
       },
       ready: function() {
 
