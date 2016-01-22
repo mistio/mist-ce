@@ -69,36 +69,44 @@ Polymer({
 
         if (namespace == 'main') {
             channel.on('list_keys', function (data) {
+                that.debounce(that._updateKeys(data), function(){
                 // console.debug('list_keys', data);
-                that._updateKeys(data);
+                }, 250);
             });
             channel.on('list_clouds', function (data) {
+                that.debounce(that._updateClouds(data), function(){
                 // console.debug('list_clouds', data);
-                that._updateClouds(data);
+                }, 250);
             });
             channel.on('list_machines', function (data) {
+                that.debounce(that._updateMachines(data), function(){
                 // console.debug('list_machines', data);
-                that._updateMachines(data);
+                }, 250);
             });
             channel.on('list_sizes', function (data) {
+                that.debounce(that._updateSizes(data), function(){
                 // console.debug('list_sizes', data);
-                that._updateSizes(data);
+                }, 250);
             });
             channel.on('list_locations', function (data) {
+                that.debounce(that._updateLocations(data), function(){
                 // console.debug('list_locations', data);
-                that._updateLocations(data);
+                }, 250);
             });
             channel.on('list_images', function (data) {
+                that.debounce(that._updateImages(data), function(){
                 // console.debug('list_images', data);
-                that._updateImages(data);
+                }, 250);
             });
             channel.on('list_networks', function (data) {
+                that.debounce(that._updateNetworks(data), function(){
                 // console.debug('list_networks', data);
-                that._updateNetworks(data);
+                }, 250);
             });
             channel.on('list_projects', function (data) {
+                that.debounce(that._updateProjects(data), function(){
                 // console.debug('list_projects', data);
-                that._updateProjects(data);
+                }, 250);
             });
             channel.on('probe', function (data) {
                 // console.debug('probe', data);
@@ -110,7 +118,7 @@ Polymer({
             });
             channel.on('monitoring', function (data) {
                 // console.debug('monitoring', data);
-                that._updateMonitoring(data);
+                that.debounce(that._updateMonitoring(data), 250);
             });
         } else if (namespace == 'logs') {
             channel.on('logs', function (data) {
