@@ -35,16 +35,15 @@
             <paper-material>
               <h2>Key ID: {{key.id}}</h2>
               <template is="dom-if" if="{{key.isDefault}}">
-                <p>Default Key</p>
-              </template>
+                <p>Default Key</p>                 
+              </template>              
             </paper-material>
             <paper-material>
               <template is="dom-if" if="{{!key.machines.length}}">
                 <p>The key is not used at any machine.</p>
               </template>
               <template is="dom-if" if="{{key.machines.length}}">
-                <h2>Machines</h2>
-                <p>Machines using this key:</p>
+                <h2>Machines:</h2>
                 <ul>
                   <template is="dom-repeat" items="{{key.machines}}">
                     <li>{{item}}</li>
@@ -52,14 +51,15 @@
                 </ul>
               </template>
             </paper-material>
-            <paper-button on-tap="listInfo">temp key info helper</paper-button>
-            <div id="keyproperties"></div>
           </div>
           <div class="absolute-bottom-right">
             <paper-menu-button vertical-align="bottom" horizontal-align="right">
               <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
               <paper-menu class="dropdown-content">
                 <paper-button on-click="addMachineS">Add Machine</paper-button>
+                <template is="dom-if" if="{{!key.isDefault}}">
+                  <paper-button on-tap="makeDefault">make this the default key</paper-button>
+                </template>
               </paper-menu>
             </paper-menu-button>
           </div>
@@ -97,5 +97,13 @@
       addMachine: function (_,params) {
         // console.log("clicked Add Machine");
       },
+      makeDefault: function(){
+        //needs to update the previous default key that it's not the default key anymore
+        var k = this.model.keysArray;
+        for (var i =0 ; i<k.length; i++ ){
+          if (k[i].isDefault) k[i].isDefault = false
+        }
+        this.set('key.isDefault', true);
+      }
     });
 </script>
