@@ -37,8 +37,3 @@ def after_step(context, step):
 
 def after_all(context):
     context.browser.quit()
-    # if not LOCAL:
-    #     node = context.remote_info['node']
-    #     container = context.remote_info['container']
-    #     node.kill(container)
-    #     node.remove_container(container)
