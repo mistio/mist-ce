@@ -26,7 +26,12 @@
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex">{{params.id}}</h2>
+            <h2>{{params.id}}</h2> 
+            <span class="key-is-default flex">
+              <template is="dom-if" if="{{key.isDefault}}">
+                Default Key               
+              </template>
+            </span>
             <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
             <paper-icon-button icon="icons:sort"></paper-icon-button>
             <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -34,9 +39,6 @@
           <div id="content">
             <paper-material>
               <h2>Key ID: {{key.id}}</h2>
-              <template is="dom-if" if="{{key.isDefault}}">
-                <p>Default Key</p>                 
-              </template>              
             </paper-material>
             <paper-material>
               <template is="dom-if" if="{{!key.machines.length}}">
