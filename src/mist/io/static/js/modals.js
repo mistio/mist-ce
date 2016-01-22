@@ -1,12 +1,16 @@
 (function($) {
     $.fn.mdPopup = function(options) {
         if (options == 'open') {
-            $(this).addClass('md-show');
+            $(this)
+                .addClass('md-show')
+                .removeClass('md-hide');
             info('open modal');
         }
 
         if (options == 'close') {
-            $(this).removeClass('md-show');
+            $(this)
+                .addClass('md-hide')
+                .removeClass('md-show');
             info('close modal');
         }
     };
