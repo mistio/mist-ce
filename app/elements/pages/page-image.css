@@ -6,3 +6,8 @@
   -webkit-overflow-scrolling: touch;
   padding: 20px;
 }
+paper-material {
+	padding: 0 20px;
+	overflow: hidden;
+	margin-bottom: 20px;
+}

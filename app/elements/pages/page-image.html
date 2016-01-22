@@ -28,10 +28,10 @@
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
             <h2 class="flex">
               {{image.name}}
-              <template is="dom-if" if$="{{image.star}}">
+              <template is="dom-if" if="{{image.star}}">
                 <paper-icon-button on-tap="unstarthis" class="gold" icon="icons:star" title="image is starred and appears in machine creation"></paper-icon-button>
               </template>
-              <template is="dom-if" if$="{{!image.star}}">
+              <template is="dom-if" if="{{!image.star}}">
                 <paper-icon-button on-tap="starthis" icon="icons:star-border" title="image does not appear in machine creation"></paper-icon-button>
               </template>
             </h2>
@@ -39,8 +39,15 @@
             <paper-icon-button icon="icons:sort"></paper-icon-button>
             <app-user-menu email="marios@mist.io"></app-user-menu>
           </div>
-          <div id="content">
-            Image Page {{params.id}}
+          <div id="content">            
+            <paper-material>
+              <h2>Image ID: {{image.id}}</h2>
+            </paper-material>
+            <paper-material>
+              <h2>Extra Info:</h2>
+              <p id="extrainfo">{{showExtra(image.extra)}}</p>
+            </paper-material>
+
             <paper-button on-tap="listInfo">temp image info helper</paper-button>
             <div id="imageproperties"></div>
           </div>
@@ -91,6 +98,14 @@
       },
       unstarthis: function() {
         this.set('image.star', false);
+      },
+      showExtra: function(extra) {
+        var e = extra;
+        var p = "";
+        for (var prop in e) {          
+          p += prop + ": " + prop.value + ", ";
+        }
+        return p;
       }
     });
 </script>
