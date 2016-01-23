@@ -32,9 +32,49 @@
             <app-user-menu email="marios@mist.io"></app-user-menu>
           </div>
           <div id="content">
-            Network Name: {{params.name}}
-            <paper-button on-tap="listInfo">temp network info helper</paper-button>
-            <div id="networkproperties"></div>
+            <paper-material>
+                <paper-button on-tap="listInfo">temp network info helper</paper-button>
+                <div id="networkproperties"></div>
+                <h2>ID:</h2>
+                <p>{{network.id}}</p>
+                <hr/>
+
+                <h2>Status:</h2>
+                <p>{{network.status}}</p>
+                <hr/>
+
+                <h2>Type:</h2>
+                <p>{{network.type}}</p>
+                <hr/>
+
+                <h2>Provider:</h2>
+                <p>{{network.provider}}</p>
+                <hr/>
+                
+                <template is="dom-if" if="{{network.subnets.length}}">
+                <h2>Subnets:</h2>
+                <p>{{showMore(network.subnets)}}</p> 
+                <hr/>
+                </template>
+                
+                <template is="dom-if" if="{{network.tags.length}}">
+                <h2>Tags:</h2>
+                <p>{{showExtra(network.tags)}}</p>
+                <hr/>
+                </template>
+
+                <template is="dom-if" if="{{network.floating_ips.length}}">
+                <h2>Floating Ips:</h2>
+                <p>{{showMore(network.floating_ips)}}</p>
+                <hr/>
+                </template>
+                
+                <template is="dom-if" if="{{network.floating_ips.length}}">
+                <h2>Extra:</h2>
+                <p>{{showExtra(network.extra)}}</p>
+                </template>
+
+            </paper-material>
           </div>
           <div class="absolute-bottom-right">
             <paper-menu-button vertical-align="bottom" horizontal-align="right">
@@ -74,6 +114,21 @@
           info+=prop+" : "+this.network[prop]+", ";
         }
         this.$.networkproperties.textContent = info;        
+      },
+      showExtra: function(extra) {
+        var e = extra;
+        var info = '';
+        for(var prop in e){
+          info+=prop+" : "+e[prop]+", ";
+        }
+        return info;
+      },
+      showMore: function(s) {
+        var info = '';
+        for (var i=0; i<s.length; s++){
+            info += i +": "+ this.showExtra(s[i]) + ", ";
+        }
+        return info;
       },
       deleteNetwork: function (_,params) {
         // console.log("clicked delete Network");

@@ -1,5 +1,5 @@
 :host {
-  background: #fafafa;
+  	background: #fafafa;
 }
 #content {
     overflow: auto;
@@ -7,5 +7,17 @@
     padding: 20px;
 }
 #container {
-  background: #fafafa;
+  	background: #fafafa;
+}
+paper-material {
+	padding: 0 20px;
+	overflow: hidden;
+	margin-bottom: 20px;
+}
+#content h2, #content p {
+	display: inline-block;
+	vertical-align: middle;
+}
+#content p {
+	padding-left: 20px;
 }
