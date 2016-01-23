@@ -14,6 +14,7 @@ from hashlib import sha256
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
 from netaddr import IPSet, IPNetwork
+from xml.sax.saxutils import escape
 
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -1579,6 +1580,10 @@ def list_machines(user, cloud_id):
             # this is windows for windows servers and None for Linux
             m.extra['os_type'] = m.extra.get('platform', 'linux')
 
+        if m.driver.type is Provider.LIBVIRT:
+            if m.extra.get('xml_description'):
+                m.extra['xml_description'] = escape(m.extra['xml_description'])
+
         # tags should be a list
         if not tags:
             tags = []
@@ -2884,7 +2889,6 @@ def list_images(user, cloud_id, term=None):
     except Exception as e:
         log.error(repr(e))
         raise CloudUnavailableError(cloud_id, e)
-
     ret = [{'id': image.id,
             'extra': image.extra,
             'name': image.name,
@@ -2902,11 +2906,6 @@ def _image_starred(user, cloud_id, image_id):
         if cloud.provider in config.EC2_IMAGES:
             if image_id in config.EC2_IMAGES[cloud.provider]:
                 default = True
-    elif cloud.provider == 'docker':
-        # do not consider docker cloud's images as default
-        default = False
-        if image_id in config.DOCKER_IMAGES:
-            default = True
     else:
         # consider all images default for clouds with few images
         default = True

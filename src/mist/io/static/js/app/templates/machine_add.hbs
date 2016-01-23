@@ -51,14 +51,13 @@
         </div>
 
         <!-- Select Image -->
-        <div id="create-machine-image" class="field-wrapper required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">   
+        <div id="create-machine-image" class="field-wrapper required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
             <div class="first-child {{if view.hasLibvirt '' 'last-child'}}">
                 <label>Image</label>
                 <div data-role="collapsible"
                      data-iconpos="right"
                      data-collapsed-icon="carat-d"
                      data-expanded-icon="carat-u"
-
                      class="mist-select">
                     <h4>
                         {{#if Mist.machineAddController.newMachineImage.id}}
@@ -124,7 +123,6 @@
                      data-iconpos="right"
                      data-collapsed-icon="carat-d"
                      data-expanded-icon="carat-u"
-
                      class="mist-select">
                     <h4>{{Mist.machineAddController.newMachineSize.name}}</h4>
 
@@ -212,7 +210,6 @@
                      data-iconpos="right"
                      data-collapsed-icon="carat-d"
                      data-expanded-icon="carat-u"
-
                      class="mist-select">
                     <h4>
                         {{#if Mist.machineAddController.newMachineKey.id}}
@@ -254,7 +251,6 @@
                      data-iconpos="right"
                      data-collapsed-icon="carat-d"
                      data-expanded-icon="carat-u"
-
                      class="mist-select">
                     <h4>
                         {{#if Mist.machineAddController.newMachineProject.name}}
@@ -278,6 +274,7 @@
 
         <!-- Docker Specific -->
         {{#if view.hasDocker}}
+        {{#if view.dockerOptionalCommand}}
         <div class="docker">
 
             <!-- Environment Vars -->
@@ -288,17 +285,16 @@
                        value=Mist.machineAddController.newMachineDockerEnvironment}}
             </div>
 
-            {{#unless view.dockerNeedScript}}
             <!-- Command -->
-            <div id="create-machine-command" class="required {{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
+            <div id="create-machine-command" class="{{if Mist.machineAddController.newMachineDockerCommand 'filled' 'empty'}}">
                 <label for="create-machine-command">Command</label>
                 {{view Mist.TextArea
                        id="create-machine-command"
                        value=Mist.machineAddController.newMachineDockerCommand}}
             </div>
-            {{/unless}}
 
         </div>
+        {{/if}}
         {{/if}}
 
         <!-- Select Networks -->

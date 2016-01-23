@@ -374,6 +374,15 @@
 	word-break: break-all;
 }
 
-div.df {
+.info-table div.df {
 	font-family: monospace;
+}
+
+.info-table .plain_code {
+    white-space: pre-wrap;
+    text-align: left;
+    overflow-y: auto;
+    word-break: break-all;
+    max-height: 250px;
+    color: #7f7f7f;
 }
