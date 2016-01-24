@@ -3831,11 +3831,12 @@ def find_public_ips(ips):
     return public_ips
 
 
-def notify_admin(title, message=""):
+def notify_admin(title, message="", team = "all"):
     """ This will only work on a multi-user setup configured to send emails """
     try:
         from mist.core.helpers import send_email
-        send_email(title, message, config.NOTIFICATION_EMAIL)
+        send_email(title, message,
+                   config.NOTIFICATION_EMAIL.get(team, config.NOTIFICATION_EMAIL)
     except ImportError:
         pass
 
