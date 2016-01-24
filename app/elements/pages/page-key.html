@@ -43,8 +43,7 @@
           <div id="content">
             <paper-material>
               <h2>Key ID: {{key.id}}</h2>
-            </paper-material>
-            <paper-material>
+              <hr/>
               <template is="dom-if" if="{{!key.machines.length}}">
                 <p>The key is not used at any machine.</p>
               </template>
