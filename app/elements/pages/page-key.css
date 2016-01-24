@@ -19,9 +19,22 @@ paper-material {
 }
 
 .paper-header h2 {
-    @apply(--layout-flex-none);
+    /*@apply(--layout-flex-none);*/
 }
 
 .key-is-default {
     padding-left: 10px;
+}
+.key-is-default span {
+    display: inline;
+    vertical-align: middle;
+    opacity: 0.54;
+    font-size: 12px;
+}
+.key-is-default iron-icon {
+    padding-left: 8px;
+}
+.key-is-default paper-icon-button {
+    background-color: #eee;
+    border-radius: 32px;
 }

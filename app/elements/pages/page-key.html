@@ -26,12 +26,16 @@
         <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
           <div class="paper-header">
             <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2>{{params.id}}</h2> 
-            <span class="key-is-default flex">
-              <template is="dom-if" if="{{key.isDefault}}">
-                Default Key
-              </template>
-            </span>
+            <h2 class="flex">{{params.id}}
+              <span class="key-is-default">
+                <template is="dom-if" if="{{key.isDefault}}">
+                  <iron-icon icon="communication:vpn-key" class="gold" title="{{key.id}} is the default Key"></iron-icon> <span>Default key</span>
+                </template>
+                <template is="dom-if" if="{{!key.isDefault}}">
+                  <paper-icon-button icon="communication:vpn-key" on-tap="makeDefault" title="make {{key.id}} the default Key"></paper-icon-button>
+                </template>
+              </span>
+            </h2>
             <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
             <paper-icon-button icon="icons:sort"></paper-icon-button>
             <app-user-menu email="marios@mist.io"></app-user-menu>
