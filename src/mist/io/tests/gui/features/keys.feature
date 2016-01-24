@@ -43,7 +43,7 @@ Feature: Actions for Keys
     And I click the button "RenamedFirstKey"
     Then I expect for "single-key-page" page to appear within max 4 seconds
     And I click the button "Delete"
-    And I expect for "dialog-popup" popup to appear within max 4 seconds
+    And I expect for "dialog-popup" modal to appear within max 4 seconds
     And I click the button "Yes"
-    And I expect for "dialog-popup" popup to disappear within max 4 seconds
+    And I expect for "dialog-popup" modal to disappear within max 4 seconds
     Then "RenamedFirstKey" key should be deleted

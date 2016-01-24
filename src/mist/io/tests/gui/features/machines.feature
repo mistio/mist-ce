@@ -38,17 +38,17 @@ Feature: Machines
     And I click the button "Actions"
     Then I expect for "machine-power-popup-popup" popup to appear within max 4 seconds
     When I click the "Reboot" button inside the "Actions" popup
-    Then I expect for "dialog-popup" popup to appear within max 4 seconds
+    Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
-    Then I expect for "dialog-popup" popup to disappear within max 4 seconds
+    Then I expect for "dialog-popup" modal to disappear within max 4 seconds
     And "randomly_created" machine state should be "running" within 200 seconds
 
     When I click the button "Actions"
     Then I expect for "machine-power-popup-popup" popup to appear within max 4 seconds
     When I click the button "Destroy"
-    Then I expect for "dialog-popup" popup to appear within max 4 seconds
+    Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
-    Then I expect for "dialog-popup" popup to disappear within max 4 seconds
+    Then I expect for "dialog-popup" modal to disappear within max 4 seconds
     Then "randomly_created" machine state should be "terminated" within 200 seconds
 
   @machine-probing
