@@ -3836,7 +3836,8 @@ def notify_admin(title, message="", team = "all"):
     try:
         from mist.core.helpers import send_email
         send_email(title, message,
-                   config.NOTIFICATION_EMAIL.get(team, config.NOTIFICATION_EMAIL)
+                   config.NOTIFICATION_EMAIL.get(team,
+                                                 config.NOTIFICATION_EMAIL))
     except ImportError:
         pass
 
