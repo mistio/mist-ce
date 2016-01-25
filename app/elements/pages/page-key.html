@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../section-symbol/section-symbol.html">
 <link rel="import" href="../tag-link/tag-link.html">
@@ -12,65 +13,68 @@
 <link rel="import" href="../responsive-element/responsive-element.html">
 
 <dom-module id="page-key">
-  <link rel="import" type="css" href="../../styles/main.css">
-  <link rel="import" type="css" href="page-key.css">
+    <link rel="import" type="css" href="../../styles/main.css">
+    <link rel="import" type="css" href="page-key.css">
 
-  <template>
-      <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
+    <template>
+        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
 
-        <app-sidebar  tag="[[tag]]" 
-                      sections="{{sections}}" 
-                      current="[[section.id]]" 
-                      drawer></app-sidebar>
+            <app-sidebar tag="[[tag]]" sections="{{sections}}" current="[[section.id]]" drawer></app-sidebar>
 
-        <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
-          <div class="paper-header">
-            <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex">{{params.id}}
-              <span class="key-is-default">
-                <template is="dom-if" if="{{key.isDefault}}">
-                  <iron-icon icon="communication:vpn-key" class="gold" title="{{key.id}} is the default Key"></iron-icon> <span>Default key</span>
-                </template>
-                <template is="dom-if" if="{{!key.isDefault}}">
-                  <paper-icon-button icon="communication:vpn-key" on-tap="makeDefault" title="make {{key.id}} the default Key"></paper-icon-button>
-                </template>
-              </span>
-            </h2>
-            <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
-            <paper-icon-button icon="icons:sort"></paper-icon-button>
-            <app-user-menu email="marios@mist.io"></app-user-menu>
-          </div>
-          <div id="content">
-            <paper-material>
-              <h2>Key ID: {{key.id}}</h2>
-              <hr/>
-              <template is="dom-if" if="{{!key.machines.length}}">
-                <p>The key is not used at any machine.</p>
-              </template>
-              <template is="dom-if" if="{{key.machines.length}}">
-                <h2>Machines:</h2>
-                <ul>
-                  <template is="dom-repeat" items="{{key.machines}}">
-                    <li>{{item}}</li>
-                  </template>
-                </ul>
-              </template>
-            </paper-material>
-          </div>
-          <div class="absolute-bottom-right">
-            <paper-menu-button vertical-align="bottom" horizontal-align="right">
-              <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
-              <paper-menu class="dropdown-content">
-                <paper-button on-click="addMachineS">Add Machine</paper-button>
-                <template is="dom-if" if="{{!key.isDefault}}">
-                  <paper-button on-tap="makeDefault">make this the default key</paper-button>
-                </template>
-              </paper-menu>
-            </paper-menu-button>
-          </div>
-        </paper-header-panel>
-      </paper-drawer-panel>      
-  </template>
+            <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
+                <div class="paper-header">
+                    <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+                    <h2 class="flex">{{params.id}}
+                        <span class="key-is-default">
+                            <template is="dom-if" if="{{key.isDefault}}">
+                                <iron-icon icon="communication:vpn-key" class="gold"></iron-icon>
+                                <span>Default key</span>
+                                <paper-tooltip>{{key.id}} is the default Key</paper-tooltip>
+                            </template>
+                            <template is="dom-if" if="{{!key.isDefault}}">
+                                <paper-icon-button icon="communication:vpn-key" on-tap="makeDefault"></paper-icon-button>
+                                <paper-tooltip>Make {{key.id}} the default Key</paper-tooltip>
+                            </template>
+                        </span>
+                    </h2>
+                    <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
+                    <paper-icon-button icon="icons:sort"></paper-icon-button>
+                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                </div>
+                <div id="content">
+                    <paper-material>
+                        <h2>Key ID: {{key.id}}</h2>
+                        <hr/>
+                        <template is="dom-if" if="{{!key.machines.length}}">
+                            <p>The key is not used at any machine.</p>
+                        </template>
+                        <template is="dom-if" if="{{key.machines.length}}">
+                            <h2>Machines:</h2>
+                            <ul>
+                                <template is="dom-repeat" items="{{key.machines}}">
+                                    <li>{{item}}</li>
+                                </template>
+                            </ul>
+                        </template>
+                    </paper-material>
+                </div>
+                <div class="absolute-bottom-right">
+                    <paper-menu-button vertical-align="bottom" horizontal-align="right">
+                        <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
+                        <paper-menu class="dropdown-content">
+                            <paper-button on-click="addMachineS">Add Machine</paper-button>
+                            <template is="dom-if" if="{{!key.isDefault}}">
+                                <paper-button on-tap="makeDefault">make this the default key</paper-button>
+                            </template>
+                        </paper-menu>
+                    </paper-menu-button>
+                </div>
+            </paper-header-panel>
+        </paper-drawer-panel>
+
+        <iron-ajax id="keyMakeDefaultRequest" url="/keys/[[key.id]]" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
+        <paper-toast id="toast0" text="[[key.id]] has become your default Key!"></paper-toast>
+    </template>
 </dom-module>
 
 <script>
@@ -79,12 +83,27 @@
         enableCustomStyleProperties: true,
         properties: {
             router: Object,
-            pageTitle: {type: String},
-            params: {type: Object, notify: true},
+            pageTitle: {
+                type: String
+            },
+            params: {
+                type: Object,
+                notify: true
+            },
             sections: Array,
-            section: {type: Object, notify: true, value: {}},
-            tag: {type:String, value: ""},
-            key: {type:Object, notify: true}
+            section: {
+                type: Object,
+                notify: true,
+                value: {}
+            },
+            tag: {
+                type: String,
+                value: ""
+            },
+            key: {
+                type: Object,
+                notify: true
+            }
         },
         ready: function() {
 
@@ -94,21 +113,31 @@
         },
         listInfo: function(e) {
             var info = '';
-            for(var prop in this.key){
-                info+=prop+" : "+this.key[prop]+", ";
+            for (var prop in this.key) {
+                info += prop + " : " + this.key[prop] + ", ";
             }
             this.$.keyproperties.textContent = info;
         },
-        addMachine: function (_,params) {
+        addMachine: function(_, params) {
             // console.log("clicked Add Machine");
         },
-        makeDefault: function(){
+        makeDefault: function(e) {
+            this.$.keyMakeDefaultRequest.generateRequest();
+        },
+        handleDefaultResponse: function(data) {
             //needs to update the previous default key that it's not the default key anymore
             var k = this.model.keysArray;
-            for (var i =0 ; i<k.length; i++ ){
-                if (k[i].isDefault) k[i].isDefault = false
+            for (var i = 0, len = k.length; i < len; i++) {
+                if (k[i].isDefault) {
+                    k[i].isDefault = false;
+                    break;
+                }
             }
             this.set('key.isDefault', true);
+            this.$.toast0.open();
+        },
+        handleError: function() {
+            
         }
     });
 </script>
