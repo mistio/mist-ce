@@ -18,10 +18,6 @@ paper-material {
 	margin-bottom: 20px;
 }
 
-.paper-header h2 {
-    /*@apply(--layout-flex-none);*/
-}
-
 .key-is-default {
     padding-left: 10px;
 }

@@ -2,315 +2,398 @@
 <link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
-
-
+<link rel="import" href="element-table-machines.html">
 <dom-module id="element-table">
-  <template>
-    <style>
-      :host {
-        display: block;
-        position: relative;
-        background: white;
-        border: 1px solid #d0d0d0;
-        border-radius: 3px;
-        opacity: 1;
-        transition: opacity 0.4s;
-      }
+    <template>
+        <style>
+        :host {
+            display: block;
+            position: relative;
+            background: white;
+            border: 1px solid #d0d0d0;
+            border-radius: 3px;
+            opacity: 1;
+            transition: opacity 0.4s;
+        }
+        
+        :host(.hidden) {
+            transition: none;
+            opacity: 0;
+        }
+        
+        .header {
+            padding: 0 24px;
+            line-height: 56px;
+            font-size: 12px;
+            font-weight: 500;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        :host([narrow-viewport]) .header .description {
+            display: none;
+        }
+        
+        :host(:not([narrow-viewport])) .header,
+        :host(:not([narrow-viewport])) .row,
+        :host(:not([narrow-viewport])) .row a {
+            @apply(--layout-horizontal);
+        }
+        
+        :host([narrow-viewport]) .header,
+        :host([narrow-viewport]) .row,
+        :host([narrow-viewport]) .row a {
+            @apply(--layout-vertical);
+        }
+        
+        .row {
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        .row a {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 15px 24px;
+            font-weight: 400;
+            font-size: 13px;
+        }
+        
+        .row.hover {
+            background: #fafafa;
+        }
+        
+        :host(:not([narrow-viewport])) .row.hover .description {
+            padding-right: 120px;
+        }
+        
+        .name {
+            width: 250px;
+            font-weight: 500;
+        }
+        
+        .id,
+        .provider {
+            min-width: 300px;
+        }
+        
+        .type {
+            min-width: 100px;
+        }
+        
+        .tag {
+            background-color: #888;
+            color: #fff;
+            padding: 2px 6px;
+            margin: 0 6px;
+            border-radius: 2px;
+        }
+        
+        .no-data {
+            font-style: italic;
+            padding: 15px 24px;
+        }
+        
+        .name .narrow {
+            display: none;
+        }
+        
+        :host([narrow-viewport]) .name .narrow {
+            display: inline;
+        }
+        
+        .row .description {
+            color: #757575;
+        }
+        
+        :host(:not([narrow-viewport])) .row .description {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        #actions element-action-menu {
+            right: 0;
+        }
+        </style>
+        <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
+        <div class="header" style$="[[_getHeaderStyle(section.color)]]">            
 
-      :host(.hidden) {
-        transition: none;
-        opacity: 0;
-      }
+            <template is="dom-if" if="[[ismachines]]">
+                <div class="name">Name <span class="narrow">/ ID/ State</span></div>
+                <div class="id">Machine ID</div>
+                <div class="description">State</div>
+            </template>
 
-      .header {
-        padding: 0 24px;
-        line-height: 56px;
-        font-size: 12px;
-        font-weight: 500;
-        border-bottom: 1px solid #e5e5e5;
-      }
+            <template is="dom-if" if="[[isimages]]">
+                <div class="name">Name <span class="narrow">/ ID/ Description</span></div>
+                <div class="id">Image ID</div>
+                <div class="description">Description</div>
+            </template>
 
-      :host([narrow-viewport]) .header .description {
-        display: none;
-      }
+            <template is="dom-if" if="[[iskeys]]">
+                <div class="name">Name <span class="narrow">/ Description</span></div>
+                <div class="description">Description </div>
+            </template>
 
-      :host(:not([narrow-viewport])) .header,
-      :host(:not([narrow-viewport])) .row,
-      :host(:not([narrow-viewport])) .row a {
-        @apply(--layout-horizontal);
-      }
+            <template is="dom-if" if="[[iskeys]]">
+                <div class="name">Name <span class="narrow">/ Description</span></div>
+                <div class="description">Description </div>
+            </template>
 
-      :host([narrow-viewport]) .header,
-      :host([narrow-viewport]) .row,
-      :host([narrow-viewport]) .row a {
-        @apply(--layout-vertical);
-      }
+            <template is="dom-if" if="[[isnetworks]]">
+                <div class="name">Name <span class="narrow">/ Description</span></div>
+                <div class="description">Description </div>
+            </template>
 
-      .row {
-        border-bottom: 1px solid #e5e5e5;
-      }
+            <template is="dom-if" if="[[isscripts]]">
+                <div class="name">Name <span class="narrow">/ Description</span></div>
+                <div class="description">Description </div>
+            </template>
 
-      .row a {
-        box-sizing: border-box;
-        /*cursor: pointer;*/ /*they block the a to go*/
-        /*overflow: hidden;*/
-        width: 100%;
-        padding: 15px 24px;
-        font-weight: 400;
-        font-size: 13px;
-      }
+        </div>
+        <div class="row no-data" hidden$="[[elements.length]]">
+            no data yet
+        </div>
+        <template is="dom-repeat" items="[[elements]]">
+            <div class="row" data-index$="[[index]]">
+                <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
+                    
+                    <template is="dom-if" if="[[ismachines]]">
+                        <element-table-machines item="[[item]]"></element-table-machines>
+                    </template>
 
-      .row.hover {
-        background: #fafafa;
-      }
+                    <template is="dom-if" if="[[!ismachines]]">
 
-      :host(:not([narrow-viewport])) .row.hover .description {
-        padding-right: 120px;
-      }
-
-      .name {
-        width: 250px;
-        font-weight: 500;
-      }
-
-      .id, .provider {
-        min-width: 300px;
-      } 
-
-      .type  {
-        min-width: 100px;
-      }
-
-      .tag {
-        background-color: #888;
-        color: #fff;
-        padding: 2px 6px;
-        margin: 0 6px;
-        border-radius: 2px;
-      }
-
-      .no-data{
-        font-style: italic;
-        padding: 15px 24px;
-      }
-
-      .name .narrow {
-        display: none;
-      }
-
-      :host([narrow-viewport])  .name .narrow {
-        display: inline;
-      }
-
-      .row .description {
-        color: #757575;
-      }
-
-      :host(:not([narrow-viewport])) .row .description {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      #actions element-action-menu {
-        right: 0;
-      }
-
-    </style>
-    <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-
-    <div class="header" style$="[[_getHeaderStyle(section.color)]]">
-      <div class="name">Name <span class="narrow">/ Description</span></div>
-      <div class="description">Description</div>
-    </div>
-    <div class="row no-data" hidden$="[[elements.length]]">
-        no data yet
-    </div>
-    <template is="dom-repeat" items="[[elements]]">      
-      <div class="row" data-index$="[[index]]">
-        <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
-
-            <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
-            <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
-            <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
-            <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
-            <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
-            <div class="state" hidden$="[[!item.state]]">[[item.state]]</div>
-
-            <div class="icon" hidden$="[[!item.icons.length]]">
-              <template is="dom-if" if="[[item.icons]]">    
-                <app-image-icons feed="[[item.icons]]"></app-image-icons>
-              </template>      
+                        <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
+                        <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
+                        <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
+                        <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
+                        <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
+                        <div class="state" hidden$="[[!item.state]]">[[item.state]]</div>
+                        <div class="icon" hidden$="[[!item.icons.length]]">
+                            <template is="dom-if" if="[[item.icons]]">
+                                <app-image-icons feed="[[item.icons]]"></app-image-icons>
+                            </template>
+                        </div>
+                        <div class="tags" hidden$="[[!item.tags.length]]">
+                            <template is="dom-if" if="[[item.tags.length]]">
+                                <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
+                                    <span class="tag">
+                                        <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>[[item.value]]
+                                    </span>
+                                </template>
+                            </template>
+                        </div>
+                    </template>
+                </a>
             </div>
-
-            <div class="tags" hidden$="[[!item.tags.length]]">
-              <template is="dom-if" if="[[item.tags.length]]"> 
-                <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
-                  <span class="tag">
-                    <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>[[item.value]]
-                  </span>
-                </template>
-              </template>
-            </div>
-
-        </a>
-      </div>
+        </template>
+        <div id="actions"></div>
     </template>
-    <div id="actions"></div>
-  </template>
 </dom-module>
 <script>
-  Polymer({
+Polymer({
     is: 'element-table',
 
     properties: {
-      elements: {
-        type: Array,
-        observer: '_elementsChanged'
-      },
-      icons: {
-        type: Array
-      },
-      tags: {
-        type: Array
-      },
-      section: {
-        type: Object
-      },
-      narrowViewport: {
-        type: Boolean,
-        reflectToAttribute: true
-      }
+        elements: {
+            type: Array,
+            observer: '_elementsChanged'
+        },
+        icons: {
+            type: Array
+        },
+        tags: {
+            type: Array
+        },
+        section: {
+          type: Object, notify: true
+        },
+        narrowViewport: {
+            type: Boolean,
+            reflectToAttribute: true
+        },
+        ismachines:{
+            type: Boolean,
+            computed:"isMachines(section)"
+        },
+        isimages:{
+            type: Boolean,
+            computed:"isImages(section)"
+        },
+        iskeys:{
+            type: Boolean,
+            computed:"isKeys(section)"
+        },
+        isnetworks:{
+            type: Boolean,
+            computed:"isNetworks(section)"
+        },
+        isscripts:{
+            type: Boolean,
+            computed:"isScripts(section)"
+        }
+
     },
 
     listeners: {
-      'tap': '_tap',
-      'mouseover': '_mouseOver',
-      'mouseleave': '_mouseLeave'
+        'tap': '_tap',
+        'mouseover': '_mouseOver',
+        'mouseleave': '_mouseLeave'
     },
 
-    _itemTagsArray: function(tagsobject) {
-      var tagsArray = [];
-      if (tagsobject.length > 0) {
-        for (i=0; i<tagsobject.length; i++){
-          tagsArray.unshift(tagsobject[i]);
-        }
-      }
-      return tagsArray;
+    isMachines: function(section) {
+        if (section && section.id == "machines")
+            return true;
+        return false;
     },
-    
+
+    isImages: function(section) {
+        if (section && section.id == "images")
+            return true;
+        return false;
+    },
+    isKeys: function(section) {
+        if (section && section.id == "keys")
+            return true;
+        return false;
+    },
+
+    isNetworks: function(section) {
+        if (section && section.id == "networks")
+            return true;
+        return false;
+    },
+
+    isScripts: function(section) {
+        if (section && section.id == "scripts")
+            return true;
+        return false;
+    },
+
+
+    _itemTagsArray: function(tagsobject) {
+        var tagsArray = [];
+        if (tagsobject.length > 0) {
+            for (i = 0; i < tagsobject.length; i++) {
+                tagsArray.unshift(tagsobject[i]);
+            }
+        }
+        return tagsArray;
+    },
+
     _currentRowIndex: -1,
 
     _sharedActionMenu: null,
 
     _findAncestor: function(node, fn) {
-      while (node && fn.call(this, node)) {
-        node = node.parentNode;
-      }
-      return node;
+        while (node && fn.call(this, node)) {
+            node = node.parentNode;
+        }
+        return node;
     },
 
     _tap: function(e) {
-      var sourceEvent = e.detail.sourceEvent;
-      var A = this._findAncestor(e.target, function(node) {
-        return node != this && node.tagName !== 'A';
-      });
+        var sourceEvent = e.detail.sourceEvent;
+        var A = this._findAncestor(e.target, function(node) {
+            return node != this && node.tagName !== 'A';
+        });
 
-      if (A && A.tagName === 'A' && A.href.indexOf(location.host) > 0) {
-        if (sourceEvent.ctrlKey || sourceEvent.metaKey) {
-          window.open(A.href);
-        } else {
-          this.fire('nav', {url: A.href});
-        }        
-        //e.preventDefault();
-      }
-      this.fire('update-params');
-    },
-
-    _mouseOver: function(e) {
-      var row = this._findAncestor(e.target, function(node) {
-        return node != this && !node.classList.contains('row') && node.id !== 'actions';
-      });
-      if (row && row.classList.contains('row')) {
-        if (this._currentRowIndex != row.dataset.index) {
-          this._hideActions();
-          this._showActions(row, row.dataset.index);
+        if (A && A.tagName === 'A' && A.href.indexOf(location.host) > 0) {
+            if (sourceEvent.ctrlKey || sourceEvent.metaKey) {
+                window.open(A.href);
+            } else {
+                this.fire('nav', {
+                    url: A.href
+                });
+            }
+            //e.preventDefault();
         }
-      } else if (row.id !== 'actions') {
-        this._hideActions();
-      }
+        this.fire('update-params');
+    },
+    _mouseOver: function(e) {
+        var row = this._findAncestor(e.target, function(node) {
+            return node != this && !node.classList.contains('row') && node.id !== 'actions';
+        });
+        if (row && row.classList.contains('row')) {
+            if (this._currentRowIndex != row.dataset.index) {
+                this._hideActions();
+                this._showActions(row, row.dataset.index);
+            }
+        } else if (row.id !== 'actions') {
+            this._hideActions();
+        }
     },
 
     _mouseLeave: function() {
-      this._hideActions();
+        this._hideActions();
     },
 
     _showActions: function(row, index) {
-      var sharedActionMenu = this._sharedActionMenu;
-      var rowOffsetTop = row.offsetTop;
+        var sharedActionMenu = this._sharedActionMenu;
+        var rowOffsetTop = row.offsetTop;
 
-      if (!sharedActionMenu) {
-        this._sharedActionMenu = document.createElement('element-action-menu');
-        this._sharedActionMenu.classList.add('hidden');
-        Polymer.dom(this.$.actions).appendChild(this._sharedActionMenu);
-        sharedActionMenu = this._sharedActionMenu;
-      }
+        if (!sharedActionMenu) {
+            this._sharedActionMenu = document.createElement('element-action-menu');
+            this._sharedActionMenu.classList.add('hidden');
+            Polymer.dom(this.$.actions).appendChild(this._sharedActionMenu);
+            sharedActionMenu = this._sharedActionMenu;
+        }
 
-      sharedActionMenu.iconsOnly = true;
-      sharedActionMenu.element = this.elements[index].name;
-      sharedActionMenu.style.top = rowOffsetTop + 'px';
+        sharedActionMenu.iconsOnly = true;
+        sharedActionMenu.element = this.elements[index].name; //brought: Cannot read property 'undefined' of undefined
+        sharedActionMenu.style.top = rowOffsetTop + 'px';
 
-      this._layoutIfNeeded(sharedActionMenu);
-      sharedActionMenu.classList.remove('hidden');
-      row.classList.add('hover');
+        this._layoutIfNeeded(sharedActionMenu);
+        sharedActionMenu.classList.remove('hidden');
+        row.classList.add('hover');
 
-      this._currentRowIndex = index;
-      this._currentRow = row;
+        this._currentRowIndex = index;
+        this._currentRow = row;
     },
 
     _hideActions: function() {
-      var row = this._currentRow;
-      var sharedActionMenu = this._sharedActionMenu;
+        var row = this._currentRow;
+        var sharedActionMenu = this._sharedActionMenu;
 
-      if (row) {
-        if (sharedActionMenu) {
-          sharedActionMenu.classList.add('hidden');
+        if (row) {
+            if (sharedActionMenu) {
+                sharedActionMenu.classList.add('hidden');
+            }
+            row.classList.remove('hover');
+            this._currentRowIndex = -1;
+            this._currentRow = null;
         }
-        row.classList.remove('hover');
-        this._currentRowIndex = -1;
-        this._currentRow = null;
-      }
     },
 
     _elementLink: function(item) {
-      var p, s = this.section.id;
-      if (s == "machines")
-        p = item.uuid
-      else if (s == "images")
-        p = item.id
-      else if (s == "keys")
-        p = item.id
-      else if (s == "networks")
-        p = item.name
-      else if (s == "scripts")
-        p = item.id           //??
+        var p, s = this.section.id;
+        if (s == "machines")
+            p = item.uuid
+        else if (s == "images")
+            p = item.id
+        else if (s == "keys")
+            p = item.id
+        else if (s == "networks")
+            p = item.name
+        else if (s == "scripts")
+            p = item.id //??
 
-      return "/" + this.section.id + "/" + p;
+        return "/" + this.section.id + "/" + p;
     },
 
     _getHeaderStyle: function(color) {
-      return 'background-color: '+ color+'; color: #fff;';
+        return 'background-color: ' + color + '; color: #fff;';
     },
 
     _elementsChanged: function() {
-      // this.classList.add('hidden');
-      this.async(function() {
-        // this.classList.remove('hidden');
-      }, 1);
+        // this.classList.add('hidden');
+        this.async(function() {
+            // this.classList.remove('hidden');
+        }, 1);
     },
 
     _layoutIfNeeded: function(el) {
-      return el.offsetTop;
+        return el.offsetTop;
     }
-  });
+});
 </script>
