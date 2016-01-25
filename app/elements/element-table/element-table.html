@@ -3,6 +3,10 @@
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
 <link rel="import" href="element-table-machines.html">
+<link rel="import" href="element-table-images.html">
+<link rel="import" href="element-table-keys.html">
+<link rel="import" href="element-table-networks.html">
+
 <dom-module id="element-table">
     <template>
         <style>
@@ -116,53 +120,79 @@
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <div class="header" style$="[[_getHeaderStyle(section.color)]]">            
-
             <template is="dom-if" if="[[ismachines]]">
-                <div class="name">Name <span class="narrow">/ ID/ State</span></div>
+                <div class="name">Name <span class="narrow">/ ID / State</span></div>
                 <div class="id">Machine ID</div>
                 <div class="description">State</div>
             </template>
-
             <template is="dom-if" if="[[isimages]]">
-                <div class="name">Name <span class="narrow">/ ID/ Description</span></div>
+                <div class="name">Name <span class="narrow">/ ID / Description</span></div>
                 <div class="id">Image ID</div>
                 <div class="description">Description</div>
             </template>
-
             <template is="dom-if" if="[[iskeys]]">
-                <div class="name">Name <span class="narrow">/ Description</span></div>
-                <div class="description">Description </div>
+                <div class="name">Name <span class="narrow">/ Default Key?</span></div>
+                <div class="description">Default Key? </div>
             </template>
-
-            <template is="dom-if" if="[[iskeys]]">
-                <div class="name">Name <span class="narrow">/ Description</span></div>
-                <div class="description">Description </div>
-            </template>
-
             <template is="dom-if" if="[[isnetworks]]">
-                <div class="name">Name <span class="narrow">/ Description</span></div>
-                <div class="description">Description </div>
+                <div class="name">Name <span class="narrow">/ Type / Provider</span></div>
+                <div class="name">Type </div>
+                <div class="provider">Provider </div>
             </template>
-
             <template is="dom-if" if="[[isscripts]]">
                 <div class="name">Name <span class="narrow">/ Description</span></div>
                 <div class="description">Description </div>
             </template>
-
         </div>
         <div class="row no-data" hidden$="[[elements.length]]">
             no data yet
         </div>
-        <template is="dom-repeat" items="[[elements]]">
-            <div class="row" data-index$="[[index]]">
-                <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
+        
                     
-                    <template is="dom-if" if="[[ismachines]]">
+        <template is="dom-if" if="[[ismachines]]">
+            <template is="dom-repeat" items="[[elements]]">
+                <div class="row" data-index$="[[index]]">
+                    <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
                         <element-table-machines item="[[item]]"></element-table-machines>
-                    </template>
+                    </a>
+                </div>
+            </template>
+        </template>
 
-                    <template is="dom-if" if="[[!ismachines]]">
+        <template is="dom-if" if="[[isimages]]">
+            <template is="dom-repeat" items="[[elements]]">
+                <div class="row" data-index$="[[index]]">
+                    <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
+                        <element-table-images item="[[item]]"></element-table-images>
+                    </a>
+                </div>
+            </template>
+        </template>
 
+         <template is="dom-if" if="[[iskeys]]">
+            <template is="dom-repeat" items="[[elements]]">
+                <div class="row" data-index$="[[index]]">
+                    <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
+                        <element-table-keys item="[[item]]"></element-table-keys>
+                    </a>
+                </div>
+            </template>
+        </template>
+
+        <template is="dom-if" if="[[isnetworks]]">
+            <template is="dom-repeat" items="[[elements]]">
+                <div class="row" data-index$="[[index]]">
+                    <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
+                        <element-table-networks item="[[item]]"></element-table-networks>
+                    </a>
+                </div>
+            </template>
+        </template>
+
+        <template is="dom-if" if="[[isscripts]]">
+            <template is="dom-repeat" items="[[elements]]">
+                <div class="row" data-index$="[[index]]">
+                    <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
                         <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
                         <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
                         <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
@@ -183,10 +213,11 @@
                                 </template>
                             </template>
                         </div>
-                    </template>
-                </a>
-            </div>
+                    </a>
+                </div>
+            </template>
         </template>
+                
         <div id="actions"></div>
     </template>
 </dom-module>

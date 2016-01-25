@@ -3,7 +3,7 @@
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
 
-<dom-module id="element-table-machines">
+<dom-module id="element-table-networks">
     <template>
         <style>
         :host div {
@@ -30,27 +30,14 @@
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
-        <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
+        <div class="id" hidden$="[[!item.type]]">[[item.type]]</div>
         <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
-        <div class="state" hidden$="[[!item.state]]">[[item.state]]</div>
-        <div class="tags" hidden$="[[!item.tags.length]]">
-            <template is="dom-if" if="[[item.tags.length]]">
-                <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
-                    <span class="tag">
-                        <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>[[item.value]]
-                    </span>
-                </template>
-            </template>
-        </div>
     </template>
 </dom-module>
 <script>
 Polymer({
-    is: 'element-table-machines',
+    is: 'element-table-networks',
     properties: {
-        // tags: {
-        //   type: Array
-        // },
         // section: {
         //   type: Object
         // },
