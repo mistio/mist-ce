@@ -91,10 +91,8 @@ def cloud_creds(context, cloud):
         ''')
         # file_input = context.browser.find_element_by_id("file-upload-input")
         # file_input.send_keys(context.mist_config['CREDENTIALS']['GCE']['private_key'])
-        fp = open(context.mist_config['CREDENTIALS']['GCE']['private_key'], 'r')
         json_input = context.browser.find_element_by_id("upload-area")
-        json_input.send_keys(fp.read())
-        fp.close()
+        json_input.send_keys(context.mist_config['CREDENTIALS']['GCE']['private_key'])
         context.execute_steps(u'''
         Then I expect for "file-upload-ok" to be clickable within max 4 seconds
         When I click the "Done" button inside the "Upload" popup
