@@ -89,8 +89,12 @@ def cloud_creds(context, cloud):
         When I click the "Add JSON Key" button inside the "Add Cloud" panel
         Then I expect for "file-upload-popup" popup to appear within max 4 seconds
         ''')
-        upload_area = context.browser.find_element_by_id("file-upload-input")
-        upload_area.send_keys(context.mist_config['CREDENTIALS']['GCE']['private_key'])
+        # file_input = context.browser.find_element_by_id("file-upload-input")
+        # file_input.send_keys(context.mist_config['CREDENTIALS']['GCE']['private_key'])
+        fp = open(context.mist_config['CREDENTIALS']['GCE']['private_key'], 'r')
+        json_input = context.browser.find_element_by_id("upload-area")
+        json_input.send_keys(fp.read())
+        fp.close()
         context.execute_steps(u'''
         Then I expect for "file-upload-ok" to be clickable within max 4 seconds
         When I click the "Done" button inside the "Upload" popup
