@@ -11,6 +11,7 @@
 <link rel="import" href="../element-table/element-table.html">
 <link rel="import" href="../element-table-cards/element-table-cards.html">
 <link rel="import" href="../responsive-element/responsive-element.html">
+<link rel="import" href="../element-dialog/element-dialog.html">
 
 <dom-module id="page-key">
     <link rel="import" type="css" href="../../styles/main.css">
@@ -74,6 +75,7 @@
             </paper-header-panel>
         </paper-drawer-panel>
 
+        <element-dialog id="dialog"></element-dialog>
         <iron-ajax id="keyMakeDefaultRequest" url="/keys/[[key.id]]" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyEditRequest" url="/keys/[[key.id]]" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyDeleteRequest" url="/keys/[[key.id]]" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
@@ -148,7 +150,8 @@
 
         },
         deleteKey: function() {
-            this.$.keyDeleteRequest.generateRequest();
+            this.$.dialog.open();
+            // this.$.keyDeleteRequest.generateRequest();
         },
         handleDeleteResponse: function() {
 

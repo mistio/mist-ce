@@ -1,0 +1,24 @@
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<dom-module id="element-dialog">
+    <template>
+        <paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation">
+            <h2>Header</h2>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button dialog-confirm>Accept</paper-button>
+            </div>
+        </paper-dialog>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: 'element-dialog',
+        properties: {
+
+        }
+    });
+</script>
