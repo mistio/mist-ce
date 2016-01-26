@@ -45,10 +45,10 @@ def given_cloud(context, cloud):
 
     context.execute_steps(u'''
         When I click the button "Add cloud"
-        Then I expect for "new-cloud-provider" panel to appear within max 2 seconds
+        Then I expect for "new-cloud-provider" panel to appear within max 4 seconds
         And I click the button "%s"
-        And I expect for "new-cloud-provider" panel to disappear within max 2 seconds
-        Then I expect for "cloud-add-fields" to be visible within max 2 seconds
+        And I expect for "new-cloud-provider" panel to disappear within max 4 seconds
+        Then I expect for "cloud-add-fields" to be visible within max 4 seconds
         When I use my "%s" credentials
         And I click the button "Add"
         Then the "%s" cloud should be added within 60 seconds
@@ -70,13 +70,13 @@ def cloud_creds(context, cloud):
         subscription_id.send_keys(context.mist_config['CREDENTIALS']['AZURE']['subscription_id'])
         context.execute_steps(u'''
         When I click the "Add Certificate" button inside the "Add Cloud" panel
-        Then I expect for "file-upload-popup" popup to appear within max 2 seconds
+        Then I expect for "file-upload-popup" popup to appear within max 4 seconds
         ''')
         upload_area = context.browser.find_element_by_id("upload-area")
         upload_area.send_keys(context.mist_config['CREDENTIALS']['AZURE']['certificate'])
         context.execute_steps(u'''
         When I click the "Done" button inside the "Upload" popup
-        Then I expect for "file-upload-popup" popup to disappear within max 2 seconds
+        Then I expect for "file-upload-popup" popup to disappear within max 4 seconds
         ''')
     elif "GCE" in cloud:
         title = context.browser.find_element_by_id("title")
@@ -87,12 +87,12 @@ def cloud_creds(context, cloud):
         project_id.send_keys(context.mist_config['CREDENTIALS']['GCE']['project_id'])
         context.execute_steps(u'''
         When I click the "Add JSON Key" button inside the "Add Cloud" panel
-        Then I expect for "file-upload-popup" popup to appear within max 2 seconds
+        Then I expect for "file-upload-popup" popup to appear within max 4 seconds
         ''')
         upload_area = context.browser.find_element_by_id("file-upload-input")
         upload_area.send_keys(context.mist_config['CREDENTIALS']['GCE']['private_key'])
         context.execute_steps(u'''
-        Then I expect for "file-upload-ok" to be clickable within max 2 seconds
+        Then I expect for "file-upload-ok" to be clickable within max 4 seconds
         When I click the "Done" button inside the "Upload" popup
         Then I expect for "file-upload-popup" popup to disappear within max 4 seconds
         ''')
