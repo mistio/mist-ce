@@ -4,10 +4,10 @@
 
 <dom-module id="element-dialog">
     <template>
-        <paper-dialog id="dialog" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
-            <h2>Delete Key</h2>
+        <paper-dialog modal="[[modal]]" id="dialog" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
+            <h2>[[title]]</h2>
             <div>
-                <p>Are you sure you want to delete this key?</p>
+                <p>[[body]]</p>
             </div>
             <div class="buttons">
                 <paper-button dialog-dismiss>No</paper-button>
@@ -21,7 +21,18 @@
     Polymer({
         is: 'element-dialog',
         properties: {
-
+            modal: {
+                type: Boolean,
+                value: true
+            },
+            title: {
+                type: String,
+                value: ''
+            },
+            body: {
+                type: String,
+                value: ''
+            }
         }
     });
 </script>

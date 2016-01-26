@@ -19,12 +19,12 @@
             opacity: 1;
             transition: opacity 0.4s;
         }
-        
+
         :host(.hidden) {
             transition: none;
             opacity: 0;
         }
-        
+
         .header {
             padding: 0 24px;
             line-height: 56px;
@@ -32,27 +32,27 @@
             font-weight: 500;
             border-bottom: 1px solid #e5e5e5;
         }
-        
+
         :host([narrow-viewport]) .header .description {
             display: none;
         }
-        
+
         :host(:not([narrow-viewport])) .header,
         :host(:not([narrow-viewport])) .row,
         :host(:not([narrow-viewport])) .row a {
             @apply(--layout-horizontal);
         }
-        
+
         :host([narrow-viewport]) .header,
         :host([narrow-viewport]) .row,
         :host([narrow-viewport]) .row a {
             @apply(--layout-vertical);
         }
-        
+
         .row {
             border-bottom: 1px solid #e5e5e5;
         }
-        
+
         .row a {
             box-sizing: border-box;
             width: 100%;
@@ -60,29 +60,29 @@
             font-weight: 400;
             font-size: 13px;
         }
-        
+
         .row.hover {
             background: #fafafa;
         }
-        
+
         :host(:not([narrow-viewport])) .row.hover .description {
             padding-right: 120px;
         }
-        
+
         .name {
             width: 250px;
             font-weight: 500;
         }
-        
+
         .id,
         .provider {
             min-width: 300px;
         }
-        
+
         .type {
             min-width: 100px;
         }
-        
+
         .tag {
             background-color: #888;
             color: #fff;
@@ -90,36 +90,36 @@
             margin: 0 6px;
             border-radius: 2px;
         }
-        
+
         .no-data {
             font-style: italic;
             padding: 15px 24px;
         }
-        
+
         .name .narrow {
             display: none;
         }
-        
+
         :host([narrow-viewport]) .name .narrow {
             display: inline;
         }
-        
+
         .row .description {
             color: #757575;
         }
-        
+
         :host(:not([narrow-viewport])) .row .description {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         #actions element-action-menu {
             right: 0;
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <div class="header" style$="[[_getHeaderStyle(section.color)]]">            
+        <div class="header" style$="[[_getHeaderStyle(section.color)]]">
             <template is="dom-if" if="[[ismachines]]">
                 <div class="name">Name <span class="narrow">/ ID / State</span></div>
                 <div class="id">Machine ID</div>
@@ -147,8 +147,8 @@
         <div class="row no-data" hidden$="[[elements.length]]">
             no data yet
         </div>
-        
-                    
+
+
         <template is="dom-if" if="[[ismachines]]">
             <template is="dom-repeat" items="[[elements]]">
                 <div class="row" data-index$="[[index]]">
@@ -217,7 +217,7 @@
                 </div>
             </template>
         </template>
-                
+
         <div id="actions"></div>
     </template>
 </dom-module>

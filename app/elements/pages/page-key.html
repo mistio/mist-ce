@@ -75,7 +75,7 @@
             </paper-header-panel>
         </paper-drawer-panel>
 
-        <element-dialog></element-dialog>
+        <element-dialog title="[[dialogOptions.title]]" body="[[dialogOptions.body]]"></element-dialog>
         <iron-ajax id="keyMakeDefaultRequest" url="/keys/[[key.id]]" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyEditRequest" url="/keys/[[key.id]]" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyDeleteRequest" url="/keys/[[key.id]]" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
@@ -109,6 +109,13 @@
             key: {
                 type: Object,
                 notify: true
+            },
+            dialogOptions: {
+                type: Object,
+                value: {
+                    title: '',
+                    body: ''
+                }
             }
         },
         ready: function() {
@@ -140,7 +147,7 @@
                 }
             }
             this.set('key.isDefault', true);
-            this.$.toast.text = key.id + ' has become your default Key!';
+            this.$.toast.text = this.key.id + ' has become your default Key!';
             this.$.toast.open();
         },
         editKey: function() {
@@ -151,7 +158,8 @@
         },
         deleteKey: function() {
             var dialog = document.querySelector('#dialog');
-            dialog.modal = true;
+            this.set('dialogOptions.title', 'Delete Key');
+            this.set('dialogOptions.body', 'Are you sure you want to delete key "' + this.key.id + '"?');
             dialog.open();
             // this.$.keyDeleteRequest.generateRequest();
         },
