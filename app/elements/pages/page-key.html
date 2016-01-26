@@ -62,10 +62,12 @@
                     <paper-menu-button vertical-align="bottom" horizontal-align="right">
                         <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
                         <paper-menu class="dropdown-content">
-                            <paper-button on-click="addMachineS">Add Machine</paper-button>
+                            <paper-button on-click="addMachine">Add Machine</paper-button>
                             <template is="dom-if" if="{{!key.isDefault}}">
                                 <paper-button on-tap="makeDefault">make this the default key</paper-button>
                             </template>
+                            <paper-button on-click="editKey">Edit Key</paper-button>
+                            <paper-button on-click="deleteKey">Delete Key</paper-button>
                         </paper-menu>
                     </paper-menu-button>
                 </div>
@@ -73,7 +75,9 @@
         </paper-drawer-panel>
 
         <iron-ajax id="keyMakeDefaultRequest" url="/keys/[[key.id]]" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
-        <paper-toast id="toast0" text="[[key.id]] has become your default Key!"></paper-toast>
+        <iron-ajax id="keyEditRequest" url="/keys/[[key.id]]" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
+        <iron-ajax id="keyDeleteRequest" url="/keys/[[key.id]]" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
+        <paper-toast id="toast"></paper-toast>
     </template>
 </dom-module>
 
@@ -134,10 +138,23 @@
                 }
             }
             this.set('key.isDefault', true);
-            this.$.toast0.open();
+            this.$.toast.text = key.id + ' has become your default Key!';
+            this.$.toast.open();
+        },
+        editKey: function() {
+            this.$.keyEditRequest.generateRequest();
+        },
+        handleEditResponse: function() {
+
+        },
+        deleteKey: function() {
+            this.$.keyDeleteRequest.generateRequest();
+        },
+        handleDeleteResponse: function() {
+
         },
         handleError: function() {
-            
+
         }
     });
 </script>
