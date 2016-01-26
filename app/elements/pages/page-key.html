@@ -75,7 +75,7 @@
             </paper-header-panel>
         </paper-drawer-panel>
 
-        <element-dialog id="dialog"></element-dialog>
+        <element-dialog></element-dialog>
         <iron-ajax id="keyMakeDefaultRequest" url="/keys/[[key.id]]" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyEditRequest" url="/keys/[[key.id]]" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyDeleteRequest" url="/keys/[[key.id]]" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
@@ -150,7 +150,9 @@
 
         },
         deleteKey: function() {
-            this.$.dialog.open();
+            var dialog = document.querySelector('#dialog');
+            dialog.modal = true;
+            dialog.open();
             // this.$.keyDeleteRequest.generateRequest();
         },
         handleDeleteResponse: function() {

@@ -4,11 +4,14 @@
 
 <dom-module id="element-dialog">
     <template>
-        <paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation">
-            <h2>Header</h2>
+        <paper-dialog id="dialog" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
+            <h2>Delete Key</h2>
+            <div>
+                <p>Are you sure you want to delete this key?</p>
+            </div>
             <div class="buttons">
-                <paper-button dialog-dismiss>Cancel</paper-button>
-                <paper-button dialog-confirm>Accept</paper-button>
+                <paper-button dialog-dismiss>No</paper-button>
+                <paper-button dialog-confirm>Yes</paper-button>
             </div>
         </paper-dialog>
     </template>
