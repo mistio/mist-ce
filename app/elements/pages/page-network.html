@@ -12,126 +12,172 @@
 <link rel="import" href="../responsive-element/responsive-element.html">
 
 <dom-module id="page-network">
-  <link rel="import" type="css" href="../../styles/main.css">
-  <link rel="import" type="css" href="page-network.css">
+	<link rel="import" type="css" href="../../styles/main.css">
+	<link rel="import" type="css" href="page-network.css">
 
-  <template>
-      <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
-        
-        <app-sidebar  tag="[[tag]]" 
-                      sections="{{sections}}" 
-                      current="[[section.id]]" 
-                      drawer></app-sidebar>
+	<template>
+		<paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
 
-        <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
-          <div class="paper-header">
-            <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex">{{network.name}}</h2>
-            <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
-            <paper-icon-button icon="icons:sort"></paper-icon-button>
-            <app-user-menu email="marios@mist.io"></app-user-menu>
-          </div>
-          <div id="content">
-            <paper-material>
-                <!-- <paper-button on-tap="listInfo">temp network info helper</paper-button> -->
-                <div id="networkproperties"></div>
-                <h2>ID:</h2>
-                <p>{{network.id}}</p>
-                <hr/>
+			<app-sidebar tag="[[tag]]" sections="{{sections}}" current="[[section.id]]" drawer></app-sidebar>
 
-                <h2>Status:</h2>
-                <p>{{network.status}}</p>
-                <hr/>
+			<paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
+				<div class="paper-header">
+					<paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+					<h2 class="flex">{{network.name}}</h2>
+					<app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
+					<paper-icon-button icon="icons:sort"></paper-icon-button>
+					<app-user-menu email="marios@mist.io"></app-user-menu>
+				</div>
+				<div id="content">
+					<paper-card class="info-card" heading="Network Information">
+						<!-- <paper-button on-tap="listInfo">temp network info helper</paper-button> -->
+						<div class="card-content">
+							<div id="networkproperties"></div>
+							<table class="info-table">
+								<tr>
+									<td>
+										<h2>Name</h2>
+									</td>
+									<td>
+										<p>[[network.name]]</p>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<h2>ID</h2>
+									</td>
+									<td>
+										<p>[[network.id]]</p>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<h2>Type</h2>
+									</td>
+									<td>
+										<p>[[network.type]]</p>
+									</td>
+								</tr>
+								<template is="dom-if" if="[[network.status]]">
+									<tr>
+										<td>
+											<h2>Status</h2>
+										</td>
+										<td>
+											<p>[[network.status]]</p>
+										</td>
+									</tr>
+								</template>
+								<tr>
+									<td>
+										<h2>Provider</h2>
+									</td>
+									<td>
+										<p>[[network.provider]]</p>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</paper-card>
 
-                <h2>Type:</h2>
-                <p>{{network.type}}</p>
-                <hr/>
+					<template is="dom-if" if="[[network.subnets.length]]">
+						<paper-card heading="Subnets ([[network.subnets.length]])">
+							<div class="card-content">
+								<h2>Subnets:</h2>
+								<p>[[showMore(network.subnets)]]</p>
+								<hr/>
+							</div>
+						</paper-card>
+					</template>
 
-                <h2>Provider:</h2>
-                <p>{{network.provider}}</p>
-                <hr/>
-                
-                <template is="dom-if" if="{{network.subnets.length}}">
-                <h2>Subnets:</h2>
-                <p>{{showMore(network.subnets)}}</p> 
-                <hr/>
-                </template>
-                
-                <template is="dom-if" if="{{network.tags.length}}">
-                <h2>Tags:</h2>
-                <p>{{showExtra(network.tags)}}</p>
-                <hr/>
-                </template>
+					<paper-card heading="Metadata">
+						<div class="card-content">
+							<template is="dom-if" if="{{network.tags.length}}">
+								<h2>Tags:</h2>
+								<p>{{showExtra(network.tags)}}</p>
+								<hr/>
+							</template>
 
-                <template is="dom-if" if="{{network.floating_ips.length}}">
-                <h2>Floating Ips:</h2>
-                <p>{{showMore(network.floating_ips)}}</p>
-                <hr/>
-                </template>
-                
-                <template is="dom-if" if="{{network.floating_ips.length}}">
-                <h2>Extra:</h2>
-                <p>{{showExtra(network.extra)}}</p>
-                </template>
+							<template is="dom-if" if="{{network.floating_ips.length}}">
+								<h2>Floating Ips:</h2>
+								<p>{{showMore(network.floating_ips)}}</p>
+								<hr/>
+							</template>
 
-            </paper-material>
-          </div>
-          <div class="absolute-bottom-right">
-            <paper-menu-button vertical-align="bottom" horizontal-align="right">
-              <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
-              <paper-menu class="dropdown-content">
-                <paper-button on-click="deleteNetwork">Add Machine</paper-button>
-              </paper-menu>
-            </paper-menu-button>
-          </div>
-        </paper-header-panel>
-      </paper-drawer-panel>      
-  </template>
+							<template is="dom-if" if="{{network.floating_ips.length}}">
+								<h2>Extra:</h2>
+								<p>{{showExtra(network.extra)}}</p>
+							</template>
+						</div>
+					</paper-card>
+				</div>
+				<div class="absolute-bottom-right">
+					<paper-menu-button vertical-align="bottom" horizontal-align="right">
+						<paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
+						<paper-menu class="dropdown-content">
+							<paper-button on-click="deleteNetwork">Add Machine</paper-button>
+						</paper-menu>
+					</paper-menu-button>
+				</div>
+			</paper-header-panel>
+		</paper-drawer-panel>
+	</template>
 </dom-module>
 
 <script>
-    Polymer({
-      is: 'page-network',
-      enableCustomStyleProperties: true,
-      properties: {
-        router: Object,
-        pageTitle: {type: String},
-        params: {type: Object, notify: true},
-        sections: Array,
-        section: {type: Object, notify: true, value: {}},
-        tag: {String, value: ""},
-        network: Object
-      },
-      ready: function() {
+	Polymer({
+		is: 'page-network',
+		enableCustomStyleProperties: true,
+		properties: {
+			router: Object,
+			pageTitle: {
+				type: String
+			},
+			params: {
+				type: Object,
+				notify: true
+			},
+			sections: Array,
+			section: {
+				type: Object,
+				notify: true,
+				value: {}
+			},
+			tag: {
+				String, value: ""
+			},
+			network: Object
+		},
+		ready: function() {
 
-      },
-      attached: function() {
+		},
+		attached: function() {
 
-      },
-      listInfo: function(e) {
-        var info = '';
-        for(var prop in this.network){
-          info+=prop+" : "+this.network[prop]+", ";
-        }
-        this.$.networkproperties.textContent = info;        
-      },
-      showExtra: function(extra) {
-        var e = extra;
-        var info = '';
-        for(var prop in e){
-          info+=prop+" : "+e[prop]+", ";
-        }
-        return info;
-      },
-      showMore: function(s) {
-        var info = '';
-        for (var i=0; i<s.length; s++){
-            info += i +": "+ this.showExtra(s[i]) + ", ";
-        }
-        return info;
-      },
-      deleteNetwork: function (_,params) {
-        // console.log("clicked delete Network");
-      },
-    });
+		},
+		listInfo: function(e) {
+			var info = '';
+			for (var prop in this.network) {
+				info += prop + " : " + this.network[prop] + ", ";
+			}
+			this.$.networkproperties.textContent = info;
+		},
+		showExtra: function(extra) {
+			var e = extra;
+			var info = '';
+			for (var prop in e) {
+				info += prop + " : " + e[prop] + ", ";
+			}
+			return info;
+		},
+		showMore: function(s) {
+			var info = '';
+			for (var i = 0; i < s.length; s++) {
+				info += i + ": " + this.showExtra(s[i]) + ", ";
+			}
+			return info;
+		},
+		deleteNetwork: function(_, params) {
+			// console.log("clicked delete Network");
+		},
+	});
 </script>
