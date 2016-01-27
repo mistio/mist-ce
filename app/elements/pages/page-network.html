@@ -36,44 +36,44 @@
 							<table class="info-table">
 								<tr>
 									<td>
-										<h2>Name</h2>
+										Name
 									</td>
 									<td>
-										<p>[[network.name]]</p>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<h2>ID</h2>
-									</td>
-									<td>
-										<p>[[network.id]]</p>
+										[[network.name]]
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<h2>Type</h2>
+										ID
 									</td>
 									<td>
-										<p>[[network.type]]</p>
+										[[network.id]]
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Type
+									</td>
+									<td>
+										[[network.type]]
 									</td>
 								</tr>
 								<template is="dom-if" if="[[network.status]]">
 									<tr>
 										<td>
-											<h2>Status</h2>
+											Status
 										</td>
 										<td>
-											<p>[[network.status]]</p>
+											[[network.status]]
 										</td>
 									</tr>
 								</template>
 								<tr>
 									<td>
-										<h2>Provider</h2>
+										Provider
 									</td>
 									<td>
-										<p>[[network.provider]]</p>
+										[[network.provider]]
 									</td>
 								</tr>
 							</table>
@@ -81,31 +81,88 @@
 					</paper-card>
 
 					<template is="dom-if" if="[[network.subnets.length]]">
-						<paper-card heading="Subnets ([[network.subnets.length]])">
+						<paper-card class="info-card" heading="Subnets ([[network.subnets.length]])">
 							<div class="card-content">
-								<h2>Subnets:</h2>
-								<p>[[showMore(network.subnets)]]</p>
-								<hr/>
+								<table class="info-table">
+									<template is="dom-repeat" items="[[network.subnets]]">
+										<template is="dom-if" if="[[item.name]]">
+											<tr class="info-table-divider">
+												<td>
+													Name
+												</td>
+												<td>
+													[[item.name]]
+												</td>
+											</tr>
+										</template>
+										<template is="dom-if" if="[[item.id]]">
+											<tr>
+												<td>
+													ID
+												</td>
+												<td>
+													[[item.id]]
+												</td>
+											</tr>
+										</template>
+										<template is="dom-if" if="[[item.zone]]">
+											<tr>
+												<td>
+													ZoneZone</td>
+												<td>
+													[[subnet.zone.name]]
+												</td>
+											</tr>
+										</template>
+										<template is="dom-if" if="[[item.cidr]]">
+											<tr>
+												<td>
+													Cidr</td>
+												<td>
+													[[subnet.cidr]]
+												</td>
+											</tr>
+										</template>
+										<template is="dom-if" if="[[item.enable_dhcp]]">
+											<tr>
+												<td>
+													DHCP Enabled</td>
+												<td>
+													[[subnet.enable_dhcp]]
+												</td>
+											</tr>
+										</template>
+										<template is="dom-if" if="[[item.gateway_ip]]">
+											<tr>
+												<td>
+													Gateway IP</td>
+												<td>
+													[[subnet.gateway_ip]]
+												</td>
+											</tr>
+										</template>
+									</template>
+								</table>
 							</div>
 						</paper-card>
 					</template>
 
-					<paper-card heading="Metadata">
+					<paper-card class="info-card" heading="Full Metadata List">
 						<div class="card-content">
 							<template is="dom-if" if="{{network.tags.length}}">
-								<h2>Tags:</h2>
-								<p>{{showExtra(network.tags)}}</p>
-								<hr/>
+								<p>Tags:
+									<p>{{showExtra(network.tags)}}</p>
+									<hr/>
 							</template>
 
 							<template is="dom-if" if="{{network.floating_ips.length}}">
-								<h2>Floating Ips:</h2>
+								<p>Floating Ips:</p>
 								<p>{{showMore(network.floating_ips)}}</p>
 								<hr/>
 							</template>
 
 							<template is="dom-if" if="{{network.floating_ips.length}}">
-								<h2>Extra:</h2>
+								<p>Extra:</p>
 								<p>{{showExtra(network.extra)}}</p>
 							</template>
 						</div>

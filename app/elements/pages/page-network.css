@@ -25,24 +25,3 @@ paper-card {
 	display: block;
 	margin-bottom: 20px;
 }
-paper-card-header {
-    color: #474747;
-    background-color: #d4d4d4;
-}
-.info-card .title-text {
-    color: #474747;
-    background-color: #d4d4d4;
-}
-.info-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
-}
-.info-table tr td {
-    width: 50%;
-    padding: 0;
-    border-bottom: 1px solid #eeedeb;
-}
-.info-table tr:last-child td {
-    border: none;
-}
