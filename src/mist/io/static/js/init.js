@@ -1,4 +1,4 @@
-var loadApp = function (
+var loadApp = function(
     callback,
     TemplatesBuild,
     CloudAddController,
@@ -48,7 +48,7 @@ var loadApp = function (
     // Ember Application
     App.ready = callback;
     App = Ember.Application.create(App);
-    window.Mist  = App;
+    window.Mist = App;
 
     // Globals
     App.set('betaFeatures', !!window.BETA_FEATURES);
@@ -56,8 +56,7 @@ var loadApp = function (
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
     App.set('password', '');
-    App.set('isClientMobile',
-        (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
+    App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
         .test(navigator.userAgent)
     );
 
@@ -75,18 +74,20 @@ var loadApp = function (
             path: '/networks/:network_id',
         });
         this.route('machine', {
-            path : '/machines/:machine_id',
+            path: '/machines/:machine_id',
         });
         this.route('keys');
         this.route('key', {
-            path : '/keys/:key_id'
+            path: '/keys/:key_id'
         });
         this.route('scripts');
         this.route('script', {
-            path : '/scripts/:script_id'
+            path: '/scripts/:script_id'
         });
         this.route('logs');
-        this.route('missing', { path: "/*path" });
+        this.route('missing', {
+            path: "/*path"
+        });
     });
 
     // Ember controllers
@@ -162,28 +163,28 @@ var loadApp = function (
             'autocapitalize'
         ],
         keyUp: function(e) {
-            if(this.get('parentView').keyUp) {
+            if (this.get('parentView').keyUp) {
                 this.get('parentView').keyUp(e);
             }
         },
         click: function(e) {
-            if(this.get('parentView').inputClicked) {
+            if (this.get('parentView').inputClicked) {
                 this.get('parentView').inputClicked(e);
             }
         },
         focusIn: function(e) {
-            if(this.get('parentView').inputClicked) {
+            if (this.get('parentView').inputClicked) {
                 this.get('parentView').inputClicked(e);
             }
         }
     });
 
     // Mist functions
-    App.isScrolledToTop = function () {
+    App.isScrolledToTop = function() {
         return window.pageYOffset <= 20;
     };
 
-    App.isScrolledToBottom = function(){
+    App.isScrolledToBottom = function() {
         var distanceToTop = $(document).height() - $(window).height();
         var top = $(document).scrollTop();
         return distanceToTop - top < 20;
@@ -202,7 +203,7 @@ var loadApp = function (
         sel.addRange(range);
     };
 
-    App.smoothScroll = function (scrollTo, timeout) {
+    App.smoothScroll = function(scrollTo, timeout) {
 
         timeout = timeout || 100;
 
@@ -224,14 +225,14 @@ var loadApp = function (
         var scrollChunks = distance / scrollTimes;
         var sign = startingTop < scrollTo ? +1 : -1;
 
-        function partialScroll () {
+        function partialScroll() {
             if (Math.abs($(window).scrollTop() - scrollTo) < 10 ||
                 scrollCounter == 0) {
                 window.scrollTo(0, scrollTo);
             } else {
                 scrollCounter--;
                 window.scrollTo(0, $(window).scrollTop() + (sign * scrollChunks));
-                setTimeout(function () {
+                setTimeout(function() {
                     partialScroll();
                 }, scrollInterval);
             }
@@ -249,14 +250,14 @@ var loadApp = function (
     };
 
     App.clock = Ember.Object.extend({
-        init: function () {
+        init: function() {
             this._super();
             var that = this;
-            setInterval(function () {
+            setInterval(function() {
                 that.tick();
             }, TIME_MAP.SECOND);
         },
-        tick: function () {
+        tick: function() {
             this.setProperties({
                 second: new Date().getSeconds(),
                 minute: new Date().getMinutes(),
@@ -267,36 +268,36 @@ var loadApp = function (
 };
 
 
-var setupChannelEvents = function (socket, namespace, callback) {
+var setupChannelEvents = function(socket, namespace, callback) {
     if (namespace == 'main')
         return setupMainChannel(socket, callback);
     else if (namespace == 'logs')
         return setupLogChannel(socket, callback);
     else if (namespace == 'shell')
-      return setupShellChannel(socket, callback);
+        return setupShellChannel(socket, callback);
     else return callback();
 };
 
 
-var setupLogChannel = function (socket, callback) {
+var setupLogChannel = function(socket, callback) {
     info('setting up log channel');
-    socket.on('open_incidents', function (openIncidents) {
-        require(['app/models/story'], function (StoryModel) {
-            var models = openIncidents.map(function (incident) {
+    socket.on('open_incidents', function(openIncidents) {
+        require(['app/models/story'], function(StoryModel) {
+            var models = openIncidents.map(function(incident) {
                 return StoryModel.create(incident);
             });
             Mist.set('openIncidents', models);
         });
-    }).on('closed_incidents', function (closedIncidents) {
-        require(['app/models/story'], function (StoryModel) {
-            var models = closedIncidents.map(function (incident) {
+    }).on('closed_incidents', function(closedIncidents) {
+        require(['app/models/story'], function(StoryModel) {
+            var models = closedIncidents.map(function(incident) {
                 return StoryModel.create(incident);
             });
             Mist.set('closedIncidents', models);
         });
-    }).on('open_jobs', function (openJobs) {
+    }).on('open_jobs', function(openJobs) {
         info('received open_jobs: ', openJobs);
-    }).on('open_shells', function (openShells) {
+    }).on('open_shells', function(openShells) {
         info('received open_shells: ', openShells);
     }).on('open_sessions', function(openSessions) {
         info('received open_sessions: ', openSessions);
@@ -311,12 +312,12 @@ var setupLogChannel = function (socket, callback) {
 };
 
 
-var setupShellChannel = function (socket, callback) {
+var setupShellChannel = function(socket, callback) {
     socket.firstData = true;
-    socket.on('close', function (data) {
+    socket.on('close', function(data) {
         info(data);
         Mist.term.write('Connection closed by remote');
-    }).on('shell_data', function (data) {
+    }).on('shell_data', function(data) {
         Mist.term.write(data);
         if (socket.firstData) {
             $('.terminal').focus();
@@ -334,118 +335,123 @@ var setupMainChannel = function(socket, callback) {
         //  TODO: This is a temporary ajax-request to get the scripts.
         //  It should be converted into a "list_scripts" socket handler
         //  as soon as the cloud supports it
-        Mist.ajax.GET('/scripts').success(function (scripts) {
+        Mist.ajax.GET('/scripts').success(function(scripts) {
             Mist.scriptsController.setModel(scripts);
         });
     }
 
-    socket.on('list_keys', function (keys) {
-        Mist.keysController.load(keys);
-    })
-    .on('list_clouds', function (clouds) {
-        Mist.cloudsController.load(clouds);
-        Mist.cloudsController.set('loaded');
-        if (callback)
-            callback();
-        callback = null;
-    })
-    .on('list_projects', function(data) {
-        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
-        if (cloud)
-            cloud.projects.setModel(data.projects);
-    })
-    .on('list_sizes', function (data) {
-        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
-        if (cloud)
-            cloud.sizes.setModel(data.sizes);
-    })
-    .on('list_images', function (data) {
-        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
-        if (cloud)
-            cloud.images.setModel(data.images);
-    })
-    .on('list_machines', function (data) {
-        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
-        if (cloud)
-            cloud.machines.load(data.machines);
-    })
-    .on('list_locations', function (data) {
-        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
-        if (cloud)
-            cloud.locations.setModel(data.locations);
-    })
-    .on('list_networks', function (data) {
-        var cloud = Mist.cloudsController.getCloud(data.cloud_id);
-        if (cloud) {
-            var networks = [];
-            networks.pushObjects(data.networks.public);
-            networks.pushObjects(data.networks.private);
-            cloud.networks.setModel(networks);
-        }
-    })
-    .on('monitoring',function (data){
-        Mist.monitoringController._updateMonitoringData(data);
-        Mist.monitoringController.trigger('onMonitoringDataUpdate');
-        Mist.cloudsController.set('checkedMonitoring', true);
-    })
-    .on('stats', function (data) {
-        Mist.graphsController._handleSocketResponse(data);
-    })
-    .on('notify', function (data){
-        if (!(data.title && data.body) && !data.machine_id) {
-            var msg = data.title || data.body;
-            Mist.notificationController.notify(msg);
-            return;
-        }
+    socket
+        .on('list_keys', function(keys) {
+            Mist.keysController.load(keys);
+        })
+        .on('list_clouds', function(clouds) {
+            Mist.cloudsController.load(clouds);
+            Mist.cloudsController.set('loaded');
+            if (callback)
+                callback();
+            callback = null;
+        })
+        .on('list_projects', function(data) {
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.projects.setModel(data.projects);
+        })
+        .on('list_sizes', function(data) {
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.sizes.setModel(data.sizes);
+        })
+        .on('list_images', function(data) {
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.images.setModel(data.images);
+        })
+        .on('list_machines', function(data) {
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.machines.load(data.machines);
+        })
+        .on('list_locations', function(data) {
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud)
+                cloud.locations.setModel(data.locations);
+        })
+        .on('list_networks', function(data) {
+            var cloud = Mist.cloudsController.getCloud(data.cloud_id);
+            if (cloud) {
+                var networks = [];
+                networks.pushObjects(data.networks.public, data.networks.private);
+                cloud.networks.setModel(networks);
+            }
+        })
+        .on('monitoring', function(data) {
+            Mist.monitoringController._updateMonitoringData(data);
+            Mist.monitoringController.trigger('onMonitoringDataUpdate');
+            Mist.cloudsController.set('checkedMonitoring', true);
+        })
+        .on('stats', function(data) {
+            Mist.graphsController._handleSocketResponse(data);
+        })
+        .on('notify', function(data) {
+            if (!(data.title && data.body) && !data.machine_id) {
+                var msg = data.title || data.body;
+                Mist.notificationController.notify(msg);
+                return;
+            }
 
-        var dialogBody = [];
+            var dialogBody = [];
 
-        // Extract machine information
-        var machineId = data.machine_id;
-        var cloudId = data.cloud_id;
-        var machine = Mist.cloudsController.getMachine(machineId, cloudId);
+            // Extract machine information
+            var machineId = data.machine_id;
+            var cloudId = data.cloud_id;
+            var machine = Mist.cloudsController.getMachine(machineId, cloudId);
 
-        if (machine && machine.id) {
-            dialogBody.push({
-                link: machine.name,
-                class: 'ui-btn ui-btn-d ui-shadow',
-                href: '#/machines/' + machineId,
-                closeDialog: true,
+            if (machine && machine.id) {
+                dialogBody
+                    .push({
+                        paragraph: data.title + ' on:',
+                        class: null
+                    }, {
+                        link: machine.name,
+                        class: 'ui-popup-link ui-btn icon-machine',
+                        href: '#/machines/' + machineId,
+                        closeDialog: true,
+                    });
+            } else {
+                warn('Machine not found', machineId, backendId);
+                dialogBody.push({
+                    class: 'ui-btn ui-btn-d ui-shadow',
+                    closeDialog: true,
+                });
+            }
+
+            // Get output
+            if (data.output)
+                dialogBody.push({
+                    command: data.output
+                });
+
+            // Get duration
+            var duration = parseInt(data.duration);
+            if (duration) {
+                var durationMins = parseInt(duration / 60);
+                var durationSecs = duration - (durationMins * 60);
+                dialogBody.push({
+                    paragraph: 'Completed in ' + durationMins + 'min ' + durationSecs + ' sec',
+                    class: 'duration'
+                });
+            }
+
+            Mist.dialogController.open({
+                size: 'large-modal',
+                type: DIALOG_TYPES.IS_PLAIN,
+                head: data.error ? 'Error' : 'Success',
+                body: dialogBody
             });
-        } else {
-            warn('Machine not found', machineId, cloudId);
-            dialogBody.push({
-                class: 'ui-btn ui-btn-d ui-shadow',
-                closeDialog: true,
-            });
-        }
-
-        // Get output
-        if (data.output)
-            dialogBody.push({
-                command: data.output
-            });
-
-        // Get duration
-        var duration = parseInt(data.duration);
-        if (duration) {
-            var durationMins = parseInt(duration / 60);
-            var durationSecs = duration - (durationMins * 60);
-            dialogBody.push({
-                paragraph: 'Completed in ' + durationMins + 'min ' + durationSecs + ' sec',
-                class: 'duration'
-            });
-        }
-
-        Mist.dialogController.open({
-            type: DIALOG_TYPES.OK,
-            head: data.title,
-            body: dialogBody
-        });
-    })
-    .on('probe', onProbe)
-    .on('ping', onProbe)
-    .emit('ready');
+        })
+        .on('probe', onProbe)
+        .on('ping', onProbe)
+        .emit('ready');
 
     function onProbe(data) {
         var machine = Mist.cloudsController.getMachine(data.machine_id, data.cloud_id);
@@ -455,13 +461,14 @@ var setupMainChannel = function(socket, callback) {
 };
 
 
-function virtualKeyboardHeight () {
+function virtualKeyboardHeight() {
     var keyboardHeight = 0;
 
     if (!Mist.term) return 0;
 
-    if (Mist.term.isIpad || Mist.term.isIphone){
-        var sx = document.body.scrollLeft, sy = document.body.scrollTop;
+    if (Mist.term.isIpad || Mist.term.isIphone) {
+        var sx = document.body.scrollLeft,
+            sy = document.body.scrollTop;
         var naturalHeight = window.innerHeight;
         window.scrollTo(sx, document.body.scrollHeight);
         keyboardHeight = naturalHeight - window.innerHeight;
@@ -475,7 +482,8 @@ function virtualKeyboardHeight () {
 
 // Calculates maximum chars that can be displayed into a fixed width
 var fontTest;
-function maxCharsInWidth (fontSize, width) {
+
+function maxCharsInWidth(fontSize, width) {
 
     fontTest.css('font-size', fontSize);
 
@@ -494,7 +502,7 @@ function maxCharsInWidth (fontSize, width) {
 
 
 // Calculates maximum lines that can be displayed into a fixed height
-function maxLinesInHeight (fontSize, height) {
+function maxLinesInHeight(fontSize, height) {
     fontTest.css('font-size', fontSize);
 
     var testString = '';
@@ -507,29 +515,29 @@ function maxLinesInHeight (fontSize, height) {
 }
 
 
-function lockScroll(){
+function lockScroll() {
     $('body').data('y-scroll', self.pageYOffset)
-             .css('overflow', 'hidden');
+        .css('overflow', 'hidden');
     window.scrollTo(null, self.pageYOffset);
 }
 
 
-function unlockScroll(){
-      $('body').css('overflow', 'auto');
-      window.scrollTo(null, $('body').data('y-scroll'))
+function unlockScroll() {
+    $('body').css('overflow', 'auto');
+    window.scrollTo(null, $('body').data('y-scroll'))
 }
 
 
-function resetFileInputField (element) {
+function resetFileInputField(element) {
     element.wrap('<form>').parent('form').trigger('reset');
     element.unwrap();
 }
 
-function getProviderFields (provider) {
+function getProviderFields(provider) {
     var providerFields = [];
     if (provider && provider.provider) {
         var providerTitle = provider.provider;
-        forIn(PROVIDER_MAP, function (fields, title) {
+        forIn(PROVIDER_MAP, function(fields, title) {
             if (providerTitle.indexOf(title) > -1)
                 providerFields = fields;
         });
@@ -537,24 +545,24 @@ function getProviderFields (provider) {
     return providerFields;
 }
 
-function clearProviderFields (provider) {
-    getProviderFields(provider).forEach(function (field) {
+function clearProviderFields(provider) {
+    getProviderFields(provider).forEach(function(field) {
         field.set('value', field.defaultValue || '');
     });
 }
 
-function parseProviderMap () {
+function parseProviderMap() {
     // Parse PROVIDER_MAP to generate template friendly fields
 
     // Append nested fields into main array
-    forIn(PROVIDER_MAP, function (fields, title) {
-        fields.forEach(function (field, i1) {
+    forIn(PROVIDER_MAP, function(fields, title) {
+        fields.forEach(function(field, i1) {
             if (field.type == 'slider') {
-                field.on.forEach(function (f, i2) {
+                field.on.forEach(function(f, i2) {
                     f.className = 'on';
                     fields.splice(i1 + i2 + 1, 0, f);
                 });
-                field.off.forEach(function (f, i2) {
+                field.off.forEach(function(f, i2) {
                     f.className = 'off';
                     fields.splice(i1 + i2 + 1, 0, f);
                 });
@@ -562,11 +570,11 @@ function parseProviderMap () {
         });
     });
 
-    forIn(PROVIDER_MAP, function (fields, title) {
+    forIn(PROVIDER_MAP, function(fields, title) {
         PROVIDER_MAP[title].className = 'provider-';
         PROVIDER_MAP[title].className += title == 'bare_metal' ?
             'baremetal' : title;
-        fields.forEach(function (field, index) {
+        fields.forEach(function(field, index) {
             field = PROVIDER_MAP[title][index] = Ember.Object.create(field);
             field.value = field.defaultValue || '';
             if (!field.showIf)
@@ -592,20 +600,20 @@ function parseProviderMap () {
                 field.placeholder += '(optional)';
             if (field.helpText)
                 field.helpId = field.name + '_' + 'help';
-            if (!field.label &&  field.name)
-                field.label = field.name.split('_').map(function (word) {
+            if (!field.label && field.name)
+                field.label = field.name.split('_').map(function(word) {
                     if (word == 'api' ||
                         word == 'url' ||
                         word == 'id')
-                            return word.toUpperCase();
+                        return word.toUpperCase();
                     return word.capitalize()
                 }).join(' ');
         });
     });
 
     // Build dependencies
-    forIn(PROVIDER_MAP, function (fields, title) {
-        fields.forEach(function (field, index) {
+    forIn(PROVIDER_MAP, function(fields, title) {
+        fields.forEach(function(field, index) {
             if (field.showIf) {
                 field.set('showDependency', fields.findBy('name', field.showIf));
                 var binding = Ember.Binding.from("showDependency.value").to("show");
