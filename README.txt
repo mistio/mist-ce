@@ -112,55 +112,64 @@ Point your browser to http://127.0.0.1:8000 and you are ready to roll!
 FAQ
 ---
 
-Question: I install mist.io and visit http://localhost:8000 but I don't see anything
-Answer: make sure all services are running
+## I install mist.io and visit http://localhost:8000 but I don't see anything
 
-user@user:~/mist.io$ ./bin/supervisorctl status
-celery                           RUNNING   pid 15169, uptime 0:00:02
-haproxy                          RUNNING   pid 15165, uptime 0:00:02
-hub-shell                        RUNNING   pid 15172, uptime 0:00:02
-memcache                         RUNNING   pid 15170, uptime 0:00:02
-rabbitmq                         RUNNING   pid 15168, uptime 0:00:02
-sockjs                           RUNNING   pid 15166, uptime 0:00:02
-uwsgi                            RUNNING   pid 15167, uptime 0:00:02
+make sure all services are running::
+
+    user@user:~/mist.io$ ./bin/supervisorctl status
+    celery                           RUNNING   pid 15169, uptime 0:00:02
+    haproxy                          RUNNING   pid 15165, uptime 0:00:02
+    hub-shell                        RUNNING   pid 15172, uptime 0:00:02
+    memcache                         RUNNING   pid 15170, uptime 0:00:02
+    rabbitmq                         RUNNING   pid 15168, uptime 0:00:02
+    sockjs                           RUNNING   pid 15166, uptime 0:00:02
+    uwsgi                            RUNNING   pid 15167, uptime 0:00:02
+
+if you don't see a service as RUNNING then mist.io won't be able to start properly. Make sure that all dependencies have been added to the system before running the buildout, and if not install them and re-run the buildout. Also check what the logs say::
+
+    user@user:~/mist.io$ ./bin/supervisorctl status
 
 
-Question: How to change mist.io listen address
-Answer: By default mist.io binds on the localhost interface, if you want to change this behavior edit haproxy.conf and change this line:
+## How to change mist.io listen address
+
+By default mist.io binds on the localhost interface, if you want to change this behavior edit haproxy.conf and change this line::
     frontend www localhost:8000
-to
+
+to::
     frontend www 0.0.0.0:8000
 
-then restart haproxy
-user@user:~/mist.io$ ./bin/supervisorctl restart haproxy
+then restart haproxy::
 
-of course make sure that no other service has already binded on port 8000
-It should now load on http://your_ip:8000
+    user@user:~/mist.io$ ./bin/supervisorctl restart haproxy
+
+of course make sure that no other service has already binded on port 8000. It should now load on http://your_ip:8000
+
 If this does not load check if a local firewall policy denies incoming access to port 8000, or if your provider denies incoming access to port 8000 (eg the default ec2 policy for some regions)
 
 
-Question: rabbitm is not running
-First make sure that erlang is installed, otherwise it won't be able to start ( on RedHat based OS you might have to install it manually, see the install section). On Ubuntu there's an error that prevents rabbitmq from starting correctly, if that's the case for you try to start epmd manually and then restart rabbitmq:
+## Rabbitm is not running
+
+First make sure that erlang is installed, otherwise it won't be able to start ( on RedHat based OS you might have to install it manually, see the install section). On Ubuntu there's an error that prevents rabbitmq from starting correctly, if that's the case for you try to start epmd manually and then restart rabbitmq::
 
 
 
-user@user:~/mist.io$ ./bin/supervisorctl status
-celery                           RUNNING   pid 15767, uptime 0:03:19
-haproxy                          RUNNING   pid 15763, uptime 0:03:19
-hub-shell                        RUNNING   pid 15769, uptime 0:03:19
-memcache                         RUNNING   pid 15768, uptime 0:03:19
-rabbitmq                         STARTING
-sockjs                           RUNNING   pid 15764, uptime 0:03:19
-uwsgi                            RUNNING   pid 15765, uptime 0:03:19
-user@user:~/mist.io$ epmd -daemon && ./bin/supervisorctl restart rabbitmq
-rabbitmq: stopped
-rabbitmq: started
-user@user:~/mist.io$ ./bin/supervisorctl status
-celery                           RUNNING   pid 15767, uptime 0:03:44
-haproxy                          RUNNING   pid 15763, uptime 0:03:44
-hub-shell                        RUNNING   pid 15769, uptime 0:03:44
-memcache                         RUNNING   pid 15768, uptime 0:03:44
-rabbitmq                         RUNNING   pid 18808, uptime 0:00:06
-sockjs                           RUNNING   pid 15764, uptime 0:03:44
-uwsgi                            RUNNING   pid 15765, uptime 0:03:44
+    user@user:~/mist.io$ ./bin/supervisorctl status
+    celery                           RUNNING   pid 15767, uptime 0:03:19
+    haproxy                          RUNNING   pid 15763, uptime 0:03:19
+    hub-shell                        RUNNING   pid 15769, uptime 0:03:19
+    memcache                         RUNNING   pid 15768, uptime 0:03:19
+    rabbitmq                         STARTING
+    sockjs                           RUNNING   pid 15764, uptime 0:03:19
+    uwsgi                            RUNNING   pid 15765, uptime 0:03:19
+    user@user:~/mist.io$ epmd -daemon && ./bin/supervisorctl restart rabbitmq
+    rabbitmq: stopped
+    rabbitmq: started
+    user@user:~/mist.io$ ./bin/supervisorctl status
+    celery                           RUNNING   pid 15767, uptime 0:03:44
+    haproxy                          RUNNING   pid 15763, uptime 0:03:44
+    hub-shell                        RUNNING   pid 15769, uptime 0:03:44
+    memcache                         RUNNING   pid 15768, uptime 0:03:44
+    rabbitmq                         RUNNING   pid 18808, uptime 0:00:06
+    sockjs                           RUNNING   pid 15764, uptime 0:03:44
+    uwsgi                            RUNNING   pid 15765, uptime 0:03:44
 
