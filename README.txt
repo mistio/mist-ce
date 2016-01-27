@@ -17,29 +17,7 @@ eggs in the system's Python.
 
 To install the basic requirements in a Debian based distro do::
 
-    sudo aptitude install gcc python-dev build-essential git erlang libpcre3-dev python-lxml
-
-
-If you wish to install it in a virtual environment you'll also need::
-
-    sudo aptitude install python-virtualenv
-
-If you plan to support KVM via libvirt, you should install libvirt library::
-
-For Debian systems::
-
-    sudo aptitude install libvirt-bin libvirt-dev
-    ./bin/pip install libvirt-python
-
-While for Redhat based::
-
-    yum install libvirt-devel -y
-    ./bin/pip install libvirt-python
-
-
-For vSphere support, you should install pyvmomi library::
-
-    ./bin/pip install pyvmomi
+    sudo aptitude install gcc python-dev build-essential git erlang libpcre3-dev python-lxml python-virtualenv
 
 In Red Hat based systems the following packages need to be installed::
 
@@ -63,6 +41,7 @@ you simply run::
 
     sudo easy_install virtualenv
 
+
 Supposing you have all the above, the steps are simple. Login as user, clone the repository,
 create a virtualenv and run buildout. This will fail if you run it as root or with sudo, so make sure you run it as user ::
 
@@ -71,6 +50,24 @@ create a virtualenv and run buildout. This will fail if you run it as root or wi
     virtualenv --no-site-packages .
     ./bin/python bootstrap.py
     ./bin/buildout -v
+
+If you plan to support KVM you should install libvirt library::
+
+For Debian systems::
+
+    sudo aptitude install libvirt-bin libvirt-dev
+    ./bin/pip install libvirt-python
+
+While for Redhat based::
+
+    yum install libvirt-devel -y
+    ./bin/pip install libvirt-python
+
+
+For vSphere support, you should install pyvmomi library::
+
+    ./bin/pip install pyvmomi
+
 
 In case you are using an older version of setuptools, bootstrap will fail. To
 solve this you need to::
@@ -112,7 +109,8 @@ Point your browser to http://127.0.0.1:8000 and you are ready to roll!
 FAQ
 ---
 
-## I install mist.io and visit http://localhost:8000 but I don't see anything
+I install mist.io and visit http://localhost:8000 but I don't see anything
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 make sure all services are running::
 
@@ -130,7 +128,8 @@ if you don't see a service as RUNNING then mist.io won't be able to start proper
     user@user:~/mist.io$ ./bin/supervisorctl status
 
 
-## How to change mist.io listen address
+How to change mist.io listen address
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default mist.io binds on the localhost interface, if you want to change this behavior edit haproxy.conf and change this line::
     frontend www localhost:8000
@@ -147,7 +146,8 @@ of course make sure that no other service has already binded on port 8000. It sh
 If this does not load check if a local firewall policy denies incoming access to port 8000, or if your provider denies incoming access to port 8000 (eg the default ec2 policy for some regions)
 
 
-## Rabbitm is not running
+Rabbitm is not running
+~~~~~~~~~~~~~~~~~~~~~~
 
 First make sure that erlang is installed, otherwise it won't be able to start ( on RedHat based OS you might have to install it manually, see the install section). On Ubuntu there's an error that prevents rabbitmq from starting correctly, if that's the case for you try to start epmd manually and then restart rabbitmq::
 
