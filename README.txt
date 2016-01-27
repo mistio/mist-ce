@@ -158,8 +158,6 @@ First make sure that erlang is installed, otherwise it won't be able to start (o
     user@user:~/mist.io$ ./bin/supervisorctl status rabbitmq
     rabbitmq                         STARTING
     user@user:~/mist.io$ epmd -daemon && ./bin/supervisorctl restart rabbitmq
-    rabbitmq: stopped
-    rabbitmq: started
     user@user:~/mist.io$ ./bin/supervisorctl status rabbitmq
     rabbitmq                         RUNNING   pid 18808, uptime 0:00:06
 
