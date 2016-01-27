@@ -4,31 +4,40 @@ from selenium.common.exceptions import NoSuchElementException, StaleElementRefer
 
 from mist.io.tests.gui.features.steps.general import *
 
+machine_states_ordering = {
+    'error': 6,
+    'pending': 5,
+    'rebooting': 4,
+    'running': 3,
+    'unknown': 2,
+    'suspended': 2,
+    'terminated': 1,
+    'stopped': 0
+}
 
-@when(u'I check the sorting by "{sorting_param}"')
-def check_sorting(context, sorting_param):
+
+@when(u'I check the sorting by "{sorting_field}"')
+def check_sorting(context, sorting_field):
     """
-    Create dict with key the arg of the step definition
+    Check the sorting for name, state or cloud in the machines list
     """
+    sorting_field = sorting_field.lower()
+    machines_elements = context.browser.find_elements_by_css_selector('#machine-list li.checkbox-link ')
+    machines = []
+    for machine in machines_elements:
+        name = safe_get_element_text(machine.find_element_by_class_name('machine-name'))
+        state = safe_get_element_text(machine.find_element_by_class_name('machine-state'))
+        cloud = safe_get_element_text(machine.find_element_by_css_selector('.machine-tags .tag:first-child'))
+        machines.append((name, state, cloud))
 
-    sort_map = {'name': 'div.machine-name', 'state': 'span.machine-state',
-                'cloud': 'div.machine-tags span.tag:nth-child(1)'}
-
-    sort_type = sorting_param
-    sorting_selector = sort_map[sort_type]
-
-    machines_elements = context.browser.find_elements_by_css_selector(
-        '#machine-list-container li ' + sorting_selector)
-    # list with machine's names
-    machines_names_list = [safe_get_element_text(machine_element) for
-                           machine_element in machines_elements]
-    # sorting the machine list
-    my_sorted_machines_list = sorted(machines_names_list)
-    # lists are sorted and they have the same number of elements
-    if my_sorted_machines_list == machines_names_list:
-        pass
-    else:
-        assert False, u'List is not sorted'
+    if sorting_field == 'name':
+        machines = sorted(machines, key=lambda x: x[0])
+    elif sorting_field == 'state':
+        machines = sorted(machines, key=lambda x: x[1], cmp=lambda x, y: machine_states_ordering[y] - machine_states_ordering[x])
+    elif sorting_field == 'cloud':
+        machines = sorted(machines, key=lambda x: x[2])
+    for i in range(len(machines)):
+        assert machines[i][0] == safe_get_element_text(machines_elements[i].find_element_by_class_name('machine-name')), "Machine list is not properly sorted by %s" % sorting_field
 
 
 @when(u'I clear the machines search bar')
