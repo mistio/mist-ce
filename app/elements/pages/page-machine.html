@@ -221,41 +221,11 @@
                 type: String,
                 value: ""
             },
-
             model: Object,
-            machine: Object,
-            upTime: {
-                type: String,
-                computed: '_computeUpTime(machine.uptime)'
-            }
+            machine: Object
         },
         listeners: {
             'machine-changed': '_machineStateLabel'
-        },
-        _computeUpTime: function(uptime) {
-            console.log(uptime);
-            var ret = '';
-            if (uptime) {
-                var x = Math.floor(uptime / 1000);
-                var seconds = x % 60;
-                x = Math.floor(x / 60);
-                var minutes = x % 60;
-                x = Math.floor(x / 60);
-                var hours = x % 24;
-                x = Math.floor(x / 24);
-                var days = x;
-
-                if (days) ret = ret + days + ' days, ';
-                if (hours) ret = ret + hours + ' hours, ';
-                if (minutes) ret = ret + minutes + ' minutes, ';
-                if (seconds) {
-                    ret = ret + seconds + ' seconds';
-                } else {
-                    ret = ret + '0 seconds';
-                }
-            }
-
-            return ret;
         },
         listInfo: function(e) {
             var info = '';

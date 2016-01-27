@@ -183,17 +183,17 @@ Polymer({
         this.set('model.clouds.' + data.cloud_id + '.imagesArray', data.images);
         var allImages = [];
         if (this.model != undefined) {
-        
+
             this.model.cloudsArray.forEach(
               function(cloud){
-                
+
                 if (cloud.imagesArray != undefined ) {
                     cloud.imagesArray.forEach(function (image,index,arr) {
                         arr[index].icons = self._generateIcon(image);
                         self.model.imagesArray.push(arr[index])
                         });
                     }
-                
+
                 return allImages = allImages.concat(cloud.imagesArray != undefined ? cloud.imagesArray : [])
             });
 
@@ -227,7 +227,7 @@ Polymer({
                     cloud.networksArray.public.forEach(function(net){net["type"]="public"; net["provider"]=cloud.provider; allNetworks.push(net);});
                     cloud.networksArray.private.forEach(function(net){net["type"]="private"; net["provider"]=cloud.provider; allNetworks.push(net);});
                     cloud.networksArray.routers.forEach(function(net){net["type"]="router"; net["provider"]=cloud.provider; allNetworks.push(net);});
-                    return allNetworks; 
+                    return allNetworks;
                     }
                 }
             );
@@ -257,7 +257,7 @@ Polymer({
                 keywords.push(lexicon[i]);
             }
         }
-        return keywords;    
+        return keywords;
     }
 
 
@@ -304,10 +304,10 @@ DumbEventTarget.prototype.emit = function(type) {
             }
         }
     }
-    console.debug("Channel " + this.name + " got event '" + type + "'.");
+    // console.debug("Channel " + this.name + " got event '" + type + "'.");
     this._ensure(type);
     if (!(('on' + type in this) || (this._listeners[type].length))) {
-        console.warn("No listeners for '" + type + "' in " + this.name + ".");
+        // console.warn("No listeners for '" + type + "' in " + this.name + ".");
     }
     if (this['on' + type]) this['on' + type].apply(this, args);
     for (var i=0; i < this._listeners[type].length; i++) {
