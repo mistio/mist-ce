@@ -15,11 +15,11 @@ dependency is build automatically via zc.buildout. Although we use zc.buildout
 it is recommended to install mist.io in a virtualenv to avoid conflicts with
 eggs in the system's Python.
 
-To install the basic requirements in a Debian based distro do::
+To install the basic requirements in a **Debian** based distro do::
 
     sudo aptitude install gcc python-dev build-essential git erlang libpcre3-dev python-lxml python-virtualenv
 
-In Red Hat based systems the following packages need to be installed::
+In **Red Hat** based systems the following packages need to be installed::
 
     sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel python-zc-buildout
 
@@ -32,11 +32,11 @@ Package erlang might be missing from the official repos so it needs to be instal
     sudo yum install erlang -y
 
 
-For openSUSE distibution, you'll have to additionally install::
+For **openSUSE** distibution, you'll have to additionally install::
 
     sudo zypper in python-gevent libevent-devel
 
-In MacOSX you have to install Xcode and its command line tools. For virtualenv
+In **MacOSX** you have to install Xcode and its command line tools. For virtualenv
 you simply run::
 
     sudo easy_install virtualenv
@@ -51,7 +51,7 @@ create a virtualenv and run buildout. This will fail if you run it as root or wi
     ./bin/python bootstrap.py
     ./bin/buildout -v
 
-If you plan to support KVM you should install libvirt library::
+If you plan to support **KVM** you should install libvirt library::
 
 For Debian systems::
 
@@ -64,7 +64,7 @@ While for Redhat based::
     ./bin/pip install libvirt-python
 
 
-For vSphere support, you should install pyvmomi library::
+For **vSphere** support, you should install pyvmomi library::
 
     ./bin/pip install pyvmomi
 
