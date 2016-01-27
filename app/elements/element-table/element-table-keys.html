@@ -2,35 +2,51 @@
 <link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
+<link rel="import" href="../app-check/app-check.html">
 
 <dom-module id="element-table-keys">
     <template>
         <style>
-        :host div {
-            display: inline-block;
+        :host {
+            padding: 15px 24px;
+            width: 100%;
         }
-        
-        .name {
+    
+        :host(:not([narrow-viewport])),
+        :host(:not([narrow-viewport])) a {
+            @apply(--layout-horizontal);
+        }
+
+        :host([narrow-viewport]),
+        :host([narrow-viewport]) a {
+            @apply(--layout-vertical);
+        }
+
+        #check {
+            padding-right: 24px;
+        }
+
+        .id {
             width: 250px;
             font-weight: 500;
+            line-height: 40px;
         }
-        
-        .id,
-        .provider {
+
+        .is-default {
+            font-weight: 400;
             min-width: 300px;
+            line-height: 40px;
         }
         
-        .tag {
-            background-color: #888;
-            color: #fff;
-            padding: 2px 6px;
-            margin: 0 6px;
-            border-radius: 2px;
-        }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
-        <div class="provider" hidden$="[[!item.isDefault]]">[[item.isDefault]]</div>
+        <app-check id="check"
+                     selected="[[selected]]" on-tap="_onSelectThread"
+                     on-transitionend="_eatEvent"></app-check>
+        <a href$="[[elementLink]]" is="pushstate-anchor">
+            <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
+            <div class="is-default" hidden$="[[!item.isDefault]]">[[item.isDefault]]</div>
+        </a>
     </template>
 </dom-module>
 <script>
@@ -40,15 +56,33 @@ Polymer({
         // icons: {
         //   type: Array
         // },
-        // section: {
-        //   type: Object
-        // },
+        elementLink : {
+            type: String,
+            computed: "_elementLink(section,item)"
+        },
+        item: {
+            type: Object
+        },
+        section: {
+            type: Object
+        },
         narrowViewport: {
             type: Boolean,
             reflectToAttribute: true
         }
     },
-
-
+    _elementLink: function(section,item) {
+        return "/" + section.id + "/" + item.id;
+    },
+    _onSelectThread: function(e) {
+      if (Polymer.dom(e).localTarget === this.$.check) {
+        e.stopPropagation();
+        this.selected = !this.selected;
+        this.fire('list-item-select', {item: this});
+      }
+    },
+    _eatEvent: function(e) {
+      e.stopPropagation();
+    },
 });
 </script>
