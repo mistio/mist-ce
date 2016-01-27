@@ -145,7 +145,7 @@ def popup_waiting_with_timeout(context, popup_id, action, seconds):
 
 @step(u'I expect for "{modal_id}" modal to {action} within max {seconds} '
       u'seconds')
-def popup_waiting_with_timeout(context, modal_id, action, seconds):
+def modal_waiting_with_timeout(context, modal_id, action, seconds):
     # dialog-popup
     """
     Function that wait for keyadd-popup to appear but for a maximum
