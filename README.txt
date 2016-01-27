@@ -123,9 +123,9 @@ make sure all services are running::
     sockjs                           RUNNING   pid 15166, uptime 0:00:02
     uwsgi                            RUNNING   pid 15167, uptime 0:00:02
 
-if you don't see a service as RUNNING then mist.io won't be able to start properly. Make sure that all dependencies have been added to the system before running the buildout, if not install them and re-run the buildout. Also have a look on the logs::
+if you don't see a service as RUNNING then mist.io won't be able to start properly. Make sure that all dependencies have been added to the system before running the buildout, if not install them and re-run the buildout. Also have a look on the logs that are on var/log dir::
 
-    user@user:~/mist.io$ ./bin/supervisorctl status
+    user@user:~/mist.io$ tail -f var/log/*.log
 
 
 How to change mist.io listen address
@@ -151,7 +151,7 @@ If this does not load check if a local firewall policy denies incoming access to
 Rabbitm is not running
 ~~~~~~~~~~~~~~~~~~~~~~
 
-First make sure that erlang is installed, otherwise it won't be able to start (on RedHat based OS you might have to install it manually, see the install section). On Ubuntu there's an error that prevents rabbitmq from starting correctly, if that's the case for you try to start epmd manually and then restart rabbitmq::
+First make sure that erlang is installed, otherwise it won't be able to start (on RedHat based OS you might have to install it manually, see the install section). On some Ubuntu systems there's an error that prevents rabbitmq from starting correctly, if that's the case for you try to start epmd manually and then restart rabbitmq::
 
 
 
