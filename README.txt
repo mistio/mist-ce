@@ -45,7 +45,7 @@ In Red Hat based systems the following packages need to be installed::
 
     sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel python-zc-buildout
 
-Package erlang might be missing from the official repos so it needs to be installed manually:
+Package erlang might be missing from the official repos so it needs to be installed manually::
 
     sudo yum install wget -y
     wget http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
