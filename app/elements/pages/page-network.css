@@ -1,18 +1,13 @@
 :host {
-  	background: #fafafa;
+	background: #fafafa;
 }
 #content {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 20px;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+	padding: 20px;
 }
 #container {
-  	background: #fafafa;
-}
-paper-material {
-	padding: 0 20px;
-	overflow: hidden;
-	margin-bottom: 20px;
+	background: #fafafa;
 }
 #content h2, #content p {
 	display: inline-block;
@@ -20,4 +15,9 @@ paper-material {
 }
 #content p {
 	padding-left: 20px;
+}
+paper-material {
+	padding: 0 20px;
+	overflow: hidden;
+	margin-bottom: 20px;
 }
