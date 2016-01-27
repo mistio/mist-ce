@@ -105,25 +105,14 @@
             },
             image: {
                 type: Object,
-                notify: true,
-                observer: '_contentChanged'
+                notify: true
             }
         },
-        _contentChanged: function(newValue, oldValue) {
-            console.log(newValue);
-        },
         ready: function() {
-            console.log(this.image);
+
         },
         attached: function() {
 
-        },
-        listInfo: function(e) {
-            var info = '';
-            for (var prop in this.image) {
-                info += prop + " : " + this.image[prop] + ", ";
-            }
-            this.$.imageproperties.textContent = info;
         },
         addMachine: function(_, params) {
             console.log("clicked Add Machine");
@@ -133,14 +122,6 @@
         },
         unstarthis: function() {
             this.set('image.star', false);
-        },
-        showExtra: function(extra) {
-            var e = extra;
-            var p = "";
-            for (var prop in e) {
-                p += prop + ": " + prop.value + ", ";
-            }
-            return p;
         }
     });
 </script>
