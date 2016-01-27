@@ -212,6 +212,11 @@ a {
 
 /* Info Card */
 
+.info-card {
+	display: block;
+	max-width: 920px;
+	margin: 0 auto 20px;
+}
 .info-card .title-text {
 	color: #474747 !important;
 	background-color: #d4d4d4;

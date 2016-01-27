@@ -10,6 +10,7 @@
 <link rel="import" href="../element-table/element-table.html">
 <link rel="import" href="../element-table-cards/element-table-cards.html">
 <link rel="import" href="../responsive-element/responsive-element.html">
+<link rel="import" href="../element-dialog/element-dialog.html">
 
 <dom-module id="page-network">
 	<link rel="import" type="css" href="../../styles/main.css">
@@ -108,9 +109,9 @@
 										<template is="dom-if" if="[[item.zone]]">
 											<tr>
 												<td>
-													ZoneZone</td>
+													Zone</td>
 												<td>
-													[[subnet.zone.name]]
+													[[item.zone.name]]
 												</td>
 											</tr>
 										</template>
@@ -119,7 +120,7 @@
 												<td>
 													Cidr</td>
 												<td>
-													[[subnet.cidr]]
+													[[item.cidr]]
 												</td>
 											</tr>
 										</template>
@@ -128,7 +129,7 @@
 												<td>
 													DHCP Enabled</td>
 												<td>
-													[[subnet.enable_dhcp]]
+													[[item.enable_dhcp]]
 												</td>
 											</tr>
 										</template>
@@ -137,7 +138,7 @@
 												<td>
 													Gateway IP</td>
 												<td>
-													[[subnet.gateway_ip]]
+													[[item.gateway_ip]]
 												</td>
 											</tr>
 										</template>
@@ -150,9 +151,9 @@
 					<paper-card class="info-card" heading="Full Metadata List">
 						<div class="card-content">
 							<template is="dom-if" if="{{network.tags.length}}">
-								<p>Tags:
-									<p>{{showExtra(network.tags)}}</p>
-									<hr/>
+								<p>Tags:</p>
+								<p>{{showExtra(network.tags)}}</p>
+								<hr/>
 							</template>
 
 							<template is="dom-if" if="{{network.floating_ips.length}}">
@@ -172,12 +173,14 @@
 					<paper-menu-button vertical-align="bottom" horizontal-align="right">
 						<paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
 						<paper-menu class="dropdown-content">
-							<paper-button on-click="deleteNetwork">Add Machine</paper-button>
+							<paper-button on-tap="deleteNetwork">Delete Network</paper-button>
 						</paper-menu>
 					</paper-menu-button>
 				</div>
 			</paper-header-panel>
 		</paper-drawer-panel>
+
+		<element-dialog title="[[dialogOptions.title]]" body="[[dialogOptions.body]]"></element-dialog>
 	</template>
 </dom-module>
 
@@ -203,7 +206,14 @@
 			tag: {
 				String, value: ""
 			},
-			network: Object
+			network: Object,
+			dialogOptions: {
+				type: Object,
+				value: {
+					title: '',
+					body: ''
+				}
+			}
 		},
 		ready: function() {
 
@@ -233,8 +243,11 @@
 			}
 			return info;
 		},
-		deleteNetwork: function(_, params) {
-			// console.log("clicked delete Network");
-		},
+		deleteNetwork: function() {
+			var dialog = document.querySelector('#dialog');
+			this.set('dialogOptions.title', 'Delete Network');
+			this.set('dialogOptions.body', 'Are you sure you want to delete network "' + this.network.name + '"?');
+			dialog.open();
+		}
 	});
 </script>
