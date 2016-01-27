@@ -34,3 +34,33 @@ paper-material {
     background-color: #eee;
     border-radius: 32px;
 }
+
+.info-card .card-content {
+    padding: 16px;
+}
+
+#key-public textarea,
+#key-private textarea {
+    height: 120px;
+    overflow: auto;
+    font-family: monospace;
+    width: 100%;
+    font-size: 14px;
+    line-height: 1.4em;
+    padding: 10px 15px;
+    box-sizing: border-box;
+    background-color: #f8f8f8;
+    border-color: #eeedeb;
+}
+#key-public textarea {
+    height: 120px;
+}
+#key-private {
+    text-align: center;
+}
+#key-private textarea {
+    height: 440px;
+}
+#key-private #showPrivateKey {
+    margin: 20px 0;
+}
