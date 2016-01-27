@@ -155,14 +155,8 @@ First make sure that erlang is installed, otherwise it won't be able to start (o
 
 
 
-    user@user:~/mist.io$ ./bin/supervisorctl status
-    celery                           RUNNING   pid 15767, uptime 0:03:19
-    haproxy                          RUNNING   pid 15763, uptime 0:03:19
-    hub-shell                        RUNNING   pid 15769, uptime 0:03:19
-    memcache                         RUNNING   pid 15768, uptime 0:03:19
+    user@user:~/mist.io$ ./bin/supervisorctl status rabbitmq
     rabbitmq                         STARTING
-    sockjs                           RUNNING   pid 15764, uptime 0:03:19
-    uwsgi                            RUNNING   pid 15765, uptime 0:03:19
     user@user:~/mist.io$ epmd -daemon && ./bin/supervisorctl restart rabbitmq
     rabbitmq: stopped
     rabbitmq: started
