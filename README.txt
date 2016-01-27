@@ -17,7 +17,8 @@ eggs in the system's Python.
 
 To install the basic requirements in a Debian based distro do::
 
-    sudo aptitude install python-dev build-essential git erlang erlang-nox
+    sudo aptitude install gcc python-dev build-essential git erlang libpcre3-dev python-lxml
+
 
 If you wish to install it in a virtual environment you'll also need::
 
@@ -25,8 +26,16 @@ If you wish to install it in a virtual environment you'll also need::
 
 If you plan to support KVM via libvirt, you should install libvirt library::
 
+For Debian systems::
+
     sudo aptitude install libvirt-bin libvirt-dev
     ./bin/pip install libvirt-python
+
+While for Redhat based::
+
+    yum install libvirt-devel -y
+    ./bin/pip install libvirt-python
+
 
 For vSphere support, you should install pyvmomi library::
 
@@ -35,6 +44,15 @@ For vSphere support, you should install pyvmomi library::
 In Red Hat based systems the following packages need to be installed::
 
     sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel python-zc-buildout
+
+Package erlang might be missing from the official repos so it needs to be installed manually:
+
+    sudo yum install wget -y
+    wget http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+    wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+    sudo rpm -Uvh remi-release-7.rpm  epel-release-7-5.noarch.rpm
+    sudo yum install erlang -y
+
 
 For openSUSE distibution, you'll have to additionally install::
 
@@ -89,3 +107,60 @@ Finally, you can start, stop or restart a specific process::
     ./bin/supervisorctl restart uwsgi
 
 Point your browser to http://127.0.0.1:8000 and you are ready to roll!
+
+
+FAQ
+---
+
+Question: I install mist.io and visit http://localhost:8000 but I don't see anything
+Answer: make sure all services are running
+
+user@user:~/mist.io$ ./bin/supervisorctl status
+celery                           RUNNING   pid 15169, uptime 0:00:02
+haproxy                          RUNNING   pid 15165, uptime 0:00:02
+hub-shell                        RUNNING   pid 15172, uptime 0:00:02
+memcache                         RUNNING   pid 15170, uptime 0:00:02
+rabbitmq                         RUNNING   pid 15168, uptime 0:00:02
+sockjs                           RUNNING   pid 15166, uptime 0:00:02
+uwsgi                            RUNNING   pid 15167, uptime 0:00:02
+
+
+Question: How to change mist.io listen address
+Answer: By default mist.io binds on the localhost interface, if you want to change this behavior edit haproxy.conf and change this line:
+    frontend www localhost:8000
+to
+    frontend www 0.0.0.0:8000
+
+then restart haproxy
+user@user:~/mist.io$ ./bin/supervisorctl restart haproxy
+
+of course make sure that no other service has already binded on port 8000
+It should now load on http://your_ip:8000
+If this does not load check if a local firewall policy denies incoming access to port 8000, or if your provider denies incoming access to port 8000 (eg the default ec2 policy for some regions)
+
+
+Question: rabbitm is not running
+First make sure that erlang is installed, otherwise it won't be able to start ( on RedHat based OS you might have to install it manually, see the install section). On Ubuntu there's an error that prevents rabbitmq from starting correctly, if that's the case for you try to start epmd manually and then restart rabbitmq:
+
+
+
+user@user:~/mist.io$ ./bin/supervisorctl status
+celery                           RUNNING   pid 15767, uptime 0:03:19
+haproxy                          RUNNING   pid 15763, uptime 0:03:19
+hub-shell                        RUNNING   pid 15769, uptime 0:03:19
+memcache                         RUNNING   pid 15768, uptime 0:03:19
+rabbitmq                         STARTING
+sockjs                           RUNNING   pid 15764, uptime 0:03:19
+uwsgi                            RUNNING   pid 15765, uptime 0:03:19
+user@user:~/mist.io$ epmd -daemon && ./bin/supervisorctl restart rabbitmq
+rabbitmq: stopped
+rabbitmq: started
+user@user:~/mist.io$ ./bin/supervisorctl status
+celery                           RUNNING   pid 15767, uptime 0:03:44
+haproxy                          RUNNING   pid 15763, uptime 0:03:44
+hub-shell                        RUNNING   pid 15769, uptime 0:03:44
+memcache                         RUNNING   pid 15768, uptime 0:03:44
+rabbitmq                         RUNNING   pid 18808, uptime 0:00:06
+sockjs                           RUNNING   pid 15764, uptime 0:03:44
+uwsgi                            RUNNING   pid 15765, uptime 0:03:44
+
