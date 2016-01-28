@@ -122,7 +122,7 @@ def panel_waiting_with_timeout(context, panel_id, action, seconds):
                                % (panel_id, action, seconds))
 
 
-@then(u'I expect for "{popup_id}" popup to {action} within max {seconds} '
+@step(u'I expect for "{popup_id}" popup to {action} within max {seconds} '
       u'seconds')
 def popup_waiting_with_timeout(context, popup_id, action, seconds):
     """
@@ -141,6 +141,28 @@ def popup_waiting_with_timeout(context, popup_id, action, seconds):
     except TimeoutException:
         raise TimeoutException("Popup %s did not %s after %s seconds"
                                % (popup_id, action, seconds))
+
+
+@step(u'I expect for "{modal_id}" modal to {action} within max {seconds} '
+      u'seconds')
+def modal_waiting_with_timeout(context, modal_id, action, seconds):
+    # dialog-popup
+    """
+    Function that wait for keyadd-popup to appear but for a maximum
+    amount of time
+    """
+    if action == 'appear':
+        css_selector = '#%s[class*="md-show"]' % modal_id
+    elif action == 'disappear':
+        css_selector = '#%s[class*="md-hide"]' % modal_id
+    else:
+        raise ValueError("Action can be either appear or disappear. Duh!")
+    try:
+        WebDriverWait(context.browser, int(seconds)).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+    except TimeoutException:
+        raise TimeoutException("Modal %s did not %s after %s seconds"
+                               % (modal_id, action, seconds))
 
 
 @then(u'I expect for "{side_panel_id}" side panel to {action} within max '

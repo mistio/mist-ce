@@ -6,21 +6,36 @@
 <dom-module id="element-table-networks">
     <template>
         <style>
-        :host div {
-            display: inline-block;
+        :host {
+            padding: 15px 24px;
+            width: 100%;
         }
-        
+    
+        :host(:not([narrow-viewport])),
+        :host(:not([narrow-viewport])) a {
+            @apply(--layout-horizontal);
+        }
+
+        :host([narrow-viewport]),
+        :host([narrow-viewport]) a {
+            @apply(--layout-vertical);
+        }
+
+        #check {
+            padding-right: 24px;
+        }
         .name {
-            width: 250px;
-            font-weight: 500;
+            min-width: 250px;
+            line-height: 40px;
         }
-        
-        .id,
+        .type,
         .provider {
+            width: 250px;
+            line-height: 40px;
             min-width: 300px;
         }
-        
         .tag {
+            font-weight: 400;
             background-color: #888;
             color: #fff;
             padding: 2px 6px;
@@ -29,24 +44,48 @@
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
-        <div class="id" hidden$="[[!item.type]]">[[item.type]]</div>
-        <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
+        <app-check id="check"
+                     selected="[[selected]]" on-tap="_onSelectThread"
+                     on-transitionend="_eatEvent"></app-check>
+        <a href$="[[elementLink]]" is="pushstate-anchor">
+            <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
+            <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
+            <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
+        </a>
     </template>
 </dom-module>
 <script>
 Polymer({
     is: 'element-table-networks',
     properties: {
-        // section: {
-        //   type: Object
-        // },
+        elementLink : {
+            type: String,
+            computed: "_elementLink(section,item)"
+        },
+        item: {
+            type: Object
+        },
+        section: {
+            type: Object
+        },
         narrowViewport: {
             type: Boolean,
             reflectToAttribute: true
         }
     },
-
+    _elementLink: function(section,item) {
+        return "/" + section.id + "/" + item.id;
+    },
+    _onSelectThread: function(e) {
+      if (Polymer.dom(e).localTarget === this.$.check) {
+        e.stopPropagation();
+        this.selected = !this.selected;
+        this.fire('list-item-select', {item: this});
+      }
+    },
+    _eatEvent: function(e) {
+      e.stopPropagation();
+    },
 
 });
 </script>

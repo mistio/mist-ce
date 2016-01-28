@@ -1109,7 +1109,7 @@ var PROVIDER_MAP = {
             label: 'Path for *.iso images',
             optional: true,
             defaultValue: '/var/lib/libvirt/images',
-            helpText: 'The path that your *.iso images are located, example /var/lib/libvirt/images',
+            helpText: 'The path that your disk or iso images are located, example /var/lib/libvirt/images',
         },
 
     ],

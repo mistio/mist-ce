@@ -1,0 +1,71 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<dom-module id="app-check">
+    <style>
+    :host([selected]) .check {
+        transform: rotate3d(0, 1, 0, 180deg);
+    }
+    
+    :host([selected]) img,
+    :host([selected]) .letter {
+        opacity: 0;
+    }
+    
+    :host([selected]) iron-icon {
+        transform: rotate3d(0, 1, 0, -180deg) scale(1);
+        opacity: 1;
+    }
+    
+    .check {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        transition: transform 350ms ease-in-out;
+        background-color: rgba(158, 158, 158, 0.2);
+        color: white;
+        will-change: transform;
+        cursor: pointer;
+    }
+    
+    img,
+    .unchecked {
+        border-radius: inherit;
+        width: 100%;
+        height: 100%;
+        transition: opacity 200ms ease-in-out 100ms;
+        will-change: opacity;
+        text-transform: uppercase;
+    }
+    
+    iron-icon {
+        transition: transform 300ms ease-in-out 100ms;
+        will-change: opacity;
+        transform: rotate3d(0, 1, 0, -180deg) scale(0);
+        position: absolute !important;
+        top: 20%;
+        left: 20%;
+        opacity: 0;
+    }
+    </style>
+    <template>
+        <div class="check">
+            <span class="unchecked layout horizontal center-center"><iron-icon icon="key"></iron-icon></span>
+            <iron-icon icon="check"></iron-icon>
+        </div>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'app-check',
+
+    properties: {
+        selected: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
+        }
+    }
+
+});
+</script>
+</dom-module>
