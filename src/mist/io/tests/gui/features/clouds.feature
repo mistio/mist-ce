@@ -48,10 +48,10 @@ Feature: Add second-tier clouds
 
   @cloud-delete
   Scenario: Cloud Actions
-    Given "EC2" cloud has been added
-    When I click the button "EC2"
+    Given "GCE" cloud has been added
+    When I click the button "GCE"
     Then I expect for "cloud-edit-popup" popup to appear within max 2 seconds
     And I click the button "Delete"
     And I click the button "Yes"
     Then I expect for "cloud-edit-popup" popup to disappear within max 2 seconds
-    Then the "EC2" cloud should be deleted
+    Then the "GCE" cloud should be deleted
