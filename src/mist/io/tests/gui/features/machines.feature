@@ -1,7 +1,6 @@
 @machines
 Feature: Machines
 
-@machine-creation
   Scenario: Create machine from Panel and from Image
     When I visit mist.io
     Then I wait for the mist.io splash page to load
@@ -39,6 +38,24 @@ Feature: Machines
     Then I should see the "second" machine added within 30 seconds
     When I clear the machines search bar
 
+    And I click the button by "select-machines-btn" id_name
+    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
+    When I click the button "Name"
+    And I click the button "None"
+    And I check the sorting by "name"
+    Then I expect for "select-machines-btn" to be clickable within max 2 seconds
+    When I click the button by "select-machines-btn" id_name
+    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
+    When I click the button "STATE"
+    And I click the button "NONE"
+    And I check the sorting by "state"
+    Then I expect for "select-machines-btn" to be clickable within max 10 seconds
+    When I click the button by "select-machines-btn" id_name
+    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
+    When I click the button "Cloud"
+    And I click the button "None"
+    And I check the sorting by "cloud"
+
     And I click the button "Create Machine"
     Then I expect for "create-machine" panel to appear within max 4 seconds
     When I fill in a "random first" machine name
@@ -71,9 +88,9 @@ Feature: Machines
     And I click the button "Actions"
     Then I expect for "machine-power-popup-popup" popup to appear within max 4 seconds
     When I click the "Reboot" button inside the "Actions" popup
-    Then I expect for "dialog-popup" popup to appear within max 4 seconds
+    Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
-    Then I expect for "dialog-popup" popup to disappear within max 4 seconds
+    Then I expect for "dialog-popup" modal to disappear within max 4 seconds
 
     When I clear the machines search bar
     Then I search for the "first" Machine
@@ -111,9 +128,9 @@ Feature: Machines
     And I click the button "Actions"
     Then I expect for "machine-power-popup-popup" popup to appear within max 4 seconds
     When I click the "Destroy" button inside the "Actions" popup
-    Then I expect for "dialog-popup" popup to appear within max 4 seconds
+    Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
-    Then I expect for "dialog-popup" popup to disappear within max 4 seconds
+    Then I expect for "dialog-popup" modal to disappear within max 4 seconds
     When I choose the "first" machine
 
     When I clear the machines search bar
@@ -122,9 +139,9 @@ Feature: Machines
     And I click the button "Actions"
     Then I expect for "machine-power-popup-popup" popup to appear within max 4 seconds
     When I click the "Destroy" button inside the "Actions" popup
-    Then I expect for "dialog-popup" popup to appear within max 4 seconds
+    Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
-    Then I expect for "dialog-popup" popup to disappear within max 4 seconds
+    Then I expect for "dialog-popup" modal to disappear within max 4 seconds
     When I choose the "second" machine
 
     When I clear the machines search bar
@@ -135,41 +152,22 @@ Feature: Machines
     Then I search for the "second" Machine
     And "second" machine state should be "terminated" within 200 seconds
 
-    When I clear the machines search bar
-    And I click the button by "select-machines-btn" id_name
-    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
-    When I click the button "Name"
-    And I click the button "None"
-    And I check the sorting by "name"
-    Then I expect for "select-machines-btn" to be clickable within max 2 seconds
-    When I click the button by "select-machines-btn" id_name
-    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
-    When I click the button "STATE"
-    And I click the button "NONE"
-    And I check the sorting by "state"
-    Then I expect for "select-machines-btn" to be clickable within max 10 seconds
-    When I click the button by "select-machines-btn" id_name
-    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
-    When I click the button "Cloud"
-    And I click the button "None"
-    And I check the sorting by "cloud"
-
     When I click the button "Home"
     Then I expect for "home-page" page to appear within max 4 seconds
     When I visit the Keys page after the counter has loaded
     When I click the button "first_machine_key"
     Then I expect for "single-key-page" page to appear within max 4 seconds
     When I click the button "Delete"
-    Then I expect for "dialog-popup" popup to appear within max 4 seconds
+    Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
-    Then I expect for "dialog-popup" popup to disappear within max 4 seconds
+    Then I expect for "dialog-popup" modal to disappear within max 4 seconds
     And "first_machine_key" key should be deleted
     When I click the button "second_machine_key"
     Then I expect for "single-key-page" page to appear within max 4 seconds
     When I click the button "Delete"
-    Then I expect for "dialog-popup" popup to appear within max 4 seconds
+    Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
-    Then I expect for "dialog-popup" popup to disappear within max 4 seconds
+    Then I expect for "dialog-popup" modal to disappear within max 4 seconds
     And "second_machine_key" key should be deleted
 
     When I wait for 4 seconds
