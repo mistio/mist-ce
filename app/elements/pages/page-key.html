@@ -116,16 +116,16 @@
             },
             key: {
                 type: Object,
-                notify: true
+                notify: true,
+                observer: '_keyChanged'
             },
             publicKey: {
                 type: String,
-                value: '',
-                observer: '_changePublicKey'
+                value: null
             },
             privateKey: {
                 type: String,
-                value: ''
+                value: null
             },
             dialogOptions: {
                 type: Object,
@@ -135,21 +135,8 @@
                 }
             }
         },
-        _changePublicKey: function(newValue, oldValue) {
+        _keyChanged: function() {
             this.set('privateKey', null);
-        },
-        ready: function() {
-
-        },
-        attached: function() {
-
-        },
-        listInfo: function(e) {
-            var info = '';
-            for (var prop in this.key) {
-                info += prop + " : " + this.key[prop] + ", ";
-            }
-            this.$.keyproperties.textContent = info;
         },
         copyPublicKey: function() {
             this.$.keyPublic.select();

@@ -44,86 +44,54 @@
         <app-socket model="{{model}}"></app-socket>
 
         <iron-routes for="app-main" selected="{{section}}">
-            <iron-route path="/" title=""></iron-route>                         <!-- 1 -->
-            <iron-route path="/machines" title="machines"></iron-route>         <!-- 2 -->
-            <iron-route path="/machines/:uuid" title="machine"></iron-route>    <!-- 3 -->
-            <iron-route path="/images" title="images"></iron-route>             <!-- 4 -->
-            <iron-route path="/images/:id" title="images"></iron-route>         <!-- 5 -->
+            <iron-route path="/" title=""></iron-route>
+            <!-- 1 -->
+            <iron-route path="/machines" title="machines"></iron-route>
+            <!-- 2 -->
+            <iron-route path="/machines/:uuid" title="machine"></iron-route>
+            <!-- 3 -->
+            <iron-route path="/images" title="images"></iron-route>
+            <!-- 4 -->
+            <iron-route path="/images/:id" title="images"></iron-route>
+            <!-- 5 -->
             <iron-route path="/keys" title="keys"></iron-route>
             <iron-route path="/keys/:id" title="keys"></iron-route>
             <iron-route path="/networks" title="networks"></iron-route>
             <iron-route path="/networks/:name" title="networks"></iron-route>
             <iron-route path="/scripts" title="scripts"></iron-route>
-            <iron-route path="/scripts/:id" title="scripts"></iron-route>       <!-- id? -->
+            <iron-route path="/scripts/:id" title="scripts"></iron-route>
+            <!-- id? -->
             <iron-route path="/elements" title="elements"></iron-route>
             <iron-route path="/account" title="account"></iron-route>
             <iron-route path="*"></iron-route>
         </iron-routes>
 
         <iron-pages id="app-main">
-            <page-dashboard     model="{{model}}" 
-                                sections="[[sections]]"><title>Dashboard</title></page-dashboard>
+            <page-dashboard model="{{model}}" sections="[[sections]]">
+                <title>Dashboard</title>
+            </page-dashboard>
             <!-- machines -->
-            <page-list          model="{{model}}" 
-                                elements="{{model.machinesArray}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.machines]]"></page-list>
+            <page-list model="{{model}}" elements="{{model.machinesArray}}" sections="{{sectionsArray}}" section="[[sections.machines]]"></page-list>
 
-            <page-machine       params="{{params}}" 
-                                model="{{model}}" 
-                                machine="{{getMachine(params)}}"
-                                elements="{{model.machinesArray}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.machines]]"></page-machine>
+            <page-machine params="{{params}}" model="{{model}}" machine="{{getMachine(params)}}" elements="{{model.machinesArray}}" sections="{{sectionsArray}}" section="[[sections.machines]]"></page-machine>
             <!-- images -->
-            <page-list          model="{{model}}" 
-                                elements="{{model.imagesArray}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.images]]"></page-list>
+            <page-list model="{{model}}" elements="{{model.imagesArray}}" sections="{{sectionsArray}}" section="[[sections.images]]"></page-list>
 
-            <page-image         params="{{params}}" 
-                                model="{{model}}" 
-                                image="{{getImage(params)}}"
-                                elements="{{model.imagesArray}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.images]]"></page-image>
+            <page-image params="{{params}}" model="{{model}}" image="{{getImage(params)}}" elements="{{model.imagesArray}}" sections="{{sectionsArray}}" section="[[sections.images]]"></page-image>
             <!-- keys -->
-            <page-list          model="{{model}}" 
-                                elements="{{model.keysArray}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.keys]]"></page-list>
+            <page-list model="{{model}}" elements="{{model.keysArray}}" sections="{{sectionsArray}}" section="[[sections.keys]]"></page-list>
 
-            <page-key           model="{{model}}" 
-                                params="{{params}}"
-                                key="{{getKey(params)}}"
-                                elements="{{model.keysArray}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.keys]]"></page-key>
+            <page-key model="{{model}}" params="{{params}}" key="{{getKey(params)}}" elements="{{model.keysArray}}" sections="{{sectionsArray}}" section="[[sections.keys]]"></page-key>
             <!-- networks -->
-            <page-list          model="{{model}}"  
-                                elements="{{model.networksArray}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.networks]]"></page-list>
+            <page-list model="{{model}}" elements="{{model.networksArray}}" sections="{{sectionsArray}}" section="[[sections.networks]]"></page-list>
 
-            <page-network       model="{{model}}" 
-                                params="{{params}}"
-                                network="{{getNetwork(params)}}"
-                                elements="{{model.networksArray}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.networks]]"></page-network>
+            <page-network model="{{model}}" params="{{params}}" network="{{getNetwork(params)}}" elements="{{model.networksArray}}" sections="{{sectionsArray}}" section="[[sections.networks]]"></page-network>
             <!-- scripts -->
-            <page-list          model="{{model}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.scripts]]"></page-list>
+            <page-list model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-list>
 
-            <page-script       model="{{model}}" 
-                                params="{{params}}"
-                                network="{{getScript(params)}}"
-                                elements="{{model.scriptsArray}}" 
-                                sections="{{sectionsArray}}" 
-                                section="[[sections.scripts]]"></page-script>
+            <page-script model="{{model}}" params="{{params}}" network="{{getScript(params)}}" elements="{{model.scriptsArray}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-script>
 
-            <page-elements></page-elements>            
+            <page-elements></page-elements>
             <page-account></page-account>
             <page-not-found></page-not-found>
         </iron-pages>
@@ -146,9 +114,9 @@
             }
         },
         observers: [
-            
+
         ],
-        listeners: {            
+        listeners: {
             'iron-activate': 'updateDocTitle',
             'iron-activate': 'updateCount',
             'page-meta': 'updateTitle',
@@ -199,21 +167,21 @@
                           color: '',
                           icon: 'device:widgets'}*/
             ];
-            
+
             this.sections = _generateMap(this.sectionsArray);
         },
         attributeChanged: function(attrName, oldVal, newVal) {
             console.warn('attrChanged', attrName, oldVal, newVal);
         },
-        updateCount : function() {
+        updateCount: function() {
             var sec = this.sectionsArray;
             var mod = this.model;
-            for (var i = 0; i<sec.length; i++){
-                var c = mod[sec[i].id+'Array'].length;
-                this.set('sectionsArray.'+i+'.count', c);
+            for (var i = 0; i < sec.length; i++) {
+                var c = mod[sec[i].id + 'Array'].length;
+                this.set('sectionsArray.' + i + '.count', c);
 
                 // Notification required for binding to update!
-                this.notifyPath(sec[i].count, c);          
+                this.notifyPath(sec[i].count, c);
             }
         },
         updateTitle: function(_, detail) {
@@ -223,24 +191,24 @@
                 document.title = "mist.io";
             }
         },
-        getMachine: function(params){
+        getMachine: function(params) {
             var ma = this.model.machinesArray;
-            var p  = params.uuid;
-            var m  = {};
-            for ( var i = 0; i < ma.length; i++ ) {
-              if( ma[i].uuid == p ) 
-                return m = ma[i];
+            var p = params.uuid;
+            var m = {};
+            for (var i = 0; i < ma.length; i++) {
+                if (ma[i].uuid == p)
+                    return m = ma[i];
             };
             //return machine object with the right 'uuid' from model.machinesArray
             return m;
         },
-        getImage: function(params){
+        getImage: function(params) {
             var ima = this.model.imagesArray;
-            var p  = params.id;
-            var im  = {};
-            for ( var i = 0; i < ima.length; i++ ) {
-              if( ima[i].id == p ) 
-                return im = ima[i];
+            var p = params.id;
+            var im = {};
+            for (var i = 0; i < ima.length; i++) {
+                if (ima[i].id == p)
+                    return im = ima[i];
             };
             //return image object with the right 'id' from model.imagesArray
             return im;
@@ -248,13 +216,13 @@
             // var index = params.id;
             // return this.model.images.index;
         },
-        getKey: function(params){
+        getKey: function(params) {
             var ka = this.model.keysArray;
-            var p  = params.id;
-            var k  = {};
-            for ( var i = 0; i < ka.length; i++ ) {
-              if( ka[i].id == p ) 
-                return k = ka[i];
+            var p = params.id;
+            var k = {};
+            for (var i = 0; i < ka.length; i++) {
+                if (ka[i].id == p)
+                    return k = ka[i];
             };
             //return key object with the right 'id' from model.keysArray
             return k;
@@ -263,24 +231,24 @@
             // var index = params.id;
             // return this.model.keys.index;
         },
-        getNetwork: function(params){
+        getNetwork: function(params) {
             var na = this.model.networksArray;
-            var p  = params.name;
-            var n  = {};
-            for ( var i = 0; i < na.length; i++ ) {
-              if( na[i].name == p ) 
-                return n = na[i];
+            var p = params.name;
+            var n = {};
+            for (var i = 0; i < na.length; i++) {
+                if (na[i].name == p)
+                    return n = na[i];
             };
             //return network object with the right 'name' from model.networksArray
             return n;
         },
-        getScript: function(params){
+        getScript: function(params) {
             var sa = this.model.networksArray;
-            var p  = params.id;
-            var s  = {};
-            for ( var i = 0; i < sa.length; i++ ) {
-              if( sa[i].id == p ) 
-                return s = sa[i];
+            var p = params.id;
+            var s = {};
+            for (var i = 0; i < sa.length; i++) {
+                if (sa[i].id == p)
+                    return s = sa[i];
             };
             //return script object with the right 'id' (???) from model.scriptsArray
             return s;
@@ -310,6 +278,6 @@
                 });
                 ga('set', 'page', loc);
             }, 2000);
-        }    
+        }
     });
 </script>
