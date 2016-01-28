@@ -57,9 +57,9 @@ def close_a_tag(context, key):
 
 @step(u'I check if the "{my_key}" key and "{my_value}" value appear for the '
       u'machine')
-def check_the_tags(context,my_key,my_value):
+def check_the_tags(context, my_key, my_value):
     check_tags = context.browser.find_elements_by_css_selector("#single-machine-info div.tag.pairs")
-    words=[]
+    words = []
     for tag in check_tags:
         tag_text = safe_get_element_text(tag)
         tag_lst = tag_text.split("=")

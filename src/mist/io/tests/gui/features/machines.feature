@@ -5,6 +5,30 @@ Feature: Machines
     When I visit mist.io
     Then I wait for the mist.io splash page to load
     Given "EC2" cloud has been added
+
+    When I visit the Machines page after the Images counter has loaded
+    When I click the button by "select-machines-btn" id_name
+    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
+    When I click the button "Name"
+    And I click the button "None"
+    And I wait for 1 seconds
+    And I check the sorting by "name"
+    Then I expect for "select-machines-btn" to be clickable within max 2 seconds
+    When I click the button by "select-machines-btn" id_name
+    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
+    When I click the button "State"
+    And I click the button "None"
+    And I check the sorting by "state"
+    And I wait for 1 seconds
+    Then I expect for "select-machines-btn" to be clickable within max 10 seconds
+    When I click the button by "select-machines-btn" id_name
+    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
+    When I click the button "Cloud"
+    And I click the button "None"
+    And I wait for 1 seconds
+    And I check the sorting by "cloud"
+    Then I click the button "Home"
+
     When I visit the Images page after the counter has loaded
     Then there should be starred Images
     When I search for the "ubuntu" Image
@@ -37,24 +61,6 @@ Feature: Machines
     And I search for the "second" Machine
     Then I should see the "second" machine added within 30 seconds
     When I clear the machines search bar
-
-    And I click the button by "select-machines-btn" id_name
-    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
-    When I click the button "Name"
-    And I click the button "None"
-    And I check the sorting by "name"
-    Then I expect for "select-machines-btn" to be clickable within max 2 seconds
-    When I click the button by "select-machines-btn" id_name
-    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
-    When I click the button "STATE"
-    And I click the button "NONE"
-    And I check the sorting by "state"
-    Then I expect for "select-machines-btn" to be clickable within max 10 seconds
-    When I click the button by "select-machines-btn" id_name
-    Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
-    When I click the button "Cloud"
-    And I click the button "None"
-    And I check the sorting by "cloud"
 
     And I click the button "Create Machine"
     Then I expect for "create-machine" panel to appear within max 4 seconds
@@ -104,7 +110,8 @@ Feature: Machines
     When I name a "testKey" key and a "testValue" value for a tag
     And I click the button "Save tags"
     Then I expect for "machine-tags-popup-popup" popup to disappear within max 20 seconds
-    When I check if the "testKey" key and "testValue" value appear for the machine
+    And I wait for 1 seconds
+    When I wait for max 20 seconds until tag with key "testKey" and value "testValue" is available
     Then I wait for 1 seconds
     And I click the button "Tags"
     Then I expect for "machine-tags-popup-popup" popup to appear within max 10 seconds
@@ -112,12 +119,16 @@ Feature: Machines
     And I name a "secTestKey" key and a "secTestValue" value for a tag
     And I click the button "Save Tags"
     Then I expect for "machine-tags-popup-popup" popup to disappear within max 20 seconds
-    When I check if the "secTestKey" key and "secTestValue" value appear for the machine
+    And I wait for 1 seconds
+    When I wait for max 20 seconds until tag with key "secTestKey" and value "secTestValue" is available
+#    When I check if the "secTestKey" key and "secTestValue" value appear for the machine
     And I click the button "Tags"
     Then I expect for "machine-tags-popup-popup" popup to appear within max 10 seconds
     And I close the tag with key "secTestKey"
     When I click the button "Save Tags"
     Then I expect for "machine-tags-popup-popup" popup to disappear within max 20 seconds
+    And I wait for 1 seconds
+    When I wait for max 20 seconds until tag with key "testKey" and value "testValue" is available
     When I focus on the "Machines" button
     Then I click the button "Machines"
     When I clear the machines search bar
@@ -131,6 +142,7 @@ Feature: Machines
     Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
     Then I expect for "dialog-popup" modal to disappear within max 4 seconds
+    And I wait for 1 seconds
     When I choose the "first" machine
 
     When I clear the machines search bar
@@ -142,6 +154,7 @@ Feature: Machines
     Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
     Then I expect for "dialog-popup" modal to disappear within max 4 seconds
+    And I wait for 1 seconds
     When I choose the "second" machine
 
     When I clear the machines search bar

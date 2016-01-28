@@ -3,6 +3,7 @@ from random import randrange
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 from mist.io.tests.gui.features.steps.general import *
+from mist.io.tests.gui.features.steps.tags import check_the_tags
 
 machine_states_ordering = {
     'error': 6,
@@ -14,6 +15,20 @@ machine_states_ordering = {
     'terminated': 1,
     'stopped': 0
 }
+
+
+@step(u'I wait for max {seconds} seconds until tag with key "{key}" and value'
+      u' "{value}" is available')
+def wait_for_tags(context, seconds, key,value):
+    timeout = time() + int(seconds)
+    while time() < timeout:
+        try:
+            check_the_tags(context, key, value)
+            return
+        except:
+            sleep(1)
+    assert False, "Tag with key %s and value %s was not available after %s" \
+                  " seconds" % (key. value, seconds)
 
 
 @when(u'I check the sorting by "{sorting_field}"')
