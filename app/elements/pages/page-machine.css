@@ -39,3 +39,17 @@
     background-color: red;
     color: rgba(255,255,255,0.82);
 }
+.machine-ip {
+    margin: 0;
+}
+.machine-tag {
+    float: none;
+    display: inline-block;
+    max-width: 100%;
+    background-color: #b5b5b5;
+    color: #fff;
+    padding: 0 5px;
+    border-radius: 1px;
+    margin: 3px 0;
+    word-break: break-all;
+}

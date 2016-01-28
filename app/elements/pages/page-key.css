@@ -34,3 +34,46 @@ paper-material {
     background-color: #eee;
     border-radius: 32px;
 }
+
+.info-card {
+    position: relative;
+}
+
+.info-card .copy-key {
+    position: absolute;
+    right: 16px;
+    top: 6px;
+    margin: 0;
+    background-color: #fff;
+    color: #474747;
+}
+
+.info-card .card-content {
+    padding: 16px;
+}
+
+#keyPublicContainer textarea,
+#keyPrivateContainer textarea {
+    height: 120px;
+    overflow: auto;
+    font-family: monospace;
+    width: 100%;
+    font-size: 14px;
+    line-height: 1.4em;
+    padding: 10px 15px;
+    box-sizing: border-box;
+    background-color: #f8f8f8;
+    border-color: #eeedeb;
+}
+#keyPublicContainer textarea {
+    height: 120px;
+}
+#keyPrivateContainer {
+    text-align: center;
+}
+#keyPrivateContainer textarea {
+    height: 440px;
+}
+#keyPrivateContainer #showPrivateKey {
+    margin: 20px 0;
+}

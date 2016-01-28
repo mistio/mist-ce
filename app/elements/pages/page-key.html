@@ -43,21 +43,27 @@
                     <app-user-menu email="marios@mist.io"></app-user-menu>
                 </div>
                 <div id="content">
-                    <paper-material>
-                        <h2>Key ID: {{key.id}}</h2>
-                        <hr/>
-                        <template is="dom-if" if="{{!key.machines.length}}">
-                            <p>The key is not used at any machine.</p>
-                        </template>
-                        <template is="dom-if" if="{{key.machines.length}}">
-                            <h2>Machines:</h2>
-                            <ul>
-                                <template is="dom-repeat" items="{{key.machines}}">
-                                    <li>{{item}}</li>
-                                </template>
-                            </ul>
-                        </template>
-                    </paper-material>
+                    <paper-card class="info-card" heading="Public Key">
+                        <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="copy-key" raised>Copy</paper-button>
+
+                        <div id="keyPublicContainer" class="card-content">
+                            <textarea id="keyPublic">
+                                [[publicKey]]
+                            </textarea>
+                        </div>
+                    </paper-card>
+
+                    <paper-card class="info-card" heading="Private Key">
+                        <paper-button hidden$="[[!privateKey]]" on-tap="copyPrivateKey" class="copy-key" raised>Copy</paper-button>
+
+                        <div id="keyPrivateContainer" class="card-content">
+                            <paper-button hidden$="[[privateKey]]" id="showPrivateKey" raised on-tap="showPrivateKey">Private Key</paper-button>
+
+                            <textarea hidden$="[[!privateKey]]" id="keyPrivate">
+                                [[privateKey]]
+                            </textarea>
+                        </div>
+                    </paper-card>
                 </div>
                 <div class="absolute-bottom-right">
                     <paper-menu-button vertical-align="bottom" horizontal-align="right">
@@ -76,6 +82,8 @@
         </paper-drawer-panel>
 
         <element-dialog title="[[dialogOptions.title]]" body="[[dialogOptions.body]]"></element-dialog>
+        <iron-ajax id="keyPublicRequest" auto="true" url="/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
+        <iron-ajax id="keyPrivateRequest" url="/keys/[[key.id]]/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyMakeDefaultRequest" url="/keys/[[key.id]]" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyEditRequest" url="/keys/[[key.id]]" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyDeleteRequest" url="/keys/[[key.id]]" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
@@ -110,6 +118,15 @@
                 type: Object,
                 notify: true
             },
+            publicKey: {
+                type: String,
+                value: '',
+                observer: '_changePublicKey'
+            },
+            privateKey: {
+                type: String,
+                value: ''
+            },
             dialogOptions: {
                 type: Object,
                 value: {
@@ -117,6 +134,9 @@
                     body: ''
                 }
             }
+        },
+        _changePublicKey: function(newValue, oldValue) {
+            this.set('privateKey', null);
         },
         ready: function() {
 
@@ -131,11 +151,32 @@
             }
             this.$.keyproperties.textContent = info;
         },
+        copyPublicKey: function() {
+            this.$.keyPublic.select();
+            document.execCommand('copy');
+            this.$.toast.text = 'The Public Key was copied to clipboard!';
+            this.$.toast.open();
+        },
+        copyPrivateKey: function() {
+            this.$.keyPrivate.select();
+            document.execCommand('copy');
+            this.$.toast.text = 'The Private Key was copied to clipboard!';
+            this.$.toast.open();
+        },
         addMachine: function(_, params) {
-            // console.log("clicked Add Machine");
+
         },
         makeDefault: function(e) {
             this.$.keyMakeDefaultRequest.generateRequest();
+        },
+        handlePublicResponse: function(data) {
+            this.publicKey = data.detail.response;
+        },
+        showPrivateKey: function() {
+            this.$.keyPrivateRequest.generateRequest();
+        },
+        handlePrivateResponse: function(data) {
+            this.privateKey = data.detail.response;
         },
         handleDefaultResponse: function(data) {
             //needs to update the previous default key that it's not the default key anymore
