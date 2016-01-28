@@ -21,6 +21,7 @@ define('app/controllers/dialog', ['ember'],
             view: null,
             callback: null,
             options: Ember.Object.create({
+                size: null,
                 head: null,
                 body: null,
                 type: null,
@@ -78,7 +79,7 @@ define('app/controllers/dialog', ['ember'],
                     head: null,
                     body: null,
                     type: null,
-                    danger: null,
+                    danger: null
                 });
             },
 
@@ -89,6 +90,7 @@ define('app/controllers/dialog', ['ember'],
                     callback: args.callback
                 });
                 this.options.setProperties({
+                    size: args.size ? args.size : 'small-modal',
                     head: args.head,
                     body: args.body,
                     type: args.type,

@@ -1,110 +1,75 @@
-<!-- Popup Overlay -->
-
-<div id="dialog-screen"
-    class="ui-popup-screen ui-overlay-b ui-screen-hidden">
-</div>
-
 <!-- Popup Wrapper -->
-
-<div id="dialog-popup"
-    class="flip
-        ui-popup-container
-        ui-popup-hidden
-        ui-popup-truncate">
-
-    <!-- Popup -->
-
-    <div id="dialog"
-        class="large-popup
-            ui-popup
-            ui-body-inherit
-            ui-overlay-shadow"
-        data-role="popup"
-        data-enhanced="true"
-        data-transition="flip"
-        data-dismissible="false">
-
-        <!-- Header -->
-
-        <div class="ui-header ui-bar-b" role="banner">
-
-            <h1 class="ui-title ui-caps">
-                {{Mist.dialogController.options.head}}
-            </h1>
+<div class="md-modal {{Mist.dialogController.options.size}} md-effect-1" id="dialog-popup">
+    <div class="md-content">
+        <div class="md-title {{if view.hasError 'failure'}} {{if view.hasSuccess 'success'}}">
+            <h1>{{Mist.dialogController.options.head}}</h1>
 
             {{#unless view.isYesNo}}
-                <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+                <a href="javascript:void(0)" class="close" {{action "close" target=view}}>&#10005;</a>
             {{/unless}}
-
         </div>
 
-        <!-- Body -->
-
-        <div class="ui-content ui-body-a" role="main">
-
+        <div class="md-body">
             {{#each Mist.dialogController.options.body as |optionBody|}}
 
                 {{#if optionBody.paragraph}}
-                    <p class={{this.class}}>{{optionBody.paragraph}}</p>
+                    <p class= {{optionBody.class}}>{{optionBody.paragraph}}</p>
                 {{/if}}
 
                 {{#if optionBody.link}}
-                    <a href={{optionBody.href}} class={{optionBody.class}} target={{optionBody.target}}
-                        {{action "linkClicked" optionBody target=view}}>
+                    <a href= {{optionBody.href}} class= {{optionBody.class}} target= {{optionBody.target}} {{action "linkClicked" optionBody target=view}}>
                             {{optionBody.link}}
                     </a>
                 {{/if}}
 
                 {{#if optionBody.command}}
-                    <pre class="command-container"
-                        {{action "commandClicked" optionBody on="click" target=view}}>{{optionBody.command}}</pre>
+                    <pre class="command-container" {{action "commandClicked" optionBody on="click" target=view}}>
+                        {{optionBody.command}}
+                    </pre>
                 {{/if}}
 
             {{/each}}
-
 
             <!-- Buttons -->
 
             {{#if view.isOK}}
 
-                <a class="ui-btn ui-shadow ui-btn-d ui-caps"
-                    {{action "confirm" target=view}}>OK</a>
-
-            {{else}}{{#if view.isBack}}
-
-                <a class="ui-btn ui-btn-a ui-caps back"
-                    {{action "confirm" target=view}}>Back</a>
+                <a class="ui-btn ui-shadow ui-btn-d ui-caps" {{action "confirm" target=view}}>OK</a>
 
             {{else}}
+                {{#if view.isBack}}
 
-                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                    <a class="ui-btn ui-btn-a ui-caps back" {{action "confirm" target=view}}>Back</a>
 
-                    {{#if view.isOKCancel}}
-                        <a class="ui-btn ui-caps back"
-                            {{action "reject" target=view}}>
+                {{else}}
+                    {{#unless view.isPlain}}
+                        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+
+                            {{#if view.isOKCancel}}
+                                <a class="ui-btn ui-caps back" {{action "reject" target=view}}>
                                 Cancel
                         </a>
-                        <a class="ui-btn ui-btn-d ui-shadow ui-caps ui-shadow"
-                            {{action "confirm" target=view}}>
+                                <a class="ui-btn ui-btn-d ui-shadow ui-caps ui-shadow" {{action "confirm" target=view}}>
                                 OK
                         </a>
-                    {{/if}}
+                            {{/if}}
 
-                    {{#if view.isYesNo}}
-                        <a class="ui-btn ui-caps back"
-                            {{action "reject" target=view}}>
+                            {{#if view.isYesNo}}
+                                <a class="ui-btn ui-caps back" {{action "reject" target=view}}>
                                 No
                         </a>
-                        <a class="ui-btn ui-caps ui-shadow {{if Mist.dialogController.options.danger 'no' 'ui-btn-d'}}"
-                            {{action "confirm" target=view}}>
+                                <a class="ui-btn ui-caps ui-shadow {{if Mist.dialogController.options.danger 'no' 'ui-btn-d'}}" {{action "confirm" target=view}}>
                                 Yes
                         </a>
-                    {{/if}}
+                            {{/if}}
 
-                </div>
-
-            {{/if}}{{/if}}
-
+                        </div>
+                    {{/unless}}
+                {{/if}}
+            {{/if}}
         </div>
     </div>
 </div>
+
+<!-- Popup Overlay -->
+<div class="md-overlay"></div>
