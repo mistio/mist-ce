@@ -35,12 +35,25 @@ paper-material {
     border-radius: 32px;
 }
 
+.info-card {
+    position: relative;
+}
+
+.info-card .copy-key {
+    position: absolute;
+    right: 16px;
+    top: 6px;
+    margin: 0;
+    background-color: #fff;
+    color: #474747;
+}
+
 .info-card .card-content {
     padding: 16px;
 }
 
-#key-public textarea,
-#key-private textarea {
+#keyPublicContainer textarea,
+#keyPrivateContainer textarea {
     height: 120px;
     overflow: auto;
     font-family: monospace;
@@ -52,15 +65,15 @@ paper-material {
     background-color: #f8f8f8;
     border-color: #eeedeb;
 }
-#key-public textarea {
+#keyPublicContainer textarea {
     height: 120px;
 }
-#key-private {
+#keyPrivateContainer {
     text-align: center;
 }
-#key-private textarea {
+#keyPrivateContainer textarea {
     height: 440px;
 }
-#key-private #showPrivateKey {
+#keyPrivateContainer #showPrivateKey {
     margin: 20px 0;
 }

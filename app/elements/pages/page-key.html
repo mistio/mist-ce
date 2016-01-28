@@ -44,21 +44,29 @@
                 </div>
                 <div id="content">
                     <paper-card class="info-card" heading="Public Key">
-                        <div id="key-public" class="card-content">
-                            <textarea>
+                        <template is="dom-if" if="[[publicKey]]">
+                            <paper-button on-tap="copyPublicKey" class="copy-key" raised>Copy</paper-button>
+                        </template>
+
+                        <div id="keyPublicContainer" class="card-content">
+                            <textarea id="keyPublic">
                                 [[publicKey]]
                             </textarea>
                         </div>
                     </paper-card>
 
                     <paper-card class="info-card" heading="Private Key">
-                        <div id="key-private" class="card-content">
+                        <template is="dom-if" if="[[privateKey]]">
+                            <paper-button on-tap="copyPrivateKey" class="copy-key" raised>Copy</paper-button>
+                        </template>
+
+                        <div id="keyPrivateContainer" class="card-content">
                             <template is="dom-if" if="[[!privateKey]]">
                                 <paper-button id="showPrivateKey" raised on-tap="showPrivateKey">Private Key</paper-button>
                             </template>
 
                             <template is="dom-if" if="[[privateKey]]">
-                                <textarea>
+                                <textarea id="keyPrivate">
                                     [[privateKey]]
                                 </textarea>
                             </template>
@@ -150,6 +158,18 @@
                 info += prop + " : " + this.key[prop] + ", ";
             }
             this.$.keyproperties.textContent = info;
+        },
+        copyPublicKey: function() {
+            this.$.keyPublic.select();
+            document.execCommand('copy');
+            this.$.toast.text = 'The Public Key was copied to clipboard!';
+            this.$.toast.open();
+        },
+        copyPrivateKey: function() {
+            this.$.keyPrivate.select();
+            document.execCommand('copy');
+            this.$.toast.text = 'The Private Key was copied to clipboard!';
+            this.$.toast.open();
         },
         addMachine: function(_, params) {
 
