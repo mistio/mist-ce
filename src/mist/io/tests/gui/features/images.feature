@@ -9,10 +9,10 @@ Feature: Actions for Images
     Then there should be starred Images
     When I search for the "bitnami" Image
     And I click the button "Load more"
-    Then the images list should be loaded within 60 seconds
+    Then the images list should be loaded within 100 seconds
     When I star an image that contains "bitnami"
     And I clear the Images search bar
-    Then the images list should be loaded within 30 seconds
+    Then the images list should be loaded within 100 seconds
     When I scroll down until all starred images appear
     Then an image that contains "the_image_name_i_starred" should be starred
     When I focus on the "the_image_name_i_starred" button
