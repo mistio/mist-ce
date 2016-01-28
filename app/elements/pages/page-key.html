@@ -44,9 +44,7 @@
                 </div>
                 <div id="content">
                     <paper-card class="info-card" heading="Public Key">
-                        <template is="dom-if" if="[[publicKey]]">
-                            <paper-button on-tap="copyPublicKey" class="copy-key" raised>Copy</paper-button>
-                        </template>
+                        <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="copy-key" raised>Copy</paper-button>
 
                         <div id="keyPublicContainer" class="card-content">
                             <textarea id="keyPublic">
@@ -56,20 +54,14 @@
                     </paper-card>
 
                     <paper-card class="info-card" heading="Private Key">
-                        <template is="dom-if" if="[[privateKey]]">
-                            <paper-button on-tap="copyPrivateKey" class="copy-key" raised>Copy</paper-button>
-                        </template>
+                        <paper-button hidden$="[[!privateKey]]" on-tap="copyPrivateKey" class="copy-key" raised>Copy</paper-button>
 
                         <div id="keyPrivateContainer" class="card-content">
-                            <template is="dom-if" if="[[!privateKey]]">
-                                <paper-button id="showPrivateKey" raised on-tap="showPrivateKey">Private Key</paper-button>
-                            </template>
+                            <paper-button hidden$="[[privateKey]]" id="showPrivateKey" raised on-tap="showPrivateKey">Private Key</paper-button>
 
-                            <template is="dom-if" if="[[privateKey]]">
-                                <textarea id="keyPrivate">
-                                    [[privateKey]]
-                                </textarea>
-                            </template>
+                            <textarea hidden$="[[!privateKey]]" id="keyPrivate">
+                                [[privateKey]]
+                            </textarea>
                         </div>
                     </paper-card>
                 </div>
