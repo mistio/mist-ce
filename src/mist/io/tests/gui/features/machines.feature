@@ -18,8 +18,8 @@ Feature: Machines
     Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
     When I click the button "State"
     And I click the button "None"
-    And I check the sorting by "state"
     And I wait for 1 seconds
+    And I check the sorting by "state"
     Then I expect for "select-machines-btn" to be clickable within max 10 seconds
     When I click the button by "select-machines-btn" id_name
     Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
