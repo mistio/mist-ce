@@ -296,7 +296,9 @@ def ssh_key_is_added(context, ssh_key_name):
                 if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']\
                         in machines_key_text:
                     context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
-                    context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
+                    context.execute_steps(u'Then I expect for '
+                                          u'"machine-keys-panel" side panel '
+                                          u'to disappear within max 4 seconds')
                     return
             context.execute_steps(u"""
                 When I click the "New key" button inside the "Manage Keys" panel
@@ -324,5 +326,6 @@ def ssh_key_is_added(context, ssh_key_name):
                 And If the key addition was successful
             """)
             context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
-            context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
-
+            context.execute_steps(u'Then I expect for "machine-keys-panel" '
+                                  u'side panel to disappear within max 4 '
+                                  u'seconds')

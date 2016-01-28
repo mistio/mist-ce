@@ -334,7 +334,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                 Ember.run(this, function() {
                     var key = this.getKey(keyId);
                     key.machines.pushObject([machine.cloud.id, machine.id]);
-                    Mist.machineKeysController.probe(key);
+                    machine.probe(keyId);
                     machine.setProperties({
                         probed: true,
                         keysCount: this.getMachineKeysCount(machine),
