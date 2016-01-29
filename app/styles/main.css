@@ -219,11 +219,11 @@ a {
 }
 .info-card .title-text {
     color: #474747 !important;
-    background: #ebeff2;
-    background: -moz-linear-gradient(top, #ebeff2 0%, #d7dce2 100%);
-    background: -webkit-linear-gradient(top, #ebeff2 0%, #d7dce2 100%);
-    background: linear-gradient(to bottom, #ebeff2 0%, #d7dce2 100%);
-    border-bottom: 2px solid #c2c6c9;
+    background: #eeedeb;
+    background: -moz-linear-gradient(top, #eeedeb 0%, #d4d4d4 100%);
+    background: -webkit-linear-gradient(top, #eeedeb 0%, #d4d4d4 100%);
+    background: linear-gradient(to bottom, #eeedeb 0%, #d4d4d4 100%);
+    border-bottom: 2px solid #7f7f7f;
     font-size: 18px !important;
     text-transform: uppercase;
 }
@@ -239,7 +239,7 @@ a {
     border-spacing: 0;
 }
 .info-table .info-table-divider {
-    background-color: #f8f8f8;
+    background-color: #eeedeb;
 }
 .info-table tr td {
     width: 50%;
@@ -251,7 +251,7 @@ a {
     font-weight: 500;
 }
 .info-table tr:nth-child(2n) {
-    background-color: #ebeff2;
+    background-color: #f2f2f2;
 }
 .info-table tr:last-child td {
     border: none;
