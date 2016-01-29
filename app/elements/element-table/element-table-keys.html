@@ -7,50 +7,48 @@
 <dom-module id="element-table-keys">
     <template>
         <style>
-        :host {
-            padding: 15px 24px;
-            width: 100%;
-        }
-    
-        :host(:not([narrow-viewport])),
-        :host(:not([narrow-viewport])) a {
-            @apply(--layout-horizontal);
-        }
+            :host {
+                padding: 15px 24px;
+                width: 100%;
+            }
 
-        :host([narrow-viewport]),
-        :host([narrow-viewport]) a {
-            @apply(--layout-vertical);
-        }
+            :host(:not([narrow-viewport])),
+            :host(:not([narrow-viewport])) a {
+                @apply(--layout-horizontal);
+            }
 
-        #check {
-            padding-right: 24px;
-        }
+            :host([narrow-viewport]),
+            :host([narrow-viewport]) a {
+                @apply(--layout-vertical);
+            }
 
-        .id {
-            width: 250px;
-            font-weight: 500;
-            line-height: 40px;
-        }
+            #check {
+                padding-right: 24px;
+            }
 
-        .is-default {
-            font-weight: 400;
-            min-width: 300px;
-            line-height: 40px;
-        }
-        .tag {
-            font-weight: 400;
-            background-color: #888;
-            color: #fff;
-            padding: 2px 6px;
-            margin: 0 6px;
-            border-radius: 2px;
-        }
-        
+            .id {
+                width: 250px;
+                font-weight: 500;
+                line-height: 40px;
+            }
+
+            .is-default {
+                font-weight: 400;
+                min-width: 300px;
+                line-height: 40px;
+            }
+
+            .tag {
+                font-weight: 400;
+                background-color: #888;
+                color: #fff;
+                padding: 2px 6px;
+                margin: 0 6px;
+                border-radius: 2px;
+            }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <app-check id="check"
-                     selected="[[selected]]" on-tap="_onSelectThread"
-                     on-transitionend="_eatEvent"></app-check>
+        <app-check id="check" selected="[[selected]]" on-tap="_onSelectThread" on-transitionend="_eatEvent"></app-check>
         <a href$="[[elementLink]]" is="pushstate-anchor">
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
             <div class="is-default" hidden$="[[!item.isDefault]]">[[item.isDefault]]</div>
@@ -58,39 +56,41 @@
     </template>
 </dom-module>
 <script>
-Polymer({
-    is: 'element-table-keys',
-    properties: {
-        // icons: {
-        //   type: Array
-        // },
-        elementLink : {
-            type: String,
-            computed: "_elementLink(section,item)"
+    Polymer({
+        is: 'element-table-keys',
+        properties: {
+            // icons: {
+            //   type: Array
+            // },
+            elementLink: {
+                type: String,
+                computed: "_elementLink(section,item)"
+            },
+            item: {
+                type: Object
+            },
+            section: {
+                type: Object
+            },
+            narrowViewport: {
+                type: Boolean,
+                reflectToAttribute: true
+            }
         },
-        item: {
-            type: Object
+        _elementLink: function(section, item) {
+            return "/" + section.id + "/" + item.id;
         },
-        section: {
-            type: Object
+        _onSelectThread: function(e) {
+            if (Polymer.dom(e).localTarget === this.$.check) {
+                e.stopPropagation();
+                this.selected = !this.selected;
+                this.fire('list-item-select', {
+                    item: this
+                });
+            }
         },
-        narrowViewport: {
-            type: Boolean,
-            reflectToAttribute: true
-        }
-    },
-    _elementLink: function(section,item) {
-        return "/" + section.id + "/" + item.id;
-    },
-    _onSelectThread: function(e) {
-      if (Polymer.dom(e).localTarget === this.$.check) {
-        e.stopPropagation();
-        this.selected = !this.selected;
-        this.fire('list-item-select', {item: this});
-      }
-    },
-    _eatEvent: function(e) {
-      e.stopPropagation();
-    },
-});
+        _eatEvent: function(e) {
+            e.stopPropagation();
+        },
+    });
 </script>
