@@ -219,7 +219,13 @@ a {
 }
 .info-card .title-text {
     color: #474747 !important;
-    background-color: #d4d4d4;
+    background: #ebeff2;
+    background: -moz-linear-gradient(top, #ebeff2 0%, #d7dce2 100%);
+    background: -webkit-linear-gradient(top, #ebeff2 0%, #d7dce2 100%);
+    background: linear-gradient(to bottom, #ebeff2 0%, #d7dce2 100%);
+    border-bottom: 2px solid #c2c6c9;
+    font-size: 18px !important;
+    text-transform: uppercase;
 }
 .info-card .card-content {
     padding: 0;
@@ -243,6 +249,9 @@ a {
 }
 .info-table tr td:first-child {
     font-weight: 500;
+}
+.info-table tr:nth-child(2n) {
+    background-color: #ebeff2;
 }
 .info-table tr:last-child td {
     border: none;
