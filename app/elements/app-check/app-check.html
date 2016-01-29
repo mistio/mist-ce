@@ -16,6 +16,11 @@
         opacity: 1;
     }
     
+    :host([selected]) iron-icon {
+        transform: rotate3d(0, 1, 0, -180deg) scale(1);
+        opacity: 1;
+    }
+
     .check {
         border-radius: 50%;
         width: 40px;

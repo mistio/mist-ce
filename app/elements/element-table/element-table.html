@@ -138,11 +138,12 @@
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
+
         <div class="header" style$="[[_getHeaderStyle(section.color)]]">
-        <!-- <app-check id="check"
+        <!-- <app-check id="allcheck"
                      selected="[[selected]]" on-tap="_onSelectAll"
                      on-transitionend="_eatEvent"></app-check> -->
-            <span class="check-all layout horizontal center-center">
+            <span id="listselect" class="check-all layout horizontal center-center" allselected$="{{allselected}}">
                 <iron-icon icon="check" on-tap="_onSelectAll"></iron-icon>
             </span>
 
@@ -174,14 +175,17 @@
             no data yet
         </div>
 
-
-        <template is="dom-if" if="[[ismachines]]">
-            <template is="dom-repeat" items="[[elements]]">
-                <div class="row" data-index$="[[index]]">
-                    <element-table-machines section="[[section]]" item="[[item]]"></element-table-machines>
-                </div>
+        <div id="machines">
+            <template is="dom-if" if="[[ismachines]]">
+                
+                    <template is="dom-repeat" items="[[elements]]">
+                        <div class="row" data-index$="[[index]]">
+                            <element-table-machines section="[[section]]" item="[[item]]"></element-table-machines>
+                        </div>
+                    </template>
+                
             </template>
-        </template>
+        </div>
 
         <template is="dom-if" if="[[isimages]]">
             <template is="dom-repeat" items="[[elements]]">
@@ -248,6 +252,11 @@ Polymer({
             type: Array,
             observer: '_elementsChanged'
         },
+        allselected: {
+            type: Boolean,
+            value: false,
+            notify: true
+        },
         icons: {
             type: Array
         },
@@ -289,7 +298,6 @@ Polymer({
         'mouseover': '_mouseOver',
         'mouseleave': '_mouseLeave'
     },
-
     isMachines: function(section) {
         if (section && section.id == "machines")
             return true;
@@ -433,19 +441,61 @@ Polymer({
     _getHeaderStyle: function(color) {
         return 'background-color: ' + color + '; color: #fff;';
     },
-
     _elementsChanged: function() {
         // this.classList.add('hidden');
         this.async(function() {
             // this.classList.remove('hidden');
         }, 1);
+
+        var elements = this.elements;
+        if (elements) {
+            elements.forEach(function(el, index) {
+                if (!('selected' in elements)) {
+                    el.selected = false;
+                }
+            }, this);
+        }
     },
 
     _layoutIfNeeded: function(el) {
         return el.offsetTop;
     },
-    _onSelectAll: function() {
+    _onSelectAll: function(e) {
+        e.stopPropagation();        
+
+        var elements = this.elements;
+        console.log(elements);
+        elements.forEach(function(el, index) {
+            el.selected = true;
+        }, this);
+        
+
+        // check where we are at and which elements we target to select
+        // also, check if we need to select or desect all
+        this.allselected = !this.allselected;
+        console.log("tap: "+this.allselected);
+
+        var els;        
+        if (this.ismachines)
+            els = this.querySelectorAll('element-table-machines');
+        if (this.isimages)
+            els = this.querySelectorAll('element-table-images');
+        if (this.iskeys)
+            els = this.querySelectorAll('element-table-keys');
+        if (this.isnetworks)
+            els = this.querySelectorAll('element-table-networks');
+        if (this.isscripts)
+            els = this.querySelectorAll('element-table-scripts');
+        
+        console.log(els);
+
+        [].forEach.call(els, function(el, index) {
+            el.selected = this.allselected;
+        }, this);
+
+            
 
     }
 });
+
 </script>

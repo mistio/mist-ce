@@ -48,8 +48,9 @@
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <app-check id="check"
-                     selected="[[selected]]" on-tap="_onSelectThread"
+
+        <app-check id="check" allselected="{{allselected}}"
+                     selected="{{selected}}" on-tap="_onSelectItem"
                      on-transitionend="_eatEvent"></app-check>
         <a href$="[[elementLink]]" is="pushstate-anchor">
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
@@ -75,6 +76,11 @@ Polymer({
         // tags: {
         //   type: Array
         // },
+        selected: { 
+            type: Boolean, 
+            notify: true, 
+            value: false,
+        },
         item: {
             type: Object
         },
@@ -89,11 +95,14 @@ Polymer({
             type: Boolean,
             reflectToAttribute: true
         }
+    },    
+    _handleEventTwo: function(e) {
+      this.$.changeMe.innerHTML = e.detail.message;
     },
     _elementLink: function(section,item) {
         return "/" + section.id + "/" + item.uuid;
     },
-    _onSelectThread: function(e) {
+    _onSelectItem: function(e) {
       if (Polymer.dom(e).localTarget === this.$.check) {
         e.stopPropagation();
         this.selected = !this.selected;
