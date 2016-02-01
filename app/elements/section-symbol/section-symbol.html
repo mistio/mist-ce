@@ -1,48 +1,46 @@
 <link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/image-icons.html">
-
 <dom-module id="section-symbol">
-  <style>
+    <style>
     :host {
-      display: block;
-      line-height: 34px;
-      width: 34px;
-      height: 34px;
-      text-align: center;
-      font-weight: 500;
-      font-size: 18px;
-      color: #fff;
-      outline: none;
+        display: block;
+        line-height: 34px;
+        width: 34px;
+        height: 34px;
+        text-align: center;
+        font-weight: 500;
+        font-size: 18px;
+        color: #fff;
+        outline: none;
     }
-
+    
     :host(.large) {
-      line-height: 64px;
-      width: 64px;
-      height: 64px;
-      font-size: 30px;
+        line-height: 64px;
+        width: 64px;
+        height: 64px;
+        font-size: 30px;
     }
-
+    
     iron-icon {
-      color: #fff;
-      opacity: .8;
+        color: #fff;
+        opacity: .8;
     }
-  </style>
-  <template>
-      <iron-icon icon="[[icon]]" style$="[[_getComputedStyle(color)]]"></iron-icon>
-  </template>
+    </style>
+    <template>
+        <iron-icon icon="[[icon]]" style$="[[_getComputedStyle(color)]]"></iron-icon>
+    </template>
 </dom-module>
-
 <script>
-  Polymer({
+Polymer({
     is: 'section-symbol',
     properties: {
-      icon: String,
-      color: String
+        icon: String,
+        color: String
     },
 
     _getComputedStyle: function(color) {
-      return 'color: ' + color + ';';
+        return 'color: ' + color + ';';
     }
-  });
+});
 </script>
