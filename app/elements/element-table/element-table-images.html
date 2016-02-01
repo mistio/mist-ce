@@ -2,7 +2,6 @@
 <link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
-
 <dom-module id="element-table-images">
     <template>
         <style>
@@ -10,17 +9,17 @@
             padding: 15px 24px;
             width: 100%;
         }
-    
+        
         :host(:not([narrow-viewport])),
         :host(:not([narrow-viewport])) a {
             @apply(--layout-horizontal);
         }
-
+        
         :host([narrow-viewport]),
         :host([narrow-viewport]) a {
             @apply(--layout-vertical);
         }
-
+        
         #check {
             padding-right: 24px;
         }
@@ -48,10 +47,7 @@
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-
-        <app-check id="check"
-                     selected="[[selected]]" on-tap="_onSelectThread"
-                     on-transitionend="_eatEvent"></app-check>
+        <app-check id="check" selected="[[selected]]" on-tap="_onSelectThread" on-transitionend="_eatEvent"></app-check>
         <a href$="[[elementLink]]" is="pushstate-anchor">
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
@@ -62,7 +58,6 @@
             </div>
             <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
         </a>
-
     </template>
 </dom-module>
 <script>
@@ -72,7 +67,7 @@ Polymer({
         // icons: {
         //   type: Array
         // },
-        elementLink : {
+        elementLink: {
             type: String,
             computed: "_elementLink(section,item)"
         },
@@ -87,18 +82,20 @@ Polymer({
             reflectToAttribute: true
         }
     },
-    _elementLink: function(section,item) {
+    _elementLink: function(section, item) {
         return "/" + section.id + "/" + item.id;
     },
     _onSelectThread: function(e) {
-      if (Polymer.dom(e).localTarget === this.$.check) {
-        e.stopPropagation();
-        this.selected = !this.selected;
-        this.fire('list-item-select', {item: this});
-      }
+        if (Polymer.dom(e).localTarget === this.$.check) {
+            e.stopPropagation();
+            this.selected = !this.selected;
+            this.fire('list-item-select', {
+                item: this
+            });
+        }
     },
     _eatEvent: function(e) {
-      e.stopPropagation();
+        e.stopPropagation();
     },
 
 });

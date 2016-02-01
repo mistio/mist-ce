@@ -1,118 +1,118 @@
 <link rel="import" href="../theme-color/theme-color.html">
 <dom-module id="section-tile">
-    <style>
-    :host {
-        display: block;
-        transition: var(--material-curve-320);
-        transform: translate(0, 60px);
-        opacity: 0;
-    }
-    
-    :host(.active) {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    
-    .content {
-        display: block;
-        position: relative;
-        width: 100%;
-        background: #fafafa;
-        border-radius: 2px;
-        box-sizing: border-box;
-        overflow: hidden;
-        cursor: pointer;
-        transition: box-shadow 200ms;
-        transition-timing-function: var(--material-curve);
-        color: #606060;
-        border: none;
-        padding: 16px;
-    }
-    
-    :host(:hover) #content {
-        box-shadow: 0 5px 10px rgba(0, 0, 0, .15);
-    }
-    
-    h2 {
-        font-weight: 400;
-        font-size: 54px;
-        margin: 16px 0 5px 0;
-        transform: translate(-50px, 0);
-        opacity: 0;
-        transition: all 500ms 320ms;
-        transition-timing-function: var(--material-curve-320);
-        text-align: center;
-        min-height: 1em;
-    }
-    
-    :host(.active) h2 {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    
-    h3 {
-        transform: translate(-50px, 0);
-        opacity: 0;
-        transition: all 600ms 320ms;
-        transition-timing-function: var(--material-curve-320);
-        text-transform: uppercase;
-        text-align: center;
-        margin: 5px 0 0 0;
-    }
-    
-    :host(.active) h3 {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    
-    .title iron-icon {
-        width: 24px;
-        height: 24px;
-        color: inherit;
-        opacity: .8;
-        vertical-align: text-top;
-        margin-left: 6px;
-    }
-    
-    :host(.active) .symbol {
-        transform: translate(0, 0);
-        opacity: 0.8;
-    }
-    
-    .title {
-        display: block;
-        font-size: 20px;
-        font-weight: 500;
-        line-height: 28px;
-    }
-    
-    .tagline {
-        transition: all 700ms 320ms;
-        transition-timing-function: var(--material-curve-320);
-        transform: translate(-50px, 0);
-        opacity: 0;
-        font-size: 13px;
-        margin: 10px 0 0 0;
-        line-height: 20px;
-        height: 40px;
-    }
-    
-    :host(.active) .tagline {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    
-    :host(.active) theme-color {
-        border: 1px solid #000;
-    }
-    
-    @media (max-width: 439px) {
-        .sections {
-            @apply(--layout-vertical);
-        }
-    }
-    </style>
     <template>
+        <style>
+        :host {
+            display: block;
+            transition: var(--material-curve-320);
+            transform: translate(0, 60px);
+            opacity: 0;
+        }
+        
+        :host(.active) {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        
+        .content {
+            display: block;
+            position: relative;
+            width: 100%;
+            background: #fafafa;
+            border-radius: 2px;
+            box-sizing: border-box;
+            overflow: hidden;
+            cursor: pointer;
+            transition: box-shadow 200ms;
+            transition-timing-function: var(--material-curve);
+            color: #606060;
+            border: none;
+            padding: 16px;
+        }
+        
+        :host(:hover) #content {
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .15);
+        }
+        
+        h2 {
+            font-weight: 400;
+            font-size: 54px;
+            margin: 16px 0 5px 0;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: all 500ms 320ms;
+            transition-timing-function: var(--material-curve-320);
+            text-align: center;
+            min-height: 1em;
+        }
+        
+        :host(.active) h2 {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        
+        h3 {
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: all 600ms 320ms;
+            transition-timing-function: var(--material-curve-320);
+            text-transform: uppercase;
+            text-align: center;
+            margin: 5px 0 0 0;
+        }
+        
+        :host(.active) h3 {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        
+        .title iron-icon {
+            width: 24px;
+            height: 24px;
+            color: inherit;
+            opacity: .8;
+            vertical-align: text-top;
+            margin-left: 6px;
+        }
+        
+        :host(.active) .symbol {
+            transform: translate(0, 0);
+            opacity: 0.8;
+        }
+        
+        .title {
+            display: block;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 28px;
+        }
+        
+        .tagline {
+            transition: all 700ms 320ms;
+            transition-timing-function: var(--material-curve-320);
+            transform: translate(-50px, 0);
+            opacity: 0;
+            font-size: 13px;
+            margin: 10px 0 0 0;
+            line-height: 20px;
+            height: 40px;
+        }
+        
+        :host(.active) .tagline {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        
+        :host(.active) theme-color {
+            border: 1px solid #000;
+        }
+        
+        @media (max-width: 439px) {
+            .sections {
+                @apply(--layout-vertical);
+            }
+        }
+        </style>
         <paper-material>
             <theme-color color="[[color]]" class="vertical content layout" themed-reverse themed-border>
                 <h2 class="count">[[count]]</h2>

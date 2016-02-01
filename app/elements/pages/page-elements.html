@@ -8,239 +8,239 @@
 <link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
 <dom-module id="page-elements">
-    <style>
-    :host {
-        background: #fafafa;
-    }
-    
-    a {
-        color: black;
-        text-decoration: none;
-    }
-    
-    #container {
-        background: #fafafa;
-    }
-    
-    .paper-header [paper-drawer-toggle] {
-        margin-left: 10px;
-    }
-    
-    .paper-header {
-        @apply(--layout-horizontal);
-        @apply(--layout-center);
-    }
-    
-    .paper-header h2 {
-        margin-left: 20px;
-        @apply(--layout-flex);
-        text-transform: capitalize;
-    }
-    
-    .paper-header .toggleViewButton {
-        --paper-icon-button-ink-color: transparent;
-    }
-    
-    .paper-header .cartButton {
-        margin-right: 10px;
-    }
-    
-    #content {
-        overflow: auto;
-        -webkit-overflow-scrolling: touch;
-        padding: 0 10px;
-    }
-    
-    app-bar .menu-icon {
-        margin-right: 15px;
-    }
-    
-    .elements-title h2 {
-        @apply(--paper-font-title);
-        color: #424242;
-    }
-    
-    .elements-title iron-icon {
-        cursor: pointer;
-        margin-left: 16px;
-    }
-    
-    .elements-title > [paper-drawer-toggle] {
-        margin: 0 16px 0 0;
-    }
-    
-    #section-heading .description {
-        font-size: 16px;
-        color: var(--paper-grey-600);
-    }
-    
-    #element-cards,
-    element-table,
-    .elements-title,
-    #section-heading {
-        max-width: 920px;
-        margin: 20px auto;
-    }
-    
-    #section-heading {
-        margin: 0px auto 16px;
-    }
-    
-    [size=xs] > * {
-        display: none;
-    }
-    
-    responsive-element[size=xs].layout {
-        -ms-flex-direction: column;
-        -webkit-flex-direction: column;
-        flex-direction: column;
-    }
-    
-    [size=xs] app-sidebar {
-        min-width: 100%;
-        height: auto;
-    }
-    
-    [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
-        padding: 0 16px;
-    }
-    
-    app-sidebar paper-toolbar {
-        --paper-toolbar-background: white;
-        --paper-toolbar: {
-            box-sizing: border-box;
-        }
-    }
-    
-    #section-tag {
-        display: none;
-    }
-    
-    #section-info {
-        position: relative;
-    }
-    
-    #section-header {
-        position: relative;
-        padding: 16px 24px 0 24px;
-        overflow: hidden;
-    }
-    
-    #section-header iron-icon {
-        cursor: pointer;
-    }
-    
-    #section-header section-symbol {
-        display: inline-block;
-        margin: 0;
-        transform: translate(-50px, 0);
-        opacity: 0;
-        transition: var(--material-curve-320);
-    }
-    
-    #section-title {
-        @apply(--paper-font-title);
-        margin: 0 0 20px;
-        transform: translate(-50px, 0);
-        opacity: 0;
-        transition: var(--material-curve-320);
-    }
-    
-    #section-tagline {
-        margin: 0;
-        padding-right: 80px;
-        transform: translate(-50px, 0);
-        opacity: 0;
-        transition: var(--material-curve-320);
-        font-size: 13px;
-        line-height: 20px;
-    }
-    
-    #section-desc {
-        margin: 0;
-    }
-    
-    [size=xs] #section-title {
-        margin-bottom: 0;
-    }
-    
-    [size=xs] #section-tagline {
-        display: none;
-    }
-    
-    [size=xs] #section-tagline {
-        margin-top: 0;
-    }
-    
-    .active #section-header section-symbol,
-    .active #section-title,
-    .active #section-tagline {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    
-    #search input:focus {
-        outline: 0;
-        background-color: #eceff1;
-        border-color: #cfd8dc;
-    }
-    
-    #search input::-webkit-search-cancel-button {
-        position: relative;
-        right: 15px;
-    }
-    
-    #section-list {
-        padding: 0 0 10px;
-    }
-    
-    #section-list h5 {
-        margin: 10px 0;
-        padding: 0 16px;
-        color: rgba(0, 0, 0, .54);
-        font-weight: 500;
-    }
-    
-    #section-list .section {
-        display: block;
-        padding: 9px 16px;
-        font-weight: 500;
-        color: rgba(0, 0, 0, .87);
-        text-transform: capitalize;
-        cursor: pointer;
-        border-width: 1px 0;
-    }
-    
-    #section-list .section[active] {
-        background: var(--paper-blue-grey-50);
-    }
-    
-    #section-list .section .all-symbol {
-        padding: 5px;
-    }
-    
-    #section-list .section section-symbol,
-    #section-list .section .all-symbol {
-        margin-right: 15px;
-    }
-    
-    [view=cards] element-table {
-        display: none;
-    }
-    
-    [view=table] #element-cards {
-        display: none;
-    }
-    
-    app-incidents {
-        width: 50%;
-    }
-    
-    #current-tag {
-        display: none;
-    }
-    </style>
     <template>
+        <style>
+        :host {
+            background: #fafafa;
+        }
+        
+        a {
+            color: black;
+            text-decoration: none;
+        }
+        
+        #container {
+            background: #fafafa;
+        }
+        
+        .paper-header [paper-drawer-toggle] {
+            margin-left: 10px;
+        }
+        
+        .paper-header {
+            @apply(--layout-horizontal);
+            @apply(--layout-center);
+        }
+        
+        .paper-header h2 {
+            margin-left: 20px;
+            @apply(--layout-flex);
+            text-transform: capitalize;
+        }
+        
+        .paper-header .toggleViewButton {
+            --paper-icon-button-ink-color: transparent;
+        }
+        
+        .paper-header .cartButton {
+            margin-right: 10px;
+        }
+        
+        #content {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 10px;
+        }
+        
+        app-bar .menu-icon {
+            margin-right: 15px;
+        }
+        
+        .elements-title h2 {
+            @apply(--paper-font-title);
+            color: #424242;
+        }
+        
+        .elements-title iron-icon {
+            cursor: pointer;
+            margin-left: 16px;
+        }
+        
+        .elements-title > [paper-drawer-toggle] {
+            margin: 0 16px 0 0;
+        }
+        
+        #section-heading .description {
+            font-size: 16px;
+            color: var(--paper-grey-600);
+        }
+        
+        #element-cards,
+        element-table,
+        .elements-title,
+        #section-heading {
+            max-width: 920px;
+            margin: 20px auto;
+        }
+        
+        #section-heading {
+            margin: 0px auto 16px;
+        }
+        
+        [size=xs] > * {
+            display: none;
+        }
+        
+        responsive-element[size=xs].layout {
+            -ms-flex-direction: column;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+        }
+        
+        [size=xs] app-sidebar {
+            min-width: 100%;
+            height: auto;
+        }
+        
+        [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
+            padding: 0 16px;
+        }
+        
+        app-sidebar paper-toolbar {
+            --paper-toolbar-background: white;
+            --paper-toolbar: {
+                box-sizing: border-box;
+            }
+        }
+        
+        #section-tag {
+            display: none;
+        }
+        
+        #section-info {
+            position: relative;
+        }
+        
+        #section-header {
+            position: relative;
+            padding: 16px 24px 0 24px;
+            overflow: hidden;
+        }
+        
+        #section-header iron-icon {
+            cursor: pointer;
+        }
+        
+        #section-header section-symbol {
+            display: inline-block;
+            margin: 0;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: var(--material-curve-320);
+        }
+        
+        #section-title {
+            @apply(--paper-font-title);
+            margin: 0 0 20px;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: var(--material-curve-320);
+        }
+        
+        #section-tagline {
+            margin: 0;
+            padding-right: 80px;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: var(--material-curve-320);
+            font-size: 13px;
+            line-height: 20px;
+        }
+        
+        #section-desc {
+            margin: 0;
+        }
+        
+        [size=xs] #section-title {
+            margin-bottom: 0;
+        }
+        
+        [size=xs] #section-tagline {
+            display: none;
+        }
+        
+        [size=xs] #section-tagline {
+            margin-top: 0;
+        }
+        
+        .active #section-header section-symbol,
+        .active #section-title,
+        .active #section-tagline {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        
+        #search input:focus {
+            outline: 0;
+            background-color: #eceff1;
+            border-color: #cfd8dc;
+        }
+        
+        #search input::-webkit-search-cancel-button {
+            position: relative;
+            right: 15px;
+        }
+        
+        #section-list {
+            padding: 0 0 10px;
+        }
+        
+        #section-list h5 {
+            margin: 10px 0;
+            padding: 0 16px;
+            color: rgba(0, 0, 0, .54);
+            font-weight: 500;
+        }
+        
+        #section-list .section {
+            display: block;
+            padding: 9px 16px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, .87);
+            text-transform: capitalize;
+            cursor: pointer;
+            border-width: 1px 0;
+        }
+        
+        #section-list .section[active] {
+            background: var(--paper-blue-grey-50);
+        }
+        
+        #section-list .section .all-symbol {
+            padding: 5px;
+        }
+        
+        #section-list .section section-symbol,
+        #section-list .section .all-symbol {
+            margin-right: 15px;
+        }
+        
+        [view=cards] element-table {
+            display: none;
+        }
+        
+        [view=table] #element-cards {
+            display: none;
+        }
+        
+        app-incidents {
+            width: 50%;
+        }
+        
+        #current-tag {
+            display: none;
+        }
+        </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
             <app-sidebar tag="" drawer>
                 <div class="content">

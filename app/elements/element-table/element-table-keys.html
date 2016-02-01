@@ -3,49 +3,48 @@
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
 <link rel="import" href="../app-check/app-check.html">
-
 <dom-module id="element-table-keys">
     <template>
         <style>
-            :host {
-                padding: 15px 24px;
-                width: 100%;
-            }
-
-            :host(:not([narrow-viewport])),
-            :host(:not([narrow-viewport])) a {
-                @apply(--layout-horizontal);
-            }
-
-            :host([narrow-viewport]),
-            :host([narrow-viewport]) a {
-                @apply(--layout-vertical);
-            }
-
-            #check {
-                padding-right: 24px;
-            }
-
-            .id {
-                width: 250px;
-                font-weight: 500;
-                line-height: 40px;
-            }
-
-            .is-default {
-                font-weight: 400;
-                min-width: 300px;
-                line-height: 40px;
-            }
-
-            .tag {
-                font-weight: 400;
-                background-color: #888;
-                color: #fff;
-                padding: 2px 6px;
-                margin: 0 6px;
-                border-radius: 2px;
-            }
+        :host {
+            padding: 15px 24px;
+            width: 100%;
+        }
+        
+        :host(:not([narrow-viewport])),
+        :host(:not([narrow-viewport])) a {
+            @apply(--layout-horizontal);
+        }
+        
+        :host([narrow-viewport]),
+        :host([narrow-viewport]) a {
+            @apply(--layout-vertical);
+        }
+        
+        #check {
+            padding-right: 24px;
+        }
+        
+        .id {
+            width: 250px;
+            font-weight: 500;
+            line-height: 40px;
+        }
+        
+        .is-default {
+            font-weight: 400;
+            min-width: 300px;
+            line-height: 40px;
+        }
+        
+        .tag {
+            font-weight: 400;
+            background-color: #888;
+            color: #fff;
+            padding: 2px 6px;
+            margin: 0 6px;
+            border-radius: 2px;
+        }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <app-check id="check" selected="[[selected]]" on-tap="_onSelectThread" on-transitionend="_eatEvent"></app-check>
@@ -56,41 +55,41 @@
     </template>
 </dom-module>
 <script>
-    Polymer({
-        is: 'element-table-keys',
-        properties: {
-            // icons: {
-            //   type: Array
-            // },
-            elementLink: {
-                type: String,
-                computed: "_elementLink(section,item)"
-            },
-            item: {
-                type: Object
-            },
-            section: {
-                type: Object
-            },
-            narrowViewport: {
-                type: Boolean,
-                reflectToAttribute: true
-            }
+Polymer({
+    is: 'element-table-keys',
+    properties: {
+        // icons: {
+        //   type: Array
+        // },
+        elementLink: {
+            type: String,
+            computed: "_elementLink(section,item)"
         },
-        _elementLink: function(section, item) {
-            return "/" + section.id + "/" + item.id;
+        item: {
+            type: Object
         },
-        _onSelectThread: function(e) {
-            if (Polymer.dom(e).localTarget === this.$.check) {
-                e.stopPropagation();
-                this.selected = !this.selected;
-                this.fire('list-item-select', {
-                    item: this
-                });
-            }
+        section: {
+            type: Object
         },
-        _eatEvent: function(e) {
+        narrowViewport: {
+            type: Boolean,
+            reflectToAttribute: true
+        }
+    },
+    _elementLink: function(section, item) {
+        return "/" + section.id + "/" + item.id;
+    },
+    _onSelectThread: function(e) {
+        if (Polymer.dom(e).localTarget === this.$.check) {
             e.stopPropagation();
-        },
-    });
+            this.selected = !this.selected;
+            this.fire('list-item-select', {
+                item: this
+            });
+        }
+    },
+    _eatEvent: function(e) {
+        e.stopPropagation();
+    },
+});
 </script>

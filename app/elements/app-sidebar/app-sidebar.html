@@ -4,229 +4,229 @@
 <link rel="import" href="../tag-link/tag-link.html">
 <link rel="import" href="../theme-color/theme-color.html">
 <dom-module id="app-sidebar">
-    <style is="custom-style">
-    :root {
-        --app-sidebar-width: 272px;
-        --app-sidebar-background: var(--primary-background-color);
-    }
-    </style>
-    <style>
-    :host {
-        height: 100%;
-        box-sizing: border-box;
-        z-index: 2;
-        background: white;
-        border-right: 1px solid #e5e5e5;
-        @apply(--layout);
-        @apply(--layout-vertical);
-        overflow-x: hidden;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    ::content paper-toolbar {
-        --paper-toolbar-background: white;
-    }
-    
-    ::content .side-section {
-        margin-bottom: 20px;
-        opacity: 0;
-        transform: translate(0, 100px);
-        transition: var(--material-curve-320);
-    }
-    
-    ::content .side-section:first-child {
-        transition-delay: 100ms;
-    }
-    
-    ::content .side-section:nth-child(2) {
-        transition-delay: 200ms;
-    }
-    
-    ::content .side-section:nth-child(3) {
-        transition-delay: 300ms;
-    }
-    
-    ::content .side-section:nth-child(4) {
-        transition-delay: 400ms;
-    }
-    
-    ::content .active .side-section {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    
-    ::content .side-section h5 {
-        @apply(--paper-font-body2);
-        border-top: 1px solid;
-        border-top-color: var(--divider-color);
-        margin: 24px 0 0 0;
-        padding: 16px 24px 12px 24px;
-    }
-    
-    ::content .side-section p {
-        @apply(--paper-font-body1);
-        color: var(--secondary-text-color);
-        padding: 0 24px;
-        margin: 0;
-    }
-    
-    ::content .content {
-        @apply(--layout-vertical);
-    }
-    
-    app-sidebar paper-toolbar {
-        --paper-toolbar-background: white;
-        --paper-toolbar: {
-            box-sizing: border-box;
-        }
-    }
-    
-    #section-tag {
-        display: none;
-    }
-    
-    #section-info {
-        position: relative;
-    }
-    
-    #section-header {
-        position: relative;
-        padding: 16px 24px 0 24px;
-        overflow: hidden;
-    }
-    
-    #section-header iron-icon {
-        cursor: pointer;
-    }
-    
-    #section-header section-symbol {
-        display: inline-block;
-        margin: 0;
-        transform: translate(-50px, 0);
-        opacity: 0;
-        transition: var(--material-curve-320);
-    }
-    
-    #section-title {
-        @apply(--paper-font-title);
-        margin: 0 0 20px;
-        transform: translate(-50px, 0);
-        opacity: 0;
-        transition: var(--material-curve-320);
-    }
-    
-    #section-tagline {
-        margin: 0;
-        padding-right: 80px;
-        transform: translate(-50px, 0);
-        opacity: 0;
-        transition: var(--material-curve-320);
-        font-size: 13px;
-        line-height: 20px;
-    }
-    
-    #section-desc {
-        margin: 0;
-    }
-    
-    [size=xs] #section-title {
-        margin-bottom: 0;
-    }
-    
-    [size=xs] #section-tagline {
-        display: none;
-    }
-    
-    [size=xs] #section-tagline {
-        margin-top: 0;
-    }
-    
-    .active #section-header section-symbol,
-    .active #section-title,
-    .active #section-tagline {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    
-    #section-list {
-        padding: 0 0 10px;
-    }
-    
-    #section-list h5 {
-        margin: 10px 0;
-        padding: 0 16px;
-        color: rgba(0, 0, 0, .54);
-        font-weight: 500;
-    }
-    
-    #section-list .section {
-        display: block;
-        padding: 9px 16px;
-        font-weight: 500;
-        color: rgba(0, 0, 0, .87);
-        text-transform: capitalize;
-        cursor: pointer;
-        border-width: 1px 0;
-    }
-    
-    #section-list .section[active] {
-        background: var(--paper-blue-grey-50);
-    }
-    
-    #section-list .section .all-symbol {
-        padding: 5px;
-    }
-    
-    #section-list .section section-symbol,
-    #section-list .section .all-symbol {
-        margin-right: 10px;
-    }
-    
-    #section-list span.count {
-        float: right;
-        opacity: 0.54;
-    }
-    
-    #section-list #dashboard {
-        background-color: slategrey;
-        color: #fff;
-        border-top: 1px solid #999;
-    }
-    
-    #section-list #dashboard iron-icon {
-        color: #fff;
-    }
-    
-    #section-list .section:last-of-type {
-        border-bottom: 1px solid #ddd;
-    }
-    
-    #current-tag {
-        background: #2196F3;
-        color: rgba(255, 255, 255, 0.87);
-        padding: 12px;
-        font-size: 16px;
-    }
-    
-    #current-tag b {
-        margin-right: 6px;
-    }
-    
-    #current-tag span {
-        text-transform: uppercase;
-    }
-    
-    .tags tag-link:last-of-type + span {
-        display: none;
-    }
-    
-    #mist-side-head {
-        min-height: 48px;
-        padding: 2px;
-    }
-    </style>
     <template>
+        <style is="custom-style">
+        :root {
+            --app-sidebar-width: 272px;
+            --app-sidebar-background: var(--primary-background-color);
+        }
+        </style>
+        <style>
+        :host {
+            height: 100%;
+            box-sizing: border-box;
+            z-index: 2;
+            background: white;
+            border-right: 1px solid #e5e5e5;
+            @apply(--layout);
+            @apply(--layout-vertical);
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        ::content paper-toolbar {
+            --paper-toolbar-background: white;
+        }
+        
+        ::content .side-section {
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translate(0, 100px);
+            transition: var(--material-curve-320);
+        }
+        
+        ::content .side-section:first-child {
+            transition-delay: 100ms;
+        }
+        
+        ::content .side-section:nth-child(2) {
+            transition-delay: 200ms;
+        }
+        
+        ::content .side-section:nth-child(3) {
+            transition-delay: 300ms;
+        }
+        
+        ::content .side-section:nth-child(4) {
+            transition-delay: 400ms;
+        }
+        
+        ::content .active .side-section {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        
+        ::content .side-section h5 {
+            @apply(--paper-font-body2);
+            border-top: 1px solid;
+            border-top-color: var(--divider-color);
+            margin: 24px 0 0 0;
+            padding: 16px 24px 12px 24px;
+        }
+        
+        ::content .side-section p {
+            @apply(--paper-font-body1);
+            color: var(--secondary-text-color);
+            padding: 0 24px;
+            margin: 0;
+        }
+        
+        ::content .content {
+            @apply(--layout-vertical);
+        }
+        
+        app-sidebar paper-toolbar {
+            --paper-toolbar-background: white;
+            --paper-toolbar: {
+                box-sizing: border-box;
+            }
+        }
+        
+        #section-tag {
+            display: none;
+        }
+        
+        #section-info {
+            position: relative;
+        }
+        
+        #section-header {
+            position: relative;
+            padding: 16px 24px 0 24px;
+            overflow: hidden;
+        }
+        
+        #section-header iron-icon {
+            cursor: pointer;
+        }
+        
+        #section-header section-symbol {
+            display: inline-block;
+            margin: 0;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: var(--material-curve-320);
+        }
+        
+        #section-title {
+            @apply(--paper-font-title);
+            margin: 0 0 20px;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: var(--material-curve-320);
+        }
+        
+        #section-tagline {
+            margin: 0;
+            padding-right: 80px;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: var(--material-curve-320);
+            font-size: 13px;
+            line-height: 20px;
+        }
+        
+        #section-desc {
+            margin: 0;
+        }
+        
+        [size=xs] #section-title {
+            margin-bottom: 0;
+        }
+        
+        [size=xs] #section-tagline {
+            display: none;
+        }
+        
+        [size=xs] #section-tagline {
+            margin-top: 0;
+        }
+        
+        .active #section-header section-symbol,
+        .active #section-title,
+        .active #section-tagline {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        
+        #section-list {
+            padding: 0 0 10px;
+        }
+        
+        #section-list h5 {
+            margin: 10px 0;
+            padding: 0 16px;
+            color: rgba(0, 0, 0, .54);
+            font-weight: 500;
+        }
+        
+        #section-list .section {
+            display: block;
+            padding: 9px 16px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, .87);
+            text-transform: capitalize;
+            cursor: pointer;
+            border-width: 1px 0;
+        }
+        
+        #section-list .section[active] {
+            background: var(--paper-blue-grey-50);
+        }
+        
+        #section-list .section .all-symbol {
+            padding: 5px;
+        }
+        
+        #section-list .section section-symbol,
+        #section-list .section .all-symbol {
+            margin-right: 10px;
+        }
+        
+        #section-list span.count {
+            float: right;
+            opacity: 0.54;
+        }
+        
+        #section-list #dashboard {
+            background-color: slategrey;
+            color: #fff;
+            border-top: 1px solid #999;
+        }
+        
+        #section-list #dashboard iron-icon {
+            color: #fff;
+        }
+        
+        #section-list .section:last-of-type {
+            border-bottom: 1px solid #ddd;
+        }
+        
+        #current-tag {
+            background: #2196F3;
+            color: rgba(255, 255, 255, 0.87);
+            padding: 12px;
+            font-size: 16px;
+        }
+        
+        #current-tag b {
+            margin-right: 6px;
+        }
+        
+        #current-tag span {
+            text-transform: uppercase;
+        }
+        
+        .tags tag-link:last-of-type + span {
+            display: none;
+        }
+        
+        #mist-side-head {
+            min-height: 48px;
+            padding: 2px;
+        }
+        </style>
         <app-socket id="appsocket" model="{{model}}"></app-socket>
         <div class="content">
             <!-- <div id="mist-side-head">
