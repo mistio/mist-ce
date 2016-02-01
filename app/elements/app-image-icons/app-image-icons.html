@@ -2,65 +2,69 @@
 <link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/image-icons.html"> -->
-
 <dom-module id="app-image-icons">
     <style>
-      :root {
+    :root {
         --ubuntu-color: rgba(100, 100, 100, .5);
         --mongo-color: rgba(150, 150, 150, .5);
         --aws-color: rgba(80, 80, 80, .5);
         --suse-color: rgba(20, 20, 20, .5);
         --fedora-color: rgba(0, 0, 0, .5);
         --linux-color: rgba(50, 50, 50, .5);
-      }
-      span {
+    }
+    
+    span {
         width: 60px;
         display: inline-block;
-      }
-      /*var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora", "linux"];*/
-      span.icon {
+    }
+    /*var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora", "linux"];*/
+    
+    span.icon {
         border-radius: 100px;
         width: 50px;
         height: 50px;
-        line-height: 50px; 
+        line-height: 50px;
         color: #fff;
-        overflow: hidden; 
-        text-align: center;        
-      }
-      span.icon-ubuntu {
+        overflow: hidden;
+        text-align: center;
+    }
+    
+    span.icon-ubuntu {
         background: var(--ubuntu-color);
-      }
-      span.icon-mongo {
+    }
+    
+    span.icon-mongo {
         background: var(--mongo-color);
-      }
-      span.icon-aws {
+    }
+    
+    span.icon-aws {
         background: var(--aws-color);
-      }
-      span.icon-suse {
+    }
+    
+    span.icon-suse {
         background: var(--suse-color);
-      }
-      span.icon-fedora {
+    }
+    
+    span.icon-fedora {
         background: var(--fedora-color);
-      }
-      span.icon-linux {
+    }
+    
+    span.icon-linux {
         background: var(--linux-color);
-      }
+    }
     </style>
     <template>
-
-      <template is="dom-repeat" items="[[feed]]">  
-        <span class$="icon icon-{{item}}">[[item]]</span>
-      </template>
-    
+        <template is="dom-repeat" items="[[feed]]">
+            <span class$="icon icon-{{item}}">[[item]]</span>
+        </template>
     </template>
 </dom-module>
-
 <script>
 Polymer({
-  is: 'app-image-icons',
-  properties: {
-    feed: Array,
-    enableCustomStyleProperties: true
-  }
+    is: 'app-image-icons',
+    properties: {
+        feed: Array,
+        enableCustomStyleProperties: true
+    }
 });
 </script>

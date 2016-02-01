@@ -2,7 +2,6 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
-
 <link rel="import" href="../section-symbol/section-symbol.html">
 <link rel="import" href="../tag-link/tag-link.html">
 <link rel="import" href="../theme-color/theme-color.html">
@@ -10,77 +9,95 @@
 <link rel="import" href="../element-table/element-table.html">
 <link rel="import" href="../element-table-cards/element-table-cards.html">
 <link rel="import" href="../responsive-element/responsive-element.html">
-
 <dom-module id="page-script">
-  <link rel="import" type="css" href="../../styles/main.css">
-  <link rel="import" type="css" href="page-script.css">
-
-  <template>
-      <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
-        
-        <app-sidebar  tag="[[tag]]" 
-                      sections="{{sections}}" 
-                      current="[[section.id]]" 
-                      drawer></app-sidebar>
-
-        <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
-          <div class="paper-header">
-            <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-            <h2 class="flex">Script page</h2>
-            <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
-            <paper-icon-button icon="icons:sort"></paper-icon-button>
-            <app-user-menu email="marios@mist.io"></app-user-menu>
-          </div>
-          <div id="content">
-            script ID: {{params.id}}
-            <paper-button on-tap="listInfo">temp script info helper</paper-button>
-            <div id="scriptproperties"></div>
-          </div>
-          <div class="absolute-bottom-right">
-            <paper-menu-button vertical-align="bottom" horizontal-align="right">
-              <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
-              <paper-menu class="dropdown-content">
-                <paper-button on-click="deleteScript">Delete Script</paper-button>
-                <paper-button on-click="runScript">Run Script on Machine</paper-button>
-              </paper-menu>
-            </paper-menu-button>
-          </div>
-        </paper-header-panel>
-      </paper-drawer-panel>      
-  </template>
-</dom-module>
-
-<script>
-    Polymer({
-      is: 'page-script',
-      enableCustomStyleProperties: true,
-      properties: {
-        router: Object,
-        pageTitle: {type: String},
-        params: {type: Object, notify: true},
-        sections: Array,
-        section: {type: Object, notify: true, value: {}},
-        tag: {String, value: ""},
-        script: Object
-      },
-      ready: function() {
-
-      },
-      attached: function() {
-
-      },
-      listInfo: function(e) {
-        var info = '';
-        for(var prop in this.script){
-          info+=prop+" : "+this.script[prop]+", ";
+    <link rel="import" type="css" href="../../styles/main.css">
+    <!-- <link rel="import" type="css" href="page-script.css"> -->
+    <template>
+        <style>
+        :host {
+            background: #fafafa;
         }
-        this.$.scriptproperties.textContent = info;        
-      },
-      deletescript: function (_,params) {
+        
+        #content {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+        
+        #container {
+            background: #fafafa;
+        }
+        </style>
+        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
+            <app-sidebar tag="[[tag]]" sections="{{sections}}" current="[[section.id]]" drawer></app-sidebar>
+            <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
+                <div class="paper-header">
+                    <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+                    <h2 class="flex">Script page</h2>
+                    <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
+                    <paper-icon-button icon="icons:sort"></paper-icon-button>
+                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                </div>
+                <div id="content">
+                    script ID: {{params.id}}
+                    <paper-button on-tap="listInfo">temp script info helper</paper-button>
+                    <div id="scriptproperties"></div>
+                </div>
+                <div class="absolute-bottom-right">
+                    <paper-menu-button vertical-align="bottom" horizontal-align="right">
+                        <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
+                        <paper-menu class="dropdown-content">
+                            <paper-button on-click="deleteScript">Delete Script</paper-button>
+                            <paper-button on-click="runScript">Run Script on Machine</paper-button>
+                        </paper-menu>
+                    </paper-menu-button>
+                </div>
+            </paper-header-panel>
+        </paper-drawer-panel>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'page-script',
+    enableCustomStyleProperties: true,
+    properties: {
+        router: Object,
+        pageTitle: {
+            type: String
+        },
+        params: {
+            type: Object,
+            notify: true
+        },
+        sections: Array,
+        section: {
+            type: Object,
+            notify: true,
+            value: {}
+        },
+        tag: {
+            String, value: ""
+        },
+        script: Object
+    },
+    ready: function() {
+
+    },
+    attached: function() {
+
+    },
+    listInfo: function(e) {
+        var info = '';
+        for (var prop in this.script) {
+            info += prop + " : " + this.script[prop] + ", ";
+        }
+        this.$.scriptproperties.textContent = info;
+    },
+    deletescript: function(_, params) {
         // console.log("clicked delete script");
-      },
-      runScript:  function (_,params) {
+    },
+    runScript: function(_, params) {
         // console.log("clicked run script");
-      },
-    });
+    },
+});
 </script>
