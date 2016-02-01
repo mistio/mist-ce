@@ -2,142 +2,263 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
-
 <dom-module id="app-incidents">
-  <link rel="import" type="css" href="app-incidents.css">
-  <template>
-    <paper-material>  <!-- title goes here, should change on stateChanged-->
-    <h2>{{title}}</h2>
-      <div class="content-area">
-        <div class="block active-alerts">
-          <h3>Now active</h3>
-          <!-- state FULL > there are incidents to display -->
-          <a class="list-item layout horizontal wrap red" href$="[[whatTriggeredIt]]"> <!-- class red should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:report-problem"></iron-icon>
-              an incident expression
+    <!-- <link rel="import" type="css" href="app-incidents.css"> -->
+    <template>
+        <style>
+        :host {
+            display: block;
+            transition: var(--material-curve-320);
+            transform: translate(0, 60px);
+            opacity: 0;
+        }
+        
+        :host(.active) {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        
+        :host paper-material {
+            min-width: 100%;
+        }
+        
+        :host h2 {
+            color: rgba(255, 255, 255, 0.87);
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 1.5em;
+            background-color: slategray;
+            text-align: center;
+            padding: 0 0.5em;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        h3 {
+            text-transform: uppercase;
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.54);
+            padding: 0 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .list-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+        }
+        
+        .list-item.red {
+            background-color: #D96557;
+            color: #fff;
+        }
+        
+        .list-item.red .expression > iron-icon {
+            color: #fff;
+        }
+        
+        .list-item.green .expression > iron-icon {
+            color: green;
+        }
+        
+        .flexchild {
+            @apply(--layout-flex);
+        }
+        
+        .block {
+            transform: translate(0, 50px);
+            opacity: 0;
+            transition: all 500ms 320ms;
+            transition-timing-function: var(--material-curve-320);
+        }
+        
+        :host(.active) .block {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        
+        @media (min-width: 869px) {
+            .content-area {
+                max-height: 390px;
+                overflow-y: scroll;
+            }
+        }
+        </style>
+        <paper-material>
+            <!-- title goes here, should change on stateChanged-->
+            <h2>{{title}}</h2>
+            <div class="content-area">
+                <div class="block active-alerts">
+                    <h3>Now active</h3>
+                    <!-- state FULL > there are incidents to display -->
+                    <a class="list-item layout horizontal wrap red" href$="[[whatTriggeredIt]]">
+                        <!-- class red should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:report-problem"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap red" href$="[[whatTriggeredIt]]">
+                        <!-- class red should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:report-problem"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                </div>
+                <div class="block resolved-alerts">
+                    <h3>Resolved</h3>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
+                        <!-- class green should come from alertstateclass -->
+                        <div class="flexchild expression">
+                            <iron-icon icon="icons:check"></iron-icon>
+                            an incident expression
+                        </div>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                </div>
+                <!-- state MIDDLE : urge user to add rules -->
+                <!-- state ONBOARD : urge user to add machine monitoring -->
             </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap red" href$="[[whatTriggeredIt]]"> <!-- class red should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:report-problem"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-        </div>
-        <div class="block resolved-alerts">
-          <h3>Resolved</h3>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-          <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]"> <!-- class green should come from alertstateclass -->
-            <div class="flexchild expression">
-              <iron-icon icon="icons:check"></iron-icon>
-              an incident expression
-            </div>
-            <div><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></div>
-          </a>
-        </div>
-
-          <!-- state MIDDLE : urge user to add rules -->
-
-          <!-- state ONBOARD : urge user to add machine monitoring -->
-
-      </div>
-    </paper-material>      
-  </template>
+        </paper-material>
+    </template>
 </dom-module>
-
 <script>
-  Polymer({
+Polymer({
     is: 'app-incidents',
     properties: {
-      title: {String, value:"Incidents"},
-      state: {String, value:"ONBOARD"},
-      whatTriggeredIt :  {String, value:"#"},  // whatTriggeredIt will be func(machine,rule) to find url#anchore to the machine page and specific rule that trigered the alert
-      alertstateclass: {String, value:"red"} // alert > red, resolved > green
+        title: {
+            String, value: "Incidents"
+        },
+        state: {
+            String, value: "ONBOARD"
+        },
+        whatTriggeredIt: {
+            String, value: "#"
+        }, // whatTriggeredIt will be func(machine,rule) to find url#anchore to the machine page and specific rule that trigered the alert
+        alertstateclass: {
+            String, value: "red"
+        } // alert > red, resolved > green
     },
     stateChanged: function(newstate) {
-      //newstate ONBOARD > title Welcome
-      //newstate MIDDLE > title Add your rules
-      //newstate FULL > title Incidents
-      //default > title Incidents
+        //newstate ONBOARD > title Welcome
+        //newstate MIDDLE > title Add your rules
+        //newstate FULL > title Incidents
+        //default > title Incidents
     },
     attached: function() {
-      var rows = this.parentNode.querySelectorAll('block');
-      var index = Array.prototype.indexOf.call(rows, this);
-      setTimeout(function() {
-        this.classList.add('active');
-      }.bind(this), (index + 1) * 50);
+        var rows = this.parentNode.querySelectorAll('block');
+        var index = Array.prototype.indexOf.call(rows, this);
+        setTimeout(function() {
+            this.classList.add('active');
+        }.bind(this), (index + 1) * 50);
     }
-  });
+});
 </script>

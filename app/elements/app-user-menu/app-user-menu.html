@@ -4,11 +4,26 @@
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
-
 <dom-module id="app-user-menu">
-    <link rel="import" type="css" href="app-user-menu.css">
+    <!-- <link rel="import" type="css" href="app-user-menu.css"> -->
     <template>
-
+        <style>
+        paper-item {
+            --paper-menu-focused-item {
+                background-color: #fff;
+            }
+        }
+        
+        paper-icon-button.gravatar {
+            border-radius: 50%;
+            border: 2px solid #212121;
+            overflow: hidden;
+        }
+        
+        paper-icon-button {
+            padding: 0;
+        }
+        </style>
         <paper-menu-button horizontal-align="right">
             <paper-icon-button src="[[gravatar]]" class="gravatar dropdown-trigger"></paper-icon-button>
             <paper-menu class="dropdown-content">
@@ -30,39 +45,36 @@
                 </paper-item>
             </paper-menu>
         </paper-menu-button>
-
     </template>
 </dom-module>
-
 <script type="text/javascript" src="../../bower_components/md5/build/md5.min.js"></script>
-
 <script>
-    Polymer({
-        is: 'app-user-menu',
-        properties: {
-            email: {
-                type: String
-            },
-            size: {
-                type: Number,
-                value: function() {
-                    return window.devicePixelRatio > 1.5 ? 80 : 40;
-                }
-            },
-            placeholder: {
-                type: String,
-                value: 'http://findicons.com/files/icons/1072/face_avatars/300/i04.png'
-            },
-            gravatar: {
-                type: String,
-                computed: '_computeGravatar(email, size, placeholder)'
+Polymer({
+    is: 'app-user-menu',
+    properties: {
+        email: {
+            type: String
+        },
+        size: {
+            type: Number,
+            value: function() {
+                return window.devicePixelRatio > 1.5 ? 80 : 40;
             }
         },
-        _computeGravatar: function(email, size, placeholder) {
-            var avatarString = md5(email),
-                url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + placeholder;
-
-            return url;
+        placeholder: {
+            type: String,
+            value: 'http://findicons.com/files/icons/1072/face_avatars/300/i04.png'
+        },
+        gravatar: {
+            type: String,
+            computed: '_computeGravatar(email, size, placeholder)'
         }
-    });
+    },
+    _computeGravatar: function(email, size, placeholder) {
+        var avatarString = md5(email),
+            url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + placeholder;
+
+        return url;
+    }
+});
 </script>
