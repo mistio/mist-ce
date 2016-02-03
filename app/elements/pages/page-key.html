@@ -159,7 +159,9 @@
             </paper-header-panel>
         </paper-drawer-panel>
         <element-dialog title="[[dialogOptions.title]]" body="[[dialogOptions.body]]"></element-dialog>
-        <iron-ajax id="keyPublicRequest" auto="true" url="/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
+        <template is="dom-if" if="[[key.id]]">
+            <iron-ajax id="keyPublicRequest" auto="true" url="/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
+        </template>
         <iron-ajax id="keyPrivateRequest" url="/keys/[[key.id]]/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyMakeDefaultRequest" url="/keys/[[key.id]]" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyEditRequest" url="/keys/[[key.id]]" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
