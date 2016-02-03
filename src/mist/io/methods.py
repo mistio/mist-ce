@@ -4321,12 +4321,13 @@ def undeploy_collectd(user, cloud_id, machine_id):
     return ret_dict
 
 
-def get_deploy_collectd_command_unix(uuid, password, monitor):
+def get_deploy_collectd_command_unix(uuid, password, monitor, port=25826):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) " \
-          "python mist_collectd.py %s %s" % (url, uuid, password)
+    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
+    if str(port) != '25826':
+        cmd += " -p %s" % port
     return cmd
 
 
