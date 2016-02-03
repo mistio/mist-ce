@@ -4331,7 +4331,7 @@ def get_deploy_collectd_command_unix(uuid, password, monitor, port=25826):
     return cmd
 
 
-def get_deploy_collectd_command_windows(uuid, password, monitor):
+def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
     return 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned ' \
            '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
            'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
@@ -4341,7 +4341,7 @@ def get_deploy_collectd_command_windows(uuid, password, monitor):
            '-servers @("%s:25826")\''  % (uuid, password, monitor)
 
 
-def get_deploy_collectd_command_coreos(uuid, password, monitor):
+def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
     return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup " \
            "-e COLLECTD_USERNAME=%s " \
            "-e COLLECTD_PASSWORD=%s " \
