@@ -34,25 +34,16 @@
         }
         
         .check-all {
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            transition: transform 350ms ease-in-out;
-            background-color: rgba(158, 158, 158, 0.2);
             color: white;
-            margin: 8px 24px 0 0;
-            cursor: pointer;
+            margin: 8px 24px 0 0;            
         }
         
-        .check-all iron-icon {
+        ::content .check-all iron-icon {
             color: white;
+            transition: opacity 200ms ease-in-out 100ms;
             opacity: 0.5;
         }
-        
-        .check-all.selected iron-icon {
-            opacity: 1;
-        }
-        
+
         :host([narrow-viewport]) .header .description {
             display: none;
         }
@@ -137,15 +128,18 @@
         #actions element-action-menu {
             right: 0;
         }
+
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <div class="header" style$="[[_getHeaderStyle(section.color)]]">
-            <!-- <app-check id="allcheck"
-                     selected="[[selected]]" on-tap="_onSelectAll"
-                     on-transitionend="_eatEvent"></app-check> -->
-            <span id="listselect" class="check-all layout horizontal center-center" allselected$="{{allselected}}">
+            <app-check class="check-all"
+                     selected="[[allselected]]" on-tap="_onSelectAll">
+                     <iron-icon icon="check"></iron-icon>
+                     </app-check>
+
+            <!-- <span id="listselect" class="check-all layout horizontal center-center" allselected$="{{allselected}}"> 
                 <iron-icon icon="check" on-tap="_onSelectAll"></iron-icon>
-            </span>
+            </span>-->
             <template is="dom-if" if="[[ismachines]]">
                 <div class="name">Name <span class="narrow">/ ID / State</span></div>
                 <div class="id">Machine ID</div>

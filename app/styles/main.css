@@ -214,7 +214,6 @@ aside {
 
 paper-material {
     background-color: #fff;
-    /*padding: 20px;*/
 }
 
 paper-menu.dropdown-content paper-button {
@@ -314,7 +313,7 @@ a {
     font-weight: 500;
 }
 
-.info-table tr:nth-child(2n) {
+.info-table tr:nth-of-type(2n) {
     background-color: #f2f2f2;
 }
 

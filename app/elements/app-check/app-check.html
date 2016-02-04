@@ -6,16 +6,6 @@
         transform: rotate3d(0, 1, 0, 180deg);
     }
     
-    :host([selected]) img,
-    :host([selected]) .letter {
-        opacity: 0;
-    }
-    
-    :host([selected]) iron-icon {
-        transform: rotate3d(0, 1, 0, -180deg) scale(1);
-        opacity: 1;
-    }
-    
     :host([selected]) iron-icon {
         transform: rotate3d(0, 1, 0, -180deg) scale(1);
         opacity: 1;
@@ -32,7 +22,6 @@
         cursor: pointer;
     }
     
-    img,
     .unchecked {
         border-radius: inherit;
         width: 100%;
@@ -51,10 +40,13 @@
         left: 20%;
         opacity: 0;
     }
+
     </style>
     <template>
         <div class="check">
-            <span class="unchecked layout horizontal center-center"><iron-icon icon="key"></iron-icon></span>
+            <span class="unchecked layout horizontal center-center">
+                <content></content>
+            </span>
             <iron-icon icon="check"></iron-icon>
         </div>
     </template>
