@@ -49,10 +49,6 @@ Polymer({
         };
 
     },
-    _machinesArrayChanged : function(changeRecord, index){
-        console.log("_machinesArrayChanged",changeRecord, index);
-        return changeRecord.base[index];
-    },
     setupChannel: function (namespace, callback) {
         var channel = this.socket.mux.channel(namespace);
         var that = this;
