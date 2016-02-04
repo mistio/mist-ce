@@ -23,7 +23,7 @@ In **Red Hat** based systems the following packages need to be installed::
 
     sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel python-zc-buildout
 
-Package erlang might be missing from the official repos so it needs to be installed manually::
+If you run the command erl after that and it is not found, then package erlang might be missing from the official repos so it needs to be installed manually::
 
     sudo yum install wget -y
     wget http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
@@ -148,7 +148,7 @@ Make sure that no other service has already binded on port 8000. It should now l
 If this does not load check if a local firewall policy denies incoming access to port 8000, or if your provider denies incoming access to port 8000 (eg the default ec2 policy for some regions)
 
 
-Rabbitm is not running
+Process rabbitmq is not running
 ~~~~~~~~~~~~~~~~~~~~~~
 
 First make sure that erlang is installed, otherwise it won't be able to start (on RedHat based OS you might have to install it manually, see the install section). On some Ubuntu systems there's an error that prevents rabbitmq from starting correctly, if that's the case for you try to start epmd manually and then restart rabbitmq::
