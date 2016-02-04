@@ -255,6 +255,9 @@ Polymer({
         this.set('dialogOptions.title', 'Delete Network');
         this.set('dialogOptions.body', 'Are you sure you want to delete network "' + this.network.name + '"?');
         dialog.open();
-    }
+    },
+    _getMode: function(narrow) {
+        return narrow ? 'waterfall' : 'scroll';
+    },
 });
 </script>

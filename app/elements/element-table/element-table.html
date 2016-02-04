@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
@@ -172,62 +173,78 @@
         <div class="row no-data" hidden$="[[elements.length]]">
             no data yet
         </div>
-        <div id="machines">
-            <template is="dom-if" if="[[ismachines]]">
-                <template is="dom-repeat" items="[[elements]]">
+        
+        <!-- <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedTest]]">
+            <template>
+                <div class="row" data-index$="[[index]]">
+                    [[item.name]]
+                </div>
+            </template>
+        </iron-list> -->
+        <template is="dom-if" if="[[ismachines]]">
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="{{selectedMachines}}">
+                <template>
                     <div class="row" data-index$="[[index]]">
                         <machine-list-item section="[[section]]" item="[[item]]"></machine-list-item>
                     </div>
                 </template>
-            </template>
-        </div>
-        <template is="dom-if" if="[[isimages]]">
-            <template is="dom-repeat" items="[[elements]]">
-                <div class="row" data-index$="[[index]]">
-                    <image-list-item section="[[section]]" item="[[item]]"></image-list-item>
-                </div>
-            </template>
+            </iron-list>
+        </template>
+         <template is="dom-if" if="[[isimages]]">
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedImages]]">
+                <template>
+                    <div class="row" data-index$="[[index]]">
+                        <image-list-item section="[[section]]" item="[[item]]"></image-list-item>
+                    </div>
+                </template>
+            </iron-list>
         </template>
         <template is="dom-if" if="[[iskeys]]">
-            <template is="dom-repeat" items="[[elements]]">
-                <div class="row" data-index$="[[index]]">
-                    <key-list-item section="[[section]]" item="[[item]]"></key-list-item>
-                </div>
-            </template>
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedKeys]]">
+                <template>
+                    <div class="row" data-index$="[[index]]">
+                        <key-list-item section="[[section]]" item="[[item]]"></key-list-item>
+                    </div>
+                </template>
+            </iron-list>
         </template>
         <template is="dom-if" if="[[isnetworks]]">
-            <template is="dom-repeat" items="[[elements]]">
-                <div class="row" data-index$="[[index]]">
-                    <network-list-item section="[[section]]" item="[[item]]"></network-list-item>
-                </div>
-            </template>
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedNetworks]]">
+                <template>
+                    <div class="row" data-index$="[[index]]">
+                        <network-list-item section="[[section]]" item="[[item]]"></network-list-item>
+                    </div>
+                </template>
+            </iron-list>
         </template>
         <template is="dom-if" if="[[isscripts]]">
-            <template is="dom-repeat" items="[[elements]]">
-                <div class="row" data-index$="[[index]]">
-                    <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
-                        <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
-                        <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
-                        <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
-                        <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
-                        <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
-                        <div class="state" hidden$="[[!item.state]]">[[item.state]]</div>
-                        <div class="icon" hidden$="[[!item.icons.length]]">
-                            <template is="dom-if" if="[[item.icons]]">
-                                <app-image-icons feed="[[item.icons]]"></app-image-icons>
-                            </template>
-                        </div>
-                        <div class="tags" hidden$="[[!item.tags.length]]">
-                            <template is="dom-if" if="[[item.tags.length]]">
-                                <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
-                                    <span class="tag">
-                                        <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>[[item.value]]
-                                    </span>
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedScripts]]">
+                <template>
+                    <div class="row" data-index$="[[index]]">
+                        <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
+                            <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
+                            <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
+                            <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
+                            <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
+                            <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
+                            <div class="state" hidden$="[[!item.state]]">[[item.state]]</div>
+                            <div class="icon" hidden$="[[!item.icons.length]]">
+                                <template is="dom-if" if="[[item.icons]]">
+                                    <app-image-icons feed="[[item.icons]]"></app-image-icons>
                                 </template>
-                            </template>
-                        </div>
-                    </a>
-                </div>
+                            </div>
+                            <div class="tags" hidden$="[[!item.tags.length]]">
+                                <template is="dom-if" if="[[item.tags.length]]">
+                                    <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
+                                        <span class="tag">
+                                            <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>[[item.value]]
+                                        </span>
+                                    </template>
+                                </template>
+                            </div>
+                        </a>
+                    </div>
+                    </template>
             </template>
         </template>
         <div id="actions"></div>
@@ -261,6 +278,11 @@ Polymer({
             type: Boolean,
             reflectToAttribute: true
         },
+        selectedMachines: {type: Array},
+        selectedImages: {type: Array},
+        selectedKeys: {type: Array},
+        selectedNetworks: {type: Array},
+        selectedScripts: {type: Array},
         ismachines: {
             type: Boolean,
             computed: "isMachines(section)"
@@ -289,6 +311,11 @@ Polymer({
         'mouseover': '_mouseOver',
         'mouseleave': '_mouseLeave'
     },
+
+    ready: function() {
+        //console.warn('element-table is ready');
+    },
+
     isMachines: function(section) {
         if (section && section.id == "machines")
             return true;
@@ -318,17 +345,6 @@ Polymer({
         return false;
     },
 
-
-    _itemTagsArray: function(tagsobject) {
-        var tagsArray = [];
-        if (tagsobject.length > 0) {
-            for (i = 0; i < tagsobject.length; i++) {
-                tagsArray.unshift(tagsobject[i]);
-            }
-        }
-        return tagsArray;
-    },
-
     _currentRowIndex: -1,
 
     _sharedActionMenu: null,
@@ -354,22 +370,24 @@ Polymer({
                     url: A.href
                 });
             }
-            //e.preventDefault();
         }
+        console.warn('selected machines:', this.selectedMachines);
         this.fire('update-params');
     },
     _mouseOver: function(e) {
-        var row = this._findAncestor(e.target, function(node) {
-            return node != this && !node.classList.contains('row') && node.id !== 'actions';
-        });
-        if (row && row.classList.contains('row')) {
-            if (this._currentRowIndex != row.dataset.index) {
-                this._hideActions();
-                this._showActions(row, row.dataset.index);
-            }
-        } else if (row.id !== 'actions') {
-            this._hideActions();
-        }
+        // _mouseOver & _showActions give error with iron-list
+
+        // var row = this._findAncestor(e.target, function(node) {
+        //     return node != this && !node.classList.contains('row') && node.id !== 'actions';
+        // });
+        // if (row && row.classList.contains('row')) {
+        //     if (this._currentRowIndex != row.dataset.index) {
+        //         this._hideActions();
+        //         this._showActions(row, row.dataset.index);
+        //     }
+        // } else if (row.id !== 'actions') {
+        //     this._hideActions();
+        // }
     },
 
     _mouseLeave: function() {
@@ -377,26 +395,28 @@ Polymer({
     },
 
     _showActions: function(row, index) {
-        var sharedActionMenu = this._sharedActionMenu;
-        var rowOffsetTop = row.offsetTop;
+        // _mouseOver & _showActions give error with iron-list
 
-        if (!sharedActionMenu) {
-            this._sharedActionMenu = document.createElement('element-action-menu');
-            this._sharedActionMenu.classList.add('hidden');
-            Polymer.dom(this.$.actions).appendChild(this._sharedActionMenu);
-            sharedActionMenu = this._sharedActionMenu;
-        }
+        // var sharedActionMenu = this._sharedActionMenu;
+        // var rowOffsetTop = row.offsetTop;
 
-        sharedActionMenu.iconsOnly = true;
-        sharedActionMenu.element = this.elements[index].name; //brought: Cannot read property 'undefined' of undefined
-        sharedActionMenu.style.top = rowOffsetTop + 'px';
+        // if (!sharedActionMenu) {
+        //     this._sharedActionMenu = document.createElement('element-action-menu');
+        //     this._sharedActionMenu.classList.add('hidden');
+        //     Polymer.dom(this.$.actions).appendChild(this._sharedActionMenu);
+        //     sharedActionMenu = this._sharedActionMenu;
+        // }
 
-        this._layoutIfNeeded(sharedActionMenu);
-        sharedActionMenu.classList.remove('hidden');
-        row.classList.add('hover');
+        // sharedActionMenu.iconsOnly = true;
+        // sharedActionMenu.element = this.elements[index].name; //brought: Cannot read property 'undefined' of undefined
+        // sharedActionMenu.style.top = rowOffsetTop + 'px';
 
-        this._currentRowIndex = index;
-        this._currentRow = row;
+        // this._layoutIfNeeded(sharedActionMenu);
+        // sharedActionMenu.classList.remove('hidden');
+        // row.classList.add('hover');
+
+        // this._currentRowIndex = index;
+        // this._currentRow = row;
     },
 
     _hideActions: function() {
@@ -433,9 +453,12 @@ Polymer({
         return 'background-color: ' + color + '; color: #fff;';
     },
     _elementsChanged: function() {
-        // this.classList.add('hidden');
+
+        console.warn('selected machines:', this.selectedMachines);
+
+        this.classList.add('hidden');
         this.async(function() {
-            // this.classList.remove('hidden');
+            this.classList.remove('hidden');
         }, 1);
     },
 
@@ -443,27 +466,34 @@ Polymer({
         return el.offsetTop;
     },
     _onSelectAll: function(e) {
-        e.stopPropagation();
+        // e.stopPropagation();
 
-        // check where we are at and which elements we target to select
-        // also, check if we need to select or desect all
+        // check where we are at and which elements we target to select 
         this.allselected = !this.allselected;
 
         var els;
         if (this.ismachines)
-            els = this.querySelectorAll('element-table-machines');
+            els = this.querySelectorAll('machine-list-item');
         if (this.isimages)
-            els = this.querySelectorAll('element-table-images');
+            els = this.querySelectorAll('image-list-item');
         if (this.iskeys)
-            els = this.querySelectorAll('element-table-keys');
+            els = this.querySelectorAll('key-list-item');
         if (this.isnetworks)
-            els = this.querySelectorAll('element-table-networks');
+            els = this.querySelectorAll('network-list-item');
         if (this.isscripts)
-            els = this.querySelectorAll('element-table-scripts');
+            els = this.querySelectorAll('script-list-item');
 
+        // update the selectedArrays
+        if (this.allselected) {
+            //fill in the cooresponding selectedArray
+        }
+        else {
+            //empty the cooresponding selected Array
+        }
         [].forEach.call(els, function(el, index) {
             el.selected = this.allselected;
         }, this);
+
     }
 });
 </script>

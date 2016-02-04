@@ -131,6 +131,9 @@ Polymer({
     },
     unstarthis: function() {
         this.set('image.star', false);
-    }
+    },
+    _getMode: function(narrow) {
+        return narrow ? 'waterfall' : 'scroll';
+    },
 });
 </script>

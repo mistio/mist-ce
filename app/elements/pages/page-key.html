@@ -274,6 +274,9 @@ Polymer({
     },
     handleError: function() {
 
-    }
+    },
+    _getMode: function(narrow) {
+        return narrow ? 'waterfall' : 'scroll';
+    },
 });
 </script>

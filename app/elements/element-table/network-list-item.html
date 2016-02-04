@@ -62,6 +62,11 @@ Polymer({
             type: String,
             computed: "_elementLink(section,item)"
         },
+        selected: {
+            type: Boolean,
+            notify: true,
+            value: false,
+        },
         item: {
             type: Object
         },

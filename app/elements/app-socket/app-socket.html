@@ -12,6 +12,10 @@ Polymer({
         model: {
             type: Object,
             notify: true
+        },
+        machinesArray: {
+            type: Array,
+            observer: "_machinesArrayChanged"
         }
     },
 
@@ -43,8 +47,12 @@ Polymer({
                 console.log('Channel logs initialized')
             });
         };
-    },
 
+    },
+    _machinesArrayChanged : function(changeRecord, index){
+        console.log("_machinesArrayChanged",changeRecord, index);
+        return changeRecord.base[index];
+    },
     setupChannel: function (namespace, callback) {
         var channel = this.socket.mux.channel(namespace);
         var that = this;
@@ -80,7 +88,7 @@ Polymer({
             });
             channel.on('list_machines', function (data) {
                 that.debounce(that._updateMachines(data), function(){
-                // console.debug('list_machines', data);
+                console.debug('list_machines', data);
                 }, 250);
             });
             channel.on('list_sizes', function (data) {
@@ -213,7 +221,13 @@ Polymer({
                 return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])}
             );
         }
-        this.set('model.machinesArray', allMachines);
+        // console.warn(this.get('model.machinesArray.length'));
+        // changeRecord
+        // if (!this.get('model.machinesArray.length')) {
+            //console.error('update machinesArray');
+            this.set('model.machinesArray', allMachines);
+            this.set('machinesArray', allMachines);
+        // }
     },
 
     _updateNetworks: function (data) {

@@ -48,7 +48,7 @@
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <app-check id="check" allselected="{{allselected}}" selected="{{selected}}" on-tap="_onSelectItem" on-transitionend="_eatEvent"></app-check>
+        <app-check id="check" allselected="{{allselected}}" selected="{{selected}}" on-tap="_onSelectItem"></app-check>
         <a href$="[[elementLink]]" is="pushstate-anchor">
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
@@ -101,12 +101,20 @@ Polymer({
     },
     _onSelectItem: function(e) {
         if (Polymer.dom(e).localTarget === this.$.check) {
-            e.stopPropagation();
-            this.selected = !this.selected;
+            this.set('selected', !this.selected);
             this.fire('list-item-select', {
                 item: this
             });
         }
+    },
+    _itemTagsArray: function(tagsobject) {
+        var tagsArray = [];
+        if (tagsobject.length > 0) {
+            for (i = 0; i < tagsobject.length; i++) {
+                tagsArray.unshift(tagsobject[i]);
+            }
+        }
+        return tagsArray;
     },
 });
 </script>
