@@ -46,6 +46,9 @@
     <!-- endreplace-->
 
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:900">
+    
+    <!-- For shared styles, shared-styles.html import in elements.html -->
+    <style is="custom-style" include="shared-styles"></style>
 
     <script tal:condition="google_analytics_id" tal:define="ANALYTICS_ID string:${google_analytics_id};
                                                             USER_GA_ID string:${user_ga_id|nothing}">
