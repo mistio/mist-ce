@@ -89,7 +89,7 @@ def check_ssh_connection_with_timeout(context,
             if re.search(":(.*)\$\s?$", lines[-1]):
                 break
         assert time() + 1 < connection_max_time, "Shell hasn't connected after"\
-                                                 "%s seconds. Aborting!"\
+                                                 " %s seconds. Aborting!"\
                                                  % connection_timeout
         sleep(1)
 
