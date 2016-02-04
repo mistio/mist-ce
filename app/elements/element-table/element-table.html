@@ -39,8 +39,7 @@
         }
         
         ::content .check-all iron-icon {
-            color: white;
-            transition: opacity 200ms ease-in-out 100ms;
+            color: white;   
             opacity: 0.5;
         }
 
@@ -134,7 +133,11 @@
         <div class="header" style$="[[_getHeaderStyle(section.color)]]">
             <app-check class="check-all"
                      selected="[[allselected]]" on-tap="_onSelectAll">
-                     <iron-icon icon="check"></iron-icon>
+                     
+                     <iron-icon icon="check">
+                     <!-- <span>test</span> -->
+
+                     </iron-icon>
                      </app-check>
 
             <!-- <span id="listselect" class="check-all layout horizontal center-center" allselected$="{{allselected}}"> 

@@ -10,7 +10,10 @@
         transform: rotate3d(0, 1, 0, -180deg) scale(1);
         opacity: 1;
     }
-    
+    :host([selected]) .unchecked, 
+    :host([selected]) ::content iron-icon  {
+        opacity: 0;
+    }
     .check {
         border-radius: 50%;
         width: 40px;
@@ -26,7 +29,7 @@
         border-radius: inherit;
         width: 100%;
         height: 100%;
-        transition: opacity 200ms ease-in-out 100ms;
+        transition: opacity 200ms ease-in-out 300ms;
         will-change: opacity;
         text-transform: uppercase;
     }
