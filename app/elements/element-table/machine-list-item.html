@@ -4,6 +4,7 @@
 <link rel="import" href="../tag-link/tag-link.html">
 <dom-module id="machine-list-item">
     <template>
+        <style is="custom-style" include="tags-and-labels"></style>
         <style>
         :host {
             @apply(--layout-horizontal);
@@ -69,50 +70,6 @@
         :host([medium-viewport]) .tags {
             width: 100px;
         }
-        /*.name {
-            width: 250px;
-            font-weight: 500;
-        }
-        
-        .id,
-        .provider {
-            min-width: 300px;
-        }
-        
-        .type {
-            min-width: 100px;
-        }
-        
-        .tag {
-            background-color: #888;
-            color: #fff;
-            padding: 2px 6px;
-            margin: 0 6px;
-            border-radius: 2px;
-        }
-        
-        .no-data {
-            font-style: italic;
-            padding: 15px 24px;
-        }
-        
-        .name .narrow {
-            display: none;
-        }
-        
-        :host([narrow-viewport]) .name .narrow {
-            display: inline;
-        }
-        
-        .row .description {
-            color: #757575;
-        }
-        
-        :host(:not([narrow-viewport])) .row .description {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }*/
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
@@ -121,7 +78,9 @@
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
             <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
-            <div class="state" hidden$="[[!item.state]]">[[item.state]]</div>
+            <div class="state machine-state reverse" hidden$="[[!item.state]]">
+                <span class$="[[item.state]]" title="machine state">[[item.state]]</span>
+            </div>
             <div class="tags" hidden$="[[!item.tags.length]]">
                 <template is="dom-if" if="[[item.tags.length]]">
                     <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">

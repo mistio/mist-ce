@@ -4,7 +4,94 @@
 <dom-module id="shared-styles">
     <template>
         <style>
-
+        :root {
+            --green-color: #69b46c;
+            --red-color: #d96557;
+            --orange-color: #e9a644;
+            --blue-color: #47b3e3;
+            --gray-dark-color: #cfd8dc;
+            --gray-light-color: #eceff1;
+            --mist-dark: #263238;
+            --mist-light: #B0BEC5;
+            --mist-very-light: #eceff1;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="tags-and-labels">
+    <template>
+        <style>
+        .machine-state {
+            padding-left: 10px;
+            color: rgba(255, 255, 255, 0.82);
+        }
+        
+        .machine-state:not(.reverse) > span {
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: inherit;
+        }
+        
+        .machine-state:not(.reverse) .unknown {
+            background-color: var(--gray-light-color);
+            color: rgba(0, 0, 0, 0.82);
+        }
+        
+        .machine-state:not(.reverse) .running {
+            background-color: var(--green-color);
+        }
+        
+        .machine-state:not(.reverse) .terminated {
+            background-color: var(--mist-dark);
+        }
+        
+        .machine-state:not(.reverse) .stopped {
+            background-color: var(--orange-color);
+        }
+        
+        .machine-state:not(.reverse) .error {
+            background-color: var(--red-color);
+        }
+        
+        .machine-state.reverse .unknown {
+            color: var(--gray-light-color);
+            background-color: transparent;
+        }
+        
+        .machine-state.reverse .running {
+            color: var(--green-color);
+            background-color: transparent;
+        }
+        
+        .machine-state.reverse .terminated {
+            color: var(--mist-dark);
+            background-color: transparent;
+        }
+        
+        .machine-state.reverse .stopped {
+            color: var(--orange-color);
+            background-color: transparent;
+        }
+        
+        .machine-state.reverse .error {
+            color: var(--red-color);
+            background-color: transparent;
+        }
+        
+        .machine-tag,
+        .tag {
+            float: none;
+            display: inline-block;
+            max-width: 100%;
+            background-color: #b5b5b5;
+            color: #fff;
+            padding: 0 5px;
+            border-radius: 1px;
+            margin: 3px 0;
+            word-break: break-all;
+        }
         </style>
     </template>
 </dom-module>

@@ -13,9 +13,11 @@
 <link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="../app-graph/app-graph.html">
 <link rel="import" href="../app-rules/app-rules.html">
+<link rel="import" href="../../styles/shared-styles.html">
 <dom-module id="page-machine">
     <link rel="import" type="css" href="../../styles/main.css">
     <template>
+        <style is="custom-style" include="tags-and-labels"></style>
         <style>
         :host {
             background: #fafafa;
@@ -31,58 +33,10 @@
             @apply(--layout-flex-none);
         }
         
-        .machine-state {
-            padding-left: 10px;
-        }
-        
-        .machine-state > span {
-            padding: 2px 4px;
-            border-radius: 2px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: inherit;
-        }
-        
-        .machine-state .unknown {
-            background-color: lightgray;
-            color: rgba(0, 0, 0, 0.82);
-        }
-        
-        .machine-state .running {
-            background-color: green;
-            color: rgba(255, 255, 255, 0.82);
-        }
-        
-        .machine-state .terminated {
-            background-color: black;
-            color: rgba(255, 255, 255, 0.82);
-        }
-        
-        .machine-state .stopped {
-            background-color: orange;
-            color: rgba(255, 255, 255, 0.82);
-        }
-        
-        .machine-state .error {
-            background-color: red;
-            color: rgba(255, 255, 255, 0.82);
-        }
-        
         .machine-ip {
             margin: 0;
         }
         
-        .machine-tag {
-            float: none;
-            display: inline-block;
-            max-width: 100%;
-            background-color: #b5b5b5;
-            color: #fff;
-            padding: 0 5px;
-            border-radius: 1px;
-            margin: 3px 0;
-            word-break: break-all;
-        }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
             <app-sidebar tag="[[tag]]" sections="{{sections}}" current="machines" drawer></app-sidebar>
@@ -101,30 +55,6 @@
                     <paper-card class="info-card" heading="Basic Info">
                         <div class="card-content">
                             <table class="info-table">
-                                <!-- <template is="dom-if" if="[[machine.probed]]">
-                                    <tr>
-                                        <td>
-                                            Up and running for
-                                        </td>
-                                        <td>
-                                            [[upTime]]
-                                        </td>
-                                    </tr>
-                                </template> -->
-                                <!-- <template is="dom-if" if="[[machine.tags]]">
-                                    <tr>
-                                        <td>
-                                            Tags
-                                        </td>
-                                        <td>
-                                            <template is="dom-repeat" items="[[machine.tags]]">
-                                                <div class="machine-tag">
-                                                    [[item.key]]
-                                                </div>
-                                            </template>
-                                        </td>
-                                    </tr>
-                                </template> -->
                                 <template is="dom-if" if="[[machine.public_ips]]">
                                     <tr>
                                         <td>
