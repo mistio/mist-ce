@@ -8,24 +8,18 @@
         <style>
         :host {
             padding: 15px 24px;
-            width: 100%;
-        }
-        
-        :host(:not([narrow-viewport])),
-        :host(:not([narrow-viewport])) a {
             @apply(--layout-horizontal);
         }
         
-        :host([narrow-viewport]),
-        :host([narrow-viewport]) a {
-            @apply(--layout-vertical);
+        a {
+            @apply(--layout-horizontal);
         }
         
         #check {
             padding-right: 24px;
         }
         
-        .id {
+        .name {
             width: 250px;
             font-weight: 500;
             line-height: 40px;
@@ -33,24 +27,21 @@
         
         .is-default {
             font-weight: 400;
-            min-width: 300px;
+            width: 100px;
             line-height: 40px;
         }
         
-        .tag {
-            font-weight: 400;
-            background-color: #888;
-            color: #fff;
-            padding: 2px 6px;
-            margin: 0 6px;
-            border-radius: 2px;
+        :host([narrow-viewport]) .name,
+        :host([narrow-viewport]) .is-default {
+            width: auto;
+            padding-right: 24px;
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <app-check id="check" selected="[[selected]]" on-tap="_onSelectThread" on-transitionend="_eatEvent"></app-check>
+        <app-check id="check" selected="[[selected]]" on-tap="_onSelectItem"></app-check>
         <a href$="[[elementLink]]" is="pushstate-anchor">
-            <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
-            <div class="is-default" hidden$="[[!item.isDefault]]">[[item.isDefault]]</div>
+            <div class="name" hidden$="[[!item.id]]">[[item.id]]</div>
+            <div class="is-default" hidden$="[[!item.isDefault]]">[[isDefaultText]]</div>
         </a>
     </template>
 </dom-module>
@@ -79,22 +70,26 @@ Polymer({
         narrowViewport: {
             type: Boolean,
             reflectToAttribute: true
+        },
+        isDefaultText: {
+            type: String,
+            computed: "_isDefault(item)"
         }
+    },
+    _isDefault: function(item){
+            if (item.isDefault)
+                return "Default key";
     },
     _elementLink: function(section, item) {
         return "/" + section.id + "/" + item.id;
     },
-    _onSelectThread: function(e) {
+    _onSelectItem: function(e) {
         if (Polymer.dom(e).localTarget === this.$.check) {
-            e.stopPropagation();
             this.selected = !this.selected;
             this.fire('list-item-select', {
                 item: this
             });
         }
-    },
-    _eatEvent: function(e) {
-        e.stopPropagation();
-    },
+    }
 });
 </script>

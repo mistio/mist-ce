@@ -57,9 +57,7 @@
         }
         
         :host([narrow-viewport]) .row,
-        /*:host([narrow-viewport]) .row a */
-        
-        {
+        :host([narrow-viewport]) .row a {
             @apply(--layout-vertical);
         }
         
@@ -94,7 +92,8 @@
         .tags {
             width: 250px;
         }
-        
+
+        .is-default,
         .state,
         .type {
             width: 100px;
@@ -122,7 +121,7 @@
         :host([narrow-viewport]) .name .narrow {
             display: inline;
         }
-
+        
         :host([medium-viewport]) .name,
         :host([medium-viewport]) .provider,
         :host([medium-viewport]) .id,
@@ -159,8 +158,8 @@
                 <div class="description">Description</div>
             </template>
             <template is="dom-if" if="[[iskeys]]">
-                <div class="name">Name <span class="narrow">/ Default Key?</span></div>
-                <div class="description">Default Key? </div>
+                <div class="name">Name <span class="narrow">/ Default</span></div>
+                <div class="is-default">Default? </div>
             </template>
             <template is="dom-if" if="[[isnetworks]]">
                 <div class="name">Name <span class="narrow">/ Type / Provider</span></div>
