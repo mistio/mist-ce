@@ -7,17 +7,15 @@
         <style>
         :host {
             padding: 15px 24px;
-            width: 100%;
-        }
-        
-        :host(:not([narrow-viewport])),
-        :host(:not([narrow-viewport])) a {
             @apply(--layout-horizontal);
         }
         
-        :host([narrow-viewport]),
+        a {
+            @apply(--layout-horizontal);
+        }
+
         :host([narrow-viewport]) a {
-            @apply(--layout-vertical);
+            @apply(--layout-vertical);   
         }
         
         #check {
@@ -25,28 +23,28 @@
         }
         
         .name {
-            min-width: 250px;
+            font-weight: 500;
+            width: 250px;
             line-height: 40px;
         }
         
-        .type,
+        .type ,
         .provider {
             width: 250px;
             line-height: 40px;
-            min-width: 300px;
+            font-weight: 400;
         }
         
-        .tag {
-            font-weight: 400;
-            background-color: #888;
-            color: #fff;
-            padding: 2px 6px;
-            margin: 0 6px;
-            border-radius: 2px;
+        :host([narrow-viewport]) .name,
+        :host([narrow-viewport]) .type,
+        :host([narrow-viewport]) .provider {
+            width: auto;
+            padding-right: 24px;
+            line-height: auto;
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <app-check id="check" selected="[[selected]]" on-tap="_onSelectThread" on-transitionend="_eatEvent"></app-check>
+        <app-check id="check" selected="[[selected]]" on-tap="_onSelectItem"></app-check>
         <a href$="[[elementLink]]" is="pushstate-anchor">
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
@@ -81,18 +79,13 @@ Polymer({
     _elementLink: function(section, item) {
         return "/" + section.id + "/" + item.id;
     },
-    _onSelectThread: function(e) {
+    _onSelectItem: function(e) {
         if (Polymer.dom(e).localTarget === this.$.check) {
-            e.stopPropagation();
             this.selected = !this.selected;
             this.fire('list-item-select', {
                 item: this
             });
         }
-    },
-    _eatEvent: function(e) {
-        e.stopPropagation();
-    },
-
+    }
 });
 </script>

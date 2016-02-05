@@ -68,7 +68,7 @@
         .row a {
             box-sizing: border-box;
             width: 100%;
-            padding: 15px 24px;
+            /*padding: 15px 24px;*/
             font-weight: 400;
             font-size: 13px;
         }
@@ -89,13 +89,13 @@
         
         .id,
         .provider,
-        .tags {
+        .tags,
+        .type {
             width: 250px;
         }
 
         .is-default,
-        .state,
-        .type {
+        .state {
             width: 100px;
         }
         
@@ -123,6 +123,7 @@
         }
         
         :host([medium-viewport]) .name,
+        :host([medium-viewport]) .type,
         :host([medium-viewport]) .provider,
         :host([medium-viewport]) .id,
         :host([medium-viewport]) .state,
@@ -164,7 +165,7 @@
             </template>
             <template is="dom-if" if="[[isnetworks]]">
                 <div class="name">Name <span class="narrow">/ Type / Provider</span></div>
-                <div class="name">Type </div>
+                <div class="type">Type </div>
                 <div class="provider">Provider </div>
             </template>
             <template is="dom-if" if="[[isscripts]]">
