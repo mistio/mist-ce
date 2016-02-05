@@ -12,10 +12,12 @@
         
         a {
             @apply(--layout-horizontal);
+            padding: 6px 6px 6px 0;
         }
-
+        
         :host([narrow-viewport]) a {
-            @apply(--layout-vertical);   
+            @apply(--layout-vertical);
+            padding: 0;
         }
         
         #check {
@@ -25,14 +27,16 @@
         .name {
             font-weight: 500;
             width: 250px;
-            line-height: 40px;
         }
         
-        .type ,
+        .type,
         .provider {
             width: 250px;
-            line-height: 40px;
             font-weight: 400;
+        }
+        
+        .type {
+            color: #757575;
         }
         
         :host([narrow-viewport]) .name,
@@ -40,7 +44,6 @@
         :host([narrow-viewport]) .provider {
             width: auto;
             padding-right: 24px;
-            line-height: auto;
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>

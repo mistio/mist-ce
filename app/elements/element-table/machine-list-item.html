@@ -13,10 +13,12 @@
         
         :host(:not([narrow-viewport])) a {
             @apply(--layout-horizontal);
+            padding: 6px 6px 6px 0;
         }
         
         :host([narrow-viewport]) a {
             @apply(--layout-vertical);
+            padding: 0;
         }
         
         #check {
