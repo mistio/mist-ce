@@ -69,11 +69,9 @@ def check_ssh_connection_with_timeout(context,
     terminal = None
     while time() < end_time:
         try:
-            terminal = context.browser.find_elements_by_class_name('terminal')
-            if len(terminal) > 0:
-                terminal = terminal[0]
-                break
+            terminal = context.browser.find_element_by_class_name('terminal')
             sleep(1)
+            break
         except NoSuchElementException:
             sleep(1)
     assert terminal, "Terminal has not opened 10 seconds after pressing the " \
@@ -94,17 +92,22 @@ def check_ssh_connection_with_timeout(context,
         sleep(1)
 
     terminal.send_keys("ls -l\n")
-    # terminal.send_keys("ls -l\n")
+    lines = lines[:-1]
     command_end_time = time() + 20
     # waiting for command output to be returned
     while time() < command_end_time:
         # if the command output has finished being printed
         if update_lines(terminal, lines):
             assert is_ssh_connection_up(lines), "Connection is broken"
-            # Check if the execution of the command has finished
+            # If it looks like the execution of the command has finished
             if re.search(":(.*)\$\s?$", lines[-1]):
-                check_ls_output(lines, filename)
-                return
+                try:
+                    # look if the result has returned
+                    check_ls_output(lines, filename)
+                    return
+                except AssertionError as e:
+                    if time() > command_end_time:
+                        raise e
         sleep(1)
     assert False, "Command output took too long"
 
