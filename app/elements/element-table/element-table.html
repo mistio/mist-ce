@@ -35,27 +35,31 @@
         
         .check-all {
             color: white;
-            margin: 8px 24px 0 0;            
+            margin: 8px 24px 0 0;
         }
         
         ::content .check-all iron-icon {
-            color: white;   
+            color: white;
             opacity: 0.5;
         }
-
-        :host([narrow-viewport]) .header .description {
+        
+        :host([narrow-viewport]) .header >:not(.name):not(.check-all) {
             display: none;
         }
         
         :host(:not([narrow-viewport])) .header,
-        :host(:not([narrow-viewport])) .row,
-        :host(:not([narrow-viewport])) .row a {
+        :host(:not([narrow-viewport])) .row {
             @apply(--layout-horizontal);
         }
         
-        :host([narrow-viewport]) .header,
+        :host([narrow-viewport]) .header {
+            @apply(--layout-horizontal);
+        }
+        
         :host([narrow-viewport]) .row,
-        :host([narrow-viewport]) .row a {
+        /*:host([narrow-viewport]) .row a */
+        
+        {
             @apply(--layout-vertical);
         }
         
@@ -74,9 +78,10 @@
         .row.hover {
             background: #fafafa;
         }
+        /* for when inline actions come in */
         
-        :host(:not([narrow-viewport])) .row.hover .description {
-            padding-right: 120px;
+        :host(:not([narrow-viewport])) .row.hover >:last-child {
+            /*padding-right: 120px;*/
         }
         
         .name {
@@ -85,12 +90,14 @@
         }
         
         .id,
-        .provider {
-            min-width: 300px;
+        .provider,
+        .tags {
+            width: 250px;
         }
         
+        .state,
         .type {
-            min-width: 100px;
+            width: 100px;
         }
         
         .tag {
@@ -105,17 +112,23 @@
             font-style: italic;
             padding: 15px 24px;
         }
+        /* hide for wide */
         
         .name .narrow {
             display: none;
         }
+        /* show for narrow */
         
         :host([narrow-viewport]) .name .narrow {
             display: inline;
         }
-        
-        .row .description {
-            color: #757575;
+
+        :host([medium-viewport]) .name,
+        :host([medium-viewport]) .provider,
+        :host([medium-viewport]) .id,
+        :host([medium-viewport]) .state,
+        :host([medium-viewport]) .tags {
+            width: 100px;
         }
         
         :host(:not([narrow-viewport])) .row .description {
@@ -127,26 +140,18 @@
         #actions element-action-menu {
             right: 0;
         }
-
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
+        <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
         <div class="header" style$="[[_getHeaderStyle(section.color)]]">
-            <app-check class="check-all"
-                     selected="[[allselected]]" on-tap="_onSelectAll">
-                     
-                     <iron-icon icon="check">
-                     <!-- <span>test</span> -->
-
-                     </iron-icon>
-                     </app-check>
-
-            <!-- <span id="listselect" class="check-all layout horizontal center-center" allselected$="{{allselected}}"> 
-                <iron-icon icon="check" on-tap="_onSelectAll"></iron-icon>
-            </span>-->
+            <app-check class="check-all" selected="[[allselected]]" on-tap="_onSelectAll">
+                <iron-icon icon="check"></iron-icon>
+            </app-check>
             <template is="dom-if" if="[[ismachines]]">
-                <div class="name">Name <span class="narrow">/ ID / State</span></div>
+                <div class="name">Name <span class="narrow">/ ID / State / State / Tags</span></div>
                 <div class="id">Machine ID</div>
-                <div class="description">State</div>
+                <div class="state">State</div>
+                <div class="tags">Tags</div>
             </template>
             <template is="dom-if" if="[[isimages]]">
                 <div class="name">Name <span class="narrow">/ ID / Description</span></div>
@@ -170,14 +175,6 @@
         <div class="row no-data" hidden$="[[elements.length]]">
             no data yet
         </div>
-        
-        <!-- <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedTest]]">
-            <template>
-                <div class="row" data-index$="[[index]]">
-                    [[item.name]]
-                </div>
-            </template>
-        </iron-list> -->
         <template is="dom-if" if="[[ismachines]]">
             <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="{{selectedMachines}}">
                 <template>
@@ -187,7 +184,7 @@
                 </template>
             </iron-list>
         </template>
-         <template is="dom-if" if="[[isimages]]">
+        <template is="dom-if" if="[[isimages]]">
             <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedImages]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
@@ -241,10 +238,10 @@
                             </div>
                         </a>
                     </div>
-                    </template>
-            </template>
+                </template>
         </template>
-        <div id="actions"></div>
+    </template>
+    <div id="actions"></div>
     </template>
 </dom-module>
 <script>
@@ -275,11 +272,21 @@ Polymer({
             type: Boolean,
             reflectToAttribute: true
         },
-        selectedMachines: {type: Array},
-        selectedImages: {type: Array},
-        selectedKeys: {type: Array},
-        selectedNetworks: {type: Array},
-        selectedScripts: {type: Array},
+        selectedMachines: {
+            type: Array
+        },
+        selectedImages: {
+            type: Array
+        },
+        selectedKeys: {
+            type: Array
+        },
+        selectedNetworks: {
+            type: Array
+        },
+        selectedScripts: {
+            type: Array
+        },
         ismachines: {
             type: Boolean,
             computed: "isMachines(section)"
@@ -374,17 +381,17 @@ Polymer({
     _mouseOver: function(e) {
         // _mouseOver & _showActions give error with iron-list
 
-        // var row = this._findAncestor(e.target, function(node) {
-        //     return node != this && !node.classList.contains('row') && node.id !== 'actions';
-        // });
-        // if (row && row.classList.contains('row')) {
-        //     if (this._currentRowIndex != row.dataset.index) {
-        //         this._hideActions();
-        //         this._showActions(row, row.dataset.index);
-        //     }
-        // } else if (row.id !== 'actions') {
-        //     this._hideActions();
-        // }
+        var row = this._findAncestor(e.target, function(node) {
+            return node != this && !node.classList.contains('row') && node.id !== 'actions';
+        });
+        if (row && row.classList.contains('row')) {
+            if (this._currentRowIndex != row.dataset.index) {
+                this._hideActions();
+                this._showActions(row, row.dataset.index);
+            }
+        } else if (row.id !== 'actions') {
+            this._hideActions();
+        }
     },
 
     _mouseLeave: function() {
@@ -394,26 +401,26 @@ Polymer({
     _showActions: function(row, index) {
         // _mouseOver & _showActions give error with iron-list
 
-        // var sharedActionMenu = this._sharedActionMenu;
-        // var rowOffsetTop = row.offsetTop;
+        var sharedActionMenu = this._sharedActionMenu;
+        var rowOffsetTop = row.offsetTop;
 
-        // if (!sharedActionMenu) {
-        //     this._sharedActionMenu = document.createElement('element-action-menu');
-        //     this._sharedActionMenu.classList.add('hidden');
-        //     Polymer.dom(this.$.actions).appendChild(this._sharedActionMenu);
-        //     sharedActionMenu = this._sharedActionMenu;
-        // }
+        if (!sharedActionMenu) {
+            this._sharedActionMenu = document.createElement('element-action-menu');
+            this._sharedActionMenu.classList.add('hidden');
+            Polymer.dom(this.$.actions).appendChild(this._sharedActionMenu);
+            sharedActionMenu = this._sharedActionMenu;
+        }
 
-        // sharedActionMenu.iconsOnly = true;
-        // sharedActionMenu.element = this.elements[index].name; //brought: Cannot read property 'undefined' of undefined
-        // sharedActionMenu.style.top = rowOffsetTop + 'px';
+        sharedActionMenu.iconsOnly = true;
+        sharedActionMenu.element = this.elements[index].name; //brought: Cannot read property 'undefined' of undefined
+        sharedActionMenu.style.top = rowOffsetTop + 'px';
 
-        // this._layoutIfNeeded(sharedActionMenu);
-        // sharedActionMenu.classList.remove('hidden');
-        // row.classList.add('hover');
+        this._layoutIfNeeded(sharedActionMenu);
+        sharedActionMenu.classList.remove('hidden');
+        row.classList.add('hover');
 
-        // this._currentRowIndex = index;
-        // this._currentRow = row;
+        this._currentRowIndex = index;
+        this._currentRow = row;
     },
 
     _hideActions: function() {
@@ -453,9 +460,9 @@ Polymer({
 
         console.warn('selected machines:', this.selectedMachines);
 
-        this.classList.add('hidden');
+        // this.classList.add('hidden');
         this.async(function() {
-            this.classList.remove('hidden');
+            // this.classList.remove('hidden');
         }, 1);
     },
 
@@ -483,8 +490,7 @@ Polymer({
         // update the selectedArrays
         if (this.allselected) {
             //fill in the cooresponding selectedArray
-        }
-        else {
+        } else {
             //empty the cooresponding selected Array
         }
         [].forEach.call(els, function(el, index) {
