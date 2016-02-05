@@ -45,10 +45,12 @@ def check_ls_output(lines, filename=None):
     command_output_start_line = 0
     # find where the ls output starts and ends
     for i in range(len(lines)-1, 0, -1):
-        if re.search("total\s\d+", lines[i]) and re.search(":(.*)\$\s?ls.*", lines[i-1]) and command_output_start_line < i:
+        if re.search("total\s\d+", lines[i]) and \
+                re.search(":.*\$.*.*ls.*", lines[i-1]) and \
+                command_output_start_line < i:
             command_output_start_line = i
             break
-        if re.search(":(.*)\$\s", lines[i]) and command_output_end_line > i:
+        if re.search(":.*\$.*", lines[i]) and command_output_end_line > i:
             command_output_end_line = i - 1
     if command_output_start_line == 0:
         assert False, "Could not find the output of the ls command. Contents" \
@@ -92,8 +94,12 @@ def check_ssh_connection_with_timeout(context,
         sleep(1)
 
     terminal.send_keys("ls -l\n")
+    # remove the last line so that it can be updated since the command has
+    # been added
     lines = lines[:-1]
     command_end_time = time() + 20
+    import ipdb
+    ipdb.set_trace()
     # waiting for command output to be returned
     while time() < command_end_time:
         # if the command output has finished being printed
