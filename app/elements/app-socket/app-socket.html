@@ -12,10 +12,6 @@ Polymer({
         model: {
             type: Object,
             notify: true
-        },
-        machinesArray: {
-            type: Array,
-            observer: "_machinesArrayChanged"
         }
     },
 
@@ -208,14 +204,22 @@ Polymer({
     },
 
     _updateMachines: function (data) {
+
         this.set('model.clouds.' + data.cloud_id + '.machines', _generateMap(data.machines));
         this.set('model.clouds.' + data.cloud_id + '.machinesArray', data.machines);
         var allMachines = [];
         if (this.model  != undefined ) {
+            
             this.model.cloudsArray.forEach(
-              function(cloud){
-                return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])}
-            );
+                function(cloud){
+                    if (cloud.machinesArray != undefined ) {
+                        cloud.machinesArray.forEach(function (machine) {
+                                machine.provider = cloud.title;
+                        });
+
+                    return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])
+                }
+            });
         }
         // console.warn(this.get('model.machinesArray.length'));
         // changeRecord
