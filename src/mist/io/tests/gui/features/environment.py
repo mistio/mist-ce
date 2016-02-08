@@ -3,7 +3,6 @@ import json
 import random
 
 from mist.io.tests.helpers.selenium_utils import choose_driver
-
 from selenium.webdriver.remote.errorhandler import NoSuchWindowException
 
 
