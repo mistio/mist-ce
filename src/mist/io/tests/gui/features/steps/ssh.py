@@ -2,7 +2,8 @@ import re
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+from selenium.common.exceptions import NoSuchElementException, \
+    StaleElementReferenceException
 
 from mist.io.tests.gui.features.steps.general import *
 
