@@ -36,12 +36,7 @@ def update_lines(terminal, lines):
         safety_counter = safety_counter - 1 if not line else max_safety_count
         if safety_counter == 0:
             break
-    if starting_lines < len(lines) or line_has_been_updated:
-        print("-\n-\n-\nTerminal has new or updated lines:")
-        for line in lines:
-            print("%s" % line)
-        print("-\n-\n-")
-    return starting_lines < len(lines)
+    return starting_lines < len(lines) or line_has_been_updated
 
 
 def check_ls_output(lines, filename=None):
