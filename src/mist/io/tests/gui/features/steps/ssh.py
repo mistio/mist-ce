@@ -18,21 +18,29 @@ def is_ssh_connection_up(lines):
 
 def update_lines(terminal, lines):
     """
-    Cleans up the terminal from empty lines and marks down the last empty line.
+    Scans through the terminal lines to find new ones and update any line that
+    has changed(for example when a command is given and enter is pressed).
     """
     starting_lines = len(lines)
+    line_has_been_updated = False
     all_lines = terminal.find_elements_by_tag_name('div')
     safety_counter = max_safety_count = 5
-    for i in range(len(lines), len(all_lines)):
-        all_lines_text = safe_get_element_text(all_lines[i])
-        line = all_lines_text.rstrip().lstrip()
+    for i in range(0, len(all_lines)):
+        line = safe_get_element_text(all_lines[i]).rstrip().lstrip()
         if line:
-            for j in range(0, max_safety_count - safety_counter):
-                lines.append(" ")
-            lines.append(line)
+            if i < starting_lines and lines[i] != line:
+                lines[i] = line
+                line_has_been_updated = True
+            elif i >= starting_lines:
+                lines.append(line)
         safety_counter = safety_counter - 1 if not line else max_safety_count
         if safety_counter == 0:
             break
+    if starting_lines < len(lines) or line_has_been_updated:
+        print("-\n-\n-\nTerminal has new or updated lines:")
+        for line in lines:
+            print("%s" % line)
+        print("-\n-\n-")
     return starting_lines < len(lines)
 
 
@@ -98,8 +106,6 @@ def check_ssh_connection_with_timeout(context,
     # been added
     lines = lines[:-1]
     command_end_time = time() + 20
-    import ipdb
-    ipdb.set_trace()
     # waiting for command output to be returned
     while time() < command_end_time:
         # if the command output has finished being printed
