@@ -51,7 +51,7 @@ Feature: Add second-tier clouds
     Given "GCE" cloud has been added
     When I click the button "GCE"
     Then I expect for "cloud-edit-popup" popup to appear within max 2 seconds
-    And I click the button "Delete"
-    And I click the button "Yes"
+    When I click the "Delete" button inside the "Edit cloud" popup
+    And I click the "Yes" button inside the "Edit cloud" popup
     Then I expect for "cloud-edit-popup" popup to disappear within max 2 seconds
     Then the "GCE" cloud should be deleted
