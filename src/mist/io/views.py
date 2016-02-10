@@ -167,6 +167,7 @@ def update_user_settings(request):
         raise UnauthorizedError()
 
 
+@view_config(route_name='api_v1_clouds', request_method='GET', renderer='json')
 @view_config(route_name='clouds', request_method='GET', renderer='json')
 def list_clouds(request):
     """
@@ -178,6 +179,7 @@ def list_clouds(request):
     return methods.list_clouds(user)
 
 
+@view_config(route_name='api_v1_clouds', request_method='POST', renderer='json')
 @view_config(route_name='clouds', request_method='POST', renderer='json')
 def add_cloud(request):
     """
@@ -303,6 +305,7 @@ def add_cloud(request):
     return ret
 
 
+@view_config(route_name='api_v1_cloud_action', request_method='DELETE')
 @view_config(route_name='cloud_action', request_method='DELETE')
 def delete_cloud(request):
     """
@@ -321,6 +324,7 @@ def delete_cloud(request):
     return OK
 
 
+@view_config(route_name='api_v1_cloud_action', request_method='PUT')
 @view_config(route_name='cloud_action', request_method='PUT')
 def rename_cloud(request):
     """
@@ -346,6 +350,7 @@ def rename_cloud(request):
     return OK
 
 
+@view_config(route_name='api_v1_cloud_action', request_method='POST')
 @view_config(route_name='cloud_action', request_method='POST')
 def toggle_cloud(request):
     """
@@ -381,6 +386,7 @@ def toggle_cloud(request):
     return OK
 
 
+@view_config(route_name='api_v1_keys', request_method='GET', renderer='json')
 @view_config(route_name='keys', request_method='GET', renderer='json')
 def list_keys(request):
     """
@@ -392,6 +398,7 @@ def list_keys(request):
     return methods.list_keys(user)
 
 
+@view_config(route_name='api_v1_keys', request_method='PUT', renderer='json')
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
     """
@@ -421,6 +428,7 @@ def add_key(request):
             'isDefault': keypair.default}
 
 
+@view_config(route_name='api_v1_key_action', request_method='DELETE', renderer='json')
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
 def delete_key(request):
     """
@@ -446,6 +454,7 @@ def delete_key(request):
     return list_keys(request)
 
 
+@view_config(route_name='api_v1_key_action', request_method='PUT', renderer='json')
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
     """
@@ -472,6 +481,7 @@ def edit_key(request):
     return {'new_id': new_id}
 
 
+@view_config(route_name='api_v1_key_action', request_method='POST')
 @view_config(route_name='key_action', request_method='POST')
 def set_default_key(request):
     """
@@ -491,6 +501,7 @@ def set_default_key(request):
     return OK
 
 
+@view_config(route_name='api_v1_key_private', request_method='GET', renderer='json')
 @view_config(route_name='key_private', request_method='GET', renderer='json')
 def get_private_key(request):
     """
@@ -514,6 +525,7 @@ def get_private_key(request):
     return user.keypairs[key_id].private
 
 
+@view_config(route_name='api_v1_key_public', request_method='GET', renderer='json')
 @view_config(route_name='key_public', request_method='GET', renderer='json')
 def get_public_key(request):
     """
@@ -535,6 +547,7 @@ def get_public_key(request):
     return user.keypairs[key_id].public
 
 
+@view_config(route_name='api_v1_keys', request_method='POST', renderer='json')
 @view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair(request):
     """
@@ -547,8 +560,8 @@ def generate_keypair(request):
     return {'priv': keypair.private, 'public': keypair.public}
 
 
-@view_config(route_name='key_association', request_method='PUT',
-             renderer='json')
+@view_config(route_name='api_v1_key_association', request_method='PUT', renderer='json')
+@view_config(route_name='key_association', request_method='PUT', renderer='json')
 def associate_key(request):
     """
     Associate a key to a machine
@@ -598,8 +611,8 @@ def associate_key(request):
     return user.keypairs[key_id].machines
 
 
-@view_config(route_name='key_association', request_method='DELETE',
-             renderer='json')
+@view_config(route_name='api_v1_key_association', request_method='DELETE', renderer='json')
+@view_config(route_name='key_association', request_method='DELETE', renderer='json')
 def disassociate_key(request):
     """
     Disassociate a key from a machine
@@ -633,6 +646,7 @@ def disassociate_key(request):
     return user.keypairs[key_id].machines
 
 
+@view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
     """
@@ -650,6 +664,7 @@ def list_machines(request):
     return methods.list_machines(user, cloud_id)
 
 
+@view_config(route_name='api_v1_machines', request_method='POST', renderer='json')
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
     """
@@ -832,7 +847,8 @@ def create_machine(request):
     return ret
 
 
-@view_config(route_name='machine', request_method='POST', renderer="json")
+@view_config(route_name='api_v1_machine', request_method='POST', renderer='json')
+@view_config(route_name='machine', request_method='POST', renderer='json')
 def machine_actions(request):
     """
     Call an action on machine
@@ -897,7 +913,8 @@ def machine_actions(request):
     raise BadRequestError()
 
 
-@view_config(route_name='machine_rdp', request_method='GET', renderer="json")
+@view_config(route_name='api_v1_machine_rdp', request_method='GET', renderer='json')
+@view_config(route_name='machine_rdp', request_method='GET', renderer='json')
 def machine_rdp(request):
     """
     Rdp file for windows machines
@@ -943,8 +960,8 @@ def machine_rdp(request):
                     body=rdp_content)
 
 
-@view_config(route_name='machine_tags', request_method='POST',
-             renderer='json')
+@view_config(route_name='api_v1_machine_tags', request_method='POST', renderer='json')
+@view_config(route_name='machine_tags', request_method='POST', renderer='json')
 def set_machine_tags(request):
     """
     Set tags on a machine
@@ -977,8 +994,8 @@ def set_machine_tags(request):
     return OK
 
 
-@view_config(route_name='machine_tag', request_method='DELETE',
-             renderer='json')
+@view_config(route_name='api_v1_machine_tag', request_method='DELETE', renderer='json')
+@view_config(route_name='machine_tag', request_method='DELETE', renderer='json')
 def delete_machine_tag(request):
     """
     Delete a tag
@@ -1006,12 +1023,14 @@ def delete_machine_tag(request):
     return OK
 
 
+@view_config(route_name='api_v1_images', request_method='POST', renderer='json')
 @view_config(route_name='images', request_method='POST', renderer='json')
 def list_specific_images(request):
     # FIXME: 1) i shouldn't exist, 2) i shouldn't be a post
     return list_images(request)
 
 
+@view_config(route_name='api_v1_images', request_method='GET', renderer='json')
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
     """
@@ -1037,6 +1056,7 @@ def list_images(request):
     return methods.list_images(user, cloud_id, term)
 
 
+@view_config(route_name='api_v1_image', request_method='POST', renderer='json')
 @view_config(route_name='image', request_method='POST', renderer='json')
 def star_image(request):
     """
@@ -1059,6 +1079,7 @@ def star_image(request):
     return methods.star_image(user, cloud_id, image_id)
 
 
+@view_config(route_name='api_v1_sizes', request_method='GET', renderer='json')
 @view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
     """
@@ -1075,6 +1096,7 @@ def list_sizes(request):
     return methods.list_sizes(user, cloud_id)
 
 
+@view_config(route_name='api_v1_locations', request_method='GET', renderer='json')
 @view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
     """
@@ -1096,6 +1118,7 @@ def list_locations(request):
     return methods.list_locations(user, cloud_id)
 
 
+@view_config(route_name='api_v1_networks', request_method='GET', renderer='json')
 @view_config(route_name='networks', request_method='GET', renderer='json')
 def list_networks(request):
     """
@@ -1114,6 +1137,7 @@ def list_networks(request):
     return methods.list_networks(user, cloud_id)
 
 
+@view_config(route_name='api_v1_networks', request_method='POST', renderer='json')
 @view_config(route_name='networks', request_method='POST', renderer='json')
 def create_network(request):
     """
@@ -1149,6 +1173,7 @@ def create_network(request):
     return methods.create_network(user, cloud_id, network, subnet, router)
 
 
+@view_config(route_name='api_v1_network', request_method='DELETE')
 @view_config(route_name='network', request_method='DELETE')
 def delete_network(request):
     """
@@ -1173,6 +1198,7 @@ def delete_network(request):
     return OK
 
 
+@view_config(route_name='api_v1_network', request_method='POST')
 @view_config(route_name='network', request_method='POST')
 def associate_ip(request):
     """
@@ -1213,6 +1239,7 @@ def associate_ip(request):
         return Response("Bad Request", 400)
 
 
+@view_config(route_name='api_v1_probe', request_method='POST', renderer='json')
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """
@@ -1252,6 +1279,7 @@ def probe(request):
     return ret
 
 
+@view_config(route_name='api_v1_monitoring', request_method='GET', renderer='json')
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
 def check_monitoring(request):
     """
@@ -1264,8 +1292,8 @@ def check_monitoring(request):
     return ret
 
 
-@view_config(route_name='update_monitoring', request_method='POST',
-             renderer='json')
+@view_config(route_name='api_v1_update_monitoring', request_method='POST', renderer='json')
+@view_config(route_name='update_monitoring', request_method='POST', renderer='json')
 def update_monitoring(request):
     """
     Enable monitoring
@@ -1348,6 +1376,7 @@ def update_monitoring(request):
     return ret_dict
 
 
+@view_config(route_name='api_v1_stats', request_method='GET', renderer='json')
 @view_config(route_name='stats', request_method='GET', renderer='json')
 def get_stats(request):
     """
@@ -1403,8 +1432,8 @@ def get_stats(request):
     return data
 
 
-@view_config(route_name='metrics', request_method='GET',
-             renderer='json')
+@view_config(route_name='api_v1_metrics', request_method='GET', renderer='json')
+@view_config(route_name='metrics', request_method='GET', renderer='json')
 def find_metrics(request):
     """
     Get metrics of a machine
@@ -1425,6 +1454,7 @@ def find_metrics(request):
     return methods.find_metrics(user, cloud_id, machine_id)
 
 
+@view_config(route_name='api_v1_metrics', request_method='PUT', renderer='json')
 @view_config(route_name='metrics', request_method='PUT', renderer='json')
 def assoc_metric(request):
     """
@@ -1454,6 +1484,7 @@ def assoc_metric(request):
     return {}
 
 
+@view_config(route_name='api_v1_metrics', request_method='DELETE', renderer='json')
 @view_config(route_name='metrics', request_method='DELETE', renderer='json')
 def disassoc_metric(request):
     """
@@ -1483,6 +1514,7 @@ def disassoc_metric(request):
     return {}
 
 
+@view_config(route_name='api_v1_metric', request_method='PUT', renderer='json')
 @view_config(route_name='metric', request_method='PUT', renderer='json')
 def update_metric(request):
     """
@@ -1526,8 +1558,8 @@ def update_metric(request):
     return {}
 
 
-@view_config(route_name='deploy_plugin', request_method='POST',
-             renderer='json')
+@view_config(route_name='api_v1_deploy_plugin', request_method='POST', renderer='json')
+@view_config(route_name='deploy_plugin', request_method='POST', renderer='json')
 def deploy_plugin(request):
     """
     Deploy a plugin on a machine.
@@ -1593,8 +1625,8 @@ def deploy_plugin(request):
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
-@view_config(route_name='deploy_plugin', request_method='DELETE',
-             renderer='json')
+@view_config(route_name='api_v1_deploy_plugin', request_method='DELETE', renderer='json')
+@view_config(route_name='deploy_plugin', request_method='DELETE', renderer='json')
 def undeploy_plugin(request):
     """
     Undeploy a plugin on a machine.
@@ -1657,6 +1689,7 @@ def undeploy_plugin(request):
     # return resp.json()
 
 
+@view_config(route_name='api_v1_rules', request_method='POST', renderer='json')
 @view_config(route_name='rules', request_method='POST', renderer='json')
 def update_rule(request):
     """
@@ -1682,6 +1715,7 @@ def update_rule(request):
     return ret.json()
 
 
+@view_config(route_name='api_v1_rule', request_method='DELETE')
 @view_config(route_name='rule', request_method='DELETE')
 def delete_rule(request):
     """
@@ -1711,6 +1745,7 @@ def delete_rule(request):
     return OK
 
 
+@view_config(route_name='api_v1_providers', request_method='GET', renderer='json')
 @view_config(route_name='providers', request_method='GET', renderer='json')
 def list_supported_providers(request):
     """
