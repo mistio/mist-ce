@@ -1,6 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+import logging
+
+log = logging.getLogger(__name__)
+
 try:
     from mist.io.tests.settings import selenium_hub, WEBDRIVER_PATH, \
         BROWSER_LOCAL, BROWSER_FLAVOR, WEBDRIVER_LOG
@@ -12,6 +16,7 @@ def choose_driver(flavor=BROWSER_FLAVOR):
     """
     Returns an instance of a remote selenium driver
     """
+    log.info("Choosing driver")
     if BROWSER_LOCAL:
         if flavor == "firefox":
             driver = webdriver.Firefox()
