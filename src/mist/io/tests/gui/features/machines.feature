@@ -174,6 +174,7 @@ Feature: Machines
     Then I expect for "dialog-popup" modal to appear within max 4 seconds
     When I click the button "Yes"
     Then I expect for "dialog-popup" modal to disappear within max 4 seconds
+    Then I wait for 2 seconds
     And "first_machine_key" key should be deleted
     When I click the button "second_machine_key"
     Then I expect for "single-key-page" page to appear within max 4 seconds
