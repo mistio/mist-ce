@@ -55,7 +55,7 @@ define('app/controllers/machine_tags', ['ember'],
                 if (this.formReady) {
                     var that = this,
                     machine = this.machine,
-                    tags = [], payload = [];
+                    tags = [], payload = {};
 
                     // create the final array with non-empty key-value pairs
                     this.newTags.forEach(function(tag) {
@@ -63,16 +63,13 @@ define('app/controllers/machine_tags', ['ember'],
                             tags.push(tag);
 
                             // change format for API
-                            var newTag = {};
-                            newTag[tag.key] = tag.value;
-                            payload.push(newTag);
+                            payload[tag.key] = tag.value
                         }
                     });
 
                     that.set('addingTag', true);
                     Mist.ajax.POST('clouds/' + machine.cloud.id + '/machines/' + machine.id + '/tags', {
-                        'tags': payload,
-                        'replace': true
+                        'tags': payload
                     })
                     .success(function () {
                         that._updateTags(tags);

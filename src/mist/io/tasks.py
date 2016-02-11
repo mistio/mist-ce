@@ -766,14 +766,14 @@ class ListMachines(UserTask):
         if multi_user:
             from mist.core.methods import get_resource_tags, set_resource_tags
             for machine in machines:
-                mistio_tags = get_resource_tags(user, "machine", cloud_id, machine.get("id"))
-                # optimized for js
                 if machine.get("tags"):
-                    tags = []
+                    tags = {}
                     for tag in machine["tags"]:
-                        tags.append({tag["key"]: tag["value"]})
+                        tags[tag["key"]]= tag["value"]
                     set_resource_tags(user, tags, "machine", cloud_id, machine.get("id"))
+                mistio_tags = get_resource_tags(user, "machine", cloud_id, machine.get("id"))
                 machine["tags"] = []
+                # optimized for js
                 for tag in mistio_tags:
                     key, value = tag.popitem()
                     tag_dict = {'key': key, 'value': value}

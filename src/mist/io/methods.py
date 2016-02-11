@@ -3468,8 +3468,19 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
                    private_ips=[], driver=conn)
 
     tags_dict = {}
-    for tag in tags:
-        for tag_key, tag_value in tag.items():
+    if isinstance(tags, list):
+        for tag in tags:
+            for tag_key, tag_value in tag.items():
+                if not tag_value:
+                    tag_value = ""
+                if type(tag_key) == unicode:
+                    tag_key = tag_key.encode('utf-8')
+                if type(tag_value) == unicode:
+                    tag_value = tag_value.encode('utf-8')
+                tags_dict[tag_key] = tag_value
+    elif isinstance(tags, dict):
+        for tag_key in tags:
+            tag_value = tags[tag_key]
             if not tag_value:
                 tag_value = ""
             if type(tag_key) == unicode:
