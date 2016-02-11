@@ -2879,6 +2879,10 @@ def list_images(user, cloud_id, term=None):
                   if img.name and img.id[:3] not in ['aki', 'ari']
                   and 'windows' not in img.name.lower()]
 
+        if term and conn.type == Provider.LIBVIRT:
+            # fetch a new listing of the images and search for the term
+            images = conn.list_images()
+
         if term and conn.type == 'docker':
             images = conn.search_images(term=term)[:40]
         #search directly on docker registry for the query
