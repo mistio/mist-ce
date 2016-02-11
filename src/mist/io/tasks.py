@@ -758,6 +758,11 @@ class ListMachines(UserTask):
     polling = True
     soft_time_limit = 60
 
+    if multi_user:
+        from mist.core.helpers import log_event
+    else:
+        log_event = lambda *args, **kwargs: None
+
     def execute(self, email, cloud_id):
         log.warn('Running list machines for user %s cloud %s' % (email, cloud_id))
         from mist.io import methods
