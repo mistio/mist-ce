@@ -50,3 +50,25 @@ def key_deleted(context, text):
     for key in keys:
         if text in safe_get_element_text(key):
             assert False, u'%s Key is not deleted'
+
+
+@step(u'I add new machine key with name "{key_name}" or I select it')
+def add_or_select_key(context, key_name):
+    if context.mist_config.get(key_name):
+        key_name = context.mist_config.get(key_name)
+
+    keys = context.browser.find_element_by_id('key').find_elements_by_tag_name('li')
+    for key in keys:
+        if key_name == safe_get_element_text(key):
+            key.click()
+            return
+
+    context.execute_steps(u'''
+        When I click the "Add Key" button inside the "Create Machine" panel
+        Then I expect for "key-add-popup" popup to appear within max 4 seconds
+        When I fill "%s" as key name
+        And I click the "Generate" button inside the "Add key" popup
+        Then I expect for "key-generate-loader" loader to finish within max 10 seconds
+        When I click the "Add" button inside the "Add key" popup
+        Then I expect for "key-add-popup" popup to disappear within max 4 seconds
+    ''' % key_name)

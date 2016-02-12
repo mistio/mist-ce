@@ -78,7 +78,7 @@ def wait_for_splash_to_appear(context, timeout=20):
             return
         except NoSuchElementException:
             sleep(1)
-    assert False, 'Splash did not appear after %s seconds' % str(timeout)
+    assert False, 'Splash did not appear after %s seconds' % timeout
 
 
 def wait_for_splash_to_load(context, timeout=60):
@@ -89,7 +89,7 @@ def wait_for_splash_to_load(context, timeout=60):
 
         if 'none' in display:
             return
-    assert False, 'Page took longer than %s seconds to load' % str(timeout)
+    assert False, 'Page took longer than %s seconds to load' % timeout
 
 
 @step(u'I wait for {seconds} seconds')
@@ -229,7 +229,7 @@ def loader_name_waiting_with_timeout(context, loader_name, seconds):
         except NoSuchElementException:
             return
     assert False, 'Loader %s did not finish after %s seconds' % (loader_name,
-                                                                  seconds)
+                                                                 seconds)
 
 
 @then(u'I expect for "{element_id}" to be visible within max {seconds} '
@@ -248,19 +248,38 @@ def become_visible_waiting_with_timeout(context, element_id, seconds):
     try:
         WebDriverWait(context.browser, int(seconds)).until(EC.element_to_be_clickable((By.ID, element_id)))
     except TimeoutException:
-        raise TimeoutException("element with id %s did not become visible "
+        raise TimeoutException("element with id %s did not become clickable "
                                "after %s seconds" % (element_id, seconds))
 
 
 @then(u'I expect for buttons inside "{element_id}" to be '
       u'clickable within max {seconds} seconds')
-def become_visible_waiting_with_timeout(context, element_id, seconds):
+def become_clickable_waiting_with_timeout(context, element_id, seconds):
     try:
         wrapper = context.browser.find_element_by_id(element_id)
         WebDriverWait(wrapper, int(seconds)).until(EC.element_to_be_clickable((By.CLASS_NAME, 'ui-btn')))
     except TimeoutException:
         raise TimeoutException("element with id %s did not become visible "
                                "after %s seconds" % (element_id, seconds))
+
+
+@step(u'I click button "{button_text}" inside "{element_id}" when '
+      u'it is clickable within max {seconds} seconds')
+def button_become_clickable_waiting_with_timeout(context, button_text,
+                                                 element_id, seconds):
+    timeout = time() + int(seconds)
+    wrapper = context.browser.find_element_by_id(element_id)
+    button = search_for_button(context, button_text, wrapper.find_elements_by_class_name('ui-btn'))
+    while time() < timeout:
+        try:
+            button.click()
+            return
+        except:
+            pass
+        assert time() + 1 < timeout, "Button %s inside element %s did not " \
+                                     "become clickable after %s seconds" % \
+                                     (button_text, element_id, seconds)
+        sleep(1)
 
 
 @when(u'I click the button by "{id_name}" id_name')
@@ -342,8 +361,8 @@ def click_button_within_panel(context, text, panel_title):
                                   panel.get_attribute('class'),
                     context.browser.find_elements_by_class_name(
                         "ui-collapsible"))
-    assert panels, u'No open panels found. Maybe the driver got refocused ' \
-                   u'or the panel failed to open'
+    assert panels, 'No open panels found. Maybe the driver got refocused ' \
+                   'or the panel failed to open'
 
     found_panel = None
     for panel in panels:
@@ -375,7 +394,8 @@ def click_button_from_collection(context, text, button_collection=None,
             return
         except WebDriverException:
             sleep(1)
-        assert False, 'Could not click button that says %s(%s)' % (safe_get_element_text(button), text)
+        assert False, 'Could not click button that says %s(%s)' % \
+                      (safe_get_element_text(button), text)
 
 
 def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
@@ -386,11 +406,10 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # element of the list
     # also doing some cleaning if the text attribute also sends back texts
     # of sub elements
+    text = text.lower()
 
     button = filter(
-        lambda b: safe_get_element_text(b).rstrip().lstrip().split('\n')[
-                      0].lower() == text.lower()
-                  and b.value_of_css_property('display') == 'block',
+        lambda b: safe_get_element_text(b).rstrip().lstrip().split('\n')[0].lower() == text,
         button_collection)
     if len(button) > 0:
         return button[0]
@@ -399,7 +418,7 @@ def search_for_button(context, text, button_collection=None, btn_cls='ui-btn'):
     # looks like it
     for button in button_collection:
         button_text = safe_get_element_text(button).split('\n')
-        if len(filter(lambda b: text.lower() in b.lower(), button_text)) > 0:
+        if len(filter(lambda b: text in b.lower(), button_text)) > 0:
             return button
 
     return None
@@ -583,3 +602,21 @@ def give_some_input(context, some_text, element_id):
     if context.mist_config.get(some_text):
         some_text = context.mist_config[some_text]
     input_element.send_keys(some_text)
+
+
+def focus_on_element(context, element):
+    position = element.location
+    context.browser.execute_script("window.scrollTo(0, %s)" % position['y'])
+
+
+@step(u'I focus on the "{name}" button')
+def focus_on_add_rule(context, name):
+    if context.mist_config.get(name):
+        name = context.mist_config[name]
+    if "Add Rule" in name:
+        button = context.browser.find_element_by_id("add-rule-button")
+        focus_on_element(context, button)
+    elif "Add Graph" in name:
+        button = context.browser.find_element_by_id("add-metric-btn")
+        focus_on_element(context, button)
+    return
