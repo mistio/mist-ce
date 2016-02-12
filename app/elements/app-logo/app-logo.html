@@ -21,6 +21,10 @@
         :host([full]) a {
             max-width: 200px;
         }
+
+        :host([white]) a {
+            max-width: 200px;
+        }
         
         h1 {
             font-size: 18px;
@@ -38,7 +42,21 @@
         }
         </style>
         <a href="/?poly=1" is="pushstate-anchor" class="horizontal layout center">
+        <template is="dom-if" if="[[full]]">
             <img src="/images/logo.svg" width="128" alt="Mist.io Logo">
+        </template>
+        <template is="dom-if" if="[[white]]">
+            <img src="/images/logos/logo-white.svg" width="128" alt="Mist.io Logo">
+        </template>
+        <template is="dom-if" if="[[vertical]]">
+            <img src="/images/logos/logo-vertical.svg" width="128" alt="Mist.io Logo">
+        </template>
+        <template is="dom-if" if="[[verticalwhite]]">
+            <img src="/images/logos/logo-vertical-white.svg" width="128" alt="Mist.io Logo">
+        </template>
+        <template is="dom-if" if="[[solo]]">
+            <img src="/images/logos/logo-solo.svg" width="128" alt="Mist.io Logo">
+        </template>
         </a>
     </template>
 </dom-module>
@@ -50,7 +68,24 @@ Polymer({
         full: {
             type: Boolean,
             value: false
+        },
+        white: {
+            type: Boolean,
+            value: false
+        },
+        vertical: {
+            type: Boolean,
+            value: false
+        },
+        verticalwhite: {
+            type: Boolean,
+            value: false
+        },
+        solo: {
+            type: Boolean,
+            value: false
         }
+
     }
 });
 </script>

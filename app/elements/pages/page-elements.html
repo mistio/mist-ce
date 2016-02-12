@@ -153,7 +153,24 @@
         #current-tag {
             display: none;
         }
-
+        .dark {
+            background-color: var(--mist-dark-color);
+            padding: 0 20px 20px 20px;
+            color: #fff;
+            display: inline-block;
+            border-radius: 4px;
+            margin: 20px;
+            vertical-align: top;
+        }
+        .white {
+            vertical-align: top;
+            background-color: #fff;            
+            padding: 0 20px 20px 20px;
+            display: inline-block;
+            border-radius: 4px;
+            margin: 20px;
+            border: 1px solid #ddd;
+        }
         /* needs to be placed in a reusable css file*/
         paper-item {
             cursor: pointer;
@@ -197,8 +214,29 @@
                     <h3>Demos</h3>
                     <div id="buttons">
                         <h3>Logos:</h3>
-                        <app-logo></app-logo>
-                        * to do: make logo only svg & make reverse-color logo
+                        <div class="white">
+                            regular:
+                            <app-logo full></app-logo>
+                        </div>
+                        <div class="dark">
+                            white:
+                            <app-logo white></app-logo>    
+                        </div>
+                        <div class="white">
+                            vertical:
+                            <app-logo vertical></app-logo>    
+                        </div>
+                        <div class="dark">
+                            verticalwhite:
+                            <app-logo verticalwhite></app-logo>    
+                        </div>
+                        <div class="white">
+                            solo (mist circle only):
+                            <app-logo solo></app-logo>    
+                        </div>
+                        <p>                        
+                        * to do: <del>make logo only svg & make reverse-color logo</del>
+                        </p>
                     </div>
                     <div id="headings">
                         <h3>Headings</h3>
