@@ -307,7 +307,7 @@ def click_button(context, text):
                                                'contains %s' % text)
 
 
-@when(u'I click the "{text}" button inside the "{popup}" popup')
+@step(u'I click the "{text}" button inside the "{popup}" popup')
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
