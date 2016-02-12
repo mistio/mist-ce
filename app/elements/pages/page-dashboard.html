@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <dom-module id="page-dashboard">
     <template>
+        <style is="custom-style" include="headings"></style>
         <style>
         :host {
             --layout-margin: 0.5em;
@@ -69,7 +70,12 @@
         /* clouds */
         
         .clouds {
-            display: inline;
+            display: inline-block;
+            overflow: hidden;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #eee;
+            margin: var(--layout-margin);
         }
         
         .clouds span.cloud-title {
@@ -79,8 +85,26 @@
         
         .clouds paper-button {
             background-color: #fff;
-            margin: var(--layout-margin);
+            color: inherit;
+            border-left: 4px solid #757575;
+            
         }
+
+        paper-button ::content iron-icon {
+            border-radius: 2em;
+            background-color: #eee;
+            padding: 3px;
+        }
+
+        paper-button ::content iron-icon[icon='check'] {
+            color: green;
+        }
+
+        paper-button ::content iron-icon[icon='clear'] {
+            color: #fff;
+            background-color: #D96557;
+        }
+
         /* sections */
         
         .sections {
@@ -146,7 +170,7 @@
             <div class="content">
                 <div class="clouds">
                     <template is="dom-repeat" items="{{model.cloudsArray}}">
-                        <paper-button raised>
+                        <paper-button raised class="link">
                             <template is="dom-if" if="{{isOnline(item)}}">
                                 <iron-icon icon="check"></iron-icon>
                             </template>

@@ -102,10 +102,10 @@
             transform: translate(0, 0);
             opacity: 1;
         }
-        
+
         :host(.active) theme-color {
-            border: 1px solid #000;
-        }
+            border-left: 4px solid;
+        }        
         
         @media (max-width: 439px) {
             .sections {
@@ -114,7 +114,7 @@
         }
         </style>
         <paper-material>
-            <theme-color color="[[color]]" class="vertical content layout" themed-reverse themed-border>
+            <theme-color color="[[color]]" class="vertical content layout" themed-reverse>
                 <h2 class="count">[[count]]</h2>
                 <h3 class="title">[[name]] <iron-icon icon="[[icon]]"></iron-icon></h3>
             </theme-color>
