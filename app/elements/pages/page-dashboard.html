@@ -58,6 +58,7 @@
         .pad {
             padding: 8px;
         }
+
         /* header */
         
         paper-toolbar {
@@ -86,14 +87,15 @@
         /* clouds */
         
         .clouds {
-            display: inline-block;
+            display: flex;
             overflow: hidden;
             margin-bottom: 10px;
-            padding: 5px;
+            padding: 16px;
             background-color: #eee;
             margin: var(--layout-margin);
             background-color: #dedede;
             box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.1) inset;
+            transition: all 100ms ease;
         }
         
         .clouds span.cloud-title {
