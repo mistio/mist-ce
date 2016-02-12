@@ -61,7 +61,16 @@
         /* header */
         
         paper-toolbar {
-            background-color: #fff;
+            /*background-color: #fff;*/
+            background-color: var(--mist-dark-color);
+        }
+        paper-toolbar ::content #topbar {
+            padding: 4px 0;
+            height: 72px;
+        }
+        paper-toolbar ::content #topBar.paper-toolbar {
+            max-width: 1100px;
+            margin: 0 auto;
         }
         
         .search.active {
@@ -141,8 +150,8 @@
         
         @media (max-width: 639px) {
             paper-toolbar /deep/ #topBar {
-                margin-top: 4px;
-                padding: 0 16px;
+                /*margin-top: 4px;*/
+                /*padding: 0 16px;*/
             }
             a.main-section:first-child {
                 min-width: calc(100% - 1em);
@@ -163,7 +172,7 @@
         </style>
         <paper-header-panel mode="standard" class="fit">
             <paper-toolbar class="paper-header">
-                <app-logo full class="flex"></app-logo>
+                <app-logo white class="flex"></app-logo>
                 <app-bar class="horizontal layout center end-justified" no-search></app-bar>
                 <app-user-menu email="marios@mist.io"></app-user-menu>
             </paper-toolbar>
@@ -181,7 +190,8 @@
                         </paper-button>
                     </template>
                     <paper-button raised><a href="/elements">elements</a></paper-button>
-                    <div class="absolute-bottom-right">
+                </div>
+                <div class="absolute-bottom-right">
                         <paper-menu-button vertical-align="bottom" horizontal-align="right">
                             <paper-fab icon="add" class="dropdown-trigger" alt="bottom align">Actions</paper-fab>
                             <paper-menu class="dropdown-content">
@@ -192,7 +202,6 @@
                             </paper-menu>
                         </paper-menu-button>
                     </div>
-                </div>
                 <div class="container flex-horizontal-with-ratios">
                     <app-incidents id="right" class="flex2child incidents top right"></app-incidents>
                     <div id="left" class="flex3child top left">
