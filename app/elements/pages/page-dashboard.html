@@ -31,7 +31,7 @@
         
         .content {
             display: block;
-            padding: 50px 0;
+            padding: 50px 16px;
             max-width: 1100px;
             margin: 0 auto;
         }
@@ -58,7 +58,10 @@
         .pad {
             padding: 8px;
         }
-
+        
+        .spacer {
+            padding: 4px 0;
+        }
         /* header */
         
         paper-toolbar {
@@ -72,8 +75,8 @@
         }
         
         paper-toolbar::content #topbar {
-            padding: 4px 0;
-            height: 72px;
+            /*padding: 4px 0;
+            height: 72px;*/
         }
         
         paper-toolbar::content #topBar.paper-toolbar {
@@ -88,11 +91,11 @@
         
         .clouds {
             display: flex;
-            overflow: hidden;
-            margin-bottom: 10px;
-            padding: 16px;
+            overflow: hidden;            
+            padding: 16px 16px 8px 16px;
             background-color: #eee;
             margin: var(--layout-margin);
+            margin-bottom: 16px;
             background-color: #dedede;
             box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.1) inset;
             transition: all 100ms ease;
@@ -103,25 +106,38 @@
             position: relative;
         }
         
-        .clouds paper-button {
+        .clouds paper-button:not(#addcoud) {
             background-color: #fff;
             color: inherit;
             border-left: 4px solid #757575;
+            margin-bottom: 8px;
         }
         
-        paper-button::content iron-icon {
+        paper-button:not(#addcoud)::content iron-icon {
             border-radius: 2em;
             background-color: #eee;
             padding: 3px;
         }
         
-        paper-button::content iron-icon[icon='check'] {
+        paper-button:not(#addcoud)::content iron-icon[icon='check'] {
             color: green;
         }
         
-        paper-button::content iron-icon[icon='clear'] {
+        paper-button:not(#addcoud)::content iron-icon[icon='clear'] {
             color: #fff;
             background-color: #D96557;
+        }
+        
+        paper-button.blue {
+            line-height: 30px;
+        }
+        
+        paper-menu-button {
+            padding: 0;
+        }
+        
+        paper-item {
+            font-size: 14px;
         }
         /* sections */
         
@@ -183,23 +199,28 @@
             <paper-toolbar class="paper-header">
                 <app-logo white class="flex"></app-logo>
                 <app-bar class="horizontal layout center end-justified" no-search>
-                    <a href="/elements">elements</a>
+                    <a href="/elements">View all elements</a>
                 </app-bar>
                 <app-user-menu email="marios@mist.io"></app-user-menu>
             </paper-toolbar>
             <div class="content">
                 <div class="clouds">
-                    <template is="dom-repeat" items="{{model.cloudsArray}}">
-                        <paper-button raised class="link">
-                            <template is="dom-if" if="{{isOnline(item)}}">
-                                <iron-icon icon="check"></iron-icon>
-                            </template>
-                            <template is="dom-if" if="{{isOffline(item)}}">
-                                <iron-icon icon="clear"></iron-icon>
-                            </template>
-                            <span class="cloud-title">{{item.title}}</span>
-                        </paper-button>
-                    </template>
+                    <div class="flex">
+                        <template is="dom-repeat" items="{{model.cloudsArray}}">
+                            <paper-button raised class="link">
+                                <template is="dom-if" if="{{isOnline(item)}}">
+                                    <iron-icon icon="check"></iron-icon>
+                                </template>
+                                <template is="dom-if" if="{{isOffline(item)}}">
+                                    <iron-icon icon="clear"></iron-icon>
+                                </template>
+                                <span class="cloud-title">{{item.title}}</span>
+                            </paper-button>
+                        </template>
+                    </div>
+                    <!-- <paper-button id="addcoud" class="blue">
+                        <iron-icon icon="icons:add"></iron-icon>add cloud
+                    </paper-button> -->
                 </div>
                 <div class="absolute-bottom-right">
                     <paper-menu-button vertical-align="bottom" horizontal-align="right">
@@ -240,11 +261,11 @@
                         <paper-material>
                             <h2 class="app-title">Load on all monitored machines</h2>
                             <google-chart id="mutating_gauge" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
-                    "redFrom": 90,
-                    "redTo": 100,
-                    "yellowFrom": 75,
-                    "yellowTo": 90,
-                    "minorTicks": 5}'>
+                            "redFrom": 90,
+                            "redTo": 100,
+                            "yellowFrom": 75,
+                            "yellowTo": 90,
+                            "minorTicks": 5}'>
                             </google-chart>
                         </paper-material>
                     </div>

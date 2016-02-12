@@ -153,6 +153,7 @@
         #current-tag {
             display: none;
         }
+        
         .dark {
             background-color: var(--mist-dark-color);
             padding: 0 20px 20px 20px;
@@ -162,24 +163,32 @@
             margin: 20px;
             vertical-align: top;
         }
+        
         .white {
             vertical-align: top;
-            background-color: #fff;            
+            background-color: #fff;
             padding: 0 20px 20px 20px;
             display: inline-block;
             border-radius: 4px;
             margin: 20px;
             border: 1px solid #ddd;
         }
+        
+        hr {
+            border-top: 1px solid #ccc;
+            height: 1px;
+            background-color: #eee;
+        }
         /* needs to be placed in a reusable css file*/
+        
         paper-item {
             cursor: pointer;
             transition: background-color 100ms;
         }
+        
         paper-item:hover {
             background-color: #eee;
         }
-
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
             <app-sidebar tag="" drawer>
@@ -210,6 +219,7 @@
                     <paper-icon-button icon="icons:sort"></paper-icon-button>
                     <paper-icon-button icon="account-circle"></paper-icon-button>
                 </div>
+                <hr/>
                 <div id="content">
                     <div id="buttons">
                         <h3>Logos:</h3>
@@ -219,30 +229,33 @@
                         </div>
                         <div class="dark">
                             white:
-                            <app-logo white></app-logo>    
+                            <app-logo white></app-logo>
                         </div>
                         <div class="white">
                             vertical:
-                            <app-logo vertical></app-logo>    
+                            <app-logo vertical></app-logo>
                         </div>
                         <div class="dark">
                             verticalwhite:
-                            <app-logo verticalwhite></app-logo>    
+                            <app-logo verticalwhite></app-logo>
                         </div>
                         <div class="white">
                             solo (mist circle only):
-                            <app-logo solo></app-logo>    
+                            <app-logo solo></app-logo>
                         </div>
-                        <p>                        
-                        * to do: <del>make logo only svg & make reverse-color logo</del>
+                        <p>
+                            * to do:
+                            <del>make logo only svg & make reverse-color logo</del>
                         </p>
                     </div>
+                    <hr/>
                     <div id="headings">
                         <h3>Headings</h3>
                         <h2 class="app-title">App-title class</h2>
                         <h2 class="app-title-light">App-title light class</h2>
                         <h2 class="app-title-lighter">App-title lighter class</h2>
                     </div>
+                    <hr/>
                     <div id="buttons">
                         <h3>Buttons:</h3>
                         <paper-button>
@@ -260,6 +273,7 @@
                         <paper-button class="blue" disabled>
                             <iron-icon icon="icons:add"></iron-icon>disabled blue
                         </paper-button>
+                        <hr/>
                         <h3>Dropdowns:</h3>
                         <p>In order to not have persistently selected items in dropdowns of action buttons use paper-listbox (ie fab actions, account dropdowns)</p>
                         <paper-menu-button ignore-select vertical-align="top" horizontal-align="right" horizontal-offset="15" vertical-offset="40">
@@ -270,7 +284,9 @@
                                 <paper-item on-tap="_dropdown">Add Script</paper-item>
                             </paper-listbox>
                         </paper-menu-button>
-                        <p>use paper-menu for forms (in place of < select >< options >)</p>
+                        <p>use paper-menu for forms (in place of
+                            < select>
+                                < options>)</p>
                         <paper-dropdown-menu label="Provider">
                             <paper-menu class="dropdown-content">
                                 <paper-item>EC2</paper-item>
@@ -279,11 +295,12 @@
                                 <paper-item>Linode</paper-item>
                             </paper-menu>
                         </paper-dropdown-menu>
-
+                        <hr/>
                         <h3>Transitioning check box:</h3>
                         <app-check id="check" selected="false" on-tap="_checkbox"></app-check>
                         <p>* uses javascript function on-tap="_checkbox"</p>
                     </div>
+                    <hr/>
                     <div id="app-tags-and-labels-css layout horizontal wrap">
                         <h3>tags and labels:</h3>
                         <div class="layout flex auto">
@@ -332,26 +349,32 @@
                             </span>
                         </div>
                     </div>
+                    <hr/>
                     <div id="app-graph-demo">
                         <h3>app-graph</h3>
                         <app-graph title="TEST"></app-graph>
                     </div>
+                    <hr/>
                     <div id="app-rules-demo">
                         <h3>app-rules</h3>
                         <app-rules></app-rules>
                     </div>
+                    <hr/>
                     <div id="app-incidents-demo">
                         <h3>app-incidents</h3>
                         <app-incidents></app-incidents>
                     </div>
+                    <hr/>
                     <div id="app-shell-demo">
                         <h3>app-shell</h3>
                         <app-shell>app-shell</app-shell>
                     </div>
+                    <hr/>
                     <div id="app-account-demo">
                         <h3>app-account</h3>
                         <app-account>app-account</app-account>
                     </div>
+                    <hr/>
                     <div id="app-forms-demo">
                         <h3>app-forms</h3>
                         <p>
@@ -467,7 +490,8 @@ Polymer({
     enableCustomStyleProperties: false,
     properties: {
         tag: {
-            String, value: ""
+            String,
+            value: ""
         },
     },
 
@@ -482,7 +506,7 @@ Polymer({
     _checkbox: function() {
         this.$.check.toggleAttribute('selected');
     },
-    _dropdown: function(e){
+    _dropdown: function(e) {
         // alert(1);
     }
 

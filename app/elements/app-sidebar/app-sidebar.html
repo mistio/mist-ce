@@ -5,6 +5,7 @@
 <link rel="import" href="../theme-color/theme-color.html">
 <dom-module id="app-sidebar">
     <template>
+        <style is="custom-style" include="shared-styles"></style>
         <style is="custom-style">
         :root {
             --app-sidebar-width: 272px;
@@ -168,11 +169,14 @@
             color: rgba(0, 0, 0, .87);
             text-transform: capitalize;
             cursor: pointer;
-            border-width: 1px 0;
+            border-width: 1px 0 1px 4px;
+            border-left: 4px solid transparent;
         }
         
         #section-list .section[active] {
             background: var(--paper-blue-grey-50);
+            border-left: 4px solid;
+            color: #444;
         }
         
         #section-list .section .all-symbol {
@@ -184,17 +188,23 @@
             margin-right: 10px;
         }
         
+        #section-list a span {
+            color: rgba(0, 0, 0, .87);
+        }
+        
         #section-list span.count {
             float: right;
             opacity: 0.54;
         }
         
         #section-list #dashboard {
-            background-color: slategrey;
+            background-color: var(--mist-dark-color);
             color: #fff;
-            border-top: 1px solid #999;
+            border-left: 4px solid var(--mist-dark-color);
+            padding: 13px 16px;
         }
-        
+
+        #section-list #dashboard span, 
         #section-list #dashboard iron-icon {
             color: #fff;
         }
@@ -222,6 +232,10 @@
             display: none;
         }
         
+        app-logo {
+            margin-right: 9px;
+        }
+        
         #mist-side-head {
             min-height: 48px;
             padding: 2px;
@@ -229,8 +243,8 @@
         </style>
         <app-socket id="appsocket" model="{{model}}"></app-socket>
         <div class="content">
-            <!-- <div id="mist-side-head">
-              <app-logo full class="flex"></app-logo>
+            <!-- <div id="mist-side-head"> class="flex">
+              
             </div> -->
             <div id="section-tag" hidden$="[[!tag]]">
                 <span>[[tag]]</span>
@@ -240,19 +254,17 @@
                 <nav>
                     <a href="/?poly=1" is="pushstate-anchor" id="dashboard" class="section" tabindex="1">
                         <div class="layout horizontal center">
-                            <div class="all-symbol" aria-hidden="true">
-                                <iron-icon icon="apps"></iron-icon>
-                            </div>
+                            <app-logo solo></app-logo>
                             <span class="title flex">dashboard</span>
                         </div>
                     </a>
                     <template is="dom-repeat" items="{{sections}}">
-                        <a class="section" is="pushstate-anchor" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(current,item.id)]]" tabindex="1">
+                        <a class="section" is="pushstate-anchor" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(current,item.id)]]" tabindex="1" style$="[[style(item.color)]]">
                             <div class="layout horizontal center">
                                 <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
                                 <span class="title flex">
                                     <span>[[item.id]]</span>
-                                    <span class="count">{{item.count}}</span>
+                                <span class="count">{{item.count}}</span>
                                 </span>
                             </div>
                         </a>
@@ -288,6 +300,9 @@ Polymer({
             notify: true,
             value: []
         }
+    },
+    style: function(color) {
+        return "color: " + color + ";"
     },
     observers: [],
     listeners: {},
