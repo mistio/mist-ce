@@ -18,6 +18,7 @@
     <link rel="import" type="css" href="../../styles/main.css">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
+        <style is="custom-style" include="info-table-style"></style>
         <style>
         :host {
             background: #fafafa;
@@ -44,7 +45,7 @@
                 <div class="paper-header">
                     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
                     <h2>Machine: {{machine.name}}</h2>
-                    <div class="machine-state flex">
+                    <div class="label flex">
                         <span class$="{{machine.state}}" title="machine state">{{machine.state}}</span>
                     </div>
                     <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
@@ -52,7 +53,8 @@
                     <app-user-menu email="marios@mist.io"></app-user-menu>
                 </div>
                 <div id="content">
-                    <paper-card class="info-card" heading="Basic Info">
+                    <paper-material class="info-card" >
+                        <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                         <div class="card-content">
                             <table class="info-table">
                                 <template is="dom-if" if="[[machine.public_ips]]">
@@ -108,12 +110,13 @@
                                 </template>
                             </table>
                         </div>
-                    </paper-card>
-                    <paper-card class="info-card" heading="Full Metadata List">
+                    </paper-material>
+                    <paper-material class="info-card" >
+                        <h2 style$="[[_getHeaderStyle(section.color)]]">Full Metadata List</h2>
                         <div class="card-content">
                             <element-for-in content="[[machine.extra]]"></element-for-in>
                         </div>
-                    </paper-card>
+                    </paper-material>
                     <app-graph title="CPU">
                         <google-chart id="mutating_gauge0" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
                 "redFrom": 90,
@@ -132,26 +135,6 @@
                 "minorTicks": 5}'>
                         </google-chart>
                     </app-graph>
-                    <!--  <app-graph title="IFACES RX">
-              <google-chart id="mutating_gauge2" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
-                "redFrom": 90,
-                "redTo": 100,
-                "yellowFrom": 75,
-                "yellowTo": 90,
-                "minorTicks": 5}'>
-              </google-chart>
-            </app-graph>
-            <app-graph title="DISKS WRITE">
-              <google-chart id="mutating_gauge3" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
-                "redFrom": 90,
-                "redTo": 100,
-                "yellowFrom": 75,
-                "yellowTo": 90,
-                "minorTicks": 5}'>
-              </google-chart>
-            </app-graph>
-            <app-graph title="RAM"></app-graph>
-            <app-graph title="LOAD"></app-graph> -->
                     <app-rules></app-rules>
                 </div>
                 <div class="absolute-bottom-right">
@@ -201,9 +184,7 @@ Polymer({
             notify: true
         },
         section: {
-            type: Object,
-            notify: true,
-            value: {}
+            type: Object
         },
         tag: {
             type: String,
@@ -259,6 +240,9 @@ Polymer({
     },
     destroy: function(_, params) {
         console.log("clicked destroy");
-    }
+    },
+    _getHeaderStyle: function(color) {
+        return 'background-color: ' + color + '; color: #fff;';
+    },
 });
 </script>

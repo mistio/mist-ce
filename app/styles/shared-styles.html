@@ -11,9 +11,9 @@
             --blue-color: #47b3e3;
             --gray-dark-color: #cfd8dc;
             --gray-light-color: #eceff1;
-            --mist-dark: #263238;
-            --mist-light: #B0BEC5;
-            --mist-very-light: #eceff1;
+            --mist-dark-color: #263238;
+            --mist-light-color: #B0BEC5;
+            --mist-very-light-color: #eceff1;
         }
         </style>
     </template>
@@ -21,78 +21,201 @@
 <dom-module id="tags-and-labels">
     <template>
         <style>
-        .machine-state {
+        .label {
             padding-right: 10px;
             color: rgba(255, 255, 255, 0.82);
         }
-        .machine-state:not(.reverse) {
-        	padding-left: 16px;
+        
+        .label:not(.reverse) {
+            padding-left: 16px;
         }
-        .machine-state:not(.reverse) > span {
+        
+        .label:not(.reverse) > span {
             padding: 2px 4px;
             border-radius: 2px;
-            font-size: 12px;
             font-weight: 700;
             cursor: inherit;
         }
         
-        .machine-state:not(.reverse) .unknown {
+        .label:not(.reverse) .unknown {
             background-color: var(--gray-light-color);
             color: rgba(0, 0, 0, 0.82);
         }
         
-        .machine-state:not(.reverse) .running {
+        .label:not(.reverse) .running {
             background-color: var(--green-color);
         }
         
-        .machine-state:not(.reverse) .terminated {
-            background-color: var(--mist-dark);
+        .label:not(.reverse) .terminated {
+            background-color: var(--mist-dark-color);
         }
         
-        .machine-state:not(.reverse) .stopped {
+        .label:not(.reverse) .stopped {
             background-color: var(--orange-color);
         }
         
-        .machine-state:not(.reverse) .error {
+        .label:not(.reverse) .error {
             background-color: var(--red-color);
         }
         
-        .machine-state.reverse .unknown {
-            color: var(--gray-light-color);
+        .label.reverse .unknown {
+            color: var(--mist-light-color);
             background-color: transparent;
         }
         
-        .machine-state.reverse .running {
+        .label.reverse .running {
             color: var(--green-color);
             background-color: transparent;
         }
         
-        .machine-state.reverse .terminated {
-            color: var(--mist-dark);
+        .label.reverse .terminated {
+            color: var(--mist-dark-color);
             background-color: transparent;
         }
         
-        .machine-state.reverse .stopped {
+        .label.reverse .stopped {
             color: var(--orange-color);
             background-color: transparent;
         }
         
-        .machine-state.reverse .error {
+        .label.reverse .error {
             color: var(--red-color);
             background-color: transparent;
         }
         
-        .machine-tag,
         .tag {
-            float: none;
             display: inline-block;
-            max-width: 100%;
-            background-color: #b5b5b5;
+            background-color: #888;
             color: #fff;
-            padding: 0 5px;
-            border-radius: 1px;
-            margin: 3px 0;
+            padding: 0 10px;
+            margin: 0 1px;
+            border-radius: 2px;
+            letter-spacing: .4px;
+            font-weight: 500 !important;
             word-break: break-all;
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="headings">
+    <template>
+        <style>
+        .app-title {
+            /*color: #fff;*/
+            text-transform: uppercase;
+            text-align: center;
+            background-color: var(--mist-light-color);
+            text-align: center;
+            padding: 0 0.5em;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .app-title-light {
+            /*color: #fff;*/
+            background-color: var(--mist-light-color);
+            padding: 0 0.5em;
+        }
+
+        .app-title-lighter {
+            /*color: #fff;*/
+            background-color: var(--mist-very-light-color);
+            padding: 0 0.5em;
+        }
+        </style>
+    </template>
+</dom-module>
+
+<dom-module id="headings">
+    <template>
+        <style>
+        .app-title {
+            color: #fff;
+            text-transform: uppercase;
+            text-align: center;
+            background-color: var(--mist-dark-color);
+            text-align: center;
+            padding: 0 0.5em;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .app-title-light {
+            color: var(--mist-dark-color);
+            background-color: var(--mist-light-color);
+            padding: 0 0.5em;
+        }
+
+        .app-title-lighter {
+            color: var(--mist-dark-color);
+            background-color: var(--mist-very-light-color);
+            padding: 0 0.5em;
+        }
+        </style>
+    </template>
+</dom-module>
+
+<dom-module id="info-table-style">
+    <template>
+        <style>
+
+        /* Info Card */
+
+        .info-card {
+            display: block;
+            max-width: 920px;
+            margin: 0 auto 20px;
+        }
+
+        .info-card .title-text {
+            /*color: #474747 !important;*/
+/*            background: #eeedeb;
+            background: -moz-linear-gradient(top, #eeedeb 0%, #d4d4d4 100%);
+            background: -webkit-linear-gradient(top, #eeedeb 0%, #d4d4d4 100%);
+            background: linear-gradient(to bottom, #eeedeb 0%, #d4d4d4 100%);*/
+            border-bottom: 2px solid #7f7f7f;
+            font-size: 18px !important;
+            text-transform: uppercase;
+        }
+
+        .info-card .card-content {
+            padding: 0;
+        }
+
+
+        /* Info Table */
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        .info-table .info-table-divider {
+            background-color: #eeedeb;
+        }
+
+        .info-table tr td {
+            width: 50%;
+            padding: 16px;
+            border-bottom: 1px solid #eeedeb;
+            font-size: 14px;
+        }
+
+        .info-table tr td:first-child {
+            font-weight: 500;
+        }
+
+        .info-table tr:nth-of-type(2n) {
+            background-color: #f2f2f2;
+        }
+
+        .info-table tr:last-child td {
+            border: none;
         }
         </style>
     </template>

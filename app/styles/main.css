@@ -85,18 +85,6 @@ a {
     line-height: 24px;
 }
 
-h2.app-title {
-    color: rgba(255, 255, 255, 0.87);
-    text-transform: uppercase;
-    text-align: center;
-    font-size: 1.5em;
-    background-color: slategray;
-    text-align: center;
-    padding: 0 0.5em;
-    margin: 0;
-    font-weight: 500;
-}
-
 catalog-app {
     overflow: hidden;
 }
@@ -220,16 +208,28 @@ paper-menu.dropdown-content paper-button {
     display: block;
 }
 
-paper-button {
-    font-size: 14px;
+paper-button.blue {
+    background-color: #0099cc;
+    color: #fff;
+    line-height: 24px;
+    padding-right: 15px;
 }
 
-paper-button.custom.blue {
-    background-color: #0099cc;
+paper-button.blue > * {
     color: #fff;
 }
 
-paper-button.custom.blue > * {
+paper-button[disabled] {
+    background: #eaeaea;
+    color: #a8a8a8;
+}
+
+paper-button.blue[disabled] > *,
+paper-button[disabled] > *  {
+    color: #a8a8a8;
+}
+
+paper-button.blue > * {
     color: #fff;
 }
 
@@ -270,10 +270,11 @@ a {
 
 .info-card {
     display: block;
-    max-width: 920px;
-    margin: 0 auto 20px;
+    margin-bottom: 20px;
 }
-
+.info-card h2 {
+    padding: 0 0.5em;
+}
 .info-card .title-text {
     color: #474747 !important;
     background: #eeedeb;

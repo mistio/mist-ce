@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <dom-module id="app-incidents">
     <template>
+        <style is="custom-style" include="headings"></style>
         <style>
         :host {
             display: block;
@@ -19,18 +20,6 @@
         
         :host paper-material {
             min-width: 100%;
-        }
-        
-        :host h2 {
-            color: rgba(255, 255, 255, 0.87);
-            text-transform: uppercase;
-            text-align: center;
-            font-size: 1.5em;
-            background-color: slategray;
-            text-align: center;
-            padding: 0 0.5em;
-            margin: 0;
-            font-weight: 500;
         }
         
         h3 {
@@ -84,7 +73,7 @@
         </style>
         <paper-material>
             <!-- title goes here, should change on stateChanged-->
-            <h2>{{title}}</h2>
+            <h2 class="app-title">{{title}}</h2>
             <div class="content-area">
                 <div class="block active-alerts">
                     <h3>Now active</h3>

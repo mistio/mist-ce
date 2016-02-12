@@ -46,17 +46,7 @@
         .id {
             color: #757575;
         }
-        
-        .tag {
-            font-weight: 400;
-            background-color: #888;
-            color: #fff;
-            padding: 0px 6px;
-            margin: 0 8px 2px 0;
-            border-radius: 2px;
-            display: inline-block;
-        }
-        
+
         :host([narrow-viewport]) .name,
         :host([narrow-viewport]) .provider,
         :host([narrow-viewport]) .id,
@@ -80,7 +70,7 @@
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
             <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
-            <div class="state machine-state reverse" hidden$="[[!item.state]]">
+            <div class="state label reverse" hidden$="[[!item.state]]">
                 <span class$="[[item.state]]" title="machine state">[[item.state]]</span>
             </div>
             <div class="tags" hidden$="[[!item.tags.length]]">
@@ -93,6 +83,7 @@
                 </template>
             </div>
         </a>
+        <paper-toggle-button></paper-toggle-button>
     </template>
 </dom-module>
 <script>

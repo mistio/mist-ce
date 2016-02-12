@@ -2,6 +2,9 @@
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <dom-module id="app-check">
     <style>
+    :host {
+        display: inline-block;
+    }
     :host([selected]) .check {
         transform: rotate3d(0, 1, 0, 180deg);
     }
@@ -55,17 +58,17 @@
     </template>
 </dom-module>
 <script>
-Polymer({
-    is: 'app-check',
+    Polymer({
+        is: 'app-check',
 
-    properties: {
-        selected: {
-            type: Boolean,
-            value: false,
-            reflectToAttribute: true
+        properties: {
+            selected: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            }
         }
-    }
 
-});
+    });
 </script>
 </dom-module>
