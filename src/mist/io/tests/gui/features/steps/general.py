@@ -1,19 +1,17 @@
 from behave import *
 from time import time, sleep
-from selenium.common.exceptions import NoSuchElementException, WebDriverException, StaleElementReferenceException
+
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
+
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import WebDriverException
+
 from selenium.webdriver.remote.webelement import *
-
-
-try:
-    from mist.io.tests.settings import LOCAL
-except ImportError:
-    LOCAL = True
-    pass
 
 
 def i_am_in_homepage(context):
@@ -31,7 +29,7 @@ def i_am_in_homepage(context):
 def visit(context):
     """
     This method will visit the mist.io instance specified by MIST_URL in the
-    settings file and if it lands on the sign in page then it will wait for
+    config file and if it lands on the sign in page then it will wait for
     the page to load, otherwise if it lands in the splash page then it will
     sleep for one second and then proceed. If you wish to wait for the splash
     page to load then you should use the "Then I wait for the mist.io splash
