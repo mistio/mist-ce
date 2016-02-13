@@ -307,7 +307,7 @@ def click_button(context, text):
                                                'contains %s' % text)
 
 
-@when(u'I click the "{text}" button inside the "{popup}" popup')
+@step(u'I click the "{text}" button inside the "{popup}" popup')
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
@@ -330,6 +330,20 @@ def click_button_within_popup(context, text, popup):
                                              'popup' % (text, popup))
                 return
     assert False, "Could not find popup with title %s" % popup
+
+
+@step(u'I click the "{text}" button inside the "{modal_title}" modal')
+def click_button_within_modal(context, text, modal_title):
+    modals = context.browser.find_elements_by_class_name("md-show")
+    for modal in modals:
+        title = safe_get_element_text(modal.find_element_by_class_name('md-title'))
+        if modal_title.lower() in title.lower():
+            buttons = modal.find_elements_by_class_name("ui-btn")
+            click_button_from_collection(context, text, buttons,
+                                         'Could not find %s button in %s '
+                                         'modal' % (text, modal_title))
+            return
+    assert False, "Could not find modal with title %s" % modal_title
 
 
 @when(u'I click the "{text}" button inside the popup with id "{popup_id}" ')
