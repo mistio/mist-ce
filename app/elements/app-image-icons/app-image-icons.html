@@ -1,6 +1,6 @@
 <dom-module id="app-image-icons">
     <style>
-    :root {
+    :host {
         --ubuntu-color: rgba(100, 100, 100, .5);
         --mongo-color: rgba(150, 150, 150, .5);
         --aws-color: rgba(80, 80, 80, .5);
@@ -9,58 +9,45 @@
         --linux-color: rgba(50, 50, 50, .5);
     }
     
-    span {
-        width: 60px;
+    :host span {
         display: inline-block;
     }
     /*var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora", "linux"];*/
     
-    span.icon {
+    :host span.icon {
         border-radius: 100px;
-        width: 50px;
-        height: 50px;
-        line-height: 50px;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
         color: #fff;
         overflow: hidden;
         text-align: center;
+        background-color: #ddd;
     }
     
-    span.icon-ubuntu {
-        background: var(--ubuntu-color);
+    :host span.icon img {
+        display: inline-block;
+        vertical-align: middle;
     }
-    
-    span.icon-mongo {
-        background: var(--mongo-color);
-    }
-    
-    span.icon-aws {
-        background: var(--aws-color);
-    }
-    
-    span.icon-suse {
-        background: var(--suse-color);
-    }
-    
-    span.icon-fedora {
-        background: var(--fedora-color);
-    }
-    
-    span.icon-linux {
-        background: var(--linux-color);
-    }
+
     </style>
     <template>
         <template is="dom-repeat" items="[[feed]]">
-            <span class$="icon icon-{{item}}">[[item]]</span>
+            <span class$="icon icon-{{item}}">
+                <img src="[[_src(item)]]" width="24px" title="[[item]]"/>
+            </span>
         </template>
     </template>
 </dom-module>
 <script>
 Polymer({
     is: 'app-image-icons',
+    enableCustomStyleProperties: true,
     properties: {
-        feed: Array,
-        enableCustomStyleProperties: true
+        feed: Array
+    },
+    _src: function(item){
+        return "../images/image-icons/"+ item +".svg";
     }
 });
 </script>

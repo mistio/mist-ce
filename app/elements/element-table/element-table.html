@@ -73,8 +73,12 @@
             font-size: 13px;
         }
         
-        .row.hover {
-            background: #fafafa;
+        .row:nth-child(2n+1) {
+            background-color: #fafafa;
+        }
+        
+        .row.hover, .row:nth-child(2n+1).hover {
+            background: #eee;
         }
         /* for when inline actions come in */
         
@@ -93,7 +97,7 @@
         .type {
             width: 250px;
         }
-
+        
         .is-default,
         .state {
             width: 100px;
