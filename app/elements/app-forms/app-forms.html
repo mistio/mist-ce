@@ -26,21 +26,23 @@
             padding: 16px;
         }
         
-        :host ::content iron-dropdown paper-material {
+        :host::content iron-dropdown paper-material {
             width: 191px;
-            top: 55px !important;
+            top: 57px !important;
         }
-        :host ::content .focused-line {
-            background-color: var(--mist-blue) !important;
-            /*background-color: #263238 !important;*/
+        
+        :host::content .focused-line.paper-input-container {
+            background-color: var(--mist-blue);
         }
-        :host ::content .input-content.label-is-floating.paper-input-container label {
-            color: var(--mist-blue) !important;
+        
+        :host::content .input-content.label-is-floating.paper-input-container label {
+            color: var(--mist-blue);
         }
+        
         ::content form paper-button {
             background-color: #0099cc;
             color: #fff;
-            margin: 8px 0;
+            margin: 8px;
             padding: 0.7em 1.7em;
             @apply(--layout-flex);
         }
@@ -65,6 +67,10 @@
             position: absolute;
             top: 10px;
             right: 10px;
+        }
+        
+        ::content paper-item {
+            font-size: 13px;
         }
         </style>
         <paper-material>
