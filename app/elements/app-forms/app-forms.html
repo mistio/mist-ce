@@ -14,11 +14,11 @@
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
 <dom-module id="app-forms">
     <template>
+        <style is="custom-style" include="shared-styles"></style>
         <style>
         :host {
             padding: 16px;
             display: block;
-            /*custom css color variables*/
             --mist-blue: #0099cc;
         }
         
@@ -26,11 +26,23 @@
             padding: 16px;
         }
         
+        :host ::content iron-dropdown paper-material {
+            width: 191px;
+            top: 55px !important;
+        }
+        :host ::content .focused-line {
+            background-color: var(--mist-blue) !important;
+            /*background-color: #263238 !important;*/
+        }
+        :host ::content .input-content.label-is-floating.paper-input-container label {
+            color: var(--mist-blue) !important;
+        }
         ::content form paper-button {
             background-color: #0099cc;
             color: #fff;
             margin: 8px 0;
             padding: 0.7em 1.7em;
+            @apply(--layout-flex);
         }
         
         ::content form paper-button > * {
@@ -69,7 +81,8 @@ Polymer({
     is: 'app-forms',
     properties: {
         formtitle: {
-            String, value: "My Form"
+            String,
+            value: "My Form"
         }, //default value of form
     },
     behaviors: [Polymer.PaperInputBehavior, Polymer.PaperInputAddonBehavior]

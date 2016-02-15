@@ -175,15 +175,15 @@
         }
         
         hr {
-            border-top: 1px solid #ccc;
+            /*border-top: 1px solid #ccc;
             height: 1px;
-            background-color: #eee;
+            background-color: #eee;*/
         }
         /* needs to be placed in a reusable css file*/
         
         paper-item {
             cursor: pointer;
-            transition: background-color 100ms;
+            /*transition: background-color 100ms;*/
         }
         
         paper-item:hover {
@@ -287,6 +287,7 @@
                         <p>use paper-menu for forms (in place of
                             < select>
                                 < options>)</p>
+                                <app-dropdown>
                         <paper-dropdown-menu label="Provider">
                             <paper-menu class="dropdown-content">
                                 <paper-item>EC2</paper-item>
@@ -295,6 +296,16 @@
                                 <paper-item>Linode</paper-item>
                             </paper-menu>
                         </paper-dropdown-menu>
+                        <app-dropdown>
+                            <paper-dropdown-menu label="Provider">
+                                <paper-menu class="dropdown-content">
+                                    <paper-item>EC2</paper-item>
+                                    <paper-item>Docker</paper-item>
+                                    <paper-item>Openstack</paper-item>
+                                    <paper-item>Linode</paper-item>
+                                </paper-menu>
+                            </paper-dropdown-menu>
+                        </app-dropdown>
                         <hr/>
                         <h3>Transitioning check box:</h3>
                         <app-check id="check" selected="false" on-tap="_checkbox"></app-check>
