@@ -39,13 +39,16 @@
             color: var(--mist-blue);
         }
         
-        ::content form paper-button {
+        :host::content form paper-button {
             background-color: #0099cc;
             color: #fff;
             margin: 0;
             @apply(--layout-flex);
         }
-        
+        ::content paper-button {
+            font-weight: 500;
+            padding: 0.8em 1.57em 0.7em 1.57em;
+        }
         ::content form paper-menu > paper-button {
             margin: 8px;
         }

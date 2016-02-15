@@ -208,11 +208,6 @@ paper-menu.dropdown-content paper-button {
     display: block;
 }
 
-paper-button {
-    font-weight: 500;
-    padding: 0.8em 1.57em 0.7em 1.57em;
-}
-
 paper-button.blue {
     background-color: #0099cc;
     color: #fff;
