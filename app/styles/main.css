@@ -208,11 +208,14 @@ paper-menu.dropdown-content paper-button {
     display: block;
 }
 
+paper-button {
+    font-weight: 500;
+    padding: 0.8em 1.57em 0.7em 1.57em;
+}
+
 paper-button.blue {
     background-color: #0099cc;
     color: #fff;
-    line-height: 24px;
-    padding-right: 15px;
 }
 
 paper-button.blue > * {
@@ -225,7 +228,7 @@ paper-button[disabled] {
 }
 
 paper-button.blue[disabled] > *,
-paper-button[disabled] > *  {
+paper-button[disabled] > * {
     color: #a8a8a8;
 }
 
@@ -272,9 +275,11 @@ a {
     display: block;
     margin-bottom: 20px;
 }
+
 .info-card h2 {
     padding: 0 0.5em;
 }
+
 .info-card .title-text {
     color: #474747 !important;
     background: #eeedeb;

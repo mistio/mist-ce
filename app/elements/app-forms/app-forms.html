@@ -42,11 +42,14 @@
         ::content form paper-button {
             background-color: #0099cc;
             color: #fff;
-            margin: 8px;
-            padding: 0.7em 1.7em;
+            margin: 0;
             @apply(--layout-flex);
         }
         
+        ::content form paper-menu > paper-button {
+            margin: 8px;
+        }
+
         ::content form paper-button > * {
             color: #fff;
         }
@@ -71,6 +74,10 @@
         
         ::content paper-item {
             font-size: 13px;
+        }
+
+        ::content paper-item:last-of-type {
+            border-bottom: 1px solid #ddd;
         }
         </style>
         <paper-material>
