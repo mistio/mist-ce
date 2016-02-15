@@ -231,6 +231,19 @@ paper-button.blue > * {
     color: #fff;
 }
 
+iron-dropdown paper-material {
+    width: 191px;
+    top: 57px !important;
+}
+
+.focused-line.paper-input-container {
+    background-color: #0099cc !important; /*var(--mist-blue);*/
+}
+
+.input-content.label-is-floating.paper-input-container label {
+    color: #0099cc !important; /*var(--mist-blue);*/
+}
+
 a {
     color: black;
     text-decoration: none;
