@@ -92,7 +92,7 @@ CREDENTIALS = test_settings.get("CREDENTIALS", {})
 
 MIST_API_TOKEN = test_settings.get("MIST_API_TOKEN", "")
 
-MIST_URL = test_settings.get("", "http://localhost:8000")
+MIST_URL = test_settings.get("MIST_URL", "http://localhost:8000")
 
 NAME = test_settings.get("NAME", "Atheofovos Gkikas")
 
