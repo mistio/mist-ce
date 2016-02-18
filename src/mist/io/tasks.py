@@ -69,12 +69,11 @@ def update_machine_count(email, cloud_id, machine_count):
         return
 
     user = user_from_email(email)
-    with user.lock_n_load():
-        user.clouds[cloud_id].machine_count = machine_count
-        user.total_machine_count = sum(
-            [cloud.machine_count for cloud in user.clouds.values()]
-        )
-        user.save()
+    user.clouds_dict[cloud_id].machine_count = machine_count
+    user.total_machine_count = sum(
+        [cloud.machine_count for cloud in user.clouds]
+    )
+    user.save()
 
 
 @app.task
@@ -119,7 +118,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
         # find the node we're looking for and get its hostname
         node = None
         try:
-            conn = connect_provider(user.clouds[cloud_id])
+            conn = connect_provider(user.clouds_dict[cloud_id])
             nodes = conn.list_nodes() # TODO: use cache
             for n in nodes:
                 if n.id == machine_id:
@@ -161,7 +160,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
                 }
 
             log_event(action='probe', result=result, **log_dict)
-            cloud = user.clouds[cloud_id]
+            cloud = user.clouds_dict[cloud_id]
             msg = "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title,
                                                         cloud_id)
             msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name,
@@ -273,7 +272,7 @@ def hpcloud_post_create_steps(self, email, cloud_id, machine_id, monitoring,
     user = user_from_email(email)
 
     try:
-        conn = connect_provider(user.clouds[cloud_id])
+        conn = connect_provider(user.clouds_dict[cloud_id])
         nodes = conn.list_nodes()
         node = None
 
@@ -335,7 +334,7 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
     user = user_from_email(email)
 
     try:
-        conn = connect_provider(user.clouds[cloud_id])
+        conn = connect_provider(user.clouds_dict[cloud_id])
         nodes = conn.list_nodes()
         node = None
 
@@ -414,7 +413,7 @@ def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
 
     try:
         # find the node we're looking for and get its hostname
-        conn = connect_provider(user.clouds[cloud_id])
+        conn = connect_provider(user.clouds_dict[cloud_id])
         nodes = conn.list_nodes()
         node = None
         for n in nodes:
@@ -487,7 +486,7 @@ def rackspace_first_gen_post_create_steps(
 
     try:
         # find the node we're looking for and get its hostname
-        conn = connect_provider(user.clouds[cloud_id])
+        conn = connect_provider(user.clouds_dict[cloud_id])
         nodes = conn.list_nodes()
         node = None
         for n in nodes:
@@ -789,7 +788,7 @@ class ListMachines(UserTask):
         user = user_from_email(email)
 
         if len(errors) == 6: # If does not respond for a minute
-            notify_user(user, 'Cloud %s does not respond' % user.clouds[cloud_id].title,
+            notify_user(user, 'Cloud %s does not respond' % user.clouds_dict[cloud_id].title,
                         email_notify=False, cloud_id=cloud_id)
 
         # Keep retrying for 30 minutes
@@ -798,10 +797,9 @@ class ListMachines(UserTask):
         if index < len(times):
             return times[index]
         else: # If cloud still unresponsive disable it & notify user
-            with user.lock_n_load():
-                user.clouds[cloud_id].enabled = False
-                user.save()
-            notify_user(user, "Cloud %s disabled after not responding for 30mins" % user.clouds[cloud_id].title,
+            user.clouds_dict[cloud_id].enabled = False
+            user.clouds_dict[cloud_id].save()
+            notify_user(user, "Cloud %s disabled after not responding for 30mins" % user.clouds_dict[cloud_id].title,
                         email_notify=True, cloud_id=cloud_id)
             log_event(user.email, 'incident', action='disable_cloud',
                       cloud_id=cloud_id, error="Cloud unresponsive")

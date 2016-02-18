@@ -219,8 +219,8 @@ class MainConnection(MistConnection):
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
                           ('list_locations', tasks.ListLocations()), ('list_projects', tasks.ListProjects()),):
-            for cloud_id in self.user.clouds:
-                if self.user.clouds[cloud_id].enabled:
+            for cloud_id in self.user.clouds_dict:
+                if self.user.clouds_dict[cloud_id].enabled:
                     cached = task.smart_delay(self.user.email, cloud_id)
                     if cached is not None:
                         log.info("Emitting %s from cache", key)
@@ -279,14 +279,14 @@ class MainConnection(MistConnection):
             if routing_key == 'list_networks':
                 cloud_id = result['cloud_id']
                 log.warn('Got networks from %s',
-                         self.user.clouds[cloud_id].title)
+                         self.user.clouds_dict[cloud_id].title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = result['machines']
                 cloud_id = result['cloud_id']
                 # update cloud machine count in multi-user setups
                 try:
-                    mcount = self.user.clouds[cloud_id].machine_count
+                    mcount = self.user.clouds_dict[cloud_id].machine_count
                     if multi_user and len(machines) != mcount:
                         tasks.update_machine_count.delay(self.user.email,
                                                          cloud_id,
