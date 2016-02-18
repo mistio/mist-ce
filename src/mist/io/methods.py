@@ -3463,11 +3463,24 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
                    private_ips=[], driver=conn)
 
     tags_dict = {}
-    for tag in tags:
-        for tag_key, tag_value in tag.items():
-            if type(tag_key) ==  unicode:
+    if isinstance(tags, list):
+        for tag in tags:
+            for tag_key, tag_value in tag.items():
+                if not tag_value:
+                    tag_value = ""
+                if type(tag_key) == unicode:
+                    tag_key = tag_key.encode('utf-8')
+                if type(tag_value) == unicode:
+                    tag_value = tag_value.encode('utf-8')
+                tags_dict[tag_key] = tag_value
+    elif isinstance(tags, dict):
+        for tag_key in tags:
+            tag_value = tags[tag_key]
+            if not tag_value:
+                tag_value = ""
+            if type(tag_key) == unicode:
                 tag_key = tag_key.encode('utf-8')
-            if type(tag_value) ==  unicode:
+            if type(tag_value) == unicode:
                 tag_value = tag_value.encode('utf-8')
             tags_dict[tag_key] = tag_value
 
@@ -3480,9 +3493,9 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
             ec2_tags.pop('Name')
             encoded_ec2_tags = {}
             for ec2_key, ec2_value in ec2_tags.items():
-                if type(ec2_key) ==  unicode:
+                if type(ec2_key) == unicode:
                     ec2_key = ec2_key.encode('utf-8')
-                if type(ec2_value) ==  unicode:
+                if type(ec2_value) == unicode:
                     ec2_value = ec2_value.encode('utf-8')
                 encoded_ec2_tags[ec2_key] = ec2_value
             conn.ex_delete_tags(machine, encoded_ec2_tags)

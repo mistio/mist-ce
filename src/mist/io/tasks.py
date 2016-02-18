@@ -757,24 +757,31 @@ class ListMachines(UserTask):
     polling = True
     soft_time_limit = 60
 
+    if multi_user:
+        from mist.core.helpers import log_event
+    else:
+        log_event = lambda *args, **kwargs: None
+
     def execute(self, email, cloud_id):
         log.warn('Running list machines for user %s cloud %s' % (email, cloud_id))
         from mist.io import methods
         user = user_from_email(email)
         machines = methods.list_machines(user, cloud_id)
         if multi_user:
+            from mist.core.methods import get_resource_tags, set_resource_tags
             for machine in machines:
-                kwargs = {}
-                kwargs['cloud_id'] = cloud_id
-                kwargs['machine_id'] = machine.get('id')
-                from mist.core.methods import list_tags
-                mistio_tags = list_tags(user, resource_type='machine', **kwargs)
+                if machine.get("tags"):
+                    tags = {}
+                    for tag in machine["tags"]:
+                        tags[tag["key"]]= tag["value"]
+                    set_resource_tags(user, tags, "machine", cloud_id, machine.get("id"))
+                mistio_tags = get_resource_tags(user, "machine", cloud_id, machine.get("id"))
+                machine["tags"] = []
                 # optimized for js
                 for tag in mistio_tags:
-                    for key, value in tag.items():
-                        tag_dict = {'key': key, 'value': value}
-                        if tag_dict not in machine['tags']:
-                            machine['tags'].append(tag_dict)
+                    key, value = tag.popitem()
+                    tag_dict = {'key': key, 'value': value}
+                    machine['tags'].append(tag_dict)
                 # FIXME: optimize!
         log.warn('Returning list machines for user %s cloud %s' % (email, cloud_id))
         return {'cloud_id': cloud_id, 'machines': machines}
