@@ -118,10 +118,9 @@ def check_auth(request):
     if ret.status_code == 200:
         ret_dict = json.loads(ret.content)
         user = user_from_request(request)
-        with user.lock_n_load():
-            user.email = email
-            user.mist_api_token = ret_dict.pop('token', '')
-            user.save()
+        user.email = email
+        user.mist_api_token = ret_dict.pop('token', '')
+        user.save()
         log.info("succesfully check_authed")
         return ret_dict
     else:
@@ -237,7 +236,7 @@ def add_cloud(request):
             remove_on_error=remove_on_error,
         )
 
-    cloud = user.clouds[cloud_id]
+    cloud = user.clouds_dict[cloud_id]
     ret = {
         'index': len(user.clouds) - 1,
         'id': cloud_id,
@@ -300,9 +299,8 @@ def toggle_cloud(request):
     user = user_from_request(request)
     if cloud_id not in user.clouds:
         raise CloudNotFoundError()
-    with user.lock_n_load():
-        user.clouds[cloud_id].enabled = bool(int(new_state))
-        user.save()
+    user.clouds_dict[cloud_id].enabled = bool(int(new_state))
+    user.clouds_dict[cloud_id].save()
     trigger_session_update(user.email, ['clouds'])
     return OK
 
@@ -808,16 +806,14 @@ def update_monitoring(request):
             raise SSLError()
         if ret.status_code == 200:
             ret_dict = json.loads(ret.content)
-            with user.lock_n_load():
-                user.email = email
-                user.mist_api_token = ret_dict.pop('token', '')
-                user.save()
+            user.email = email
+            user.mist_api_token = ret_dict.pop('token', '')
+            user.save()
             log.info("succesfully check_authed")
         elif ret.status_code in [400, 401]:
-            with user.lock_n_load():
-                user.email = ""
-                user.mist_api_token = ""
-                user.save()
+            user.email = ""
+            user.mist_api_token = ""
+            user.save()
             raise UnauthorizedError("You need to authenticate to mist.io.")
         else:
             raise UnauthorizedError("You need to authenticate to mist.io.")

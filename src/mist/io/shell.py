@@ -224,7 +224,7 @@ class ParamikoShell(object):
 
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
-        if cloud_id not in user.clouds:
+        if cloud_id not in user.clouds_dict:
             raise CloudNotFoundError(cloud_id)
         if key_id and key_id not in user.keypairs:
             raise KeypairNotFoundError(key_id)
@@ -331,26 +331,27 @@ class ParamikoShell(object):
                 trigger_session_update_flag = False
                 for i in range(3):
                     try:
-                        with user.lock_n_load():
-                            updated = False
-                            for i in range(len(user.keypairs[key_id].machines)):
-                                machine = user.keypairs[key_id].machines[i]
-                                if [cloud_id, machine_id] == machine[:2]:
-                                    old_assoc = user.keypairs[key_id].machines[i]
-                                    user.keypairs[key_id].machines[i] = assoc
-                                    updated = True
-                                    old_ssh_user = None
-                                    old_port = None
-                                    if len(old_assoc) > 3:
-                                        old_ssh_user = old_assoc[3]
-                                    if len(old_assoc) > 5:
-                                        old_port = old_assoc[5]
-                                    if old_ssh_user != ssh_user or old_port != port:
-                                        trigger_session_update_flag = True
+                        updated = False
+                        for i in range(len(user.keypairs[key_id].machines)):
+                            machine = user.keypairs[key_id].machines[i]
+                            if [cloud_id, machine_id] == machine[:2]:
+                                old_assoc = user.keypairs[key_id].machines[i]
+                                user.keypairs[key_id].machines[i] = assoc
+                                user.keypairs[key_id].save()
+                                updated = True
+                                old_ssh_user = None
+                                old_port = None
+                                if len(old_assoc) > 3:
+                                    old_ssh_user = old_assoc[3]
+                                if len(old_assoc) > 5:
+                                    old_port = old_assoc[5]
+                                if old_ssh_user != ssh_user or old_port != port:
+                                    trigger_session_update_flag = True
                             # if association didn't exist, create it!
                             if not updated:
                                 user.keypairs[key_id].machines.append(assoc)
                                 trigger_session_update_flag = True
+                                user.keypairs[key_id].save()
                             user.save()
                     except:
                         if i == 2:

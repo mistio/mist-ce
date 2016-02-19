@@ -2664,15 +2664,15 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     except KeyError:
                         port = 22
 
-                    with user.lock_n_load():
-                        machine_uid = [cloud_id, machine_id]
+                    machine_uid = [cloud_id, machine_id]
 
-                        for keypair in user.keypairs:
-                            for machine in user.keypairs[keypair].machines:
-                                if machine[:2] == machine_uid:
-                                    key_id = keypair
-                                    machine[-1] = int(port)
-                        user.save()
+                    for keypair in user.keypairs:
+                        for machine in user.keypairs[keypair].machines:
+                            if machine[:2] == machine_uid:
+                                key_id = keypair
+                                machine[-1] = int(port)
+                                user.keypairs[keypair].save()
+                    user.save()
 
         elif action is 'destroy':
             if conn.type is Provider.DOCKER and node.state == 0:
@@ -2824,7 +2824,7 @@ def list_images(user, cloud_id, term=None):
     if cloud_id not in user.clouds_dict:
         raise CloudNotFoundError(cloud_id)
 
-    cloud = user.clouds[cloud_id]
+    cloud = user.clouds_dict[cloud_id]
     conn = connect_provider(cloud)
     try:
         starred = list(cloud.starred)
@@ -3638,10 +3638,9 @@ def check_monitoring(user):
     if ret.status_code == 200:
         return ret.json()
     elif ret.status_code in [400, 401]:
-        with user.lock_n_load():
-            user.email = ""
-            user.mist_api_token = ""
-            user.save()
+        user.email = ""
+        user.mist_api_token = ""
+        user.save()
     log.error("Error getting stats %d:%s", ret.status_code, ret.text)
     raise ServiceUnavailableError()
 
