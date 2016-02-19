@@ -804,7 +804,8 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'password',
-            helpText: 'You can find your API Token on the Packet.net portal'
+            helpText: 'You can find your API Token on the Packet.net portal',
+            helpHref: 'http://docs.mist.io/article/100-adding-packet'
         },
         {
             name: 'project_id',
