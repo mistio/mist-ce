@@ -35,8 +35,10 @@ import ansible.utils
 import ansible.constants
 
 try:
-    from mist.core import config, model
+    from mist.core import config
+    from mist.core.user.models import User, Cloud, Machine
 except ImportError:
+    print "Seems to be on IO version"
     from mist.io import config, model
 
 from mist.io.shell import Shell
@@ -91,14 +93,14 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             if not machine_user:
                 machine_user = 'root'
 
-        machine = model.Machine()
+        machine = Machine()
         machine.dns_name = machine_hostname
         machine.ssh_port = port
         machine.public_ips = [machine_hostname]
         machine_id = machine_hostname.replace('.', '').replace(' ', '')
         machine.name = machine_hostname
         machine.machine_id = machine_id
-        cloud = model.Cloud()
+        cloud = Cloud()
         cloud.title = machine_hostname
         cloud.provider = provider
         cloud.enabled = True
@@ -145,7 +147,7 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             if not apisecret:
                 raise RequiredParameterMissingError("apisecret")
 
-        cloud = model.Cloud()
+        cloud = Cloud()
         cloud.title = title
         cloud.provider = provider
         cloud.apikey = apikey
@@ -366,7 +368,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
             machine_user = 'root'
 
     machine_hostname = sanitize_host(machine_hostname)
-    machine = model.Machine()
+    machine = Machine()
     machine.ssh_port = port
     machine.remote_desktop_port = rdp_port
     if machine_hostname:
@@ -376,7 +378,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
     machine.machine_id = machine_id
     machine.name = title
     machine.os_type = os_type
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.enabled = True
@@ -437,7 +439,7 @@ def _add_cloud_coreos(user, title, provider, params):
         if not machine_user:
             machine_user = 'root'
 
-    machine = model.Machine()
+    machine = Machine()
     machine.ssh_port = port
     if machine_hostname:
         machine.dns_name = machine_hostname
@@ -445,7 +447,7 @@ def _add_cloud_coreos(user, title, provider, params):
     machine_id = machine_hostname.replace('.', '').replace(' ', '')
     machine.name = title
     machine.os_type = os_type
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.enabled = True
@@ -508,7 +510,7 @@ def _add_cloud_vcloud(title, provider, params):
         if host not in ['my.idcloudonline.com', 'compute.idcloudonline.com']:
             host = 'my.idcloudonline.com'
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = username
@@ -539,7 +541,7 @@ def _add_cloud_ec2(user, title, params):
                     api_secret = cloud.apisecret
                     break
 
-        cloud = model.Cloud()
+        cloud = Cloud()
         cloud.title = title
         cloud.provider = region
         cloud.apikey = api_key
@@ -572,7 +574,7 @@ def _add_cloud_rackspace(user, title, provider, params):
                 api_key = cloud.apisecret
                 break
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = username
@@ -593,7 +595,7 @@ def _add_cloud_nephoscale(title, provider, params):
     if not password:
         raise RequiredParameterMissingError('password')
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = username
@@ -613,7 +615,7 @@ def _add_cloud_softlayer(title, provider, params):
     if not api_key:
         raise RequiredParameterMissingError('api_key')
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = username
@@ -629,7 +631,7 @@ def _add_cloud_digitalocean(title, provider, params):
     if not token:
         raise RequiredParameterMissingError('token')
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = token
@@ -661,7 +663,7 @@ def _add_cloud_gce(title, provider, params):
         except:
             raise MistError("Make sure you upload a valid json file")
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = email
@@ -682,7 +684,7 @@ def _add_cloud_azure(title, provider, params):
     if not certificate:
         raise RequiredParameterMissingError('certificate')
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = subscription_id
@@ -698,7 +700,7 @@ def _add_cloud_linode(title, provider, params):
     if not api_key:
         raise RequiredParameterMissingError('api_key')
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = api_key
@@ -727,7 +729,7 @@ def _add_cloud_docker(title, provider, params):
     cert_file = params.get('cert_file', '')
     ca_cert_file = params.get('ca_cert_file', '')
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.docker_port = docker_port
@@ -763,7 +765,7 @@ def _add_cloud_libvirt(user, title, provider, params):
     except:
         port = 22
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = apikey
@@ -804,7 +806,7 @@ def _add_cloud_hp(user, title, provider, params):
                 password = cloud.apisecret
                 break
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = username
@@ -846,7 +848,7 @@ def _add_cloud_openstack(title, provider, params):
     compute_endpoint = params.get('compute_endpoint', '')
 
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = username
@@ -866,7 +868,7 @@ def _add_cloud_hostvirtual(title, provider, params):
     if not api_key:
         raise RequiredParameterMissingError('api_key')
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = api_key
@@ -882,7 +884,7 @@ def _add_cloud_vultr(title, provider, params):
     if not api_key:
         raise RequiredParameterMissingError('api_key')
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = api_key
@@ -899,7 +901,7 @@ def _add_cloud_packet(title, provider, params):
         raise RequiredParameterMissingError('api_key')
     project_id = params.get('project_id', '')
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = api_key
@@ -925,7 +927,7 @@ def _add_cloud_vsphere(title, provider, params):
         raise RequiredParameterMissingError('host')
     host = sanitize_host(host)
 
-    cloud = model.Cloud()
+    cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
     cloud.apikey = username
@@ -943,7 +945,7 @@ def rename_cloud(user, cloud_id, new_name):
     log.info("Renaming cloud: %s", cloud_id)
     if cloud_id not in user.clouds_dict:
         raise CloudNotFoundError(cloud_id)
-    if model.Cloud.objects(owner_id=user.id,title=new_name).count():
+    if Cloud.objects(owner_id=user.id,title=new_name).count():
         raise CloudNameExistsError(new_name)
     user.clouds_dict[cloud_id].title = new_name
     user.clouds_dict[cloud_id].save()
@@ -993,7 +995,7 @@ def add_key(user, key_id, private_key):
     if key_id in user.keypairs:
         raise KeypairExistsError(key_id)
 
-    keypair = model.Keypair()
+    keypair = Keypair()
     keypair.private = private_key
     keypair.construct_public_from_private()
     keypair.default = not len(user.keypairs)
@@ -1254,7 +1256,7 @@ def connect_provider(cloud):
         * Openstack Diablo through Trystack, should also try Essex,
         * Linode
 
-    Cloud is expected to be a mist.io.model.Cloud
+    Cloud is expected to be a mist.io.Cloud
 
     """
     import libcloud.security
