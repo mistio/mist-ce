@@ -12,6 +12,7 @@ from mist.io.resources import Root
 from mist.io import config
 
 import logging
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -73,6 +74,7 @@ def main(global_config, **settings):
 
     def string_adapter(obj, request):
         return str(obj)
+
     json_renderer.add_adapter(object, string_adapter)
     configurator.add_renderer('json', json_renderer)
     configurator.add_static_view('resources', 'mist.io:static')
@@ -106,7 +108,7 @@ def add_routes(configurator):
     configurator.add_route('machine_tags',
                            '/clouds/{cloud}/machines/{machine}/tags')
     configurator.add_route('machine_tag',
-                     '/clouds/{cloud}/machines/{machine}/tags/{tag}')
+                           '/clouds/{cloud}/machines/{machine}/tags/{tag}')
     configurator.add_route('probe',
                            '/clouds/{cloud}/machines/{machine}/probe')
 
