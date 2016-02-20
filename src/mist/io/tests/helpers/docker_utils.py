@@ -1,31 +1,25 @@
-try:
-    import docker
-    from mist.io.tests.settings import docker_nodes
-except ImportError:
-    pass
-
-
 def select_docker():
     """
     Choose the container with the minimum load
     """
-    nodes = []
-    for node in docker_nodes:
-        nodes.append(docker.Client(base_url=node, version='1.10'))
-
-    if len(nodes) == 1:
-        chosen_node = nodes[0]
-        return chosen_node
-
-    containers_number = nodes[0].info()['Containers']
-    chosen_node = nodes[0]
-
-    for node in nodes:
-        if node.info()['Containers'] < containers_number:
-            containers_number = node.info()['Containers']
-            chosen_node = node
-
-    return chosen_node
+    # nodes = []
+    # for node in docker_nodes:
+    #     nodes.append(docker.Client(base_url=node, version='1.10'))
+    #
+    # if len(nodes) == 1:
+    #     chosen_node = nodes[0]
+    #     return chosen_node
+    #
+    # containers_number = nodes[0].info()['Containers']
+    # chosen_node = nodes[0]
+    #
+    # for node in nodes:
+    #     if node.info()['Containers'] < containers_number:
+    #         containers_number = node.info()['Containers']
+    #         chosen_node = node
+    #
+    # return chosen_node
+    return None
 
 
 def select_image(docker_node, flavor):
