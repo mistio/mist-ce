@@ -1476,9 +1476,9 @@ def list_machines(user, cloud_id):
 
     if cloud_id not in user.clouds:
         raise CloudNotFoundError(cloud_id)
-    conn = connect_provider(user.clouds[cloud_id])
 
     try:
+        conn = connect_provider(user.clouds[cloud_id])
         machines = conn.list_nodes()
     except InvalidCredsError:
         raise CloudUnauthorizedError()
@@ -2558,7 +2558,15 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
     bare_metal = False
     if user.clouds[cloud_id].provider == 'bare_metal':
         bare_metal = True
-    conn = connect_provider(user.clouds[cloud_id])
+
+    try:
+        conn = connect_provider(user.clouds[cloud_id])
+    except InvalidCredsError:
+        raise CloudUnauthorizedError()
+    except Exception as exc:
+        log.error("Error while connecting to cloud")
+        raise CloudUnavailableError(exc=exc)
+
     #GCE needs machine.extra as well, so we need the real machine object
     machine = None
     try:
