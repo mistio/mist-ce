@@ -9,9 +9,7 @@ be performed inside the corresponding method functions.
 
 """
 
-from datetime import datetime
-
-import traceback
+import re
 import requests
 import json
 
@@ -28,7 +26,6 @@ except ImportError:
 
 from mist.io import methods
 from mist.io.model import Keypair
-from mist.io.shell import Shell
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
 import pyramid.httpexceptions
@@ -355,6 +352,41 @@ def delete_key(request):
     user = user_from_request(request)
     methods.delete_key(user, key_id)
     return list_keys(request)
+
+
+@view_config(route_name='keys', request_method='DELETE', renderer='json')
+def delete_keys(request):
+    user = user_from_request(request)
+    params = params_from_request(request)
+    key_ids = []
+    for param in params:
+        if re.match('key_id\d+$', param) is None:
+            raise BadRequestError('All key id parameters must be in '
+                                  'key_id\d+ format')
+        key_ids.append(params[param])
+    if len(key_ids) == 0:
+        raise RequiredParameterMissingError('No key ids provided')
+    # remove duplicate ids if there are any
+    key_ids = sorted(key_ids)
+    i = 1
+    while i < len(key_ids):
+        if key_ids[i] == key_ids[i - 1]:
+            key_ids = key_ids[:i] + key_ids[i + 1:]
+        else:
+            i += 1
+    report = {}
+    for key_id in key_ids:
+        try:
+            methods.delete_key(user, key_id)
+        except KeypairNotFoundError:
+            report[key_id] = 'not_found'
+        else:
+            report[key_id] = 'deleted'
+    # if no script id was valid raise exception
+    if len(filter(lambda key_id: report[key_id] == 'not_found',
+                  report)) == len(key_ids):
+        raise NotFoundError('No valid script id provided')
+    return report
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
