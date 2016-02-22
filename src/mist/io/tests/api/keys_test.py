@@ -171,3 +171,20 @@ def test_016_test_generate_keypair(pretty_print, mist_io):
     response = mist_io.generate_keypair().post()
     assert response.status_code == requests.codes.ok, response.content
     print "Success!!!"
+
+
+def test_017_delete_key(pretty_print, cache, mist_io):
+    response = mist_io.delete_key(
+        key_id=cache.get('keys_tests/key_id', '')).delete()
+    assert response.status_code == requests.codes.ok, response.content
+    response = mist_io.delete_key(
+        key_id=cache.get('keys_tests/other_key_id', '')).delete()
+    assert response.status_code == requests.codes.ok, response.content
+    print "Success!!!"
+
+
+def test_018_delete_key(pretty_print, cache, mist_io):
+    response = mist_io.delete_key(
+        key_id=cache.get('keys_tests/other_key_id', '')[:-2]).delete()
+    assert response.status_code == requests.codes.not_found, response.content
+    print "Success!!!"
