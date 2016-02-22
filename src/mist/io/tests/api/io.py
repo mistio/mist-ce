@@ -99,74 +99,6 @@ class MistIoApi(object):
         req.delete = req.unavailable_api_call
         return req
 
-    def add_key(self, name, private, cookie=None, csrf_token=None,
-                api_token=None):
-        payload = {
-            'id': name,
-            'priv': private
-        }
-        req = MistRequests(uri=self.uri + "/keys", cookie=cookie, data=payload,
-                           csrf_token=csrf_token, api_token=api_token)
-
-        req.get = req.unavailable_api_call
-        req.post = req.unavailable_api_call
-        req.delete = req.unavailable_api_call
-        return req
-
-    def edit_key(self, key_id, new_name, cookie=None, csrf_token=None,
-                 api_token=None):
-        req = MistRequests(uri=self.uri + "/keys/" + key_id,
-                           data={'new_id': new_name}, cookie=cookie,
-                           csrf_token=csrf_token, api_token=api_token)
-        req.get = req.unavailable_api_call
-        req.post = req.unavailable_api_call
-        req.delete = req.unavailable_api_call
-        return req
-
-    def list_keys(self, cookie=None, csrf_token=None, api_token=None):
-        req = MistRequests(uri=self.uri + "/keys", cookie=cookie,
-                           csrf_token=csrf_token, api_token=api_token)
-        req.post = req.unavailable_api_call
-        req.put = req.unavailable_api_call
-        req.delete = req.unavailable_api_call
-        return req
-
-    def delete_key(self, key_id, cookie=None, csrf_token=None, api_token=None):
-        req = MistRequests(uri=self.uri + "/keys/" + key_id, cookie=cookie,
-                           csrf_token=csrf_token, api_token=api_token)
-        req.get = req.unavailable_api_call
-        req.post = req.unavailable_api_call
-        req.put = req.unavailable_api_call
-        return req
-
-    def generate_keypair(self, cookie=None, csrf_token=None, api_token=None):
-        req = MistRequests(uri=self.uri + "/keys", cookie=cookie,
-                           csrf_token=csrf_token, api_token=api_token)
-        req.get = req.unavailable_api_call
-        req.put = req.unavailable_api_call
-        req.delete = req.unavailable_api_call
-        return req
-
-    def get_private_key(self, key_id, cookie=None, csrf_token=None,
-                        api_token=None):
-        req = MistRequests(uri=self.uri + "/keys/" + key_id + "/private",
-                           cookie=cookie, csrf_token=csrf_token,
-                           api_token=api_token)
-        req.post = req.unavailable_api_call
-        req.put = req.unavailable_api_call
-        req.delete = req.unavailable_api_call
-        return req
-
-    def get_public_key(self, key_id, cookie=None, csrf_token=None,
-                       api_token=None):
-        req = MistRequests(uri=self.uri + "/keys/" + key_id + "/public",
-                           cookie=cookie, csrf_token=csrf_token,
-                           api_token=api_token)
-        req.post = req.unavailable_api_call
-        req.put = req.unavailable_api_call
-        req.delete = req.unavailable_api_call
-        return req
-
     def list_machines(self, cloud_id, cookie=None, csrf_token=None,
                       api_token=None):
         req = MistRequests(uri=self.uri + '/clouds/' + cloud_id + "/machines",
@@ -237,6 +169,84 @@ class MistIoApi(object):
         req = MistRequests(uri=uri, cookie=cookie, data={'action': 'reboot'},
                            csrf_token=csrf_token, api_token=api_token)
 
+        req.get = req.unavailable_api_call
+        req.put = req.unavailable_api_call
+        req.delete = req.unavailable_api_call
+        return req
+
+    def list_keys(self, cookie=None, csrf_token=None, api_token=None):
+        req = MistRequests(uri=self.uri + "/keys", cookie=cookie,
+                           csrf_token=csrf_token, api_token=api_token)
+        req.post = req.unavailable_api_call
+        req.put = req.unavailable_api_call
+        req.delete = req.unavailable_api_call
+        return req
+
+    def add_key(self, id, private, cookie=None, csrf_token=None,
+                api_token=None):
+        payload = {
+            'id': id,
+            'priv': private
+        }
+        req = MistRequests(uri=self.uri + "/keys", cookie=cookie, data=payload,
+                           csrf_token=csrf_token, api_token=api_token)
+
+        req.get = req.unavailable_api_call
+        req.post = req.unavailable_api_call
+        req.delete = req.unavailable_api_call
+        return req
+
+    def edit_key(self, id, new_id, cookie=None, csrf_token=None,
+                 api_token=None):
+        req = MistRequests(uri=self.uri + "/keys/" + id,
+                           data={'new_id': new_id}, cookie=cookie,
+                           csrf_token=csrf_token, api_token=api_token)
+        req.get = req.unavailable_api_call
+        req.post = req.unavailable_api_call
+        req.delete = req.unavailable_api_call
+        return req
+
+    def delete_key(self, key_id, cookie=None, csrf_token=None, api_token=None):
+        req = MistRequests(uri=self.uri + "/keys/" + key_id, cookie=cookie,
+                           csrf_token=csrf_token, api_token=api_token)
+        req.get = req.unavailable_api_call
+        req.post = req.unavailable_api_call
+        req.put = req.unavailable_api_call
+        return req
+
+    def generate_keypair(self, cookie=None, csrf_token=None, api_token=None):
+        req = MistRequests(uri=self.uri + "/keys", cookie=cookie,
+                           csrf_token=csrf_token, api_token=api_token)
+        req.get = req.unavailable_api_call
+        req.put = req.unavailable_api_call
+        req.delete = req.unavailable_api_call
+        return req
+
+    def get_private_key(self, key_id, cookie=None, csrf_token=None,
+                        api_token=None):
+        req = MistRequests(uri=self.uri + "/keys/" + key_id + "/private",
+                           cookie=cookie, csrf_token=csrf_token,
+                           api_token=api_token)
+        req.post = req.unavailable_api_call
+        req.put = req.unavailable_api_call
+        req.delete = req.unavailable_api_call
+        return req
+
+    def get_public_key(self, key_id, cookie=None, csrf_token=None,
+                       api_token=None):
+        req = MistRequests(uri=self.uri + "/keys/" + key_id + "/public",
+                           cookie=cookie, csrf_token=csrf_token,
+                           api_token=api_token)
+        req.post = req.unavailable_api_call
+        req.put = req.unavailable_api_call
+        req.delete = req.unavailable_api_call
+        return req
+
+    def set_default_key(self, key_id, cookie=None, csrf_token=None,
+                        api_token=None):
+        req = MistRequests(uri=self.uri + "/keys/" + key_id,
+                           cookie=cookie, csrf_token=csrf_token,
+                           api_token=api_token)
         req.get = req.unavailable_api_call
         req.put = req.unavailable_api_call
         req.delete = req.unavailable_api_call
