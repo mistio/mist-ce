@@ -97,12 +97,12 @@ def test_008_edit_key_with_no_new_id(pretty_print, cache, mist_io):
     print "Success!!!"
 
 
-# def test_009_edit_key_with_same_id(pretty_print, cache, mist_io):
-#     key_id = cache.get('keys_tests/key_id', '')
-#     response = mist_io.edit_key(id=key_id,
-#                                 new_id=key_id).put()
-#     assert response.status_code == requests.codes.bad_request, response.content
-#     print "Success!!!"
+def test_009_edit_key_with_same_id(pretty_print, cache, mist_io):
+    key_id = cache.get('keys_tests/key_id', '')
+    response = mist_io.edit_key(id=key_id,
+                                new_id=key_id).put()
+    assert response.status_code == requests.codes.ok, response.content
+    print "Success!!!"
 
 
 def test_010_get_private_key(pretty_print, cache, mist_io):
