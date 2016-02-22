@@ -8,7 +8,7 @@ private_key = "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA8tENh4L7Pkz2AlGD
 public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDy0Q2Hgvs+TPYCUYM1I8CPIuIXyrXVCwN1PqJROn7fF/flpoBqMQ+QDuuLTnO+0VsF7d/8TOXPo+88iBvL12k2OjuJxXkhN7npHJzYgF03iRzMRfftflDi2lp2nqJlqV7mIVVDuJvgpq0qDeJeqzb2ntTqhjb1KTlS1gc/CPFEi4G4l50rj07+QlnqOhDTnfVOSz62x+yjorDZOXZtUC3mGRRrewx2ud3+meFvarJG7pigfvB0JDoQ4VH29IxClvhpt6HVlGiZFk0oWP+VBIjLIMYLDvwceJPrBFkBGBRFSJwk74hWsQlelLEzLjrQzr9cURCXU1j4S8yZWR8A25gP"
 
 
-def get_keys_with_name(id, keys):
+def get_keys_with_id(id, keys):
     return filter(lambda x: x['id'] == id, keys)
 
 
@@ -17,7 +17,7 @@ def get_random_key_id(existing_keys):
         random_key_id = ''.join([random.choice(string.ascii_letters +
                                                string.digits) for _ in
                                  range(6)])
-        scripts = get_keys_with_name(random_key_id, existing_keys)
+        scripts = get_keys_with_id(random_key_id, existing_keys)
         if len(scripts) == 0:
             return random_key_id
 
@@ -59,7 +59,7 @@ def test_005_add_key(pretty_print, cache, mist_io):
     assert response.status_code == requests.codes.ok, response.content
     response = mist_io.list_keys().get()
     assert response.status_code == requests.codes.ok, response.content
-    script = get_keys_with_name(cache.get('keys_tests/key_id', ''),
+    script = get_keys_with_id(cache.get('keys_tests/key_id', ''),
                                 json.loads(response.content))
     assert len(script) > 0, "Key was added through the api but is not " \
                             "visible in the list of keys"
@@ -82,7 +82,7 @@ def test_007_edit_key(pretty_print, cache, mist_io):
     assert response.status_code == requests.codes.ok, response.content
     response = mist_io.list_keys().get()
     assert response.status_code == requests.codes.ok, response.content
-    script = get_keys_with_name(new_key_id,
+    script = get_keys_with_id(new_key_id,
                                 json.loads(response.content))
     assert len(script) > 0, "Key was added through the api but is not " \
                             "visible in the list of keys"
@@ -143,7 +143,7 @@ def test_014_add_second_key_and_set_default(pretty_print, cache, mist_io):
     assert response.status_code == requests.codes.ok, response.content
     response = mist_io.list_keys().get()
     assert response.status_code == requests.codes.ok, response.content
-    script = get_keys_with_name(cache.get('keys_tests/other_key_id', ''),
+    script = get_keys_with_id(cache.get('keys_tests/other_key_id', ''),
                                 json.loads(response.content))
     assert len(script) > 0, "Key was added through the api but is not " \
                             "visible in the list of keys"
@@ -152,7 +152,7 @@ def test_014_add_second_key_and_set_default(pretty_print, cache, mist_io):
     assert response.status_code == requests.codes.ok, response.content
     response = mist_io.list_keys().get()
     assert response.status_code == requests.codes.ok, response.content
-    script = get_keys_with_name(cache.get('keys_tests/other_key_id', ''),
+    script = get_keys_with_id(cache.get('keys_tests/other_key_id', ''),
                                 json.loads(response.content))
     assert len(script) > 0, "Key was added through the api but is not " \
                             "visible in the list of keys"
