@@ -356,15 +356,25 @@ def delete_key(request):
 
 @view_config(route_name='keys', request_method='DELETE', renderer='json')
 def delete_keys(request):
+    """
+    Delete multiple keys.
+    Provide a list of key ids to be deleted. The method will try to delete
+    all of them and then return a json that describes for each key id
+    whether or not it was deleted or not_found if the key id could not
+    be located. If no key id was found then a 404(Not Found) response will
+    be returned.
+    ---
+    key_ids:
+      required: true
+      type: array
+      items:
+        type: string
+        name: key_id
+    """
     user = user_from_request(request)
     params = params_from_request(request)
-    key_ids = []
-    for param in params:
-        if re.match('key_id\d+$', param) is None:
-            raise BadRequestError('All key id parameters must be in '
-                                  'key_id\d+ format')
-        key_ids.append(params[param])
-    if len(key_ids) == 0:
+    key_ids = params.get('key_ids', [])
+    if type(key_ids) != list or len(key_ids) == 0:
         raise RequiredParameterMissingError('No key ids provided')
     # remove duplicate ids if there are any
     key_ids = sorted(key_ids)
