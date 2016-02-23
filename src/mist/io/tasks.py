@@ -798,8 +798,9 @@ class ListMachines(UserTask):
             notify_user(user, 'Cloud %s does not respond' % user.clouds_dict[cloud_id].title,
                         email_notify=False, cloud_id=cloud_id)
 
-        # Keep retrying for 30 minutes
-        times = [60, 60, 120, 300, 600, 600]
+        # Keep retrying every 30 secs for 10 minutes, then every 60 secs for
+        # 20 minutes and finally every 20 minutes
+        times = [30]*20 + [60]*20
         index = len(errors) - 6
         if index < len(times):
             return times[index]
@@ -810,6 +811,7 @@ class ListMachines(UserTask):
                         email_notify=True, cloud_id=cloud_id)
             log_event(user.email, 'incident', action='disable_cloud',
                       cloud_id=cloud_id, error="Cloud unresponsive")
+            return 20*60
 
 
 class ProbeSSH(UserTask):

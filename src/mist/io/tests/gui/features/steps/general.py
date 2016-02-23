@@ -1,19 +1,17 @@
 from behave import *
 from time import time, sleep
-from selenium.common.exceptions import NoSuchElementException, WebDriverException, StaleElementReferenceException
+
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
+
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import WebDriverException
+
 from selenium.webdriver.remote.webelement import *
-
-
-try:
-    from mist.io.tests.settings import LOCAL
-except ImportError:
-    LOCAL = True
-    pass
 
 
 def i_am_in_homepage(context):
@@ -31,7 +29,7 @@ def i_am_in_homepage(context):
 def visit(context):
     """
     This method will visit the mist.io instance specified by MIST_URL in the
-    settings file and if it lands on the sign in page then it will wait for
+    config file and if it lands on the sign in page then it will wait for
     the page to load, otherwise if it lands in the splash page then it will
     sleep for one second and then proceed. If you wish to wait for the splash
     page to load then you should use the "Then I wait for the mist.io splash
@@ -307,7 +305,7 @@ def click_button(context, text):
                                                'contains %s' % text)
 
 
-@when(u'I click the "{text}" button inside the "{popup}" popup')
+@step(u'I click the "{text}" button inside the "{popup}" popup')
 def click_button_within_popup(context, text, popup):
     popups = context.browser.find_elements_by_class_name("ui-popup-active")
     for pop in popups:
@@ -330,6 +328,20 @@ def click_button_within_popup(context, text, popup):
                                              'popup' % (text, popup))
                 return
     assert False, "Could not find popup with title %s" % popup
+
+
+@step(u'I click the "{text}" button inside the "{modal_title}" modal')
+def click_button_within_modal(context, text, modal_title):
+    modals = context.browser.find_elements_by_class_name("md-show")
+    for modal in modals:
+        title = safe_get_element_text(modal.find_element_by_class_name('md-title'))
+        if modal_title.lower() in title.lower():
+            buttons = modal.find_elements_by_class_name("ui-btn")
+            click_button_from_collection(context, text, buttons,
+                                         'Could not find %s button in %s '
+                                         'modal' % (text, modal_title))
+            return
+    assert False, "Could not find modal with title %s" % modal_title
 
 
 @when(u'I click the "{text}" button inside the popup with id "{popup_id}" ')
