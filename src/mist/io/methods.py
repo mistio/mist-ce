@@ -1615,7 +1615,10 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    azure_port_bindings='', hostname='', plugins=None,
                    disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
-                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
+                   associate_floating_ip=False,
+                   associate_floating_ip_subnet=None, project_id=None,
+                   cronjob={}
+                   ):
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1768,9 +1771,17 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
 
+    # only for mist.core, set cronjob entry
+
+    if cronjob:
+        from mist.core.methods import add_cronjob_entry
+        cronjob["machines_per_cloud"] = [[cloud_id, node.id]]
+        cronjob_info = add_cronjob_entry(user, cronjob)
+
+    # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
-        # when this is ok, it calss post_deploy for script/monitoring
+        # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
             user.email, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
@@ -1793,9 +1804,9 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             networks = list_networks(user, cloud_id)
             mist.io.tasks.openstack_post_create_steps.delay(
                 user.email, cloud_id, node.id, monitoring, script, key_id,
-                node.extra.get('username'), node.extra.get('password'), public_key,
-                script_id=script_id, script_params=script_params, job_id = job_id,
-                hostname=hostname, plugins=plugins,
+                node.extra.get('username'), node.extra.get('password'),
+                public_key, script_id=script_id, script_params=script_params,
+                job_id = job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
                 post_script_params=post_script_params,
                 networks=networks
@@ -1807,8 +1818,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
             user.email, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
+            script_id=script_id, script_params=script_params,
+            job_id = job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
             post_script_params=post_script_params,
         )
@@ -1821,14 +1832,15 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             post_script_params=post_script_params,
         )
 
-
     ret = {'id': node.id,
-            'name': node.name,
-            'extra': node.extra,
-            'public_ips': node.public_ips,
-            'private_ips': node.private_ips,
-            'job_id': job_id,
-            }
+           'name': node.name,
+           'extra': node.extra,
+           'public_ips': node.public_ips,
+           'private_ips': node.private_ips,
+           'job_id': job_id,
+           }
+    if cronjob:
+        ret['cronjob_entry'] = cronjob_info
 
     return ret
 
