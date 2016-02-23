@@ -3,12 +3,12 @@ import requests
 
 class MistRequests(object):
     """
-    Simple class to make requests with or withour cookies etc.
+    Simple class to make requests with or without cookies etc.
     This way we can have the same request methods both in io and core
     """
 
-    def __init__(self, uri, data=None, cookie=None, timeout=None,
-                 csrf_token=None, api_token=None):
+    def __init__(self, uri, params=None, data=None, json=None, cookie=None,
+                 timeout=None, csrf_token=None, api_token=None):
         self.headers = {}
         if cookie:
             self.headers.update({'Cookie': cookie})
@@ -19,14 +19,16 @@ class MistRequests(object):
         self.timeout = timeout
         self.uri = uri
         self.data = data
+        self.params = params
+        self.json = json
 
     def post(self):
-        response = requests.post(self.uri, data=self.data,
+        response = requests.post(self.uri, data=self.data, json=self.json,
                                  headers=self.headers, timeout=self.timeout)
         return response
 
     def get(self):
-        response = requests.get(self.uri, params=self.data,
+        response = requests.get(self.uri, params=self.params,
                                 headers=self.headers, timeout=self.timeout)
         return response
 
@@ -36,8 +38,9 @@ class MistRequests(object):
         return response
 
     def delete(self):
-        response = requests.delete(self.uri, params=self.data,
-                                   headers=self.headers, timeout=self.timeout)
+        response = requests.delete(self.uri, params=self.params, data=self.data,
+                                   json=self.json, headers=self.headers,
+                                   timeout=self.timeout)
         return response
 
     def unavailable_api_call(self, *args, **kwargs):
