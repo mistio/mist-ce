@@ -97,12 +97,12 @@ def test_008_edit_key_with_no_new_id(pretty_print, cache, mist_io):
     print "Success!!!"
 
 
-# def test_009_edit_key_with_same_id(pretty_print, cache, mist_io):
-#     key_id = cache.get('keys_tests/key_id', '')
-#     response = mist_io.edit_key(id=key_id,
-#                                 new_id=key_id).put()
-#     assert response.status_code == requests.codes.bad_request, response.content
-#     print "Success!!!"
+def test_009_edit_key_with_same_id(pretty_print, cache, mist_io):
+    key_id = cache.get('keys_tests/key_id', '')
+    response = mist_io.edit_key(id=key_id,
+                                new_id=key_id).put()
+    assert response.status_code == requests.codes.ok, response.content
+    print "Success!!!"
 
 
 def test_010_get_private_key(pretty_print, cache, mist_io):
@@ -187,4 +187,47 @@ def test_018_delete_key(pretty_print, cache, mist_io):
     response = mist_io.delete_key(
         key_id=cache.get('keys_tests/other_key_id', '')[:-2]).delete()
     assert response.status_code == requests.codes.not_found, response.content
+    print "Success!!!"
+
+
+def test_019_delete_multiple_keys_with_no_key_ids(pretty_print, mist_io):
+    response = mist_io.delete_keys(key_ids=[]).delete()
+    assert response.status_code == requests.codes.bad_request, response.content
+    print "Success!!!"
+
+
+def test_020_delete_multiple_wrong_key_ids(pretty_print, cache, mist_io):
+    response = mist_io.delete_keys(key_ids=['bla', 'bla2']).delete()
+    assert response.status_code == requests.codes.not_found, response.content
+    print "Success!!!"
+
+
+def test_021_delete_multiple_keys(pretty_print, mist_io):
+    key_ids = []
+    # add 3 more keys and then delete them
+    for i in range(3):
+        response = mist_io.list_keys().get()
+        assert response.status_code == requests.codes.ok, response.content
+        new_key_id = get_random_key_id(json.loads(response.content))
+        response = mist_io.add_key(id=new_key_id, private=private_key).put()
+        assert response.status_code == requests.codes.ok, response.content
+        response = mist_io.list_keys().get()
+        assert response.status_code == requests.codes.ok, response.content
+        script = get_keys_with_id(new_key_id, json.loads(response.content))
+        assert len(script) > 0, \
+            "Key was added but is not visible in the list of keys"
+        key_ids.append(new_key_id)
+
+    key_ids.append('bla')
+    key_ids.append('bla2')
+
+    response = mist_io.delete_keys(key_ids=key_ids).delete()
+    assert response.status_code == requests.codes.ok, response.content
+    report = json.loads(response.content)
+    for key_id in key_ids:
+        if 'bla' not in key_id:
+            assert report.get(key_id, '') == 'deleted', report
+        if 'bla' in key_id:
+            assert report.get(key_id, '') == 'not_found', report
+
     print "Success!!!"
