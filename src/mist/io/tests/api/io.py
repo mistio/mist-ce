@@ -215,17 +215,9 @@ class MistIoApi(object):
         return req
 
     def delete_keys(self, key_ids, api_token=None):
-        i = 1
-        key_id_params = ""
-        for key_id in key_ids:
-            if i != 1:
-                key_id_params += "&"
-            else:
-                key_id_params += "?"
-            key_id_params += "key_id{0}={1}".format(i, key_id)
-            i += 1
-        req = MistRequests(uri=self.uri + '/keys%s' % key_id_params,
-                           api_token=api_token)
+        req = MistRequests(uri=self.uri + '/keys',
+                           api_token=api_token,
+                           json={'key_ids': key_ids})
         req.get = req.unavailable_api_call
         req.post = req.unavailable_api_call
         req.put = req.unavailable_api_call
