@@ -1,39 +1,36 @@
-import os
+import mist.io.tests.config as config
 
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-try:
-    from mist.io.tests.settings import selenium_hub, LOCAL, CHROMEDRIVER_PATH, \
-        PHANTOMJS_PATH, BROWSER_LOCAL, BROWSER_FLAVOR, BASE_DIR
-except ImportError:
-    pass
+import logging
+
+log = logging.getLogger(__name__)
 
 
-def choose_driver(flavor="firefox"):
+def choose_driver(flavor=None):
     """
-    Returns an instant of a remote selenium driver
+    Returns an instance of a remote selenium driver
     """
 
-    if BROWSER_FLAVOR:
-        flavor = BROWSER_FLAVOR
+    flavor = flavor if flavor is not None else config.BROWSER_FLAVOR
 
-    if BROWSER_LOCAL:
+    log.info("Choosing driver")
+    if config.BROWSER_LOCAL:
         if flavor == "firefox":
             driver = webdriver.Firefox()
         elif flavor == "chrome":
-            service_log_path = os.path.join(BASE_DIR,
-                                            "var/log/chromedriver.log")
             service_args = ['--verbose']
-            driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH,
+            driver = webdriver.Chrome(executable_path=config.WEBDRIVER_PATH,
                                       service_args=service_args,
-                                      service_log_path=service_log_path)
+                                      service_log_path=config.WEBDRIVER_LOG)
 
         elif flavor == "phantomjs":
-            driver = webdriver.PhantomJS(executable_path=PHANTOMJS_PATH)
+            driver = webdriver.PhantomJS(executable_path=config.WEBDRIVER_PATH)
         else:
             raise Exception("%s is not supported!" % flavor)
     else:
-        driver = webdriver.Remote(command_executor=selenium_hub, desired_capabilities=DesiredCapabilities.FIREFOX)
+        driver = webdriver.Remote(command_executor=config.selenium_hub,
+                                  desired_capabilities=DesiredCapabilities.FIREFOX)
 
     return driver

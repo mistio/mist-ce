@@ -1,5 +1,5 @@
-/src/mist/io/tests/passwordless
-/src/mist/io/tests/gce.json
+src/mist/io/tests/passwordless
+src/mist/io/tests/gce.json
 bin
 cloudpy
 dist
@@ -38,3 +38,7 @@ erl_crash.dump
 test.png
 *~
 pip-selfcheck.json
+test_settings.py
+error*.png
+.cache
+

@@ -34,6 +34,7 @@
     margin: 10px 0 20px;
 }
 #single-script-page .ui-collapsible .ui-collapsible-heading a {
+    background-color: #d4d4d4;
     border: none;
     padding: 20px 70px 16px !important;
 }
