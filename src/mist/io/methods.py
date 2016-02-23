@@ -35,8 +35,7 @@ import ansible.utils
 import ansible.constants
 
 try:
-    from mist.core import config
-    from mist.core.user.models import User, Cloud, Machine
+    from mist.core.user.models import User, Cloud, Machine, config, Keypair
 except ImportError:
     print "Seems to be on IO version"
     from mist.io import config, model
@@ -1034,11 +1033,11 @@ def delete_key(user, key_id):
     keypair.delete()
     del user.keypairs[key_id]
 
-    if keypair.default and len(user.keypairs):
+    if keypair.default and user.keypairs:
         other_key = user.keypairs.keys()[0]
         user.keypairs[other_key].default = True
 
-        user.save()
+    user.save()
     log.info("Deleted key with id '%s'.", key_id)
     trigger_session_update(user.email, ['keys'])
 
@@ -2969,10 +2968,12 @@ def list_clouds(user):
 
 
 def list_keys(user):
-    return [{'id': key,
-             'machines': user.keypairs[key].machines,
-             'isDefault': user.keypairs[key].default}
-            for key in user.keypairs]
+    keypairs = []
+    for key_id in user.keypairs:
+        keypairs.append([{'id': key_id,
+             'machines': user.keypairs[key_id].machines,
+             'isDefault': user.keypairs[key_id].default}])
+    return keypairs
 
 
 def list_sizes(user, cloud_id):
