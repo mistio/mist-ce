@@ -34,3 +34,18 @@ def password2():
 @pytest.fixture
 def mist_io():
     return MistIoApi(config.MIST_URL)
+
+@pytest.fixture
+def script_id():
+    return config.SCRIPT_ID
+
+@pytest.fixture
+def machines_per_clouds():
+    return config.MACHINES_PER_CLOUD
+
+@pytest.fixture
+def expires():
+    return config.EXPIRES
+
+
+
