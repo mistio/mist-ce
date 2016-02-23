@@ -49,6 +49,7 @@ from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_user_listening
 from mist.io.helpers import amqp_log
 
+
 # libcloud certificate fix for OS X
 libcloud.security.CA_CERTS_PATH.append(cert_path)
 
@@ -225,8 +226,11 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
                 except Exception as e:
                     print repr(e)
                     error = True
-                    notify_user(user, "Enable monitoring failed for machine %s" % machine_id, repr(e))
-                    notify_admin('Enable monitoring on creation failed for user %s machine %s: %r' % (email, machine_id, e))
+                    notify_user(user, "Enable monitoring failed for machine %s"
+                                % machine_id, repr(e))
+                    notify_admin('Enable monitoring on creation failed for '
+                                 'user %s machine %s: %r'
+                                 % (email, machine_id, e))
                     log_event(action='enable_monitoring_failed', error=repr(e),
                               **log_dict)
 
@@ -250,7 +254,8 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
         if str(exc).startswith('Retry'):
             raise
         notify_user(user, "Deployment script failed for machine %s" % machine_id)
-        notify_admin("Deployment script failed for machine %s in cloud %s by user %s" % (machine_id, cloud_id, email), repr(exc))
+        notify_admin("Deployment script failed for machine %s in cloud "
+                     "%s by user %s" % (machine_id, cloud_id, email), repr(exc))
         log_event(
             email=email,
             event_type='job',
@@ -262,6 +267,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
             error="Couldn't connect to run post deploy steps.",
             job_id=job_id
         )
+
 
 @app.task(bind=True, default_retry_delay=2*60)
 def hpcloud_post_create_steps(self, email, cloud_id, machine_id, monitoring,
@@ -326,10 +332,11 @@ def hpcloud_post_create_steps(self, email, cloud_id, machine_id, monitoring,
 
 @app.task(bind=True, default_retry_delay=2*60)
 def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
-                              command, key_id, username, password, public_key,
-                              script_id='', script_params='', job_id=None,
-                              hostname='', plugins=None,
-                              post_script_id='', post_script_params='', networks=[]):
+                                command, key_id, username, password, public_key,
+                                script_id='', script_params='', job_id=None,
+                                hostname='', plugins=None,
+                                post_script_id='', post_script_params='',
+                                networks=[]):
 
     from mist.io.methods import connect_provider
     user = user_from_email(email)
@@ -363,14 +370,16 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                 for network in networks['public']:
                     created_floating_ips += [floating_ip for floating_ip in network['floating_ips']]
 
-                # From the already created floating ips try to find one that is not associated to a node
+                # From the already created floating ips try to find one that
+                # is not associated to a node
                 unassociated_floating_ip = None
                 for ip in created_floating_ips:
                     if not ip['node_id']:
                         unassociated_floating_ip = ip
                         break
 
-                # Find the ports which are associated to the machine (e.g. the ports of the private ips)
+                # Find the ports which are associated to the machine
+                # (e.g. the ports of the private ips)
                 # and use one to associate a floating ip
                 ports = conn.ex_list_ports()
                 machine_port_id = None
@@ -430,10 +439,11 @@ def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
             raise self.retry(exc=Exception(), max_retries=20)
 
         try:
-            # login with user, password. Deploy the public key, enable sudo access for
-            # username, disable password authentication and reload ssh.
-            # After this is done, call post_deploy_steps if deploy script or monitoring
-            # is provided
+            # login with user, password. Deploy the public key, enable sudo
+            # access for username, disable password authentication
+            # and reload ssh.
+            # After this is done, call post_deploy_steps if deploy script
+            # or monitoring is provided
             ssh = paramiko.SSHClient()
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -503,8 +513,10 @@ def rackspace_first_gen_post_create_steps(
             raise self.retry(exc=Exception(), max_retries=20)
 
         try:
-            # login with user, password and deploy the ssh public key. Disable password authentication and reload ssh.
-            # After this is done, call post_deploy_steps if deploy script or monitoring
+            # login with user, password and deploy the ssh public key.
+            # Disable password authentication and reload ssh.
+            # After this is done, call post_deploy_steps
+            # if deploy script or monitoring
             # is provided
             ssh=paramiko.SSHClient()
             ssh.load_system_host_keys()
@@ -777,7 +789,8 @@ class ListMachines(UserTask):
                         if tag_dict not in machine['tags']:
                             machine['tags'].append(tag_dict)
                 # FIXME: optimize!
-        log.warn('Returning list machines for user %s cloud %s' % (email, cloud_id))
+        log.warn('Returning list machines for user %s cloud %s'
+                 % (email, cloud_id))
         return {'cloud_id': cloud_id, 'machines': machines}
 
     def error_rerun_handler(self, exc, errors, email, cloud_id):
@@ -788,8 +801,9 @@ class ListMachines(UserTask):
 
         user = user_from_email(email)
 
-        if len(errors) == 6: # If does not respond for a minute
-            notify_user(user, 'Cloud %s does not respond' % user.clouds[cloud_id].title,
+        if len(errors) == 6:  # If does not respond for a minute
+            notify_user(user, 'Cloud %s does not respond'
+                        % user.clouds[cloud_id].title,
                         email_notify=False, cloud_id=cloud_id)
 
         # Keep retrying for 30 minutes
@@ -797,11 +811,13 @@ class ListMachines(UserTask):
         index = len(errors) - 6
         if index < len(times):
             return times[index]
-        else: # If cloud still unresponsive disable it & notify user
+        else:  # If cloud still unresponsive disable it & notify user
             with user.lock_n_load():
                 user.clouds[cloud_id].enabled = False
                 user.save()
-            notify_user(user, "Cloud %s disabled after not responding for 30mins" % user.clouds[cloud_id].title,
+            notify_user(user,
+                        "Cloud %s disabled after not responding for 30 mins"
+                        % user.clouds[cloud_id].title,
                         email_notify=True, cloud_id=cloud_id)
             log_event(user.email, 'incident', action='disable_cloud',
                       cloud_id=cloud_id, error="Cloud unresponsive")
@@ -875,7 +891,8 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          docker_port_bindings={}, docker_exposed_ports={},
                          azure_port_bindings='', hostname='', plugins=None,
                          disk_size=None, disk_path=None,
-                         cloud_init='', associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
+                         cloud_init='', associate_floating_ip=False,
+                         associate_floating_ip_subnet=None, project_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
