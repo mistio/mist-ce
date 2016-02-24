@@ -1026,16 +1026,15 @@ def delete_key(user, key_id):
     log.info("Deleting key with id '%s'.", key_id)
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
-
-    keypair = user.keypairs[key_id]
-
+    default_key = keypair.default
     keypair = user.keypairs[key_id]
     keypair.delete()
     del user.keypairs[key_id]
 
-    if keypair.default and user.keypairs:
+    if default_key and user.keypairs:
         other_key = user.keypairs.keys()[0]
         user.keypairs[other_key].default = True
+        user.keypairs[other_key].save()
 
     user.save()
     log.info("Deleted key with id '%s'.", key_id)
@@ -2968,12 +2967,10 @@ def list_clouds(user):
 
 
 def list_keys(user):
-    keypairs = []
-    for key_id in user.keypairs:
-        keypairs.append([{'id': key_id,
-             'machines': user.keypairs[key_id].machines,
-             'isDefault': user.keypairs[key_id].default}])
-    return keypairs
+    return [{'id': key,
+             'machines': user.keypairs[key].machines,
+             'isDefault': user.keypairs[key].default}
+            for key in user.keypairs]
 
 
 def list_sizes(user, cloud_id):
