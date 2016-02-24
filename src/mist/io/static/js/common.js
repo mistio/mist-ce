@@ -804,7 +804,8 @@ var PROVIDER_MAP = {
         {
             name: 'api_key',
             type: 'password',
-            helpText: 'You can find your API Token on the Packet.net portal'
+            helpText: 'You can find your API Token on the Packet.net portal',
+            helpHref: 'http://docs.mist.io/article/100-adding-packet'
         },
         {
             name: 'project_id',
@@ -1109,7 +1110,7 @@ var PROVIDER_MAP = {
             label: 'Path for *.iso images',
             optional: true,
             defaultValue: '/var/lib/libvirt/images',
-            helpText: 'The path that your *.iso images are located, example /var/lib/libvirt/images',
+            helpText: 'The path that your disk or iso images are located, example /var/lib/libvirt/images',
         },
 
     ],

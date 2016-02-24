@@ -758,6 +758,11 @@ class ListMachines(UserTask):
     polling = True
     soft_time_limit = 60
 
+    if multi_user:
+        from mist.core.helpers import log_event
+    else:
+        log_event = lambda *args, **kwargs: None
+
     def execute(self, email, cloud_id):
         log.warn('Running list machines for user %s cloud %s' % (email, cloud_id))
         from mist.io import methods
@@ -792,19 +797,14 @@ class ListMachines(UserTask):
             notify_user(user, 'Cloud %s does not respond' % user.clouds[cloud_id].title,
                         email_notify=False, cloud_id=cloud_id)
 
-        # Keep retrying for 30 minutes
-        times = [60, 60, 120, 300, 600, 600]
+        # Keep retrying every 30 secs for 10 minutes, then every 60 secs for
+        # 20 minutes and finally every 20 minutes
+        times = [30]*20 + [60]*20
         index = len(errors) - 6
         if index < len(times):
             return times[index]
-        else: # If cloud still unresponsive disable it & notify user
-            with user.lock_n_load():
-                user.clouds[cloud_id].enabled = False
-                user.save()
-            notify_user(user, "Cloud %s disabled after not responding for 30mins" % user.clouds[cloud_id].title,
-                        email_notify=True, cloud_id=cloud_id)
-            log_event(user.email, 'incident', action='disable_cloud',
-                      cloud_id=cloud_id, error="Cloud unresponsive")
+        else:
+            return 20*60
 
 
 class ProbeSSH(UserTask):

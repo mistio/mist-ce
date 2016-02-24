@@ -151,7 +151,10 @@ define('app/controllers/machines', ['app/models/machine'],
             shutdownMachine: function(machineId, callback) {
                 var that = this;
                 var machine = this.getMachine(machineId);
-                machine.waitFor('stopped');
+
+                // Be careful libvirt machines go to 'terminated'
+                // while others to 'stopped' state
+                machine.waitFor(machine.cloud.provider == 'libvirt' ? 'terminated' : 'stopped');
                 machine.lockOn('pending');
                 this.set('shutingdownMachine', true);
                 Mist.ajax.POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {

@@ -12,6 +12,7 @@ Feature: Add second-tier clouds
     And I click the button "<provider>"
     And I expect for "new-cloud-provider" panel to disappear within max 2 seconds
     Then I expect for "cloud-add-fields" to be visible within max 2 seconds
+    And I wait for 1 seconds
     When I use my "<credentials>" credentials
     And I click the button "Add"
     Then the "<provider>" cloud should be added within 60 seconds
@@ -47,10 +48,11 @@ Feature: Add second-tier clouds
 
   @cloud-delete
   Scenario: Cloud Actions
-    Given "EC2" cloud has been added
-    When I click the button "EC2"
-    Then I expect for "cloud-edit-popup" popup to appear within max 2 seconds
-    And I click the button "Delete"
-    And I click the button "Yes"
-    Then I expect for "cloud-edit-popup" popup to disappear within max 2 seconds
-    Then the "EC2" cloud should be deleted
+    Given "GCE" cloud has been added
+    When I click the button "GCE"
+    Then I expect for "cloud-edit-popup" popup to appear within max 4 seconds
+    When I click the "Delete" button inside the "Edit cloud" popup
+    And I wait for 1 seconds
+    And I click the "Yes" button inside the "Edit cloud" popup
+    Then I expect for "cloud-edit-popup" popup to disappear within max 8 seconds
+    Then the "GCE" cloud should be deleted

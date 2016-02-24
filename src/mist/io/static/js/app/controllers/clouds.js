@@ -200,7 +200,6 @@ define('app/controllers/clouds', ['app/models/cloud', 'ember'],
                 }).success(function (data) {
                     machine.probeSuccess(data);
                 }).error(function(message) {
-                    console.log(message);
                     if (!machine.cloud || !machine.cloud.enabled) return;
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success, data) {

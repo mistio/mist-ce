@@ -14,6 +14,7 @@ from hashlib import sha256
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
 from netaddr import IPSet, IPNetwork
+from xml.sax.saxutils import escape
 
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -1475,9 +1476,9 @@ def list_machines(user, cloud_id):
 
     if cloud_id not in user.clouds:
         raise CloudNotFoundError(cloud_id)
-    conn = connect_provider(user.clouds[cloud_id])
 
     try:
+        conn = connect_provider(user.clouds[cloud_id])
         machines = conn.list_nodes()
     except InvalidCredsError:
         raise CloudUnauthorizedError()
@@ -1578,6 +1579,10 @@ def list_machines(user, cloud_id):
         if m.driver.type in config.EC2_PROVIDERS:
             # this is windows for windows servers and None for Linux
             m.extra['os_type'] = m.extra.get('platform', 'linux')
+
+        if m.driver.type is Provider.LIBVIRT:
+            if m.extra.get('xml_description'):
+                m.extra['xml_description'] = escape(m.extra['xml_description'])
 
         # tags should be a list
         if not tags:
@@ -2553,7 +2558,15 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
     bare_metal = False
     if user.clouds[cloud_id].provider == 'bare_metal':
         bare_metal = True
-    conn = connect_provider(user.clouds[cloud_id])
+
+    try:
+        conn = connect_provider(user.clouds[cloud_id])
+    except InvalidCredsError:
+        raise CloudUnauthorizedError()
+    except Exception as exc:
+        log.error("Error while connecting to cloud")
+        raise CloudUnavailableError(exc=exc)
+
     #GCE needs machine.extra as well, so we need the real machine object
     machine = None
     try:
@@ -2874,6 +2887,10 @@ def list_images(user, cloud_id, term=None):
                   if img.name and img.id[:3] not in ['aki', 'ari']
                   and 'windows' not in img.name.lower()]
 
+        if term and conn.type == Provider.LIBVIRT:
+            # fetch a new listing of the images and search for the term
+            images = conn.list_images()
+
         if term and conn.type == 'docker':
             images = conn.search_images(term=term)[:40]
         #search directly on docker registry for the query
@@ -2884,7 +2901,6 @@ def list_images(user, cloud_id, term=None):
     except Exception as e:
         log.error(repr(e))
         raise CloudUnavailableError(cloud_id, e)
-
     ret = [{'id': image.id,
             'extra': image.extra,
             'name': image.name,
@@ -2902,11 +2918,6 @@ def _image_starred(user, cloud_id, image_id):
         if cloud.provider in config.EC2_IMAGES:
             if image_id in config.EC2_IMAGES[cloud.provider]:
                 default = True
-    elif cloud.provider == 'docker':
-        # do not consider docker cloud's images as default
-        default = False
-        if image_id in config.DOCKER_IMAGES:
-            default = True
     else:
         # consider all images default for clouds with few images
         default = True
@@ -3628,9 +3639,13 @@ def check_monitoring(user):
         raise SSLError()
     if ret.status_code == 200:
         return ret.json()
-    else:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
+    elif ret.status_code in [400, 401]:
+        with user.lock_n_load():
+            user.email = ""
+            user.mist_api_token = ""
+            user.save()
+    log.error("Error getting stats %d:%s", ret.status_code, ret.text)
+    raise ServiceUnavailableError()
 
 
 def enable_monitoring(user, cloud_id, machine_id,
@@ -3828,11 +3843,13 @@ def find_public_ips(ips):
     return public_ips
 
 
-def notify_admin(title, message=""):
+def notify_admin(title, message="", team = "all"):
     """ This will only work on a multi-user setup configured to send emails """
     try:
         from mist.core.helpers import send_email
-        send_email(title, message, config.NOTIFICATION_EMAIL)
+        send_email(title, message,
+                   config.NOTIFICATION_EMAIL.get(team,
+                                                 config.NOTIFICATION_EMAIL))
     except ImportError:
         pass
 
@@ -4316,20 +4333,22 @@ def undeploy_collectd(user, cloud_id, machine_id):
     return ret_dict
 
 
-def get_deploy_collectd_command_unix(uuid, password, monitor):
+def get_deploy_collectd_command_unix(uuid, password, monitor, port=25826):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
     cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
+    if str(port) != '25826':
+        cmd += " -p %s" % port
     return cmd
 
 
-def get_deploy_collectd_command_windows(uuid, password, monitor):
-     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:25826"""""") -interval 10'"''' % (uuid, password, monitor)
+def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
+     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:%s"""""") -interval 10'"''' % (uuid, password, monitor, port)
 
 
-def get_deploy_collectd_command_coreos(uuid, password, monitor):
-    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
+def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
+    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (uuid, password, monitor, port)
 
 
 def machine_name_validator(provider, name):
@@ -4353,7 +4372,10 @@ def machine_name_validator(provider, name):
     elif provider is Provider.NEPHOSCALE:
         pass
     elif provider is Provider.GCE:
-        pass
+        if not re.search(r'^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', name):
+            raise MachineNameValidationError("name must be 1-63 characters long, with the first " + \
+                "character being a lowercase letter, and all following characters must be a dash, " + \
+                "lowercase letter, or digit, except the last character, which cannot be a dash.")
     elif provider is Provider.SOFTLAYER:
         pass
     elif provider is Provider.DIGITAL_OCEAN:

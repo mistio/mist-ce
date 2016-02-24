@@ -33,7 +33,12 @@ define('app/helpers/forIn', [],
                     var tpl = ''
 
                     for (var i = 0, len = data.length; i < len; i++) {
-                        tpl += "<tr><td>" + processKeys(data[i].key) + "</td><td>" + data[i].value + "</td></tr>";
+                        if (data[i].key == 'xml_description') {
+                            tpl += "<tr><td>" + processKeys(data[i].key) + "</td>";
+                            tpl += "<td><pre class='plain_code'>" + data[i].value + "</pre></td></tr>";
+                        } else {
+                            tpl += "<tr><td>" + processKeys(data[i].key) + "</td><td>" + data[i].value + "</td></tr>";
+                        }
                     }
 
                     return tpl;

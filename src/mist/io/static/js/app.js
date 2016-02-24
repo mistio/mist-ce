@@ -29,7 +29,8 @@ require.config({
         yamljs: '../dist/yamljs/dist/yaml.min',
         init: 'init',
         common: 'common',
-        multiplex: 'multiplex'
+        multiplex: 'multiplex',
+        modals: 'modals'
     },
     deps: ['jquery', 'common', 'init'],
     callback: function () {
@@ -82,6 +83,14 @@ var LOADER_STEPS = {
         exec: function () {
             require(['multiplex'], function () {
                 appLoader.complete('load multiplex');
+            });
+        }
+    },
+    'load modals': {
+        before: [],
+        exec: function () {
+            require(['modals'], function () {
+                appLoader.complete('load modals');
             });
         }
     },

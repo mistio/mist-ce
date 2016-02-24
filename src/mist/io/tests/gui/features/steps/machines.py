@@ -1,38 +1,58 @@
-import re
 from random import randrange
 
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 from mist.io.tests.gui.features.steps.general import *
+from mist.io.tests.gui.features.steps.tags import check_the_tags
+
+machine_states_ordering = {
+    'error': 6,
+    'pending': 5,
+    'rebooting': 4,
+    'running': 3,
+    'unknown': 2,
+    'suspended': 2,
+    'terminated': 1,
+    'stopped': 0
+}
 
 
-@when(u'I check the sorting by "{sorting_param}"')
-def check_sorting(context, sorting_param):
+@step(u'I wait for max {seconds} seconds until tag with key "{key}" and value'
+      u' "{value}" is available')
+def wait_for_tags(context, seconds, key,value):
+    timeout = time() + int(seconds)
+    while time() < timeout:
+        try:
+            check_the_tags(context, key, value)
+            return
+        except:
+            sleep(1)
+    assert False, "Tag with key %s and value %s was not available after %s" \
+                  " seconds" % (key. value, seconds)
+
+
+@when(u'I check the sorting by "{sorting_field}"')
+def check_sorting(context, sorting_field):
     """
-    Create dict with key the arg of the step definition
+    Check the sorting for name, state or cloud in the machines list
     """
+    sorting_field = sorting_field.lower()
+    machines_elements = context.browser.find_elements_by_css_selector('#machine-list li.checkbox-link ')
+    machines = []
+    for machine in machines_elements:
+        name = safe_get_element_text(machine.find_element_by_class_name('machine-name'))
+        state = safe_get_element_text(machine.find_element_by_class_name('machine-state'))
+        cloud = safe_get_element_text(machine.find_element_by_css_selector('.machine-tags .tag:first-child'))
+        machines.append((name, state, cloud))
 
-    sort_map = {'name': 'div.machine-name', 'state': 'span.machine-state',
-                'cloud': 'div.machine-tags span.tag:nth-child(1)'}
-
-    sort_type = sorting_param
-    sorting_selector = sort_map[sort_type]
-
-    machines_elements = context.browser.find_elements_by_css_selector(
-        '#machine-list-container li ' + sorting_selector)
-    # list with machine's names
-    machines_names_list = [safe_get_element_text(machine_element) for
-                           machine_element in machines_elements]
-    # sorting the machine list
-    my_sorted_machines_list = sorted(machines_names_list)
-    # lists are sorted and they have the same number of elements
-    if my_sorted_machines_list == machines_names_list:
-        pass
-    else:
-        assert False, u'List is not sorted'
+    if sorting_field == 'name':
+        machines = sorted(machines, key=lambda x: x[0])
+    elif sorting_field == 'state':
+        machines = sorted(machines, key=lambda x: x[1], cmp=lambda x, y: machine_states_ordering[y] - machine_states_ordering[x])
+    elif sorting_field == 'cloud':
+        machines = sorted(machines, key=lambda x: x[2])
+    for i in range(len(machines)):
+        assert machines[i][0] == safe_get_element_text(machines_elements[i].find_element_by_class_name('machine-name')), "Machine list is not properly sorted by %s" % sorting_field
 
 
 @when(u'I clear the machines search bar')
@@ -127,7 +147,7 @@ def assert_machine_probed(context, name, seconds):
         machine = get_machine(context, name)
         if machine:
             try:
-                probed = machine.find_element_by_class_name("probed")
+                machine.find_element_by_class_name("probed")
                 return
             except NoSuchElementException:
                 pass
@@ -227,6 +247,13 @@ def check_probing(context):
     assert False, "Could not find any line about probing"
 
 
+@then(u'I search for the "{text}" Machine')
+def search_image(context, text):
+    if context.mist_config.get(text):
+        text = context.mist_config.get(text)
+    search_for_something(context, text, 'machine')
+
+
 @given(u'ssh key with name "{ssh_key_name}" is added')
 def ssh_key_is_added(context, ssh_key_name):
     # first we have to find the keys button
@@ -284,7 +311,9 @@ def ssh_key_is_added(context, ssh_key_name):
                 if context.mist_config['CREDENTIALS'][ssh_key_name]['key_name']\
                         in machines_key_text:
                     context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
-                    context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
+                    context.execute_steps(u'Then I expect for '
+                                          u'"machine-keys-panel" side panel '
+                                          u'to disappear within max 4 seconds')
                     return
             context.execute_steps(u"""
                 When I click the "New key" button inside the "Manage Keys" panel
@@ -312,117 +341,6 @@ def ssh_key_is_added(context, ssh_key_name):
                 And If the key addition was successful
             """)
             context.browser.find_elements_by_class_name('ui-panel-dismiss')[0].click()
-            context.execute_steps(u'Then I expect for "machine-keys-panel" side panel to disappear within max 4 seconds')
-
-
-def is_ssh_connection_up(lines):
-    errors = ['disconnected', 'timeout', 'timed out', 'closure', 'broken']
-    for line in lines:
-        for error in errors:
-            if error in line.lower():
-                return False
-    return True
-
-
-def update_lines(terminal, lines):
-    """
-    Cleans up the terminal from empty lines and marks down the last empty line.
-    """
-    starting_lines = len(lines)
-    all_lines = terminal.find_elements_by_tag_name('div')
-    safety_counter = max_safety_count = 5
-    for i in range(len(lines), len(all_lines)):
-        all_lines_text = safe_get_element_text(all_lines[i])
-        line = all_lines_text.rstrip().lstrip()
-        if line:
-            for j in range(0, max_safety_count - safety_counter):
-                lines.append(" ")
-            lines.append(line)
-        safety_counter = safety_counter - 1 if not line else max_safety_count
-        if safety_counter == 0:
-            break
-    return starting_lines < len(lines)
-
-
-def check_ssh_connection_with_timeout(context, connection_timeout=200):
-    end_time = time() + 10
-    terminal = None
-    while time() < end_time:
-        try:
-            terminal = context.browser.find_elements_by_class_name('terminal')
-            if len(terminal) > 0:
-                terminal = terminal[0]
-                break
-            sleep(1)
-        except NoSuchElementException:
-            sleep(1)
-    assert terminal, "Terminal has not opened 10 seconds after pressing the " \
-                     "button. Aborting!"
-
-    connection_max_time = time() + connection_timeout
-    lines = []
-
-    # waiting for input to become available
-    while time() < connection_max_time:
-        if update_lines(terminal, lines):
-            assert is_ssh_connection_up(lines), "Error while using shell"
-            if re.search(":~#$", lines[-1]):
-                break
-        assert time() + 1 < connection_max_time, "Shell hasn't connected after"\
-                                                 "%s seconds. Aborting!"\
-                                                 % connection_timeout
-        sleep(1)
-
-    terminal.send_keys("ls -l\n")
-    command_input_line = len(lines) - 1
-    # terminal.send_keys("ls -l\n")
-    command_end_time = time() + 20
-    # waiting for command output to be returned
-    while time() < command_end_time:
-        # if the command output has finished being printed
-        if update_lines(terminal, lines):
-            assert is_ssh_connection_up(lines), "Connection is broken"
-            if re.search(":~#$", lines[-1]):
-                for i in range(len(lines)-2, command_input_line, -1):
-                    if re.search("total\s\d{1,3}", lines[i]):
-                        return
-        sleep(1)
-    assert False, "Command output took too long"
-
-
-@step(u'I test the ssh connection')
-def check_ssh_connection(context):
-    """
-    This step will press the shell button and wait for the connection to be
-    established and then will try to execute a command in the server and
-    get some output.
-    """
-    check_ssh_connection_with_timeout(context)
-
-
-@step('I test the ssh connection {times} times for max {seconds} seconds each'
-      ' time')
-def multi_ssh_test(context, times, seconds):
-    assert int(times) > 0, "You should test ssh a positive number of times"
-    for i in range(int(times)):
-        assertion_error = None
-        context.execute_steps(u'Then I click the button "Shell"')
-        try:
-            check_ssh_connection_with_timeout(context, int(seconds))
-        except AssertionError as e:
-            assertion_error = e
-            if i == int(times) - 1:
-                assert False, "Connection has not been established. Last error " \
-                              "encountered was:\n%s" % repr(assertion_error)
-        sleep(2)
-        clicketi_click(context, context.browser.find_element_by_id('shell-back'))
-        WebDriverWait(context.browser, 4).until(EC.invisibility_of_element_located((By.CLASS_NAME, 'terminal')))
-        if not assertion_error:
-            return
-
-
-@then(u'I search for the "{text}" Machine')
-def search_image(context, text):
-    if context.mist_config.get(text):
-        text = context.mist_config.get(text)
-    search_for_something(context, text, 'machine')
+            context.execute_steps(u'Then I expect for "machine-keys-panel" '
+                                  u'side panel to disappear within max 4 '
+                                  u'seconds')

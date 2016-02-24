@@ -29,7 +29,6 @@ define('app/views/graph_list_control', [],
                 from = from.replace(', ' + thisYear, '');
                 until = new Date(until).getPrettyDateTime(true, true);
                 until = until.replace(', ' + thisYear, '');
-                console.log(from);
                 return from + ' - ' + until;
             }.property(
                 'Mist.graphsController.config.fetchStatsArgs',

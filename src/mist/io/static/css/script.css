@@ -145,3 +145,6 @@
 #single-script-page .command-container {
     white-space: pre !important;
 }
+#command-collapsible.ui-collapsible .ui-collapsible-heading a {
+        background-color: #d4d4d4;
+}
