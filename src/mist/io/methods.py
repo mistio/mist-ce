@@ -1476,9 +1476,9 @@ def list_machines(user, cloud_id):
 
     if cloud_id not in user.clouds:
         raise CloudNotFoundError(cloud_id)
-    conn = connect_provider(user.clouds[cloud_id])
 
     try:
+        conn = connect_provider(user.clouds[cloud_id])
         machines = conn.list_nodes()
     except InvalidCredsError:
         raise CloudUnauthorizedError()
@@ -2558,7 +2558,15 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
     bare_metal = False
     if user.clouds[cloud_id].provider == 'bare_metal':
         bare_metal = True
-    conn = connect_provider(user.clouds[cloud_id])
+
+    try:
+        conn = connect_provider(user.clouds[cloud_id])
+    except InvalidCredsError:
+        raise CloudUnauthorizedError()
+    except Exception as exc:
+        log.error("Error while connecting to cloud")
+        raise CloudUnavailableError(exc=exc)
+
     #GCE needs machine.extra as well, so we need the real machine object
     machine = None
     try:
@@ -4325,30 +4333,22 @@ def undeploy_collectd(user, cloud_id, machine_id):
     return ret_dict
 
 
-def get_deploy_collectd_command_unix(uuid, password, monitor):
+def get_deploy_collectd_command_unix(uuid, password, monitor, port=25826):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) " \
-          "python mist_collectd.py %s %s" % (url, uuid, password)
+    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
+    if str(port) != '25826':
+        cmd += " -p %s" % port
     return cmd
 
 
-def get_deploy_collectd_command_windows(uuid, password, monitor):
-    return 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned ' \
-           '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
-           'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
-           'deploy_collectm/master/collectm.remote.install.ps1\',' \
-           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
-           '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
-           '-servers @("%s:25826")\''  % (uuid, password, monitor)
+def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
+     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:%s"""""") -interval 10'"''' % (uuid, password, monitor, port)
 
 
-def get_deploy_collectd_command_coreos(uuid, password, monitor):
-    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup " \
-           "-e COLLECTD_USERNAME=%s " \
-           "-e COLLECTD_PASSWORD=%s " \
-           "-e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
+def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
+    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (uuid, password, monitor, port)
 
 
 def machine_name_validator(provider, name):
