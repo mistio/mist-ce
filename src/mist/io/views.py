@@ -69,8 +69,7 @@ def exception_handler_mist(exc, request):
              renderer='templates/404.pt')
 def not_found(self, request):
 
-    return pyramid.httpexceptions.HTTPFound(request.host_url+"/#"+request.path)
-
+    return pyramid.httpexceptions.HTTPFound(request.host_url + "/#" + request.path)
 
 
 @view_config(route_name='home', request_method='GET',
@@ -78,6 +77,36 @@ def not_found(self, request):
 def home(request):
     """Home page view"""
     user = user_from_request(request)
+    teams = [
+        {
+            'id': 1,
+            'title': 'Frontend Team'
+            'members': [
+                {
+                    'name': 'Marios Fakiolas',
+                    'role': 'Web Developer'
+                }, {
+                    'name': 'Xristina Papakonstantinou',
+                    'role': 'Web Designer'
+                }
+            ],
+            'policies': [
+
+            ]
+        }, {
+            'id': 2,
+            'title': 'QΑ Team'
+            'members': [
+                {
+                    'name': 'Pablo Tziano',
+                    'role': 'QA Developer'
+                }
+            ],
+            'policies': [
+
+            ]
+        }
+    ]
     return {
         'project': 'mist.io',
         'email': json.dumps(user.email),
@@ -94,6 +123,7 @@ def home(request):
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
         'last_build': config.LAST_BUILD
+        'teams': json.dumps(teams)
     }
 
 
@@ -540,7 +570,8 @@ def create_machine(request):
         script_id = request.json_body.get('script_id', '')
         script_params = params_from_request(request).get('script_params', '')
         post_script_id = request.json_body.get('post_script_id', '')
-        post_script_params = params_from_request(request).get('post_script_params', '')
+        post_script_params = params_from_request(
+            request).get('post_script_params', '')
         async = request.json_body.get('async', False)
         quantity = request.json_body.get('quantity', 1)
         persist = request.json_body.get('persist', False)
@@ -553,8 +584,10 @@ def create_machine(request):
         hostname = request.json_body.get('hostname', '')
         plugins = request.json_body.get('plugins')
         cloud_init = request.json_body.get('cloud_init', '')
-        associate_floating_ip = request.json_body.get('associate_floating_ip', False)
-        associate_floating_ip_subnet = request.json_body.get('attach_floating_ip_subnet', None)
+        associate_floating_ip = request.json_body.get(
+            'associate_floating_ip', False)
+        associate_floating_ip_subnet = request.json_body.get(
+            'attach_floating_ip_subnet', None)
         project_id = request.json_body.get('project', None)
     except Exception as e:
         raise RequiredParameterMissingError(e)
