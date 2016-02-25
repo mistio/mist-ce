@@ -333,3 +333,47 @@ def test_utils():
     with raises(AssertionError):
         assert_is_not_none(a)
     assert_is_not_none([])
+
+    assert_less(1, 2)
+    assert_less("1", "2")
+    assert_less("bla", "blabla")
+    with raises(AssertionError):
+        assert_less(1, 1)
+    assert_less_or_equal(1, 1)
+    assert_less_or_equal("1", "1")
+    assert_less_or_equal(1, 2)
+    assert_less_or_equal("bla", "bla1")
+    with raises(AssertionError):
+        assert_less_or_equal("bla", "ala")
+
+    assert_greater(2, 1)
+    assert_greater("2", "1")
+    assert_greater("blabla", "bla")
+    with raises(AssertionError):
+        assert_greater(1, 1)
+    assert_greater_or_equal(1, 1)
+    assert_greater_or_equal("1", "1")
+    assert_greater_or_equal(2, 1)
+    assert_greater_or_equal("bla1", "bla")
+    with raises(AssertionError):
+        assert_greater_or_equal("ala", "bla")
+
+    a = (1, 1)
+    b = (1, 1)
+    c = ("1", "2")
+    d = ("bla", "blabla")
+    e = ("1", "1")
+
+    assert_is_instance(a, tuple)
+    with raises(AssertionError):
+        assert_is_instance([1], tuple)
+    assert_tuple_equal(a, a)
+    with raises(AssertionError):
+        assert_tuple_equal(a, [1, 1])
+    assert_tuple_equal(a, b)
+    with raises(AssertionError):
+        assert_tuple_equal(a, c)
+    with raises(AssertionError):
+        assert_tuple_equal(a, d)
+    with raises(AssertionError):
+        assert_tuple_equal(a, e)
