@@ -184,6 +184,7 @@ var loadFiles = function (callback) {
         'app/controllers/script_edit',
         'app/controllers/script_run',
         'app/controllers/scripts',
+        'app/controllers/teams',
 
         'app/routes/image',
         'app/routes/images',
@@ -197,6 +198,8 @@ var loadFiles = function (callback) {
         'app/routes/networks',
         'app/routes/script',
         'app/routes/scripts',
+        'app/routes/teams',
+        'app/routes/team',
 
         'app/views/home',
         'app/views/cloud_add',
@@ -256,6 +259,8 @@ var loadFiles = function (callback) {
         'app/views/script_log_list',
         'app/views/subnet_list_item',
         'app/views/user_menu',
+        'app/views/teams',
+        'app/views/team',
 
         'app/helpers/forIn'
     ], callback);

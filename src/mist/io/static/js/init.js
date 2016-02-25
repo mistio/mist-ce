@@ -38,6 +38,7 @@ var loadApp = function(
     ScriptRunController,
     ScriptsController,
     ProjectsController,
+    TeamsController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -84,6 +85,10 @@ var loadApp = function(
         this.route('script', {
             path: '/scripts/:script_id'
         });
+        this.route('teams');
+        this.route('team', {
+            path: '/teams/:team_id'
+        });
         this.route('logs');
         this.route('missing', {
             path: "/*path"
@@ -128,6 +133,7 @@ var loadApp = function(
     App.set('projectsController', ProjectsController.create());
     App.set('machineRunScriptController', MachineRunScriptController.create());
     App.set('machineImageCreateController', MachineImageCreateController.create());
+    App.set('teamsController', TeamsController.create());
 
 
     // Ember custom widgets
@@ -304,7 +310,7 @@ var setupLogChannel = function(socket, callback) {
     }).emit('ready');
     if (! Mist.isCore) {
         Mist.set('openIncidents', []);
-    }    
+    }
     Mist.set('closedIncidents', [])
 
     if (callback)
