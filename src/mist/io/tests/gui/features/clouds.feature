@@ -15,7 +15,7 @@ Feature: Add second-tier clouds
     And I wait for 1 seconds
     When I use my "<credentials>" credentials
     And I click the button "Add"
-    Then the "<provider>" cloud should be added within 60 seconds
+    Then the "<provider>" cloud should be added within 120 seconds
 #    And I wait for 3 seconds
 
     Examples: Providers
