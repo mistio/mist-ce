@@ -80,7 +80,7 @@ def home(request):
     teams = [
         {
             'id': 1,
-            'title': 'Frontend Team'
+            'name': 'Frontend Team',
             'members': [
                 {
                     'name': 'Marios Fakiolas',
@@ -90,21 +90,17 @@ def home(request):
                     'role': 'Web Designer'
                 }
             ],
-            'policies': [
-
-            ]
+            'policies': []
         }, {
             'id': 2,
-            'title': 'QΑ Team'
+            'name': 'QA Team',
             'members': [
                 {
                     'name': 'Pablo Tziano',
                     'role': 'QA Developer'
                 }
             ],
-            'policies': [
-
-            ]
+            'policies': []
         }
     ]
     return {
@@ -122,7 +118,7 @@ def home(request):
         'is_core': json.dumps(False),
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
-        'last_build': config.LAST_BUILD
+        'last_build': config.LAST_BUILD,
         'teams': json.dumps(teams)
     }
 

@@ -1,0 +1,11 @@
+<label>{{view Mist.Checkbox checked=team.selected}}</label>
+
+{{#link-to "team" team}}
+    <div class="ui-grid-b">
+        <div class="ui-block-a team-name">{{team.name}}</div>
+        <div class="ui-block-b team-members">
+          <span class="tag">{{team.members.length}}</span>
+        </div>
+        <div class="ui-block-c"></div>
+    </div>
+{{/link-to}}
