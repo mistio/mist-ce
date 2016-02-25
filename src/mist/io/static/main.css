@@ -676,6 +676,7 @@ textarea {
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable,
 #script-list-page .ui-filterable,
+#team-list-page .ui-filterable,
 #network-list-page .ui-filterable {
     position: relative;
     top: -59px;
@@ -692,6 +693,7 @@ textarea {
     #machine-list-page .ui-filterable,
     #key-list-page .ui-filterable,
     #script-list-page .ui-filterable,
+    #team-list-page .ui-filterable,
     #network-list-page .ui-filterable  {
         margin-left: 50px !important;
         margin-right: 50px !important;
@@ -701,6 +703,7 @@ textarea {
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search,
 #script-list-page .ui-filterable .ui-input-search,
+#team-list-page .ui-filterable .ui-input-search,
 #network-list-page .ui-filterable .ui-input-search {
     margin-left: 55px;
 }
@@ -712,6 +715,7 @@ textarea {
 #key-list-page .ui-filterable .ui-input-search,
 #image-list-page .ui-filterable .ui-input-search,
 #script-list-page .ui-filterable .ui-input-search,
+#team-list-page .ui-filterable .ui-input-search,
 #network-list-page .ui-filterable .ui-input-search {
     background-color: #fff;
     border-color: #b5b5b5;
@@ -726,6 +730,7 @@ textarea {
 #key-list-page .ui-filterable input,
 #network-list-page .ui-filterable input,
 #image-list-page .ui-filterable input,
+#team-list-page .ui-filterable input,
 #script-list-page .ui-filterable input {
     min-height: 35px;
     position: relative;
@@ -735,6 +740,7 @@ textarea {
 #machine-list-page .machines-header,
 #image-list-page .images-header,
 #script-list-page .scripts-header,
+#team-list-page .teams-header,
 #key-list-page .keys-header,
 #network-list-page .networks-header {
     background-color: #d4d4d4;
@@ -750,6 +756,7 @@ textarea {
 #machine-list-page .machines-header:after,
 #key-list-page .keys-header:after,
 #script-list-page .scripts-header:after,
+#team-list-page .scripts-header:after,
 #network-list-page .networks-header:after {
     content: '';
     clear: both;
