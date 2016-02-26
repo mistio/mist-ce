@@ -39,12 +39,12 @@ Feature: Add second-tier clouds
   Scenario: Cloud Actions
     Given "Rackspace" cloud has been added
     When I click the button "Rackspace"
-    Then I expect for "cloud-edit-popup" popup to appear within max 2 seconds
+    Then I expect for "cloud-edit-popup" popup to appear within max 4 seconds
     When I rename the cloud to "Renamed"
     And I click the "OK" button inside the "Edit cloud" popup
     When I click the "_x_" button inside the "Edit cloud" popup
-    Then I expect for "cloud-edit-popup" popup to disappear within max 2 seconds
-    And the "Renamed" cloud should be added within 3 seconds
+    Then I expect for "cloud-edit-popup" popup to disappear within max 4 seconds
+    And the "Renamed" cloud should be added within 4 seconds
 
   @cloud-delete
   Scenario: Cloud Actions
