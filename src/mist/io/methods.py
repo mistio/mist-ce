@@ -35,7 +35,10 @@ import ansible.utils
 import ansible.constants
 
 try:
-    from mist.core.user.models import User, Cloud, Machine, config, Keypair
+    from mist.core.user.models import User
+    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+    from mist.core.keypair.models import Keypair
+    from mist.core import config
 except ImportError:
     print "Seems to be on IO version"
     from mist.io import config, model
@@ -92,6 +95,13 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             if not machine_user:
                 machine_user = 'root'
 
+        cloud = Cloud()
+        cloud.title = machine_hostname
+        cloud.provider = provider
+        cloud.enabled = True
+        cloud.owner = user
+        cloud.save()
+
         machine = Machine()
         machine.dns_name = machine_hostname
         machine.ssh_port = port
@@ -99,16 +109,7 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         machine_id = machine_hostname.replace('.', '').replace(' ', '')
         machine.name = machine_hostname
         machine.machine_id = machine_id
-        cloud = Cloud()
-        cloud.title = machine_hostname
-        cloud.provider = provider
-        cloud.enabled = True
-        cloud_id = cloud.get_id()
-        machine.cloud_id = cloud_id
-        cloud.machines.append(machine)
-        cloud.save()
-        user.clouds.append(cloud)
-        user.save()
+        machine.cloud = cloud
 
         # try to connect. this will either fail and we'll delete the
         # cloud, or it will work and it will create the association
@@ -121,19 +122,14 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 )
             except MachineUnauthorizedError as exc:
                 # remove cloud
-                clo =  user.clouds_dict[cloud_id]
-                user.clouds.remove(clo)
-                clo.delete()
-                user.save()
+                Cloud.objects.get(id=cloud_id, owner=user).delete()
                 raise CloudUnauthorizedError(exc)
     else:
         # if api secret not given, search if we already know it
         # FIXME: just pass along an empty apisecret
         if apisecret == 'getsecretfromdb':
-            for cloud_id in user.clouds_dict:
-                if apikey == user.clouds_dict[cloud_id].apikey:
-                    apisecret = user.clouds_dict[cloud_id].apisecret
-                    break
+            cloud = Cloud.objects.get(owner=user, apikey=apikey)
+            apisecret = cloud.apisecret
 
         if not provider.__class__ is int and ':' in provider:
             provider, region = provider.split(':')[0], provider.split(':')[1]
@@ -154,7 +150,7 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         cloud.apiurl = apiurl
         cloud.tenant_name = tenant_name
         cloud.region = region
-        cloud.owner_id = user.get_id()
+        cloud.owner = user
         if provider == 'docker':
             cloud.docker_port = docker_port
         #For digital ocean v2 of the API, only apisecret is needed.
@@ -191,10 +187,6 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 cloud.apiurl = cloud.apiurl.replace(prefix, '')
             cloud.apiurl = cloud.apiurl.split('/')[0] #need host, not url
 
-        cloud_id = cloud.get_id()
-        if cloud_id in user.clouds_dict:
-            raise CloudExistsError(cloud_id)
-
         # validate cloud before adding
         if remove_on_error:
             try:
@@ -209,11 +201,9 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 log.error("Error while trying list_nodes: %r", exc)
                 raise CloudUnavailableError(exc=exc)
         cloud.save()
-        user.clouds.append(cloud)
-        user.save()
     log.info("Cloud with id '%s' added succesfully.", cloud_id)
     trigger_session_update(user.email, ['clouds'])
-    return cloud_id
+    return cloud.id
 
 
 def add_cloud_v_2(user, title, provider, params):
@@ -262,35 +252,35 @@ def add_cloud_v_2(user, title, provider, params):
     elif provider == 'rackspace':
         cloud_id, cloud = _add_cloud_rackspace(user, title, provider, params)
     elif provider == 'nephoscale':
-        cloud_id, cloud = _add_cloud_nephoscale(title, provider, params)
+        cloud_id, cloud = _add_cloud_nephoscale(user, title, provider, params)
     elif provider == 'digitalocean':
-        cloud_id, cloud = _add_cloud_digitalocean(title, provider, params)
+        cloud_id, cloud = _add_cloud_digitalocean(user, title, provider, params)
     elif provider == 'softlayer':
-        cloud_id, cloud = _add_cloud_softlayer(title, provider, params)
+        cloud_id, cloud = _add_cloud_softlayer(user, title, provider, params)
     elif provider == 'gce':
-        cloud_id, cloud = _add_cloud_gce(title, provider, params)
+        cloud_id, cloud = _add_cloud_gce(user, title, provider, params)
     elif provider == 'azure':
-        cloud_id, cloud = _add_cloud_azure(title, provider, params)
+        cloud_id, cloud = _add_cloud_azure(user, title, provider, params)
     elif provider == 'linode':
-        cloud_id, cloud = _add_cloud_linode(title, provider, params)
+        cloud_id, cloud = _add_cloud_linode(user, title, provider, params)
     elif provider == 'docker':
-        cloud_id, cloud = _add_cloud_docker(title, provider, params)
+        cloud_id, cloud = _add_cloud_docker(user, title, provider, params)
     elif provider == 'hpcloud':
         cloud_id, cloud = _add_cloud_hp(user, title, provider, params)
     elif provider == 'openstack':
-        cloud_id, cloud = _add_cloud_openstack(title, provider, params)
+        cloud_id, cloud = _add_cloud_openstack(user, title, provider, params)
     elif provider in ['vcloud', 'indonesian_vcloud']:
-        cloud_id, cloud = _add_cloud_vcloud(title, provider, params)
+        cloud_id, cloud = _add_cloud_vcloud(user, title, provider, params)
     elif provider == 'libvirt':
         cloud_id, cloud = _add_cloud_libvirt(user, title, provider, params)
     elif provider == 'hostvirtual':
-        cloud_id, cloud = _add_cloud_hostvirtual(title, provider, params)
+        cloud_id, cloud = _add_cloud_hostvirtual(user, title, provider, params)
     elif provider == 'vultr':
-        cloud_id, cloud = _add_cloud_vultr(title, provider, params)
+        cloud_id, cloud = _add_cloud_vultr(user, title, provider, params)
     elif provider == 'vsphere':
-        cloud_id, cloud = _add_cloud_vsphere(title, provider, params)
+        cloud_id, cloud = _add_cloud_vsphere(user, title, provider, params)
     elif provider == 'packet':
-        cloud_id, cloud = _add_cloud_packet(title, provider, params)
+        cloud_id, cloud = _add_cloud_packet(user, title, provider, params)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -316,11 +306,8 @@ def add_cloud_v_2(user, title, provider, params):
             except Exception as exc:
                 log.error("Error while trying list_nodes: %r", exc)
                 raise CloudUnavailableError(exc=exc)
-    cloud.owner_id = user.id
+    cloud.owner = user
     cloud.save()
-    if not cloud in user.clouds:
-        user.clouds.append(cloud)
-    user.save()
     log.info("Cloud with id '%s' added succesfully with Api-Version: 2.", cloud_id)
     trigger_session_update(user.email, ['clouds'])
 
@@ -331,7 +318,7 @@ def add_cloud_v_2(user, title, provider, params):
         username = cloud.apikey
         associate_key(user, key_id, cloud_id, node_id, username=username)
 
-    return {'cloud_id': cloud_id}
+    return {'cloud_id': cloud.id}
 
 
 def _add_cloud_bare_metal(user, title, provider, params):
@@ -358,42 +345,39 @@ def _add_cloud_bare_metal(user, title, provider, params):
 
     use_ssh = remove_on_error and os_type == 'unix' and machine_key
     if use_ssh:
-        if machine_key not in user.keypairs:
-            raise KeypairNotFoundError(machine_key)
+        key = Key.objects.get(owner=user, name=machine_key)
         if not machine_hostname:
             raise BadRequestError("You have specified an SSH key but machine "
                                   "hostname is empty.")
         if not machine_user:
             machine_user = 'root'
 
-    machine_hostname = sanitize_host(machine_hostname)
+    cloud = Cloud()
+    cloud.title = title
+    cloud.provider = provider
+    cloud.enabled = True
+    cloud.owner = user
+    cloud.save()
+
     machine = Machine()
+    machine.cloud = cloud
+    machine_hostname = sanitize_host(machine_hostname)
     machine.ssh_port = port
     machine.remote_desktop_port = rdp_port
     if machine_hostname:
         machine.dns_name = machine_hostname
         machine.public_ips = [machine_hostname]
-    machine_id = title.replace('.', '').replace(' ', '')
-    machine.machine_id = machine_id
+    machine.machine_id = title.replace('.', '').replace(' ', '')
     machine.name = title
     machine.os_type = os_type
-    cloud = Cloud()
-    cloud.title = title
-    cloud.provider = provider
-    cloud.enabled = True
-    cloud_id = cloud.get_id()
-    machine.cloud_id = cloud_id
-    cloud.machines.append(machine)
-    cloud.save()
-    user.clouds.append(cloud)
-    user.save()
+    machine.save()
 
     # try to connect. this will either fail and we'll delete the
     # cloud, or it will work and it will create the association
     if use_ssh:
         try:
             ssh_command(
-                user, cloud_id, machine_id, machine_hostname, 'uptime',
+                user, cloud.id, machine.machine.id, machine_hostname, 'uptime',
                 key_id=machine_key, username=machine_user, password=None,
                 port=port
             )
@@ -412,7 +396,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
     else:
         mon_dict = {}
 
-    return cloud_id, mon_dict
+    return cloud.id, mon_dict
 
 
 def _add_cloud_coreos(user, title, provider, params):
@@ -433,11 +417,17 @@ def _add_cloud_coreos(user, title, provider, params):
 
     use_ssh = remove_on_error and machine_key
     if use_ssh:
-        if machine_key not in user.keypairs:
-            raise KeypairNotFoundError(machine_key)
+        key = Keypair.objects.get(owner=user, name=machine_key)
         if not machine_user:
             machine_user = 'root'
 
+    cloud = Cloud()
+    cloud.title = title
+    cloud.provider = provider
+    cloud.enabled = True
+    cloud.machines[machine_id] = machine
+    cloud.owner = user
+    cloud.save()
     machine = Machine()
     machine.ssh_port = port
     if machine_hostname:
@@ -446,16 +436,8 @@ def _add_cloud_coreos(user, title, provider, params):
     machine_id = machine_hostname.replace('.', '').replace(' ', '')
     machine.name = title
     machine.os_type = os_type
-    cloud = Cloud()
-    cloud.title = title
-    cloud.provider = provider
-    cloud.enabled = True
-    cloud.machines[machine_id] = machine
-    cloud_id = cloud.get_id()
-    cloud.save()
-    user.clouds.append(cloud)
-    user.save()
-
+    machine.cloud = cloud
+    machine.save()
     # try to connect. this will either fail and we'll delete the
     # cloud, or it will work and it will create the association
     if use_ssh:
@@ -481,10 +463,10 @@ def _add_cloud_coreos(user, title, provider, params):
     else:
         mon_dict = {}
 
-    return cloud_id, mon_dict
+    return cloud.id, mon_dict
 
 
-def _add_cloud_vcloud(title, provider, params):
+def _add_cloud_vcloud(user, title, provider, params):
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -516,9 +498,9 @@ def _add_cloud_vcloud(title, provider, params):
     cloud.apisecret = password
     cloud.apiurl = host
     cloud.enabled = True
-    cloud_id = cloud.get_id()
-
-    return cloud_id, cloud
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
 
 def _add_cloud_ec2(user, title, params):
@@ -546,9 +528,9 @@ def _add_cloud_ec2(user, title, params):
         cloud.apikey = api_key
         cloud.apisecret = api_secret
         cloud.enabled = True
-        cloud_id = cloud.get_id()
-
-        return cloud_id, cloud
+        cloud.owner = user
+        cloud.save()
+        return cloud.id, cloud
 
 
 def _add_cloud_rackspace(user, title, provider, params):
@@ -580,12 +562,12 @@ def _add_cloud_rackspace(user, title, provider, params):
     cloud.apisecret = api_key
     cloud.enabled = True
     cloud.region = region
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
-
-def _add_cloud_nephoscale(title, provider, params):
+def _add_cloud_nephoscale(user, title, provider, params):
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -600,12 +582,13 @@ def _add_cloud_nephoscale(title, provider, params):
     cloud.apikey = username
     cloud.apisecret = password
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
 
-def _add_cloud_softlayer(title, provider, params):
+def _add_cloud_softlayer(user, title, provider, params):
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -620,12 +603,13 @@ def _add_cloud_softlayer(title, provider, params):
     cloud.apikey = username
     cloud.apisecret = api_key
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
 
-def _add_cloud_digitalocean(title, provider, params):
+def _add_cloud_digitalocean(user, title, provider, params):
     token = params.get('token', '')
     if not token:
         raise RequiredParameterMissingError('token')
@@ -636,12 +620,13 @@ def _add_cloud_digitalocean(title, provider, params):
     cloud.apikey = token
     cloud.apisecret = token
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
 
-def _add_cloud_gce(title, provider, params):
+def _add_cloud_gce(user, title, provider, params):
     private_key = params.get('private_key', '')
     if not private_key:
         raise RequiredParameterMissingError('private_key')
@@ -669,12 +654,13 @@ def _add_cloud_gce(title, provider, params):
     cloud.apisecret = private_key
     cloud.tenant_name = project_id
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
 
-def _add_cloud_azure(title, provider, params):
+def _add_cloud_azure(user, title, provider, params):
     subscription_id = params.get('subscription_id', '')
     if not subscription_id:
         raise RequiredParameterMissingError('subscription_id')
@@ -689,12 +675,13 @@ def _add_cloud_azure(title, provider, params):
     cloud.apikey = subscription_id
     cloud.apisecret = certificate
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
 
-def _add_cloud_linode(title, provider, params):
+def _add_cloud_linode(user, title, provider, params):
     api_key = params.get('api_key', '')
     if not api_key:
         raise RequiredParameterMissingError('api_key')
@@ -705,12 +692,13 @@ def _add_cloud_linode(title, provider, params):
     cloud.apikey = api_key
     cloud.apisecret = api_key
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
 
-def _add_cloud_docker(title, provider, params):
+def _add_cloud_docker(user, title, provider, params):
     try:
         docker_port = int(params.get('docker_port', 4243))
     except:
@@ -739,9 +727,10 @@ def _add_cloud_docker(title, provider, params):
     cloud.apisecret = auth_password
     cloud.apiurl = docker_host
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
 
 def _add_cloud_libvirt(user, title, provider, params):
@@ -774,8 +763,10 @@ def _add_cloud_libvirt(user, title, provider, params):
     cloud.ssh_port = port
     cloud_id = cloud.get_id()
     cloud.images_location = images_location
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
 
 def _add_cloud_hp(user, title, provider, params):
@@ -814,12 +805,13 @@ def _add_cloud_hp(user, title, provider, params):
     cloud.region = region
     cloud.tenant_name = tenant_name
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
+    return cloud.id, cloud
 
-    return cloud_id, cloud
 
 
-def _add_cloud_openstack(title, provider, params):
+def _add_cloud_openstack(user, title, provider, params):
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -857,12 +849,14 @@ def _add_cloud_openstack(title, provider, params):
     cloud.region = region
     cloud.compute_endpoint = compute_endpoint
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
 
-    return cloud_id, cloud
+    return cloud.id, cloud
 
 
-def _add_cloud_hostvirtual(title, provider, params):
+
+def _add_cloud_hostvirtual(user, title, provider, params):
     api_key = params.get('api_key', '')
     if not api_key:
         raise RequiredParameterMissingError('api_key')
@@ -873,12 +867,14 @@ def _add_cloud_hostvirtual(title, provider, params):
     cloud.apikey = api_key
     cloud.apisecret = api_key
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
 
-    return cloud_id, cloud
+    return cloud.id, cloud
 
 
-def _add_cloud_vultr(title, provider, params):
+
+def _add_cloud_vultr(user, title, provider, params):
     api_key = params.get('api_key', '')
     if not api_key:
         raise RequiredParameterMissingError('api_key')
@@ -889,12 +885,13 @@ def _add_cloud_vultr(title, provider, params):
     cloud.apikey = api_key
     cloud.apisecret = api_key
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
 
-    return cloud_id, cloud
+    return cloud.id, cloud
 
 
-def _add_cloud_packet(title, provider, params):
+def _add_cloud_packet(user, title, provider, params):
     api_key = params.get('api_key', '')
     if not api_key:
         raise RequiredParameterMissingError('api_key')
@@ -906,13 +903,15 @@ def _add_cloud_packet(title, provider, params):
     cloud.apikey = api_key
     cloud.apisecret = api_key
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
     if project_id:
         cloud.tenant_name = project_id
-    return cloud_id, cloud
+    cloud.save()
+
+    return cloud.id, cloud
 
 
-def _add_cloud_vsphere(title, provider, params):
+def _add_cloud_vsphere(user, title, provider, params):
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -933,21 +932,19 @@ def _add_cloud_vsphere(title, provider, params):
     cloud.apisecret = password
     cloud.apiurl = host
     cloud.enabled = True
-    cloud_id = cloud.get_id()
+    cloud.owner = user
+    cloud.save()
 
-    return cloud_id, cloud
+    return cloud.id, cloud
 
 
 def rename_cloud(user, cloud_id, new_name):
     """Renames cloud with given cloud_id."""
 
     log.info("Renaming cloud: %s", cloud_id)
-    if cloud_id not in user.clouds_dict:
-        raise CloudNotFoundError(cloud_id)
-    if Cloud.objects(owner_id=user.id,title=new_name).count():
-        raise CloudNameExistsError(new_name)
-    user.clouds_dict[cloud_id].title = new_name
-    user.clouds_dict[cloud_id].save()
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud.title = new_name
+    cloud.save()
     log.info("Succesfully renamed cloud '%s'", cloud_id)
     trigger_session_update(user.email, ['clouds'])
 
@@ -972,12 +969,8 @@ def delete_cloud(user, cloud_id):
             log.warning("Couldn't disable monitoring before deleting cloud. "
                         "Error: %r", exc)
 
-    if cloud_id not in user.clouds_dict:
-        raise CloudNotFoundError(cloud_id)
-    cloud = user.clouds_dict[cloud_id]
-    user.clouds.remove(cloud)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
     cloud.delete()
-    user.save()
     log.info("Succesfully deleted cloud '%s'", cloud_id)
     trigger_session_update(user.email, ['clouds'])
 
@@ -996,15 +989,14 @@ def add_key(user, key_id, private_key):
 
     keypair = Keypair()
     keypair.private = private_key
+    keypair.name = key_id
     keypair.construct_public_from_private()
-    keypair.default = not len(user.keypairs)
-    keypair.machines = []
+    if not Keypair.objects(owner=user, default=True):
+        keypair.default = True
 
     if not keypair.isvalid():
         raise KeyValidationError()
     keypair.save()
-    user.keypairs[key_id] = keypair
-    user.save()
 
     log.info("Added key with id '%s'", key_id)
     trigger_session_update(user.email, ['keys'])
@@ -1024,19 +1016,14 @@ def delete_key(user, key_id):
     """
 
     log.info("Deleting key with id '%s'.", key_id)
-    if key_id not in user.keypairs:
-        raise KeypairNotFoundError(key_id)
-    default_key = keypair.default
-    keypair = user.keypairs[key_id]
-    keypair.delete()
-    del user.keypairs[key_id]
-
-    if default_key and user.keypairs:
-        other_key = user.keypairs.keys()[0]
-        user.keypairs[other_key].default = True
-        user.keypairs[other_key].save()
-
-    user.save()
+    key = Keypair.objects.get(owner=user, name=key_id)
+    if key.default:
+        default_key = keypair.default
+    key.delete()
+    other_key = Keypair.objects(owner=user).first()
+    if default_key and other_key:
+        other_key.default = True
+        other_key.save()
     log.info("Deleted key with id '%s'.", key_id)
     trigger_session_update(user.email, ['keys'])
 
@@ -1051,21 +1038,16 @@ def set_default_key(user, key_id):
     """
 
     log.info("Setting key with id '%s' as default.", key_id)
-    keypairs = user.keypairs
 
-    if not key_id in keypairs:
-        raise KeypairNotFoundError(key_id)
+    default_key = Keypair.objects(owner=user, default=True).first()
+    if default_key:
+        default_key.default = False
+        default_key.save()
 
-    keypairs = user.keypairs
-    for key in keypairs:
-        if keypairs[key].default:
-            keypairs[key].default = False
-            keypairs[key].save()
+    key = Keypair.objects.get(owner=user, name=key_id)
+    key.default = True
+    key.save()
 
-    keypairs[key_id].default = True
-    keypairs[key_id].save()
-
-    user.save()
     log.info("Succesfully set key with id '%s' as default.", key_id)
     trigger_session_update(user.email, ['keys'])
 
@@ -1083,19 +1065,14 @@ def edit_key(user, new_key, old_key):
     log.info("Renaming key '%s' to '%s'.", old_key, new_key)
     if not new_key:
         raise KeypairParameterMissingError("new name")
-    if old_key not in user.keypairs:
-        raise KeypairNotFoundError(old_key)
 
     if old_key == new_key:
         log.warning("Same name provided, will not edit key. No reason")
         return
 
-    old_keypair = user.keypairs[old_key]
-    old_keypair.name = new_key
-    del user.keypairs[old_key]
-    user.keypairs[new_key] = old_keypair
-    old_keypair.save()
-    user.save()
+    key = Keypair.objects.get(owner=user, name=old_key)
+    key.name = new_key
+    key.save()
     log.info("Renamed key '%s' to '%s'.", old_key, new_key)
     trigger_session_update(user.email, ['keys'])
 
@@ -1113,46 +1090,30 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
     if not host:
         log.info("Host not given so will only create association without "
                  "actually deploying the key to the server.")
-    if key_id not in user.keypairs:
-        raise KeypairNotFoundError(key_id)
-    if cloud_id not in user.clouds_dict:
-        raise CloudNotFoundError(cloud_id)
 
-    keypair = user.keypairs[key_id]
-    machine_uid = [cloud_id, machine_id]
+
+    key = Keypair.objects.get(owner=user, name=key_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    associated = False
+    if Machine.objects(owner=user, key_associations__keypair__exact=key, id=machine_id):
+        log.warning("Keypair '%s' already associated with machine '%s' "
+                    "in cloud '%s'", key_id, cloud_id, machine_id)
+        associated = True
+
+    machine = Machine.objects.get(owner=user, cloud=cloud, id=machine_id)
+
 
     # check if key already associated
-    associated = False
-    for machine in keypair.machines:
-        if machine[:2] == machine_uid:
-            log.warning("Keypair '%s' already associated with machine '%s' "
-                        "in cloud '%s'", key_id, cloud_id, machine_id)
-            associated = True
     # if not already associated, create the association
     # this is only needed if association doesn't exist and host is not provided
     # associations will otherwise be created by shell.autoconfigure upon
     # succesful connection
     if not host:
         if not associated:
-            for i in range(3):
-                try:
-                    assoc = [cloud_id,
-                             machine_id,
-                             0,
-                             username,
-                             False,
-                             port]
-                    user.keypairs[key_id].machines.append(assoc)
-                    user.keypairs[key_id].save()
-                    user.save()
-                except:
-                    if i == 2:
-                        log.error('RACE CONDITION: failed to recover from previous race conditions')
-                        raise
-                    else:
-                        log.error('RACE CONDITION: trying to recover from race condition')
-                else:
-                    break
+            key_assoc = KeyAssociation(keypair=key, last_used=0,
+                                       ssh_user=username, sudo=False, port=port)
+            machine.key_associations.append(key_assoc)
+            machine.save()
             trigger_session_update(user.email, ['keys'])
         return
 
@@ -1203,21 +1164,13 @@ def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
     """
 
     log.info("Disassociating key, undeploy = %s" % host)
+    key = Keypair.objects.get(owner=user, name=key_id)
 
-    if key_id not in user.keypairs:
-        raise KeypairNotFoundError(key_id)
-    ## if cloud_id not in user.clouds:
-        ## raise CloudNotFoundError(cloud_id)
-
-    keypair = user.keypairs[key_id]
-    machine_uid = [cloud_id, machine_id]
-    key_found = False
-    for machine in keypair.machines:
-        if machine[:2] == machine_uid:
-            key_found = True
-            break
+    machine = Machine.objects.get(owner=user,
+                                  key_associations__keypair__exact=key,
+                                  id=machine_id)
     # key not associated
-    if not key_found:
+    if not machine:
         raise BadRequestError("Keypair '%s' is not associated with "
                               "machine '%s'" % (key_id, machine_id))
 
@@ -1232,15 +1185,12 @@ def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
             ssh_command(user, cloud_id, machine_id, host, command)
         except:
             pass
-
     # removing key association
-    keypair = user.keypairs[key_id]
-    for machine in keypair.machines:
-        if machine[:2] == machine_uid:
-            keypair.machines.remove(machine)
-            Keypair.save()
-            user.save()
+    for assoc in machine.key_associations:
+        if assoc.keypair = key:
             break
+    machine.key_associations.remove(assoc)
+    machine.save()
     trigger_session_update(user.email, ['keys'])
 
 
@@ -1469,11 +1419,9 @@ def get_machine_actions(machine_from_api, conn, extra):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-
-    if cloud_id not in user.clouds_dict:
-        raise CloudNotFoundError(cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
     try:
-        conn = connect_provider(user.clouds_dict[cloud_id])
+        conn = connect_provider(cloud)
         machines = conn.list_nodes()
     except InvalidCredsError:
         raise CloudUnauthorizedError()
@@ -1557,11 +1505,12 @@ def list_machines(user, cloud_id):
 
         if m.driver.type == 'bare_metal':
             can_reboot = False
-            keypairs = user.keypairs
-            for key_id in keypairs:
-                for machine in keypairs[key_id].machines:
-                    if [cloud_id, m.id] == machine[:2]:
-                        can_reboot = True
+            keys = Keypair.objects(owner=user)
+            machine = Machine.objects(owner=user,
+                                      key_associations__keypair__in=keys,
+                                      id=machine_id)
+            if machine:
+                can_reboot = True
             m.extra['can_reboot'] = can_reboot
 
         if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
@@ -1633,30 +1582,22 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     """
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
-
-    if cloud_id not in user.clouds_dict:
-        raise CloudNotFoundError(cloud_id)
-    conn = connect_provider(user.clouds_dict[cloud_id])
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    conn = connect_provider(cloud)
 
     machine_name = machine_name_validator(conn.type, machine_name)
-
-    if key_id and key_id not in user.keypairs:
-        raise KeypairNotFoundError(key_id)
+    key = None
+    if key_id:
+        key = Keypair.objects.get(owner=user, name=key_id)
 
     # if key_id not provided, search for default key
     if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
         if not key_id:
-            for kid in user.keypairs:
-                if user.keypairs[kid].default:
-                    key_id = kid
-                    break
-        if key_id is None:
-            raise KeypairNotFoundError("Couldn't find default keypair")
-
-    if key_id:
-        keypair = user.keypairs[key_id]
-        private_key = keypair.private
-        public_key = keypair.public
+            key = Keypair.objects.get(owner=user, default=True)
+            key_id = key.name
+    if key:
+        private_key = key.private
+        public_key = key.public
     else:
         public_key = None
 
@@ -1666,21 +1607,20 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     location = NodeLocation(location_id, name=location_name, country='', driver=conn)
 
     if conn.type is Provider.DOCKER:
-        if key_id:
+        if public_key:
             node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
                                           docker_env=docker_env, docker_command=docker_command,
                                           docker_port_bindings=docker_port_bindings,
                                           docker_exposed_ports=docker_exposed_ports)
-        else:
-            node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
-                                          docker_command=docker_command, docker_port_bindings=docker_port_bindings,
-                                          docker_exposed_ports=docker_exposed_ports)
-        if key_id and key_id in user.keypairs:
             node_info = conn.inspect_node(node)
             try:
                 ssh_port = int(node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort'])
             except:
                 pass
+        else:
+            node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
+                                          docker_command=docker_command, docker_port_bindings=docker_port_bindings,
+                                          docker_exposed_ports=docker_exposed_ports)
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
         node = _create_machine_rackspace(conn, public_key, machine_name, image,
@@ -2546,15 +2486,13 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
                                                                    actions))
-
-    if cloud_id not in user.clouds_dict:
-        raise CloudNotFoundError()
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
 
     bare_metal = False
-    if user.clouds_dict[cloud_id].provider == 'bare_metal':
+    if cloud.provider == 'bare_metal':
         bare_metal = True
     try:
-        conn = connect_provider(user.clouds_dict[cloud_id])
+        conn = connect_provider(cloud)
     except InvalidCredsError:
         raise CloudUnauthorizedError()
     except Exception as exc:
@@ -2603,7 +2541,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     port = 22
 
                 machine_uid = [cloud_id, machine_id]
-
+                # ############################################################ continue here
                 for keypair in user.keypairs:
                     for machine in user.keypairs[keypair].machines:
                         if machine[:2] == machine_uid:
