@@ -1605,7 +1605,7 @@ def list_machines(user, cloud_id):
         conn.disconnect()
     return ret
 
-
+# command is not an arg into function, but in post deploy steps there is?
 def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
@@ -1617,7 +1617,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False,
                    associate_floating_ip_subnet=None, project_id=None,
-                   cronjob={}
+                   cronjob={}, command=None
                    ):
 
     """Creates a new virtual machine on the specified cloud.
@@ -1641,6 +1641,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     """
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
+
 
     if cloud_id not in user.clouds:
         raise CloudNotFoundError(cloud_id)
@@ -1771,13 +1772,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
 
-    # only for mist.core, set cronjob entry
-
-    if cronjob:
-        from mist.core.methods import add_cronjob_entry
-        cronjob["machines_per_cloud"] = [[cloud_id, node.id]]
-        cronjob_info = add_cronjob_entry(user, cronjob)
-
     # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
@@ -1788,7 +1782,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
     elif conn.type == Provider.HPCLOUD:
         mist.io.tasks.hpcloud_post_create_steps.delay(
@@ -1797,7 +1791,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
@@ -1809,7 +1803,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                 job_id = job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
                 post_script_params=post_script_params,
-                networks=networks
+                networks=networks, cronjob=cronjob,
             )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1821,15 +1815,16 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             script_id=script_id, script_params=script_params,
             job_id = job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob
         )
-    elif key_id:
+
+    elif key_id:   # there is a problem here with command and script
         mist.io.tasks.post_deploy_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
-            script_id=script_id, script_params=script_params,
+            user.email, cloud_id, node.id, monitoring, script=script,
+            key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
 
     ret = {'id': node.id,
@@ -1839,8 +1834,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
            'private_ips': node.private_ips,
            'job_id': job_id,
            }
-    if cronjob:
-        ret['cronjob_entry'] = cronjob_info
 
     return ret
 
