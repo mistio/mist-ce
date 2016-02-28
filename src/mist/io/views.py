@@ -553,10 +553,14 @@ def create_machine(request):
     associate_floating_ip_subnet = params.get('attach_floating_ip_subnet', None)
     project_id = params.get('project', None)
 
-    # only for mist.core, parameters for cronjob type one_off
-    if 'cronjob_type' not in params:
+    # only for mist.core, parameters for cronjob
+    if not params.get('cronjob_type'):
         cronjob = {}
     else:
+        for key in ('cronjob_name', 'cronjob_type', 'cronjob_entry'):
+            if key not in params:
+                raise RequiredParameterMissingError(key)
+
         cronjob= {
             'name': params.get('cronjob_name'),
             'description': params.get('description', ''),
@@ -565,7 +569,7 @@ def create_machine(request):
             'cronjob_type': params.get('cronjob_type'),
             'cronjob_entry': params.get('cronjob_entry'),
             'expires': params.get('expires', ''),
-            'enabled': params.get('cronjob_enabled'),
+            'enabled': bool(params.get('cronjob_enabled', False)),
             'run_immediately': params.get('run_immediately', False),
             }
 
@@ -593,6 +597,7 @@ def create_machine(request):
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
+
         args = (user.email, ) + args
         kwargs.update({'quantity': quantity, 'persist': persist})
         tasks.create_machine_async.apply_async(args, kwargs, countdown=2)
