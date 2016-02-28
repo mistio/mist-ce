@@ -94,11 +94,13 @@ def ssh_command(email, cloud_id, machine_id, host, command,
 
 
 @app.task(bind=True, default_retry_delay=3*60)
-def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
+def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
                       key_id=None, username=None, password=None, port=22,
                       script_id='', script_params='', job_id=None,
-                      hostname='', plugins=None,
-                      post_script_id='', post_script_params=''):
+                      hostname='', plugins=None, script=None,
+                      post_script_id='', post_script_params='', cronjob={}):
+
+
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
     from mist.io.methods import create_dns_a_record
@@ -109,13 +111,13 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
     else:
         from mist.io.methods import enable_monitoring
         log_event = lambda *args, **kwargs: None
-
     job_id = job_id or uuid.uuid4().hex
 
     user = user_from_email(email)
     tmp_log = lambda msg, *args: log.error('Post deploy: %s' % msg, *args)
     tmp_log('Entering post deploy steps for %s %s %s',
             user.email, cloud_id, machine_id)
+
     try:
         # find the node we're looking for and get its hostname
         node = None
@@ -244,6 +246,25 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
                 error = ret['error']
                 tmp_log('executed post_script_id %s', script_id)
 
+            # only for mist.core, set cronjob entry as a post deploy step
+            if cronjob:
+                try:
+                    from mist.core.methods import add_cronjob_entry
+                    tmp_log('Add cronjob entry %s', cronjob["name"])
+                    cronjob["machines_per_cloud"] = [[cloud_id, machine_id]]
+                    cronjob_info = add_cronjob_entry(user, cronjob)
+                    tmp_log("A cronjob entry was added")
+                    log_event(action='add cronjob entry',
+                              cronjob=cronjob_info.to_json(), **log_dict)
+
+                except Exception as e:
+                    print repr(e)
+                    error = True
+                    notify_user(user, "add cronjob entry failed for machine %s"
+                                % machine_id, repr(e))
+                    log_event(action='Add cronjob entry failed', error=repr(e),
+                              **log_dict)
+
             log_event(action='post_deploy_finished', error=error, **log_dict)
 
         except (ServiceUnavailableError, SSHException) as exc:
@@ -274,7 +295,8 @@ def hpcloud_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                               command, key_id, username, password, public_key,
                               script_id='', script_params='', job_id=None,
                               hostname='', plugins=None,
-                              post_script_id='', post_script_params=''):
+                              post_script_id='', post_script_params='',
+                              cronjob={}):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -320,7 +342,7 @@ def hpcloud_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                     script_id=script_id, script_params=script_params,
                     job_id=job_id, hostname=hostname, plugins=plugins,
                     post_script_id=post_script_id,
-                    post_script_params=post_script_params,
+                    post_script_params=post_script_params, cronjob=cronjob
                 )
 
             except:
@@ -336,7 +358,7 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                                 script_id='', script_params='', job_id=None,
                                 hostname='', plugins=None,
                                 post_script_id='', post_script_params='',
-                                networks=[]):
+                                networks=[], cronjob={}):
 
     from mist.io.methods import connect_provider
     user = user_from_email(email)
@@ -361,7 +383,7 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
-                post_script_params=post_script_params,
+                post_script_params=post_script_params, cronjob=cronjob
             )
 
         else:
@@ -417,7 +439,7 @@ def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                             command, key_id, username, password, public_key,
                             script_id='', script_params='', job_id=None,
                             hostname='', plugins=None,
-                            post_script_id='', post_script_params=''):
+                            post_script_id='', post_script_params='',cronjob={}):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
 
@@ -475,7 +497,7 @@ def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
-                post_script_params=post_script_params,
+                post_script_params=post_script_params, cronjob=cronjob,
             )
 
         except Exception as exc:
@@ -490,7 +512,7 @@ def rackspace_first_gen_post_create_steps(
     self, email, cloud_id, machine_id, monitoring, command, key_id,
     password, public_key, username='root', script_id='', script_params='',
     job_id=None, hostname='', plugins=None, post_script_id='',
-    post_script_params=''
+    post_script_params='', cronjob={}
 ):
     from mist.io.methods import connect_provider
     user = user_from_email(email)
@@ -535,7 +557,7 @@ def rackspace_first_gen_post_create_steps(
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
-                post_script_params=post_script_params,
+                post_script_params=post_script_params, cronjob=cronjob
             )
 
         except Exception as exc:
@@ -821,6 +843,9 @@ class ListMachines(UserTask):
             return 20*60
 
 
+
+
+
 class ProbeSSH(UserTask):
     abstract = False
     task_key = 'probe'
@@ -890,7 +915,10 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          azure_port_bindings='', hostname='', plugins=None,
                          disk_size=None, disk_path=None,
                          cloud_init='', associate_floating_ip=False,
-                         associate_floating_ip_subnet=None, project_id=None):
+                         associate_floating_ip_subnet=None, project_id=None,
+                         cronjob={}):
+
+
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -930,7 +958,8 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
              'cloud_init': cloud_init,
              'disk_size': disk_size,
              'disk_path': disk_path,
-             'project_id': project_id}
+             'project_id': project_id,
+             'cronjob': cronjob}
         ))
 
     def create_machine_wrapper(args_kwargs):
