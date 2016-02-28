@@ -109,23 +109,34 @@ class MistIoApi(object):
         req.delete = req.unavailable_api_call
         return req
 
-    def create_machine(self, cloud_id, key_id, name, location, image, size,
+    def create_machine(self, cloud_id, key_id, name, provider, location, image, size,
                        script=None, disk=None, image_extra=None, cookie=None,
-                       csrf_token=None, api_token=None):
+                       csrf_token=None, api_token=None, cron_enable=False,
+                       cron_type=None, cron_entry=None, cron_script=None,
+                       cron_name=None, async=False):
         # ! disk and image_extra are required only for Linode
+        # ! cronjobs' variables are required only if we want to set a scheduler
+        # ! this way cronjob vars pass empty in create machine params
         payload = {
             # 'cloud': cloud_id,
             'key': key_id,
             'name': name,
+            'provider': provider,
             'location': location,
             'image': image,
             'size': size,
             'script': script,
             'disk': disk,
-            'image_extra': image_extra
+            'image_extra': image_extra,
+            'cronjob_enabled': cron_enable,
+            'cronjob_type': cron_type,
+            'cronjob_entry': cron_entry,
+            'cronjob_script_id': cron_script,
+            'cronjob_name': cron_name,
+            'async': async
         }
         req = MistRequests(uri=self.uri + "/clouds/" + cloud_id + "/machines",
-                           cookie=cookie, data=payload, timeout=600,
+                           cookie=cookie, data=json.dumps(payload), timeout=600,
                            csrf_token=csrf_token, api_token=api_token)
 
         req.get = req.unavailable_api_call
