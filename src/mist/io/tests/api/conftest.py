@@ -40,7 +40,7 @@ def script_id():
     return config.SCRIPT_ID
 
 @pytest.fixture
-def machines_per_clouds():
+def machines_per_cloud():
     return config.MACHINES_PER_CLOUD
 
 @pytest.fixture
