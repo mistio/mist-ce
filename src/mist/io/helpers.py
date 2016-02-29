@@ -111,7 +111,8 @@ def parse_ping(stdout):
     """Parse ping's stdout and return dict of extracted metrics."""
     re_header = "^--- (.*) ping statistics ---$"
     re_packets = "^([\d]+) packets transmitted, ([\d]+)"
-    re_rtt = ".*min/avg/max/[a-z]* = ([\d]+\.[\d]+)/([\d]+\.[\d]+)/([\d]+\.[\d]+)"
+    re_rtt = ".*min/avg/max/[a-z]* = " \
+             "([\d]+\.[\d]+)/([\d]+\.[\d]+)/([\d]+\.[\d]+)"
     lines = stdout.split("\n")
     for i in range(len(lines) - 2):
         line = lines[i]
@@ -176,7 +177,7 @@ def amqp_subscribe(exchange, callback, queue='',
 
     connection = Connection(config.AMQP_URI)
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange, type=ex_type, auto_delete=true)
+    channel.exchange_declare(exchange=exchange, type=ex_type, auto_delete=True)
     resp = channel.queue_declare(queue, exclusive=True)
     if not routing_keys:
         channel.queue_bind(resp.queue, exchange)
@@ -203,7 +204,7 @@ def _amqp_user_exchange(user):
         email = user
     else:
         email = user.email
-    tag = email.replace('@', ':') or 'noone'
+    tag = email.replace('@', ':') or 'none'
     return "mist-user_%s" % tag
 
 
@@ -335,7 +336,6 @@ def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
         msg = "Host '%s' resolves to '%s' which" % (host, ipaddr)
     else:
         msg = "Host '%s'" % host
-
 
     if not netaddr.valid_ipv4(ipaddr):
         raise MistError(msg + " is not a valid IPv4 address.")

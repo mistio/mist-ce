@@ -1,5 +1,6 @@
 """mist.io.socket.
 
+
 Here we define the socketio Connection and handlers.
 
 When a user loads mist.io or comes back online, their browser will request a
@@ -26,7 +27,8 @@ try:
     from mist.core.auth.methods import user_from_session_id
     from mist.core import config
     from mist.core.methods import get_stats
-    from mist.core.cloud.models import Cloud, Machine, Keypair
+    from mist.core.cloud.models import Cloud, Machine
+    from mist.core.keypair.models import Keypair
     multi_user = True
 except ImportError:
     from mist.io.helpers import user_from_session_id

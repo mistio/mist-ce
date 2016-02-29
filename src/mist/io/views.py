@@ -19,13 +19,16 @@ try:
     from mist.core import config
     from mist.core.helpers import view_config
     from mist.core.auth.methods import user_from_request
+    from mist.core.models import Keypair
+    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+
 except ImportError:
     from mist.io import config
     from mist.io.helpers import user_from_request
     from pyramid.view import view_config
 
 from mist.io import methods
-from mist.io.model import Keypair
+
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
 import pyramid.httpexceptions
@@ -70,7 +73,6 @@ def exception_handler_mist(exc, request):
 def not_found(self, request):
 
     return pyramid.httpexceptions.HTTPFound(request.host_url+"/#"+request.path)
-
 
 
 @view_config(route_name='home', request_method='GET',
@@ -118,7 +120,7 @@ def check_auth(request):
         user.email = email
         user.mist_api_token = ret_dict.pop('token', '')
         user.save()
-        log.info("succesfully check_authed")
+        log.info("successfully check_authed")
         return ret_dict
     else:
         log.error("Couldn't check_auth to mist.io: %r", ret)
@@ -294,12 +296,18 @@ def toggle_cloud(request):
         raise BadRequestError('Invalid cloud state')
 
     user = user_from_request(request)
-    if cloud_id not in user.clouds:
-        raise CloudNotFoundError()
-    user.clouds_dict[cloud_id].enabled = bool(int(new_state))
-    user.clouds_dict[cloud_id].save()
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud.enabled=bool(int(new_state))
+    cloud.save()
     trigger_session_update(user.email, ['clouds'])
     return OK
+
+    # if cloud_id not in user.clouds:
+    #     raise CloudNotFoundError()
+    # user.clouds_dict[cloud_id].enabled = bool(int(new_state))
+    # user.clouds_dict[cloud_id].save()
+    # trigger_session_update(user.email, ['clouds'])
+    # return OK
 
 
 @view_config(route_name='keys', request_method='GET', renderer='json')
@@ -323,10 +331,10 @@ def add_key(request):
     user = user_from_request(request)
     key_id = methods.add_key(user, key_id, private_key)
 
-    keypair = user.keypairs[key_id]
+    keypair = Keypair.objects.get(owner=user, id=key_id)
 
     return {'id': key_id,
-            'machines': keypair.machines,
+            'machines': keypair.machines, # TODO transform KeyAssociation the old way
             'isDefault': keypair.default}
 
 
@@ -433,9 +441,7 @@ def get_private_key(request):
     key_id = request.matchdict['key']
     if not key_id:
         raise RequiredParameterMissingError("key_id")
-    if key_id not in user.keypairs:
-        raise KeypairNotFoundError(key_id)
-    return user.keypairs[key_id].private
+    return Keypair.objects.get(owner=user, id=key_id).private
 
 
 @view_config(route_name='key_public', request_method='GET', renderer='json')
@@ -444,9 +450,7 @@ def get_public_key(request):
     key_id = request.matchdict['key']
     if not key_id:
         raise RequiredParameterMissingError("key_id")
-    if key_id not in user.keypairs:
-        raise KeypairNotFoundError(key_id)
-    return user.keypairs[key_id].public
+    return Keypair.objects.get(owner=user, id=key_id).public
 
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
@@ -478,7 +482,7 @@ def associate_key(request):
     methods.associate_key(user, key_id, cloud_id, machine_id, host,
                           username=ssh_user, port=ssh_port)
     return user.keypairs[key_id].machines
-
+# TODO
 
 @view_config(route_name='key_association', request_method='DELETE',
              renderer='json')
@@ -493,7 +497,7 @@ def disassociate_key(request):
     user = user_from_request(request)
     methods.disassociate_key(user, key_id, cloud_id, machine_id, host)
     return user.keypairs[key_id].machines
-
+# TODO
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
@@ -601,7 +605,8 @@ def machine_actions(request):
     # plan_id is the id of the plan to resize
     name = params.get('name', '')
 
-    if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename', 'undefine', 'suspend', 'resume'):
+    if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename',
+                  'undefine', 'suspend', 'resume'):
         if action == 'start':
             methods.start_machine(user, cloud_id, machine_id)
         elif action == 'stop':
@@ -629,6 +634,7 @@ def machine_actions(request):
 @view_config(route_name='machine_rdp', request_method='GET', renderer="json")
 def machine_rdp(request):
     "Generate and return an rdp file for windows machines"
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
