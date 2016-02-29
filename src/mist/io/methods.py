@@ -2883,13 +2883,15 @@ def transform_key_machine_associations(machines, keypair): # TODO put function i
                                         key_assoc.sudo,
                                         key_assoc.port])
     return key_associations
+
+
 def list_keys(user):
     keys = Keypair.objects(owner=user).only("id", "default")
     clouds = Cloud.objects(owner=user)
     key_objects = []
     for key in keys:
         key_object = {}
-        machines = Machine.objects(cloud__in=cloud,
+        machines = Machine.objects(cloud__in=clouds,
                                    key_associations__keypair__exact=key)
         key_object["id"] = key.id
         key_object["isDefault"] = key.default
