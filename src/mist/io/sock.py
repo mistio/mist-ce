@@ -193,6 +193,7 @@ class UserUpdatesConsumer(Consumer):
 
 
 class MainConnection(MistConnection):
+
     def on_open(self, conn_info):
         super(MainConnection, self).on_open(conn_info)
         self.running_machines = set()
@@ -217,12 +218,13 @@ class MainConnection(MistConnection):
     def list_clouds(self):
         clouds_view = methods.list_clouds(self.user)
         self.send('list_clouds', clouds_view)
-        clouds = Cloud.objects(owner=user, enabled=True)
+        clouds = Cloud.objects(owner=self.user, enabled=True)
         for key, task in (('list_machines', tasks.ListMachines()),
                           ('list_images', tasks.ListImages()),
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
-                          ('list_locations', tasks.ListLocations()), ('list_projects', tasks.ListProjects()),):
+                          ('list_locations', tasks.ListLocations()),
+                          ('list_projects', tasks.ListProjects()),):
 
             for cloud in clouds:
                 cached = task.smart_delay(self.user.email, cloud.id)
