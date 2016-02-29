@@ -33,8 +33,12 @@ from mist.io.helpers import get_auth_header
 
 
 try:  # Multi-user environment
+    from mist.core.user.models import User
+    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+    from mist.core.keypair.models import Keypair
     from mist.core.helpers import user_from_email
     from mist.core import config
+
     multi_user = True
     cert_path = "src/mist.io/cacert.pem"
     celery_cfg = 'mist.core.celery_config'
@@ -69,7 +73,11 @@ def update_machine_count(email, cloud_id, machine_count):
         return
 
     user = user_from_email(email)
-    user.clouds_dict[cloud_id].machine_count = machine_count
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud.machine_count = machine_count
+    # user.clouds_dict[cloud_id].machine_count = machine_count
+    # TODO machine count property function
+    # TODO total machine count property function
     user.total_machine_count = sum(
         [cloud.machine_count for cloud in user.clouds]
     )
@@ -147,7 +155,8 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
             )
             tmp_log('connected to shell')
             result = probe_ssh_only(user, cloud_id, machine_id, host=None,
-                           key_id=key_id, ssh_user=ssh_user, shell=shell)
+                                    key_id=key_id, ssh_user=ssh_user,
+                                    shell=shell)
             log_dict = {
                     'email': email,
                     'event_type': 'job',
@@ -160,11 +169,10 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
                 }
 
             log_event(action='probe', result=result, **log_dict)
-            cloud = user.clouds_dict[cloud_id]
-            msg = "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title,
-                                                        cloud_id)
-            msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name,
-                                                             node.id)
+            cloud = Cloud.objects(owner=user, id=cloud_id)
+            # cloud = user.clouds_dict[cloud_id]
+            msg = "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title, cloud_id)
+            msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name, node.id)
 
             if hostname:
                 try:
@@ -187,7 +195,8 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
                 tmp_log('executed script_id %s', script_id)
             elif command:
                 tmp_log('will run command %s', command)
-                log_event(action='deployment_script_started', command=command, **log_dict)
+                log_event(action='deployment_script_started', command=command,
+                          **log_dict)
                 start_time = time()
                 retval, output = shell.command(command)
                 tmp_log('executed command %s', command)
@@ -261,6 +270,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command,
             error="Couldn't connect to run post deploy steps.",
             job_id=job_id
         )
+
 
 @app.task(bind=True, default_retry_delay=2*60)
 def hpcloud_post_create_steps(self, email, cloud_id, machine_id, monitoring,
@@ -360,16 +370,19 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
             try:
                 created_floating_ips = []
                 for network in networks['public']:
-                    created_floating_ips += [floating_ip for floating_ip in network['floating_ips']]
+                    created_floating_ips += [floating_ip for floating_ip
+                                             in network['floating_ips']]
 
-                # From the already created floating ips try to find one that is not associated to a node
+                # From the already created floating ips try to find one
+                # that is not associated to a node
                 unassociated_floating_ip = None
                 for ip in created_floating_ips:
                     if not ip['node_id']:
                         unassociated_floating_ip = ip
                         break
 
-                # Find the ports which are associated to the machine (e.g. the ports of the private ips)
+                # Find the ports which are associated to the machine
+                # (e.g. the ports of the private ips)
                 # and use one to associate a floating ip
                 ports = conn.ex_list_ports()
                 machine_port_id = None
@@ -379,11 +392,14 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                         break
 
                 if unassociated_floating_ip:
-                    log.info("Associating floating ip with machine: %s" % node.id)
-                    ip = conn.ex_associate_floating_ip_to_node(unassociated_floating_ip['id'], machine_port_id)
+                    log.info("Associating floating "
+                             "ip with machine: %s" % node.id)
+                    ip = conn.ex_associate_floating_ip_to_node(
+                        unassociated_floating_ip['id'], machine_port_id)
                 else:
                     # Find the external network
-                    log.info("Create and associating floating ip with machine: %s" % node.id)
+                    log.info("Create and associating floating ip with "
+                             "machine: %s" % node.id)
                     ext_net_id = networks['public'][0]['id']
                     ip = conn.ex_create_floating_ip(ext_net_id, machine_port_id)
 
@@ -429,14 +445,17 @@ def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
             raise self.retry(exc=Exception(), max_retries=20)
 
         try:
-            # login with user, password. Deploy the public key, enable sudo access for
+            # login with user, password. Deploy the public key,
+            # enable sudo access for
             # username, disable password authentication and reload ssh.
-            # After this is done, call post_deploy_steps if deploy script or monitoring
+            # After this is done, call post_deploy_steps if deploy
+            # script or monitoring
             # is provided
             ssh = paramiko.SSHClient()
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(host, username=username, password=password, timeout=None, allow_agent=False, look_for_keys=False)
+            ssh.connect(host, username=username, password=password,
+                        timeout=None, allow_agent=False, look_for_keys=False)
 
             ssh.exec_command('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % public_key)
 
@@ -505,7 +524,7 @@ def rackspace_first_gen_post_create_steps(
             # login with user, password and deploy the ssh public key. Disable password authentication and reload ssh.
             # After this is done, call post_deploy_steps if deploy script or monitoring
             # is provided
-            ssh=paramiko.SSHClient()
+            ssh = paramiko.SSHClient()
             ssh.load_system_host_keys()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(host, username=username, password=password, timeout=None, allow_agent=False, look_for_keys=False)
@@ -707,11 +726,13 @@ class ListNetworks(UserTask):
     soft_time_limit = 30
 
     def execute(self, email, cloud_id):
-        log.warn('Running list networks for user %s cloud %s' % (email, cloud_id))
+        log.warn('Running list networks for user %s cloud %s'
+                 % (email, cloud_id))
         from mist.io import methods
         user = user_from_email(email)
         networks = methods.list_networks(user, cloud_id)
-        log.warn('Returning list networks for user %s cloud %s' % (email, cloud_id))
+        log.warn('Returning list networks for user %s cloud %s'
+                 % (email, cloud_id))
         return {'cloud_id': cloud_id, 'networks': networks}
 
 
@@ -728,7 +749,8 @@ class ListImages(UserTask):
         from mist.io import methods
         user = user_from_email(email)
         images = methods.list_images(user, cloud_id)
-        log.warn('Returning list images for user %s cloud %s' % (email, cloud_id))
+        log.warn('Returning list images for user %s cloud %s' %
+                 (email, cloud_id))
         return {'cloud_id': cloud_id, 'images': images}
 
 
@@ -741,11 +763,13 @@ class ListProjects(UserTask):
     soft_time_limit = 30
 
     def execute(self, email, cloud_id):
-        log.warn('Running list projects for user %s cloud %s' % (email, cloud_id))
+        log.warn('Running list projects for user %s cloud %s' %
+                 (email, cloud_id))
         from mist.io import methods
         user = user_from_email(email)
         projects = methods.list_projects(user, cloud_id)
-        log.warn('Returning list projects for user %s cloud %s' % (email, cloud_id))
+        log.warn('Returning list projects for user %s cloud %s' %
+                 (email, cloud_id))
         return {'cloud_id': cloud_id, 'projects': projects}
 
 
@@ -770,6 +794,7 @@ class ListMachines(UserTask):
         if multi_user:
             from mist.core.methods import get_resource_tags, set_resource_tags
             for machine in machines:
+                # TODO tags tags tags
                 if machine.get("tags"):
                     tags = {}
                     for tag in machine["tags"]:
@@ -795,7 +820,8 @@ class ListMachines(UserTask):
         user = user_from_email(email)
 
         if len(errors) == 6: # If does not respond for a minute
-            notify_user(user, 'Cloud %s does not respond' % user.clouds_dict[cloud_id].title,
+            notify_user(user, 'Cloud %s does not respond' %
+                        Cloud.objects(owner=user, id=cloud_id).title,
                         email_notify=False, cloud_id=cloud_id)
 
         # Keep retrying every 30 secs for 10 minutes, then every 60 secs for
@@ -805,9 +831,13 @@ class ListMachines(UserTask):
         if index < len(times):
             return times[index]
         else: # If cloud still unresponsive disable it & notify user
-            user.clouds_dict[cloud_id].enabled = False
-            user.clouds_dict[cloud_id].save()
-            notify_user(user, "Cloud %s disabled after not responding for 30mins" % user.clouds_dict[cloud_id].title,
+            cloud = Cloud.objects(owner=user, id=cloud_id)
+            cloud.enabled=False
+            cloud.save()
+            # user.clouds_dict[cloud_id].enabled = False
+            # user.clouds_dict[cloud_id].save()
+            notify_user(user, "Cloud %s disabled after not responding for "
+                              "30 mins" % cloud.title,
                         email_notify=True, cloud_id=cloud_id)
             log_event(user.email, 'incident', action='disable_cloud',
                       cloud_id=cloud_id, error="Cloud unresponsive")
