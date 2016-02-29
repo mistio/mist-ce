@@ -8,10 +8,10 @@ Feature: Add second-tier clouds
   @all-clouds
   Scenario Outline:
     When I click the button "Add cloud"
-    Then I expect for "new-cloud-provider" panel to appear within max 2 seconds
+    Then I expect for "new-cloud-provider" panel to appear within max 4 seconds
     And I click the button "<provider>"
-    And I expect for "new-cloud-provider" panel to disappear within max 2 seconds
-    Then I expect for "cloud-add-fields" to be visible within max 2 seconds
+    And I expect for "new-cloud-provider" panel to disappear within max 4 seconds
+    Then I expect for "cloud-add-fields" to be visible within max 4 seconds
     And I wait for 1 seconds
     When I use my "<credentials>" credentials
     And I click the button "Add"
@@ -27,7 +27,7 @@ Feature: Add second-tier clouds
     | SoftLayer             | SOFTLAYER    |
     | EC2                   | EC2          |
     | NephoScale            | NEPHOSCALE   |
-#    | Linode                | LINODE       |
+    | Linode                | LINODE       |
 #    | Packet.net            | PACKET       |
 #    | VMware vCloud         | VMWARE       |
 #    | Indonesian Cloud      | INDONESIAN   |
