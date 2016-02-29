@@ -1,4 +1,4 @@
-"""mist.io.socket
+"""mist.io.socket.
 
 Here we define the socketio Connection and handlers.
 
@@ -26,6 +26,7 @@ try:
     from mist.core.auth.methods import user_from_session_id
     from mist.core import config
     from mist.core.methods import get_stats
+    from mist.core.cloud.models import Cloud, Machine, Keypair
     multi_user = True
 except ImportError:
     from mist.io.helpers import user_from_session_id
@@ -212,19 +213,20 @@ class MainConnection(MistConnection):
         self.send('list_keys', methods.list_keys(self.user))
 
     def list_clouds(self):
-        clouds = methods.list_clouds(self.user)
-        self.send('list_clouds', clouds)
+        clouds_view = methods.list_clouds(self.user)
+        self.send('list_clouds', clouds_view)
+        clouds = Cloud.objects(owner=user, enabled=True)
         for key, task in (('list_machines', tasks.ListMachines()),
                           ('list_images', tasks.ListImages()),
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
                           ('list_locations', tasks.ListLocations()), ('list_projects', tasks.ListProjects()),):
-            for cloud_id in self.user.clouds_dict:
-                if self.user.clouds_dict[cloud_id].enabled:
-                    cached = task.smart_delay(self.user.email, cloud_id)
-                    if cached is not None:
-                        log.info("Emitting %s from cache", key)
-                        self.send(key, cached)
+
+            for cloud in clouds:
+                cached = task.smart_delay(self.user.email, cloud.id)
+                if cached is not None:
+                    log.info("Emitting %s from cache", key)
+                    self.send(key, cached)
 
     def check_monitoring(self):
         try:
@@ -285,8 +287,9 @@ class MainConnection(MistConnection):
                 machines = result['machines']
                 cloud_id = result['cloud_id']
                 # update cloud machine count in multi-user setups
+                cloud = Cloud.objects.get(owner=self.user, id=cloud_id)
                 try:
-                    mcount = self.user.clouds_dict[cloud_id].machine_count
+                    mcount = Machine.objects(cloud=cloud).count()
                     if multi_user and len(machines) != mcount:
                         tasks.update_machine_count.delay(self.user.email,
                                                          cloud_id,
@@ -313,15 +316,11 @@ class MainConnection(MistConnection):
                         continue
 
                     has_key = False
-                    for k in self.user.keypairs.values():
-                        for m in k.machines:
-                            if m[:2] == [cloud_id, machine['id']]:
-                                has_key = True
-                                break
-                        if has_key:
-                            break
-
-                    if has_key:
+                    keypairs = Keypair.objects(owner=self.user)
+                    machine = Machine.get(cloud=cloud,
+                                          machine_id=machine["id"],
+                                          key_associations__not__size=0)
+                    if machine:
                         cached = tasks.ProbeSSH().smart_delay(
                             self.user.email, cloud_id, machine['id'], ips[0]
                         )
