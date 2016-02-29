@@ -114,7 +114,7 @@
         }
         </style>
         <paper-material>
-            <theme-color color="[[color]]" class="vertical content layout" themed-reverse>
+            <theme-color color="[[statecolor]]" class="vertical content layout" themed-reverse>
                 <h2 class="count">[[count]]</h2>
                 <h3 class="title">[[name]] <iron-icon icon="[[icon]]"></iron-icon></h3>
             </theme-color>
@@ -131,7 +131,17 @@ Polymer({
         },
         count: {
             type: Number
+        },
+        color: {
+            type: String
+        },
+        statecolor: {
+            type: String,
+            computed: "_computeStateColor(count, color)"
         }
+    },
+    _computeStateColor: function (count, color){
+        return (count ? color : "#eeeeee" );
     },
     attached: function() {
         var tiles = this.parentNode.querySelectorAll('section-tile');
