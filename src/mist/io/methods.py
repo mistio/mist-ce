@@ -2903,7 +2903,7 @@ def list_keys(user):
 
 def list_sizes(user, cloud_id):
     """List sizes (aka flavors) from each cloud."""
-    Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
     conn = connect_provider(cloud)
 
     try:
@@ -3472,7 +3472,7 @@ def delete_machine_tag(user, cloud_id, machine_id, tag):
         raise RequiredParameterMissingError("tag")
     conn = connect_provider(cloud)
 
-    if type(tag) ==  unicode:
+    if type(tag) == unicode:
         tag = tag.encode('utf-8')
 
     if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
@@ -3516,7 +3516,7 @@ def delete_machine_tag(user, cloud_id, machine_id, tag):
                     mkey = tag_data.get('key')
                     mdata = tag_data.get('value')
                     if tag == mkey:
-                        metadata.remove({u'value':mdata, u'key':mkey})
+                        metadata.remove({u'value': mdata, u'key': mkey})
                 conn.ex_set_node_metadata(machine, metadata)
             except Exception as exc:
                 raise InternalServerError("Error while updating metadata", exc)
@@ -3524,9 +3524,9 @@ def delete_machine_tag(user, cloud_id, machine_id, tag):
             tags = machine.extra.get('metadata', None)
             key = None
             for mkey, mdata in tags.iteritems():
-                if type(mkey) ==  unicode:
+                if type(mkey) == unicode:
                     mkey = mkey.encode('utf-8')
-                if type(mdata) ==  unicode:
+                if type(mdata) == unicode:
                     mdata = mdata.encode('utf-8')
                 if tag == mkey:
                     key = mkey
@@ -3792,7 +3792,8 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
                 name = kwargs['machine_name']
             else:
                 try:
-                    name = Machine.objects.get(cloud=cloud, machine_id=machine_id).name
+                    name = Machine.objects.get(cloud=cloud,
+                                               machine_id=machine_id).name
                 except MachineNotFoundError:
                     name = ''
             if name:
@@ -3816,7 +3817,8 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
     try: # Send email in multi-user env
         if email_notify:
             from mist.core.helpers import send_email
-            send_email("[mist.io] %s" % title, body.encode('utf-8', 'ignore'), user.email)
+            send_email("[mist.io] %s" % title, body.encode('utf-8', 'ignore'),
+                       user.email)
     except ImportError:
         pass
 
@@ -3824,7 +3826,7 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
 def find_metrics(user, cloud_id, machine_id):
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
                                                   cloud_id, machine_id)
-    headers={'Authorization': get_auth_header(user)}
+    headers = {'Authorization': get_auth_header(user)}
     try:
         resp = requests.get(url, headers=headers, verify=config.SSL_VERIFY)
     except requests.exceptions.SSLError as exc:
@@ -3840,7 +3842,7 @@ def find_metrics(user, cloud_id, machine_id):
 
 def assoc_metric(user, cloud_id, machine_id, metric_id):
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
-                                                  cloud_id, machine_id)
+                                                cloud_id, machine_id)
     try:
         resp = requests.put(url,
                             headers={'Authorization': get_auth_header(user)},
@@ -3924,7 +3926,7 @@ def deploy_python_plugin(user, cloud_id, machine_id, plugin_id,
         raise BadRequestError("Invalid value_type '%s'. Must be 'gauge' or "
                               "'derive'." % value_type)
 
-    # Iniatilize SSH connection
+    # Initialize SSH connection
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id)
     sftp = shell.ssh.open_sftp()
