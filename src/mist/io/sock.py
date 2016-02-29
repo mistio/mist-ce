@@ -1,4 +1,5 @@
-"""mist.io.socket
+999"""mist.io.socket
+
 
 Here we define the socketio Connection and handlers.
 
@@ -26,6 +27,9 @@ try:
     from mist.core.auth.methods import user_from_session_id
     from mist.core import config
     from mist.core.methods import get_stats
+    from mist.core.user.models import User
+    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+    from mist.core.keypair.models import Keypair
     multi_user = True
 except ImportError:
     from mist.io.helpers import user_from_session_id
