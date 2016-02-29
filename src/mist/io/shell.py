@@ -24,6 +24,9 @@ from mist.io.exceptions import ServiceUnavailableError
 from mist.io.helpers import trigger_session_update
 
 try:
+    from mist.core.user.models import User
+    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+    from mist.core.keypair.models import Keypair
     from mist.core import config
 except ImportError:
     from mist.io import config
@@ -115,8 +118,10 @@ class ParamikoShell(object):
                 break
             except paramiko.AuthenticationException as exc:
                 log.error("ssh exception %r", exc)
-                raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
-                                               % (username, self.host, port, exc))
+                raise MachineUnauthorizedError("Couldn't connect to "
+                                               "%s@%s:%s. %s"
+                                               % (username, self.host,
+                                                  port, exc))
             except socket.error as exc:
                 log.error("Got ssh error: %r", exc)
                 if not attempts:
@@ -127,7 +132,6 @@ class ParamikoShell(object):
                 # eg related to network, but keep until all attempts are made
                 if not attempts:
                     raise ServiceUnavailableError(repr(exc))
-
 
     def disconnect(self):
         """Close the SSH connection."""
@@ -224,13 +228,12 @@ class ParamikoShell(object):
 
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
-        if cloud_id not in user.clouds_dict:
-            raise CloudNotFoundError(cloud_id)
-        if key_id and key_id not in user.keypairs:
-            raise KeypairNotFoundError(key_id)
+        Cloud.objects.get(owner=user,cloud=cloud_id)
+        if key_id:
+            key = Keypair.objects.get(owner=user, name=key_id)
 
         # get candidate keypairs if key_id not provided
-        keypairs = user.keypairs
+        keypairs = Keypair.objects(owner=user)
         if key_id:
             pref_keys = [key_id]
         else:
@@ -240,7 +243,7 @@ class ParamikoShell(object):
             recent_keys = []
             root_keys = []
             sudo_keys = []
-            for key_id in keypairs:
+            for key_id in keypairs:    # TODO vasilis
                 for machine in keypairs[key_id].machines:
                     if [cloud_id, machine_id] == machine[:2]:
                         assoc_keys.append(key_id)
@@ -257,7 +260,7 @@ class ParamikoShell(object):
 
         # try to connect
         for key_id in pref_keys:
-            keypair = user.keypairs[key_id]
+            keypair = Keypair.objects.get(owner=user, name=key_id)
 
             # find username
             users = []
@@ -265,14 +268,14 @@ class ParamikoShell(object):
             if username:
                 users = [username]
             else:
-                for machine in keypair.machines:
+                for machine in keypair.machines:  # TODO VASILIS
                     if machine[:2] == [cloud_id, machine_id]:
                         if len(machine) >= 4 and machine[3]:
                             users.append(machine[3])
                             break
                 # if username not found, try several alternatives
                 # check to see if some other key is associated with machine
-                for other_keypair in user.keypairs.values():
+                for other_keypair in user.keypairs.values():  # TODO vasilis
                     for machine in other_keypair.machines:
                         if machine[:2] == [cloud_id, machine_id]:
                             if len(machine) >= 4 and machine[3]:
@@ -282,7 +285,8 @@ class ParamikoShell(object):
                             if len(machine) >= 6 and machine[5]:
                                 port = machine[5]
                 # check some common default names
-                for name in ['root', 'ubuntu', 'ec2-user', 'user', 'azureuser', 'core', 'centos', 'cloud-user', 'fedora']:
+                for name in ['root', 'ubuntu', 'ec2-user', 'user', 'azureuser',
+                             'core', 'centos', 'cloud-user', 'fedora']:
                     if name not in users:
                         users.append(name)
             for ssh_user in users:
@@ -331,7 +335,7 @@ class ParamikoShell(object):
                 trigger_session_update_flag = False
                 for i in range(3):
                     try:
-                        updated = False
+                        updated = False          # TODO vasilis
                         for i in range(len(user.keypairs[key_id].machines)):
                             machine = user.keypairs[key_id].machines[i]
                             if [cloud_id, machine_id] == machine[:2]:
@@ -348,17 +352,19 @@ class ParamikoShell(object):
                                 if old_ssh_user != ssh_user or old_port != port:
                                     trigger_session_update_flag = True
                             # if association didn't exist, create it!
-                            if not updated:
+                            if not updated:       # TODO vasilis
                                 user.keypairs[key_id].machines.append(assoc)
                                 trigger_session_update_flag = True
                                 user.keypairs[key_id].save()
                             user.save()
                     except:
                         if i == 2:
-                            log.error('RACE CONDITION: shell failed to recover from previous race conditions')
+                            log.error('RACE CONDITION: shell failed to recover '
+                                      'from previous race conditions')
                             raise
                         else:
-                            log.error('RACE CONDITION: shell trying to recover from race condition')
+                            log.error('RACE CONDITION: shell trying to recover '
+                                      'from race condition')
                     else:
                         break
                 if trigger_session_update_flag:
@@ -386,10 +392,7 @@ class DockerShell(object):
     def autoconfigure(self, user, cloud_id, machine_id, **kwargs):
         log.info("autoconfiguring DockerShell for machine %s:%s",
                  cloud_id, machine_id)
-        if cloud_id not in user.clouds:
-            raise CloudNotFoundError(cloud_id)
-
-        cloud = user.clouds[cloud_id]
+        cloud = Cloud.objects.get(owner=user, cloud=cloud_id)
         docker_port = cloud.docker_port
 
         # For basic auth
