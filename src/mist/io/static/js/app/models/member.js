@@ -1,6 +1,6 @@
-define('app/models/team', ['ember'],
+define('app/models/member', ['ember'],
     //
-    //  Team Model
+    //  Member Model
     //
     //  @returns Class
     //
@@ -16,8 +16,9 @@ define('app/models/team', ['ember'],
 
             id: null,
             name: null,
-            members: [],
-            organization: null
+            email: null,
+            team: null
+
         });
     }
 );

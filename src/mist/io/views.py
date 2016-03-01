@@ -77,32 +77,7 @@ def not_found(self, request):
 def home(request):
     """Home page view"""
     user = user_from_request(request)
-    teams = [
-        {
-            'id': 1,
-            'name': 'Frontend Team',
-            'members': [
-                {
-                    'name': 'Marios Fakiolas',
-                    'role': 'Web Developer'
-                }, {
-                    'name': 'Xristina Papakonstantinou',
-                    'role': 'Web Designer'
-                }
-            ],
-            'policies': []
-        }, {
-            'id': 2,
-            'name': 'QA Team',
-            'members': [
-                {
-                    'name': 'Pablo Tziano',
-                    'role': 'QA Developer'
-                }
-            ],
-            'policies': []
-        }
-    ]
+
     return {
         'project': 'mist.io',
         'email': json.dumps(user.email),
@@ -118,8 +93,7 @@ def home(request):
         'is_core': json.dumps(False),
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
-        'last_build': config.LAST_BUILD,
-        'teams': json.dumps(teams)
+        'last_build': config.LAST_BUILD
     }
 
 

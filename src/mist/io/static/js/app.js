@@ -185,6 +185,7 @@ var loadFiles = function (callback) {
         'app/controllers/scripts',
         'app/controllers/organizations',
         'app/controllers/teams',
+        'app/controllers/members',
 
         'app/routes/image',
         'app/routes/images',

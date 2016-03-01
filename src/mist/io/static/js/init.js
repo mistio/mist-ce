@@ -38,8 +38,9 @@ var loadApp = function(
     ScriptRunController,
     ScriptsController,
     ProjectsController,
-    TeamsController,
     OrganizationsController,
+    TeamsController,
+    MembersController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -136,7 +137,7 @@ var loadApp = function(
     App.set('machineImageCreateController', MachineImageCreateController.create());
     App.set('organizationsController', OrganizationsController.create());
     App.set('teamsController', TeamsController.create());
-
+    App.set('membersController', MembersController.create());
 
     // Ember custom widgets
     App.Select = Ember.Select.extend({
@@ -348,7 +349,7 @@ var setupMainChannel = function(socket, callback) {
         });
     }
 
-    var organization = {
+    var organizations = [{
         id: 1,
         name: 'my_organization',
         members: [{
@@ -369,6 +370,7 @@ var setupMainChannel = function(socket, callback) {
             email: 'dr@mist.io'
         }],
         teams: [{
+            id: 1,
             name: 'Frontend Team',
             description: '',
             members: [1, 2],
@@ -383,6 +385,7 @@ var setupMainChannel = function(socket, callback) {
                 }]
             }
         }, {
+            id: 2,
             name: 'QA Team',
             description: '',
             members: [3],
@@ -397,6 +400,7 @@ var setupMainChannel = function(socket, callback) {
                 }]
             }
         }, {
+            id: 3,
             name: 'Backend Team',
             description: '',
             members: [4],
@@ -411,15 +415,17 @@ var setupMainChannel = function(socket, callback) {
                 }]
             }
         }]
-    };
-
-    Mist.teamsController.setModel(organization.teams);
+    }];
 
     socket
         .on('list_keys', function(keys) {
             Mist.keysController.load(keys);
         })
         .on('list_clouds', function(clouds) {
+            console.log(Mist);
+            Mist.organizationsController.load(organizations);
+            // Mist.organizationsController.set('loaded');
+
             Mist.cloudsController.load(clouds);
             Mist.cloudsController.set('loaded');
             if (callback)

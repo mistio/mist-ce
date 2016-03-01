@@ -21,24 +21,15 @@ define('app/views/team', ['app/views/page', 'app/models/team'],
              */
 
             load: function () {
-
                 // Add event listeners
                 Mist.teamsController.on('onTeamListChange', this, 'updateView');
-                // Mist.teamsController.on('onTeamDisassociate', this, 'updateMachines');
-                // Mist.cloudsController.on('onMachineListChange', this, 'updateMachines');
-
                 Ember.run.next(this, this.updateView);
-
             }.on('didInsertElement'),
 
 
             unload: function () {
-
                 // Remove event listeners
                 Mist.teamsController.off('onTeamListChange', this, 'updateView');
-                // Mist.teamsController.off('onTeamDisassociate', this, 'updateMachines');
-                // Mist.cloudsController.off('onMachineListChange', this, 'updateMachines');
-
             }.on('willDestroyElement'),
 
 

@@ -17,7 +17,6 @@ define('app/routes/base', ['ember'],
             }.observes('documentTitle'),
 
             activate: function () {
-                console.log(1);
                 this.setDocumentTitle();
             }
         });
