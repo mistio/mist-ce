@@ -34,25 +34,42 @@ def wait_for_tags(context, seconds, key,value):
 @when(u'I check the sorting by "{sorting_field}"')
 def check_sorting(context, sorting_field):
     """
-    Check the sorting for name, state or cloud in the machines list
+    Check the sorting for name, state or cloud in the machines list. This
+    function checks basically if the machines have the desired vertical
+
     """
     sorting_field = sorting_field.lower()
-    machines_elements = context.browser.find_elements_by_css_selector('#machine-list li.checkbox-link ')
+    machines_elements = context.browser.find_elements_by_css_selector(
+        '#machine-list li.checkbox-link ')
     machines = []
     for machine in machines_elements:
-        name = safe_get_element_text(machine.find_element_by_class_name('machine-name'))
-        state = safe_get_element_text(machine.find_element_by_class_name('machine-state'))
-        cloud = safe_get_element_text(machine.find_element_by_css_selector('.machine-tags .tag:first-child'))
-        machines.append((name, state, cloud))
+        name = safe_get_element_text(
+            machine.find_element_by_class_name('machine-name')).lower()
+        state = safe_get_element_text(
+            machine.find_element_by_class_name('machine-state')).lower()
+        cloud = safe_get_element_text(machine.find_element_by_css_selector(
+            '.machine-tags .tag:first-child')).lower()
+        machines.append((name, state, cloud, machine.location['y']))
 
+    # sort the list of machine tuples
     if sorting_field == 'name':
         machines = sorted(machines, key=lambda x: x[0])
     elif sorting_field == 'state':
-        machines = sorted(machines, key=lambda x: x[1], cmp=lambda x, y: machine_states_ordering[y] - machine_states_ordering[x])
+        machines = sorted(machines, key=lambda x: x[1],
+                          cmp=lambda x, y: machine_states_ordering[y] -
+                                           machine_states_ordering[x])
     elif sorting_field == 'cloud':
         machines = sorted(machines, key=lambda x: x[2])
-    for i in range(len(machines)):
-        assert machines[i][0] == safe_get_element_text(machines_elements[i].find_element_by_class_name('machine-name')), "Machine list is not properly sorted by %s" % sorting_field
+
+    # make sure that the list is also sorted by element height
+    for i in range(len(machines) - 1):
+        assert machines[i][3] < machines[i + 1][3], "Machine list is not" \
+                                                    " properly sorted by %s." \
+                                                    " Expected field was %s " \
+                                                    "and actual field was " \
+                                                    "%s" % (sorting_field,
+                                                            machines[i],
+                                                            machines[i + 1])
 
 
 @when(u'I clear the machines search bar')
