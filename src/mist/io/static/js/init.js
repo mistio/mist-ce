@@ -39,6 +39,7 @@ var loadApp = function(
     ScriptsController,
     ProjectsController,
     TeamsController,
+    OrganizationsController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -133,6 +134,7 @@ var loadApp = function(
     App.set('projectsController', ProjectsController.create());
     App.set('machineRunScriptController', MachineRunScriptController.create());
     App.set('machineImageCreateController', MachineImageCreateController.create());
+    App.set('organizationsController', OrganizationsController.create());
     App.set('teamsController', TeamsController.create());
 
 
@@ -308,7 +310,7 @@ var setupLogChannel = function(socket, callback) {
     }).on('open_sessions', function(openSessions) {
         info('received open_sessions: ', openSessions);
     }).emit('ready');
-    if (! Mist.isCore) {
+    if (!Mist.isCore) {
         Mist.set('openIncidents', []);
     }
     Mist.set('closedIncidents', [])
@@ -345,6 +347,73 @@ var setupMainChannel = function(socket, callback) {
             Mist.scriptsController.setModel(scripts);
         });
     }
+
+    var organization = {
+        id: 1,
+        name: 'my_organization',
+        members: [{
+            id: 1,
+            name: 'Marios Fakiolas',
+            email: 'marios@mist.io'
+        }, {
+            id: 2,
+            name: 'Xristina Papakonstantinou',
+            email: 'xristina@mist.io'
+        }, {
+            id: 3,
+            name: 'Pablo Tziano',
+            email: 'pablo@mist.io'
+        }, {
+            id: 4,
+            name: 'Dimitris Rozakis',
+            email: 'dr@mist.io'
+        }],
+        teams: [{
+            name: 'Frontend Team',
+            description: '',
+            members: [1, 2],
+            policy: {
+                operator: 'ALLOW',
+                rules: [{
+                    operator: 'DENY',
+                    action: '',
+                    rtype: '',
+                    rid: '',
+                    rtags: ''
+                }]
+            }
+        }, {
+            name: 'QA Team',
+            description: '',
+            members: [3],
+            policy: {
+                operator: 'ALLOW',
+                rules: [{
+                    operator: 'DENY',
+                    action: '',
+                    rtype: '',
+                    rid: '',
+                    rtags: ''
+                }]
+            }
+        }, {
+            name: 'Backend Team',
+            description: '',
+            members: [4],
+            policy: {
+                operator: 'ALLOW',
+                rules: [{
+                    operator: 'DENY',
+                    action: '',
+                    rtype: '',
+                    rid: '',
+                    rtags: ''
+                }]
+            }
+        }]
+    };
+
+    Mist.teamsController.setModel(organization.teams);
 
     socket
         .on('list_keys', function(keys) {

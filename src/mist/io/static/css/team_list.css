@@ -76,9 +76,10 @@
 #team-list-page .team-search-container .icon-xx:hover {
     cursor: pointer;
 }
-#team-list .team-tags {
+#team-list .team-members {
+    font-weight: 400;
     text-align: center;
-    padding-right: 26px;
+    padding-right: 30px;
 }
 .team-name {
     font-weight: 400;

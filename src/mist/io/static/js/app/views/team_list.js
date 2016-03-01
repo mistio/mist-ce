@@ -31,17 +31,14 @@ define('app/views/team_list', ['app/views/page'],
             }.on('willDestroyElement'),
 
             canRename: function() {
-                return true;
                 return Mist.teamsController.get('selectedObjects').length == 1;
             }.property('Mist.teamsController.model.@each.selected'),
 
             canDelete: function() {
-                return true;
                 return Mist.teamsController.get('selectedObjects').length;
             }.property('Mist.teamsController.model.@each.selected'),
 
             updateFooter: function() {
-                return;
                 if (Mist.teamsController.get('selectedObjects').length) {
                     this.$('.ui-footer').slideDown();
                 } else {
