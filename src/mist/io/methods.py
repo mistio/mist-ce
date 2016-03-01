@@ -115,13 +115,13 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if remove_on_error:
             try:
                 ssh_command(
-                    user, cloud_id, machine_id, machine_hostname, 'uptime',
+                    user, cloud.id, machine_id, machine_hostname, 'uptime',
                     key_id=machine_key, username=machine_user, password=None,
                     port=port
                 )
             except MachineUnauthorizedError as exc:
                 # remove cloud
-                Cloud.objects.get(owner=user, id=cloud_id).delete()
+                Cloud.objects.get(owner=user, id=cloud.id).delete()
                 raise CloudUnauthorizedError(exc)
     else:
         # if api secret not given, search if we already know it
