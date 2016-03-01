@@ -12,8 +12,10 @@ define('app/routes/teams', ['app/routes/base'],
 
             documentTitle: 'mist.io - teams',
 
-            exit: function () {
-
+            exit: function() {
+                Mist.teamsController.model.forEach(function(team) {
+                    team.set('selected', false);
+                });
             }
         });
     }

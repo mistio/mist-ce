@@ -261,6 +261,7 @@ var loadFiles = function (callback) {
         'app/views/user_menu',
         'app/views/team_list',
         'app/views/team_list_item',
+        'app/views/team',
 
         'app/helpers/forIn'
     ], callback);

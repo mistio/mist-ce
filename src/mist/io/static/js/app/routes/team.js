@@ -4,30 +4,36 @@ define('app/routes/team', ['app/routes/base'],
     //
     //  @returns Class
     //
-    function (BaseRoute) {
+    function(BaseRoute) {
 
         'use strict';
 
-        return App.ScriptRoute = BaseRoute.extend({
+        return App.TeamRoute = BaseRoute.extend({
 
-            activate: function () {
+            activate: function() {
+                console.log(123);
                 this._super();
-                Ember.run.next(this, function () {
+                Ember.run.next(this, function() {
                     var model = this.modelFor('team');
+                    console.log(model);
                     var id = model._id || model.id;
-                    var team = Mist.teamsController.getObject(id);
+                    var team = Mist.teamsController.getTeam(id);
+                    console.log(team);
                     this.set('documentTitle', 'mist.io - ' + (team ? team.name : id));
                 });
             },
 
-            redirect: function (team) {
+            redirect: function(team) {
                 Mist.teamsController.set('teamRequest', team._id);
             },
 
-            model: function (args) {
+            model: function(args) {
+                console.log(args);
                 var id = args.team_id;
                 if (Mist.teamsController.loading)
-                    return {_id: id};
+                    return {
+                        _id: id
+                    };
                 return Mist.teamsController.getObject(id);
             },
 

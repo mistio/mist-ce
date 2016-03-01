@@ -10,7 +10,12 @@ define('app/models/team', ['app/models/base'],
 
         return BaseModel.extend({
 
+            //
+            //  Properties
+            //
 
+            id: null,
+            name: null
         });
     }
 );

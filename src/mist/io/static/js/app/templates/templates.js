@@ -69,7 +69,8 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/machine_image_create.hbs',
         'text!app/templates/teams.hbs',
         'text!app/templates/team_list.hbs',
-        'text!app/templates/team_list_item.hbs'
+        'text!app/templates/team_list_item.hbs',
+        'text!app/templates/team.hbs'
       ], function () {
         Ember.TEMPLATES['application'] = Ember.Handlebars.compile(arguments[0]);
         Ember.TEMPLATES['cloud_add'] = Ember.Handlebars.compile(arguments[1]);
@@ -139,6 +140,7 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['teams'] = Ember.Handlebars.compile(arguments[65]);
         Ember.TEMPLATES['team_list'] = Ember.Handlebars.compile(arguments[66]);
         Ember.TEMPLATES['team_list_item'] = Ember.Handlebars.compile(arguments[67]);
+        Ember.TEMPLATES['team'] = Ember.Handlebars.compile(arguments[68]);
         callback();
         info('loaded raw templates');
       });

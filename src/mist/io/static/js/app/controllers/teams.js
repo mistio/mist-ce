@@ -22,10 +22,6 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 return this.get('sortByTerm') == 'name';
             }),
 
-            sortByType: Ember.computed('sortByTerm', function () {
-                return this.get('sortByTerm') == 'type';
-            }),
-
             filteredTeams: Ember.computed('model', 'searchTerm', function() {
                 var filteredTeams = [];
 
@@ -49,22 +45,22 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 return filteredTeams;
             }),
 
-            sortedTeams: Ember.computed('filteredTeams', 'filteredTeams.@each.name', 'filteredTeams.@each.type', 'sortByTerm', function() {
+            sortedTeams: Ember.computed('filteredTeams', 'filteredTeams.@each.name', 'sortByTerm', function() {
                 if(this.get('filteredTeams'))
                 {
                     if (this.get('sortByName'))
                     {
                         return this.get('filteredTeams').sortBy('name');
                     }
-
-                    if (this.get('sortByType'))
-                    {
-                        return this.get('filteredTeams').sortBy('type');
-                    }
                 }
             }),
 
+            //
+            //  Methods
+            //
+
             getTeam: function(teamId) {
+                console.log(this.model, teamId);
                 return this.model.findBy('id', teamId);
             },
 

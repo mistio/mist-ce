@@ -54,6 +54,20 @@ define('app/views/team_list', ['app/views/page'],
 
             actions: {
 
+                selectClicked: function () {
+                    $('#select-teams-popup').popup('open');
+                },
+
+                selectionModeClicked: function (mode) {
+                    $('#select-teams-popup').popup('close');
+
+                    Ember.run(function () {
+                        Mist.teamsController.get('filteredTeams').forEach(function (team) {
+                            team.set('selected', mode);
+                        });
+                    });
+                },
+
                 deleteClicked: function() {
 
                     var teams = Mist.teamsController.get('selectedObjects');

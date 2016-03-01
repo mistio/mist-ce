@@ -1,0 +1,37 @@
+/* Single Team Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+#single-team-page > .ui-content {
+    padding-top: 30px;
+    background-color: transparent;
+}
+#single-team-page .ui-block-b .ui-title {
+    text-align: center;
+}
+#single-team-page .ui-footer {
+    display: block;
+}
+#single-team-page .ui-collapsible {
+    margin: 10px 0 20px;
+}
+#single-team-page .ui-collapsible .ajax-loader {
+    display: inline;
+    float: right;
+}
+#single-team-page .ui-collapsible .ui-collapsible-heading a {
+    background-color: #d4d4d4;
+    border: none;
+    padding: 20px 70px 16px !important;
+}
+#single-team-page .ui-collapsible .ui-collapsible-content {
+    background-color: #faf9f4;
+    padding: 10px 20px !important;
+}
+#single-team-page .ui-collapsible .ui-collapsible-content .ui-listview {
+    margin: 0;
+    box-shadow: none;
+}
+@-moz-document url-prefix() {
+    #single-team-page .ui-collapsible .ajax-loader {
+        margin-top: -20px;
+    }
+}
