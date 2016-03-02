@@ -184,6 +184,11 @@ def assert_list_equal(list1, list2, msg=None):
     assert_sequence_equal(list1, list2, msg, seq_type=list)
 
 
+def assert_list_not_empty(_list, msg=None):
+    assert type(_list) == list, "Object provided is not a list"
+    assert len(_list) > 0, msg
+
+
 def assert_tuple_equal(tuple1, tuple2, msg=None):
     """A tuple-specific equality assertion.
 
