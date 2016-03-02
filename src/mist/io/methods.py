@@ -34,14 +34,14 @@ import ansible.callbacks
 import ansible.utils
 import ansible.constants
 
-try:
-    from mist.core.user.models import User
-    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
-    from mist.core.keypair.models import Keypair
-    from mist.core import config
-except ImportError:
-    print "Seems to be on IO version"
-    from mist.io import config, model
+# try:
+# from mist.core.user.models import User
+from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+from mist.core.keypair.models import Keypair
+from mist.core import config
+# except ImportError:
+#     print "Seems to be on IO version"
+#     from mist.io import config, model
 
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
@@ -2858,18 +2858,20 @@ def star_image(user, cloud_id, image_id):
 
 
 def list_clouds(user):
-    ret = []
     clouds = Cloud.objects(owner=user).only("id", "apikey", "title", "provider",
                                             "poll_interval", "enabled",
                                             "region", "tenant_name",
                                             "docker_port")
     clouds = clouds.as_pymongo()
+    normalized_clouds = []
     for cloud in clouds:
         if cloud["provider"] != "docker":
             del cloud["docker_port"]
         cloud["state"] = 'online' if cloud["enabled"] else 'offline'
+        cloud["id"] = cloud["_id"]
+        normalized_clouds.append(cloud)
 
-    return clouds
+    return normalized_clouds
 
 def transform_key_machine_associations(machines, keypair): # TODO put function in helpers
     key_associations = []

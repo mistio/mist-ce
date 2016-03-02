@@ -15,17 +15,17 @@ import json
 
 from pyramid.response import Response
 
-try:
-    from mist.core import config
-    from mist.core.helpers import view_config
-    from mist.core.auth.methods import user_from_request
-    from mist.core.models import Keypair
-    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+# try:
+from mist.core.helpers import view_config
+from mist.core.auth.methods import user_from_request
+from mist.core.keypair.models import Keypair
+from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+from mist.core import config
 
-except ImportError:
-    from mist.io import config
-    from mist.io.helpers import user_from_request
-    from pyramid.view import view_config
+# except ImportError:
+#     from mist.io import config
+#     from mist.io.helpers import user_from_request
+#     from pyramid.view import view_config
 
 from mist.io import methods
 

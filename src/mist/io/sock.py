@@ -321,10 +321,10 @@ class MainConnection(MistConnection):
 
                     has_key = False
                     keypairs = Keypair.objects(owner=self.user)
-                    machine = Machine.get(cloud=cloud,
+                    machine_obj = Machine.objects(cloud=cloud,
                                           machine_id=machine["id"],
-                                          key_associations__not__size=0)
-                    if machine:
+                                          key_associations__not__size=0).first()
+                    if machine_obj:
                         cached = tasks.ProbeSSH().smart_delay(
                             self.user.email, cloud_id, machine['id'], ips[0]
                         )
@@ -338,7 +338,7 @@ class MainConnection(MistConnection):
                         self.send('ping', cached)
 
         elif routing_key == 'update':
-            self.user.refresh()
+            self.user.reload()
             sections = result
             if 'clouds' in sections:
                 self.list_clouds()
