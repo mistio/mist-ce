@@ -169,22 +169,71 @@ def update_user_settings(request):
         raise UnauthorizedError()
 
 
+@view_config(route_name='api_v1_clouds', request_method='GET', renderer='json')
 @view_config(route_name='clouds', request_method='GET', renderer='json')
 def list_clouds(request):
-    """Gets the available clouds.
-
-    .. note:: Currently, this is only used by the cloud controller in js.
-
+    """
+    Request a list of all added clouds.
+    ---
     """
 
     user = user_from_request(request)
     return methods.list_clouds(user)
 
 
+@view_config(route_name='api_v1_clouds', request_method='POST', renderer='json')
 @view_config(route_name='clouds', request_method='POST', renderer='json')
 def add_cloud(request):
-    """Adds a new cloud."""
-
+    """
+    Add a new cloud
+     Adds a new cloud to the user and returns the cloud_id
+    ---
+    api_key:
+      type: string
+    api_secret:
+      type: string
+    apiurl:
+      type: string
+    docker_port:
+      type: string
+    machine_key:
+      type: string
+    machine_port:
+      type: string
+    machine_user:
+      type: string
+    provider:
+      description: The id of the cloud provider.
+      enum:
+      - vcloud
+      - bare_metal
+      - docker
+      - libvirt
+      - openstack
+      - vsphere
+      - coreos
+      - ec2
+      - rackspace
+      - nephoscale
+      - digitalocean
+      - softlayer
+      - gce
+      - azure
+      - linode
+      - indonesian_vcloud
+      - hostvirtual
+      - vultr
+      required: true
+      type: string
+    remove_on_error:
+      type: string
+    tenant_name:
+      type: string
+    title:
+      description: The human readable title of the cloud.
+      required: true
+      type: string
+    """
     params = params_from_request(request)
     # remove spaces from start/end of string fields that are often included
     # when pasting keys, preventing thus succesfull connection with the
@@ -258,13 +307,17 @@ def add_cloud(request):
     return ret
 
 
+@view_config(route_name='api_v1_cloud_action', request_method='DELETE')
 @view_config(route_name='cloud_action', request_method='DELETE')
 def delete_cloud(request):
-    """Deletes a cloud.
-
-    .. note:: It assumes the user may re-add it later so it does not remove
-              any key associations.
-
+    """
+    Delete a cloud
+    Deletes cloud with given cloud_id.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
     """
 
     cloud_id = request.matchdict['cloud']
@@ -273,10 +326,21 @@ def delete_cloud(request):
     return OK
 
 
+@view_config(route_name='api_v1_cloud_action', request_method='PUT')
 @view_config(route_name='cloud_action', request_method='PUT')
 def rename_cloud(request):
-    """Renames a cloud."""
-
+    """
+    Rename a cloud
+    Renames cloud with given cloud_id.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    new_name:
+      description: ' New name for the key (will also serve as the key''s id)'
+      type: string
+    """
     cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
     new_name = params.get('new_name', '')
@@ -288,8 +352,23 @@ def rename_cloud(request):
     return OK
 
 
+@view_config(route_name='api_v1_cloud_action', request_method='POST')
 @view_config(route_name='cloud_action', request_method='POST')
 def toggle_cloud(request):
+    """
+    Toggle a cloud
+    Toggles cloud with given cloud_id.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    new_state:
+      enum:
+      - '0'
+      - '1'
+      type: string
+    """
     cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
     new_state = params.get('new_state', '')
@@ -309,20 +388,34 @@ def toggle_cloud(request):
     return OK
 
 
+@view_config(route_name='api_v1_keys', request_method='GET', renderer='json')
 @view_config(route_name='keys', request_method='GET', renderer='json')
 def list_keys(request):
-    """List keys.
-
-    List all key pairs that are configured on this server. Only the public
-    keys are returned.
-
+    """
+    List keys
+    Retrieves a list of all added Keys
+    ---
     """
     user = user_from_request(request)
     return methods.list_keys(user)
 
 
+@view_config(route_name='api_v1_keys', request_method='PUT', renderer='json')
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
+    """
+    Add key
+    Add key with specific id
+    ---
+    id:
+      description: ' The Key name (id)'
+      required: true
+      type: string
+    priv:
+      description: ' The private key'
+      required: true
+      type: string
+    """
     params = params_from_request(request)
     key_id = params.get('id', '')
     private_key = params.get('priv', '')
@@ -337,17 +430,21 @@ def add_key(request):
             'isDefault': keypair.default}
 
 
+@view_config(route_name='api_v1_key_action', request_method='DELETE', renderer='json')
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
 def delete_key(request):
-    """Delete key.
-
-    When a keypair gets deleted, it takes its asociations with it so just need
-    to remove from the server too.
-
-    If the default key gets deleted, it sets the next one as default, provided
-    that at least another key exists. It returns the list of all keys after
-    the deletion, excluding the private keys (check also list_keys).
-
+    """
+    Delete key
+    Delete key. When a keypair gets deleted, it takes its asociations with it
+    so just need to remove from the server too. If the default key gets delet-
+    ed, it sets the next one as default, provided that at least another key e-
+    xists. It returns the list of all keys after the deletion, excluding the
+    private keys (check also list_keys).
+    ---
+    key:
+      in: path
+      required: true
+      type: string
     """
 
     key_id = request.matchdict.get('key')
@@ -359,6 +456,7 @@ def delete_key(request):
     return list_keys(request)
 
 
+@view_config(route_name='api_v1_keys', request_method='DELETE', renderer='json')
 @view_config(route_name='keys', request_method='DELETE', renderer='json')
 def delete_keys(request):
     """
@@ -404,9 +502,22 @@ def delete_keys(request):
     return report
 
 
+@view_config(route_name='api_v1_key_action', request_method='PUT', renderer='json')
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
-
+    """
+    Edit a key
+    Edits a given key's name from old_key -> new_key
+    ---
+    new_id:
+      description: The new Key name (id)
+      type: string
+    key:
+      description: ' The old key name (id)'
+      in: path
+      required: true
+      type: string
+    """
     old_id = request.matchdict['key']
     params = params_from_request(request)
     new_id = params.get('new_id')
@@ -418,8 +529,19 @@ def edit_key(request):
     return {'new_id': new_id}
 
 
+@view_config(route_name='api_v1_key_action', request_method='POST')
 @view_config(route_name='key_action', request_method='POST')
 def set_default_key(request):
+    """
+    Set default key
+    Sets a new default key
+    ---
+    key:
+      description: The key id
+      in: path
+      required: true
+      type: string
+    """
     key_id = request.matchdict['key']
     user = user_from_request(request)
 
@@ -427,13 +549,19 @@ def set_default_key(request):
     return OK
 
 
+@view_config(route_name='api_v1_key_private', request_method='GET', renderer='json')
 @view_config(route_name='key_private', request_method='GET', renderer='json')
 def get_private_key(request):
-    """Gets private key from keypair name.
-
+    """
+    Gets private key from keypair name.
     It is used in single key view when the user clicks the display private key
     button.
-
+    ---
+    key:
+      description: ' The key id'
+      in: path
+      required: true
+      type: string
     """
 
     user = user_from_request(request)
@@ -445,8 +573,19 @@ def get_private_key(request):
     return user.keypairs[key_id].private
 
 
+@view_config(route_name='api_v1_key_public', request_method='GET', renderer='json')
 @view_config(route_name='key_public', request_method='GET', renderer='json')
 def get_public_key(request):
+    """
+    Get public key
+    Gets public key from keypair name.
+    ---
+    key:
+      description: ' The key id'
+      in: path
+      required: true
+      type: string
+    """
     user = user_from_request(request)
     key_id = request.matchdict['key']
     if not key_id:
@@ -456,16 +595,49 @@ def get_public_key(request):
     return user.keypairs[key_id].public
 
 
+@view_config(route_name='api_v1_keys', request_method='POST', renderer='json')
 @view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair(request):
+    """
+    Generate key
+    Generate key pair
+    ---
+    """
     keypair = Keypair()
     keypair.generate()
     return {'priv': keypair.private, 'public': keypair.public}
 
 
-@view_config(route_name='key_association', request_method='PUT',
-             renderer='json')
+@view_config(route_name='api_v1_key_association', request_method='PUT', renderer='json')
+@view_config(route_name='key_association', request_method='PUT', renderer='json')
 def associate_key(request):
+    """
+    Associate a key to a machine
+    Associates a key with a machine. If host is set it will also attempt to ac-
+    tually deploy it to the machine. To do that it requires another keypair (-
+    existing_key) that can connect to the machine.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    key:
+      in: path
+      required: true
+      type: string
+    host:
+      type: string
+    port:
+      default: 22
+      type: integer
+    ssh_user:
+      description: The ssh user
+      type: string
+    """
     key_id = request.matchdict['key']
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -487,9 +659,29 @@ def associate_key(request):
     return user.keypairs[key_id].machines
 
 
-@view_config(route_name='key_association', request_method='DELETE',
-             renderer='json')
+@view_config(route_name='api_v1_key_association', request_method='DELETE', renderer='json')
+@view_config(route_name='key_association', request_method='DELETE', renderer='json')
 def disassociate_key(request):
+    """
+    Disassociate a key from a machine
+    Disassociates a key from a machine. If host is set it will also attempt to
+     actually remove it from the machine.
+    ---
+    key:
+      in: path
+      required: true
+      type: string
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    host:
+      type: string
+    """
     key_id = request.matchdict['key']
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -502,19 +694,126 @@ def disassociate_key(request):
     return user.keypairs[key_id].machines
 
 
+@view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
-    """Gets machines and their metadata from a cloud."""
+    """
+    List machines on cloud
+    Gets machines and their metadata from a cloud
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    """
 
     user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     return methods.list_machines(user, cloud_id)
 
 
+@view_config(route_name='api_v1_machines', request_method='POST', renderer='json')
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
-    """Creates a new virtual machine on the specified cloud."""
-
+    """
+    Create a machine on cloud
+    Creates a new virtual machine on the specified cloud. If the cloud is Rack-
+    space it attempts to deploy the node with an ssh key provided in config.
+    the method used is the only one working in the old Rackspace cloud. creat-
+    e_node(), from libcloud.compute.base, with 'auth' kwarg doesn't do the tr-
+    ick. Didn't test if you can upload some ssh related files using the 'ex_f-
+    iles' kwarg from openstack 1.0 driver. In Linode creation is a bit differ-
+    ent. There you can pass the key file directly during creation. The Linode
+     API also requires to set a disk size and doesn't get it from size.id. So-
+    , send size.disk from the client and use it in all cases just to avoid pr-
+    ovider checking. Finally, Linode API does not support association between
+     a machine and the image it came from. We could set this, at least for ma-
+    chines created through mist.io in ex_comment, lroot or lconfig. lroot see-
+    ms more appropriate. However, liblcoud doesn't support linode.config.list
+     at the moment, so no way to get them. Also, it will create inconsistenci-
+    es for machines created through mist.io and those from the Linode interfa-
+    ce.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    azure_port_bindings:
+      type: string
+    cloud_id:
+      description: The Cloud ID
+      required: true
+      type: string
+    disk:
+      description: ' Needed only by Linode cloud'
+      type: string
+    docker_command:
+      type: string
+    docker_env:
+      items:
+        type: string
+      type: array
+    docker_exposed_ports:
+      type: object
+    docker_port_bindings:
+      type: object
+    hostname:
+      type: string
+    image_extra:
+      description: ' Needed only by Linode cloud'
+      type: string
+    image_id:
+      description: ' Id of image to be used with the creation'
+      required: true
+      type: string
+    image_name:
+      type: string
+    ips:
+      type: string
+    job_id:
+      type: string
+    key_id:
+      description: ' Associate machine with this key_id'
+      required: true
+      type: string
+    location_id:
+      description: ' Id of the cloud''s location to create the machine'
+      required: true
+      type: string
+    location_name:
+      type: string
+    machine_name:
+      required: true
+      type: string
+    monitoring:
+      type: string
+    networks:
+      items:
+        type: string
+      type: array
+    plugins:
+      items:
+        type: string
+      type: array
+    post_script_id:
+      type: string
+    post_script_params:
+      type: string
+    script:
+      type: string
+    script_id:
+      type: string
+    script_params:
+      type: string
+    size_id:
+      description: ' If of the size of the machine'
+      required: true
+      type: string
+    size_name:
+      type: string
+    ssh_port:
+      type: integer
+    """
     cloud_id = request.matchdict['cloud']
 
     try:
@@ -596,8 +895,37 @@ def create_machine(request):
     return ret
 
 
-@view_config(route_name='machine', request_method='POST', renderer="json")
+@view_config(route_name='api_v1_machine', request_method='POST', renderer='json')
+@view_config(route_name='machine', request_method='POST', renderer='json')
 def machine_actions(request):
+    """
+    Call an action on machine
+    Calls a machine action on clouds that support it
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    action:
+      enum:
+      - start
+      - stop
+      - reboot
+      - destroy
+      - resize
+      - rename
+      required: true
+      type: string
+    name:
+      type: string
+    size:
+      description: The size id of the plan to resize
+      type: string
+    """
     # TODO: We shouldn't return list_machines, just 200. Save the API!
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -633,9 +961,31 @@ def machine_actions(request):
     raise BadRequestError()
 
 
-@view_config(route_name='machine_rdp', request_method='GET', renderer="json")
+@view_config(route_name='api_v1_machine_rdp', request_method='GET', renderer='json')
+@view_config(route_name='machine_rdp', request_method='GET', renderer='json')
 def machine_rdp(request):
-    "Generate and return an rdp file for windows machines"
+    """
+    Rdp file for windows machines
+    Generate and return an rdp file for windows machines
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    rdp_port:
+      default: 3389
+      in: query
+      required: true
+      type: integer
+    host:
+      in: query
+      required: true
+      type: string
+    """
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
@@ -658,10 +1008,26 @@ def machine_rdp(request):
                     body=rdp_content)
 
 
-@view_config(route_name='machine_tags', request_method='POST',
-             renderer='json')
+@view_config(route_name='api_v1_machine_tags', request_method='POST', renderer='json')
+@view_config(route_name='machine_tags', request_method='POST', renderer='json')
 def set_machine_tags(request):
-    """Sets metadata for a machine, given the cloud and machine id."""
+    """
+    Set tags on a machine
+    Set tags for a machine, given the cloud and machine id.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    tags:
+      items:
+        type: object
+      type: array
+    """
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     try:
@@ -676,13 +1042,27 @@ def set_machine_tags(request):
     return OK
 
 
-@view_config(route_name='machine_tag', request_method='DELETE',
-             renderer='json')
+@view_config(route_name='api_v1_machine_tag', request_method='DELETE', renderer='json')
+@view_config(route_name='machine_tag', request_method='DELETE', renderer='json')
 def delete_machine_tag(request):
-    """Deletes tag for a machine, given the machine id and the tag to be
-    deleted.
-
     """
+    Delete a tag
+    Delete tag in the db for specified resource_type
+    ---
+    tag:
+      in: path
+      required: true
+      type: string
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    """
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     tag = request.matchdict['tag']
@@ -691,18 +1071,29 @@ def delete_machine_tag(request):
     return OK
 
 
+@view_config(route_name='api_v1_images', request_method='POST', renderer='json')
 @view_config(route_name='images', request_method='POST', renderer='json')
 def list_specific_images(request):
     # FIXME: 1) i shouldn't exist, 2) i shouldn't be a post
     return list_images(request)
 
 
+@view_config(route_name='api_v1_images', request_method='GET', renderer='json')
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
-    """List images from each cloud.
-    Furthermore if a search_term is provided, we loop through each
-    cloud and search for that term in the ids and the names of
-    the community images"""
+    """
+    List images of specified cloud
+    List images from each cloud. Furthermore if a search_term is provided, we
+    loop through each cloud and search for that term in the ids and the names
+     of the community images
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    search_term:
+      type: string
+    """
 
     cloud_id = request.matchdict['cloud']
     try:
@@ -713,44 +1104,109 @@ def list_images(request):
     return methods.list_images(user, cloud_id, term)
 
 
+@view_config(route_name='api_v1_image', request_method='POST', renderer='json')
 @view_config(route_name='image', request_method='POST', renderer='json')
 def star_image(request):
-    """Toggle image as starred."""
-
+    """
+    Star/unstar an image
+    Toggle image star (star/unstar)
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    image:
+      description: Id of image to be used with the creation
+      in: path
+      required: true
+      type: string
+    """
     cloud_id = request.matchdict['cloud']
     image_id = request.matchdict['image']
     user = user_from_request(request)
     return methods.star_image(user, cloud_id, image_id)
 
 
+@view_config(route_name='api_v1_sizes', request_method='GET', renderer='json')
 @view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
-    """List sizes (aka flavors) from each cloud."""
+    """
+    List sizes of a cloud
+    List sizes (aka flavors) from each cloud.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    """
     cloud_id = request.matchdict['cloud']
     user = user_from_request(request)
     return methods.list_sizes(user, cloud_id)
 
 
+@view_config(route_name='api_v1_locations', request_method='GET', renderer='json')
 @view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
-    """List locations from each cloud."""
+    """
+    List locations of cloud
+    List locations from each cloud. Locations mean different things in each cl-
+    oud. e.g. EC2 uses it as a datacenter in a given availability zone, where-
+    as Linode lists availability zones. However all responses share id, name
+    and country eventhough in some cases might be empty, e.g. Openstack. In E-
+    C2 all locations by a provider have the same name, so the availability zo-
+    nes are listed instead of name.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    """
     cloud_id = request.matchdict['cloud']
     user = user_from_request(request)
     return methods.list_locations(user, cloud_id)
 
 
+@view_config(route_name='api_v1_networks', request_method='GET', renderer='json')
 @view_config(route_name='networks', request_method='GET', renderer='json')
 def list_networks(request):
-    """List networks from each cloud."""
+    """
+    List networks of a cloud
+    List networks from each cloud.
+    Currently NephoScale and Openstack networks
+     are supported. For other providers this returns an empty list.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    """
     cloud_id = request.matchdict['cloud']
     user = user_from_request(request)
     return methods.list_networks(user, cloud_id)
 
 
+@view_config(route_name='api_v1_networks', request_method='POST', renderer='json')
 @view_config(route_name='networks', request_method='POST', renderer='json')
 def create_network(request):
     """
-    Creates a new network. Currently working only with OPENSTACK cloud
+    Create network on a cloud
+    Creates a new network. If subnet dict is specified, after creating the net-
+    work it will use the new network's id to create a subnet
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    cloud_id:
+      description: The Cloud ID
+      type: string
+    network:
+      required: true
+      type: string
+    router:
+      type: string
+    subnet:
+      type: string
     """
     cloud_id = request.matchdict['cloud']
 
@@ -765,10 +1221,21 @@ def create_network(request):
     return methods.create_network(user, cloud_id, network, subnet, router)
 
 
+@view_config(route_name='api_v1_network', request_method='DELETE')
 @view_config(route_name='network', request_method='DELETE')
 def delete_network(request):
     """
-    Deletes a network. Currently working only with OPENSTACK cloud
+    Delete a network
+    Delete a network
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    network:
+      in: path
+      required: true
+      type: string
     """
     cloud_id = request.matchdict['cloud']
     network_id = request.matchdict['network']
@@ -779,9 +1246,31 @@ def delete_network(request):
     return OK
 
 
+@view_config(route_name='api_v1_network', request_method='POST')
 @view_config(route_name='network', request_method='POST')
 def associate_ip(request):
-
+    """
+    Associate ip
+    Associate ip with the specific network and machine
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    network:
+      in: path
+      required: true
+      type: string
+    assign:
+      default: true
+      type: boolean
+    ip:
+      required: true
+      type: string
+    machine:
+      required: true
+      type: string
+    """
     cloud_id = request.matchdict['cloud']
     network_id = request.matchdict['network']
     params = params_from_request(request)
@@ -798,12 +1287,31 @@ def associate_ip(request):
         return Response("Bad Request", 400)
 
 
+@view_config(route_name='api_v1_probe', request_method='POST', renderer='json')
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
-    """Probes a machine using ping and ssh to collect metrics.
-
-    .. note:: Used for getting uptime and a list of deployed keys.
-
+    """
+    Probe a machine
+    Ping and SSH to machine and collect various metrics.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    host:
+      type: string
+    key:
+      type: string
+    ssh_user:
+      default: ''
+      description: ' Optional. Give if you explicitly want a specific user'
+      in: query
+      required: false
+      type: string
     """
     machine_id = request.matchdict['machine']
     cloud_id = request.matchdict['cloud']
@@ -819,22 +1327,54 @@ def probe(request):
     return ret
 
 
+@view_config(route_name='api_v1_monitoring', request_method='GET', renderer='json')
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
 def check_monitoring(request):
-    """Ask the mist.io service if monitoring is enabled for this machine.
-
+    """
+    Check monitoring
+    Ask the mist.io service if monitoring is enabled for this machine.
+    ---
     """
     user = user_from_request(request)
     ret = methods.check_monitoring(user)
     return ret
 
 
-@view_config(route_name='update_monitoring', request_method='POST',
-             renderer='json')
+@view_config(route_name='api_v1_update_monitoring', request_method='POST', renderer='json')
+@view_config(route_name='update_monitoring', request_method='POST', renderer='json')
 def update_monitoring(request):
-    """Enable/disable monitoring for this machine using the hosted mist.io
-    service.
-
+    """
+    Enable monitoring
+    Enable monitoring for a machine.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    action:
+      enum:
+      - enable
+      - disable
+      type: string
+    dns_name:
+      type: string
+    dry:
+      default: false
+      type: boolean
+    name:
+      description: ' Name of the plugin'
+      type: string
+    no_ssh:
+      default: false
+      type: boolean
+    public_ips:
+      items:
+        type: string
+      type: array
     """
     user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
@@ -890,8 +1430,49 @@ def update_monitoring(request):
     return ret_dict
 
 
+@view_config(route_name='api_v1_stats', request_method='GET', renderer='json')
 @view_config(route_name='stats', request_method='GET', renderer='json')
 def get_stats(request):
+    """
+    Get monitor data for a machine
+    Get all monitor data for this machine
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    start:
+      description: ' Time formatted as integer, from when to fetch stats (default now)'
+      in: query
+      required: false
+      type: string
+    stop:
+      default: ''
+      description: Time formatted as integer, until when to fetch stats (default +10 seconds)
+      in: query
+      required: false
+      type: string
+    step:
+      default: ''
+      description: ' Step to fetch stats (default 10 seconds)'
+      in: query
+      required: false
+      type: string
+    metrics:
+      default: ''
+      in: query
+      required: false
+      type: string
+    request_id:
+      default: ''
+      in: query
+      required: false
+      type: string
+    """
     data = methods.get_stats(
         user_from_request(request),
         request.matchdict['cloud'],
@@ -905,17 +1486,47 @@ def get_stats(request):
     return data
 
 
-@view_config(route_name='metrics', request_method='GET',
-             renderer='json')
+@view_config(route_name='api_v1_metrics', request_method='GET', renderer='json')
+@view_config(route_name='metrics', request_method='GET', renderer='json')
 def find_metrics(request):
+    """
+    Get metrics of a machine
+    Get all metrics associated with specific machine
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    """
     user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     return methods.find_metrics(user, cloud_id, machine_id)
 
 
+@view_config(route_name='api_v1_metrics', request_method='PUT', renderer='json')
 @view_config(route_name='metrics', request_method='PUT', renderer='json')
 def assoc_metric(request):
+    """
+    Associate metric with machine
+    Associate metric with specific machine
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    metric_id:
+      description: ' Metric_id '
+      type: string
+    """
     user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -927,8 +1538,25 @@ def assoc_metric(request):
     return {}
 
 
+@view_config(route_name='api_v1_metrics', request_method='DELETE', renderer='json')
 @view_config(route_name='metrics', request_method='DELETE', renderer='json')
 def disassoc_metric(request):
+    """
+    Disassociate metric from machine
+    Disassociate metric from specific machine
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    metric_id:
+      description: ' Metric_id '
+      type: string
+    """
     user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -940,8 +1568,36 @@ def disassoc_metric(request):
     return {}
 
 
+@view_config(route_name='api_v1_metric', request_method='PUT', renderer='json')
 @view_config(route_name='metric', request_method='PUT', renderer='json')
 def update_metric(request):
+    """
+    Update a metric configuration
+    Update a metric configuration
+    ---
+    metric:
+      description: ' Metric_id (provided by self.get_stats() )'
+      in: path
+      required: true
+      type: string
+    cloud_id:
+      required: true
+      type: string
+    host:
+      type: string
+    machine_id:
+      required: true
+      type: string
+    name:
+      description: Name of the plugin
+      type: string
+    plugin_type:
+      type: string
+    unit:
+      description: ' Optional. If given the new plugin will be measured according to this
+        unit'
+      type: string
+    """
     user = user_from_request(request)
     metric_id = request.matchdict['metric']
     params = params_from_request(request)
@@ -956,9 +1612,46 @@ def update_metric(request):
     return {}
 
 
-@view_config(route_name='deploy_plugin', request_method='POST',
-             renderer='json')
+@view_config(route_name='api_v1_deploy_plugin', request_method='POST', renderer='json')
+@view_config(route_name='deploy_plugin', request_method='POST', renderer='json')
 def deploy_plugin(request):
+    """
+    Deploy a plugin on a machine.
+    Deploy a plugin on the specific machine.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    plugin:
+      in: path
+      required: true
+      type: string
+    host:
+      required: true
+      type: string
+    name:
+      required: true
+      type: string
+    plugin_type:
+      default: python
+      enum:
+      - python
+      required: true
+      type: string
+    read_function:
+      required: true
+      type: string
+    unit:
+      type: string
+    value_type:
+      default: gauge
+      type: string
+    """
     user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -986,9 +1679,35 @@ def deploy_plugin(request):
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
-@view_config(route_name='deploy_plugin', request_method='DELETE',
-             renderer='json')
+@view_config(route_name='api_v1_deploy_plugin', request_method='DELETE', renderer='json')
+@view_config(route_name='deploy_plugin', request_method='DELETE', renderer='json')
 def undeploy_plugin(request):
+    """
+    Undeploy a plugin on a machine.
+    Undeploy a plugin on the specific machine.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    plugin:
+      in: path
+      required: true
+      type: string
+    host:
+      required: true
+      type: string
+    plugin_type:
+      default: python
+      enum:
+      - python
+      required: true
+      type: string
+    """
     user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -1024,10 +1743,12 @@ def undeploy_plugin(request):
     # return resp.json()
 
 
+@view_config(route_name='api_v1_rules', request_method='POST', renderer='json')
 @view_config(route_name='rules', request_method='POST', renderer='json')
 def update_rule(request):
-    """Creates or updates a rule.
-
+    """
+    Creates or updates a rule.
+    ---
     """
     user = user_from_request(request)
     params = params_from_request(request)
@@ -1048,10 +1769,18 @@ def update_rule(request):
     return ret.json()
 
 
+@view_config(route_name='api_v1_rule', request_method='DELETE')
 @view_config(route_name='rule', request_method='DELETE')
 def delete_rule(request):
-    """Deletes a rule.
-
+    """
+    Delete rule
+    Deletes a rule.
+    ---
+    rule:
+      description: ' Rule id '
+      in: path
+      required: true
+      type: string
     """
     user = user_from_request(request)
     try:
@@ -1070,13 +1799,20 @@ def delete_rule(request):
     return OK
 
 
+@view_config(route_name='api_v1_providers', request_method='GET', renderer='json')
 @view_config(route_name='providers', request_method='GET', renderer='json')
 def list_supported_providers(request):
     """
-    @param request: A simple GET request
-    @return: Return all of our SUPPORTED PROVIDERS
+    List supported providers
+    Return all of our SUPPORTED PROVIDERS
+    ---
+    api_version:
+      enum:
+      - 1
+      - 2
+      in: header
+      type: integer
     """
-
     api_version = request.headers.get('Api-Version', 1)
     if int(api_version) == 2:
         return {'supported_providers': config.SUPPORTED_PROVIDERS_V_2}
