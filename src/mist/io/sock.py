@@ -10,38 +10,29 @@ greenlet.
 
 import uuid
 import json
-import socket
 import random
 import traceback
 import datetime
-from time import time
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
-import tornado.iostream
-
-import requests
 
 try:
-    from mist.core.auth.methods import user_from_session_id
     from mist.core import config
     from mist.core.methods import get_stats
     multi_user = True
 except ImportError:
-    from mist.io.helpers import user_from_session_id
     from mist.io import config
     from mist.io.methods import get_stats
     multi_user = False
 
-from mist.io.helpers import amqp_subscribe_user
-from mist.io.methods import notify_user
-from mist.io.exceptions import MachineUnauthorizedError
+from mist.core.auth.methods import auth_context_from_session_id
+
 from mist.io.exceptions import BadRequestError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
 from mist.io import tasks
-from mist.io.shell import Shell
 from mist.io.hub.tornado_shell_client import ShellHubClient
 
 import logging
@@ -71,25 +62,15 @@ def get_conn_info(conn_info):
     return ip, user_agent, session_id
 
 
-def mist_conn_str(conn_dict):
-    parts = []
-    dt_last_rcv = datetime.datetime.fromtimestamp(conn_dict['last_rcv'])
-    conn_dict['last_rcv'] = dt_last_rcv
-    for key in ('name', 'last_rcv', 'user', 'ip', 'user_agent', 'closed',
-                'session_id'):
-        if key in conn_dict:
-            parts.append(conn_dict.pop(key))
-    parts.extend(conn_dict.values())
-    return ' - '.join(map(str, parts))
-
-
 class MistConnection(SockJSConnection):
     closed = False
 
     def on_open(self, conn_info):
         log.info("%s: Initializing", self.__class__.__name__)
         self.ip, self.user_agent, session_id = get_conn_info(conn_info)
-        self.user = user_from_session_id(session_id)
+        self.auth_context = auth_context_from_session_id(session_id)
+        self.user = self.auth_context.user
+        self.owner = self.auth_context.owner
         self.session_id = uuid.uuid4().hex
         CONNECTIONS.add(self)
 
@@ -119,7 +100,15 @@ class MistConnection(SockJSConnection):
         }
 
     def __repr__(self):
-        return mist_conn_str(self.get_dict())
+        parts = []
+        dt_last_rcv = datetime.datetime.fromtimestamp(conn_dict['last_rcv'])
+        conn_dict['last_rcv'] = dt_last_rcv
+        for key in ('name', 'last_rcv', 'user', 'ip', 'user_agent', 'closed',
+                    'session_id'):
+            if key in conn_dict:
+                parts.append(conn_dict.pop(key))
+        parts.extend(conn_dict.values())
+        return ' - '.join(map(str, parts))
 
 
 class ShellConnection(MistConnection):
@@ -218,7 +207,8 @@ class MainConnection(MistConnection):
                           ('list_images', tasks.ListImages()),
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
-                          ('list_locations', tasks.ListLocations()), ('list_projects', tasks.ListProjects()),):
+                          ('list_locations', tasks.ListLocations()),
+                          ('list_projects', tasks.ListProjects())):
             for cloud_id in self.user.clouds_dict:
                 if self.user.clouds_dict[cloud_id].enabled:
                     cached = task.smart_delay(self.user.email, cloud_id)
