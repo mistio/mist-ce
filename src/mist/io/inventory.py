@@ -1,3 +1,11 @@
+try:
+    from mist.core.user.models import User
+    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+    from mist.core.keypair.models import Keypair
+    from mist.core import config
+except ImportError:
+    from mist.io import config, model
+
 import mist.io.methods
 
 
@@ -13,32 +21,35 @@ class MistInventory(object):
         self.hosts = {}
         self.keys = {}
         if not machines:
-            machines = [(bid, m['id'])
-                        for bid in self.user.clouds
-                        for m in self._list_machines(bid)]
+            clouds = Cloud.objects(owner=self.user)
+            machines = Machine.objects(cloud__in= clouds).only("machine_id", "cloud").as_pymongo()
+            # machines = [(bid, m['id']) for bid in self.user.clouds for m in self._list_machines(bid)]
+        #  for bid, mid in machines:
+        for machine in machines:
+                bid = machine['cloud']
+                mid = machine['machine_id']
+                try:
+                    name, ip_addr = self.find_machine_details(bid, mid)
+                    key_id, ssh_user, port = self.find_ssh_settings(bid, mid)
+                except Exception as exc:
+                    print exc
+                    continue
+                if key_id not in self.keys:
+                    keypair = Keypair.objects.get(owner=self.user, name=key_id)
+                    self.keys[key_id] = keypair.private
 
-        for bid, mid in machines:
-            try:
-                name, ip_addr = self.find_machine_details(bid, mid)
-                key_id, ssh_user, port = self.find_ssh_settings(bid, mid)
-            except Exception as exc:
-                print exc
-                continue
-            if key_id not in self.keys:
-                self.keys[key_id] = self.user.keypairs[key_id].private
+                if name in self.hosts:
+                    num = 2
+                    while ('%s-%d' % (name, num)) in self.hosts:
+                        num += 1
+                    name = '%s-%d' % (name, num)
 
-            if name in self.hosts:
-                num = 2
-                while ('%s-%d' % (name, num)) in self.hosts:
-                    num += 1
-                name = '%s-%d' % (name, num)
-
-            self.hosts[name] = {
-                'ansible_ssh_host': ip_addr,
-                'ansible_ssh_port': port,
-                'ansible_ssh_user': ssh_user,
-                'ansible_ssh_private_key_file': 'id_rsa/%s' % key_id,
-            }
+                self.hosts[name] = {
+                    'ansible_ssh_host': ip_addr,
+                    'ansible_ssh_port': port,
+                    'ansible_ssh_user': ssh_user,
+                    'ansible_ssh_private_key_file': 'id_rsa/%s' % key_id,
+                }
 
     def export(self, include_localhost=True):
         ans_inv = ''
@@ -77,17 +88,9 @@ class MistInventory(object):
         raise Exception('Machine not found in list_machines')
 
     def find_ssh_settings(self, cloud_id, machine_id):
-        assocs = []
-        for key_id, keypair in self.user.keypairs.items():
-            for assoc in keypair.machines:
-                if [cloud_id, machine_id] == assoc[:2]:
-                    assocs.append({
-                        'key_id': key_id,
-                        'last': assoc[2] if len(assoc) > 2 else 0,
-                        'user': assoc[3] if len(assoc) > 3 else '',
-                        'port': assoc[5] if len(assoc) > 5 else 22,
-                    })
-        if not assocs:
+        cloud = Cloud.objects.get(owner=self.user, id=cloud_id)
+        machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+        if not machine.key_associations:
             raise Exception("Machine doesn't have SSH association")
-        assoc = sorted(assocs, key=lambda a: a['last'])[-1]
-        return assoc['key_id'], assoc['user'] or 'root', assoc['port']
+        assoc = sorted(machine.key_associations, key=lambda a: a.last_used)[-1]
+        return assoc.keypair.name, assoc.ssh_user or 'root', assoc.port

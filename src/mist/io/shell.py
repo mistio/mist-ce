@@ -24,6 +24,9 @@ from mist.io.exceptions import ServiceUnavailableError
 from mist.io.helpers import trigger_session_update
 
 try:
+    from mist.core.user.models import User
+    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+    from mist.core.keypair.models import Keypair
     from mist.core import config
 except ImportError:
     from mist.io import config
@@ -115,8 +118,10 @@ class ParamikoShell(object):
                 break
             except paramiko.AuthenticationException as exc:
                 log.error("ssh exception %r", exc)
-                raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
-                                               % (username, self.host, port, exc))
+                raise MachineUnauthorizedError("Couldn't connect to "
+                                               "%s@%s:%s. %s"
+                                               % (username, self.host,
+                                                  port, exc))
             except socket.error as exc:
                 log.error("Got ssh error: %r", exc)
                 if not attempts:
@@ -127,7 +132,6 @@ class ParamikoShell(object):
                 # eg related to network, but keep until all attempts are made
                 if not attempts:
                     raise ServiceUnavailableError(repr(exc))
-
 
     def disconnect(self):
         """Close the SSH connection."""
@@ -224,84 +228,41 @@ class ParamikoShell(object):
 
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
-        if cloud_id not in user.clouds_dict:
-            raise CloudNotFoundError(cloud_id)
-        if key_id and key_id not in user.keypairs:
-            raise KeypairNotFoundError(key_id)
-
-        # get candidate keypairs if key_id not provided
-        keypairs = user.keypairs
+        cloud = Cloud.objects.get(owner=user, cloud=cloud_id)
+        machine = Machine.objects(cloud=cloud, machine_id=machine_id)
+        machine = machine.modify(upsert=True, new=True, machine_id=machine_id)
+        users = []
         if key_id:
-            pref_keys = [key_id]
+            keys = [Keypair.objects.get(owner=user, name=key_id)]
         else:
-            default_keys = [key_id for key_id in keypairs
-                            if keypairs[key_id].default]
-            assoc_keys = []
-            recent_keys = []
-            root_keys = []
-            sudo_keys = []
-            for key_id in keypairs:
-                for machine in keypairs[key_id].machines:
-                    if [cloud_id, machine_id] == machine[:2]:
-                        assoc_keys.append(key_id)
-                        if len(machine) > 2 and \
-                                int(time() - machine[2]) < 7*24*3600:
-                            recent_keys.append(key_id)
-                        if len(machine) > 3 and machine[3] == 'root':
-                            root_keys.append(key_id)
-                        if len(machine) > 4 and machine[4] is True:
-                            sudo_keys.append(key_id)
-            pref_keys = root_keys or sudo_keys or assoc_keys
-            if default_keys and default_keys[0] not in pref_keys:
-                pref_keys.append(default_keys[0])
-
-        # try to connect
-        for key_id in pref_keys:
-            keypair = user.keypairs[key_id]
-
-            # find username
-            users = []
-            # if username was specified, then try only that
-            if username:
-                users = [username]
-            else:
-                for machine in keypair.machines:
-                    if machine[:2] == [cloud_id, machine_id]:
-                        if len(machine) >= 4 and machine[3]:
-                            users.append(machine[3])
-                            break
-                # if username not found, try several alternatives
-                # check to see if some other key is associated with machine
-                for other_keypair in user.keypairs.values():
-                    for machine in other_keypair.machines:
-                        if machine[:2] == [cloud_id, machine_id]:
-                            if len(machine) >= 4 and machine[3]:
-                                ssh_user = machine[3]
-                                if ssh_user not in users:
-                                    users.append(ssh_user)
-                            if len(machine) >= 6 and machine[5]:
-                                port = machine[5]
-                # check some common default names
-                for name in ['root', 'ubuntu', 'ec2-user', 'user', 'azureuser', 'core', 'centos', 'cloud-user', 'fedora']:
+            keys = [key_assoc.keypair
+                    for key_assoc in machine.key_associations]
+            users = [key_assoc.ssh_user
+                     for key_assoc in machine.key_associations]
+        if username:
+            users = [username]
+        if not users:
+            users = [key_assoc.ssh_user
+                     for key_assoc in machine.key_associations]
+            for key_assoc in machine.key_associations:
+                if key_assoc.port:
+                    port = key_assoc.port
+            for name in ['root', 'ubuntu', 'ec2-user', 'user', 'azureuser',
+                         'core', 'centos', 'cloud-user', 'fedora']:
                     if name not in users:
                         users.append(name)
+        for key in keys:
             for ssh_user in users:
                 try:
                     log.info("ssh -i %s %s@%s:%s",
-                             key_id, ssh_user, self.host, port)
+                             key.name, ssh_user, self.host, port)
                     self.connect(username=ssh_user,
-                                 key=keypair.private,
+                                 key=key.private,
                                  password=password,
                                  port=port)
                 except MachineUnauthorizedError:
                     continue
-                # this is a hack: if you try to login to ec2 with the wrong
-                # username, it won't fail the connection, so a
-                # MachineUnauthorizedException won't be raised. Instead, it
-                # will prompt you to login as some other user.
-                # This hack tries to identify when such a thing is happening
-                # and then tries to connect with the username suggested in
-                # the prompt.
+
                 retval, resp = self.command('uptime')
                 new_ssh_user = None
                 if 'Please login as the user ' in resp:
@@ -314,7 +275,7 @@ class ParamikoShell(object):
                     try:
                         self.disconnect()
                         self.connect(username=new_ssh_user,
-                                     key=keypair.private,
+                                     key=key.private,
                                      password=password,
                                      port=port)
                         ssh_user = new_ssh_user
@@ -322,48 +283,24 @@ class ParamikoShell(object):
                         continue
                 # we managed to connect succesfully, return
                 # but first update key
-                assoc = [cloud_id,
-                         machine_id,
-                         time(),
-                         ssh_user,
-                         self.check_sudo(),
-                         port]
-                trigger_session_update_flag = False
-                for i in range(3):
-                    try:
-                        updated = False
-                        for i in range(len(user.keypairs[key_id].machines)):
-                            machine = user.keypairs[key_id].machines[i]
-                            if [cloud_id, machine_id] == machine[:2]:
-                                old_assoc = user.keypairs[key_id].machines[i]
-                                user.keypairs[key_id].machines[i] = assoc
-                                user.keypairs[key_id].save()
-                                updated = True
-                                old_ssh_user = None
-                                old_port = None
-                                if len(old_assoc) > 3:
-                                    old_ssh_user = old_assoc[3]
-                                if len(old_assoc) > 5:
-                                    old_port = old_assoc[5]
-                                if old_ssh_user != ssh_user or old_port != port:
-                                    trigger_session_update_flag = True
-                            # if association didn't exist, create it!
-                            if not updated:
-                                user.keypairs[key_id].machines.append(assoc)
-                                trigger_session_update_flag = True
-                                user.keypairs[key_id].save()
-                            user.save()
-                    except:
-                        if i == 2:
-                            log.error('RACE CONDITION: shell failed to recover from previous race conditions')
-                            raise
-                        else:
-                            log.error('RACE CONDITION: shell trying to recover from race condition')
-                    else:
+                updated = False
+                for key_assoc in machine.key_associations:
+                    if key_assoc.keypair == key:
+                        key_assoc.ssh_user = ssh_user
+                        updated = True
+                        trigger_session_update_flag = True
                         break
+                if not updated:
+                    trigger_session_update_flag = True
+                    key_assoc = KeyAssociation(keypair=key, ssh_user=ssh_user,
+                                               port=port,
+                                               sudo=self.check_sudo())
+                    machine.key_associations.append(key_assoc)
+                machine.save()
+
                 if trigger_session_update_flag:
                     trigger_session_update(user.email, ['keys'])
-                return key_id, ssh_user
+                return key.name, ssh_user
 
         raise MachineUnauthorizedError("%s:%s" % (cloud_id, machine_id))
 
@@ -386,10 +323,7 @@ class DockerShell(object):
     def autoconfigure(self, user, cloud_id, machine_id, **kwargs):
         log.info("autoconfiguring DockerShell for machine %s:%s",
                  cloud_id, machine_id)
-        if cloud_id not in user.clouds:
-            raise CloudNotFoundError(cloud_id)
-
-        cloud = user.clouds[cloud_id]
+        cloud = Cloud.objects.get(owner=user, cloud=cloud_id)
         docker_port = cloud.docker_port
 
         # For basic auth
