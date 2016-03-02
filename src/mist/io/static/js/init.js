@@ -424,7 +424,6 @@ var setupMainChannel = function(socket, callback) {
         .on('list_clouds', function(clouds) {
             console.log(Mist);
             Mist.organizationsController.load(organizations);
-            // Mist.organizationsController.set('loaded');
 
             Mist.cloudsController.load(clouds);
             Mist.cloudsController.set('loaded');

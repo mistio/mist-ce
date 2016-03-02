@@ -1,4 +1,4 @@
-define('app/controllers/teams', ['app/models/team'],
+define('app/controllers/teams', ['app/models/team', 'ember'],
     //
     //  Teams Controller
     //
