@@ -2572,11 +2572,11 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
         log.error("Error while connecting to cloud")
         raise CloudUnavailableError(exc=exc)
 
-    #GCE needs machine.extra as well, so we need the real machine object
+    # GCE needs machine.extra as well, so we need the real machine object
     machine = None
     try:
         if conn.type == 'azure':
-            #Azure needs the cloud service specified as well as the node
+            # Azure needs the cloud service specified as well as the node
             cloud_service = conn.get_cloud_service_from_node_id(machine_id)
             nodes = conn.list_nodes(ex_cloud_service_name=cloud_service)
             for node in nodes:
@@ -2589,7 +2589,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     machine = node
                     break
         if machine is None:
-            #did not find the machine_id on the list of nodes, still do not fail
+            # did not find the machine_id on the list of nodes, still do not fail
             raise MachineUnavailableError("Error while attempting to %s machine"
                                   % action)
     except:
