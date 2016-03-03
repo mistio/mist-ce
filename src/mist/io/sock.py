@@ -35,6 +35,7 @@ from mist.io.exceptions import BadRequestError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
+from mist.core import methods as core_methods
 from mist.io import tasks
 from mist.io.hub.tornado_shell_client import ShellHubClient
 
@@ -202,11 +203,12 @@ class MainConnection(MistConnection):
         self.check_monitoring()
 
     def list_keys(self):
-        self.send('list_keys', methods.list_keys(self.user))
+        self.send('list_keys',
+                  core_methods.filter_list_keys(self.auth_context))
 
     def list_clouds(self):
-        clouds_view = methods.list_clouds(self.user)
-        self.send('list_clouds', clouds_view)
+        self.send('list_clouds',
+                  core_methods.filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.user, enabled=True)
         for key, task in (('list_machines', tasks.ListMachines()),
                           ('list_images', tasks.ListImages()),
