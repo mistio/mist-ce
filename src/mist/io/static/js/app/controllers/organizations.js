@@ -24,7 +24,6 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
             //
 
             load: function(organizations) {
-                console.log(organizations);
                 this._updateModel(organizations);
                 this.set('loading', false);
             },
@@ -42,7 +41,6 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
             },
 
             updateTeams: function () {
-                console.log(1);
                 var organizations = Mist.organizationsController.model;
                 var teamList = [];
                 organizations.forEach(function (organization) {
@@ -70,7 +68,6 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                     }, this);
 
                     organizations.forEach(function(organization) {
-
                         var oldOrganization = this.getOrganization(organization.id);
 
                         if (oldOrganization) {
@@ -99,8 +96,10 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
 
             _updateTeamCount: function() {
                 Ember.run(this, function() {
-                    var teamCount = this.model.reduce(function(a, b) {
-                        return a + b;
+                    var teamCount = 0;
+                    this.model.forEach(function(organization) {
+                        console.log(organization.get('teamCount'));
+                        teamCount += organization.teamCount;
                     });
                     this.set('teamCount', teamCount);
                     this.trigger('onTeamListChange');
@@ -112,6 +111,7 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
             //
 
             teamCountObserver: function() {
+                console.log(11);
                 Ember.run.once(this, '_updateTeamCount');
             }.observes('model.@each.teamCount')
         });

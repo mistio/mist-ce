@@ -183,6 +183,7 @@ var loadFiles = function (callback) {
         'app/controllers/script_edit',
         'app/controllers/script_run',
         'app/controllers/scripts',
+        'app/controllers/projects',
         'app/controllers/organizations',
         'app/controllers/teams',
         'app/controllers/members',

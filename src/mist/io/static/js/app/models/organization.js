@@ -27,6 +27,7 @@ define('app/models/organization', ['app/controllers/teams', 'app/controllers/mem
             //
 
             load: function() {
+                console.log(1111);
                 Ember.run(this, function() {
                     // Add controllers
                     this.teams = TeamsController.create({
@@ -57,6 +58,7 @@ define('app/models/organization', ['app/controllers/teams', 'app/controllers/mem
             },
 
             _updateTeamCount: function() {
+                console.log(111);
                 Ember.run(this, function() {
                     this.set('teamCount', this.teams.model.length);
                     this.trigger('onTeamListChange');

@@ -24,6 +24,7 @@ define('app/controllers/teams', ['app/models/team', 'ember'],
             //
 
             init: function () {
+                console.log('i');
                 this._super();
                 this.set('model', []);
                 this.set('loading', true);
@@ -68,9 +69,11 @@ define('app/controllers/teams', ['app/models/team', 'ember'],
 
                     // Remove deleted teams
                     that.model.forEach(function(team) {
-                        if (!teams.findBy('id', team.id))
-                            if (team.id != -1)
+                        if (!teams.findBy('id', team.id)) {
+                            if (team.id != -1) {
                                 that.model.removeObject(team);
+                            }
+                        }
                     });
 
                     // Update model

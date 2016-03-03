@@ -416,15 +416,13 @@ var setupMainChannel = function(socket, callback) {
             }
         }]
     }];
-
+    Mist.organizationsController.load(organizations);
+    
     socket
         .on('list_keys', function(keys) {
             Mist.keysController.load(keys);
         })
         .on('list_clouds', function(clouds) {
-            console.log(Mist);
-            Mist.organizationsController.load(organizations);
-
             Mist.cloudsController.load(clouds);
             Mist.cloudsController.set('loaded');
             if (callback)
