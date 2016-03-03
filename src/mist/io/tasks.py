@@ -33,7 +33,7 @@ from mist.io.helpers import get_auth_header
 
 
 try:  # Multi-user environment
-    from mist.core.user.models import User
+    from mist.core.user.models import User, Owner
     from mist.core.cloud.models import Cloud, Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
     from mist.core.helpers import user_from_email
