@@ -97,6 +97,13 @@ var app = Polymer({
         sectionsArray: {
             type: Array,
             notify: true
+        },
+        onb: {
+            type: Array,
+        },
+        onbvalue : {
+            type: Number,
+            computed: "_computeOnbState(model)"
         }
     },
     observers: [
@@ -110,6 +117,38 @@ var app = Polymer({
     },
     _toast: null,
     ready: function() {
+        this.onb = [
+            {
+                state : 0,
+                description : 'user is onboard',
+                textMessage: '',
+                promptButton: ''
+            },
+            {
+                state : 10,
+                description : 'user has no data at all',
+                textMessage: "You have no data.",
+                promptButton: 'Add your first cloud'
+            },
+            {
+                state : 20,
+                description : 'user has added a cloud, has no monitoring, no rules',
+                textMessage: "You have added your first cloud.",
+                promptButton: 'Add monitoring'
+            },
+            {
+                state : 21,
+                description : 'user has added cloud and monitoring, has no rules',
+                textMessage: "You have added monitoring.",
+                promptButton: 'Set your rules'
+            },
+            {
+                state : 30,
+                description : 'user has added other, but no clouds',
+                textMessage: "You have no clouds.",
+                promptButton: 'Add your first cloud'
+            }
+        ];
         this.model = {
             cloudsArray: [],
             machinesArray: [],
@@ -117,6 +156,8 @@ var app = Polymer({
             imagesArray: [],
             keysArray: [],
             networksArray: [],
+            templatesArray:[],
+            teamsArray:[],
             pending: {
                 clouds: true,
                 monitoring: true
@@ -147,6 +188,16 @@ var app = Polymer({
                 color: '#D48900',
                 icon: 'image:movie-creation',
                 count: '0'
+            }, {
+                id: 'templates',
+                color: '#0097A7',
+                icon: 'image:crop-landscape',
+                count: '1'
+            }, {
+                id: 'teams',
+                color: '#607D8B',
+                icon: 'icons:account-circle',
+                count: '1'                
             }
             /*,
                       {id: 'templates',
@@ -155,6 +206,32 @@ var app = Polymer({
         ];
 
         this.sections = _generateMap(this.sectionsArray);
+    },
+    _computeOnbState: function(model) {
+        if (model) {
+            var clouds      = model.cloudsArray.length;
+            var scripts     = model.scriptsArray.length;
+            var keys        = model.keysArray.length;
+            var templates   = model.templatesArray.length;
+            var teams       = model.teamsArray.length;
+
+            var all = clouds + scripts + keys + templates + teams;
+
+            if ( all == 0){
+                return 10;
+            }
+            else if ( all > 0 && clouds == 0){
+                return 30;
+            }
+            else if ( clouds > 0 ){
+                if (hasMonitoring)
+                    return 21;
+                else 
+                    return 20;
+            }
+        }
+        else 
+            return 0;
     },
     attributeChanged: function(attrName, oldVal, newVal) {
         console.warn('attrChanged', attrName, oldVal, newVal);

@@ -252,8 +252,14 @@
                             <a href="/networks" class="main-section flex" is="pushstate-anchor">
                                 <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="{{model.networksArray.length}}"></section-tile>
                             </a>
-                            <a href="/scripts" class="main-section flex is=" pushstate-anchor "">
+                            <a href="/scripts" class="main-section flex" is=" pushstate-anchor">
                                 <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="{{model.scriptsArray.length}}"></section-tile>
+                            </a>
+                            <a href="/templates" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="{{model.templatesArray.length}}"></section-tile>
+                            </a>
+                            <a href="/teams" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
                             </a>
                         </div>
                     </div>
@@ -280,16 +286,16 @@ function getRandomGaugeValue(offset, factor) {
     return offset + Math.round(factor * Math.random());
 }
 
-window.setInterval(function() {
-    var gauge = document.getElementById('mutating_gauge');
-    gauge.data = [
-        ["Label", "Value"],
-        ["Memory", getRandomGaugeValue(40, 60)],
-        ["CPU", getRandomGaugeValue(40, 60)],
-        ["Network", getRandomGaugeValue(60, 20)]
-    ];
+// window.setInterval(function() {
+//     var gauge = document.getElementById('mutating_gauge');
+//     gauge.data = [
+//         ["Label", "Value"],
+//         ["Memory", getRandomGaugeValue(40, 60)],
+//         ["CPU", getRandomGaugeValue(40, 60)],
+//         ["Network", getRandomGaugeValue(60, 20)]
+//     ];
 
-}, 3000);
+// }, 3000);
 
 Polymer({
     is: 'page-dashboard',
@@ -313,6 +319,7 @@ Polymer({
         this.fire('page-meta', {
             title: null
         });
+       
     },
     isOnline: function(cloud) {
         return cloud.state == 'online';
