@@ -2888,14 +2888,14 @@ def transform_key_machine_associations(machines, keypair): # TODO put function i
 
 
 def list_keys(user):
-    keys = Keypair.objects(owner=user).only("id", "default")
+    keys = Keypair.objects(owner=user).only("default", "name")
     clouds = Cloud.objects(owner=user)
     key_objects = []
     for key in keys:
         key_object = {}
         machines = Machine.objects(cloud__in=clouds,
                                    key_associations__keypair__exact=key)
-        key_object["id"] = key.id
+        key_object["id"] = key.name # This is for backwards compatibility
         key_object["isDefault"] = key.default
         key_object["machines"] = transform_key_machine_associations(machines,
                                                                     key)
