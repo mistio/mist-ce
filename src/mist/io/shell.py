@@ -228,7 +228,7 @@ class ParamikoShell(object):
 
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
-        cloud = Cloud.objects.get(owner=user, cloud=cloud_id)
+        cloud = Cloud.objects.get(owner=user, id=cloud_id)
         machine = Machine.objects(cloud=cloud, machine_id=machine_id)
         machine = machine.modify(upsert=True, new=True, machine_id=machine_id)
         users = []

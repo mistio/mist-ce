@@ -33,7 +33,7 @@ from mist.io.helpers import get_auth_header
 
 
 try:  # Multi-user environment
-    from mist.core.user.models import User
+    from mist.core.user.models import User, Owner
     from mist.core.cloud.models import Cloud, Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
     from mist.core.helpers import user_from_email
@@ -74,7 +74,7 @@ def update_machine_count(owner, cloud_id, machine_count):
     if owner.find("@")!=-1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     cloud.machine_count = machine_count
     # user.clouds_dict[cloud_id].machine_count = machine_count
@@ -94,7 +94,7 @@ def ssh_command(owner, cloud_id, machine_id, host, command,
     if owner.find("@")!=-1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id,
                                            key_id, username, password, port)
@@ -127,7 +127,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command,
     if owner.find("@") != -1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
     tmp_log = lambda msg, *args: log.error('Post deploy: %s' % msg, *args)
     tmp_log('Entering post deploy steps for %s %s %s',
             user.email, cloud_id, machine_id)
@@ -292,7 +292,7 @@ def hpcloud_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
     if owner.find("@")!=-1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
 
     try:
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
@@ -358,7 +358,7 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
     if owner.find("@")!=-1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
 
     try:
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
@@ -446,7 +446,7 @@ def azure_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
     if owner.find("@")!=-1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
 
     try:
         # find the node we're looking for and get its hostname
@@ -526,7 +526,7 @@ def rackspace_first_gen_post_create_steps(
     if owner.find("@")!=-1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
     try:
         # find the node we're looking for and get its hostname
         cloud = Cloud.objects.get(id=cloud_id)
@@ -725,7 +725,7 @@ class ListSizes(UserTask):
         if owner.find("@")!=-1:
             user = user_from_email(owner)
         else:
-            user = Owner.objects.get(owner)
+            user = Owner.objects.get(id=owner)
         sizes = methods.list_sizes(user, cloud_id)
         return {'cloud_id': cloud_id, 'sizes': sizes}
 
@@ -743,7 +743,7 @@ class ListLocations(UserTask):
         if owner.find("@")!=-1:
             user = user_from_email(owner)
         else:
-            user = Owner.objects.get(owner)
+            user = Owner.objects.get(id=owner)
         locations = methods.list_locations(user, cloud_id)
         return {'cloud_id': cloud_id, 'locations': locations}
 
@@ -760,7 +760,7 @@ class ListNetworks(UserTask):
         if owner.find("@")!=-1:
             user = user_from_email(owner)
         else:
-            user = Owner.objects.get(owner)
+            user = Owner.objects.get(id=owner)
         log.warn('Running list networks for user %s cloud %s'
                  % (user.email, cloud_id))
         from mist.io import methods
@@ -783,7 +783,7 @@ class ListImages(UserTask):
         if owner.find("@") != -1:
             user = user_from_email(owner)
         else:
-            user = Owner.objects.get(owner)
+            user = Owner.objects.get(id=owner)
         log.warn('Running list images for user %s cloud %s' % (user.email, cloud_id))
         images = methods.list_images(user, cloud_id)
         log.warn('Returning list images for user %s cloud %s' %
@@ -803,7 +803,7 @@ class ListProjects(UserTask):
         if owner.find("@") != -1:
             user = user_from_email(owner)
         else:
-            user = Owner.objects.get(owner)
+            user = Owner.objects.get(id=owner)
         log.warn('Running list projects for user %s cloud %s' %
                  (user.email, cloud_id))
         from mist.io import methods
@@ -831,7 +831,7 @@ class ListMachines(UserTask):
         if owner.find("@") != -1:
             user = user_from_email(owner)
         else:
-            user = Owner.objects.get(owner)
+            user = Owner.objects.get(id=owner)
         log.warn('Running list machines for user %s cloud %s' % (user.email, cloud_id))
         machines = methods.list_machines(user, cloud_id)
         if multi_user:
@@ -862,7 +862,7 @@ class ListMachines(UserTask):
         if owner.find("@") != -1:
             user = user_from_email(owner)
         else:
-            user = Owner.objects.get(owner)
+            user = Owner.objects.get(id=owner)
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
 
         if len(errors) == 6: # If does not respond for a minute
@@ -901,7 +901,7 @@ class ProbeSSH(UserTask):
         if owner.find("@") != -1:
             user = user_from_email(owner)
         else:
-            user = Owner.objects.get(owner)
+            user = Owner.objects.get(id=owner)
         from mist.io.methods import probe_ssh_only
         res = probe_ssh_only(user, cloud_id, machine_id, host)
         return {'cloud_id': cloud_id,
@@ -941,7 +941,7 @@ def deploy_collectd(owner, cloud_id, machine_id, extra_vars):
     if owner.find("@") != -1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
     mist.io.methods.deploy_collectd(user, cloud_id, machine_id, extra_vars)
 
 
@@ -950,7 +950,7 @@ def undeploy_collectd(owner, cloud_id, machine_id):
     if owner.find("@") != -1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
     import mist.io.methods
     mist.io.methods.undeploy_collectd(user, cloud_id, machine_id)
 
@@ -992,7 +992,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
     if owner.find("@") != -1:
         user = user_from_email(owner)
     else:
-        user = Owner.objects.get(owner)
+        user = Owner.objects.get(id=owner)
     specs = []
     for name in names:
         specs.append((

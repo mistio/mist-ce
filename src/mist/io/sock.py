@@ -275,8 +275,8 @@ class MainConnection(MistConnection):
 
             if routing_key == 'list_networks':
                 cloud_id = result['cloud_id']
-                log.warn('Got networks from %s',
-                         self.user.clouds_dict[cloud_id].title)
+                cloud = Cloud.objects.get(owner=self.user, id=cloud_id)
+                log.warn('Got networks from %s', cloud.title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = result['machines']
