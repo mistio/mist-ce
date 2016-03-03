@@ -27,7 +27,6 @@ require.config({
         c3: '../dist/c3/c3.min',
         term: '../dist/term.js/src/term',
         yamljs: '../dist/yamljs/dist/yaml.min',
-        datetimepicker: '../dist/datetimepicker/jquery.datetimepicker',
         init: 'init',
         common: 'common',
         multiplex: 'multiplex',
