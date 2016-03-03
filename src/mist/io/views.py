@@ -235,9 +235,8 @@ def add_cloud(request):
             remove_on_error=remove_on_error,
         )
 
-    cloud = user.clouds_dict[cloud_id]
+    cloud = Cloud.objects.get(id=cloud_id)
     ret = {
-        'index': len(user.clouds) - 1,
         'id': cloud_id,
         'apikey': cloud.apikey,
         'apiurl': cloud.apiurl,
