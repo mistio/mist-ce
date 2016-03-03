@@ -48,7 +48,7 @@ from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
-from mist.io.helpers import check_host, sanitize_host
+from mist.io.helpers import check_host, sanitize_host, transform_key_machine_associations
 from mist.io.exceptions import *
 
 
@@ -994,6 +994,7 @@ def add_key(user, key_id, private_key):
 
     if not keypair.isvalid():
         raise KeyValidationError()
+    keypair.owner = user
     keypair.save()
 
     log.info("Added key with id '%s'", key_id)
@@ -1015,8 +1016,9 @@ def delete_key(user, key_id):
 
     log.info("Deleting key with id '%s'.", key_id)
     key = Keypair.objects.get(owner=user, name=key_id)
-    if key.default:
-        default_key = key.default
+    default_key = key.default
+    # if key.default:
+    #     default_key = key.default
     key.delete()
     other_key = Keypair.objects(owner=user).first()
     if default_key and other_key:
@@ -1093,12 +1095,13 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
     key = Keypair.objects.get(owner=user, name=key_id)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     associated = False
-    if Machine.objects(owner=user, key_associations__keypair__exact=key, id=machine_id):
+    if Machine.objects(cloud=cloud, key_associations__keypair__exact=key, machine_id=machine_id):
         log.warning("Keypair '%s' already associated with machine '%s' "
                     "in cloud '%s'", key_id, cloud_id, machine_id)
         associated = True
 
-    machine = Machine.objects.get(cloud=cloud, id=machine_id)
+    machine = Machine.objects(cloud=cloud, machine_id=machine_id)
+    machine = machine.modify(upsert=True, new=True, machine_id=machine_id)
 
 
     # check if key already associated
@@ -1118,13 +1121,13 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
     # if host is specified, try to actually deploy
     log.info("Deploying key to machine.")
     filename = '~/.ssh/authorized_keys'
-    grep_output = '`grep \'%s\' %s`' % (keypair.public, filename)
+    grep_output = '`grep \'%s\' %s`' % (key.public, filename)
     new_line_check_cmd = (
         'if [ "$(tail -c1 %(file)s; echo x)" != "\\nx" ];'
         ' then echo "" >> %(file)s; fi' % {'file': filename}
     )
     append_cmd = ('if [ -z "%s" ]; then echo "%s" >> %s; fi'
-                  % (grep_output, keypair.public, filename))
+                  % (grep_output, key.public, filename))
     command = new_line_check_cmd + " ; " + append_cmd
     log.debug("command = %s", command)
 
@@ -2872,19 +2875,6 @@ def list_clouds(user):
         normalized_clouds.append(cloud)
 
     return normalized_clouds
-
-def transform_key_machine_associations(machines, keypair): # TODO put function in helpers
-    key_associations = []
-    for machine in machines:
-        for key_assoc in machine.key_associations:
-            if key_assoc.keypair == keypair:
-                key_associations.append([machine.cloud.id,
-                                        machine.machine_id,
-                                        key_assoc.last_used,
-                                        key_assoc.ssh_user,
-                                        key_assoc.sudo,
-                                        key_assoc.port])
-    return key_associations
 
 
 def list_keys(user):

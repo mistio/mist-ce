@@ -34,7 +34,7 @@ from mist.io.exceptions import *
 import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request
-from mist.io.helpers import trigger_session_update
+from mist.io.helpers import trigger_session_update, transform_key_machine_associations
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -332,10 +332,18 @@ def add_key(request):
     user = user_from_request(request)
     key_id = methods.add_key(user, key_id, private_key)
 
-    keypair = Keypair.objects.get(owner=user, id=key_id)
+    keypair = Keypair.objects.get(owner=user, name=key_id)
+
+    clouds = Cloud.objects(owner=user)
+    machines = Machine.objects(cloud__in=clouds,
+                               key_associations__keypair__exact=keypair)
+    # key_object["id"] = key.name # This is for backwards compatibility
+    # key_object["isDefault"] = key.default
+
+    assoc_machines = transform_key_machine_associations(machines, keypair)
 
     return {'id': key_id,
-            'machines': keypair.machines, # TODO transform KeyAssociation the old way
+            'machines': assoc_machines,
             'isDefault': keypair.default}
 
 

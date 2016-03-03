@@ -376,3 +376,17 @@ def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
         raise MistError("%s is not allowed. It belongs to '%s' "
                         "which is %s." % (msg, cidr,
                                           forbidden_subnets[str(cidr)]))
+
+
+def transform_key_machine_associations(machines, keypair):
+    key_associations = []
+    for machine in machines:
+        for key_assoc in machine.key_associations:
+            if key_assoc.keypair == keypair:
+                key_associations.append([machine.cloud.id,
+                                        machine.machine_id,
+                                        key_assoc.last_used,
+                                        key_assoc.ssh_user,
+                                        key_assoc.sudo,
+                                        key_assoc.port])
+    return key_associations
