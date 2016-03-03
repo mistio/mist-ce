@@ -2,7 +2,7 @@
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
-<dom-module id="app-dashboard-fab">
+<dom-module id="app-fab">
 	<template>
 		<style>
 			#fabmenuoptions {
@@ -40,7 +40,7 @@
 		<div id="fab-menu">
 			<div id="fabmenuoptions">
 				<div class="item">
-					<paper-icon-button id="addclooud" icon="file:cloud" on-tap="addclooud"></paper-icon-button> 
+					<paper-icon-button id="addclooud" icon="image:wb-cloudy" on-tap="addclooud"></paper-icon-button> 
 					<paper-tooltip position="left" animation-delay="0">Add Cloud</paper-tooltip>
 				</div>
 				<div class="item">
@@ -58,7 +58,7 @@
 </dom-module>
 <script>
 	Polymer({
-	    is: 'app-dashboard-fab',
+	    is: 'app-fab',
 	    properties: {
 	    	icon:{
 	    		type: String,

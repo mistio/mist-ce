@@ -3,7 +3,7 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
-<link rel="import" href="../app-fab/app-dashboard-fab.html">
+<link rel="import" href="../app-fab/app-fab.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
@@ -221,15 +221,9 @@
                             </paper-button>
                         </template>
                     </div>
-                    <!-- <paper-button id="addcoud" class="blue">
-                        <iron-icon icon="icons:add"></iron-icon>add cloud
-                    </paper-button> -->
                 </div>
                 <div class="absolute-bottom-right">
-                    <app-dashboard-fab></app-dashboard-fab>
-                    <!-- <paper-menu-button vertical-align="bottom" horizontal-align="right">
-                        <paper-fab icon="add" class="dropdown-trigger" alt="bottom align" on-tap="">Actions</paper-fab>
-                    </paper-menu-button> -->
+                    <app-fab></app-fab>
                 </div>
                 <div class="container flex-horizontal-with-ratios">
                     <app-incidents id="right" class="flex2child incidents top right"></app-incidents>
