@@ -880,7 +880,7 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          docker_port_bindings={}, docker_exposed_ports={},
                          azure_port_bindings='', hostname='', plugins=None,
                          disk_size=None, disk_path=None,
-                         cloud_init='', associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
+                         cloud_init='', associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None, bare_metal=False):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError

@@ -1615,7 +1615,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    azure_port_bindings='', hostname='', plugins=None,
                    disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
-                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
+                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None, bare_metal=False):
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1719,7 +1719,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
                                          machine_name, image, size,
-                                         location)
+                                         location, bare_metal, cloud_init)
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(conn, key_id, private_key,
                                              public_key, machine_name,
@@ -2104,14 +2104,13 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key,
 
 
 def _create_machine_softlayer(conn, key_name, private_key, public_key,
-                             machine_name, image, size, location):
+                             machine_name, image, size, location, bare_metal, cloud_init):
     """Create a machine in Softlayer.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
 
     """
-
     key = str(public_key).replace('\n','')
     try:
         server_key = ''
@@ -2135,6 +2134,12 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
         domain = None
         name = machine_name
 
+    # FIXME: SoftLayer allows only bash/script, no actual cloud-init
+    # Also need to upload this on a public https url...
+    if cloud_init:
+        postInstallScriptUri = ''
+    else:
+        postInstallScriptUri = None
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -2143,7 +2148,9 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
                 image=image,
                 size=size,
                 location=location,
-                sshKeys=server_key
+                sshKeys=server_key,
+                bare_metal=bare_metal,
+                postInstallScriptUri=postInstallScriptUri
             )
         except Exception as e:
             raise MachineCreationError("Softlayer, got exception %s" % e, e)
@@ -2655,8 +2662,10 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
 
                     else:
                        machine.reboot()
-                if conn.type == 'azure':
+                elif conn.type == 'azure':
                     conn.reboot_node(machine, ex_cloud_service_name=cloud_service)
+                elif conn.type == 'softlayer':
+                    conn.reboot_node(machine)
                 else:
                     machine.reboot()
                 if conn.type is Provider.DOCKER:
@@ -2682,6 +2691,8 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 machine.destroy()
             elif conn.type == 'azure':
                 conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
+            elif conn.type == 'softlayer':
+                conn.destroy_node(machine)
             else:
                 machine.destroy()
     except AttributeError:
