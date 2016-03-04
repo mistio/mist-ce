@@ -18,7 +18,9 @@ def assert_equal(first, second, msg=None):
        operator.
     """
     if type(first) != type(second):
-        raise AssertionError("%s and %s are not of the same type" % (safe_repr(first), safe_repr(second)))
+        if type(first) not in [str, unicode] and type(second) not in [str, unicode]:
+            raise AssertionError("%s and %s are not of the same type" %
+                                 (safe_repr(first), safe_repr(second)))
     if type(first) == dict and type(second) == dict:
         assert_dict_equal(first, second, msg)
     elif type(first) == list and type(second) == list:
