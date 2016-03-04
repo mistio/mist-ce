@@ -1,0 +1,90 @@
+#single-team-page .ui-block-b .ui-title {
+    text-align: center;
+}
+#single-team-page #select-members-btn {
+    float: left !important;
+    font-weight: normal;
+    background-color: transparent;
+    color: #b5b5b5;
+    border-width: 0;
+    padding: .4em .75em !important;
+    text-align: left;
+    width: 14px;
+    height: 22px;
+    margin: 18px 5px 10px 11px !important;
+    font-size: 14px;
+    line-height: 1.6em;
+    z-index: 2;
+}
+#single-team-page #select-members-btn:hover {
+    color: #444 !important;
+}
+#select-members-popup .icon-check:after {
+    font-size: 14px;
+    top: 1.3em;
+    color: #d4d4d4;
+}
+#single-team-page .ui-filterable .ui-input-search {
+    margin-right: 230px !important;
+}
+#single-team-page #add-member-btn {
+    float: right;
+    margin: 0;
+}
+#single-team-page .list-wrapper .ui-block-b {
+  text-align: center;
+}
+#single-team-page .ui-icon-check:after {
+    background-color: #46d4c9;
+}
+#member-list {
+    box-shadow: none;
+    margin-top: -48px;
+}
+#single-team-page .member-search-container {
+    position: relative;
+    top: -56px;
+    margin-left: 50px;
+    margin-right: 230px;
+}
+
+#single-team-page .member-search {
+    padding-right: 35px;
+}
+
+#single-team-page .member-search-container [class*='icon-'] {
+    color: #7f7f7f;
+    display: inline-block;
+    background-color: #e8e8e8;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    padding: 0 8px 0 10px;
+    box-sizing: border-box;
+    height: 30.8px;
+    line-height: 30.8px;
+}
+#single-team-page .member-search-container [class*='icon-']:after {
+    font-size: 14px;
+    color: #444;
+}
+
+#single-team-page .member-search-container .icon-xx:hover {
+    cursor: pointer;
+}
+#member-list .member-tags {
+    text-align: center;
+    padding-right: 26px;
+}
+#member-list .member-tags .tag {
+    float: none;
+}
+.member-name {
+    font-weight: 400;
+}
+
+@media only screen and  (max-width: 600px) {
+    #single-team-page .member-search-container {
+        margin-right: 90px;
+    }
+}
