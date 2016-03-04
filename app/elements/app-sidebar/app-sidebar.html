@@ -259,15 +259,17 @@
                         </div>
                     </a>
                     <template is="dom-repeat" items="{{sections}}">
-                        <a class="section" is="pushstate-anchor" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(current,item.id)]]" tabindex="1" style$="[[style(item.color)]]">
-                            <div class="layout horizontal center">
-                                <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
-                                <span class="title flex">
-                                    <span>[[item.id]]</span>
-                                <span class="count">{{item.count}}</span>
-                                </span>
-                            </div>
-                        </a>
+                        <template is="dom-if" if="[[item.count]]">
+                            <a class="section" is="pushstate-anchor" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(current,item.id)]]" tabindex="1" style$="[[style(item.color)]]">
+                                <div class="layout horizontal center">
+                                    <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
+                                    <span class="title flex">
+                                        <span>[[item.id]]</span>
+                                    <span class="count">{{item.count}}</span>
+                                    </span>
+                                </div>
+                            </a>
+                        </template>
                     </template>
                 </nav>
                 <a href="/elements" class="flex section">
