@@ -10,8 +10,28 @@ define('app/views/team_list', ['app/views/page'],
 
         return App.TeamListView = PageView.extend({
 
+            //
+            //  Properties
+            //
+
             templateName: 'team_list',
             controllerName: 'teamsController',
+
+            //
+            // Computed Properties
+            //
+
+            canRename: function() {
+                return Mist.teamsController.get('selectedObjects').length == 1;
+            }.property('Mist.teamsController.model.@each.selected'),
+
+            canDelete: function() {
+                return Mist.teamsController.get('selectedObjects').length;
+            }.property('Mist.teamsController.model.@each.selected'),
+
+            //
+            // Initialization
+            //
 
             load: function() {
 
@@ -30,13 +50,9 @@ define('app/views/team_list', ['app/views/page'],
 
             }.on('willDestroyElement'),
 
-            canRename: function() {
-                return Mist.teamsController.get('selectedObjects').length == 1;
-            }.property('Mist.teamsController.model.@each.selected'),
-
-            canDelete: function() {
-                return Mist.teamsController.get('selectedObjects').length;
-            }.property('Mist.teamsController.model.@each.selected'),
+            //
+            // Methods
+            //
 
             updateFooter: function() {
                 if (Mist.teamsController.get('selectedObjects').length) {
@@ -46,30 +62,33 @@ define('app/views/team_list', ['app/views/page'],
                 }
             },
 
-
             //
             //  Actions
             //
 
-
             actions: {
+                addClicked: function() {
+                    Mist.teamAddController.open();
+                },
 
-                selectClicked: function () {
+                editClicked: function() {
+                    Mist.teamEditController.open(Mist.teamsController.get('selectedObjects')[0]);
+                },
+
+                selectClicked: function() {
                     $('#select-teams-popup').popup('open');
                 },
 
-                selectionModeClicked: function (mode) {
+                selectionModeClicked: function(mode) {
                     $('#select-teams-popup').popup('close');
-
-                    Ember.run(function () {
-                        Mist.teamsController.get('filteredTeams').forEach(function (team) {
+                    Ember.run(function() {
+                        Mist.teamsController.get('filteredTeams').forEach(function(team) {
                             team.set('selected', mode);
                         });
                     });
                 },
 
                 deleteClicked: function() {
-
                     var teams = Mist.teamsController.get('selectedObjects');
 
                     Mist.dialogController.open({
@@ -81,7 +100,7 @@ define('app/views/team_list', ['app/views/page'],
                         callback: function(didConfirm) {
                             if (!didConfirm) return;
                             teams.forEach(function(team) {
-                                Mist.teamsController.deleteScript({
+                                Mist.teamsController.deleteTeam({
                                     team: team
                                 });
                             });

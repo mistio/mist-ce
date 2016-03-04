@@ -11,7 +11,6 @@ define('app/routes/team', ['app/routes/base'],
         return App.TeamRoute = BaseRoute.extend({
 
             activate: function() {
-                console.log(123);
                 this._super();
                 Ember.run.next(this, function() {
                     var model = this.modelFor('team');

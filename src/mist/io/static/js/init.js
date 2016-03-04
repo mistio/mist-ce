@@ -38,9 +38,9 @@ var loadApp = function(
     ScriptRunController,
     ScriptsController,
     ProjectsController,
-    OrganizationsController,
+    // OrganizationController,
     TeamsController,
-    MembersController,
+    TeamEditController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -59,6 +59,7 @@ var loadApp = function(
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
     App.set('password', '');
+    App.set('organization', ORGANIZATION);
     App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
         .test(navigator.userAgent)
     );
@@ -135,9 +136,9 @@ var loadApp = function(
     App.set('projectsController', ProjectsController.create());
     App.set('machineRunScriptController', MachineRunScriptController.create());
     App.set('machineImageCreateController', MachineImageCreateController.create());
-    App.set('organizationsController', OrganizationsController.create());
+    // App.set('organizationController', OrganizationController.create());
     App.set('teamsController', TeamsController.create());
-    App.set('membersController', MembersController.create());
+    App.set('teamEditController', TeamEditController.create());
 
     // Ember custom widgets
     App.Select = Ember.Select.extend({
@@ -349,75 +350,23 @@ var setupMainChannel = function(socket, callback) {
         });
     }
 
-    var organizations = [{
-        id: 1,
-        name: 'my_organization',
-        members: [{
-            id: 1,
-            name: 'Marios Fakiolas',
-            email: 'marios@mist.io'
-        }, {
-            id: 2,
-            name: 'Xristina Papakonstantinou',
-            email: 'xristina@mist.io'
-        }, {
-            id: 3,
-            name: 'Pablo Tziano',
-            email: 'pablo@mist.io'
-        }, {
-            id: 4,
-            name: 'Dimitris Rozakis',
-            email: 'dr@mist.io'
-        }],
-        teams: [{
-            id: 1,
-            name: 'Frontend Team',
-            description: '',
-            members: [1, 2],
-            policy: {
-                operator: 'ALLOW',
-                rules: [{
-                    operator: 'DENY',
-                    action: '',
-                    rtype: '',
-                    rid: '',
-                    rtags: ''
-                }]
-            }
-        }, {
-            id: 2,
-            name: 'QA Team',
-            description: '',
-            members: [3],
-            policy: {
-                operator: 'ALLOW',
-                rules: [{
-                    operator: 'DENY',
-                    action: '',
-                    rtype: '',
-                    rid: '',
-                    rtags: ''
-                }]
-            }
-        }, {
-            id: 3,
-            name: 'Backend Team',
-            description: '',
-            members: [4],
-            policy: {
-                operator: 'ALLOW',
-                rules: [{
-                    operator: 'DENY',
-                    action: '',
-                    rtype: '',
-                    rid: '',
-                    rtags: ''
-                }]
-            }
-        }]
-    }];
-    Mist.organizationsController.load(organizations);
-    
+    // Fast implementation for teams modelling
+    var organization = Mist.organization, teams = [];
+    organization.teams.forEach(function(team) {
+        team.organization = {
+            id: organization.id,
+            name: organization.name
+        };
+
+        var members = organization.members.filter(function(member) {
+            return team.members.indexOf(member.id) > -1;
+        });
+        team.members = members;
+        teams.pushObject(team);
+    });
+
+    Mist.teamsController.setModel(teams);
+
     socket
         .on('list_keys', function(keys) {
             Mist.keysController.load(keys);

@@ -24,18 +24,41 @@
         </div>
     </div>
 
-    <div data-role="content" data-theme="a">
+    <div role="main" class="ui-content" data-theme="c">
+        <div id="member-list-container" class="ui-shadow">
+            <div class="ui-grid-a members-header">
+                <div class="ui-block-a">
+                    {{#if view.team.members.length}}
+                        <a id="select-members-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
+                                ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
+                    {{/if}}
+                </div>
+                <div class="ui-block-b">
 
-        {{#if Mist.teamsController.loading}}
-        <div class="ajax-loader"></div>
-        {{/if}}
+                </div>
+            </div><!-- /grid-b -->
 
-         <div class="ui-shadow" data-role="collapsible" data-collapsed="false">
-            <h4>{{view.team.name}}</h4>
+            {{#if view.team.members.length}}
+                <div class="member-search-container">
+                    {{#if Mist.teamsController.searchTerm}}
+                        <span {{action "clearClicked" target=view}} class="icon-xx"></span>
+                    {{else}}
+                        <span class="icon-search"></span>
+                    {{/if}}
+                    {{input value=Mist.teamsController.searchTerm placeholder="Filter members" class="team-search"}}
+                </div>
+
+                <ul id="member-list" data-role="listview"
+                    data-inset="true"
+                    class="checkbox-list">
+                    {{#each view.team.members as |member|}}
+                        {{component "member-list-item" member=member class="checkbox-link"}}
+                    {{/each}}
+                </ul>
+            {{/if}}
         </div>
 
-        <div class="large-padding"></div>
-
+        <div class="mid-padding"></div>
     </div>
 
     {{component "dialog-popup"}}

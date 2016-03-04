@@ -184,9 +184,9 @@ var loadFiles = function (callback) {
         'app/controllers/script_run',
         'app/controllers/scripts',
         'app/controllers/projects',
-        'app/controllers/organizations',
+        // 'app/controllers/organization',
         'app/controllers/teams',
-        'app/controllers/members',
+        'app/controllers/team_edit',
 
         'app/routes/image',
         'app/routes/images',
@@ -264,6 +264,8 @@ var loadFiles = function (callback) {
         'app/views/team_list',
         'app/views/team_list_item',
         'app/views/team',
+        'app/views/team_edit',
+        'app/views/member_list_item',
 
         'app/helpers/forIn'
     ], callback);

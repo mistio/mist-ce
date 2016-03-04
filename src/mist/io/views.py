@@ -77,6 +77,73 @@ def not_found(self, request):
 def home(request):
     """Home page view"""
     user = user_from_request(request)
+    organization = {
+        'id': 1,
+        'name': 'my_organization',
+        'members': [{
+            'id': 1,
+            'name': 'Marios Fakiolas',
+            'email': 'marios@mist.io'
+        }, {
+            'id': 2,
+            'name': 'Xristina Papakonstantinou',
+            'email': 'xristina@mist.io'
+        }, {
+            'id': 3,
+            'name': 'Pablo Tziano',
+            'email': 'pablo@mist.io'
+        }, {
+            'id': 4,
+            'name': 'Dimitris Rozakis',
+            'email': 'dr@mist.io'
+        }],
+        'teams': [{
+            'id': 1,
+            'name': 'Frontend Team',
+            'description': '',
+            'members': [1, 2],
+            'policy': {
+                'operator': 'ALLOW',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': '',
+                    'rtype': '',
+                    'rid': '',
+                    'rtags': ''
+                }]
+            }
+        }, {
+            'id': 2,
+            'name': 'QA Team',
+            'description': '',
+            'members': [3],
+            'policy': {
+                'operator': 'ALLOW',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': '',
+                    'rtype': '',
+                    'rid': '',
+                    'rtags': ''
+                }]
+            }
+        }, {
+            'id': 3,
+            'name': 'Backend Team',
+            'description': '',
+            'members': [4],
+            'policy': {
+                'operator': 'ALLOW',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': '',
+                    'rtype': '',
+                    'rid': '',
+                    'rtags': ''
+                }]
+            }
+        }]
+    }
 
     return {
         'project': 'mist.io',
@@ -93,7 +160,8 @@ def home(request):
         'is_core': json.dumps(False),
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
-        'last_build': config.LAST_BUILD
+        'last_build': config.LAST_BUILD,
+        'organization': json.dumps(organization)
     }
 
 

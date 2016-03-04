@@ -63,6 +63,8 @@
 
     {{component "dialog-popup"}}
 
+    {{component "team-edit"}}
+
     <div id="select-teams-popup" class="ui-mini" data-role="popup" data-transition="flip" data-position-to="#select-teams-btn">
         <div class="ui-header ui-caps">Sort by</div>
         <ul data-role="listview">
@@ -86,7 +88,7 @@
         <div class="ui-grid-a">
             <div class="{{if view.canRename '' 'ui-state-disabled'}} ui-block-a">
                 <a class="ui-btn ui-btn-icon-right ui-caps icon-edit"
-                    {{action "editClicked" target=view}}>Edit</a>
+                    {{action "editClicked" target=view}}>Rename</a>
             </div>
             <div class="{{if view.canDelete '' 'ui-state-disabled'}} ui-block-b">
                 <a class="ui-btn ui-btn-icon-right ui-caps icon-xx"

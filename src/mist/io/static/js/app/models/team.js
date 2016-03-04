@@ -16,8 +16,17 @@ define('app/models/team', ['ember'],
 
             id: null,
             name: null,
-            members: [],
-            organization: null
+            // members: [],
+            // organization: null,
+            // policy: null,
+
+            //
+            // Initialization
+            //
+
+            load: function() {
+
+            }.on('init')
         });
     }
 );

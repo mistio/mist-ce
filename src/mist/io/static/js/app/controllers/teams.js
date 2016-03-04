@@ -1,101 +1,133 @@
-define('app/controllers/teams', ['app/models/team', 'ember'],
+define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'],
     //
     //  Teams Controller
     //
     //  @returns Class
     //
-    function(Team) {
+    function(BaseArrayController, TeamModel) {
 
         'use strict';
 
-        return Ember.Controller.extend(Ember.Evented, {
+        return BaseArrayController.extend({
 
             //
-            // Properties
+            //  Properties
             //
 
-            model: [],
-            loading: null,
-            members: [],
-            organization: null,
+            baseModel: TeamModel,
+            searchTerm: null,
+            sortByTerm: 'name',
 
             //
-            //  Initialization
+            //  Computed Properties
             //
 
-            init: function () {
-                console.log('i');
-                this._super();
-                this.set('model', []);
-                this.set('loading', true);
+            sortByName: Ember.computed('sortByTerm', function() {
+                return this.get('sortByTerm') == 'name';
+            }),
+
+            sortByType: Ember.computed('sortByTerm', function() {
+                return this.get('sortByTerm') == 'type';
+            }),
+
+            filteredTeams: Ember.computed('model', 'searchTerm', function() {
+                var filteredTeams = [];
+
+                if (this.searchTerm) {
+                    var that = this;
+                    this.model.forEach(function(team) {
+                        var regex = new RegExp(that.searchTerm, 'i');
+
+                        if (regex.test(team.name)) {
+                            filteredTeams.push(team);
+                        } else {
+                            if (team.selected) {
+                                team.set('selected', false);
+                            }
+                        }
+                    });
+                } else {
+                    filteredTeams = this.model;
+                }
+
+                return filteredTeams;
+            }),
+
+            sortedTeams: Ember.computed('filteredTeams', 'filteredTeams.@each.name', 'filteredTeams.@each.type', 'sortByTerm', function() {
+                if (this.get('filteredTeams')) {
+                    if (this.get('sortByName')) {
+                        return this.get('filteredTeams').sortBy('name');
+                    }
+
+                    if (this.get('sortByType')) {
+                        return this.get('filteredTeams').sortBy('type');
+                    }
+                }
+            }),
+
+            //
+            // Methods
+            //
+
+            deleteTeam: function (args) {
+                var that = this;
+                that.set('deletingTeam', true);
+                Mist.ajax.DELETE('/orgs/' + args.team.organization.name + '/teams/' + args.team.id, {
+                }).success(function () {
+                    that._deleteObject(args.team);
+                }).error(function (message) {
+                    Mist.notificationController.notify(message);
+                }).complete(function (success) {
+                    that.set('deletingTeam', false);
+                    if (args.callback)
+                        args.callback(success);
+                })
             },
 
-            load: function (teams) {
-                this._updateModel(teams);
-                this.set('loading', false);
+            renameTeam: function(args) {
+                var that = this;
+                that.set('renamingTeam', true);
+                Mist.ajax.PUT('/orgs/' + args.team.organization.name + '/teams/' + args.team.id, {
+                    new_name: args.newName,
+                    new_description: args.newDescription
+                }).success(function() {
+                    that._renameTeam(args.team, args.newName, args.newDescription);
+                }).error(function(message) {
+                    Mist.notificationController.notify(message);
+                }).complete(function(success) {
+                    that.set('renamingTeam', false);
+                    if (args.callback)
+                        args.callback(success);
+                });
             },
-
-            //
-            //  Methods
-            //
 
             getTeam: function(teamId) {
+                console.log(teamId, this.model, this.model.findBy('id', teamId));
                 return this.model.findBy('id', teamId);
             },
 
-            teamExists: function(teamId) {
-                return !!this.getTeam(teamId);
+            getRequestedTeam: function() {
+                if (this.teamRequest) {
+                    return this.getObject(this.teamRequest);
+                }
             },
 
+            clearSearch: function() {
+                this.set('searchTerm', null);
+            },
 
             //
-            //  Pseudo-Private Methods
+            // Private Methods
             //
 
-            _updateModel: function(teams) {
-                var that = this;
-                Ember.run(function() {
-                    // Replace dummy teams (newly created)
-                    var dummyTeams = that.model.filterBy('id', -1);
-
-                    dummyTeams.forEach(function(team) {
-                        var realTeam = teams.findBy('name', team.name);
-                        if (realTeam) {
-                            for (var attr in realTeam) {
-                                team.set(attr, realTeam[attr]);
-                            }
-                        }
-                    });
-
-                    // Remove deleted teams
-                    that.model.forEach(function(team) {
-                        if (!teams.findBy('id', team.id)) {
-                            if (team.id != -1) {
-                                that.model.removeObject(team);
-                            }
-                        }
-                    });
-
-                    // Update model
-                    teams.forEach(function(team) {
-                        if (that.teamExists(team.id)) {
-                            // Update existing teams
-                            var old_team = that.getTeam(team.id);
-
-                            for (var attr in team) {
-                                old_team.set(attr, team[attr]);
-                            }
-                        } else {
-                            // Add new team
-                            team.organization = that.organization;
-                            that.model.pushObject(Team.create(team));
-                        }
-                    });
-
-                    Mist.organizationsController.updateTeams();
-                    that.trigger('onTeamListChange');
+            _renameTeam: function(team, name, description) {
+                Ember.run(this, function() {
+                    team.set('name', name);
+                    if (description) {
+                        team.set('description', description);
+                    }
                 });
-            },
+            }
         });
     }
 );

@@ -41,6 +41,7 @@
 @import url("css/team_list.css");
 @import url("css/team.css");
 @import url("css/modals.css");
+@import url("css/member_list.css");
 
 
 .ui-content, .header-grid {
@@ -678,6 +679,7 @@ textarea {
 #key-list-page .ui-filterable,
 #script-list-page .ui-filterable,
 #team-list-page .ui-filterable,
+#single-team-page .ui-filterable,
 #network-list-page .ui-filterable {
     position: relative;
     top: -59px;
@@ -695,6 +697,7 @@ textarea {
     #key-list-page .ui-filterable,
     #script-list-page .ui-filterable,
     #team-list-page .ui-filterable,
+    #single-team-page .ui-filterable,
     #network-list-page .ui-filterable  {
         margin-left: 50px !important;
         margin-right: 50px !important;
@@ -705,6 +708,7 @@ textarea {
 #key-list-page .ui-filterable .ui-input-search,
 #script-list-page .ui-filterable .ui-input-search,
 #team-list-page .ui-filterable .ui-input-search,
+#single-team-page .ui-filterable .ui-input-search,
 #network-list-page .ui-filterable .ui-input-search {
     margin-left: 55px;
 }
@@ -717,6 +721,7 @@ textarea {
 #image-list-page .ui-filterable .ui-input-search,
 #script-list-page .ui-filterable .ui-input-search,
 #team-list-page .ui-filterable .ui-input-search,
+#single-team-page .ui-filterable .ui-input-search,
 #network-list-page .ui-filterable .ui-input-search {
     background-color: #fff;
     border-color: #b5b5b5;
@@ -732,6 +737,7 @@ textarea {
 #network-list-page .ui-filterable input,
 #image-list-page .ui-filterable input,
 #team-list-page .ui-filterable input,
+#single-team-page .ui-filterable input,
 #script-list-page .ui-filterable input {
     min-height: 35px;
     position: relative;
@@ -742,6 +748,7 @@ textarea {
 #image-list-page .images-header,
 #script-list-page .scripts-header,
 #team-list-page .teams-header,
+#single-team-page .members-header,
 #key-list-page .keys-header,
 #network-list-page .networks-header {
     background-color: #d4d4d4;
@@ -758,6 +765,7 @@ textarea {
 #key-list-page .keys-header:after,
 #script-list-page .scripts-header:after,
 #team-list-page .scripts-header:after,
+#single-team-page .members-header:after,
 #network-list-page .networks-header:after {
     content: '';
     clear: both;

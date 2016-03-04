@@ -10,6 +10,10 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
 
         return BaseArrayController.extend({
 
+            //
+            // Properties
+            //
+
             baseModel: ScriptModel,
             searchTerm: null,
             sortByTerm: 'name',
@@ -63,6 +67,10 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                     }
                 }
             }),
+
+            //
+            // Methods
+            //
 
             addScript: function (args) {
                 var that = this;
@@ -146,6 +154,10 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
             clearSearch: function() {
                 this.set('searchTerm', null);
             },
+
+            //
+            // Private Methods
+            //
 
             _renameScript: function (script, name, description) {
                 Ember.run(this, function () {
