@@ -37,7 +37,7 @@
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <app-check id="check" selected="[[selected]]" on-tap="_onSelectItem"></app-check>
+        <app-check id="check" selected="[[selected]]" on-tap="_onSelectItem">K</app-check>
         <a href$="[[elementLink]]" is="pushstate-anchor">
             <div class="name" hidden$="[[!item.id]]">[[item.id]]</div>
             <div class="is-default" hidden$="[[!item.isDefault]]">[[isDefaultText]]</div>

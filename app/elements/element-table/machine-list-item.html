@@ -65,7 +65,7 @@
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
-        <app-check id="check" allselected="{{allselected}}" selected="{{selected}}" on-tap="_onSelectItem"></app-check>
+        <app-check id="check" allselected="{{allselected}}" selected="{{selected}}" on-tap="_onSelectItem">M</app-check>
         <a href$="[[elementLink]]" is="pushstate-anchor">
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
