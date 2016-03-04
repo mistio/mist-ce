@@ -133,14 +133,6 @@ module.exports = function(grunt) {
                     force: true
                 }
             },
-            datetimepicker: {
-                target: '../bower_components/datetimepicker/',
-                link: 'dist/datetimepicker',
-                options: {
-                    overwrite: true,
-                    force: true
-                }
-            },
             images: {
                 target: '../src/mist/io/static/images',
                 link: 'dist/images',
@@ -224,7 +216,6 @@ module.exports = function(grunt) {
 		'symlink:fonts',
 		'symlink:states',
 		'symlink:yamljs',
-		'symlink:datetimepicker',
 		'requirejs',
 		'symlink:mistjs',
 		'symlink:mistcss',
