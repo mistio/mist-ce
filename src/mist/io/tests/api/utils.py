@@ -193,6 +193,11 @@ def assert_list_not_empty(_list, msg=None):
     assert len(_list) > 0, msg
 
 
+def assert_list_empty(_list, msg=None):
+    assert type(_list) == list, "Object provided is not a list"
+    assert len(_list) == 0, msg
+
+
 def assert_tuple_equal(tuple1, tuple2, msg=None):
     """A tuple-specific equality assertion.
 
@@ -258,6 +263,13 @@ def assert_response_not_found(response, msg=None):
     if msg is None:
         msg = response.content
     assert response.status_code == codes.not_found, msg
+
+
+def assert_response_server_error(response, msg=None):
+    assert type(response) == Response, "Object provided is not a Response"
+    if msg is None:
+        msg = response.content
+    assert response.status_code == codes.server_error, msg
 
 
 def assert_dict_equal(d1, d2, msg=None):
