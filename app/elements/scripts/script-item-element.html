@@ -1,0 +1,108 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<dom-module id="script-item-element">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+            .check {
+                width: 26px;
+                display: inline-block;
+            }
+            
+            paper-checkbox {
+                display: none;
+            }
+            
+            :host:hover paper-checkbox,
+            paper-checkbox[checked] {
+              display: inline-block;
+            }
+        </style>
+        <paper-item on-tap="_viewScript" class$="info-item flex-horizontal-with-ratios [[indexClass]]">
+            <div class="flexchild">
+                <span class="check">
+                    <paper-checkbox checked="{{selected}}" on-tap="_selectScript"></paper-checkbox>
+                </span>
+                <span class="name">[[script.name]]</span>
+            </div>
+            <div class="flexchild">[[script.type]]</div>
+            <content></content>
+        </paper-item>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'script-item-element',
+
+                properties: {
+                    script: {
+                        type: Object
+                    },
+                    selected: {
+                        type: Boolean,
+                        value: false,
+                        notify: true
+                    },
+                    index: {
+                        type: Number
+                    },
+                    count: {
+                        type: Number
+                    },
+                    indexClass: {
+                        type: String,
+                        computed: '_computeIsIndexClass(index, count)'
+                    },
+                    isDefaultText: {
+                        type: String,
+                        computed: '_computeIsDefaultText(script.isDefault)'
+                    }
+                },
+                listeners: {
+                    'selected-changed': '_selectScriptChanged'
+                },
+                _computeIsIndexClass: function(index, count) {
+                    var classes = [];
+                    classes.push(
+                        (index + 1) % 2 == 0 ? 'even' : 'odd',
+                        index + 1 == count ? 'last' : null
+                    );
+                    return classes.join(' ');
+                },
+                _selectScriptChanged: function(e) {
+                    var selected = e.detail.value;
+                    this.fire('toggleSelectedScript', {
+                        script: this.script,
+                        selected: selected
+                    });
+                },
+                _viewScript: function(e) {
+                    page.show('/scripts/' + this.script.id);
+                },
+                _selectScript: function(e) {
+                    // This is used to prevent event bubbling
+                    e.stopPropagation();
+                },
+                _computeIsDefaultText: function(isDefault) {
+                    return isDefault ? 'Default' : null;
+                }
+            });
+        })();
+    </script>
+</dom-module>

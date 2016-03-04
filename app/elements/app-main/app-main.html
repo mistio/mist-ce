@@ -29,6 +29,13 @@
 <link rel="import" href="../pages/page-elements.html">
 <link rel="import" href="../pages/page-account.html">
 <link rel="import" href="../pages/page-not-found.html">
+<link rel="import" href="../scripts/script-add-element.html">
+<link rel="import" href="../scripts/script-edit-element.html">
+<link rel="import" href="../scripts/script-item-element.html">
+<link rel="import" href="../scripts/script-page-element.html">
+<link rel="import" href="../scripts/script-run-element.html">
+<link rel="import" href="../scripts/scripts-list-element.html">
+
 <dom-module id="app-main">
     <style>
     paper-toast {
@@ -76,7 +83,8 @@
             <page-list model="{{model}}" elements="{{model.networksArray}}" sections="{{sectionsArray}}" section="[[sections.networks]]"></page-list>
             <page-network model="{{model}}" params="{{params}}" network="{{getNetwork(params)}}" elements="{{model.networksArray}}" sections="{{sectionsArray}}" section="[[sections.networks]]"></page-network>
             <!-- scripts -->
-            <page-list model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-list>
+            <scripts-list-element model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]" clouds=[[model.cloudsArray]]></scripts-list-element>
+            <!-- <page-list model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-list> -->
             <page-script model="{{model}}" params="{{params}}" network="{{getScript(params)}}" elements="{{model.scriptsArray}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-script>
             <page-elements></page-elements>
             <page-account></page-account>
@@ -153,7 +161,52 @@ var app = Polymer({
         this.model = {
             cloudsArray: [],
             machinesArray: [],
-            scriptsArray: [],
+            scriptsArray:  [{
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "test",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "runner",
+                script: "owner/repo",
+                source: "github",
+                type: "executable",
+                user: "marios@mist.io"
+            }, {
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "install scipt",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "custom script",
+                script: "owner/repo",
+                source: "github",
+                type: "inline",
+                user: "marios@mist.io"
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "update script",
+                script: "owner/repo",
+                source: "github",
+                type: "inline",
+                user: "marios@mist.io"
+            }],
             imagesArray: [],
             keysArray: [],
             networksArray: [],
