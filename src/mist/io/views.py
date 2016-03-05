@@ -36,6 +36,8 @@ import pyramid.httpexceptions
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, transform_key_machine_associations
 
+from mist.core.auth.methods import auth_context_from_request
+
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
@@ -263,10 +265,9 @@ def delete_cloud(request):
               any key associations.
 
     """
-
+    auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    user = user_from_request(request)
-    methods.delete_cloud(user, cloud_id)
+    methods.delete_cloud(auth_context.owner, cloud_id)
     return OK
 
 
@@ -274,19 +275,20 @@ def delete_cloud(request):
 def rename_cloud(request):
     """Renames a cloud."""
 
+    auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
     new_name = params.get('new_name', '')
     if not new_name:
         raise RequiredParameterMissingError('new_name')
 
-    user = user_from_request(request)
-    methods.rename_cloud(user, cloud_id, new_name)
+    methods.rename_cloud(auth_context.owner, cloud_id, new_name)
     return OK
 
 
 @view_config(route_name='cloud_action', request_method='POST')
 def toggle_cloud(request):
+    auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
     new_state = params.get('new_state', '')
@@ -296,19 +298,11 @@ def toggle_cloud(request):
     if new_state != "1" and new_state != "0":
         raise BadRequestError('Invalid cloud state')
 
-    user = user_from_request(request)
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     cloud.enabled=bool(int(new_state))
     cloud.save()
-    trigger_session_update(user.email, ['clouds'])
+    trigger_session_update(auth_context.owner, ['clouds'])
     return OK
-
-    # if cloud_id not in user.clouds:
-    #     raise CloudNotFoundError()
-    # user.clouds_dict[cloud_id].enabled = bool(int(new_state))
-    # user.clouds_dict[cloud_id].save()
-    # trigger_session_update(user.email, ['clouds'])
-    # return OK
 
 
 @view_config(route_name='keys', request_method='GET', renderer='json')

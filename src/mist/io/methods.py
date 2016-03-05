@@ -936,18 +936,18 @@ def _add_cloud_vsphere(user, title, provider, params):
     return cloud.id, cloud
 
 
-def rename_cloud(user, cloud_id, new_name):
+def rename_cloud(owner, cloud_id, new_name):
     """Renames cloud with given cloud_id."""
 
     log.info("Renaming cloud: %s", cloud_id)
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     cloud.title = new_name
     cloud.save()
     log.info("Succesfully renamed cloud '%s'", cloud_id)
-    trigger_session_update(user.email, ['clouds'])
+    trigger_session_update(owner, ['clouds'])
 
 
-def delete_cloud(user, cloud_id):
+def delete_cloud(owner, cloud_id):
     """Deletes cloud with given cloud_id."""
 
     log.info("Deleting cloud: %s", cloud_id)
@@ -962,15 +962,15 @@ def delete_cloud(user, cloud_id):
         # this a core/io installation, disable directly using core's function
         log.info("Disabling monitoring before deleting cloud.")
         try:
-            disable_monitoring_cloud(user, cloud_id)
+            disable_monitoring_cloud(owner, cloud_id)
         except Exception as exc:
             log.warning("Couldn't disable monitoring before deleting cloud. "
                         "Error: %r", exc)
 
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     cloud.delete()
     log.info("Succesfully deleted cloud '%s'", cloud_id)
-    trigger_session_update(user.email, ['clouds'])
+    trigger_session_update(owner, ['clouds'])
 
 
 def add_key(user, key_id, private_key):
