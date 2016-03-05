@@ -843,9 +843,6 @@ class ListMachines(UserTask):
             return 20*60
 
 
-
-
-
 class ProbeSSH(UserTask):
     abstract = False
     task_key = 'probe'
@@ -918,7 +915,6 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          associate_floating_ip_subnet=None, project_id=None,
                          cronjob={}):
 
-
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -938,9 +934,12 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
     THREAD_COUNT = 5
     pool = ThreadPool(THREAD_COUNT)
 
-    names = []
-    for i in range(1, quantity+1):
-        names.append('%s-%d' % (machine_name,i))
+    if quantity == 1:
+        names = [machine_name]
+    else:
+        names = []
+        for i in range(1, quantity+1):
+            names.append('%s-%d' % (machine_name, i))
 
     user = user_from_email(email)
     specs = []
