@@ -18,8 +18,8 @@ from amqp import Message
 from amqp.connection import Connection
 from amqp.exceptions import NotFound as AmqpNotFound
 
-from mist.io.model import User
 from mist.io.exceptions import MistError
+import mist.core.user.models
 
 try:
     from mist.core import config
@@ -70,18 +70,6 @@ def params_from_request(request):
     except:
         params = request.params
     return params
-
-
-def user_from_request(request):
-    return User()
-
-
-def user_from_session_id(session_id):
-    return User()
-
-
-def user_from_email(email):
-    return User()
 
 
 def b58_encode(num):
@@ -197,20 +185,22 @@ def amqp_subscribe(exchange, callback, queue='',
         amqp_log("SUBSCRIPTION ENDED: %s %s %r" % (exchange, queue, exc))
 
 
-def _amqp_user_exchange(user):
+def _amqp_owner_exchange(owner):
     # The exchange/queue name consists of a non-empty sequence of these
     # characters: letters, digits, hyphen, underscore, period, or colon.
-    if isinstance(user, basestring):
-        email = user
-    else:
-        email = user.email
-    tag = email.replace('@', ':') or 'none'
-    return "mist-user_%s" % tag
+    if isinstance(owner, basestring) and '@' in owner:
+        owner = mist.core.user.models.User.objects.get(email=owner)
+    elif not isinstance(owner, mist.core.user.models.Owner):
+        try:
+            owner = mist.core.user.models.Owner.objects.get(id=owner)
+        except:
+            raise Exception(repr(owner))
+    return "owner_%s" % owner.id
 
 
 def amqp_publish_user(user, routing_key, data):
     try:
-        amqp_publish(_amqp_user_exchange(user), routing_key, data)
+        amqp_publish(_amqp_owner_exchange(user), routing_key, data)
     except AmqpNotFound:
         return False
     except Exception:
@@ -219,14 +209,14 @@ def amqp_publish_user(user, routing_key, data):
 
 
 def amqp_subscribe_user(user, queue, callback):
-    amqp_subscribe(_amqp_user_exchange(user), callback, queue)
+    amqp_subscribe(_amqp_owner_exchange(user), callback, queue)
 
 
-def amqp_user_listening(user):
+def amqp_owner_listening(owner):
     connection = Connection(config.AMQP_URI)
     channel = connection.channel()
     try:
-        channel.exchange_declare(exchange=_amqp_user_exchange(user),
+        channel.exchange_declare(exchange=_amqp_owner_exchange(owner),
                                  type='fanout', passive=True)
     except AmqpNotFound:
         return False

@@ -50,7 +50,7 @@ except ImportError:  # Standalone mist.io
     celery_cfg = 'mist.io.celery_config'
 
 from mist.io.helpers import amqp_publish_user
-from mist.io.helpers import amqp_user_listening
+from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
 
 # libcloud certificate fix for OS X
@@ -620,7 +620,11 @@ class UserTask(Task):
         return self.memcache.delete(cache_key)
 
     def run(self, *args, **kwargs):
-        email = args[0]
+        owner_id = args[0]
+        if '@' in owner_id:
+            owner_id = User.objects.get(email=owner_id).id
+            args[0] = owner_id
+        log.error('Running %s for %s', self.__class__.__name__, owner_id)
         # seq_id is an id for the sequence of periodic tasks, to avoid
         # running multiple concurrent sequences of the same task with the
         # same arguments. it is empty on first run, constant afterwards
@@ -639,7 +643,7 @@ class UserTask(Task):
                     cached_err = None
                     # cached err will be deleted or overwritten in a while
                     #self.memcache.delete(cache_key + 'error')
-        if not amqp_user_listening(email):
+        if not amqp_owner_listening(owner_id):
             # noone is waiting for result, stop trying, but flush cached erros
             self.memcache.delete(cache_key + 'error')
             return
@@ -685,7 +689,7 @@ class UserTask(Task):
         else:
             self.memcache.delete(cache_key + 'error')
         cached = {'timestamp': time(), 'payload': data, 'seq_id': seq_id}
-        ok = amqp_publish_user(email, routing_key=self.task_key, data=data)
+        ok = amqp_publish_user(owner_id, routing_key=self.task_key, data=data)
         if not ok:
             # echange closed, no one gives a shit, stop repeating, why try?
             amqp_log("%s: exchange closed" % id_str)
@@ -720,13 +724,10 @@ class ListSizes(UserTask):
     polling = False
     soft_time_limit = 30
 
-    def execute(self, owner, cloud_id):
+    def execute(self, owner_id, cloud_id):
         from mist.io import methods
-        if owner.find("@")!=-1:
-            user = user_from_email(owner)
-        else:
-            user = Owner.objects.get(id=owner)
-        sizes = methods.list_sizes(user, cloud_id)
+        owner = Owner.objects.get(id=owner_id)
+        sizes = methods.list_sizes(owner, cloud_id)
         return {'cloud_id': cloud_id, 'sizes': sizes}
 
 
@@ -738,13 +739,10 @@ class ListLocations(UserTask):
     polling = False
     soft_time_limit = 30
 
-    def execute(self, owner, cloud_id):
+    def execute(self, owner_id, cloud_id):
         from mist.io import methods
-        if owner.find("@")!=-1:
-            user = user_from_email(owner)
-        else:
-            user = Owner.objects.get(id=owner)
-        locations = methods.list_locations(user, cloud_id)
+        owner = Owner.objects.get(id=owner_id)
+        locations = methods.list_locations(owner, cloud_id)
         return {'cloud_id': cloud_id, 'locations': locations}
 
 
@@ -756,17 +754,14 @@ class ListNetworks(UserTask):
     polling = False
     soft_time_limit = 30
 
-    def execute(self, owner, cloud_id):
-        if owner.find("@")!=-1:
-            user = user_from_email(owner)
-        else:
-            user = Owner.objects.get(id=owner)
+    def execute(self, owner_id, cloud_id):
+        owner = Owner.objects.get(id=owner_id)
         log.warn('Running list networks for user %s cloud %s'
-                 % (user.email, cloud_id))
+                 % (owner.id, cloud_id))
         from mist.io import methods
-        networks = methods.list_networks(user, cloud_id)
+        networks = methods.list_networks(owner, cloud_id)
         log.warn('Returning list networks for user %s cloud %s'
-                 % (user.email, cloud_id))
+                 % (owner.id, cloud_id))
         return {'cloud_id': cloud_id, 'networks': networks}
 
 
@@ -778,16 +773,14 @@ class ListImages(UserTask):
     polling = False
     soft_time_limit = 60*2
 
-    def execute(self, owner, cloud_id):
+    def execute(self, owner_id, cloud_id):
         from mist.io import methods
-        if owner.find("@") != -1:
-            user = user_from_email(owner)
-        else:
-            user = Owner.objects.get(id=owner)
-        log.warn('Running list images for user %s cloud %s' % (user.email, cloud_id))
-        images = methods.list_images(user, cloud_id)
-        log.warn('Returning list images for user %s cloud %s' %
-                 (user.email, cloud_id))
+        owner = Owner.objects.get(id=owner_id)
+        log.warn('Running list images for user %s cloud %s',
+                 owner.id, cloud_id)
+        images = methods.list_images(owner, cloud_id)
+        log.warn('Returning list images for user %s cloud %s',
+                 owner.id, cloud_id)
         return {'cloud_id': cloud_id, 'images': images}
 
 
@@ -799,17 +792,14 @@ class ListProjects(UserTask):
     polling = False
     soft_time_limit = 30
 
-    def execute(self, owner, cloud_id):
-        if owner.find("@") != -1:
-            user = user_from_email(owner)
-        else:
-            user = Owner.objects.get(id=owner)
-        log.warn('Running list projects for user %s cloud %s' %
-                 (user.email, cloud_id))
+    def execute(self, owner_id, cloud_id):
+        owner = Owner.objects.get(id=owner_id)
+        log.warn('Running list projects for user %s cloud %s',
+                 owner.id, cloud_id)
         from mist.io import methods
-        projects = methods.list_projects(user, cloud_id)
-        log.warn('Returning list projects for user %s cloud %s' %
-                 (user.email, cloud_id))
+        projects = methods.list_projects(owner, cloud_id)
+        log.warn('Returning list projects for user %s cloud %s',
+                 owner.id, cloud_id)
         return {'cloud_id': cloud_id, 'projects': projects}
 
 
@@ -826,14 +816,12 @@ class ListMachines(UserTask):
     else:
         log_event = lambda *args, **kwargs: None
 
-    def execute(self, owner, cloud_id):
+    def execute(self, owner_id, cloud_id):
         from mist.io import methods
-        if owner.find("@") != -1:
-            user = user_from_email(owner)
-        else:
-            user = Owner.objects.get(id=owner)
-        log.warn('Running list machines for user %s cloud %s' % (user.email, cloud_id))
-        machines = methods.list_machines(user, cloud_id)
+        owner = Owner.objects.get(id=owner_id)
+        log.warn('Running list machines for user %s cloud %s',
+                 owner.id, cloud_id)
+        machines = methods.list_machines(owner, cloud_id)
         if multi_user:
             from mist.core.methods import get_machine_tags, set_machine_tags
             for machine in machines:
@@ -842,9 +830,10 @@ class ListMachines(UserTask):
                     tags = {}
                     for tag in machine["tags"]:
                         tags[tag["key"]]= tag["value"]
-                    set_machine_tags(user, tags, cloud_id, machine.get("id"))
+                    set_machine_tags(owner, tags, cloud_id, machine.get("id"))
                 try:
-                    mistio_tags = get_machine_tags(user, cloud_id, machine.get("id"))
+                    mistio_tags = get_machine_tags(owner, cloud_id,
+                                                   machine.get("id"))
                 except:
                     log.info("Machine has not tags in mist db")
                 else:
@@ -855,22 +844,20 @@ class ListMachines(UserTask):
                         tag_dict = {'key': key, 'value': value}
                         machine['tags'].append(tag_dict)
                 # FIXME: optimize!
-        log.warn('Returning list machines for user %s cloud %s' % (user.email, cloud_id))
+        log.warn('Returning list machines for user %s cloud %s',
+                 owner.id, cloud_id)
         return {'cloud_id': cloud_id, 'machines': machines}
 
-    def error_rerun_handler(self, exc, errors, owner, cloud_id):
+    def error_rerun_handler(self, exc, errors, owner_id, cloud_id):
         from mist.io.methods import notify_user
 
         if len(errors) < 6:
             return self.result_fresh  # Retry when the result is no longer fresh
-        if owner.find("@") != -1:
-            user = user_from_email(owner)
-        else:
-            user = Owner.objects.get(id=owner)
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+        owner = Owner.objects.get(id=owner_id)
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
         if len(errors) == 6: # If does not respond for a minute
-            notify_user(user, 'Cloud %s does not respond' %
+            notify_user(owner, 'Cloud %s does not respond' %
                         cloud.title,
                         email_notify=False, cloud_id=cloud_id)
 
@@ -885,10 +872,10 @@ class ListMachines(UserTask):
             cloud.save()
             # user.clouds_dict[cloud_id].enabled = False
             # user.clouds_dict[cloud_id].save()
-            notify_user(user, "Cloud %s disabled after not responding for "
-                              "30 mins" % cloud.title,
+            notify_user(owner, "Cloud %s disabled after not responding for "
+                               "30 mins" % cloud.title,
                         email_notify=True, cloud_id=cloud_id)
-            log_event(user.email, 'incident', action='disable_cloud',
+            log_event(owner, 'incident', action='disable_cloud',
                       cloud_id=cloud_id, error="Cloud unresponsive")
             return 20*60
 
@@ -901,13 +888,10 @@ class ProbeSSH(UserTask):
     polling = True
     soft_time_limit = 60
 
-    def execute(self, owner, cloud_id, machine_id, host):
-        if owner.find("@") != -1:
-            user = user_from_email(owner)
-        else:
-            user = Owner.objects.get(id=owner)
+    def execute(self, owner_id, cloud_id, machine_id, host):
+        owner = Owner.objects.get(id=owner_id)
         from mist.io.methods import probe_ssh_only
-        res = probe_ssh_only(user, cloud_id, machine_id, host)
+        res = probe_ssh_only(owner, cloud_id, machine_id, host)
         return {'cloud_id': cloud_id,
                 'machine_id': machine_id,
                 'host': host,
@@ -927,7 +911,7 @@ class Ping(UserTask):
     polling = True
     soft_time_limit = 30
 
-    def execute(self, owner, cloud_id, machine_id, host):
+    def execute(self, owner_id, cloud_id, machine_id, host):
         from mist.io import methods
         res = methods.ping(host)
         return {'cloud_id': cloud_id,
