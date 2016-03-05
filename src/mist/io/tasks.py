@@ -926,20 +926,21 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
         log_event = lambda *args, **kwargs: None
     job_id = job_id or uuid.uuid4().hex
 
-    log_event(email, 'job', 'async_machine_creation_started', job_id=job_id,
-              cloud_id=cloud_id, script=script, script_id=script_id,
-              script_params=script_params, monitoring=monitoring,
-              persist=persist, quantity=quantity)
-
-    THREAD_COUNT = 5
-    pool = ThreadPool(THREAD_COUNT)
-
     if quantity == 1:
         names = [machine_name]
     else:
         names = []
         for i in range(1, quantity+1):
             names.append('%s-%d' % (machine_name, i))
+
+    log_event(email, 'job', 'async_machine_creation_started', job_id=job_id,
+              cloud_id=cloud_id, script=script, script_id=script_id,
+              script_params=script_params, monitoring=monitoring,
+              persist=persist, quantity=quantity, key_id=key_id,
+              machine_names=names)
+
+    THREAD_COUNT = 5
+    pool = ThreadPool(THREAD_COUNT)
 
     user = user_from_email(email)
     specs = []
