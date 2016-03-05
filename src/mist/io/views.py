@@ -21,7 +21,7 @@ from mist.core.auth.methods import user_from_request
 from mist.core.keypair.models import Keypair
 from mist.core.cloud.models import Cloud, Machine, KeyAssociation
 from mist.core import config
-
+import mist.core.methods
 # except ImportError:
 #     from mist.io import config
 #     from mist.io.helpers import user_from_request
@@ -172,15 +172,21 @@ def list_clouds(request):
     .. note:: Currently, this is only used by the cloud controller in js.
 
     """
-
-    user = user_from_request(request)
-    return methods.list_clouds(user)
+    auth_context = mist.core.auth.methods.auth_context_from_request(request)
+    if not auth_context.has_perm('cloud', 'read'):
+        raise UnauthorizedError()
+    print "#"*100
+    print mist.core.methods.filter_list_clouds(auth_context)
+    return mist.core.methods.filter_list_clouds(auth_context)
 
 
 @view_config(route_name='clouds', request_method='POST', renderer='json')
 def add_cloud(request):
     """Adds a new cloud."""
-
+    auth_context = mist.core.auth.methods.auth_context_from_request(request)
+    if not auth_context.has_perm('cloud', 'add'):
+        raise UnauthorizedError()
+    user = auth_context.owner
     params = params_from_request(request)
     # remove spaces from start/end of string fields that are often included
     # when pasting keys, preventing thus succesfull connection with the
@@ -196,7 +202,6 @@ def add_cloud(request):
     if not provider:
         raise RequiredParameterMissingError('provider')
 
-    user = user_from_request(request)
 
     monitoring = None
     if int(api_version) == 2:
@@ -236,6 +241,10 @@ def add_cloud(request):
         )
 
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
+
+    cloud_tags = auth_context.get_tags("cloud","read")
+    mist.core.methods.set_cloud_tags(user, cloud_tags, cloud_id)
+
     c_count = Cloud.objects(owner=user).count()
     ret = {
         'index': c_count - 1,
@@ -263,9 +272,12 @@ def delete_cloud(request):
               any key associations.
 
     """
-
+    auth_context = mist.core.auth.methods.auth_context_from_request(request)
+    user = auth_context.owner
     cloud_id = request.matchdict['cloud']
-    user = user_from_request(request)
+    cloud_tags = mist.core.methods.get_cloud_tags(user, cloud_id)
+    if not auth_context.has_perm('cloud', 'remove', cloud_id, cloud_tags):
+        raise UnauthorizedError()
     methods.delete_cloud(user, cloud_id)
     return OK
 
@@ -279,8 +291,13 @@ def rename_cloud(request):
     new_name = params.get('new_name', '')
     if not new_name:
         raise RequiredParameterMissingError('new_name')
+    auth_context = mist.core.auth.methods.auth_context_from_request(request)
+    user = auth_context.owner
+    cloud_tags = mist.core.methods.get_cloud_tags(user, cloud_id)
+    if not auth_context.has_perm('cloud', 'edit', cloud_id, cloud_tags):
+        raise UnauthorizedError()
 
-    user = user_from_request(request)
+
     methods.rename_cloud(user, cloud_id, new_name)
     return OK
 
@@ -296,7 +313,12 @@ def toggle_cloud(request):
     if new_state != "1" and new_state != "0":
         raise BadRequestError('Invalid cloud state')
 
-    user = user_from_request(request)
+    auth_context = mist.core.auth.methods.auth_context_from_request(request)
+    user = auth_context.owner
+    cloud_tags = mist.core.methods.get_cloud_tags(user, cloud_id)
+    if not auth_context.has_perm('cloud', 'edit', cloud_id, cloud_tags):
+        raise UnauthorizedError()
+
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     cloud.enabled=bool(int(new_state))
     cloud.save()
@@ -329,16 +351,21 @@ def add_key(request):
     key_id = params.get('id', '')
     private_key = params.get('priv', '')
 
-    user = user_from_request(request)
+    auth_context = mist.core.auth.methods.auth_context_from_request(request)
+    user = auth_context.owner
+    key_tags = mist.core.methods.get_key_tags(user, key_id)
+    if not auth_context.has_perm('key', 'add'):
+        raise UnauthorizedError()
+
     key_id = methods.add_key(user, key_id, private_key)
 
     keypair = Keypair.objects.get(owner=user, name=key_id)
 
+    # since its a new key machines fields should be an empty list
+
     clouds = Cloud.objects(owner=user)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=keypair)
-    # key_object["id"] = key.name # This is for backwards compatibility
-    # key_object["isDefault"] = key.default
 
     assoc_machines = transform_key_machine_associations(machines, keypair)
 
