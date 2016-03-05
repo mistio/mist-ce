@@ -155,14 +155,13 @@ class ShellConnection(MistConnection):
         super(ShellConnection, self).on_close(stale=stale)
 
 
-class UserUpdatesConsumer(Consumer):
+class OwnerUpdatesConsumer(Consumer):
     def __init__(self, main_sockjs_conn,
                  amqp_url=config.BROKER_URL):
         self.sockjs_conn = main_sockjs_conn
-        email = self.sockjs_conn.user.email or 'noone'
-        super(UserUpdatesConsumer, self).__init__(
+        super(OwnerUpdatesConsumer, self).__init__(
             amqp_url=amqp_url,
-            exchange='mist-user_%s' % email.replace('@', ':'),
+            exchange='owner_%s' % self.sockjs_conn.owner.id,
             queue='mist-socket-%d' % random.randrange(2 ** 20),
             exchange_type='fanout',
             exchange_kwargs={'auto_delete': True},
@@ -170,7 +169,7 @@ class UserUpdatesConsumer(Consumer):
         )
 
     def on_message(self, unused_channel, basic_deliver, properties, body):
-        super(UserUpdatesConsumer, self).on_message(
+        super(OwnerUpdatesConsumer, self).on_message(
             unused_channel, basic_deliver, properties, body
         )
         self.sockjs_conn.process_update(
@@ -178,21 +177,22 @@ class UserUpdatesConsumer(Consumer):
         )
 
     def start_consuming(self):
-        super(UserUpdatesConsumer, self).start_consuming()
+        super(OwnerUpdatesConsumer, self).start_consuming()
         self.sockjs_conn.start()
 
 
 class MainConnection(MistConnection):
 
     def on_open(self, conn_info):
+        log.info("************** Open!")
         super(MainConnection, self).on_open(conn_info)
         self.running_machines = set()
         self.consumer = None
 
     def on_ready(self):
-        log.info("Ready to go!")
+        log.info("************** Ready to go!")
         if self.consumer is None:
-            self.consumer = UserUpdatesConsumer(self)
+            self.consumer = OwnerUpdatesConsumer(self)
             self.consumer.run()
         else:
             log.error("It seems we have received 'on_ready' more than once.")
@@ -209,7 +209,8 @@ class MainConnection(MistConnection):
     def list_clouds(self):
         self.send('list_clouds',
                   core_methods.filter_list_clouds(self.auth_context))
-        clouds = Cloud.objects(owner=self.user, enabled=True)
+        clouds = Cloud.objects(owner=self.owner, enabled=True)
+        log.info(clouds)
         for key, task in (('list_machines', tasks.ListMachines()),
                           ('list_images', tasks.ListImages()),
                           ('list_sizes', tasks.ListSizes()),
@@ -218,7 +219,7 @@ class MainConnection(MistConnection):
                           ('list_projects', tasks.ListProjects()),):
 
             for cloud in clouds:
-                cached = task.smart_delay(self.user.email, cloud.id)
+                cached = task.smart_delay(self.owner.id, cloud.id)
                 if cached is not None:
                     log.info("Emitting %s from cache", key)
                     self.send(key, cached)
@@ -230,7 +231,7 @@ class MainConnection(MistConnection):
         except ImportError:
             func = methods.check_monitoring
         try:
-            self.send('monitoring', func(self.user))
+            self.send('monitoring', func(self.owner))
         except Exception as exc:
             log.warning("Check monitoring failed with: %r", exc)
 
@@ -238,7 +239,7 @@ class MainConnection(MistConnection):
                  metrics):
         error = False
         try:
-            data = get_stats(self.user, cloud_id, machine_id,
+            data = get_stats(self.owner, cloud_id, machine_id,
                              start, stop, step)
         except BadRequestError as exc:
             error = str(exc)
@@ -275,18 +276,18 @@ class MainConnection(MistConnection):
 
             if routing_key == 'list_networks':
                 cloud_id = result['cloud_id']
-                cloud = Cloud.objects.get(owner=self.user, id=cloud_id)
+                cloud = Cloud.objects.get(owner=self.owner, id=cloud_id)
                 log.warn('Got networks from %s', cloud.title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = result['machines']
                 cloud_id = result['cloud_id']
                 # update cloud machine count in multi-user setups
-                cloud = Cloud.objects.get(owner=self.user, id=cloud_id)
+                cloud = Cloud.objects.get(owner=self.owner, id=cloud_id)
                 try:
                     mcount = Machine.objects(cloud=cloud).count()
                     if multi_user and len(machines) != mcount:
-                        tasks.update_machine_count.delay(self.user.email,
+                        tasks.update_machine_count.delay(self.owner.id,
                                                          cloud_id,
                                                          len(machines))
                 except Exception as exc:
@@ -311,25 +312,25 @@ class MainConnection(MistConnection):
                         continue
 
                     has_key = False
-                    keypairs = Keypair.objects(owner=self.user)
+                    keypairs = Keypair.objects(owner=self.owner)
                     machine_obj = Machine.objects(cloud=cloud,
                                           machine_id=machine["id"],
                                           key_associations__not__size=0).first()
                     if machine_obj:
                         cached = tasks.ProbeSSH().smart_delay(
-                            self.user.email, cloud_id, machine['id'], ips[0]
+                            self.owner.id, cloud_id, machine['id'], ips[0]
                         )
                         if cached is not None:
                             self.send('probe', cached)
 
                     cached = tasks.Ping().smart_delay(
-                        self.user.email, cloud_id, machine['id'], ips[0]
+                        self.owner.id, cloud_id, machine['id'], ips[0]
                     )
                     if cached is not None:
                         self.send('ping', cached)
 
         elif routing_key == 'update':
-            self.user.reload()
+            self.owner.reload()
             sections = result
             if 'clouds' in sections:
                 self.list_clouds()
