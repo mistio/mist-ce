@@ -843,13 +843,17 @@ class ListMachines(UserTask):
                     for tag in machine["tags"]:
                         tags[tag["key"]]= tag["value"]
                     set_machine_tags(user, tags, cloud_id, machine.get("id"))
-                mistio_tags = get_machine_tags(user, cloud_id, machine.get("id"))
-                machine["tags"] = []
-                # optimized for js
-                for tag in mistio_tags:
-                    key, value = tag.popitem()
-                    tag_dict = {'key': key, 'value': value}
-                    machine['tags'].append(tag_dict)
+                try:
+                    mistio_tags = get_machine_tags(user, cloud_id, machine.get("id"))
+                except:
+                    log.info("Machine has not tags in mist db")
+                else:
+                    machine["tags"] = []
+                    # optimized for js
+                    for tag in mistio_tags:
+                        key, value = tag.popitem()
+                        tag_dict = {'key': key, 'value': value}
+                        machine['tags'].append(tag_dict)
                 # FIXME: optimize!
         log.warn('Returning list machines for user %s cloud %s' % (user.email, cloud_id))
         return {'cloud_id': cloud_id, 'machines': machines}
