@@ -965,6 +965,7 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
     def create_machine_wrapper(args_kwargs):
         args, kwargs = args_kwargs
         error = False
+        node = {}
         try:
             node = create_machine(*args, **kwargs)
         except MachineCreationError as exc:
@@ -974,7 +975,8 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
         finally:
             name = args[3]
             log_event(email, 'job', 'machine_creation_finished', job_id=job_id,
-                      cloud_id=cloud_id, machine_name=name, error=error)
+                      cloud_id=cloud_id, machine_name=name, error=error,
+                      machine_id=node.get('id', ''))
 
     pool.map(create_machine_wrapper, specs)
     pool.close()
