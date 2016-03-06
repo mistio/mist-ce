@@ -21,13 +21,17 @@ define('app/views/team_list', ['app/views/page'],
             // Computed Properties
             //
 
-            canRename: function() {
-                return Mist.teamsController.get('selectedObjects').length == 1;
-            }.property('Mist.teamsController.model.@each.selected'),
+            hasOrganization: Ember.computed('Mist.organization', 'Mist.org_create', function() {
+                return !!Mist.organization && Mist.org_create;
+            }),
 
-            canDelete: function() {
+            canRename: Ember.computed('Mist.teamsController.model.@each.selected', function() {
+                return Mist.teamsController.get('selectedObjects').length == 1;
+            }),
+
+            canDelete: Ember.computed('Mist.teamsController.model.@each.selected', function() {
                 return Mist.teamsController.get('selectedObjects').length;
-            }.property('Mist.teamsController.model.@each.selected'),
+            }),
 
             //
             // Initialization
@@ -67,6 +71,10 @@ define('app/views/team_list', ['app/views/page'],
             //
 
             actions: {
+                addOrganizationClicked: function() {
+                    Mist.organizationAddController.open();
+                },
+
                 addClicked: function() {
                     Mist.teamAddController.open();
                 },

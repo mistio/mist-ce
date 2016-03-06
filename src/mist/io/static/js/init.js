@@ -42,6 +42,7 @@ var loadApp = function(
     TeamsController,
     TeamEditController,
     TeamAddController,
+    OrganizationAddController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -61,6 +62,7 @@ var loadApp = function(
     App.set('email', EMAIL);
     App.set('password', '');
     App.set('organization', ORGANIZATION);
+    App.set('org_create', ORG_CREATE);
     App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
         .test(navigator.userAgent)
     );
@@ -141,6 +143,7 @@ var loadApp = function(
     App.set('teamsController', TeamsController.create());
     App.set('teamEditController', TeamEditController.create());
     App.set('teamAddController', TeamAddController.create());
+    App.set('organizationAddController', OrganizationAddController.create());
 
     // Ember custom widgets
     App.Select = Ember.Select.extend({
@@ -354,18 +357,20 @@ var setupMainChannel = function(socket, callback) {
 
     // Fast implementation for teams modelling
     var organization = Mist.organization, teams = [];
-    organization.teams.forEach(function(team) {
-        team.organization = {
-            id: organization.id,
-            name: organization.name
-        };
+    if (organization) {
+        organization.teams.forEach(function(team) {
+            team.organization = {
+                id: organization.id,
+                name: organization.name
+            };
 
-        var members = organization.members.filter(function(member) {
-            return team.members.indexOf(member.id) > -1;
+            var members = organization.members.filter(function(member) {
+                return team.members.indexOf(member.id) > -1;
+            });
+            team.members = members;
+            teams.pushObject(team);
         });
-        team.members = members;
-        teams.pushObject(team);
-    });
+    }
 
     Mist.teamsController.setModel(teams);
 

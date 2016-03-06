@@ -99,6 +99,21 @@ def home(request):
         }],
         'teams': [{
             'id': 1,
+            'name': 'Owners',
+            'description': '',
+            'members': [1],
+            'policy': {
+                'operator': 'ALLOW',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': '',
+                    'rtype': '',
+                    'rid': '',
+                    'rtags': ''
+                }]
+            }
+        }, {
+            'id': 2,
             'name': 'Frontend Team',
             'description': '',
             'members': [1, 2],
@@ -113,7 +128,7 @@ def home(request):
                 }]
             }
         }, {
-            'id': 2,
+            'id': 3,
             'name': 'QA Team',
             'description': '',
             'members': [3],
@@ -128,7 +143,7 @@ def home(request):
                 }]
             }
         }, {
-            'id': 3,
+            'id': 4,
             'name': 'Backend Team',
             'description': '',
             'members': [4],
@@ -144,6 +159,7 @@ def home(request):
             }
         }]
     }
+    organization = None
 
     return {
         'project': 'mist.io',
@@ -161,6 +177,7 @@ def home(request):
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
         'last_build': config.LAST_BUILD,
+        'org_create': json.dumps(True),
         'organization': json.dumps(organization)
     }
 

@@ -47,6 +47,7 @@
     <script tal:content="string: var CSRF_TOKEN=${csrf_token}" />
     <script tal:content="string: var BETA_FEATURES=${beta_features}" />
     <script tal:content="string: var ORGANIZATION=${organization}" />
+    <script tal:content="string: var ORG_CREATE=${org_create}" />
 
     <script src="resources/dist/requirejs/require.js"></script>
 

@@ -103,7 +103,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var that = this;
                 that.set('deletingTeam', true);
                 Mist.ajax
-                    .DELETE('/orgs/' + args.team.organization.id + '/teams/' + args.team.id, {})
+                    .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id, {})
                     .success(function() {
                         that._deleteObject(args.team);
                     })
@@ -121,7 +121,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var that = this;
                 that.set('renamingTeam', true);
                 Mist.ajax
-                    .PUT('/orgs/' + args.team.organization.id + '/teams/' + args.team.id, {
+                    .PUT('/org/' + args.team.organization.id + '/teams/' + args.team.id, {
                         new_name: args.newName,
                         new_description: args.newDescription
                     })

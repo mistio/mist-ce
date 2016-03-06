@@ -12,7 +12,7 @@ define('app/controllers/team_add', ['ember'],
 
             newTeam: Ember.Object.create({
                 name: '',
-                description: '',
+                description: ''
             }),
 
 
@@ -47,7 +47,7 @@ define('app/controllers/team_add', ['ember'],
             clear: function () {
                 this.get('newTeam').setProperties({
                     name: '',
-                    description: '',
+                    description: ''
                 });
             }
         });
