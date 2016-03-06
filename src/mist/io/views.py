@@ -174,21 +174,17 @@ def list_clouds(request):
     .. note:: Currently, this is only used by the cloud controller in js.
 
     """
-    auth_context = mist.core.auth.methods.auth_context_from_request(request)
-    if not auth_context.has_perm('cloud', 'read'):
-        raise UnauthorizedError()
-    print "#"*100
-    print mist.core.methods.filter_list_clouds(auth_context)
+    auth_context = auth_context_from_request(request)
     return mist.core.methods.filter_list_clouds(auth_context)
 
 
 @view_config(route_name='clouds', request_method='POST', renderer='json')
 def add_cloud(request):
     """Adds a new cloud."""
-    auth_context = mist.core.auth.methods.auth_context_from_request(request)
+    auth_context = auth_context_from_request(request)
     if not auth_context.has_perm('cloud', 'add'):
         raise UnauthorizedError()
-    user = auth_context.owner
+    owner = auth_context.owner
     params = params_from_request(request)
     # remove spaces from start/end of string fields that are often included
     # when pasting keys, preventing thus succesfull connection with the
@@ -207,7 +203,7 @@ def add_cloud(request):
 
     monitoring = None
     if int(api_version) == 2:
-        ret = methods.add_cloud_v_2(user, title, provider, params)
+        ret = methods.add_cloud_v_2(owner, title, provider, params)
         cloud_id = ret['cloud_id']
         monitoring = ret.get('monitoring')
     else:
@@ -233,7 +229,7 @@ def add_cloud(request):
         # TODO: check if all necessary information was provided in the request
 
         cloud_id = methods.add_cloud(
-            user, title, provider, apikey, apisecret, apiurl,
+            owner, title, provider, apikey, apisecret, apiurl,
             tenant_name=tenant_name,
             machine_hostname=machine_hostname, machine_key=machine_key,
             machine_user=machine_user, region=region,
@@ -242,12 +238,13 @@ def add_cloud(request):
             remove_on_error=remove_on_error,
         )
 
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
-    cloud_tags = auth_context.get_tags("cloud","read")
-    mist.core.methods.set_cloud_tags(user, cloud_tags, cloud_id)
+    cloud_tags = auth_context.get_tags('cloud', 'add')
+    if cloud_tags:
+        mist.core.methods.set_cloud_tags(owner, cloud_tags, cloud_id)
 
-    c_count = Cloud.objects(owner=user).count()
+    c_count = Cloud.objects(owner=owner).count()
     ret = {
         'index': c_count - 1,
         'id': cloud_id,
@@ -274,13 +271,12 @@ def delete_cloud(request):
               any key associations.
 
     """
-    auth_context = mist.core.auth.methods.auth_context_from_request(request)
-    user = auth_context.owner
+    auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    cloud_tags = mist.core.methods.get_cloud_tags(user, cloud_id)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm('cloud', 'remove', cloud_id, cloud_tags):
         raise UnauthorizedError()
-    methods.delete_cloud(user, cloud_id)
+    methods.delete_cloud(auth_context.owner, cloud_id)
     return OK
 
 
@@ -294,14 +290,11 @@ def rename_cloud(request):
     new_name = params.get('new_name', '')
     if not new_name:
         raise RequiredParameterMissingError('new_name')
-    auth_context = mist.core.auth.methods.auth_context_from_request(request)
-    user = auth_context.owner
-    cloud_tags = mist.core.methods.get_cloud_tags(user, cloud_id)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm('cloud', 'edit', cloud_id, cloud_tags):
         raise UnauthorizedError()
 
-
-    methods.rename_cloud(user, cloud_id, new_name)
+    methods.rename_cloud(auth_context.owner, cloud_id, new_name)
     return OK
 
 
@@ -317,13 +310,11 @@ def toggle_cloud(request):
     if new_state != "1" and new_state != "0":
         raise BadRequestError('Invalid cloud state')
 
-    auth_context = mist.core.auth.methods.auth_context_from_request(request)
-    user = auth_context.owner
-    cloud_tags = mist.core.methods.get_cloud_tags(user, cloud_id)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm('cloud', 'edit', cloud_id, cloud_tags):
         raise UnauthorizedError()
 
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     cloud.enabled=bool(int(new_state))
     cloud.save()
     trigger_session_update(auth_context.owner, ['clouds'])
@@ -338,8 +329,8 @@ def list_keys(request):
     keys are returned.
 
     """
-    user = user_from_request(request)
-    return methods.list_keys(user)
+    auth_context = auth_context_from_request(request)
+    return mist.core.methods.filter_list_keys(auth_context)
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
@@ -348,19 +339,22 @@ def add_key(request):
     key_id = params.get('id', '')
     private_key = params.get('priv', '')
 
-    auth_context = mist.core.auth.methods.auth_context_from_request(request)
-    user = auth_context.owner
-    key_tags = mist.core.methods.get_key_tags(user, key_id)
+    auth_context = auth_context_from_request(request)
     if not auth_context.has_perm('key', 'add'):
         raise UnauthorizedError()
 
-    key_id = methods.add_key(user, key_id, private_key)
+    key_id = methods.add_key(auth_context.owner, key_id, private_key)
 
-    keypair = Keypair.objects.get(owner=user, name=key_id)
+    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    keypair.save()
+
+    key_tags = auth_context.get_tags('key', 'add')
+    if key_tags:
+        mist.core.methods.set_key_tags(auth_context.owner, key_tags, key_id)
 
     # since its a new key machines fields should be an empty list
 
-    clouds = Cloud.objects(owner=user)
+    clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=keypair)
 
