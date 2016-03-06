@@ -40,13 +40,8 @@ def mist_io():
 
 
 @pytest.fixture
-def script_id():
-    return config.SCRIPT_ID
-
-
-@pytest.fixture
 def expires():
-    return (date.fromtimestamp(time()) + timedelta(days=-1, hours=1)).strftime("%Y-%m-%d %H:%M:%S")
+    return (date.fromtimestamp(time()) + timedelta(days=1, hours=1)).strftime("%Y-%m-%d %H:%M:%S")
 
 
 @pytest.fixture
