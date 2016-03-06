@@ -1,0 +1,84 @@
+#add-team {
+    width: 281px;
+    box-shadow: none;
+    position: relative;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+}
+
+#add-team.ui-collapsible-collapsed {
+    width: 220px;
+    position: relative;
+}
+
+#team-add.ui-content {
+    background-color: #FAF9F4;
+    padding: 16px;
+    width: 249px;
+}
+
+#add-team-overlay {
+    z-index: 899;
+    min-height: 800px;
+}
+
+#team-add .ui-collapsible-content {
+    max-height: 120px;
+    overflow-y: auto;
+}
+#team-add .ui-collapsible-heading {
+    text-transform: capitalize;
+}
+#team-add .ui-collapsible-heading > a {
+    background-color: #fff !important;
+    border-color: #b5b5b5 !important;
+    color: #444 !important;
+    font-size: 14px;
+    padding-left: .75em !important;
+}
+#team-add .ui-collapsible-heading > a:after {
+    background-image: none;
+    font-size: 14px;
+    margin-top: -6px;
+    color: #444;
+}
+#team-add .ui-collapsible-heading.ui-collapsible-heading-collapsed > a:after {
+    content: '\0072';
+}
+#team-add .ui-collapsible-heading > a:after {
+    content: '\0073';
+}
+#team-add .filled .ui-collapsible-heading-toggle {
+    color: #444 !important;
+    background-color: #fff !important;
+    border-color: #b5b5b5 !important;
+}
+#team-add .ui-collapsible-content .ui-listview {
+    margin: 0;
+    border: 1px solid #b5b5b5;
+    margin: -1px 0 0 !important;
+}
+#team-add .empty.required .ui-collapsible-heading > a {
+    color: #7f7f7f !important;
+}
+#team-add .empty.required .ui-collapsible-heading > a,
+#team-add .empty.required .ui-collapsible-content > .ui-listview {
+    border-color: #0099cc !important;
+}
+#team-add .ui-collapsible-content .ui-listview .ui-btn {
+    background-color: #fff;
+    padding-left: .75em !important;
+    border: none;
+}
+#team-add .ui-collapsible-content .ui-listview .ui-btn:hover {
+    background-color: #66C2E0;
+    color: #fff !important;
+}
+#team-add .ui-collapsible-content .ui-listview .ui-btn,
+#team-add .ui-collapsible-heading-toggle {
+    line-height: 21px;
+    padding-top: 5.5px !important;
+    padding-bottom: 5.5px !important;
+    font-size: 14px;
+}
