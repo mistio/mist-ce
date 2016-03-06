@@ -23,7 +23,7 @@ define('app/views/team_list_item', ['app/views/list_item'],
 
             membersText: Ember.computed('team.members.[]', function() {
                 var len = this.get('team.members').length;
-                return len + (len > 1 ? ' Members' : ' Member');
+                return len + (len == 1 ? ' Member' : ' Members');
             }),
 
             //

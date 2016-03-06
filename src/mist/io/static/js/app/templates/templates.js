@@ -72,6 +72,7 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/team_list_item.hbs',
         'text!app/templates/team.hbs',
         'text!app/templates/team_edit.hbs',
+        'text!app/templates/team_add.hbs',
         'text!app/templates/member_list_item.hbs'
       ], function () {
         Ember.TEMPLATES['application'] = Ember.Handlebars.compile(arguments[0]);
@@ -144,7 +145,8 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['team_list_item'] = Ember.Handlebars.compile(arguments[67]);
         Ember.TEMPLATES['team'] = Ember.Handlebars.compile(arguments[68]);
         Ember.TEMPLATES['team_edit'] = Ember.Handlebars.compile(arguments[69]);
-        Ember.TEMPLATES['member_list_item'] = Ember.Handlebars.compile(arguments[70]);
+        Ember.TEMPLATES['team_add'] = Ember.Handlebars.compile(arguments[70]);
+        Ember.TEMPLATES['member_list_item'] = Ember.Handlebars.compile(arguments[71]);
         callback();
         info('loaded raw templates');
       });
