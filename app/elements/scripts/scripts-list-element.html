@@ -42,7 +42,7 @@
         .paper-header {
             @apply(--layout-horizontal);
         }
-        /* header mock up */
+
         .paper-header {
             height: 60px;
             font-size: 24px;
@@ -57,7 +57,7 @@
             height: 320px;
             font-size: 16px;
         }
-        /* headder mock up */
+
         .paper-header h2 {
             margin-left: 20px;
             @apply(--layout-flex);
@@ -76,6 +76,14 @@
             overflow: auto;
             -webkit-overflow-scrolling: touch;
             padding: 0 10px;
+        }
+
+        paper-icon-button {
+            transition: all 200ms;
+        }
+
+        paper-icon-button.active-sort {
+            transform: rotate(180deg);            
         }
 
         app-bar .menu-icon {
@@ -139,12 +147,6 @@
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
             <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
-                <!-- <paper-scroll-header-panel view$="[[_actualView(view)]]" main condenses keep-condensed-header> -->
-                <!-- <div class="paper-header" style$="[[_getHeaderStyle(section.color)]]">
-                    <h2 class="flex">[[presentedScripts.length]] Scripts</h2>
-                    <paper-icon-button class="toggleViewButton" icon="[[viewIcon]]" on-tap="toggleView" hidden$="[[_forceCards]]"></paper-icon-button>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
-                </div> -->
                 <paper-toolbar class="tall" style$="[[_getHeaderStyle(section.color)]]">
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
@@ -171,8 +173,6 @@
                         <div class="list-head flex-horizontal-with-ratios">
                             <div class="flexchild">
                                 <paper-tooltip for="selectAllBtn" position="top">Select all</paper-tooltip>
-                                <!-- <paper-checkbox id="selectAllBtn" checked="[[selectAll]]" on-tap="_selectAllChanged"></paper-checkbox> -->
-
                                 <app-check id="selectAllBtn" class="check-all" checked="[[selectAll]]" selected="[[selectAll]]" on-tap="_selectAllChanged">
                                     <iron-icon icon="check"></iron-icon>
                                 </app-check>
@@ -332,7 +332,7 @@
             },
             _computeIsActiveSort: function(sortByTerm, sortOption) {
                 return sortByTerm == sortOption ? 'active-sort' : null;
-            },
+            },                        
             _scriptsChanged: function(scripts, selectedScripts) {
                 this.set('showDeleteOption', selectedScripts.base.length > 0);
 
