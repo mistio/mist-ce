@@ -232,6 +232,9 @@ def add_cloud(request):
       type: string
     """
     auth_context = auth_context_from_request(request)
+    cloud_tags = auth_context.get_tags("cloud", "read")
+    if not cloud_tags:
+        raise UnauthorizedError()
     if not auth_context.has_perm('cloud', 'add'):
         raise UnauthorizedError()
     owner = auth_context.owner
@@ -290,7 +293,6 @@ def add_cloud(request):
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
-    cloud_tags = auth_context.get_tags('cloud', 'add')
     if cloud_tags:
         mist.core.methods.set_cloud_tags(owner, cloud_tags, cloud_id)
 
@@ -436,15 +438,11 @@ def add_key(request):
     auth_context = auth_context_from_request(request)
     if not auth_context.has_perm('key', 'add'):
         raise UnauthorizedError()
-
+    key_tags = auth_context.get_tags("key", "read")
     key_id = methods.add_key(auth_context.owner, key_id, private_key)
 
+    mist.core.methods.set_keypair_tags(auth_context.owner, key_tags, key_id)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-    keypair.save()
-
-    key_tags = auth_context.get_tags('key', 'add')
-    if key_tags:
-        mist.core.methods.set_key_tags(auth_context.owner, key_tags, key_id)
 
     # since its a new key machines fields should be an empty list
 
@@ -480,7 +478,10 @@ def delete_key(request):
     if not key_id:
         raise KeypairParameterMissingError()
 
-    if not auth_context.has_perm('key', 'remove', key_id):
+    auth_context = auth_context_from_request(request)
+    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'remove', keypair.id, keypair_tags):
         raise UnauthorizedError()
     methods.delete_key(auth_context.owner, key_id)
     return list_keys(request)
@@ -504,7 +505,8 @@ def delete_keys(request):
         type: string
         name: key_id
     """
-    user = user_from_request(request)
+    auth_context = auth_context_from_request(request)
+
     params = params_from_request(request)
     key_ids = params.get('key_ids', [])
     if type(key_ids) != list or len(key_ids) == 0:
@@ -520,7 +522,11 @@ def delete_keys(request):
     report = {}
     for key_id in key_ids:
         try:
-            methods.delete_key(user, key_id)
+            keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+            keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+            if not auth_context.has_perm('key', 'remove', keypair.id, keypair_tags):
+                raise UnauthorizedError()
+            methods.delete_key(auth_context.owner, key_id)
         except KeypairNotFoundError:
             report[key_id] = 'not_found'
         else:
@@ -554,8 +560,12 @@ def edit_key(request):
     if not new_id:
         raise RequiredParameterMissingError("new_id")
 
-    user = user_from_request(request)
-    methods.edit_key(user, new_id, old_id)
+    auth_context = auth_context_from_request(request)
+    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
+        raise UnauthorizedError()
+    methods.edit_key(auth_context.owner, new_id, old_id)
     return {'new_id': new_id}
 
 
@@ -573,9 +583,14 @@ def set_default_key(request):
       type: string
     """
     key_id = request.matchdict['key']
-    user = user_from_request(request)
 
-    methods.set_default_key(user, key_id)
+    auth_context = auth_context_from_request(request)
+    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
+        raise UnauthorizedError()
+
+    methods.set_default_key(auth_context.owner, key_id)
     return OK
 
 
@@ -594,11 +609,16 @@ def get_private_key(request):
       type: string
     """
 
-    user = user_from_request(request)
     key_id = request.matchdict['key']
     if not key_id:
         raise RequiredParameterMissingError("key_id")
-    return Keypair.objects.get(owner=user, id=key_id).private
+
+    auth_context = auth_context_from_request(request)
+    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'read_private', keypair.id, keypair_tags):
+        raise UnauthorizedError()
+    return Keypair.objects.get(owner=auth_context.owner, id=key_id).private
 
 
 @view_config(route_name='api_v1_key_public', request_method='GET', renderer='json')
@@ -614,10 +634,15 @@ def get_public_key(request):
       required: true
       type: string
     """
-    user = user_from_request(request)
     key_id = request.matchdict['key']
     if not key_id:
         raise RequiredParameterMissingError("key_id")
+
+    auth_context = auth_context_from_request(request)
+    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'read', keypair.id, keypair_tags):
+        raise UnauthorizedError()
     return Keypair.objects.get(owner=user, id=key_id).public
 
 
@@ -679,11 +704,29 @@ def associate_key(request):
         host = None
     if not host:
         raise RequiredParameterMissingError('host')
-    user = user_from_request(request)
+    auth_context = auth_context_from_request(request)
+    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'read_private', keypair.id, keypair_tags):
+        raise UnauthorizedError()
+    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
+                                  id=cloud_id), machine_id=machine_id)
+    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+                                                      cloud_id, machine_id)
+    if not auth_context.has_perm("machine", "associate_key", machine.id,
+                                 machine_tags):
+        raise UnauthorizedError()
+
     methods.associate_key(user, key_id, cloud_id, machine_id, host,
                           username=ssh_user, port=ssh_port)
-    return user.keypairs[key_id].machines
-# TODO
+    clouds = Cloud.objects(owner=auth_context.owner)
+    machines = Machine.objects(cloud__in=clouds,
+                               key_associations__keypair__exact=keypair)
+
+    assoc_machines = transform_key_machine_associations(machines, keypair)
+    # FIX filter machines based on auth_context
+
+    return assoc_machines
 
 @view_config(route_name='api_v1_key_association', request_method='DELETE', renderer='json')
 @view_config(route_name='key_association', request_method='DELETE', renderer='json')
@@ -715,9 +758,26 @@ def disassociate_key(request):
         host = request.json_body.get('host')
     except:
         host = None
-    user = user_from_request(request)
+
+    auth_context = auth_context_from_request(request)
+    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
+                                  id=cloud_id), machine_id=machine_id)
+    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+                                                      cloud_id, machine_id)
+    if not auth_context.has_perm("machine", "disassociate_key", machine.id,
+                                 machine_tags):
+        raise UnauthorizedError()
+
     methods.disassociate_key(user, key_id, cloud_id, machine_id, host)
-    return user.keypairs[key_id].machines
+    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    clouds = Cloud.objects(owner=auth_context.owner)
+    machines = Machine.objects(cloud__in=clouds,
+                               key_associations__keypair__exact=keypair)
+
+    assoc_machines = transform_key_machine_associations(machines, keypair)
+    # FIX filter machines based on auth_context
+
+    return assoc_machines
 # TODO
 
 @view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
@@ -890,6 +950,7 @@ def create_machine(request):
         raise RequiredParameterMissingError(e)
 
     user = user_from_request(request)
+
     import uuid
     job_id = uuid.uuid4().hex
     from mist.io import tasks
