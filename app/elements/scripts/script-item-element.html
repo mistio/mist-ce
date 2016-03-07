@@ -18,9 +18,12 @@
             .flexchild {
                 @apply(--layout-flex);
             }
-            .check {
-                /*width: 26px;*/
+            #check {                
                 display: inline-block;
+            }
+
+            app-check {
+                margin-right: 16px;
             }
             
             :host:hover paper-checkbox,
@@ -31,7 +34,6 @@
         <paper-item on-tap="_viewScript" class$="info-item flex-horizontal-with-ratios [[indexClass]]">
             <div class="flexchild">
                 <span class="check">
-                    <!-- <paper-checkbox checked="{{selected}}" on-tap="_selectScript"></paper-checkbox> -->
                     <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectScript">S</app-check>
                 </span>
                 <span class="name">[[script.name]]</span>
@@ -95,6 +97,12 @@
                 _selectScript: function(e) {
                     // This is used to prevent event bubbling
                     e.stopPropagation();
+                    if (Polymer.dom(e).localTarget === this.$.check) {
+                        this.set('selected', !this.selected);
+                        this.fire('list-item-select', {
+                            item: this
+                        });
+                    }
                 },
                 _computeIsDefaultText: function(isDefault) {
                     return isDefault ? 'Default' : null;
