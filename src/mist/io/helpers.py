@@ -193,8 +193,8 @@ def _amqp_owner_exchange(owner):
     elif not isinstance(owner, mist.core.user.models.Owner):
         try:
             owner = mist.core.user.models.Owner.objects.get(id=owner)
-        except:
-            raise Exception(repr(owner))
+        except Exception as exc:
+            raise Exception('%r %r' % (exc, owner))
     return "owner_%s" % owner.id
 
 

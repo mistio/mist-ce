@@ -104,6 +104,7 @@ class MistConnection(SockJSConnection):
         }
 
     def __repr__(self):
+        conn_dict = self.get_dict()
         parts = []
         dt_last_rcv = datetime.datetime.fromtimestamp(conn_dict['last_rcv'])
         conn_dict['last_rcv'] = dt_last_rcv
@@ -222,6 +223,10 @@ class MainConnection(MistConnection):
                 cached = task.smart_delay(self.owner.id, cloud.id)
                 if cached is not None:
                     log.info("Emitting %s from cache", key)
+                    if key == 'list_machines':
+                        cached['machines'] = core_methods.filter_list_machines(
+                            self.auth_context, machines=cached['machines']
+                        )
                     self.send(key, cached)
 
     def check_monitoring(self):
@@ -270,18 +275,15 @@ class MainConnection(MistConnection):
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_networks', 'list_machines',
                                'list_locations', 'list_projects', 'ping']):
-            self.send(routing_key, result)
-            if routing_key == 'probe':
-                log.warn('send probe')
-
-            if routing_key == 'list_networks':
-                cloud_id = result['cloud_id']
-                cloud = Cloud.objects.get(owner=self.owner, id=cloud_id)
-                log.warn('Got networks from %s', cloud.title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = result['machines']
                 cloud_id = result['cloud_id']
+                filtered_machines = core_methods.filter_list_machines(
+                    self.auth_context, machines=machines
+                )
+                self.send(routing_key, {'cloud_id': cloud_id,
+                                        'machines': filtered_machines})
                 # update cloud machine count in multi-user setups
                 cloud = Cloud.objects.get(owner=self.owner, id=cloud_id)
                 try:
@@ -328,6 +330,8 @@ class MainConnection(MistConnection):
                     )
                     if cached is not None:
                         self.send('ping', cached)
+            else:
+                self.send(routing_key, result)
 
         elif routing_key == 'update':
             self.owner.reload()

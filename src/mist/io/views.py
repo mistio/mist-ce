@@ -530,9 +530,9 @@ def disassociate_key(request):
 def list_machines(request):
     """Gets machines and their metadata from a cloud."""
 
-    user = user_from_request(request)
+    auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    return methods.list_machines(user, cloud_id)
+    return mist.core.methods.list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='machines', request_method='POST', renderer='json')
