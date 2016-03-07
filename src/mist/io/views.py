@@ -735,7 +735,7 @@ def list_machines(request):
 
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    return mist.core.methods.list_machines(auth_context, cloud_id)
+    return mist.core.methods.filter_list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='api_v1_machines', request_method='POST', renderer='json')
