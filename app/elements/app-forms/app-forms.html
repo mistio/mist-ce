@@ -1,7 +1,6 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <!-- needed for the forms' inputs -->
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
@@ -21,24 +20,24 @@
             display: block;
             --mist-blue: #0099cc;
         }
-        
+
         :host paper-material {
             padding: 16px;
         }
-        
+
         :host::content iron-dropdown paper-material {
             width: 191px;
             top: 57px !important;
         }
-        
+
         :host::content .focused-line.paper-input-container {
             background-color: var(--mist-blue);
         }
-        
+
         :host::content .input-content.label-is-floating.paper-input-container label {
             color: var(--mist-blue);
         }
-        
+
         :host::content form paper-button {
             background-color: #0099cc;
             color: #fff;
@@ -56,7 +55,7 @@
         ::content form paper-button > * {
             color: #fff;
         }
-        
+
         ::content hr {
             height: 0;
             margin: 8px -16px;
@@ -64,17 +63,17 @@
             background: transparent;
             border-width: 0 0 1px 0;
         }
-        
+
         paper-material > h3 {
             margin: 0;
         }
-        
+
         #close-this-form {
             position: absolute;
             top: 10px;
             right: 10px;
         }
-        
+
         ::content paper-item {
             font-size: 13px;
         }
