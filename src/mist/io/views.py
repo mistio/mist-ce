@@ -475,13 +475,14 @@ def delete_key(request):
       required: true
       type: string
     """
-
+    auth_context = auth_context_from_request(request)
     key_id = request.matchdict.get('key')
     if not key_id:
         raise KeypairParameterMissingError()
 
-    user = user_from_request(request)
-    methods.delete_key(user, key_id)
+    if not auth_context.has_perm('key', 'remove', key_id):
+        raise UnauthorizedError()
+    methods.delete_key(auth_context.owner, key_id)
     return list_keys(request)
 
 
