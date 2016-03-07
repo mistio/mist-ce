@@ -11,21 +11,21 @@ Feature: Machines
     Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
     When I click the button "Name"
     And I click the button "None"
-    And I wait for 1 seconds
+    And I wait for 2 seconds
     And I check the sorting by "name"
     Then I expect for "select-machines-btn" to be clickable within max 2 seconds
     When I click the button by "select-machines-btn" id_name
     Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
     When I click the button "State"
     And I click the button "None"
-    And I wait for 1 seconds
+    And I wait for 2 seconds
     And I check the sorting by "state"
     Then I expect for "select-machines-btn" to be clickable within max 10 seconds
     When I click the button by "select-machines-btn" id_name
     Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
     When I click the button "Cloud"
     And I click the button "None"
-    And I wait for 1 seconds
+    And I wait for 2 seconds
     And I check the sorting by "cloud"
     Then I click the button "Home"
 
