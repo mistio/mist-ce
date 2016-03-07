@@ -232,9 +232,6 @@ def add_cloud(request):
       type: string
     """
     auth_context = auth_context_from_request(request)
-    cloud_tags = auth_context.get_tags("cloud", "read")
-    if not cloud_tags:
-        raise UnauthorizedError()
     if not auth_context.has_perm('cloud', 'add'):
         raise UnauthorizedError()
     owner = auth_context.owner
@@ -293,6 +290,7 @@ def add_cloud(request):
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
+    cloud_tags = auth_context.get_tags("cloud", "add")
     if cloud_tags:
         mist.core.methods.set_cloud_tags(owner, cloud_tags, cloud_id)
 
@@ -438,10 +436,10 @@ def add_key(request):
     auth_context = auth_context_from_request(request)
     if not auth_context.has_perm('key', 'add'):
         raise UnauthorizedError()
-    key_tags = auth_context.get_tags("key", "read")
     key_id = methods.add_key(auth_context.owner, key_id, private_key)
-
-    mist.core.methods.set_keypair_tags(auth_context.owner, key_tags, key_id)
+    key_tags = auth_context.get_tags("key", "add")
+    if key_tags:
+        mist.core.methods.set_keypair_tags(auth_context.owner, key_tags, key_id)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
 
     # since its a new key machines fields should be an empty list
@@ -712,8 +710,7 @@ def associate_key(request):
     keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
     if not auth_context.has_perm('key', 'read_private', keypair.id, keypair_tags):
         raise UnauthorizedError()
-    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
-                                  id=cloud_id), machine_id=machine_id)
+    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
     if not auth_context.has_perm("machine", "associate_key", machine.id,
@@ -766,8 +763,7 @@ def disassociate_key(request):
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
         raise UnauthorizedError()
-    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
-                                  id=cloud_id), machine_id=machine_id)
+    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
     if not auth_context.has_perm("machine", "disassociate_key", machine.id,
@@ -984,7 +980,7 @@ def create_machine(request):
         kwargs.update({'quantity': quantity, 'persist': persist})
         tasks.create_machine_async.apply_async(args, kwargs, countdown=2)
         ret = {'job_id': job_id}
-
+    # TODO checkif allowed and add tags in create_machine
     return ret
 
 
@@ -1491,8 +1487,7 @@ def probe(request):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
-                                  id=cloud_id), machine_id=machine_id)
+    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
     if not auth_context.has_perm("machine", "read", machine.id, machine_tags):
         raise UnauthorizedError()
 
@@ -1655,8 +1650,7 @@ def get_stats(request):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
-                                  id=cloud_id), machine_id=machine_id)
+    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
     if not auth_context.has_perm("machine", "read", machine.id, machine_tags):
         raise UnauthorizedError()
 
@@ -1697,8 +1691,7 @@ def find_metrics(request):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
-                                  id=cloud_id), machine_id=machine_id)
+    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
     if not auth_context.has_perm("machine", "read", machine.id, machine_tags):
         raise UnauthorizedError()
     return methods.find_metrics(user, cloud_id, machine_id)
