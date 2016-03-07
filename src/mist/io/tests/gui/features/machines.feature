@@ -89,7 +89,7 @@ Feature: Machines
 
     When I clear the machines search bar
     Then I search for the "second" Machine
-    And I wait for 1 second
+    And I wait for 1 seconds
     Then "second" machine state should be "running" within 200 seconds
     When I choose the "second" machine
     And I click the button "Actions"
@@ -101,7 +101,7 @@ Feature: Machines
 
     When I clear the machines search bar
     Then I search for the "first" Machine
-    And I wait for 1 second
+    And I wait for 1 seconds
     Then "first" machine state should be "running" within 200 seconds
 
     And I click the button "first"
@@ -135,7 +135,7 @@ Feature: Machines
     Then I click the button "Machines"
     When I clear the machines search bar
     Then I search for the "first" Machine
-    And I wait for 1 second
+    And I wait for 1 seconds
     Then the "first" machine in the list should have a tag with key "testKey" and value "testValue"
 
     When I choose the "first" machine
@@ -163,7 +163,7 @@ Feature: Machines
 
     When I clear the machines search bar
     Then I search for the "first" Machine
-    And I wait for 1 second
+    And I wait for 1 seconds
     And "first" machine state should be "terminated" within 200 seconds
 
     When I clear the machines search bar
