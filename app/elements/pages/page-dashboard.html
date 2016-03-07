@@ -9,6 +9,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <dom-module id="page-dashboard">
     <template>
         <style is="custom-style" include="headings"></style>
@@ -16,11 +17,11 @@
         :host {
             --layout-margin: 0.5em;
         }
-        
+
         paper-header-panel {
             background: rgb(245, 245, 245);
         }
-        
+
         paper-header-panel {
             --paper-header-panel-shadow: {
                 height: 6px;
@@ -29,70 +30,70 @@
             }
         }
         /* layout helper classes */
-        
+
         .content {
             display: block;
             padding: 50px 16px;
             max-width: 1100px;
             margin: 0 auto;
         }
-        
+
         .flex-horizontal-with-ratios {
             @apply(--layout-horizontal);
             justify-content: stretch;
         }
-        
+
         .flexchild {
             @apply(--layout-flex);
         }
-        
+
         .flex2child {
             @apply(--layout-flex-2);
             order: 2;
         }
-        
+
         .flex3child {
             @apply(--layout-flex-2);
             order: 1;
         }
-        
+
         .pad {
             padding: 8px;
         }
-        
+
         .spacer {
             padding: 4px 0;
         }
         /* header */
-        
+
         paper-toolbar {
             /*background-color: #fff;*/
             background-color: var(--mist-dark-color);
             color: rgba(255, 255, 255, 0.84);
         }
-        
+
         paper-toolbar a {
             color: rgba(255, 255, 255, 0.84);
         }
-        
+
         paper-toolbar::content #topbar {
             /*padding: 4px 0;
             height: 72px;*/
         }
-        
+
         paper-toolbar::content #topBar.paper-toolbar {
             max-width: 1100px;
             margin: 0 auto;
         }
-        
+
         .search.active {
             left: 15px;
         }
         /* clouds */
-        
+
         .clouds {
             display: flex;
-            overflow: hidden;            
+            overflow: hidden;
             padding: 16px 16px 8px 16px;
             background-color: #eee;
             margin: var(--layout-margin);
@@ -102,12 +103,12 @@
             transition: all 100ms ease;
             font-size: 14px;
         }
-        
+
         .clouds span.cloud-title {
             bottom: -2px;
             position: relative;
         }
-        
+
         .clouds paper-button:not(#addcoud) {
             background-color: #fff;
             color: inherit;
@@ -115,67 +116,67 @@
             margin-bottom: 8px;
             padding: 0.7em 0.57em;
         }
-        
+
         paper-button:not(#addcoud)::content iron-icon {
             border-radius: 2em;
             background-color: #eee;
             padding: 3px;
         }
-        
+
         paper-button:not(#addcoud)::content iron-icon[icon='check'] {
             color: green;
         }
-        
+
         paper-button:not(#addcoud)::content iron-icon[icon='clear'] {
             color: #fff;
             background-color: #D96557;
         }
-        
+
         paper-button.blue {
             line-height: 30px;
         }
-        
+
         paper-menu-button {
             padding: 0;
         }
-        
+
         paper-item {
             font-size: 14px;
         }
         /* sections */
-        
+
         .sections {
             align-items: stretch;
         }
-        
+
         a.main-section {
             min-width: 200px;
             margin: var(--layout-margin);
         }
         /* incidents */
-        
+
         .incidents {
             margin: var(--layout-margin);
             @apply(--layout-horizontal);
             align-items: stretch;
         }
         /* graphs */
-        
+
         .graphs {
             margin: var(--layout-margin);
         }
-        
+
         google-chart {
             height: 300px;
             width: 100%;
         }
-        
+
         @media (max-width: 489px) {
             a.main-section {
                 width: calc(100% - 1em);
             }
         }
-        
+
         @media (max-width: 639px) {
             paper-toolbar /deep/ #topBar {
                 /*margin-top: 4px;*/
@@ -185,7 +186,7 @@
                 min-width: calc(100% - 1em);
             }
         }
-        
+
         @media (max-width: 639px) {
             .flex-horizontal-with-ratios {
                 @apply(--layout-vertical);
@@ -230,23 +231,23 @@
                     <div id="left" class="flex3child top left">
                         <div class="sections layout horizontal wrap">
                             <a href="/machines" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="{{model.machinesArray.length}}">
+                                <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
                                 </section-tile>
                             </a>
                             <a href="/images" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="{{model.imagesArray.length}}"></section-tile>
+                                <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="[[model.imagesArray.length]]"></section-tile>
                             </a>
                             <a href="/keys" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="{{model.keysArray.length}}"></section-tile>
+                                <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="[[model.keysArray.length]]"></section-tile>
                             </a>
                             <a href="/networks" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="{{model.networksArray.length}}"></section-tile>
+                                <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="[[model.networksArray.length]]"></section-tile>
                             </a>
                             <a href="/scripts" class="main-section flex" is=" pushstate-anchor">
-                                <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="{{model.scriptsArray.length}}"></section-tile>
+                                <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="[[model.scriptsArray.length]]"></section-tile>
                             </a>
                             <a href="/templates" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="{{model.templatesArray.length}}"></section-tile>
+                                <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="[[model.templatesArray.length]]"></section-tile>
                             </a>
                             <a href="/teams" class="main-section flex" is="pushstate-anchor">
                                 <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
@@ -266,6 +267,42 @@
                             "minorTicks": 5}'>
                             </google-chart>
                         </paper-material>
+                    </div>
+                    <div class="logs">
+                      <paper-input id="filter" label="Filter logs"></paper-input>
+                      <vaadin-grid id="sort">
+                        <table>
+                          <colgroup>
+                            <col>
+                            <col>
+                            <col>
+                          </colgroup>
+                          <thead>
+                            <tr>
+                              <th>Action</th>
+                              <th>Type</th>
+                              <th>Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Connect</td>
+                              <td>session</td>
+                              <td>1 min ago</td>
+                            </tr>
+                            <tr>
+                              <td>Disonnect</td>
+                              <td>session</td>
+                              <td>30 mins ago</td>
+                            </tr>
+                            <tr>
+                              <td>Create Machine</td>
+                              <td>request</td>
+                              <td>1 hour ago</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </vaadin-grid>
                     </div>
                 </div>
         </paper-header-panel>
@@ -309,7 +346,7 @@ Polymer({
         this.fire('page-meta', {
             title: null
         });
-       
+
     },
     isOnline: function(cloud) {
         return cloud.state == 'online';

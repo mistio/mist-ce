@@ -74,14 +74,17 @@ def exception_handler_mist(exc, request):
 
 
 @view_config(route_name='home', request_method='GET')
+@view_config(route_name='keys', request_method='GET')
+@view_config(route_name='machines', request_method='GET')
+@view_config(route_name='networks', request_method='GET')
 def home(request):
     """Home page view"""
     params = params_from_request(request)
     user = user_from_request(request)
-    if params.get('poly', ''):
-        template = 'poly.pt'
-    else:
+    if params.get('ember'):
         template = 'home.pt'
+    else:
+        template = 'poly.pt'
     return render_to_response('templates/%s' % template,
         {
         'project': 'mist.io',
@@ -389,7 +392,6 @@ def toggle_cloud(request):
 
 
 @view_config(route_name='api_v1_keys', request_method='GET', renderer='json')
-@view_config(route_name='keys', request_method='GET', renderer='json')
 def list_keys(request):
     """
     List keys
@@ -695,7 +697,6 @@ def disassociate_key(request):
 
 
 @view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
-@view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
     """
     List machines on cloud
@@ -1167,7 +1168,6 @@ def list_locations(request):
 
 
 @view_config(route_name='api_v1_networks', request_method='GET', renderer='json')
-@view_config(route_name='networks', request_method='GET', renderer='json')
 def list_networks(request):
     """
     List networks of a cloud

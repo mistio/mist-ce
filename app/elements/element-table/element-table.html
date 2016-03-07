@@ -19,12 +19,12 @@
             opacity: 1;
             transition: opacity 0.4s;
         }
-        
+
         :host(.hidden) {
             transition: none;
             opacity: 0;
         }
-        
+
         .header {
             padding: 0 24px;
             line-height: 56px;
@@ -32,39 +32,39 @@
             font-weight: 500;
             border-bottom: 1px solid #e5e5e5;
         }
-        
+
         .check-all {
             color: white;
             margin: 8px 24px 0 0;
         }
-        
+
         ::content .check-all iron-icon {
             color: white;
             opacity: 0.5;
         }
-        
+
         :host([narrow-viewport]) .header >:not(.name):not(.check-all) {
             display: none;
         }
-        
+
         :host(:not([narrow-viewport])) .header,
         :host(:not([narrow-viewport])) .row {
             @apply(--layout-horizontal);
         }
-        
+
         :host([narrow-viewport]) .header {
             @apply(--layout-horizontal);
         }
-        
+
         :host([narrow-viewport]) .row,
         :host([narrow-viewport]) .row a {
             @apply(--layout-vertical);
         }
-        
+
         .row {
             border-bottom: 1px solid #e5e5e5;
         }
-        
+
         .row a {
             box-sizing: border-box;
             width: 100%;
@@ -72,37 +72,37 @@
             font-weight: 400;
             font-size: 13px;
         }
-        
+
         .row:nth-child(2n+1) {
             background-color: #fafafa;
         }
-        
+
         .row.hover, .row:nth-child(2n+1).hover {
             background: #eee;
         }
         /* for when inline actions come in */
-        
+
         :host(:not([narrow-viewport])) .row.hover >:last-child {
             /*padding-right: 120px;*/
         }
-        
+
         .name {
             width: 250px;
             font-weight: 500;
         }
-        
+
         .id,
         .provider,
         .tags,
         .type {
             width: 250px;
         }
-        
+
         .is-default,
         .state {
             width: 100px;
         }
-        
+
         .tag {
             background-color: #888;
             color: #fff;
@@ -110,22 +110,22 @@
             margin: 0 6px;
             border-radius: 2px;
         }
-        
+
         .no-data {
             font-style: italic;
             padding: 15px 24px;
         }
         /* hide for wide */
-        
+
         .name .narrow {
             display: none;
         }
         /* show for narrow */
-        
+
         :host([narrow-viewport]) .name .narrow {
             display: inline;
         }
-        
+
         :host([medium-viewport]) .name,
         :host([medium-viewport]) .type,
         :host([medium-viewport]) .provider,
@@ -134,13 +134,13 @@
         :host([medium-viewport]) .tags {
             width: 100px;
         }
-        
+
         :host(:not([narrow-viewport])) .row .description {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         #actions element-action-menu {
             right: 0;
         }
@@ -380,7 +380,7 @@ Polymer({
                 });
             }
         }
-        console.warn('selected machines:', this.selectedMachines);
+        console.log('selected machines:', this.selectedMachines);
         this.fire('update-params');
     },
     _mouseOver: function(e) {
@@ -477,7 +477,7 @@ Polymer({
     _onSelectAll: function(e) {
         // e.stopPropagation();
 
-        // check where we are at and which elements we target to select 
+        // check where we are at and which elements we target to select
         this.allselected = !this.allselected;
 
         var els;

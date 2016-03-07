@@ -25,39 +25,39 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
-        
+
         ::content paper-toolbar {
             --paper-toolbar-background: white;
         }
-        
+
         ::content .side-section {
             margin-bottom: 20px;
             opacity: 0;
             transform: translate(0, 100px);
             transition: var(--material-curve-320);
         }
-        
+
         ::content .side-section:first-child {
             transition-delay: 100ms;
         }
-        
+
         ::content .side-section:nth-child(2) {
             transition-delay: 200ms;
         }
-        
+
         ::content .side-section:nth-child(3) {
             transition-delay: 300ms;
         }
-        
+
         ::content .side-section:nth-child(4) {
             transition-delay: 400ms;
         }
-        
+
         ::content .active .side-section {
             transform: translate(0, 0);
             opacity: 1;
         }
-        
+
         ::content .side-section h5 {
             @apply(--paper-font-body2);
             border-top: 1px solid;
@@ -65,43 +65,43 @@
             margin: 24px 0 0 0;
             padding: 16px 24px 12px 24px;
         }
-        
+
         ::content .side-section p {
             @apply(--paper-font-body1);
             color: var(--secondary-text-color);
             padding: 0 24px;
             margin: 0;
         }
-        
+
         ::content .content {
             @apply(--layout-vertical);
         }
-        
+
         app-sidebar paper-toolbar {
             --paper-toolbar-background: white;
             --paper-toolbar: {
                 box-sizing: border-box;
             }
         }
-        
+
         #section-tag {
             display: none;
         }
-        
+
         #section-info {
             position: relative;
         }
-        
+
         #section-header {
             position: relative;
             padding: 16px 24px 0 24px;
             overflow: hidden;
         }
-        
+
         #section-header iron-icon {
             cursor: pointer;
         }
-        
+
         #section-header section-symbol {
             display: inline-block;
             margin: 0;
@@ -109,7 +109,7 @@
             opacity: 0;
             transition: var(--material-curve-320);
         }
-        
+
         #section-title {
             @apply(--paper-font-title);
             margin: 0 0 20px;
@@ -117,7 +117,7 @@
             opacity: 0;
             transition: var(--material-curve-320);
         }
-        
+
         #section-tagline {
             margin: 0;
             padding-right: 80px;
@@ -127,41 +127,41 @@
             font-size: 13px;
             line-height: 20px;
         }
-        
+
         #section-desc {
             margin: 0;
         }
-        
+
         [size=xs] #section-title {
             margin-bottom: 0;
         }
-        
+
         [size=xs] #section-tagline {
             display: none;
         }
-        
+
         [size=xs] #section-tagline {
             margin-top: 0;
         }
-        
+
         .active #section-header section-symbol,
         .active #section-title,
         .active #section-tagline {
             transform: translate(0, 0);
             opacity: 1;
         }
-        
+
         #section-list {
             padding: 0 0 10px;
         }
-        
+
         #section-list h5 {
             margin: 10px 0;
             padding: 0 16px;
             color: rgba(0, 0, 0, .54);
             font-weight: 500;
         }
-        
+
         #section-list .section {
             display: block;
             padding: 9px 16px;
@@ -172,31 +172,31 @@
             border-width: 1px 0 1px 4px;
             border-left: 4px solid transparent;
         }
-        
+
         #section-list .section[active] {
             background: var(--paper-blue-grey-50);
             border-left: 4px solid;
             color: #444;
         }
-        
+
         #section-list .section .all-symbol {
             padding: 5px;
         }
-        
+
         #section-list .section section-symbol,
         #section-list .section .all-symbol {
             margin-right: 10px;
         }
-        
+
         #section-list a span {
             color: rgba(0, 0, 0, .87);
         }
-        
+
         #section-list span.count {
             float: right;
             opacity: 0.54;
         }
-        
+
         #section-list #dashboard {
             background-color: var(--mist-dark-color);
             color: #fff;
@@ -204,47 +204,46 @@
             padding: 13px 16px;
         }
 
-        #section-list #dashboard span, 
+        #section-list #dashboard span,
         #section-list #dashboard iron-icon {
             color: #fff;
         }
-        
+
         #section-list .section:last-of-type {
             border-bottom: 1px solid #ddd;
         }
-        
+
         #current-tag {
             background: #2196F3;
             color: rgba(255, 255, 255, 0.87);
             padding: 12px;
             font-size: 16px;
         }
-        
+
         #current-tag b {
             margin-right: 6px;
         }
-        
+
         #current-tag span {
             text-transform: uppercase;
         }
-        
+
         .tags tag-link:last-of-type + span {
             display: none;
         }
-        
+
         app-logo {
             margin-right: 9px;
         }
-        
+
         #mist-side-head {
             min-height: 48px;
             padding: 2px;
         }
         </style>
-        <app-socket id="appsocket" model="{{model}}"></app-socket>
         <div class="content">
             <!-- <div id="mist-side-head"> class="flex">
-              
+
             </div> -->
             <div id="section-tag" hidden$="[[!tag]]">
                 <span>[[tag]]</span>
@@ -252,25 +251,75 @@
             </div>
             <div id="section-list">
                 <nav>
-                    <a href="/?poly=1" is="pushstate-anchor" id="dashboard" class="section" tabindex="1">
+                    <a href="/" is="pushstate-anchor" id="dashboard" class="section" tabindex="1">
                         <div class="layout horizontal center">
                             <app-logo solo></app-logo>
                             <span class="title flex">dashboard</span>
                         </div>
                     </a>
-                    <template is="dom-repeat" items="{{sections}}">
-                        <template is="dom-if" if="[[item.count]]">
-                            <a class="section" is="pushstate-anchor" href$="[[_sectionLink(item.id)]]" active$="[[_isEqual(current,item.id)]]" tabindex="1" style$="[[style(item.color)]]">
-                                <div class="layout horizontal center">
-                                    <section-symbol aria-hidden="true" icon="[[item.icon]]" color="[[item.color]]"></section-symbol>
-                                    <span class="title flex">
-                                        <span>[[item.id]]</span>
-                                    <span class="count">{{item.count}}</span>
-                                    </span>
-                                </div>
-                            </a>
-                        </template>
-                    </template>
+                    <a class="section" is="pushstate-anchor" href="/machines" active$="[[_isEqual(current, 'machines')]]" tabindex="1" style="[[sections.machines.color]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.machines.icon]]" color="[[sections.machines.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>machines</span>
+                            <span class="count">[[model.machinesArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="section" is="pushstate-anchor" href="/images" active$="[[_isEqual(current, 'images')]]" tabindex="1" style="[[sections.images.color]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.images.icon]]" color="[[sections.images.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>images</span>
+                            <span class="count">[[model.imagesArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="section" is="pushstate-anchor" href="/keys" active$="[[_isEqual(current, 'keys')]]" tabindex="1" style="[[sections.keys.color]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.keys.icon]]" color="[[sections.keys.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>keys</span>
+                            <span class="count">[[model.keysArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="section" is="pushstate-anchor" href="/networks" active$="[[_isEqual(current, 'networks')]]" tabindex="1" style="[[sections.networks.color]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.networks.icon]]" color="[[sections.networks.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>networks</span>
+                            <span class="count">[[model.networksArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="section" is="pushstate-anchor" href="/scripts" active$="[[_isEqual(current, 'scripts')]]" tabindex="1" style="[[sections.scripts.color]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.scripts.icon]]" color="[[sections.scripts.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>scripts</span>
+                            <span class="count">[[model.scriptsArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="section" is="pushstate-anchor" href="/templates" active$="[[_isEqual(current, 'templates')]]" tabindex="1" style="[[sections.templates.color]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.templates.icon]]" color="[[sections.templates.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>templates</span>
+                            <span class="count">[[model.templatesArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="section" is="pushstate-anchor" href="/teams" active$="[[_isEqual(current, 'teams')]]" tabindex="1" style="[[sections.teams.color]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.teams.icon]]" color="[[sections.teams.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>teams</span>
+                            <span class="count">[[model.teamsArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
                 </nav>
                 <a href="/elements" class="flex section">
                     <div class="layout horizontal center">
@@ -313,6 +362,9 @@ Polymer({
     },
     attached: function() {
 
+    },
+    _itemCount: function(item) {
+        return this.get('model.' + item + 'Array.length');
     },
     _sectionLink: function(name) {
         return '/' + name;

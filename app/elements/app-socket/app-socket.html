@@ -7,7 +7,8 @@ Polymer({
     url: '/socket',
     properties: {
         socket: {
-            type: Object
+            type: Object,
+            value: false
         },
         model: {
             type: Object,
@@ -16,7 +17,10 @@ Polymer({
     },
 
     ready: function () {
-        // Create the socket
+        // Create the socket if it does not exist
+        if (this.socket)
+            return;
+
         this.socket = new SockJS(this.url, null,
             {'protocols_whitelist': ['websocket', 'xhr-polling']}
         );
@@ -33,6 +37,7 @@ Polymer({
 
         // When socket connects create mux and prepare channels
         var that = this;
+        console.warn('setting socket onopen handler');
         this.socket.onopen = function () {
             console.log('CONNECTION ESTABLISHED');
             this.mux = new MultiplexedWebSocket(this);
@@ -45,6 +50,7 @@ Polymer({
         };
 
     },
+
     setupChannel: function (namespace, callback) {
         var channel = this.socket.mux.channel(namespace);
         var that = this;
@@ -80,7 +86,7 @@ Polymer({
             });
             channel.on('list_machines', function (data) {
                 that.debounce(that._updateMachines(data), function(){
-                console.debug('list_machines', data);
+                // console.debug('list_machines', data);
                 }, 250);
             });
             channel.on('list_sizes', function (data) {
@@ -95,7 +101,7 @@ Polymer({
             });
             channel.on('list_images', function (data) {
                 that.debounce(that._updateImages(data), function(){
-                // console.debug('list_images', data);
+                console.debug('list_images', data);
                 }, 250);
             });
             channel.on('list_networks', function (data) {
@@ -117,8 +123,9 @@ Polymer({
                 that._ping(data);
             });
             channel.on('monitoring', function (data) {
-                // console.debug('monitoring', data);
-                that.debounce(that._updateMonitoring(data), 250);
+                that.debounce(that._updateMonitoring(data), function () {
+                  // console.debug('monitoring', data);
+                }, 250);
             });
         } else if (namespace == 'logs') {
             channel.on('logs', function (data) {
@@ -152,9 +159,34 @@ Polymer({
     },
 
     _updateClouds: function (data) {
-        this.set('model.clouds', _generateMap(data));
-        this.set('model.cloudsArray', data);
-        this.set('model.pending.clouds', false);
+        return this._updateModel('clouds', data);
+    },
+
+    _updateModel: function (section, data) {
+        var changed = false,
+            pending = this.get('model.' + section + '.pending');
+
+        for (var i=0; i < data.length; i++) {
+            var item = this.get('model.' + section + '.' + data[i].id);
+            if (!item) {
+                changed = true;
+                break;
+            }
+        }
+
+        if (changed) {
+            console.warn('updating', section);
+            this.set('model.' + section, _generateMap(data));
+            this.set('model.' + section + 'Array', data);
+        } else {
+            console.warn('not updating', section);
+        }
+
+        if (pending) {
+            this.set('model.pending.' + section, false);
+        }
+
+        return changed;
     },
 
     _updateMonitoring: function (data) {
@@ -163,24 +195,24 @@ Polymer({
     },
 
     _updateKeys: function (data) {
-        this.set('model.keys', _generateMap(data));
-        this.set('model.keysArray', data);
+        return this._updateModel('keys', data);
     },
 
     _updateSizes: function (data) {
-        this.set('model.clouds.' + data.cloud_id + '.sizes', _generateMap(data.sizes));
-        this.set('model.clouds.' + data.cloud_id + '.sizesArray', data.sizes);
+        //return this._updateModel('clouds.' + data.cloud_id + '.sizes', data);
     },
 
     _updateLocations: function (data) {
-        this.set('model.clouds.' + data.cloud_id + '.locations', _generateMap(data.locations));
-        this.set('model.clouds.' + data.cloud_id + '.locationsArray', data.locations);
+        //return this._updateModel('clouds.' + data.cloud_id + '.locations', data);
     },
 
     _updateImages: function (data) {
+        console.warn('clouds.' + data.cloud_id + '.images');
+        var changed = this._updateModel('clouds.' + data.cloud_id + '.images', data);
+        if (!changed)
+            return false;
+        return changed;
         self = this;
-        this.set('model.clouds.' + data.cloud_id + '.images', _generateMap(data.images));
-        this.set('model.clouds.' + data.cloud_id + '.imagesArray', data.images);
         var allImages = [];
         if (this.model != undefined) {
 
@@ -209,7 +241,7 @@ Polymer({
         this.set('model.clouds.' + data.cloud_id + '.machinesArray', data.machines);
         var allMachines = [];
         if (this.model  != undefined ) {
-            
+
             this.model.cloudsArray.forEach(
                 function(cloud){
                     if (cloud.machinesArray != undefined ) {
