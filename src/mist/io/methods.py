@@ -109,7 +109,7 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         machine.name = machine_hostname
         machine.machine_id = machine_id
         machine.cloud = cloud
-
+        machine.save()
         # try to connect. this will either fail and we'll delete the
         # cloud, or it will work and it will create the association
         if remove_on_error:
@@ -1295,9 +1295,9 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.VSPHERE:
         conn = driver(host=cloud.apiurl, username=cloud.apikey, password=cloud.apisecret)
     elif cloud.provider == 'bare_metal':
-        conn = BareMetalDriver(cloud.machines)
+        conn = BareMetalDriver(Machine.objects(owner=user, cloud=cloud))
     elif cloud.provider == 'coreos':
-        conn = CoreOSDriver(cloud.machines)
+        conn = CoreOSDriver(Machine.objects(owner=user, cloud=cloud))
     elif cloud.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if cloud.apisecret:
