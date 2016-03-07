@@ -19,7 +19,7 @@ define('app/controllers/script_add', ['ember'],
                 entryPoint: '',
                 text: '',
                 source: {},
-                description: '',
+                description: ''
             }),
 
 
@@ -60,7 +60,7 @@ define('app/controllers/script_add', ['ember'],
                     text: '',
                     source: '',
                     script: '',
-                    description: '',
+                    description: ''
                 });
             },
 

@@ -18,6 +18,20 @@ define('app/views/script_run', ['app/views/popup'],
             }.property('Mist.scriptRunController.scriptToRun.machine'),
 
             //
+            // Methods
+            //
+
+            _renderFields: function() {
+                Ember.run.schedule('afterRender', this, function() {
+                    $('body').enhanceWithin();
+                });
+            },
+
+            _closeDropdown: function(el) {
+                $('#script-run-' + el + ' .mist-select').collapsible('collapse');
+            },
+
+            //
             //  Actions
             //
 
@@ -26,9 +40,11 @@ define('app/views/script_run', ['app/views/popup'],
                     Mist.scriptRunController.get('scriptToRun').set('machine', machine);
                     $('#script-run-machine').collapsible('collapse');
                 },
+
                 backClicked: function () {
                     Mist.scriptRunController.close();
                 },
+
                 runClicked: function () {
                     Mist.scriptRunController.run();
                 }
