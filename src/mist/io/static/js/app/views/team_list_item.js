@@ -16,6 +16,7 @@ define('app/views/team_list_item', ['app/views/list_item'],
 
             layoutName: 'team_list_item',
             team: null,
+            classNameBindings: ['isDisabled'],
 
             //
             //  Computed Properties
@@ -24,6 +25,10 @@ define('app/views/team_list_item', ['app/views/list_item'],
             membersText: Ember.computed('team.members.[]', function() {
                 var len = this.get('team.members').length;
                 return len + (len == 1 ? ' Member' : ' Members');
+            }),
+
+            isDisabled: Ember.computed('team.name', function() {
+                return this.get('team.name') == 'Owners';
             }),
 
             //

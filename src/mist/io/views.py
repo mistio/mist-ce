@@ -159,7 +159,7 @@ def home(request):
             }
         }]
     }
-    organization = None
+    # organization = None
 
     return {
         'project': 'mist.io',

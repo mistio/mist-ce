@@ -1,4 +1,8 @@
-<label>{{view Mist.Checkbox checked=team.selected}}</label>
+{{#if view.isDisabled}}
+    <label>{{view Mist.Checkbox checked=team.selected data-disabled="true"}}</label>
+{{else}}
+    <label>{{view Mist.Checkbox checked=team.selected}}</label>
+{{/if}}
 
 {{#link-to "team" team}}
     <div class="ui-grid-b">

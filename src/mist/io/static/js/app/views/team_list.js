@@ -91,7 +91,9 @@ define('app/views/team_list', ['app/views/page'],
                     $('#select-teams-popup').popup('close');
                     Ember.run(function() {
                         Mist.teamsController.get('filteredTeams').forEach(function(team) {
-                            team.set('selected', mode);
+                            if(team.get('name') != 'Owners') {
+                                team.set('selected', mode);
+                            }
                         });
                     });
                 },

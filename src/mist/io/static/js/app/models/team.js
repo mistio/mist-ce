@@ -4,7 +4,7 @@ define('app/models/team', ['ember'],
     //
     //  @returns Class
     //
-    function () {
+    function() {
 
         'use strict';
 
@@ -19,6 +19,12 @@ define('app/models/team', ['ember'],
             // members: [],
             // organization: null,
             // policy: null,
+
+            //
+            // Computed Properties
+            //
+
+
 
             //
             // Initialization
