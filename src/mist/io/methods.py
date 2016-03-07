@@ -2886,6 +2886,7 @@ def list_keys(user):
         machines = Machine.objects(cloud__in=clouds,
                                    key_associations__keypair__exact=key)
         key_object["id"] = key.name # This is for backwards compatibility
+        key_object['_real_id'] = key.id  # Fuck backwards compatibility
         key_object["isDefault"] = key.default
         key_object["machines"] = transform_key_machine_associations(machines,
                                                                     key)

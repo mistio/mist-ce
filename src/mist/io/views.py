@@ -478,7 +478,8 @@ def delete_key(request):
 
     auth_context = auth_context_from_request(request)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
+                                                      keypair.id)
     if not auth_context.has_perm('key', 'remove', keypair.id, keypair_tags):
         raise UnauthorizedError()
     methods.delete_key(auth_context.owner, key_id)
