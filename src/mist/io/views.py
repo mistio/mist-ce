@@ -515,6 +515,7 @@ def create_machine(request):
         associate_floating_ip_subnet = request.json_body.get('attach_floating_ip_subnet', None)
         project_id = request.json_body.get('project', None)
         bare_metal = request.json_body.get('bare_metal', False)
+        hourly = request.json_body.get('hourly', True)
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
@@ -538,7 +539,7 @@ def create_machine(request):
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet,
-              'project_id': project_id, 'bare_metal': bare_metal}
+              'project_id': project_id, 'bare_metal': bare_metal, 'hourly': hourly}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:

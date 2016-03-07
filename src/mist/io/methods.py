@@ -1615,7 +1615,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    azure_port_bindings='', hostname='', plugins=None,
                    disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
-                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None, bare_metal=False):
+                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None, bare_metal=False, hourly=True):
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1719,7 +1719,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
                                          machine_name, image, size,
-                                         location, bare_metal, cloud_init)
+                                         location, bare_metal, cloud_init, hourly)
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(conn, key_id, private_key,
                                              public_key, machine_name,
@@ -2104,7 +2104,7 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key,
 
 
 def _create_machine_softlayer(conn, key_name, private_key, public_key,
-                             machine_name, image, size, location, bare_metal, cloud_init):
+                             machine_name, image, size, location, bare_metal, cloud_init, hourly):
     """Create a machine in Softlayer.
 
     Here there is no checking done, all parameters are expected to be
@@ -2150,7 +2150,8 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
                 location=location,
                 sshKeys=server_key,
                 bare_metal=bare_metal,
-                postInstallScriptUri=postInstallScriptUri
+                postInstallScriptUri=postInstallScriptUri,
+                ex_hourly=hourly
             )
         except Exception as e:
             raise MachineCreationError("Softlayer, got exception %s" % e, e)
