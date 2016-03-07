@@ -12,6 +12,7 @@
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
 <link rel="import" href="../app-sidebar/app-sidebar.html">
@@ -35,6 +36,7 @@
 <link rel="import" href="../scripts/script-page-element.html">
 <link rel="import" href="../scripts/script-run-element.html">
 <link rel="import" href="../scripts/scripts-list-element.html">
+<link rel="import" href="../pages/page-test.html">
 
 <dom-module id="app-main">
     <style>
@@ -84,6 +86,7 @@
             <page-network model="{{model}}" params="{{params}}" network="{{getNetwork(params)}}" elements="{{model.networksArray}}" sections="{{sectionsArray}}" section="[[sections.networks]]"></page-network>
             <!-- scripts -->
             <scripts-list-element model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]" clouds=[[model.cloudsArray]]></scripts-list-element>
+            <!-- <page-test model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]" clouds=[[model.cloudsArray]]></page-test> -->
             <!-- <page-list model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-list> -->
             <page-script model="{{model}}" params="{{params}}" network="{{getScript(params)}}" elements="{{model.scriptsArray}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-script>
             <page-elements></page-elements>
@@ -206,7 +209,259 @@ var app = Polymer({
                 source: "github",
                 type: "inline",
                 user: "marios@mist.io"
-            }],
+            },{
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "test",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "runner",
+                script: "owner/repo",
+                source: "github",
+                type: "executable",
+                user: "marios@mist.io"
+            }, {
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "install scipt",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "custom script",
+                script: "owner/repo",
+                source: "github",
+                type: "inline",
+                user: "marios@mist.io"
+            },{
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "test",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "runner",
+                script: "owner/repo",
+                source: "github",
+                type: "executable",
+                user: "marios@mist.io"
+            }, {
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "install scipt",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "custom script",
+                script: "owner/repo",
+                source: "github",
+                type: "inline",
+                user: "marios@mist.io"
+            },{
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "test",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "runner",
+                script: "owner/repo",
+                source: "github",
+                type: "executable",
+                user: "marios@mist.io"
+            }, {
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "install scipt",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "custom script",
+                script: "owner/repo",
+                source: "github",
+                type: "inline",
+                user: "marios@mist.io"
+            },{
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "test",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "runner",
+                script: "owner/repo",
+                source: "github",
+                type: "executable",
+                user: "marios@mist.io"
+            }, {
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "install scipt",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "custom script",
+                script: "owner/repo",
+                source: "github",
+                type: "inline",
+                user: "marios@mist.io"
+            },{
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "test",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "runner",
+                script: "owner/repo",
+                source: "github",
+                type: "executable",
+                user: "marios@mist.io"
+            }, {
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "install scipt",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "custom script",
+                script: "owner/repo",
+                source: "github",
+                type: "inline",
+                user: "marios@mist.io"
+            },{
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "test",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "runner",
+                script: "owner/repo",
+                source: "github",
+                type: "executable",
+                user: "marios@mist.io"
+            }, {
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "install scipt",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "custom script",
+                script: "owner/repo",
+                source: "github",
+                type: "inline",
+                user: "marios@mist.io"
+            },{
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "test",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "runner",
+                script: "owner/repo",
+                source: "github",
+                type: "executable",
+                user: "marios@mist.io"
+            }, {
+                description: "",
+                entrypoint: "",
+                id: "448082e761c94660acfe54427c5ca461",
+                name: "install scipt",
+                script: "#!/bin/bash\necho 'hello world '",
+                source: "inline",
+                type: "executable",
+                user: "marios@mist.io",
+            }, {
+                description: "test",
+                entrypoint: "",
+                id: "576bf98fe7e14d87b2b9075f099eeebe",
+                name: "custom script",
+                script: "owner/repo",
+                source: "github",
+                type: "inline",
+                user: "marios@mist.io"
+            },],
             imagesArray: [],
             keysArray: [],
             networksArray: [],

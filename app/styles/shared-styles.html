@@ -104,7 +104,6 @@
         </style>
     </template>
 </dom-module>
-
 <dom-module id="headings">
     <template>
         <style>
@@ -120,14 +119,14 @@
             font-weight: 400;
             letter-spacing: 1px;
         }
-
+        
         .app-title-light {
             color: var(--mist-dark-color);
             background-color: var(--mist-light-color);
             padding: 2px 16px 0 16px;
             border-bottom: 4px solid #90A4AE;
         }
-
+        
         .app-title-lighter {
             color: var(--mist-dark-color);
             background-color: var(--mist-very-light-color);
@@ -137,22 +136,171 @@
         </style>
     </template>
 </dom-module>
+<dom-module id="lists">
+    <template>
+        <style>
+        .list-head {
+            background-color: #f2f2f2;
+            padding: 0 16px;
+            font-weight: 400;
+            font-size: 0.9em;
+            color: inherit;
+        }
+        
+        .list-head > * {
+            padding: 8px 0;
+            line-height: 43px;
+        }
+        
+        ::content paper-item {
+            padding: 16px;
+            border-bottom: 1px solid #e5e5e5;
+            min-height: inherit;
+            cursor: pointer;
+        }
+        
+        ::content paper-item .name {
+            font-weight: 700;
+        }
+        
+        ::content paper-item paper-checkbox[disabled] ~ .name {
+            opacity: 0.54;
+            font-weight: 400;
+        }
+        
+        .row:nth-child(2n+1):hover,
+        .row:hover {
+            background-color: #eee;
+        }
 
+        .list {
+            position: relative;            
+        }
+        
+        .title-text {
+            padding: 16px 16px 0 16px;
+        }
+        
+        .list-options {
+            background-color: #dedede;
+            padding: 16px;
+        }
+        
+        .list-options paper-icon-button {
+            vertical-align: top;
+        }
+        
+        .list-title {
+            margin: 0;
+            color: #90A4AE;
+            font-size: 0.9em;
+            font-weight: 500;
+            line-height: 40px;
+            text-transform: uppercase;
+            transition: 200ms color;
+        }
+        
+        .search {
+            display: inline-block;
+        }
+        
+        .list-options paper-icon-button >::content iron-icon:hover {
+            color: var(--mist-blue);
+        }
+        
+        .row {
+            overflow: hidden;
+        }
+        
+        .row-actions {
+            position: absolute;
+            top: 8px;
+            right: 0;
+            z-index: 3;
+            display: none;
+            transition: 200ms color;
+            height: inherit;
+            /*opacity: 0;
+            transition: 500ms all;
+            transform: translate3d(200px, 0, 0);*/
+        }
+        
+        .row:hover .row-actions {
+            display: block;
+            /*opacity: 1;
+            transform: translate3d(0, 0, 0);*/
+        }
+        
+        .row .row-actions paper-icon-button:hover {
+            color: var(--mist-blue);
+        }
+        
+        .list-options .label {
+            font-size: 0.8em;
+            color: inherit;
+            padding: 8px 8px 0 0;
+            line-height: 25px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+        
+        .list-options:hover .label {
+            color: #90A4AE;
+        }
+        
+        .list-options paper-input[type='search'] {
+            width: 300px;
+        }
+        
+        ::content iron-collapse.sub-items {
+            border-bottom: 2px solid #ccc;
+            background-color: #f6f6f6;
+        }
+        
+        ::content iron-collapse.sub-items .info-item {
+            padding: 16px 0 16px 46px;
+            border-bottom: 1px solid #ccc;
+            min-height: inherit;
+            opacity: 0.54;
+            font-size: 0.9em;
+        }
+        
+        ::content .active-true {
+            color: #999;
+        }
+        
+        ::content .session-active {
+            color: #000;
+        }
+        
+        ::content .revoke {
+            background-color: var(--red-color);
+            color: #fff;
+            padding: 2px 6px;
+        }
+        
+        paper-fab {
+            position: absolute !important;
+            top: -68px;
+            right: 32px;
+        }
+        </style>
+    </template>
+</dom-module>
 <dom-module id="info-table-style">
     <template>
         <style>
-
         /* Info Card */
-
+        
         .info-card {
             display: block;
             max-width: 920px;
             margin: 0 auto 20px;
         }
-
+        
         .info-card .title-text {
             /*color: #474747 !important;*/
-/*            background: #eeedeb;
+            /*            background: #eeedeb;
             background: -moz-linear-gradient(top, #eeedeb 0%, #d4d4d4 100%);
             background: -webkit-linear-gradient(top, #eeedeb 0%, #d4d4d4 100%);
             background: linear-gradient(to bottom, #eeedeb 0%, #d4d4d4 100%);*/
@@ -160,39 +308,37 @@
             font-size: 18px !important;
             text-transform: uppercase;
         }
-
+        
         .info-card .card-content {
             padding: 0;
         }
-
-
         /* Info Table */
-
+        
         .info-table {
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
         }
-
+        
         .info-table .info-table-divider {
             background-color: #eeedeb;
         }
-
+        
         .info-table tr td {
             width: 50%;
             padding: 16px;
             border-bottom: 1px solid #eeedeb;
             font-size: 14px;
         }
-
+        
         .info-table tr td:first-child {
             font-weight: 500;
         }
-
+        
         .info-table tr:nth-of-type(2n) {
             background-color: #f2f2f2;
         }
-
+        
         .info-table tr:last-child td {
             border: none;
         }

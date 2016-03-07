@@ -84,7 +84,9 @@ a {
     letter-spacing: 0.018em;
     line-height: 24px;
 }
-
+::-webkit-scrollbar {
+    /*z-index: 99999;*/
+}
 catalog-app {
     overflow: hidden;
 }

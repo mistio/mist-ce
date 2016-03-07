@@ -38,7 +38,8 @@
     "color": "~2.5.0",
     "polymer-localforage": "https://github.com/addyosmani/polymer-localforage.git#gh-pages",
     "excess-router": "~0.9.9",
-    "iron-routes": "*"
+    "iron-routes": "*",
+    "vaadin-grid": "^1.0.0"
   },
   "resolutions": {
     "jquery": "~2.1.4",
