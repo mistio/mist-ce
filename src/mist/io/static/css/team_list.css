@@ -1,3 +1,19 @@
+#team-list-page .ui-collapsible {
+    margin: 10px 0 20px;
+}
+#team-list-page .ui-collapsible .ui-collapsible-heading a {
+    background-color: #d4d4d4;
+    border: none;
+    padding: 20px 70px 16px !important;
+}
+#team-list-page .ui-collapsible .ui-collapsible-content {
+    background-color: #faf9f4;
+    padding: 0 !important;
+}
+#team-list-page #add-organization-btn {
+    display: inline-block;
+    margin: 20px auto;
+}
 #team-list-page .ui-block-b .ui-title {
     text-align: center;
 }

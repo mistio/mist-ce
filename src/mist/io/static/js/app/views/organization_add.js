@@ -27,22 +27,10 @@ define('app/views/organization_add', ['app/views/popup'],
             }),
 
             //
-            //  Methods
-            //
-
-            clear: function() {
-
-            },
-
-            //
             //  Actions
             //
 
             actions: {
-                clickOverlay: function() {
-                    $('#add-organization').collapsible('collapse');
-                },
-
                 backClicked: function() {
                     Mist.organizationAddController.close();
                 },

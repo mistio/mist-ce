@@ -4,7 +4,7 @@ define('app/controllers/organization_add', ['ember'],
     //
     //  @returns Class
     //
-    function () {
+    function() {
 
         'use strict';
 
@@ -14,19 +14,20 @@ define('app/controllers/organization_add', ['ember'],
                 name: '',
                 description: ''
             }),
+            formReady: false,
 
 
-            open: function () {
+            open: function() {
                 this.clear();
-                this.view.clear();
+                this.view.open();
             },
 
 
-            add: function () {
+            add: function() {
                 var that = this;
                 Mist.organizationsController.addOrganization({
                     organization: that.get('newOrganization'),
-                    callback: function (success) {
+                    callback: function(success) {
                         if (success) {
                             $('#add-organization').collapsible('collapse');
                             Ember.run.next(function() {
@@ -37,19 +38,30 @@ define('app/controllers/organization_add', ['ember'],
                 })
             },
 
-
-            close: function () {
+            close: function() {
                 this.clear();
-                this.view.clear();
+                this.view.close();
             },
 
-
-            clear: function () {
+            clear: function() {
                 this.get('newOrganization').setProperties({
                     name: '',
                     description: ''
                 });
-            }
+                this.set('formReady', false);
+            },
+
+            _updateFormReady: function() {
+                this.set('formReady', !!this.get('newOrganization.name'));
+            },
+
+            //
+            // Observers
+            //
+
+            formObserver: function () {
+                Ember.run.once(this, '_updateFormReady');
+            }.observes('newOrganization.name'),
         });
     }
 );

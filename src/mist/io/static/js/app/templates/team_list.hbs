@@ -15,7 +15,7 @@
                             {{#if Mist.teamsController.model.length}}
                                 Teams
                             {{else}}
-                                Create Organization
+                                Organization
                             {{/if}}
                         </h1>
                     </div>
@@ -71,8 +71,7 @@
                 <h4>Organization</h4>
 
                 <div class="text-center">
-                    <p class="text-center">Create your organization</p>
-                    <a id="add-organization-btn" class="ui-btn ui-btn-d ui-shadow ui-caps" {{action "addOrganizationClicked" target=view}}>Create</a>
+                    <a id="add-organization-btn" class="ui-btn ui-btn-d ui-shadow ui-caps" {{action "addOrganizationClicked" target=view}}>Create Organization</a>
                 </div>
             </div>
         {{/if}}
