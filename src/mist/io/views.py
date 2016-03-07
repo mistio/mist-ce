@@ -515,6 +515,10 @@ def create_machine(request):
         associate_floating_ip_subnet = request.json_body.get('attach_floating_ip_subnet', None)
         project_id = request.json_body.get('project', None)
         bare_metal = request.json_body.get('bare_metal', False)
+        # bare_metal True creates a hardware server in SoftLayer,
+        # whule bare_metal False creates a virtual cloud server
+        # hourly True is the default setting for SoftLayer hardware
+        # servers, while False means the server has montly pricing
         hourly = request.json_body.get('hourly', True)
     except Exception as e:
         raise RequiredParameterMissingError(e)
