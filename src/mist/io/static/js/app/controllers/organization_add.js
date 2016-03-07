@@ -29,7 +29,7 @@ define('app/controllers/organization_add', ['ember'],
                     organization: that.get('newOrganization'),
                     callback: function(success) {
                         if (success) {
-                            $('#add-organization').collapsible('collapse');
+                            that.close();
                             Ember.run.next(function() {
                                 $('body').enhanceWithin();
                             })
@@ -59,7 +59,7 @@ define('app/controllers/organization_add', ['ember'],
             // Observers
             //
 
-            formObserver: function () {
+            formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
             }.observes('newOrganization.name'),
         });

@@ -14,106 +14,87 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
             // Properties
             //
 
-            model: [],
-            teamCount: 0,
-            teams: [],
-            members: [],
+            model: null,
 
             //
             //  Initialization
             //
 
-            load: function(organizations) {
-                this._updateModel(organizations);
-                this.set('loading', false);
+            init: function () {
+                this._super();
+                this.set('model', null);
+                this.set('loading', true);
             },
 
             //
             // Methods
             //
 
-            getOrganization: function(organizationId) {
-                return this.model.findBy('id', organizationId);
+            load: function(organization) {
+                this._updateModel(organization);
+                this.set('loading', false);
             },
 
-            organizationExists: function(organizationId) {
-                return !!this.getOrganization(organizationId);
-            },
-
-            updateTeams: function () {
-                var organizations = Mist.organizationsController.model;
-                var teamList = [];
-                organizations.forEach(function (organization) {
-                    teamList.pushObjects(organization.teams.model);
+            addOrganization: function(args) {
+                var organization = Ember.Object.create({
+                    id: -1,
+                    name: args.organization.name,
+                    description: args.organization.description
                 });
-                this.set('teams', teamList);
-            },
-
-            updateMembers: function () {
-                var organizations = Mist.organizationsController.model;
-                var memberList = [];
-                organizations.forEach(function (organization) {
-                    memberList.pushObjects(organization.members.model);
-                });
-                this.set('members', memberList);
-            },
-
-            _updateModel: function(organizations) {
-                Ember.run(this, function() {
-                    // Remove deleted organizations
-                    this.model.forEach(function(organization) {
-                        if (!organizations.findBy('id', organization.id)) {
-                            this.model.removeObject(organization);
-                        }
-                    }, this);
-
-                    organizations.forEach(function(organization) {
-                        var oldOrganization = this.getOrganization(organization.id);
-
-                        if (oldOrganization) {
-                            // Update existing organizations
-                            forIn(organization, function(value, property) {
-                                oldOrganization.set(property, value);
-                            });
-                        } else {
-                            // Add new organizations
-                            this._addOrganization(organization);
-                        }
-                    }, this);
-
-                    this.trigger('onOrganizationListChange');
-                });
+                this._addOrganization(organization);
+                // var that = this;
+                // that.set('addingOrganization', true);
+                // Mist.ajax
+                //     .POST('/org', {
+                //         'name': args.organization.name,
+                //         'description': args.organization.description
+                //     })
+                //     .success(function(organization) {
+                //         that._addOrganization(organization);
+                //     })
+                //     .error(function(message) {
+                //         Mist.notificationController.notify(message);
+                //     })
+                //     .complete(function(success) {
+                //         that.set('addingOrganization', false);
+                //         if (args.callback)
+                //             args.callback(success);
+                //     });
             },
 
             _addOrganization: function(organization) {
-                Ember.run(this, function() {
-                    if (this.organizationExists(organization.id)) return;
-                    var organizationModel = Organization.create(organization);
-                    this.model.addObject(organizationModel);
-                    this.trigger('onOrganizationAdd');
-                });
+                this._updateModel(organization);
+                this.trigger('onOrganizationAdd');
+
+                // This is a very bad implementation
+                // try to emit an event and run this
+                // in teams controller
+                var teams = [{
+                    id: -1,
+                    name: 'Owners',
+                    description: '',
+                    members: [{
+                        id: -1,
+                        name: Mist.firstName && Mist.lastName ? Mist.firstName + ' ' + Mist.lastName : Mist.email,
+                        email: Mist.email
+                    }],
+                    policy: {}
+                }];
+
+                Mist.teamsController.setModel(teams);
+                this._renderFields();
             },
 
-            _updateTeamCount: function() {
-                Ember.run(this, function() {
-                    var teamCount = 0;
-                    this.model.forEach(function(organization) {
-                        console.log(organization.get('teamCount'));
-                        teamCount += organization.teamCount;
-                    });
-                    this.set('teamCount', teamCount);
-                    this.trigger('onTeamListChange');
-                });
+            _updateModel: function(organization) {
+                var organizationModel = Organization.create(organization);
+                this.set('model', organizationModel);
             },
 
-            //
-            // Observers
-            //
-
-            teamCountObserver: function() {
-                console.log(11);
-                Ember.run.once(this, '_updateTeamCount');
-            }.observes('model.@each.teamCount')
+            _renderFields: function() {
+                Ember.run.scheduleOnce('afterRender', this, function() {
+                    $('body').enhanceWithin();
+                });
+            },
         });
     }
 );

@@ -38,10 +38,10 @@ var loadApp = function(
     ScriptRunController,
     ScriptsController,
     ProjectsController,
-    // OrganizationController,
     TeamsController,
     TeamEditController,
     TeamAddController,
+    OrganizationsController,
     OrganizationAddController,
     HomeView) {
 
@@ -139,10 +139,10 @@ var loadApp = function(
     App.set('projectsController', ProjectsController.create());
     App.set('machineRunScriptController', MachineRunScriptController.create());
     App.set('machineImageCreateController', MachineImageCreateController.create());
-    // App.set('organizationController', OrganizationController.create());
     App.set('teamsController', TeamsController.create());
     App.set('teamEditController', TeamEditController.create());
     App.set('teamAddController', TeamAddController.create());
+    App.set('organizationsController', OrganizationsController.create());
     App.set('organizationAddController', OrganizationAddController.create());
 
     // Ember custom widgets
@@ -369,6 +369,13 @@ var setupMainChannel = function(socket, callback) {
             });
             team.members = members;
             teams.pushObject(team);
+        });
+    }
+
+    if (organization) {
+        Mist.organizationsController.load({
+            id: organization.id,
+            name: organization.name
         });
     }
 

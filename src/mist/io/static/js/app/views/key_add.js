@@ -78,8 +78,7 @@ define('app/views/key_add', ['app/views/popup'],
 
             updateButtonObserver: function () {
                 Ember.run.once(this, 'updateAddButton');
-            }.observes('Mist.keyAddController.formReady',
-                'Mist.keyAddController.addingKey'),
+            }.observes('Mist.keyAddController.formReady', 'Mist.keyAddController.addingKey')
         });
     }
 );

@@ -185,10 +185,10 @@ var loadFiles = function (callback) {
         'app/controllers/script_run',
         'app/controllers/scripts',
         'app/controllers/projects',
-        // 'app/controllers/organization',
         'app/controllers/teams',
         'app/controllers/team_edit',
         'app/controllers/team_add',
+        'app/controllers/organizations',
         'app/controllers/organization_add',
 
         'app/routes/image',

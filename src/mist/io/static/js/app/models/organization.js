@@ -1,10 +1,10 @@
-define('app/models/organization', ['app/controllers/teams', 'app/controllers/members', 'ember'],
+define('app/models/organization', ['ember'],
     //
     //  Organization Model
     //
     //  @returns Class
     //
-    function(TeamsController, MembersController) {
+    function() {
 
         'use strict';
 
@@ -16,55 +16,15 @@ define('app/models/organization', ['app/controllers/teams', 'app/controllers/mem
 
             id: null,
             name: null,
-            teams: [],
-            members: [],
-
-            teamCount: null,
-
+            description: null,
 
             //
             //  Initialization
             //
 
             load: function() {
-                console.log(1111);
-                Ember.run(this, function() {
-                    // Add controllers
-                    this.teams = TeamsController.create({
-                        organization: this,
-                        model: []
-                    });
-                    this.members = MembersController.create({
-                        organization: this,
-                        model: []
-                    });
 
-                    // Add events
-                    this.teams.on('onTeamListChange', this, '_updateTeamCount');
-                });
-            }.on('init'),
-
-
-            //
-            //  Methods
-            //
-
-            update: function(data) {
-                this._super(data);
-            },
-
-            getTeam: function(teamId) {
-                return this.teams.getTeam(teamId);
-            },
-
-            _updateTeamCount: function() {
-                console.log(111);
-                Ember.run(this, function() {
-                    this.set('teamCount', this.teams.model.length);
-                    this.trigger('onTeamListChange');
-                    Mist.organizationsController.trigger('onTeamListChange');
-                });
-            },
+            }.on('init')
         });
     }
 );

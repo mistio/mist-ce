@@ -1,12 +1,12 @@
-#team-list-page .ui-collapsible {
+#team-list-page #add-organization.ui-collapsible {
     margin: 10px 0 20px;
 }
-#team-list-page .ui-collapsible .ui-collapsible-heading a {
+#team-list-page #add-organization.ui-collapsible .ui-collapsible-heading a {
     background-color: #d4d4d4;
     border: none;
     padding: 20px 70px 16px !important;
 }
-#team-list-page .ui-collapsible .ui-collapsible-content {
+#team-list-page #add-organization.ui-collapsible .ui-collapsible-content {
     background-color: #faf9f4;
     padding: 0 !important;
 }
