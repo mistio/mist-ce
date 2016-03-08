@@ -24,10 +24,12 @@ for provider in ['eu-central-1', 'us-east-1', 'us-west-2', 'us-west-1', 'eu-west
     time.sleep(10)
     #wait to load otherwise it fails
     browser.find_by_css('.gwt-Button').click()
-    time.sleep(10)
+
+    time.sleep(1)
 
     divs = browser.find_by_css('.NB')
     divs.extend(browser.find_by_css('.PB'))
+    divs.extend(browser.find_by_css('.BC'))
 
 
     print '    \'%s\': {' % provider
