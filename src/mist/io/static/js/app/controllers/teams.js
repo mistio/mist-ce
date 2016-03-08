@@ -139,11 +139,12 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             },
 
             getTeam: function(teamId) {
-                console.log(teamId, this.model, this.model.findBy('id', teamId));
+                console.log(teamId, this.get('model'), Mist.teamsController.model, this.model.findBy('id', teamId));
                 return this.model.findBy('id', teamId);
             },
 
             getRequestedTeam: function() {
+                console.log(this.teamRequest);
                 if (this.teamRequest) {
                     return this.getObject(this.teamRequest);
                 }

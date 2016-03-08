@@ -52,7 +52,7 @@
     margin: 0;
 }
 #team-list-page .list-wrapper .ui-block-b {
-  text-align: center;
+    text-align: center;
 }
 #team-list-page .ui-icon-check:after {
     background-color: #46d4c9;
@@ -67,11 +67,9 @@
     margin-left: 50px;
     margin-right: 250px;
 }
-
 #team-list-page .team-search {
     padding-right: 35px;
 }
-
 #team-list-page .team-search-container [class*='icon-'] {
     color: #7f7f7f;
     display: inline-block;
@@ -88,7 +86,6 @@
     font-size: 14px;
     color: #444;
 }
-
 #team-list-page .team-search-container .icon-xx:hover {
     cursor: pointer;
 }
@@ -100,9 +97,11 @@
 .team-name {
     font-weight: 400;
 }
-
-@media only screen and  (max-width: 600px) {
+@media only screen and (max-width: 600px) {
     #team-list-page .team-search-container {
-        margin-right: 90px;
+        margin-right: 85px !important;
+    }
+    #team-list-page .team-members {
+        display: none;
     }
 }

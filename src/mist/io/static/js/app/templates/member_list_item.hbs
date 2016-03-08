@@ -1,9 +1,9 @@
 <label>{{view Mist.Checkbox checked=member.selected}}</label>
 
-<a href="javascript:void(0)">
+{{#link-to "team" member}}
     <div class="ui-grid-b">
-        <div class="ui-block-a team-name">{{member.name}}</div>
-        <div class="ui-block-b team-members">{{member.email}}</div>
+        <div class="ui-block-a member-name">{{member.name}}</div>
+        <div class="ui-block-b member-email">{{member.email}}</div>
         <div class="ui-block-c"></div>
     </div>
-</a>
+{{/link-to}}

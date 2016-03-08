@@ -40,13 +40,13 @@ define('app/views/team', ['app/views/page', 'app/models/team'],
 
 
             updateModel: function() {
-
+                console.log(1);
                 // Check if user has requested a specific team
                 // through the address bar and retrieve it
                 var team = Mist.teamsController.getRequestedTeam();
                 if (team)
                     this.get('controller').set('model', team);
-
+                console.log(team);
                 // Get a reference of team model
                 this.set('team', this.get('controller').get('model'));
             },
