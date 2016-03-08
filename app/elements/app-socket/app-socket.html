@@ -48,7 +48,6 @@ Polymer({
                 console.log('Channel logs initialized')
             });
         };
-
     },
 
     setupChannel: function (namespace, callback) {
@@ -199,49 +198,43 @@ Polymer({
     },
 
     _updateSizes: function (data) {
-        //return this._updateModel('clouds.' + data.cloud_id + '.sizes', data);
+        return this._updateModel('clouds.' + data.cloud_id + '.sizes', data.sizes);
     },
 
     _updateLocations: function (data) {
-        //return this._updateModel('clouds.' + data.cloud_id + '.locations', data);
+        return this._updateModel('clouds.' + data.cloud_id + '.locations', data.locations);
     },
 
     _updateImages: function (data) {
-        console.warn('clouds.' + data.cloud_id + '.images');
-        var changed = this._updateModel('clouds.' + data.cloud_id + '.images', data);
+        var changed = this._updateModel('clouds.' + data.cloud_id + '.images', data.images);
         if (!changed)
             return false;
-        return changed;
+
         self = this;
         var allImages = [];
         if (this.model != undefined) {
-
             this.model.cloudsArray.forEach(
               function(cloud){
-
                 if (cloud.imagesArray != undefined ) {
                     cloud.imagesArray.forEach(function (image,index,arr) {
                         arr[index].icons = self._generateIcon(image);
                         self.model.imagesArray.push(arr[index])
                         });
                     }
-
                 return allImages = allImages.concat(cloud.imagesArray != undefined ? cloud.imagesArray : [])
             });
-
         }
-
 
         this.set('model.imagesArray', allImages);
     },
 
     _updateMachines: function (data) {
+        var changed = this._updateModel('clouds.' + data.cloud_id + '.machines', data.machines);
+        if (!changed)
+            return false;
 
-        this.set('model.clouds.' + data.cloud_id + '.machines', _generateMap(data.machines));
-        this.set('model.clouds.' + data.cloud_id + '.machinesArray', data.machines);
         var allMachines = [];
         if (this.model  != undefined ) {
-
             this.model.cloudsArray.forEach(
                 function(cloud){
                     if (cloud.machinesArray != undefined ) {
@@ -253,13 +246,9 @@ Polymer({
                 }
             });
         }
-        // console.warn(this.get('model.machinesArray.length'));
-        // changeRecord
-        // if (!this.get('model.machinesArray.length')) {
-            //console.error('update machinesArray');
-            this.set('model.machinesArray', allMachines);
-            this.set('machinesArray', allMachines);
-        // }
+
+        this.set('model.machinesArray', allMachines);
+        this.set('machinesArray', allMachines);
     },
 
     _updateNetworks: function (data) {

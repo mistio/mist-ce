@@ -1,41 +1,40 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <dom-module id="app-rules">
     <template>
         <style>
         :host paper-card {
             min-width: 100%;
         }
-        
+
         .container > div {
             padding: 10px;
             background-color: #eee;
         }
-        
+
         .flex-horizontal {
             @apply(--layout-horizontal);
         }
-        
+
         .flexchild {
             @apply(--layout-flex);
         }
-        
+
         .an-app-rule {
             margin-bottom: 1px;
         }
-        
+
         .rule-expression {
             padding: 8px;
         }
-        
+
         .card-actions {
             overflow: hidden;
             padding-top: 10px;
             padding-bottom: 10px;
         }
-        
+
         paper-button.custom.blue {
             /*line-height: 24px;
             padding-right: 15px;*/
