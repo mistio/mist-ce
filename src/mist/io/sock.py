@@ -225,8 +225,10 @@ class MainConnection(MistConnection):
                     log.info("Emitting %s from cache", key)
                     if key == 'list_machines':
                         cached['machines'] = core_methods.filter_list_machines(
-                            self.auth_context, machines=cached['machines']
+                            self.auth_context, **cached
                         )
+                        if not cached['machines']:
+                            continue
                     self.send(key, cached)
 
     def check_monitoring(self):
@@ -280,10 +282,11 @@ class MainConnection(MistConnection):
                 machines = result['machines']
                 cloud_id = result['cloud_id']
                 filtered_machines = core_methods.filter_list_machines(
-                    self.auth_context, machines=machines
+                    self.auth_context, cloud_id, machines
                 )
-                self.send(routing_key, {'cloud_id': cloud_id,
-                                        'machines': filtered_machines})
+                if filtered_machines:
+                    self.send(routing_key, {'cloud_id': cloud_id,
+                                            'machines': filtered_machines})
                 # update cloud machine count in multi-user setups
                 cloud = Cloud.objects.get(owner=self.owner, id=cloud_id)
                 try:
