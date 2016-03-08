@@ -16,6 +16,9 @@
             --mist-very-light-color: #eceff1;
             --mist-blue: #0099cc;
         }
+        paper-tooltip {
+            font-size: 13px;
+        }
         </style>
     </template>
 </dom-module>
@@ -141,6 +144,7 @@
         <style>
         .list-head {
             background-color: #f2f2f2;
+            border-bottom: 1px solid #e5e5e5;
             padding: 0 16px;
             font-weight: 400;
             font-size: 0.9em;
@@ -148,7 +152,7 @@
         }
         
         .list-head > * {
-            padding: 8px 0;
+            padding: 16px 0;
             line-height: 43px;
         }
         
@@ -183,11 +187,35 @@
         
         .list-options {
             background-color: #dedede;
-            padding: 16px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .list-options > .search {
+            padding: 16px 8px 16px 16px;
+            margin-right: 0;
+            background-color: #fff;
+            transition: all 200ms;
+            background-color: #dedede;
+        }
+
+        .list-options > .search.true {
+            margin-right: 16px;
+            background-color: #fff;
+        }
+
+        .search.true paper-input-container .underline .unfocused-line {
+            /*height: 0;*/
+            background: red;
         }
         
         .list-options paper-icon-button {
             vertical-align: top;
+        }
+
+        -webkit-search-cancel-button {
+            display: none !important;
         }
         
         .list-title {
@@ -198,6 +226,10 @@
             line-height: 40px;
             text-transform: uppercase;
             transition: 200ms color;
+        }
+
+        .list-head :not(paper-tooltip){
+            text-transform: uppercase;
         }
         
         .search {
@@ -240,7 +272,7 @@
         }
         
         .list-options paper-input[type='search'] {
-            width: 300px;
+            width: 400px;
         }
         
         ::content iron-collapse.sub-items {

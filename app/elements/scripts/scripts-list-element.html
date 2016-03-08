@@ -155,15 +155,20 @@
                 </paper-toolbar>
                 <div class="list">
                     <div hidden$="[[!hasScripts]]" class="list-options">
-                        <paper-tooltip for="searchScriptBtn" position="top">Toggle Search</paper-tooltip>
-                        <paper-icon-button id="searchScriptBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
-                        <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm}}" placeholder="Search..." no-label-float class="search"></paper-input>
-                        <span hidden$="[[showSearchOption]]" class="label">Search scripts</span>
-                        <paper-tooltip for="runScriptBtn" position="top">Run Script</paper-tooltip>
+                        <div class$="option search [[showSearchOption]]">
+                            <paper-icon-button id="searchScriptBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
+                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm}}" placeholder="" no-label-float class="search"></paper-input>
+                            <paper-icon-button hidden$="[[!showSearchOption]]" icon="close" on-tap="_toggleSearchSelected"></paper-icon-button>
+                            <span hidden$="[[showSearchOption]]" class="label">Search scripts</span>                            
+                        </div>
+                    
+                        <paper-tooltip for="runScriptBtn" position="bottom">Run Script</paper-tooltip>
                         <paper-icon-button id="runScriptBtn" hidden$="[[!showRunOption]]" on-tap="_runSelected" icon="schedule"></paper-icon-button>
-                        <paper-tooltip for="editScriptBtn" position="top">Edit</paper-tooltip>
-                        <paper-icon-button id="editScriptBtn" hidden$="[[!showEditOption]]" on-tap="_editSelected" icon="image:edit"></paper-icon-button>
-                        <paper-tooltip for="deleteScriptBtn" position="top">Delete</paper-tooltip>
+                    
+                        <paper-tooltip for="editScriptBtn" position="bottom">Edit</paper-tooltip>
+                        <paper-icon-button id="editScriptBtn" hidden$="[[!showEditOption]]" on-tap="_editSelected" icon="image:edit"></paper-icon-button>                        
+                    
+                        <paper-tooltip for="deleteScriptBtn" position="bottom">Delete</paper-tooltip>
                         <paper-icon-button id="deleteScriptBtn" hidden$="[[!showDeleteOption]]" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
                         <span hidden$="[[!showDeleteOption]]" class="label">
                         Delete [[selectedScripts.length]] script<span hidden$="[[!moreThanOneSelected]]">s</span> </span>
@@ -176,7 +181,6 @@
                                 <app-check id="selectAllBtn" class="check-all" checked="[[selectAll]]" selected="[[selectAll]]" on-tap="_selectAllChanged">
                                     <iron-icon icon="check"></iron-icon>
                                 </app-check>
-
                                 Νame
                                 <paper-icon-button id="sortByName" class$="[[_computeIsActiveSort(sortByTerm, 'name')]]" icon="icons:arrow-upward" on-tap="_sortScripts" sort-option="name"></paper-icon-button>
                                 <paper-tooltip for="sortByName" position="top">Sort by name</paper-tooltip>
