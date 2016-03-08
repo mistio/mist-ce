@@ -65,7 +65,11 @@ STATES = {
     NodeState.ERROR: 'error',
     NodeState.PAUSED: 'paused',
     NodeState.SUSPENDED: 'suspended',
+    NodeState.STARTING = 'starting',
+    NodeState.STOPPING = 'stopping',
+    NodeState.RECONFIGURING = 'reconfiguring'
 }
+
 
 
 # All EC2 providers, useful for type checking
