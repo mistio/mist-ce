@@ -67,7 +67,6 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
-HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
 
 
 def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -180,9 +179,6 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
             cloud.apiurl = cloud.apiurl.rstrip('/')
 
-        #for HP Cloud
-        if 'hpcloudsvc' in apiurl:
-            cloud.apiurl = HPCLOUD_AUTH_URL
 
         if provider == 'vcloud':
             for prefix in ['https://', 'http://']:
@@ -274,8 +270,6 @@ def add_cloud_v_2(user, title, provider, params):
         cloud_id, cloud = _add_cloud_linode(title, provider, params)
     elif provider == 'docker':
         cloud_id, cloud = _add_cloud_docker(title, provider, params)
-    elif provider == 'hpcloud':
-        cloud_id, cloud = _add_cloud_hp(user, title, provider, params)
     elif provider == 'openstack':
         cloud_id, cloud = _add_cloud_openstack(title, provider, params)
     elif provider in ['vcloud', 'indonesian_vcloud']:
@@ -783,47 +777,6 @@ def _add_cloud_libvirt(user, title, provider, params):
     return cloud_id, cloud
 
 
-def _add_cloud_hp(user, title, provider, params):
-    username = params.get('username', '')
-    if not username:
-        raise RequiredParameterMissingError('username')
-
-    password = params.get('password', '')
-    if not password:
-        raise RequiredParameterMissingError('password')
-
-    tenant_name = params.get('tenant_name', '')
-    if not tenant_name:
-        raise RequiredParameterMissingError('tenant_name')
-
-    apiurl = params.get('apiurl') or ''
-    if 'hpcloudsvc' in apiurl:
-            apiurl = HPCLOUD_AUTH_URL
-
-    region = params.get('region', '')
-    if not region:
-        raise RequiredParameterMissingError('region')
-
-    if password == 'getsecretfromdb':
-        for cloud_id in user.clouds:
-            if username == user.clouds[cloud_id].apikey:
-                password = user.clouds[cloud_id].apisecret
-                break
-
-    cloud = model.Cloud()
-    cloud.title = title
-    cloud.provider = provider
-    cloud.apikey = username
-    cloud.apisecret = password
-    cloud.apiurl = apiurl
-    cloud.region = region
-    cloud.tenant_name = tenant_name
-    cloud.enabled = True
-    cloud_id = cloud.get_id()
-
-    return cloud_id, cloud
-
-
 def _add_cloud_openstack(title, provider, params):
     username = params.get('username', '')
     if not username:
@@ -1276,31 +1229,15 @@ def connect_provider(cloud):
         temp_key_file.close()
         conn = driver(cloud.apikey, temp_key_file.name)
     elif cloud.provider == Provider.OPENSTACK:
-        #keep this for cloud compatibility, however we now use HPCLOUD
-        #as separate provider
-        if 'hpcloudsvc' in cloud.apiurl:
-            conn = driver(
-                cloud.apikey,
-                cloud.apisecret,
-                ex_force_auth_version=cloud.auth_version or '2.0_password',
-                ex_force_auth_url=cloud.apiurl,
-                ex_tenant_name=cloud.tenant_name or cloud.apikey,
-                ex_force_service_region = cloud.region,
-                ex_force_service_name='Compute'
-            )
-        else:
-            conn = driver(
-                cloud.apikey,
-                cloud.apisecret,
-                ex_force_auth_version=cloud.auth_version or '2.0_password',
-                ex_force_auth_url=cloud.apiurl,
-                ex_tenant_name=cloud.tenant_name,
-                ex_force_service_region=cloud.region,
-                ex_force_base_url=cloud.compute_endpoint,
-            )
-    elif cloud.provider == Provider.HPCLOUD:
-        conn = driver(cloud.apikey, cloud.apisecret, cloud.tenant_name,
-                      region=cloud.region)
+        conn = driver(
+            cloud.apikey,
+            cloud.apisecret,
+            ex_force_auth_version=cloud.auth_version or '2.0_password',
+            ex_force_auth_url=cloud.apiurl,
+            ex_tenant_name=cloud.tenant_name,
+            ex_force_service_region=cloud.region,
+            ex_force_base_url=cloud.compute_endpoint,
+        )
     elif cloud.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR]:
         conn = driver(cloud.apisecret)
     elif cloud.provider == Provider.PACKET:
@@ -1693,9 +1630,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key,
                                          machine_name, image, size, location, networks, cloud_init)
-    elif conn.type is Provider.HPCLOUD:
-        node = _create_machine_hpcloud(conn, private_key, public_key,
-                                       machine_name, image, size, location, networks)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
         for loc in locations:
@@ -1772,15 +1706,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calss post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
-            node.extra.get('username'), node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params,
-        )
-    elif conn.type == Provider.HPCLOUD:
-        mist.io.tasks.hpcloud_post_create_steps.delay(
             user.email, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
@@ -1921,59 +1846,6 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
                 ex_userdata=user_data)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e, e)
-    return node
-
-
-def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
-                             image, size, location, networks):
-    """Create a machine in HP Cloud.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = str(public_key).replace('\n','')
-
-    try:
-        server_key = ''
-        keys = conn.ex_list_keypairs()
-        for k in keys:
-            if key == k.public_key:
-                server_key = k.name
-                break
-        if not server_key:
-            server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
-            server_key = server_key.name
-    except:
-        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
-        server_key = server_key.name
-
-    #FIXME: Neutron API not currently supported by libcloud
-    #need to pass the network on create node - can only omitted if one network only exists
-
-    # select the right OpenStack network object
-    available_networks = conn.ex_list_networks()
-    try:
-        chosen_networks = []
-        for net in available_networks:
-            if net.id in networks:
-                chosen_networks.append(net)
-    except:
-            chosen_networks = []
-
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(name=machine_name,
-                image=image,
-                size=size,
-                location=location,
-                ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                max_tries=1,
-                ex_keyname=server_key,
-                networks=chosen_networks)
-        except Exception as e:
-            raise MachineCreationError("HP Cloud, got exception %s" % e, e)
     return node
 
 
@@ -3085,7 +2957,7 @@ def list_networks(user, cloud_id):
                 'name': network.name,
                 'extra': network.extra,
             })
-    elif conn.type in (Provider.OPENSTACK, Provider.HPCLOUD):
+    elif conn.type in (Provider.OPENSTACK,):
         networks = conn.ex_list_networks()
         subnets = conn.ex_list_subnets()
         routers = conn.ex_list_routers()
@@ -3278,13 +3150,11 @@ def create_network(user, cloud_id, network, subnet, router):
     cloud = user.clouds[cloud_id]
 
     conn = connect_provider(cloud)
-    if conn.type not in (Provider.OPENSTACK, Provider.HPCLOUD):
+    if conn.type not in (Provider.OPENSTACK,):
         raise NetworkActionNotSupported()
 
     if conn.type is Provider.OPENSTACK:
         ret = _create_network_openstack(conn, network, subnet, router)
-    elif conn.type is Provider.HPCLOUD:
-        ret = _create_network_hpcloud(conn, network, subnet, router)
 
     task = mist.io.tasks.ListNetworks()
     task.clear_cache(user.email, cloud_id)
@@ -3295,6 +3165,8 @@ def create_network(user, cloud_id, network, subnet, router):
 def _create_network_hpcloud(conn, network, subnet, router):
     """
     Create hpcloud network
+    NOT used anymore, stays for reference
+
     """
     try:
         network_name = network.get('name')
@@ -3430,11 +3302,6 @@ def delete_network(user, cloud_id, network_id):
 
     conn = connect_provider(cloud)
     if conn.type is Provider.OPENSTACK:
-        try:
-            conn.ex_delete_network(network_id)
-        except Exception as e:
-            raise NetworkError(e)
-    elif conn.type is Provider.HPCLOUD:
         try:
             conn.ex_delete_network(network_id)
         except Exception as e:
@@ -4363,8 +4230,6 @@ def machine_name_validator(provider, name):
     elif provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
         pass
     elif provider in [Provider.OPENSTACK]:
-        pass
-    elif provider is Provider.HPCLOUD:
         pass
     elif provider in config.EC2_PROVIDERS:
         if len(name) > 255:
