@@ -18,9 +18,10 @@
             .flexchild {
                 @apply(--layout-flex);
             }
-            
-            #check {                
+
+            #check {
                 display: inline-block;
+                vertical-align: middle;
             }
 
             app-check {
@@ -35,7 +36,7 @@
         <paper-item on-tap="_viewScript" class$="info-item flex-horizontal-with-ratios [[indexClass]]">
             <div class="flexchild">
                 <span class="check">
-                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectScript">&nbsp;</app-check>
+                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectScript"></app-check>
                     <paper-tooltip for="check" position="right">Select item</paper-tooltip>
                 </span>
                 <span class="name">[[script.name]]</span>
