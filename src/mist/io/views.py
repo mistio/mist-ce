@@ -710,10 +710,14 @@ def associate_key(request):
     keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
     if not auth_context.has_perm('key', 'read_private', keypair.id, keypair_tags):
         raise UnauthorizedError()
-    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    if not auth_context.has_perm("machine", "associate_key", machine.id,
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "associate_key", machine_uuid,
                                  machine_tags):
         raise UnauthorizedError()
 
@@ -763,10 +767,14 @@ def disassociate_key(request):
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
         raise UnauthorizedError()
-    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    if not auth_context.has_perm("machine", "disassociate_key", machine.id,
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "disassociate_key", machine_uuid,
                                  machine_tags):
         raise UnauthorizedError()
 
@@ -1028,11 +1036,14 @@ def machine_actions(request):
     if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
         raise UnauthorizedError()
     if action in ('start', 'stop', 'reboot', 'destroy', 'resize'):
-        machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
-                                      id=cloud_id), machine_id=machine_id)
         machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                           cloud_id, machine_id)
-        if not auth_context.has_perm("machine", action, machine.id,
+        try:
+            machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+            machine_uuid = machine.id
+        except me.DoesNotExist:
+            machine_uuid = ""
+        if not auth_context.has_perm("machine", action, machine_uuid,
                                      machine_tags):
             raise UnauthorizedError()
 
@@ -1142,11 +1153,14 @@ def set_machine_tags(request):
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
         raise UnauthorizedError()
-    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
-                                  id=cloud_id), machine_id=machine_id)
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    if not auth_context.has_perm("machine", "edit_tags", machine.id,
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "edit_tags", machine_uuid,
                                  machine_tags):
         raise UnauthorizedError()
 
@@ -1182,11 +1196,14 @@ def delete_machine_tag(request):
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
         raise UnauthorizedError()
-    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
-                                  id=cloud_id), machine_id=machine_id)
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    if not auth_context.has_perm("machine", "edit_tags", machine.id,
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "edit_tags", machine_uuid,
                                  machine_tags):
         raise UnauthorizedError()
     methods.delete_machine_tag(auth_context.owner, cloud_id, machine_id, tag)
@@ -1433,9 +1450,12 @@ def associate_ip(request):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    machine = Machine.objects.get(cloud=Cloud(owner=auth_context.owner,
-                                  id=cloud_id), machine_id=machine_id)
-    if not auth_context.has_perm("machine", "edit", machine.id, machine_tags):
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "edit", machine_uuid, machine_tags):
         raise UnauthorizedError()
 
     ret = methods.associate_ip(auth_context.owner, cloud_id, network_id, ip, machine_id,
@@ -1487,8 +1507,12 @@ def probe(request):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
-    if not auth_context.has_perm("machine", "read", machine.id, machine_tags):
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "read", machine_uuid, machine_tags):
         raise UnauthorizedError()
 
 
@@ -1650,8 +1674,12 @@ def get_stats(request):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
-    if not auth_context.has_perm("machine", "read", machine.id, machine_tags):
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "read", machine_uuid, machine_tags):
         raise UnauthorizedError()
 
     data = methods.get_stats(
@@ -1691,10 +1719,14 @@ def find_metrics(request):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
-    machine = Machine.objects.get(cloud=Cloud(id=cloud_id), machine_id=machine_id)
-    if not auth_context.has_perm("machine", "read", machine.id, machine_tags):
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "read", machine_uuid, machine_tags):
         raise UnauthorizedError()
-    return methods.find_metrics(user, cloud_id, machine_id)
+    return methods.find_metrics(auth_context.owner, cloud_id, machine_id)
 
 
 @view_config(route_name='api_v1_metrics', request_method='PUT', renderer='json')
@@ -1716,14 +1748,26 @@ def assoc_metric(request):
       description: ' Metric_id '
       type: string
     """
-    user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     metric_id = params.get('metric_id')
     if not metric_id:
         raise RequiredParameterMissingError('metric_id')
-    methods.assoc_metric(user, cloud_id, machine_id, metric_id)
+    auth_context = auth_context_from_request(request)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+    if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
+        raise UnauthorizedError()
+    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+                                                      cloud_id, machine_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "edit_graphs", machine_uuid, machine_tags):
+        raise UnauthorizedError()
+    methods.assoc_metric(auth_context.owner, cloud_id, machine_id, metric_id)
     return {}
 
 
@@ -1746,14 +1790,26 @@ def disassoc_metric(request):
       description: ' Metric_id '
       type: string
     """
-    user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     metric_id = params.get('metric_id')
     if not metric_id:
         raise RequiredParameterMissingError('metric_id')
-    methods.disassoc_metric(user, cloud_id, machine_id, metric_id)
+    auth_context = auth_context_from_request(request)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+    if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
+        raise UnauthorizedError()
+    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+                                                      cloud_id, machine_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "edit_graphs", machine_uuid, machine_tags):
+        raise UnauthorizedError()
+    methods.disassoc_metric(auth_context.owner, cloud_id, machine_id, metric_id)
     return {}
 
 
@@ -1787,16 +1843,31 @@ def update_metric(request):
         unit'
       type: string
     """
-    user = user_from_request(request)
     metric_id = request.matchdict['metric']
     params = params_from_request(request)
+    machine_id = params.get('machine_id')
+    cloud_id = params.get('cloud_id')
+    auth_context = auth_context_from_request(request)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+    if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
+        raise UnauthorizedError()
+    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+                                                      cloud_id, machine_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "edit_custom_metrics", machine_uuid,
+                                 machine_tags):
+        raise UnauthorizedError()
     methods.update_metric(
-        user,
+        auth_context.owner,
         metric_id,
         name=params.get('name'),
         unit=params.get('unit'),
-        cloud_id=params.get('cloud_id'),
-        machine_id=params.get('machine_id'),
+        cloud_id=cloud_id,
+        machine_id=machine_id
     )
     return {}
 
@@ -1841,22 +1912,35 @@ def deploy_plugin(request):
       default: gauge
       type: string
     """
-    user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     plugin_id = request.matchdict['plugin']
     params = params_from_request(request)
     plugin_type = params.get('plugin_type')
     host = params.get('host')
+    auth_context = auth_context_from_request(request)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+    if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
+        raise UnauthorizedError()
+    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+                                                      cloud_id, machine_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "edit_custom_metrics", machine_uuid,
+                                 machine_tags):
+        raise UnauthorizedError()
     if plugin_type == 'python':
         ret = methods.deploy_python_plugin(
-            user, cloud_id, machine_id, plugin_id,
+            auth_context.owner, cloud_id, machine_id, plugin_id,
             value_type=params.get('value_type', 'gauge'),
             read_function=params.get('read_function'),
             host=host,
         )
         methods.update_metric(
-            user,
+            auth_context.owner,
             metric_id=ret['metric_id'],
             name=params.get('name'),
             unit=params.get('unit'),
@@ -1897,15 +1981,28 @@ def undeploy_plugin(request):
       required: true
       type: string
     """
-    user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     plugin_id = request.matchdict['plugin']
     params = params_from_request(request)
     plugin_type = params.get('plugin_type')
     host = params.get('host')
+    auth_context = auth_context_from_request(request)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+    if auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
+        raise UnauthorizedError()
+    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+                                                      cloud_id, machine_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "edit_custom_metrics", machine_uuid,
+                                 machine_tags):
+        raise UnauthorizedError()
     if plugin_type == 'python':
-        ret = methods.undeploy_python_plugin(user, cloud_id,
+        ret = methods.undeploy_python_plugin(auth_context.owner, cloud_id,
                                              machine_id, plugin_id, host)
         return ret
     else:
