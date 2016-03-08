@@ -36,6 +36,11 @@
 <link rel="import" href="../scripts/script-page-element.html">
 <link rel="import" href="../scripts/script-run-element.html">
 <link rel="import" href="../scripts/scripts-list-element.html">
+<link rel="import" href="../keys/key-add-element.html">
+<link rel="import" href="../keys/key-edit-element.html">
+<link rel="import" href="../keys/key-item-element.html">
+<link rel="import" href="../keys/key-page-element.html">
+<link rel="import" href="../keys/keys-list-element.html">
 <link rel="import" href="../pages/page-test.html">
 
 <dom-module id="app-main">
@@ -80,7 +85,8 @@
             <page-image params="[[params]]" model="[[model]]" image="[[getImage(params)]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-image>
             <!-- keys -->
             <page-list model="[[model]]" elements="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]"></page-list>
-            <page-key model="[[model]]" params="[[params]]" key="[[getKey(params)]]" elements="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]"></page-key>
+            <keys-list-element model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" keys="[[model.keysArray]]"></keys-list-element>
+            <!-- <page-key model="[[model]]" params="[[params]]" key="[[getKey(params)]]" elements="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]"></page-key> -->
             <!-- networks -->
             <page-list model="[[model]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-list>
 
@@ -464,7 +470,16 @@ var app = Polymer({
                 user: "marios@mist.io"
             },],
             imagesArray: [],
-            keysArray: [],
+            keysArray: [{
+                id: "test2",
+                isDefault: false
+            }, {
+                id: "primary",
+                isDefault: true
+            }, {
+                id: "kvm",
+                isDefault: false
+            }],
             networksArray: [],
             templatesArray:[],
             teamsArray:[],
