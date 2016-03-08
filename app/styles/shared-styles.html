@@ -105,6 +105,150 @@
             /*accent color*/
             --mist-blue: #039BE5;
         }
+
+        .green {
+            background-color: var(--green-color);
+            color: #fff;
+        }
+        
+        .red {
+            background-color: var(--red-color);
+            color: #fff;
+        }
+        
+        .orange {
+            background-color: var(--orange-color);
+            color: #444;
+        }
+        
+        .blue {
+            background-color: var(--blue-color);
+            color: #444;
+        }
+        
+        .mist-dark {
+            background-color: var(--mist-dark-color);
+            color: #fff;
+        }
+        
+        .mist-light {
+            background-color: var(--mist-light-color);
+            color: #444;
+        }
+        
+        .mist-lighter {
+            background-color: var(--mist-lighter-color);
+            color: #444;
+        }
+        
+        .mist-blue {
+            background-color: var(--mist-blue);
+            color: #fff;
+        }
+        
+        .gray-dark {
+            background-color: var(--gray-dark-color);
+            color: #444;
+        }
+        
+        .gray-light {
+            background-color: var(--gray-light-color);
+            color: #444;
+        }
+        
+        .page-title {
+            @apply(--paper-font-display2);
+        }
+        
+        paper-menu a > *,
+        paper-menu paper-item > *,
+        paper-menu paper-icon-item > * {
+            pointer-events: none;
+        }
+        
+        paper-dialog paper-button {
+            margin-top: 0;
+        }
+        
+        paper-card {
+            display: block;
+        }
+        
+        paper-material,
+        paper-card {
+            padding-bottom: 8px;
+        }
+        
+        paper-material > h2,
+        paper-material > p,
+        paper-card > h2,
+        paper-card > p {
+            padding: 16px;
+            font-weight: 400;
+        }
+        
+        paper-material.form {
+            max-width: 940px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        paper-material.form > h2 {
+            padding: 0 0 16px 0;
+        }
+        
+        .top-actions {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+        
+        .bottom-actions {
+            padding-bottom: 2px;
+            margin-top: 16px;
+        }
+        
+        paper-dialog {
+            padding: 0;
+        }
+        
+        paper-card paper-button:not([disabled]),
+        paper-material paper-button:not([disabled]),
+        paper-button.blue {
+            background-color: var(--mist-blue);
+            color: #fff;
+            margin: 0;
+            @apply(--layout-flex);
+        }
+        
+        .notifications > * {
+            color: #fff;
+            padding: 8px;
+            margin: 16px 0;
+        }
+        
+        :host >::content .focused-line.paper-input-container {
+            background-color: var(--mist-blue);
+        }
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+        :host >::content .input-content.label-is-floating.paper-input-container label {
+            color: rgba(0,0,0,0.54) !important;
+            text-transform: uppercase;
+        }
+        
+        @media (max-width: 600px) {
+            .page-title {
+                font-size: 24px!important;
+            }
+        }
+        /* Paper progress */
+        
+        paper-progress {
+            --paper-progress-active-color: var(--mist-blue);
+        }
         </style>
     </template>
 </dom-module>
@@ -290,11 +434,6 @@
             margin-right: 16px;
             background-color: #fff;
         }
-
-        .search.true paper-input-container .underline .unfocused-line {
-            /*height: 0;*/
-            background: red;
-        }
         
         .list-options paper-icon-button {
             vertical-align: top;
@@ -397,6 +536,102 @@
             position: absolute !important;
             top: -68px;
             right: 32px;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="forms">
+    <template>
+        <style>
+        :host {
+            display: block;
+        }
+        
+        :host[focused] {
+            outline: none;
+        }
+        
+        paper-material.form {
+            background-color: #fff;
+            padding: 24px;
+        }
+        
+        :host::content form paper-button {
+            background-color: var(--mist-blue);
+            color: #fff;
+            margin: 0;
+            @apply(--layout-flex);
+        }
+        
+        ::content paper-button {
+            font-weight: 400;
+            padding: 0.8em 1.57em 0.7em 1.57em;
+        }
+        
+        ::content form paper-menu > paper-button {
+            margin: 8px;
+        }
+        
+        ::content form paper-button > * {
+            color: #fff;
+        }
+        
+        :host paper-button[disabled] {
+            background-color: #eaeaea;
+            color: #a8a8a8;
+            cursor: not-allowed;
+            margin: 0
+        }
+        
+        ::content hr {
+            height: 0;
+            border-bottom: 1px solid #eee;
+            background: transparent;
+            border-width: 0 0 1px 0;
+            margin: 32px 0 8px 0;
+        }
+        
+        paper-material > h2 {
+            margin: 0;
+            height: 36px;
+            line-height: 36px;
+            padding-left: 0;
+        }
+        
+        ::content paper-item:hover {
+            background-color: var(--mist-lighter-color);
+        }
+        
+        paper-dropdown-menu::content paper-item:last-of-type {
+            border-bottom: 0 none;
+        }
+        
+        paper-dropdown-menu::content paper-menu {
+            padding: 0;
+        }
+        
+        paper-dropdown-menu::content iron-dropdown {
+            position: absolute;
+            top: 6px !important;
+            left: 0px !important;
+            right: 0;
+            width: 100%;
+        }
+        
+        paper-dropdown-menu::content iron-dropdown .dropdown-content {
+            width: 100%;
+        }
+        
+        paper-textarea.like-editor >::content textarea {
+            color: #fff !important;
+            padding: 2px !important;
+            padding: 4px 8px !important;
+            font-size: 0.9em !important;
+            font-family: monospace !important;
+        }
+        
+        paper-textarea.like-editor >::content iron-autogrow-textarea {
+            background-color: var(--mist-dark-color);
         }
         </style>
     </template>

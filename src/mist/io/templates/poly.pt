@@ -38,6 +38,7 @@
     <script tal:content="string: var BETA_FEATURES=${beta_features}" />
 
     <link rel="stylesheet" href="styles/main.css" inline>
+    <link rel="stylesheet" href="styles/grid.css" inline>
 
     <script src="bower_components/webcomponentsjs/webcomponents-lite.js" inline></script>
 

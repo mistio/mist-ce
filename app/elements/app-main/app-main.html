@@ -13,6 +13,7 @@
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
 <link rel="import" href="../app-sidebar/app-sidebar.html">
@@ -68,6 +69,7 @@
             <iron-route path="/networks/:name" title="networks"></iron-route>
             <iron-route path="/scripts" title="scripts"></iron-route>
             <iron-route path="/scripts/:id" title="scripts"></iron-route>
+            <iron-route path="/add-script" title="add scripts"></iron-route>
             <!-- id? -->
             <iron-route path="/elements" title="elements"></iron-route>
             <iron-route path="/account" title="account"></iron-route>
@@ -95,7 +97,8 @@
             <scripts-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-element>
             <!-- <page-test model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]" clouds=[[model.cloudsArray]]></page-test> -->
             <!-- <page-list model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-list> -->
-            <page-script model="{{model}}" params="{{params}}" network="{{getScript(params)}}" elements="{{model.scriptsArray}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-script>
+            <page-script model="[[model]]" params="[[params]]" script="[[getScript(params)]]" elements="[[model.scriptsArray]]" sections="[[sectionsArray]]" section="[[sections.scripts]]"></page-script>
+            <script-add-element model="{{model}}" sections="[[sections]]" section="[[sections.scripts]]"></script-add-element>
             <page-elements></page-elements>
             <page-account></page-account>
             <page-not-found></page-not-found>
