@@ -78,7 +78,7 @@ h6 {
     line-height: 20px;
 }
 
-a {
+a:not(.regular) {
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.018em;

@@ -33,13 +33,13 @@
               display: inline-block;
             }
         </style>
-        <paper-item on-tap="_viewScript" class$="info-item flex-horizontal-with-ratios [[indexClass]]">
+        <paper-item class$="info-item flex-horizontal-with-ratios [[indexClass]]"> 
             <div class="flexchild">
                 <span class="check">
                     <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectScript"></app-check>
                     <paper-tooltip for="check" position="right">Select item</paper-tooltip>
                 </span>
-                <span class="name">[[script.name]]</span>
+                <span class="name"><a class="regular" href="scripts/[[script.id]]">[[script.name]]</a></span>
             </div>
             <div class="flexchild">[[script.type]]</div>
             <content></content>
@@ -93,6 +93,9 @@
                         script: this.script,
                         selected: selected
                     });
+                },
+                _scriptUrl: function(script){
+                    return "/scripts/"+script.id;
                 },
                 _viewScript: function(e) {
                     page.show('/scripts/' + this.script.id);

@@ -91,12 +91,22 @@
                 is: 'script-page-element',
 
                 properties: {
+                    params: {
+                        type: Object
+                    },
+                    model: {
+                        type: Object
+                    },
+                    sections: {
+                        type: Object
+                    },
                     script: {
                         type: Object,
-                        computed: '_computeScript(id)'
+                        computed: '_computeScript(params)'
                     },
-                    id: {
-                        type: String
+                    scriptid: {
+                        type: String,
+                        computed: '_computeScriptId(params)'
                     },
                     isInline: {
                         type: Boolean,
@@ -107,10 +117,24 @@
                     'confirmation': '_deleteScriptResponse',
                     'updateSelectedScript': '_updateScript'
                 },
-                _computeScript: function(id) {
-                    return Mist.scripts.find(function(script) {
-                        return script.id == id;
-                    }, this);
+                _computeId: function(params) {
+                    return params.id;
+                },
+                _computeScript: function(params) {
+                    // return this.model.scriptsArray.find(function(script) {
+                    //     return script.id == id;
+                    // }, this);
+                    var sa = this.model.scriptsArray;
+                    var p = params.id;
+                    var s = {};
+                    for (var i = 0; i < sa.length; i++) {
+                        if (sa[i].id == p)
+                            return s = sa[i];
+                    };                    
+                    return s;
+                },
+                _computeScriptId: function(params){
+                    return params.id;
                 },
                 _computeIsInline: function(source) {
                     return source == 'inline';
