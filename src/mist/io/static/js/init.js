@@ -38,6 +38,12 @@ var loadApp = function(
     ScriptRunController,
     ScriptsController,
     ProjectsController,
+    TeamsController,
+    TeamEditController,
+    TeamAddController,
+    OrganizationsController,
+    OrganizationAddController,
+    MemberAddController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -56,6 +62,8 @@ var loadApp = function(
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
     App.set('password', '');
+    App.set('organization', ORGANIZATION);
+    App.set('org_create', ORG_CREATE);
     App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
         .test(navigator.userAgent)
     );
@@ -83,6 +91,10 @@ var loadApp = function(
         this.route('scripts');
         this.route('script', {
             path: '/scripts/:script_id'
+        });
+        this.route('teams');
+        this.route('team', {
+            path: '/teams/:team_id'
         });
         this.route('logs');
         this.route('missing', {
@@ -128,7 +140,12 @@ var loadApp = function(
     App.set('projectsController', ProjectsController.create());
     App.set('machineRunScriptController', MachineRunScriptController.create());
     App.set('machineImageCreateController', MachineImageCreateController.create());
-
+    App.set('teamsController', TeamsController.create());
+    App.set('teamEditController', TeamEditController.create());
+    App.set('teamAddController', TeamAddController.create());
+    App.set('organizationsController', OrganizationsController.create());
+    App.set('organizationAddController', OrganizationAddController.create());
+    App.set('memberAddController', MemberAddController.create());
 
     // Ember custom widgets
     App.Select = Ember.Select.extend({
@@ -302,9 +319,9 @@ var setupLogChannel = function(socket, callback) {
     }).on('open_sessions', function(openSessions) {
         info('received open_sessions: ', openSessions);
     }).emit('ready');
-    if (! Mist.isCore) {
+    if (!Mist.isCore) {
         Mist.set('openIncidents', []);
-    }    
+    }
     Mist.set('closedIncidents', [])
 
     if (callback)
@@ -339,6 +356,32 @@ var setupMainChannel = function(socket, callback) {
             Mist.scriptsController.setModel(scripts);
         });
     }
+
+    // Fast implementation for teams modelling
+    var organization = Mist.organization, teams = [];
+    if (organization) {
+        organization.teams.forEach(function(team) {
+            team.organization = {
+                id: organization.id,
+                name: organization.name
+            };
+
+            var members = organization.members.filter(function(member) {
+                return team.members.indexOf(member.id) > -1;
+            });
+            team.members = members;
+            teams.pushObject(team);
+        });
+    }
+
+    if (organization) {
+        Mist.organizationsController.load({
+            id: organization.id,
+            name: organization.name
+        });
+    }
+
+    Mist.teamsController.setModel(teams);
 
     socket
         .on('list_keys', function(keys) {

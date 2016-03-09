@@ -21,7 +21,6 @@ define('app/controllers/networks', [
             baseModel: NetworkModel,
             passOnProperties: ['cloud'],
 
-
             //
             //  Methods
             //

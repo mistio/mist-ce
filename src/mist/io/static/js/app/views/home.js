@@ -20,14 +20,18 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 return !Mist.openIncidents && Mist.isCore;
             }),
 
-            hasIncidents: function () {
+            hasIncidents: Ember.computed('Mist.openIncidents', function () {
                 if (Mist.openIncidents)
                     return !!Mist.openIncidents.length;
-            }.property('Mist.openIncidents'),
+            }),
 
-            machineCount: function () {
+            machineCount: Ember.computed('Mist.cloudsController.machineCount', function () {
                 return Mist.cloudsController.machineCount;
-            }.property('Mist.cloudsController.machineCount'),
+            }),
+
+            hasOrganization: Ember.computed('Mist.org_create', function() {
+                return Mist.org_create;
+            }),
 
             //
             //  Initialization

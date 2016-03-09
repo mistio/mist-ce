@@ -1,0 +1,7 @@
+<td><img src="{{view.gravatarURL}}" class="member-gravatar" alt="{{member.name}}" />  {{member.name}}</td>
+<td>{{member.email}}</td>
+<td class="member-actions">
+    {{#unless view.isOwners}}
+    <a class="ui-btn ui-shadow ui-caps no" {{action "removeMemberClicked" target=view}}>Remove</a>
+    {{/unless}}
+</td>

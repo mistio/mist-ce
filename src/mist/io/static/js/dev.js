@@ -184,6 +184,13 @@ var loadFiles = function (callback) {
         'app/controllers/script_edit',
         'app/controllers/script_run',
         'app/controllers/scripts',
+        'app/controllers/projects',
+        'app/controllers/teams',
+        'app/controllers/team_edit',
+        'app/controllers/team_add',
+        'app/controllers/organizations',
+        'app/controllers/organization_add',
+        'app/controllers/member_add',
 
         'app/routes/image',
         'app/routes/images',
@@ -197,6 +204,8 @@ var loadFiles = function (callback) {
         'app/routes/networks',
         'app/routes/script',
         'app/routes/scripts',
+        'app/routes/teams',
+        'app/routes/team',
 
         'app/views/home',
         'app/views/cloud_add',
@@ -256,6 +265,14 @@ var loadFiles = function (callback) {
         'app/views/script_log_list',
         'app/views/subnet_list_item',
         'app/views/user_menu',
+        'app/views/team_list',
+        'app/views/team_list_item',
+        'app/views/team',
+        'app/views/team_edit',
+        'app/views/team_add',
+        'app/views/member_item',
+        'app/views/member_add',
+        'app/views/organization_add',
 
         'app/helpers/forIn'
     ], callback);

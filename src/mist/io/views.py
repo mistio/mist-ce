@@ -74,14 +74,103 @@ def exception_handler_mist(exc, request):
              renderer='templates/404.pt')
 def not_found(self, request):
 
-    return pyramid.httpexceptions.HTTPFound(request.host_url+"/#"+request.path)
-
+    return pyramid.httpexceptions.HTTPFound(request.host_url + "/#" + request.path)
 
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
 def home(request):
     """Home page view"""
     user = user_from_request(request)
+    organization = {
+        'id': 1,
+        'name': 'my_organization',
+        'members': [{
+            'id': 1,
+            'name': 'Marios Fakiolas',
+            'email': 'marios@mist.io'
+        }, {
+            'id': 2,
+            'name': 'Xristina Papakonstantinou',
+            'email': 'xristina@mist.io'
+        }, {
+            'id': 3,
+            'name': 'Pablo Tziano',
+            'email': 'pablo@mist.io'
+        }, {
+            'id': 4,
+            'name': 'Dimitris Rozakis',
+            'email': 'dr@mist.io'
+        }],
+        'teams': [{
+            'id': 1,
+            'name': 'Owners',
+            'description': '',
+            'members': [1],
+            'policy': {
+                'operator': 'ALLOW',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': 'abc',
+                    'rtype': 'machine',
+                    'rid': '',
+                    'rtags': ''
+                }, {
+                    'operator': 'ALLOW',
+                    'action': 'abc',
+                    'rtype': 'script',
+                    'rid': '',
+                    'rtags': ''
+                }]
+            }
+        }, {
+            'id': 2,
+            'name': 'Frontend Team',
+            'description': '',
+            'members': [1, 2],
+            'policy': {
+                'operator': 'ALLOW',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': '',
+                    'rtype': '',
+                    'rid': '',
+                    'rtags': ''
+                }]
+            }
+        }, {
+            'id': 3,
+            'name': 'QA Team',
+            'description': '',
+            'members': [3],
+            'policy': {
+                'operator': 'ALLOW',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': '',
+                    'rtype': '',
+                    'rid': '',
+                    'rtags': ''
+                }]
+            }
+        }, {
+            'id': 4,
+            'name': 'Backend Team',
+            'description': '',
+            'members': [4],
+            'policy': {
+                'operator': 'ALLOW',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': '',
+                    'rtype': '',
+                    'rid': '',
+                    'rtags': ''
+                }]
+            }
+        }]
+    }
+    # organization = None
+
     return {
         'project': 'mist.io',
         'email': json.dumps(user.email),
@@ -97,7 +186,9 @@ def home(request):
         'is_core': json.dumps(False),
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
-        'last_build': config.LAST_BUILD
+        'last_build': config.LAST_BUILD,
+        'org_create': json.dumps(True),
+        'organization': json.dumps(organization)
     }
 
 
@@ -941,7 +1032,8 @@ def create_machine(request):
         script_id = request.json_body.get('script_id', '')
         script_params = params_from_request(request).get('script_params', '')
         post_script_id = request.json_body.get('post_script_id', '')
-        post_script_params = params_from_request(request).get('post_script_params', '')
+        post_script_params = params_from_request(
+            request).get('post_script_params', '')
         async = request.json_body.get('async', False)
         quantity = request.json_body.get('quantity', 1)
         persist = request.json_body.get('persist', False)
@@ -954,8 +1046,10 @@ def create_machine(request):
         hostname = request.json_body.get('hostname', '')
         plugins = request.json_body.get('plugins')
         cloud_init = request.json_body.get('cloud_init', '')
-        associate_floating_ip = request.json_body.get('associate_floating_ip', False)
-        associate_floating_ip_subnet = request.json_body.get('attach_floating_ip_subnet', None)
+        associate_floating_ip = request.json_body.get(
+            'associate_floating_ip', False)
+        associate_floating_ip_subnet = request.json_body.get(
+            'attach_floating_ip_subnet', None)
         project_id = request.json_body.get('project', None)
     except Exception as e:
         raise RequiredParameterMissingError(e)
