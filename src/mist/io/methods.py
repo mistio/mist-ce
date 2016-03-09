@@ -2877,6 +2877,7 @@ def list_sizes(user, cloud_id):
                     'driver': size.driver.name,
                     'name': size.name,
                     'price': size.price,
+                    'extra': size.extra,
                     'ram': size.ram})
     if conn.type == 'libvirt':
         # close connection with libvirt

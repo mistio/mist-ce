@@ -65,9 +65,9 @@ STATES = {
     NodeState.ERROR: 'error',
     NodeState.PAUSED: 'paused',
     NodeState.SUSPENDED: 'suspended',
-    NodeState.STARTING = 'starting',
-    NodeState.STOPPING = 'stopping',
-    NodeState.RECONFIGURING = 'reconfiguring'
+    NodeState.STARTING: 'starting',
+    NodeState.STOPPING: 'stopping',
+    NodeState.RECONFIGURING: 'reconfiguring'
 }
 
 
@@ -75,7 +75,8 @@ STATES = {
 # All EC2 providers, useful for type checking
 EC2_PROVIDERS = (
     Provider.EC2_US_EAST,
-    Provider.EC2_AP_NORTHEAST,
+    Provider.EC2_AP_NORTHEAST1,
+    Provider.EC2_AP_NORTHEAST2,
     Provider.EC2_EU_WEST,
     Provider.EC2_EU_CENTRAL,
     Provider.EC2_US_WEST,
@@ -131,6 +132,10 @@ SUPPORTED_PROVIDERS_V_2 = [
             {
                 'location': 'Tokyo',
                 'id': Provider.EC2_AP_NORTHEAST
+            },
+            {
+                'location': 'Seoul',
+                'id': Provider.EC2_AP_NORTHEAST2
             },
             {
                 'location': 'Singapore',
