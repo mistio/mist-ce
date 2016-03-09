@@ -190,6 +190,7 @@ var loadFiles = function (callback) {
         'app/controllers/team_add',
         'app/controllers/organizations',
         'app/controllers/organization_add',
+        'app/controllers/member_add',
 
         'app/routes/image',
         'app/routes/images',
@@ -270,6 +271,7 @@ var loadFiles = function (callback) {
         'app/views/team_edit',
         'app/views/team_add',
         'app/views/member_list_item',
+        'app/views/member_add',
         'app/views/organization_add',
 
         'app/helpers/forIn'

@@ -43,6 +43,7 @@ var loadApp = function(
     TeamAddController,
     OrganizationsController,
     OrganizationAddController,
+    MemberAddController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -144,6 +145,7 @@ var loadApp = function(
     App.set('teamAddController', TeamAddController.create());
     App.set('organizationsController', OrganizationsController.create());
     App.set('organizationAddController', OrganizationAddController.create());
+    App.set('memberAddController', MemberAddController.create());
 
     // Ember custom widgets
     App.Select = Ember.Select.extend({
