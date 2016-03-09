@@ -16,7 +16,9 @@ define('app/routes/script', ['app/routes/base'],
                     var model = this.modelFor('script');
                     var id = model._id || model.id;
                     var script = Mist.scriptsController.getObject(id);
-                    Mist.logsController.view.set('filterString', id);
+                    if (Mist.logsController.model.length) {
+                        Mist.logsController.view.set('filterString', id);
+                    }
                     this.set('documentTitle', 'mist.io - ' + (script ? script.name : id));
                 });
                 Ember.run.later(function(){

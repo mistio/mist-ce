@@ -73,13 +73,13 @@
            </table>
        </div>
 
-       <div class="ui-shadow" data-role="collapsible" data-collapsed="false">
+       {{#if Mist.logsController.model.length}}
+           <div class="ui-shadow" data-role="collapsible" data-collapsed="false">
+               <h4>Logs</h4>
 
-           <h4>Logs</h4>
-
-           {{component "script-log-list"}}
-
-       </div>
+               {{component "script-log-list"}}
+           </div>
+       {{/if}}
 
         <div class="large-padding"></div>
 

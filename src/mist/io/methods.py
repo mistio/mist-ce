@@ -244,12 +244,12 @@ def add_cloud_v_2(user, title, provider, params):
 
     if provider == 'bare_metal':
         cloud_id, mon_dict = _add_cloud_bare_metal(user, title, provider, params)
-        log.info("Cloud with id '%s' added succesfully.", cloud_id)
+        log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user.email, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'coreos':
         cloud_id, mon_dict = _add_cloud_coreos(user, title, provider, params)
-        log.info("Cloud with id '%s' added succesfully.", cloud_id)
+        log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user.email, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'ec2':
@@ -1413,9 +1413,9 @@ def list_machines(user, cloud_id):
 
     if cloud_id not in user.clouds:
         raise CloudNotFoundError(cloud_id)
-    conn = connect_provider(user.clouds[cloud_id])
 
     try:
+        conn = connect_provider(user.clouds[cloud_id])
         machines = conn.list_nodes()
     except InvalidCredsError:
         raise CloudUnauthorizedError()
@@ -1542,7 +1542,7 @@ def list_machines(user, cloud_id):
         conn.disconnect()
     return ret
 
-
+# command is not an arg into function, but in post deploy steps there is?
 def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
@@ -1552,7 +1552,10 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    azure_port_bindings='', hostname='', plugins=None,
                    disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
-                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
+                   associate_floating_ip=False,
+                   associate_floating_ip_subnet=None, project_id=None,
+                   cronjob={}, command=None
+                   ):
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1575,6 +1578,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     """
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
+
 
     if cloud_id not in user.clouds:
         raise CloudNotFoundError(cloud_id)
@@ -1702,28 +1706,29 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
 
+    # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
-        # when this is ok, it calss post_deploy for script/monitoring
+        # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
             user.email, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
             networks = list_networks(user, cloud_id)
             mist.io.tasks.openstack_post_create_steps.delay(
                 user.email, cloud_id, node.id, monitoring, script, key_id,
-                node.extra.get('username'), node.extra.get('password'), public_key,
-                script_id=script_id, script_params=script_params, job_id = job_id,
-                hostname=hostname, plugins=plugins,
+                node.extra.get('username'), node.extra.get('password'),
+                public_key, script_id=script_id, script_params=script_params,
+                job_id = job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
                 post_script_params=post_script_params,
-                networks=networks
+                networks=networks, cronjob=cronjob,
             )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1732,28 +1737,28 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
             user.email, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params,
-        )
-    elif key_id:
-        mist.io.tasks.post_deploy_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
             script_id=script_id, script_params=script_params,
+            job_id = job_id, hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params, cronjob=cronjob
+        )
+
+    elif key_id:   # there is a problem here with command and script
+        mist.io.tasks.post_deploy_steps.delay(
+            user.email, cloud_id, node.id, monitoring, script=script,
+            key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
 
-
     ret = {'id': node.id,
-            'name': node.name,
-            'extra': node.extra,
-            'public_ips': node.public_ips,
-            'private_ips': node.private_ips,
-            'job_id': job_id,
-            }
+           'name': node.name,
+           'extra': node.extra,
+           'public_ips': node.public_ips,
+           'private_ips': node.private_ips,
+           'job_id': job_id,
+           }
 
     return ret
 
@@ -2430,12 +2435,20 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
     bare_metal = False
     if user.clouds[cloud_id].provider == 'bare_metal':
         bare_metal = True
-    conn = connect_provider(user.clouds[cloud_id])
-    #GCE needs machine.extra as well, so we need the real machine object
+
+    try:
+        conn = connect_provider(user.clouds[cloud_id])
+    except InvalidCredsError:
+        raise CloudUnauthorizedError()
+    except Exception as exc:
+        log.error("Error while connecting to cloud")
+        raise CloudUnavailableError(exc=exc)
+
+    # GCE needs machine.extra as well, so we need the real machine object
     machine = None
     try:
         if conn.type == 'azure':
-            #Azure needs the cloud service specified as well as the node
+            # Azure needs the cloud service specified as well as the node
             cloud_service = conn.get_cloud_service_from_node_id(machine_id)
             nodes = conn.list_nodes(ex_cloud_service_name=cloud_service)
             for node in nodes:
@@ -2448,7 +2461,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     machine = node
                     break
         if machine is None:
-            #did not find the machine_id on the list of nodes, still do not fail
+            # did not find the machine_id on the list of nodes, still do not fail
             raise MachineUnavailableError("Error while attempting to %s machine"
                                   % action)
     except:
@@ -4193,30 +4206,22 @@ def undeploy_collectd(user, cloud_id, machine_id):
     return ret_dict
 
 
-def get_deploy_collectd_command_unix(uuid, password, monitor):
+def get_deploy_collectd_command_unix(uuid, password, monitor, port=25826):
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
-    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) " \
-          "python mist_collectd.py %s %s" % (url, uuid, password)
+    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
+    if str(port) != '25826':
+        cmd += " -p %s" % port
     return cmd
 
 
-def get_deploy_collectd_command_windows(uuid, password, monitor):
-    return 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned ' \
-           '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
-           'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
-           'deploy_collectm/master/collectm.remote.install.ps1\',' \
-           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
-           '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
-           '-servers @("%s:25826")\''  % (uuid, password, monitor)
+def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
+     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:%s"""""") -interval 10'"''' % (uuid, password, monitor, port)
 
 
-def get_deploy_collectd_command_coreos(uuid, password, monitor):
-    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup " \
-           "-e COLLECTD_USERNAME=%s " \
-           "-e COLLECTD_PASSWORD=%s " \
-           "-e MONITOR_SERVER=%s mist/collectd" % (uuid, password, monitor)
+def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
+    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (uuid, password, monitor, port)
 
 
 def machine_name_validator(provider, name):
