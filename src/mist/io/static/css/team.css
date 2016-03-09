@@ -35,3 +35,62 @@
         margin-top: -20px;
     }
 }
+#single-team-page .ui-collapsible .ui-collapsible-content {
+    background-color: #faf9f4;
+    padding: 0 !important;
+}
+#single-team-page .ui-collapsible .ui-collapsible-content .ui-listview {
+    margin: 0;
+}
+#single-team-page .info-table {
+    width: 100%;
+}
+#single-team-page .info-table td {
+    margin: 0;
+    width: 50%;
+    font-size: 14px;
+    padding: 10px 12px;
+}
+#single-team-page .info-table tr:last-child td {
+    border-bottom: none;
+}
+#single-team-page .info-table tr td:nth-child(1) {
+    padding-left: 70px;
+}
+@media only screen and  (max-width: 500px) {
+    #single-team-page .info-table tr td:nth-child(1) {
+        padding-left: 30px;
+    }
+}
+#single-team-page .info-table tr td:nth-child(2) {
+    color: #7f7f7f;
+}
+#single-team-page .info-table tr {
+    background-color: #faf9f4;
+    border: none;
+}
+#single-team-page .info-table .member-item {
+    border-bottom: 1px solid #eeedeb;
+}
+#single-team-page .info-table .member-item:hover {
+    background-color: #f2f2f2;
+}
+#single-team-page .info-table td.member-actions {
+    padding: 0 12px;
+}
+#single-team-page .info-table .ui-btn.no {
+    display: inline-block;
+    margin: 0;
+    padding: 3px 5px;
+    position: relative;
+    top: 2px;
+}
+#single-team-page .info-table .member-header {
+    background-color: #E4E4E4;
+    border-bottom: 1px solid #E4E4E4;
+    color: #444;
+}
+#single-team-page #member-add {
+    display: inline-block;
+    margin: 20px auto;
+}

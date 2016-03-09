@@ -101,41 +101,48 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
 
             deleteTeam: function(args) {
                 var that = this;
+                that._deleteObject(args.team);
                 that.set('deletingTeam', true);
-                Mist.ajax
-                    .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id, {})
-                    .success(function() {
-                        that._deleteObject(args.team);
-                    })
-                    .error(function(message) {
-                        Mist.notificationController.notify(message);
-                    })
-                    .complete(function(success) {
-                        that.set('deletingTeam', false);
-                        if (args.callback)
-                            args.callback(success);
-                    });
+                // Mist.ajax
+                //     .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id, {})
+                //     .success(function() {
+                //         that._deleteObject(args.team);
+                //     })
+                //     .error(function(message) {
+                //         Mist.notificationController.notify(message);
+                //     })
+                //     .complete(function(success) {
+                //         that.set('deletingTeam', false);
+                //         if (args.callback)
+                //             args.callback(success);
+                //     });
             },
 
             renameTeam: function(args) {
                 var that = this;
+                that._renameTeam(args.team, args.newName, args.newDescription);
                 that.set('renamingTeam', true);
-                Mist.ajax
-                    .PUT('/org/' + args.team.organization.id + '/teams/' + args.team.id, {
-                        new_name: args.newName,
-                        new_description: args.newDescription
-                    })
-                    .success(function() {
-                        that._renameTeam(args.team, args.newName, args.newDescription);
-                    })
-                    .error(function(message) {
-                        Mist.notificationController.notify(message);
-                    })
-                    .complete(function(success) {
-                        that.set('renamingTeam', false);
-                        if (args.callback)
-                            args.callback(success);
-                    });
+                // Mist.ajax
+                //     .PUT('/org/' + args.team.organization.id + '/teams/' + args.team.id, {
+                //         new_name: args.newName,
+                //         new_description: args.newDescription
+                //     })
+                //     .success(function() {
+                //         that._renameTeam(args.team, args.newName, args.newDescription);
+                //     })
+                //     .error(function(message) {
+                //         Mist.notificationController.notify(message);
+                //     })
+                //     .complete(function(success) {
+                //         that.set('renamingTeam', false);
+                //         if (args.callback)
+                //             args.callback(success);
+                //     });
+            },
+
+            removeMember: function(args) {
+                var that = this;
+                console.log(args);
             },
 
             getTeam: function(teamId) {
@@ -144,7 +151,6 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             },
 
             getRequestedTeam: function() {
-                console.log(this.teamRequest);
                 if (this.teamRequest) {
                     return this.getObject(this.teamRequest);
                 }

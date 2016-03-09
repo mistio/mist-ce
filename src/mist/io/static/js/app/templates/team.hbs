@@ -7,7 +7,7 @@
                 <div class="ui-grid-b">
                     <div class="ui-block-a">
                         {{#link-to 'teams' class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
-                        ui-btn-icon-left ui-corner-all nav-back"}}<span>Teams</span>{{/link-to}}
+                        ui-btn-icon-left ui-corner-all nav-back" }}<span>Teams</span>{{/link-to}}
                     </div>
 
                     <div class="ui-block-b">
@@ -19,43 +19,56 @@
                             {{component "user-menu"}}
                         </div>
                     </div>
-                </div><!-- /grid-b -->
+                </div>
+                <!-- /grid-b -->
             </div>
         </div>
     </div>
 
     <div role="main" class="ui-content" data-theme="c">
-        <div id="member-list-container" class="ui-shadow">
-            <div class="ui-grid-a members-header">
-                <div class="ui-block-a">
-                    {{#if view.team.members.length}}
-                        <a id="select-members-btn" class="responsive-button ui-btn ui-btn-add ui-btn-d icon-down
-                                ui-btn-icon-right" {{action "selectClicked" target=view}}></a>
-                    {{/if}}
-                </div>
-                <div class="ui-block-b">
-
-                </div>
-            </div><!-- /grid-b -->
+        <div id="member-list-container" class="ui-shadow" data-role="collapsible" data-collapsed="false">
+            <h4>Members</h4>
 
             {{#if view.team.members.length}}
-                <div class="member-search-container">
-                    {{#if Mist.teamsController.searchTerm}}
-                        <span {{action "clearClicked" target=view}} class="icon-xx"></span>
-                    {{else}}
-                        <span class="icon-search"></span>
-                    {{/if}}
-                    {{input value=Mist.teamsController.searchTerm placeholder="Filter members" class="team-search"}}
-                </div>
-
-                <ul id="member-list" data-role="listview"
-                    data-inset="true"
-                    class="checkbox-list">
+            <table class="info-table">
+                <tbody>
+                    <tr class="member-header">
+                        <td>Name</td>
+                        <td>Email</td>
+                        <td class="member-actions"></td>
+                    </tr>
                     {{#each view.team.members as |member|}}
-                        {{component "member-list-item" member=member class="checkbox-link"}}
+                        <tr class="member-item">
+                            <td>{{member.name}}</td>
+                            <td>{{member.email}}</td>
+                            <td class="member-actions">
+                                {{#unless view.isOwners}}
+                                <a class="ui-btn ui-shadow ui-caps no" {{action "removeMemberClicked" member target=view}}>Remove</a>
+                                {{/unless}}
+                            </td>
+                        </tr>
                     {{/each}}
-                </ul>
+                </tbody>
+            </table>
             {{/if}}
+
+            <div class="text-center">
+                <a href="#" id="member-add" class="ui-btn ui-shadow ui-caps ui-btn-d">Add Member</a>
+            </div>
+        </div>
+
+        <div id="policy-list-container" class="ui-shadow" data-role="collapsible" data-collapsed="false">
+            <h4>Policy</h4>
+
+            <table class="info-table">
+                <tbody>
+                    {{#each view.team.policy.rules as |rule|}}
+                    <tr>
+                        <td>{{rule.operator}} {{rule.action}} ON {{rule.rtype}} WHEN {{rule.rid}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
         </div>
 
         <div class="mid-padding"></div>
@@ -63,17 +76,19 @@
 
     {{component "dialog-popup"}}
 
+    {{component "team-edit"}}
+
+    {{#unless view.isOwners}}
     <div class="dual-action-footer" data-role="footer" data-theme="b">
         <div class="ui-grid-a">
             <div class="ui-block-a">
-                <a class="ui-btn ui-btn-icon-right ui-caps icon-edit"
-                    {{action "renameClicked" target=view}}>Rename</a>
+                <a class="ui-btn ui-btn-icon-right ui-caps icon-edit" {{action "renameClicked" target=view}}>Rename</a>
             </div>
             <div class="ui-block-b">
-                <a class="ui-btn ui-btn-icon-right ui-caps icon-xx"
-                    {{action "deleteClicked" target=view}}>Delete</a>
+                <a class="ui-btn ui-btn-icon-right ui-caps icon-xx" {{action "deleteClicked" target=view}}>Delete</a>
             </div>
         </div>
     </div>
+    {{/unless}}
 
 </div>

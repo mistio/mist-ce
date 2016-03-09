@@ -106,8 +106,14 @@ def home(request):
                 'operator': 'ALLOW',
                 'rules': [{
                     'operator': 'DENY',
-                    'action': '',
-                    'rtype': '',
+                    'action': 'abc',
+                    'rtype': 'machine',
+                    'rid': '',
+                    'rtags': ''
+                }, {
+                    'operator': 'ALLOW',
+                    'action': 'abc',
+                    'rtype': 'script',
                     'rid': '',
                     'rtags': ''
                 }]
