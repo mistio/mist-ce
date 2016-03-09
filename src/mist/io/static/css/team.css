@@ -90,7 +90,8 @@
     border-bottom: 1px solid #E4E4E4;
     color: #444;
 }
-#single-team-page #member-invite {
+#single-team-page #member-invite,
+#single-team-page #rule-add {
     display: inline-block;
     margin: 20px auto;
 }

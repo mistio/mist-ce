@@ -67,6 +67,10 @@ define('app/views/team', ['app/views/page'],
                     Mist.memberAddController.open();
                 },
 
+                saveRulesClicked: function() {
+                    
+                },
+
                 renameClicked: function() {
                     var team = this.team;
                     Mist.teamEditController.open(team, function(success) {

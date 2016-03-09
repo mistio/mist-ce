@@ -145,6 +145,10 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 console.log(args);
             },
 
+            inviteMember: function(member) {
+                console.log(member);
+            },
+
             getTeam: function(teamId) {
                 console.log(teamId, this.get('model'), Mist.teamsController.model, this.model.findBy('id', teamId));
                 return this.model.findBy('id', teamId);
