@@ -10,31 +10,22 @@ define('app/controllers/member_add', ['ember'],
 
         return Ember.Object.extend({
 
+            //
+            // Properties
+            //
+
             newMember: Ember.Object.create({
                 email: ''
             }),
             formReady: false,
 
+            //
+            // Methods
+            //
 
             open: function() {
                 this.clear();
                 this.view.open();
-            },
-
-
-            add: function() {
-                var that = this;
-                Mist.membersController.addMember({
-                    member: that.get('newMember'),
-                    callback: function(success) {
-                        if (success) {
-                            that.close();
-                            Ember.run.next(function() {
-                                $('body').enhanceWithin();
-                            })
-                        }
-                    }
-                })
             },
 
             close: function() {
@@ -46,6 +37,10 @@ define('app/controllers/member_add', ['ember'],
                 this.get('newMember').set('email', '');
                 this.set('formReady', false);
             },
+
+            //
+            // Private Methods
+            //
 
             _updateFormReady: function() {
                 this.set('formReady', !!this.get('newMember.email'));

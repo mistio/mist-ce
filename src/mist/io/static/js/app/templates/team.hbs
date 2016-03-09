@@ -53,7 +53,7 @@
             {{/if}}
 
             <div class="text-center">
-                <a id="member-add" class="ui-btn ui-shadow ui-caps ui-btn-d" {{action "inviteMemberClicked" target=view}}>Invite Member</a>
+                <a id="member-invite" class="ui-btn ui-shadow ui-caps ui-btn-d" {{action "inviteMemberClicked" target=view}}>Invite Member</a>
             </div>
         </div>
 
@@ -77,6 +77,8 @@
     {{component "dialog-popup"}}
 
     {{component "team-edit"}}
+
+    {{component "member-add"}}
 
     {{#unless view.isOwners}}
     <div class="dual-action-footer" data-role="footer" data-theme="b">

@@ -14,7 +14,7 @@
         <div data-role="content" data-theme="a">
             <form {{action "addClicked" on="submit" target=view}}>
                 <div class="form-field required {{if Mist.memberAddController.newMember.name 'filled' 'empty'}}">
-                    <label for="member-name">Name</label>
+                    <label for="member-name">Email</label>
                     {{input value=Mist.memberAddController.newMember.email id="member-email"}}
                 </div>
 
