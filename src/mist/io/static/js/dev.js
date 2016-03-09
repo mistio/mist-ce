@@ -270,7 +270,7 @@ var loadFiles = function (callback) {
         'app/views/team',
         'app/views/team_edit',
         'app/views/team_add',
-        'app/views/member_list_item',
+        'app/views/member_item',
         'app/views/member_add',
         'app/views/organization_add',
 

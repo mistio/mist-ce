@@ -38,16 +38,14 @@ define('app/controllers/member_add', ['ember'],
                 this.set('formReady', false);
             },
 
-            add: function() {
+            add: function(team) {
                 var that = this;
                 Mist.teamsController.inviteMember({
                     member: that.get('newMember'),
+                    team: team,
                     callback: function(success) {
                         if (success) {
                             that.close();
-                            Ember.run.next(function() {
-                                $('body').enhanceWithin();
-                            })
                         }
                     }
                 })

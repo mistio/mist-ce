@@ -17,6 +17,7 @@ define('app/views/member_add', ['app/views/popup'],
             layoutName: 'member_add',
             controllerName: 'memberAddController',
             popupId: '#member-add',
+            team: null,
 
             //
             //  Computed Properties
@@ -36,7 +37,7 @@ define('app/views/member_add', ['app/views/popup'],
                 },
 
                 addClicked: function() {
-                    Mist.memberAddController.add();
+                    Mist.memberAddController.add(this.get('team'));
                 }
             }
         });

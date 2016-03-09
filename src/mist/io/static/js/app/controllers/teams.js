@@ -70,83 +70,101 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             //
 
             addTeam: function(args) {
-                var team = Ember.Object.create({
-                    id: -1,
-                    name: args.team.name,
-                    description: args.team.description,
-                    organization: args.team.organization,
-                    members: [],
-                    policy: {}
-                });
-                this._addTeam(team);
-                // var that = this;
-                // that.set('addingTeam', true);
-                // Mist.ajax
-                //     .POST('/org/' + args.team.organization.id + '/teams', {
-                //         'name': args.team.name,
-                //         'description': args.team.description
-                //     })
-                //     .success(function(team) {
-                //         that._addTeam(team);
-                //     })
-                //     .error(function(message) {
-                //         Mist.notificationController.notify(message);
-                //     })
-                //     .complete(function(success) {
-                //         that.set('addingTeam', false);
-                //         if (args.callback)
-                //             args.callback(success);
-                //     });
+                var that = this;
+                that.set('addingTeam', true);
+                Mist.ajax
+                    .POST('/org/' + args.team.organization.id + '/teams', {
+                        'name': args.team.name,
+                        'description': args.team.description
+                    })
+                    .success(function(newTeam) {
+                        that._addTeam(team, newTeam);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('addingTeam', false);
+                        if (args.callback)
+                            args.callback(success);
+                    });
             },
 
             deleteTeam: function(args) {
                 var that = this;
-                that._deleteObject(args.team);
                 that.set('deletingTeam', true);
-                // Mist.ajax
-                //     .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id, {})
-                //     .success(function() {
-                //         that._deleteObject(args.team);
-                //     })
-                //     .error(function(message) {
-                //         Mist.notificationController.notify(message);
-                //     })
-                //     .complete(function(success) {
-                //         that.set('deletingTeam', false);
-                //         if (args.callback)
-                //             args.callback(success);
-                //     });
+                Mist.ajax
+                    .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id, {})
+                    .success(function() {
+                        that._deleteObject(args.team);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('deletingTeam', false);
+                        if (args.callback)
+                            args.callback(success);
+                    });
             },
 
             renameTeam: function(args) {
                 var that = this;
-                that._renameTeam(args.team, args.newName, args.newDescription);
                 that.set('renamingTeam', true);
-                // Mist.ajax
-                //     .PUT('/org/' + args.team.organization.id + '/teams/' + args.team.id, {
-                //         new_name: args.newName,
-                //         new_description: args.newDescription
-                //     })
-                //     .success(function() {
-                //         that._renameTeam(args.team, args.newName, args.newDescription);
-                //     })
-                //     .error(function(message) {
-                //         Mist.notificationController.notify(message);
-                //     })
-                //     .complete(function(success) {
-                //         that.set('renamingTeam', false);
-                //         if (args.callback)
-                //             args.callback(success);
-                //     });
+                Mist.ajax
+                    .PUT('/org/' + args.team.organization.id + '/teams/' + args.team.id, {
+                        new_name: args.newName,
+                        new_description: args.newDescription
+                    })
+                    .success(function() {
+                        that._renameTeam(args.team, args.newName, args.newDescription);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('renamingTeam', false);
+                        if (args.callback)
+                            args.callback(success);
+                    });
             },
 
             removeMember: function(args) {
                 var that = this;
-                console.log(args);
+                that.set('deletingMember', true);
+                Mist.ajax
+                    .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members/' + args.member.id, {})
+                    .success(function() {
+                        that._deleteMember(args.team, args.member);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('deletingMember', false);
+                        if (args.callback)
+                            args.callback(success);
+                    });
             },
 
-            inviteMember: function(member) {
-                console.log(member);
+            inviteMember: function(args) {
+                var that = this;
+                that.set('invitingMember', true);
+                Mist.ajax
+                    .POST('/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members', {
+                        'email': args.member.email
+                    })
+                    .success(function() {
+                        Mist.notificationController.notify('An invitation was sent to user with email: ' + args.member.email);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('invitingMember', false);
+                        if (args.callback)
+                            args.callback(success);
+                    });
             },
 
             getTeam: function(teamId) {
@@ -168,7 +186,15 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             // Private Methods
             //
 
-            _addTeam: function(team) {
+            _addTeam: function(team, newTeam) {
+                var team = Ember.Object.create({
+                    id: newTeam.id,
+                    name: team.name,
+                    description: team.description,
+                    organization: team.organization,
+                    members: [],
+                    policy: {}
+                });
                 Ember.run(this, function() {
                     this.model.pushObject(team);
                     this.trigger('onAdd', {
@@ -183,6 +209,12 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     if (description) {
                         team.set('description', description);
                     }
+                });
+            },
+
+            _deleteMember: function(team, member) {
+                Ember.run(this, function() {
+                    team.members.removeObject(member);
                 });
             }
         });

@@ -13,7 +13,7 @@
         </div>
         <div data-role="content" data-theme="a">
             <form {{action "addClicked" on="submit" target=view}}>
-                <div class="form-field required {{if Mist.memberAddController.newMember.name 'filled' 'empty'}}">
+                <div class="form-field required {{if Mist.memberAddController.newMember.email 'filled' 'empty'}}">
                     <label for="member-name">Email</label>
                     {{input value=Mist.memberAddController.newMember.email id="member-email"}}
                 </div>

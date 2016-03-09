@@ -68,7 +68,7 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 saveRulesClicked: function() {
-                    
+
                 },
 
                 renameClicked: function() {
@@ -99,28 +99,6 @@ define('app/views/team', ['app/views/page'],
                                         console.log(123);
                                         Mist.__container__.lookup('router:main').transitionTo('teams');
                                 });
-                            }
-                        }
-                    });
-                },
-
-                removeMemberClicked: function(member) {
-                    var teamId = this.get('team').id;
-
-                    Mist.dialogController.open({
-                        type: DIALOG_TYPES.YES_NO,
-                        head: 'Delete member',
-                        body: [{
-                            paragraph: 'Are you sure you want to remove member "' +
-                                member.name + '" ?'
-                        }],
-                        callback: function(didConfirm) {
-                            if (didConfirm) {
-                                var args = {
-                                    member: member,
-                                    teamId: teamId
-                                };
-                                Mist.teamsController.removeMember(args);
                             }
                         }
                     });

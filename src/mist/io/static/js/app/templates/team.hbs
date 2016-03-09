@@ -38,15 +38,7 @@
                         <td class="member-actions"></td>
                     </tr>
                     {{#each view.team.members as |member|}}
-                        <tr class="member-item">
-                            <td>{{member.name}}</td>
-                            <td>{{member.email}}</td>
-                            <td class="member-actions">
-                                {{#unless view.isOwners}}
-                                <a class="ui-btn ui-shadow ui-caps no" {{action "removeMemberClicked" member target=view}}>Remove</a>
-                                {{/unless}}
-                            </td>
-                        </tr>
+                        {{component "member-item" member=member team=view.team}}
                     {{/each}}
                 </tbody>
             </table>
@@ -82,7 +74,7 @@
 
     {{component "team-edit"}}
 
-    {{component "member-add"}}
+    {{component "member-add" team=view.team}}
 
     {{#unless view.isOwners}}
     <div class="dual-action-footer" data-role="footer" data-theme="b">

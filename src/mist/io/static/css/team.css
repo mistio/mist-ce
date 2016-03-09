@@ -95,3 +95,11 @@
     display: inline-block;
     margin: 20px auto;
 }
+#single-team-page .member-gravatar {
+    display: block;
+    float: left;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+}
