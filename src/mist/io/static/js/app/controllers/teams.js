@@ -73,12 +73,12 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var that = this;
                 that.set('addingTeam', true);
                 Mist.ajax
-                    .POST('/org/' + args.team.organization.id + '/teams', {
+                    .POST('/org/' + ORGANIZATION.id + '/teams', {
                         'name': args.team.name,
                         'description': args.team.description
                     })
                     .success(function(newTeam) {
-                        that._addTeam(team, newTeam);
+                        that._addTeam(args.team, newTeam);
                     })
                     .error(function(message) {
                         Mist.notificationController.notify(message);
