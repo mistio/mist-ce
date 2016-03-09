@@ -733,7 +733,7 @@ def get_public_key(request):
     keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
     if not auth_context.has_perm('key', 'read', keypair.id, keypair_tags):
         raise UnauthorizedError()
-    return Keypair.objects.get(owner=user, id=key_id).public
+    return Keypair.objects.get(owner=auth_context.owner, id=key_id).public
 
 
 @view_config(route_name='api_v1_keys', request_method='POST', renderer='json')
@@ -813,7 +813,7 @@ def associate_key(request):
                                  machine_tags):
         raise UnauthorizedError()
 
-    methods.associate_key(user, key_id, cloud_id, machine_id, host,
+    methods.associate_key(auth_context.owner, key_id, cloud_id, machine_id, host,
                           username=ssh_user, port=ssh_port)
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
@@ -870,7 +870,7 @@ def disassociate_key(request):
                                  machine_tags):
         raise UnauthorizedError()
 
-    methods.disassociate_key(user, key_id, cloud_id, machine_id, host)
+    methods.disassociate_key(auth_context.owner, key_id, cloud_id, machine_id, host)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
@@ -1195,7 +1195,20 @@ def machine_rdp(request):
     """
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
-    user = user_from_request(request)
+    auth_context = auth_context_from_request(request)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+    if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
+        raise UnauthorizedError()
+    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+                                                      cloud_id, machine_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    if not auth_context.has_perm("machine", "read", machine_uuid,
+                                 machine_tags):
+            raise UnauthorizedError()
     rdp_port = request.params.get('rdp_port', 3389)
     host = request.params.get('host')
 
