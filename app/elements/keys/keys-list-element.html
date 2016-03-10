@@ -87,6 +87,10 @@
         paper-icon-button.active-sort::content iron-icon {
             color: #009688;
         }
+
+        iron-icon#KeyDefault {
+            padding: 8px;
+        }
         
         app-bar .menu-icon {
             margin-right: 15px;
@@ -224,11 +228,11 @@
                             <span hidden$="[[showSearchOption]]" class="label">Search keys</span>
                         </div>
                     
-                        <paper-tooltip for="makeDefaultKeyBtn" position="top">Make Default</paper-tooltip>
+                        <paper-tooltip for="makeDefaultKeyBtn" position="bottom">Make Default</paper-tooltip>
                         <paper-icon-button id="makeDefaultKeyBtn" hidden$="[[!showMakeDefaultOption]]" on-tap="_starSelected" icon="[[makeDefaultIcon]]"></paper-icon-button>
-                        <paper-tooltip for="editKeyBtn" position="top">Rename</paper-tooltip>
+                        <paper-tooltip for="editKeyBtn" position="bottom">Rename</paper-tooltip>
                         <paper-icon-button id="editKeyBtn" hidden$="[[!showEditOption]]" on-tap="_editSelected" icon="image:edit"></paper-icon-button>
-                        <paper-tooltip for="deleteKeyBtn" position="top">Delete All Selected
+                        <paper-tooltip for="deleteKeyBtn" position="bottom">Delete Selected
                         </paper-tooltip>
                         <paper-icon-button id="deleteKeyBtn" hidden$="[[!showDeleteOption]]" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
                         <span hidden$="[[!showDeleteOption]]" class="label">
@@ -257,8 +261,12 @@
                                 <div class="row">
                                     <key-item-element selected="{{selected}}" key="[[key]]" index="[[index]]" count="[[presentedKeys.length]]">
                                         <div class="row-actions">
-                                            <paper-tooltip for="makeDefaultKeyBtn" position="top">Make Default</paper-tooltip>
-                                            <paper-icon-button id="makeDefaultKeyBtn" on-tap="_starThis" icon="[[makeDefaultIcon]]"></paper-icon-button>
+                                            <paper-tooltip hidden$="[[!key.isDefault]]" for="KeyDefault" position="top">Key is Default</paper-tooltip>
+                                            <iron-icon hidden$="[[!key.isDefault]]" id="KeyDefault" icon="star"></iron-icon>
+
+                                            <paper-tooltip hidden$="[[key.isDefault]]" for="makeDefaultKeyBtn" position="top">Make Default</paper-tooltip>
+                                            <paper-icon-button hidden$="[[key.isDefault]]" id="makeDefaultKeyBtn" on-tap="_starThis" icon="star-border"></paper-icon-button>
+
                                             <paper-tooltip for="editKeyBtn" position="top">Rename</paper-tooltip>
                                             <paper-icon-button id="editKeyBtn" on-tap="_editSelected" icon="image:edit"></paper-icon-button>
                                             <paper-tooltip for="deleteKeyBtn" position="top">Delete All Selected
@@ -464,18 +472,16 @@
             },
             _starSelected: function(e) {
                 var selectedKey = this.selectedKey;
+
                 this.keys.forEach(function(el, index) {
                     this.set('keys.' + index + '.isDefault', el.id == selectedKey.id ? !selectedKey.isDefault : false);
                 }, this);
+
                 this.querySelector('iron-list').selectItem(selectedKey);
             },
             _starThis: function(e) {
-                // Make this key default
-                // var thiskey = e.target.parentNode;
-                // var thiskeyindex = e.target.getAttribute(index);
-                // this.keys.forEach(function(el, index) {
-                //     this.set('keys.' + index + '.isDefault', el.id == thiskey.id ? !selectedKey.isDefault : false);
-                // }, this);
+                e.stopPropagation();
+                //make cklicked key default
             },
             _editSelected: function(e) {
                 var el = this.querySelector('key-edit-element');
@@ -504,7 +510,7 @@
                 dialog._openDialog();
             },
             _formatTitle: function() {
-                return this.selectedKeys.length > 1 ? "Delete Keys" : "Delete Key";
+                return this.selectedKeys.length > 1 ? "Delete Keys?" : "Delete Key?";
             },
             _formatBody: function() {
                 var selectedKeys = this.selectedKeys,
@@ -514,7 +520,7 @@
                     })
                     .join(', ');
 
-                return (selectedKeys.length > 1 ? "Are you sure you want to delete these keys: " : "Are you sure you want to delete this key: ") + names + "?";
+                return (selectedKeys.length > 1 ? "Deleting keys cannot be undone. Keys to delete:" : "Deleting keys cannot be undone. Key to delete: ") + names ;
             },
             _showNotification: function(title) {
                 var notification = document.querySelector('notification-element');

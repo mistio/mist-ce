@@ -37,15 +37,17 @@
                 display: inline-block;
             }
         </style>
-        <paper-item on-tap="_viewKey" class$="info-item flex-horizontal-with-ratios [[indexClass]]">
+        <paper-item class$="info-item flex-horizontal-with-ratios [[indexClass]]">
             <div class="flexchild">
                 <span class="check">
                     <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectKey"></app-check>
                     <paper-tooltip for="check" position="right">Select item</paper-tooltip>
                 </span>
-                <span class="name">[[key.id]]</span>
+                <span class="name">
+                    <a class="regular" href="keys/[[key.id]]">[[key.id]]</a>
+                </span>
             </div>
-            <div class="flexchild">[[isDefaultText]]</div>
+            <div class="flexchild">{{isDefaultText}}</div>
             <div>
                 <content></content>
             </div>
@@ -80,7 +82,8 @@
                     },
                     isDefaultText: {
                         type: String,
-                        computed: '_computeIsDefaultText(key.isDefault)'
+                        computed: '_computeIsDefaultText(key.isDefault)',
+                        notify: true
                     }
                 },
                 listeners: {
