@@ -3,6 +3,7 @@
 
 <dom-module id="script-edit-element">
     <template>
+        <style is="custom-style" include="dialogs"></style>
         <style include="shared-styles">
             :host {
                 display: block;
@@ -12,20 +13,19 @@
                 display: block;
             }
 
-            paper-dialog {
-                width: 300px;
-            }
         </style>
 
         <paper-dialog id="editScriptModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
             <h2>Edit Script</h2>
             <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
-                <paper-input id="name" label="Name" error-message="Please enter script's name" value="{{script.name}}"></paper-input>
-
-                <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter script's description" value="{{script.description}}"></paper-textarea>
-
-                <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                <p>
+                    <paper-input id="name" label="Name" error-message="Please enter script's name" value="{{script.name}}"></paper-input>
+                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter script's description" value="{{script.description}}"></paper-textarea>
+                </p>
+                <div class="clearfix btn-group">
+                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div>                
             </paper-dialog-scrollable>
         </paper-dialog>
 

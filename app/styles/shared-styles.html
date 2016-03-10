@@ -704,6 +704,38 @@
         </style>
     </template>
 </dom-module>
+<dom-module id="dialogs">
+    <template>
+        <style>
+            paper-menu,
+            paper-dropdown-menu {
+                width: 100%;
+            }
+
+            paper-dialog {
+                width: 300px;
+            }
+
+            paper-dialog-scrollable p {
+                margin: 0 24px 24px 24px;
+                font-size: 16px;
+                color: rgba(0,0,0,0.54);
+            }
+
+            paper-dialog paper-icon-button.close {
+                position: absolute;
+                margin: 0;
+                top: 15px;
+                right: 16px;
+            }
+            .btn-group {
+                display: flex;
+                justify-content: flex-end;
+                margin: 0 24px;
+            }
+        </style>
+    </template>
+</dom-module>
 <dom-module id="info-table-style">
     <template>
         <style>
