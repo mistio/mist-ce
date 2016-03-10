@@ -81,6 +81,9 @@
 #single-script-page .log-list ul li a {
     margin: 0;
 }
+#script-run {
+    margin-bottom: 60px;
+}
 #run-script .ui-collapsible-heading {
     text-transform: capitalize;
 }
@@ -145,6 +148,12 @@
 #single-script-page .command-container {
     white-space: pre !important;
 }
+
+#run-script .ui-slider {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+}
 #command-collapsible.ui-collapsible .ui-collapsible-heading a {
-        background-color: #d4d4d4;
+    background-color: #d4d4d4;
 }
