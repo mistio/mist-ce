@@ -151,6 +151,12 @@
             min-width: 100%;
             height: auto;
         }
+        .absolute-top-right {
+            position: fixed;
+            right: 18px;
+            top: 305px;
+            z-index: 10;
+        }
         </style>
         <!-- <paper-card heading="Keys">
             <div class="card-content">
@@ -220,7 +226,7 @@
                     <span class="bottom title">[[presentedKeys.length]] Keys</span>
                 </paper-toolbar>
                 <div class="list">
-                    <div hidden$="[[!hasScripts]]" class="list-options">
+                    <div hidden$="[[!hasKeys]]" class="list-options">
                         <div class$="option search [[showSearchOption]]">
                             <paper-icon-button id="searchKeyBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
                             <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm}}" no-label-float class="search"></paper-input>
@@ -239,20 +245,20 @@
                         Delete [[selectedKeys.length]] key<span hidden$="[[!moreThanOneSelected]]">s</span> </span>
                         </span>
                     </div>
-                    <div hidden$="[[!hasScripts]]" class="info-list">
+                    <div hidden$="[[!hasKeys]]" class="info-list">
                         <div class="list-head flex-horizontal-with-ratios">
                             <div class="flexchild">
                                 <paper-tooltip for="selectAllBtn" position="top">Select all</paper-tooltip>
-                               <app-check id="selectAllBtn" class="check-all" checked="[[selectAll]]" selected="[[selectAll]]" on-tap="_selectAllChanged">
+                                <app-check id="selectAllBtn" class="check-all" checked="[[selectAll]]" selected="[[selectAll]]" on-tap="_selectAllChanged">
                                     <iron-icon icon="check"></iron-icon>
                                 </app-check>
                                 Νame
                                 <paper-tooltip for="sortById" position="top">Sort by name</paper-tooltip>
-                                <paper-icon-button id="sortById" class$="[[_computeIsActiveSort(sortByTerm, 'id')]]" icon="expand-more" on-tap="_sortKeys" sort-option="id"></paper-icon-button>
+                                <paper-icon-button id="sortById" class$="[[_computeIsActiveSort(sortByTerm, 'id')]]" icon="icons:arrow-upward" on-tap="_sortKeys" sort-option="id"></paper-icon-button>
                             </div>
                             <div class="flexchild">Default
                                 <paper-tooltip for="sortByDefault" position="top">Sort by default</paper-tooltip>
-                                <paper-icon-button id="sortByDefault" class$="[[_computeIsActiveSort(sortByTerm, 'default')]]" icon="expand-more" on-tap="_sortKeys" sort-option="default"></paper-icon-button>
+                                <paper-icon-button id="sortByDefault" class$="[[_computeIsActiveSort(sortByTerm, 'default')]]" icon="icons:arrow-upward" on-tap="_sortKeys" sort-option="default"></paper-icon-button>
                             </div>
                         </div>
                         <div class="info-body">
@@ -282,7 +288,7 @@
                     <p hidden$="[[hasKeys]]">
                         No keys found here. You can add some by using the action button!
                     </p>
-                    <div class="absolute-bottom-right">
+                    <div class="absolute-top-right">
                         <paper-fab id="addBtn" icon="add" on-tap="_openAddKeyModal"></paper-fab>
                     </div>
                 </div>

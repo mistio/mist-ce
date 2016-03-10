@@ -3,6 +3,7 @@
 
 <dom-module id="key-add-element">
     <template>
+        <style is="custom-style" include="dialogs"></style>
         <style include="shared-styles">
             :host {
                 display: block;
@@ -22,12 +23,13 @@
             <h2>Add Key</h2>
             <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
-                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.name}}"></paper-input>
+                <p>
+                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.name}}"></paper-input>
 
-                <paper-textarea id="privateKey" label="Private Key" rows="5" required error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
+                    <paper-textarea id="privateKey" label="Private Key" rows="5" required error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
 
-                <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
-
+                    <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
+                </p>
                 <div class="clearfix btn-group">
                     <paper-button class="purple" raised on-tap="_generateKeyAjax">Generate</paper-button>
                     <paper-button class="purple" raised on-tap="_uploadKey">Upload</paper-button>

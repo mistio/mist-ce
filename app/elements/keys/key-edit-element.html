@@ -3,6 +3,7 @@
 
 <dom-module id="key-edit-element">
     <template>
+        <style is="custom-style" include="dialogs"></style>
         <style include="shared-styles">
             :host {
                 display: block;
@@ -15,15 +16,22 @@
             paper-dialog {
                 width: 300px;
             }
+            .submit-btn {
+                background-color: var(--mist-blue);
+                color: #fff;
+            }
         </style>
 
         <paper-dialog id="editKeyModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
             <h2>Rename Key</h2>
             <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
-                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.id}}"></paper-input>
-
+                <p>
+                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.id}}"></paper-input>
+                </p>
+                <div class="clearfix btn-group">
                 <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div>
             </paper-dialog-scrollable>
         </paper-dialog>
 
