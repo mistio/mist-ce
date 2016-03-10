@@ -156,7 +156,20 @@
                 <div class="content">
                     <content></content>
                     <div class="absolute-bottom-right">
-                        <app-fab></app-fab>
+                         <app-fab>
+                            <div class="item">
+                                <paper-icon-button id="addclooud" icon="image:wb-cloudy" on-tap="addclooud"></paper-icon-button> 
+                                <paper-tooltip position="left" animation-delay="0">Add Cloud</paper-tooltip>
+                            </div>
+                            <div class="item">
+                                <paper-icon-button id="addmachine" icon="hardware:computer" on-tap="addmachine"></paper-icon-button> 
+                                <paper-tooltip position="left" animation-delay="0">Add Machine</paper-tooltip>
+                            </div>
+                            <div class="item">
+                                <paper-icon-button id="addscript" icon="image:movie-creation" on-tap="addscript"></paper-icon-button>
+                                <paper-tooltip position="left" animation-delay="0">Run Script</paper-tooltip>
+                            </div>
+                        </app-fab>
                     </div>
                 </div>
             </paper-header-panel>
