@@ -1059,7 +1059,27 @@ def create_machine(request):
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
-    user = user_from_request(request)
+    auth_context = auth_context_from_request(request)
+    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+    if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
+        raise UnauthorizedError()
+    if not auth_context.has_perm("cloud", "create_resources", cloud_id,
+                                 cloud_tags):
+        raise UnauthorizedError()
+    if not auth_context.has_perm("machine", "create"):
+        raise UnauthorizedError()
+    if script_id:
+        script_tags = mist.core.methods.get_script_tags(script_id)
+        if auth_context.has_perm("script", "run", script_id, script_tags):
+            raise UnauthorizedError()
+    if key_id:
+        key_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
+                                                      key_id)
+        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        if not auth_context.has_perm("key", "read", keypair.id, key_tags):
+            raise UnauthorizedError()
+
+    tags = auth_context.get_tags("machine", "create")
 
     import uuid
     job_id = uuid.uuid4().hex
@@ -1080,11 +1100,12 @@ def create_machine(request):
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet,
-              'project_id': project_id}
+              'project_id': project_id,
+              'tags': tags}
     if not async:
-        ret = methods.create_machine(user, *args, **kwargs)
+        ret = methods.create_machine(auth_context.owner, *args, **kwargs)
     else:
-        args = (user.email, ) + args
+        args = (auth_context.owner.id, ) + args
         kwargs.update({'quantity': quantity, 'persist': persist})
         tasks.create_machine_async.apply_async(args, kwargs, countdown=2)
         ret = {'job_id': job_id}

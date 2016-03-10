@@ -1560,7 +1560,9 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    azure_port_bindings='', hostname='', plugins=None,
                    disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
-                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
+                   associate_floating_ip=False,
+                   associate_floating_ip_subnet=None, project_id=None,
+                   tags=None):
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1757,6 +1759,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             post_script_params=post_script_params,
         )
 
+    if tags:
+        mist.core.methods.set_machine_tags(user, tags, cloud_id, node.id)
 
     ret = {'id': node.id,
             'name': node.name,
