@@ -227,7 +227,7 @@ class MainConnection(MistConnection):
                         cached['machines'] = core_methods.filter_list_machines(
                             self.auth_context, **cached
                         )
-                        if not cached['machines']:
+                        if cached['machines'] is None:
                             continue
                     self.send(key, cached)
 
@@ -284,7 +284,7 @@ class MainConnection(MistConnection):
                 filtered_machines = core_methods.filter_list_machines(
                     self.auth_context, cloud_id, machines
                 )
-                if filtered_machines:
+                if filtered_machines is not None:
                     self.send(routing_key, {'cloud_id': cloud_id,
                                             'machines': filtered_machines})
                 # update cloud machine count in multi-user setups
