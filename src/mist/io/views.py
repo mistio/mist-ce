@@ -74,9 +74,14 @@ def exception_handler_mist(exc, request):
 
 
 @view_config(route_name='home', request_method='GET')
-@view_config(route_name='keys', request_method='GET')
 @view_config(route_name='machines', request_method='GET')
+@view_config(route_name='machine', request_method='GET')
+@view_config(route_name='images', request_method='GET')
+@view_config(route_name='image', request_method='GET')
+@view_config(route_name='keys', request_method='GET')
+@view_config(route_name='key', request_method='GET')
 @view_config(route_name='networks', request_method='GET')
+@view_config(route_name='network', request_method='GET')
 def home(request):
     """Home page view"""
     params = params_from_request(request)
@@ -432,8 +437,8 @@ def add_key(request):
             'isDefault': keypair.default}
 
 
-@view_config(route_name='api_v1_key_action', request_method='DELETE', renderer='json')
-@view_config(route_name='key_action', request_method='DELETE', renderer='json')
+@view_config(route_name='api_v1_key', request_method='DELETE', renderer='json')
+@view_config(route_name='key', request_method='DELETE', renderer='json')
 def delete_key(request):
     """
     Delete key
@@ -504,8 +509,8 @@ def delete_keys(request):
     return report
 
 
-@view_config(route_name='api_v1_key_action', request_method='PUT', renderer='json')
-@view_config(route_name='key_action', request_method='PUT', renderer='json')
+@view_config(route_name='api_v1_key', request_method='PUT', renderer='json')
+@view_config(route_name='key', request_method='PUT', renderer='json')
 def edit_key(request):
     """
     Edit a key
@@ -531,8 +536,8 @@ def edit_key(request):
     return {'new_id': new_id}
 
 
-@view_config(route_name='api_v1_key_action', request_method='POST')
-@view_config(route_name='key_action', request_method='POST')
+@view_config(route_name='api_v1_key', request_method='POST')
+@view_config(route_name='key', request_method='POST')
 def set_default_key(request):
     """
     Set default key
@@ -1080,7 +1085,6 @@ def list_specific_images(request):
 
 
 @view_config(route_name='api_v1_images', request_method='GET', renderer='json')
-@view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
     """
     List images of specified cloud

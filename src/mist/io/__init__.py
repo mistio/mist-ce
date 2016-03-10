@@ -153,8 +153,8 @@ def add_routes(configurator):
     configurator.add_route('network', '/clouds/{cloud}/networks/{network}')
 
     configurator.add_route('api_v1_keys', '/api/v1/keys')
-    configurator.add_route('api_v1_key_action', '/api/v1/keys/{key}')
-    configurator.add_route('key_action', '/keys/{key}')
+    configurator.add_route('api_v1_key', '/api/v1/keys/{key}')
+    configurator.add_route('key', '/keys/{key}')
     configurator.add_route('api_v1_key_public', '/api/v1/keys/{key}/public')
     configurator.add_route('key_public', '/keys/{key}/public')
     configurator.add_route('api_v1_key_private', '/api/v1/keys/{key}/private')
