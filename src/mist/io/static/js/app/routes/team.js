@@ -16,7 +16,6 @@ define('app/routes/team', ['app/routes/base'],
                     var model = this.modelFor('team');
                     var id = model._id || model.id;
                     var team = Mist.teamsController.getObject(id);
-                    console.log(Mist.teamsController.model, id);
                     this.set('documentTitle', 'mist.io - ' + (team ? team.name : id));
                 }, 500);
             },
