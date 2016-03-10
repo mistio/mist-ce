@@ -8,6 +8,12 @@
             display: block;
         }
         
+        paper-material {
+            display: block;
+            padding: 20px;
+            margin: 36px;
+        }
+        
         paper-progress {
             position: absolute;
             bottom: 85px;
@@ -29,7 +35,7 @@
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
-                    <span class="bottom title">Add Script</span>
+                    <span class="bottom title">Add Script {{typedName}}</span>
                 </paper-toolbar>
                 <div id="content">
                     <paper-material>
@@ -98,6 +104,11 @@
                             description: ''
                         }
                     }
+                },
+                typedName: {
+                    type: String,
+                    value: '',
+                    notify: true
                 },
                 fields: {
                     type: Array,
@@ -237,7 +248,13 @@
             },
             observers: [
                 '_fieldsChanged(fields.*, sendingData)',
+                '_updateTypedName(fields.#0.*)'
             ],
+            _updateTypedName: function(t) {
+                if (t.path == "fields.#0.value" && t.value) {
+                    this.typedName = '"'+t.value+'"';
+                }
+            },
             _getHeaderStyle: function(color) {
                 return 'background-color: ' + color + '; color: #fff;';
             },
@@ -325,6 +342,7 @@
                     // Reset Form Fields Validation
                     this._resetField(el, index);
                 }, this);
+                this.typedName = "";
             },
             _resetField: function(el, index) {
                 this.set('fields.' + index + '.value', el.defaultValue);
