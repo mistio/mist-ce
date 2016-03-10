@@ -147,7 +147,7 @@ var loadApp = function(
     App.set('organizationAddController', OrganizationAddController.create());
     App.set('memberAddController', MemberAddController.create());
 
-    App.teamsController.setModel(TEAMS);
+    App.teamsController.setModel(ORGANIZATION.teams);
 
     // Ember custom widgets
     App.Select = Ember.Select.extend({
@@ -362,7 +362,7 @@ var setupMainChannel = function(socket, callback) {
     // Fast implementation for teams modelling
     var organization = Mist.organization, teams = [];
     if (organization) {
-        TEAMS.forEach(function(team) {
+        organization.teams.forEach(function(team) {
             team.organization = {
                 id: organization.id,
                 name: organization.name
