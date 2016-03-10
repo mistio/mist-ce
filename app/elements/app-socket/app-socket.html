@@ -37,7 +37,6 @@ Polymer({
 
         // When socket connects create mux and prepare channels
         var that = this;
-        console.warn('setting socket onopen handler');
         this.socket.onopen = function () {
             console.log('CONNECTION ESTABLISHED');
             this.mux = new MultiplexedWebSocket(this);
@@ -78,6 +77,11 @@ Polymer({
                 // console.debug('list_keys', data);
                 }, 250);
             });
+            channel.on('list_scripts', function (data) {
+                that.debounce(that._updateScripts(data), function(){
+                // console.debug('list_scripts', data);
+                }, 250);
+            });
             channel.on('list_clouds', function (data) {
                 that.debounce(that._updateClouds(data), function(){
                 // console.debug('list_clouds', data);
@@ -100,7 +104,7 @@ Polymer({
             });
             channel.on('list_images', function (data) {
                 that.debounce(that._updateImages(data), function(){
-                console.debug('list_images', data);
+                // console.debug('list_images', data);
                 }, 250);
             });
             channel.on('list_networks', function (data) {
@@ -127,8 +131,9 @@ Polymer({
                 }, 250);
             });
         } else if (namespace == 'logs') {
+            console.warn('setup log handler');
             channel.on('logs', function (data) {
-                console.debug('logs', data);
+                console.error('got logs', data);
             });
         }
         channel.send('ready');
@@ -165,20 +170,43 @@ Polymer({
         var changed = false,
             pending = this.get('model.' + section + '.pending');
 
+        // For each item in the received data array
         for (var i=0; i < data.length; i++) {
+            // Check if item exists in respective model
             var item = this.get('model.' + section + '.' + data[i].id);
-            if (!item) {
+            if (!item) { // If does not exist then model needs to be updated
                 changed = true;
                 break;
             }
+            // check if all fields of the data item exist in the model item
+            var dataKeys = Object.keys(data[i]), modelKeys = Object.keys(item);
+            for (var k=0; k < dataKeys.length; k++){
+                if (modelKeys.indexOf(dataKeys[k]) == -1) {
+                    // If something is missing the model needs to be updated
+                    changed = true;
+                    break;
+                }
+                // If something changed the model needs to be updated
+                if (JSON.stringify(data[i][dataKeys[k]]).localeCompare(JSON.stringify(item[dataKeys[k]]))) {
+                    console.debug('property ', dataKeys[k], ' changed in ', item);
+                    var oldVal = JSON.stringify(item[dataKeys[k]]),
+                        newVal = JSON.stringify(data[i][dataKeys[k]]);
+                    console.debug('Old value: ',  oldVal, oldVal.length);
+                    console.debug('New value: ',  newVal, newVal.length);
+                    changed = true;
+                    break;
+                }
+            }
+            if (changed)
+                break;
         }
 
         if (changed) {
-            console.warn('updating', section);
+            console.debug('updating', section);
             this.set('model.' + section, _generateMap(data));
             this.set('model.' + section + 'Array', data);
         } else {
-            console.warn('not updating', section);
+            console.debug('no need to update', section);
         }
 
         if (pending) {
@@ -189,7 +217,7 @@ Polymer({
     },
 
     _updateMonitoring: function (data) {
-        console.warn('got monitoring', data);
+        //console.warn('got monitoring', data);
         this.set('model.pending.monitoring', false);
     },
 
@@ -252,22 +280,24 @@ Polymer({
     },
 
     _updateNetworks: function (data) {
-        this.set('model.clouds.' + data.cloud_id + '.networks', _generateMap(data.networks));
-        this.set('model.clouds.' + data.cloud_id + '.networksArray', data.networks);
-        var allNetworks = [];
-        if (this.model  != undefined ) {
-            this.model.cloudsArray.forEach(
-              function(cloud){
-                if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length){
-                    cloud.networksArray.public.forEach(function(net){net["type"]="public"; net["provider"]=cloud.provider; allNetworks.push(net);});
-                    cloud.networksArray.private.forEach(function(net){net["type"]="private"; net["provider"]=cloud.provider; allNetworks.push(net);});
-                    cloud.networksArray.routers.forEach(function(net){net["type"]="router"; net["provider"]=cloud.provider; allNetworks.push(net);});
-                    return allNetworks;
-                    }
-                }
-            );
-        }
-        this.set('model.networksArray', allNetworks);
+        var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', data.networks);
+        if (!changed)
+            return false;
+
+          var allNetworks = [];
+          if (this.model  != undefined ) {
+              this.model.cloudsArray.forEach(
+                function(cloud){
+                  if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length){
+                      cloud.networksArray.public.forEach(function(net){net["type"]="public"; net["provider"]=cloud.provider; allNetworks.push(net);});
+                      cloud.networksArray.private.forEach(function(net){net["type"]="private"; net["provider"]=cloud.provider; allNetworks.push(net);});
+                      cloud.networksArray.routers.forEach(function(net){net["type"]="router"; net["provider"]=cloud.provider; allNetworks.push(net);});
+                      return allNetworks;
+                      }
+                  }
+              );
+          }
+          this.set('model.networksArray', allNetworks);
     },
 
     _updateProjects: function (data) {
@@ -296,7 +326,7 @@ Polymer({
     }
 
 
-})
+});
 
 var _generateMap = function(list) {
   var out = {};
