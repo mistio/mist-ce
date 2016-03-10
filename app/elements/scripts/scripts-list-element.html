@@ -439,7 +439,7 @@
                 dialog._openDialog();
             },
             _formatTitle: function() {
-                return this.selectedScripts.length > 1 ? "Delete Scripts" : "Delete Script";
+                return this.selectedScripts.length > 1 ? "Delete Scripts?" : "Delete Script?";
             },
             _formatBody: function() {
                 var selectedScripts = this.selectedScripts,
@@ -449,7 +449,7 @@
                     })
                     .join(', ');
 
-                return (selectedScripts.length > 1 ? "Are you sure you want to delete these scripts: " : "Are you sure you want to delete this script: ") + names + "?";
+                return (selectedScripts.length > 1 ? "Deleting scripts cannot be undone. Scripts to delete: " : "Deleting scripts cannot be undone. Script to delete: ") + names ;
             },
             _showNotification: function(title) {
                 var notification = document.querySelector('notification-element');
