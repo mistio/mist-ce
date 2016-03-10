@@ -570,7 +570,7 @@ def delete_key(request):
     auth_context = auth_context_from_request(request)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
     keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                      keypair.id)
+                                                      key_id)
     if not auth_context.has_perm('key', 'remove', keypair.id, keypair_tags):
         raise UnauthorizedError()
     methods.delete_key(auth_context.owner, key_id)
@@ -613,7 +613,8 @@ def delete_keys(request):
     for key_id in key_ids:
         try:
             keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-            keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+            keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
+                                                              key_id)
             if not auth_context.has_perm('key', 'remove', keypair.id, keypair_tags):
                 raise UnauthorizedError()
             methods.delete_key(auth_context.owner, key_id)
@@ -651,8 +652,8 @@ def edit_key(request):
         raise RequiredParameterMissingError("new_id")
 
     auth_context = auth_context_from_request(request)
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    keypair = Keypair.objects.get(owner=auth_context.owner, name=old_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, old_id)
     if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
         raise UnauthorizedError()
     methods.edit_key(auth_context.owner, new_id, old_id)
@@ -676,7 +677,8 @@ def set_default_key(request):
 
     auth_context = auth_context_from_request(request)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
+                                                      key_id)
     if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
         raise UnauthorizedError()
 
@@ -705,10 +707,12 @@ def get_private_key(request):
 
     auth_context = auth_context_from_request(request)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
-    if not auth_context.has_perm('key', 'read_private', keypair.id, keypair_tags):
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
+                                                      key_id)
+    if not auth_context.has_perm('key', 'read_private', keypair.id,
+                                 keypair_tags):
         raise UnauthorizedError()
-    return Keypair.objects.get(owner=auth_context.owner, id=key_id).private
+    return keypair.private
 
 
 @view_config(route_name='api_v1_key_public', request_method='GET', renderer='json')
@@ -730,10 +734,11 @@ def get_public_key(request):
 
     auth_context = auth_context_from_request(request)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
+                                                      key_id)
     if not auth_context.has_perm('key', 'read', keypair.id, keypair_tags):
         raise UnauthorizedError()
-    return Keypair.objects.get(owner=auth_context.owner, id=key_id).public
+    return keypair.public
 
 
 @view_config(route_name='api_v1_keys', request_method='POST', renderer='json')
