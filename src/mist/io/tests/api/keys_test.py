@@ -17,8 +17,8 @@ def get_random_key_id(existing_keys):
         random_key_id = ''.join([random.choice(string.ascii_letters +
                                                string.digits) for _ in
                                  range(6)])
-        scripts = get_keys_with_id(random_key_id, existing_keys)
-        if len(scripts) == 0:
+        keys = get_keys_with_id(random_key_id, existing_keys)
+        if len(keys) == 0:
             return random_key_id
 
 
@@ -59,9 +59,9 @@ def test_005_add_key(pretty_print, cache, mist_io):
     assert response.status_code == requests.codes.ok, response.content
     response = mist_io.list_keys().get()
     assert response.status_code == requests.codes.ok, response.content
-    script = get_keys_with_id(cache.get('keys_tests/key_id', ''),
+    keys = get_keys_with_id(cache.get('keys_tests/key_id', ''),
                                 json.loads(response.content))
-    assert len(script) > 0, "Key was added through the api but is not " \
+    assert len(keys) > 0, "Key was added through the api but is not " \
                             "visible in the list of keys"
     print "Success!!!"
 
@@ -82,10 +82,10 @@ def test_007_edit_key(pretty_print, cache, mist_io):
     assert response.status_code == requests.codes.ok, response.content
     response = mist_io.list_keys().get()
     assert response.status_code == requests.codes.ok, response.content
-    script = get_keys_with_id(new_key_id,
-                                json.loads(response.content))
-    assert len(script) > 0, "Key was added through the api but is not " \
-                            "visible in the list of keys"
+    keys = get_keys_with_id(new_key_id,
+                            json.loads(response.content))
+    assert len(keys) > 0, "Key was added through the api but is not " \
+                          "visible in the list of keys"
     cache.set('keys_tests/key_id', new_key_id)
     print "Success!!!"
 
@@ -143,20 +143,20 @@ def test_014_add_second_key_and_set_default(pretty_print, cache, mist_io):
     assert response.status_code == requests.codes.ok, response.content
     response = mist_io.list_keys().get()
     assert response.status_code == requests.codes.ok, response.content
-    script = get_keys_with_id(cache.get('keys_tests/other_key_id', ''),
+    keys = get_keys_with_id(cache.get('keys_tests/other_key_id', ''),
                                 json.loads(response.content))
-    assert len(script) > 0, "Key was added through the api but is not " \
+    assert len(keys) > 0, "Key was added through the api but is not " \
                             "visible in the list of keys"
     response = mist_io.set_default_key(
         key_id=cache.get('keys_tests/other_key_id', '')).post()
     assert response.status_code == requests.codes.ok, response.content
     response = mist_io.list_keys().get()
     assert response.status_code == requests.codes.ok, response.content
-    script = get_keys_with_id(cache.get('keys_tests/other_key_id', ''),
+    keys = get_keys_with_id(cache.get('keys_tests/other_key_id', ''),
                                 json.loads(response.content))
-    assert len(script) > 0, "Key was added through the api but is not " \
+    assert len(keys) > 0, "Key was added through the api but is not " \
                             "visible in the list of keys"
-    assert script[0]['isDefault'], 'Key is not default'
+    assert keys[0]['isDefault'], 'Key is not default'
     print "Success!!!"
 
 
@@ -213,8 +213,8 @@ def test_021_delete_multiple_keys(pretty_print, mist_io):
         assert response.status_code == requests.codes.ok, response.content
         response = mist_io.list_keys().get()
         assert response.status_code == requests.codes.ok, response.content
-        script = get_keys_with_id(new_key_id, json.loads(response.content))
-        assert len(script) > 0, \
+        keys = get_keys_with_id(new_key_id, json.loads(response.content))
+        assert len(keys) > 0, \
             "Key was added but is not visible in the list of keys"
         key_ids.append(new_key_id)
 

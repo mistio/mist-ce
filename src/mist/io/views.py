@@ -909,28 +909,20 @@ def list_machines(request):
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
     """
-    Create a machine on cloud
-    Creates a new virtual machine on the specified cloud. If the cloud is Rack-
-    space it attempts to deploy the node with an ssh key provided in config.
-    the method used is the only one working in the old Rackspace cloud. creat-
-    e_node(), from libcloud.compute.base, with 'auth' kwarg doesn't do the tr-
-    ick. Didn't test if you can upload some ssh related files using the 'ex_f-
-    iles' kwarg from openstack 1.0 driver. In Linode creation is a bit differ-
-    ent. There you can pass the key file directly during creation. The Linode
-     API also requires to set a disk size and doesn't get it from size.id. So-
-    , send size.disk from the client and use it in all cases just to avoid pr-
-    ovider checking. Finally, Linode API does not support association between
-     a machine and the image it came from. We could set this, at least for ma-
-    chines created through mist.io in ex_comment, lroot or lconfig. lroot see-
-    ms more appropriate. However, liblcoud doesn't support linode.config.list
-     at the moment, so no way to get them. Also, it will create inconsistenci-
-    es for machines created through mist.io and those from the Linode interfa-
-    ce.
+    Create machine(s) on cloud
+    Creates one or more machines on the specified cloud. If async is true, a
+    jobId will be returned.
     ---
     cloud:
       in: path
       required: true
       type: string
+    async:
+      description: ' Create machines asynchronously, returning a jobId'
+      type: boolean
+    quantity:
+      description: ' The number of machines that will be created, async only'
+      type: integer
     azure_port_bindings:
       type: string
     cloud_id:
@@ -938,7 +930,7 @@ def create_machine(request):
       required: true
       type: string
     disk:
-      description: ' Needed only by Linode cloud'
+      description: ' Only required by Linode cloud'
       type: string
     docker_command:
       type: string
@@ -1007,57 +999,78 @@ def create_machine(request):
     ssh_port:
       type: integer
     """
+    params = params_from_request(request)
     cloud_id = request.matchdict['cloud']
 
-    try:
-        key_id = request.json_body.get('key')
-        machine_name = request.json_body['name']
-        location_id = request.json_body.get('location', None)
-        if request.json_body.get('provider') == 'libvirt':
-            image_id = request.json_body.get('image')
-            disk_size = int(request.json_body.get('libvirt_disk_size', 4))
-            disk_path = request.json_body.get('libvirt_disk_path', '')
-        else:
-            image_id = request.json_body['image']
-            disk_size = disk_path = None
-        size_id = request.json_body['size']
-        # deploy_script received as unicode, but ScriptDeployment wants str
-        script = str(request.json_body.get('script', ''))
-        # these are required only for Linode/GCE, passing them anyway
-        image_extra = request.json_body.get('image_extra', None)
-        disk = request.json_body.get('disk', None)
-        image_name = request.json_body.get('image_name', None)
-        size_name = request.json_body.get('size_name', None)
-        location_name = request.json_body.get('location_name', None)
-        ips = request.json_body.get('ips', None)
-        monitoring = request.json_body.get('monitoring', False)
-        networks = request.json_body.get('networks', [])
-        docker_env = request.json_body.get('docker_env', [])
-        docker_command = request.json_body.get('docker_command', None)
-        script_id = request.json_body.get('script_id', '')
-        script_params = params_from_request(request).get('script_params', '')
-        post_script_id = request.json_body.get('post_script_id', '')
-        post_script_params = params_from_request(
-            request).get('post_script_params', '')
-        async = request.json_body.get('async', False)
-        quantity = request.json_body.get('quantity', 1)
-        persist = request.json_body.get('persist', False)
-        docker_port_bindings = request.json_body.get('docker_port_bindings',
-                                                     {})
-        docker_exposed_ports = request.json_body.get('docker_exposed_ports',
-                                                     {})
-        azure_port_bindings = request.json_body.get('azure_port_bindings', '')
-        # hostname: if provided it will be attempted to assign a DNS name
-        hostname = request.json_body.get('hostname', '')
-        plugins = request.json_body.get('plugins')
-        cloud_init = request.json_body.get('cloud_init', '')
-        associate_floating_ip = request.json_body.get(
-            'associate_floating_ip', False)
-        associate_floating_ip_subnet = request.json_body.get(
-            'attach_floating_ip_subnet', None)
-        project_id = request.json_body.get('project', None)
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
+    for key in ('name', 'size'):
+        if key not in params:
+            raise RequiredParameterMissingError(key)
+
+    key_id = params.get('key')
+    machine_name = params['name']
+    location_id = params.get('location', None)
+    if params.get('provider') == 'libvirt':
+        image_id = params.get('image')
+        disk_size = int(params.get('libvirt_disk_size', 4))
+        disk_path = params.get('libvirt_disk_path', '')
+    else:
+        image_id = params.get('image')
+        if not image_id:
+            raise RequiredParameterMissingError("machine_name")
+        disk_size = disk_path = None
+    size_id = params['size']
+    # deploy_script received as unicode, but ScriptDeployment wants str
+    script = str(params.get('script', ''))
+    # these are required only for Linode/GCE, passing them anyway
+    image_extra = params.get('image_extra', None)
+    disk = params.get('disk', None)
+    image_name = params.get('image_name', None)
+    size_name = params.get('size_name', None)
+    location_name = params.get('location_name', None)
+    ips = params.get('ips', None)
+    monitoring = params.get('monitoring', False)
+    networks = params.get('networks', [])
+    docker_env = params.get('docker_env', [])
+    docker_command = params.get('docker_command', None)
+    script_id = params.get('script_id', '')
+    script_params = params.get('script_params', '')
+    post_script_id = params.get('post_script_id', '')
+    post_script_params = params.get('post_script_params', '')
+    async = params.get('async', False)
+    quantity = params.get('quantity', 1)
+    persist = params.get('persist', False)
+    docker_port_bindings = params.get('docker_port_bindings',
+                                                 {})
+    docker_exposed_ports = params.get('docker_exposed_ports',
+                                                 {})
+    azure_port_bindings = params.get('azure_port_bindings', '')
+    # hostname: if provided it will be attempted to assign a DNS name
+    hostname = params.get('hostname', '')
+    plugins = params.get('plugins')
+    cloud_init = params.get('cloud_init', '')
+    associate_floating_ip = params.get('associate_floating_ip', False)
+    associate_floating_ip_subnet = params.get('attach_floating_ip_subnet', None)
+    project_id = params.get('project', None)
+
+    # only for mist.core, parameters for cronjob
+    if not params.get('cronjob_type'):
+        cronjob = {}
+    else:
+        for key in ('cronjob_name', 'cronjob_type', 'cronjob_entry'):
+            if key not in params:
+                raise RequiredParameterMissingError(key)
+
+        cronjob= {
+            'name': params.get('cronjob_name'),
+            'description': params.get('description', ''),
+            'action': params.get('cronjob_action', ''),
+            'script_id': params.get('cronjob_script_id', ''),
+            'cronjob_type': params.get('cronjob_type'),
+            'cronjob_entry': params.get('cronjob_entry'),
+            'expires': params.get('expires', ''),
+            'enabled': bool(params.get('cronjob_enabled', False)),
+            'run_immediately': params.get('run_immediately', False),
+            }
 
     auth_context = auth_context_from_request(request)
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
@@ -1101,6 +1114,7 @@ def create_machine(request):
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet,
               'project_id': project_id,
+              'cronjob': cronjob,
               'tags': tags}
     if not async:
         ret = methods.create_machine(auth_context.owner, *args, **kwargs)

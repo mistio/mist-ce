@@ -1,3 +1,5 @@
+from requests import codes, Response
+
 from pytest import raises
 
 
@@ -16,7 +18,9 @@ def assert_equal(first, second, msg=None):
        operator.
     """
     if type(first) != type(second):
-        raise AssertionError("%s and %s are not of the same type" % (safe_repr(first), safe_repr(second)))
+        if type(first) not in [str, unicode] and type(second) not in [str, unicode]:
+            raise AssertionError("%s and %s are not of the same type" %
+                                 (safe_repr(first), safe_repr(second)))
     if type(first) == dict and type(second) == dict:
         assert_dict_equal(first, second, msg)
     elif type(first) == list and type(second) == list:
@@ -184,6 +188,16 @@ def assert_list_equal(list1, list2, msg=None):
     assert_sequence_equal(list1, list2, msg, seq_type=list)
 
 
+def assert_list_not_empty(_list, msg=None):
+    assert type(_list) == list, "Object provided is not a list"
+    assert len(_list) > 0, msg
+
+
+def assert_list_empty(_list, msg=None):
+    assert type(_list) == list, "Object provided is not a list"
+    assert len(_list) == 0, msg
+
+
 def assert_tuple_equal(tuple1, tuple2, msg=None):
     """A tuple-specific equality assertion.
 
@@ -207,6 +221,55 @@ def assert_set_equal(set1, set2, msg=None):
 
     """
     assert_sequence_equal(set1, set2, msg=msg, seq_type=set)
+
+
+def assert_response_ok(response, msg=None):
+    assert type(response) == Response, "Object provided is not a Response"
+    if msg is None:
+        msg = response.content
+    assert response.status_code == codes.ok, msg
+
+
+def assert_response_unauthorized(response, msg=None):
+    assert type(response) == Response, "Object provided is not a Response"
+    if msg is None:
+        msg = response.content
+    assert response.status_code == codes.unauthorized, msg
+
+
+def assert_response_bad_request(response, msg=None):
+    assert type(response) == Response, "Object provided is not a Response"
+    if msg is None:
+        msg = response.content
+    assert response.status_code == codes.bad_request, msg
+
+
+def assert_response_conflict(response, msg=None):
+    assert type(response) == Response, "Object provided is not a Response"
+    if msg is None:
+        msg = response.content
+    assert response.status_code == codes.conflict, msg
+
+
+def assert_response_forbidden(response, msg=None):
+    assert type(response) == Response, "Object provided is not a Response"
+    if msg is None:
+        msg = response.content
+    assert response.status_code == codes.forbidden, msg
+
+
+def assert_response_not_found(response, msg=None):
+    assert type(response) == Response, "Object provided is not a Response"
+    if msg is None:
+        msg = response.content
+    assert response.status_code == codes.not_found, msg
+
+
+def assert_response_server_error(response, msg=None):
+    assert type(response) == Response, "Object provided is not a Response"
+    if msg is None:
+        msg = response.content
+    assert response.status_code == codes.server_error, msg
 
 
 def assert_dict_equal(d1, d2, msg=None):

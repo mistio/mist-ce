@@ -238,12 +238,12 @@ def add_cloud_v_2(user, title, provider, params):
 
     if provider == 'bare_metal':
         cloud_id, mon_dict = _add_cloud_bare_metal(user, title, provider, params)
-        log.info("Cloud with id '%s' added succesfully.", cloud_id)
+        log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user.email, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'coreos':
         cloud_id, mon_dict = _add_cloud_coreos(user, title, provider, params)
-        log.info("Cloud with id '%s' added succesfully.", cloud_id)
+        log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user.email, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'ec2':
@@ -1550,7 +1550,7 @@ def list_machines(user, cloud_id):
         conn.disconnect()
     return ret
 
-
+# command is not an arg into function, but in post deploy steps there is?
 def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
@@ -1562,7 +1562,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False,
                    associate_floating_ip_subnet=None, project_id=None,
-                   tags=None):
+                   cronjob={}, command=None, tags=None):
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1706,16 +1706,17 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif key_id:
         associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
 
+    # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
-        # when this is ok, it calss post_deploy for script/monitoring
+        # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
             user.email, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
     elif conn.type == Provider.HPCLOUD:
         mist.io.tasks.hpcloud_post_create_steps.delay(
@@ -1724,19 +1725,19 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
             networks = list_networks(user, cloud_id)
             mist.io.tasks.openstack_post_create_steps.delay(
                 user.email, cloud_id, node.id, monitoring, script, key_id,
-                node.extra.get('username'), node.extra.get('password'), public_key,
-                script_id=script_id, script_params=script_params, job_id = job_id,
-                hostname=hostname, plugins=plugins,
+                node.extra.get('username'), node.extra.get('password'),
+                public_key, script_id=script_id, script_params=script_params,
+                job_id = job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
                 post_script_params=post_script_params,
-                networks=networks
+                networks=networks, cronjob=cronjob,
             )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -1745,30 +1746,31 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
             user.email, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params,
-        )
-    elif key_id:
-        mist.io.tasks.post_deploy_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
             script_id=script_id, script_params=script_params,
+            job_id = job_id, hostname=hostname, plugins=plugins,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params, cronjob=cronjob
+        )
+
+    elif key_id:   # there is a problem here with command and script
+        mist.io.tasks.post_deploy_steps.delay(
+            user.email, cloud_id, node.id, monitoring, script=script,
+            key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
 
     if tags:
         mist.core.methods.set_machine_tags(user, tags, cloud_id, node.id)
 
     ret = {'id': node.id,
-            'name': node.name,
-            'extra': node.extra,
-            'public_ips': node.public_ips,
-            'private_ips': node.private_ips,
-            'job_id': job_id,
-            }
+           'name': node.name,
+           'extra': node.extra,
+           'public_ips': node.public_ips,
+           'private_ips': node.private_ips,
+           'job_id': job_id,
+           }
 
     return ret
 
@@ -2503,11 +2505,12 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
     except Exception as exc:
         log.error("Error while connecting to cloud")
         raise CloudUnavailableError(exc=exc)
-    #GCE needs machine.extra as well, so we need the real machine object
+
+    # GCE needs machine.extra as well, so we need the real machine object
     machine = None
     try:
         if conn.type == 'azure':
-            #Azure needs the cloud service specified as well as the node
+            # Azure needs the cloud service specified as well as the node
             cloud_service = conn.get_cloud_service_from_node_id(machine_id)
             nodes = conn.list_nodes(ex_cloud_service_name=cloud_service)
             for node in nodes:
@@ -2520,7 +2523,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     machine = node
                     break
         if machine is None:
-            #did not find the machine_id on the list of nodes, still do not fail
+            # did not find the machine_id on the list of nodes, still do not fail
             raise MachineUnavailableError("Error while attempting to %s machine"
                                   % action)
     except:
