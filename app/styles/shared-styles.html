@@ -538,6 +538,76 @@
         </style>
     </template>
 </dom-module>
+<dom-module id="single-page">
+    <template>
+        <style>
+        /*TAKE CARE: needs renaming, will possibly break used with css id="lists"*/
+        /* Lists Basic Styling */
+        
+        .info-head > * {
+            font-weight: 700;
+            padding: 16px 0;
+        }
+        
+        .info-head {
+            border-bottom: 1px solid #7f7f7f;
+        }
+        
+        .info-body .info-item {
+            border-bottom: 1px solid #d4d4d4;
+            padding: 16px 0;
+            min-height: inherit;
+        }
+        
+        .info-body .sub-items .info-item {
+            color: #7f7f7f;
+        }
+        
+        .info-body .info-item iron-icon {
+            margin-right: 10px;
+        }
+        
+        .info-body .info-item.even {
+            background-color: #f2f2f2;
+        }
+        
+        .info-body .info-item.last {
+            border: none;
+        }
+        /* Table Basic Styling */
+        
+        .info-table .info-item .flexchild:first-of-type {
+            font-weight: 700;
+        }
+        
+        .info-table .info-group .info-item:nth-of-type(2n) {
+            background-color: #f2f2f2;
+        }
+        
+        .info-table .info-group .info-item:last-of-type {
+            border: none;
+        }
+        
+        .info-group .info-item .flexchild:first-of-type {
+            font-weight: 700;
+        }
+        
+        .info-group .info-item:nth-of-type(2n) {
+            background-color: #f2f2f2;
+        }
+        
+        .info-group .info-item:last-of-type {
+            border: none;
+        }
+        
+        .info-group .info-item {
+            border-bottom: 1px solid #d4d4d4;
+            padding: 16px 8px;
+            min-height: inherit;
+        }
+        </style>
+    </template>
+</dom-module>
 <dom-module id="forms">
     <template>
         <style>
