@@ -121,17 +121,9 @@
                     return params.id;
                 },
                 _computeScript: function(params) {
-                    // return this.model.scriptsArray.find(function(script) {
-                    //     return script.id == id;
-                    // }, this);
-                    var sa = this.model.scriptsArray;
-                    var p = params.id;
-                    var s = {};
-                    for (var i = 0; i < sa.length; i++) {
-                        if (sa[i].id == p)
-                            return s = sa[i];
-                    };                    
-                    return s;
+                    return this.model.scriptsArray.find(function(script) {
+                        return script.id == params.id;
+                    }, this);
                 },
                 _computeScriptId: function(params){
                     return params.id;
