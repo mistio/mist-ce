@@ -46,7 +46,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                 if (provider && provider.indexOf('ec2') > -1 && image && image.extra) {
                     var virtualization_type = image.extra.virtualization_type;
                     if (virtualization_type) {
-                        console.log('ec2');
                         var filteredSizes = this.get('newMachineProvider.sizes.model').filter(function(size, index) {
                             return size.extra.virtualizationTypes.indexOf(virtualization_type) > -1;
                         }, this);
