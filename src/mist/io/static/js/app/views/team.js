@@ -13,6 +13,10 @@ define('app/views/team', ['app/views/page'],
 
             templateName: 'team',
 
+            //
+            // Computed Properties
+            //
+
             model: function () {
                 return this.get('controller').get('model');
             }.property('controller.model'),

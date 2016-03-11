@@ -51,6 +51,9 @@
     font-size: 14px;
     padding: 10px 12px;
 }
+#single-team-page #policy-list-container .info-table td {
+    width: 100%;
+}
 #single-team-page .info-table tr:last-child td {
     border-bottom: none;
 }
@@ -69,10 +72,15 @@
     background-color: #faf9f4;
     border: none;
 }
-#single-team-page .info-table .member-item {
+#single-team-page .info-table .member-item,
+#single-team-page .info-table .rule-item {
     border-bottom: 1px solid #eeedeb;
 }
-#single-team-page .info-table .member-item:hover {
+#single-team-page .info-table .rule-item .ui-input-text {
+    display: inline-table;
+}
+#single-team-page .info-table .member-item:hover,
+#single-team-page .info-table .rule-item:hover {
     background-color: #f2f2f2;
 }
 #single-team-page .info-table td.member-actions {
@@ -85,7 +93,8 @@
     position: relative;
     top: 2px;
 }
-#single-team-page .info-table .member-header {
+#single-team-page .info-table .member-header,
+#single-team-page .info-table .policy-operator {
     background-color: #E4E4E4;
     border-bottom: 1px solid #E4E4E4;
     color: #444;

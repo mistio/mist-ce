@@ -54,11 +54,11 @@
 
             <table class="info-table">
                 <tbody>
-                    {{#each view.team.policy.rules as |rule|}}
-                    <tr>
-                        <td>{{rule.operator}} {{rule.action}} ON {{rule.rtype}} WHEN {{rule.rid}}</td>
-                    </tr>
+                    {{#each view.team.policy.rules as |rule index|}}
+                        {{component "policy-rule-item" rule=rule team=view.team}}
                     {{/each}}
+                    
+                    {{component "policy-operator-item" policy=view.team.policy team=view.team}}
                 </tbody>
             </table>
 

@@ -103,7 +103,7 @@ def home(request):
             'description': '',
             'members': [1],
             'policy': {
-                'operator': 'ALLOW',
+                'operator': 'DENY',
                 'rules': [{
                     'operator': 'DENY',
                     'action': 'abc',
@@ -124,11 +124,17 @@ def home(request):
             'description': '',
             'members': [1, 2],
             'policy': {
-                'operator': 'ALLOW',
+                'operator': 'DENY',
                 'rules': [{
                     'operator': 'DENY',
-                    'action': '',
-                    'rtype': '',
+                    'action': 'abc',
+                    'rtype': 'machine',
+                    'rid': '',
+                    'rtags': ''
+                }, {
+                    'operator': 'ALLOW',
+                    'action': 'abc',
+                    'rtype': 'script',
                     'rid': '',
                     'rtags': ''
                 }]
@@ -142,8 +148,14 @@ def home(request):
                 'operator': 'ALLOW',
                 'rules': [{
                     'operator': 'DENY',
-                    'action': '',
-                    'rtype': '',
+                    'action': 'abc',
+                    'rtype': 'machine',
+                    'rid': '',
+                    'rtags': ''
+                }, {
+                    'operator': 'ALLOW',
+                    'action': 'abc',
+                    'rtype': 'script',
                     'rid': '',
                     'rtags': ''
                 }]
@@ -157,8 +169,14 @@ def home(request):
                 'operator': 'ALLOW',
                 'rules': [{
                     'operator': 'DENY',
-                    'action': '',
-                    'rtype': '',
+                    'action': 'abc',
+                    'rtype': 'machine',
+                    'rid': '',
+                    'rtags': ''
+                }, {
+                    'operator': 'ALLOW',
+                    'action': 'abc',
+                    'rtype': 'script',
                     'rid': '',
                     'rtags': ''
                 }]
@@ -183,7 +201,6 @@ def home(request):
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
         'last_build': config.LAST_BUILD,
-        'org_create': json.dumps(True),
         'organization': json.dumps(organization)
     }
 

@@ -44,6 +44,8 @@ var loadApp = function(
     OrganizationsController,
     OrganizationAddController,
     MemberAddController,
+    PolicyRuleEditController,
+    PolicyOperatorEditController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -63,7 +65,6 @@ var loadApp = function(
     App.set('email', EMAIL);
     App.set('password', '');
     App.set('organization', ORGANIZATION);
-    App.set('org_create', ORG_CREATE);
     App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
         .test(navigator.userAgent)
     );
@@ -146,6 +147,8 @@ var loadApp = function(
     App.set('organizationsController', OrganizationsController.create());
     App.set('organizationAddController', OrganizationAddController.create());
     App.set('memberAddController', MemberAddController.create());
+    App.set('policyRuleEditController', PolicyRuleEditController.create());
+    App.set('policyOperatorEditController', PolicyOperatorEditController.create());
 
     // Ember custom widgets
     App.Select = Ember.Select.extend({
