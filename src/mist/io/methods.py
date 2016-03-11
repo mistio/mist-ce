@@ -8,6 +8,7 @@ import base64
 import requests
 import subprocess
 import re
+import mongoengine as me
 from time import sleep, time
 from datetime import datetime
 from hashlib import sha256
@@ -1091,18 +1092,14 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
         log.info("Host not given so will only create association without "
                  "actually deploying the key to the server.")
 
-
     key = Keypair.objects.get(owner=user, name=key_id)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     associated = False
-    if Machine.objects(cloud=cloud, key_associations__keypair__exact=key, machine_id=machine_id):
+    if Machine.objects(cloud=cloud, key_associations__keypair__exact=key,
+                       machine_id=machine_id):
         log.warning("Keypair '%s' already associated with machine '%s' "
                     "in cloud '%s'", key_id, cloud_id, machine_id)
         associated = True
-
-    machine = Machine.objects(cloud=cloud, machine_id=machine_id)
-    machine = machine.modify(upsert=True, new=True, machine_id=machine_id)
-
 
     # check if key already associated
     # if not already associated, create the association
@@ -1111,8 +1108,14 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
     # succesful connection
     if not host:
         if not associated:
+            try:
+                machine = Machine.objects.get(cloud=cloud,
+                                              machine_id=machine_id)
+            except me.DoesNotExist:
+                machine = Machine(cloud=cloud, machine_id=machine_id)
             key_assoc = KeyAssociation(keypair=key, last_used=0,
-                                       ssh_user=username, sudo=False, port=port)
+                                       ssh_user=username, sudo=False,
+                                       port=port)
             machine.key_associations.append(key_assoc)
             machine.save()
             trigger_session_update(user.email, ['keys'])
@@ -1606,13 +1609,17 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
-    image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
-    location = NodeLocation(location_id, name=location_name, country='', driver=conn)
+    image = NodeImage(image_id, name=image_name, extra=image_extra,
+                      driver=conn)
+    location = NodeLocation(location_id, name=location_name, country='',
+                            driver=conn)
 
     if conn.type is Provider.DOCKER:
         if public_key:
-            node = _create_machine_docker(conn, machine_name, image_id, '', public_key=public_key,
-                                          docker_env=docker_env, docker_command=docker_command,
+            node = _create_machine_docker(conn, machine_name, image_id, '',
+                                          public_key=public_key,
+                                          docker_env=docker_env,
+                                          docker_command=docker_command,
                                           docker_port_bindings=docker_port_bindings,
                                           docker_exposed_ports=docker_exposed_ports)
             node_info = conn.inspect_node(node)
@@ -1624,16 +1631,17 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
                                           docker_command=docker_command, docker_port_bindings=docker_port_bindings,
                                           docker_exposed_ports=docker_exposed_ports)
-    elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
-                     Provider.RACKSPACE]:
+    elif conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
         node = _create_machine_rackspace(conn, public_key, machine_name, image,
                                          size, location, user_data=cloud_init)
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key,
-                                         machine_name, image, size, location, networks, cloud_init)
+                                         machine_name, image, size, location,
+                                         networks, cloud_init)
     elif conn.type is Provider.HPCLOUD:
         node = _create_machine_hpcloud(conn, private_key, public_key,
-                                       machine_name, image, size, location, networks)
+                                       machine_name, image, size, location,
+                                       networks)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
         for loc in locations:
@@ -1641,10 +1649,11 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                 location = loc
                 break
         node = _create_machine_ec2(conn, key_id, private_key, public_key,
-                                   machine_name, image, size, location, cloud_init)
+                                   machine_name, image, size, location,
+                                   cloud_init)
     elif conn.type is Provider.NEPHOSCALE:
-        node = _create_machine_nephoscale(conn, key_id, private_key, public_key,
-                                          machine_name, image, size,
+        node = _create_machine_nephoscale(conn, key_id, private_key,
+                                          public_key, machine_name, image, size,
                                           location, ips)
     elif conn.type is Provider.GCE:
         sizes = conn.list_sizes(location=location_name)
@@ -1653,7 +1662,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                 size = size
                 break
         node = _create_machine_gce(conn, key_id, private_key, public_key,
-                                         machine_name, image, size, location, cloud_init)
+                                   machine_name, image, size, location,
+                                   cloud_init)
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
                                          machine_name, image, size,
@@ -1675,10 +1685,10 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                                       location)
     elif conn.type == Provider.HOSTVIRTUAL:
         node = _create_machine_hostvirtual(conn, public_key, machine_name, image,
-                                         size, location)
+                                           size, location)
     elif conn.type == Provider.VULTR:
         node = _create_machine_vultr(conn, public_key, machine_name, image,
-                                         size, location, cloud_init)
+                                     size, location, cloud_init)
     elif conn.type is Provider.LIBVIRT:
         try:
             # size_id should have a format cpu:ram, eg 1:2048
@@ -1695,7 +1705,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                                        cloud_init=cloud_init)
     elif conn.type == Provider.PACKET:
         node = _create_machine_packet(conn, public_key, machine_name, image,
-                                         size, location, cloud_init, project_id)
+                                      size, location, cloud_init, project_id)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -1711,7 +1721,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
+            user.id, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
@@ -1720,7 +1730,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         )
     elif conn.type == Provider.HPCLOUD:
         mist.io.tasks.hpcloud_post_create_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
+            user.id, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
@@ -1731,7 +1741,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         if associate_floating_ip:
             networks = list_networks(user, cloud_id)
             mist.io.tasks.openstack_post_create_steps.delay(
-                user.email, cloud_id, node.id, monitoring, script, key_id,
+                user.id, cloud_id, node.id, monitoring, script, key_id,
                 node.extra.get('username'), node.extra.get('password'),
                 public_key, script_id=script_id, script_params=script_params,
                 job_id = job_id, hostname=hostname, plugins=plugins,
@@ -1744,7 +1754,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
+            user.id, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params,
             job_id = job_id, hostname=hostname, plugins=plugins,
@@ -1754,7 +1764,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     elif key_id:   # there is a problem here with command and script
         mist.io.tasks.post_deploy_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script=script,
+            user.id, cloud_id, node.id, monitoring, script=script,
             key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
@@ -1776,7 +1786,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
 
 def _create_machine_rackspace(conn, public_key, machine_name,
-                             image, size, location, user_data):
+                              image, size, location, user_data):
     """Create a machine in Rackspace.
 
     Here there is no checking done, all parameters are expected to be
