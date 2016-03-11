@@ -568,8 +568,11 @@ def delete_key(request):
     if not key_id:
         raise KeypairParameterMissingError()
 
-    auth_context = auth_context_from_request(request)
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    try:
+        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    except me.DoesNotExist:
+        raise NotFoundError('Key id does not exist')
+
     keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
                                                       key_id)
     if not auth_context.has_perm('key', 'remove', keypair.id, keypair_tags):
@@ -613,20 +616,31 @@ def delete_keys(request):
     report = {}
     for key_id in key_ids:
         try:
-            keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-            keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                              key_id)
-            if not auth_context.has_perm('key', 'remove', keypair.id, keypair_tags):
-                raise UnauthorizedError()
-            methods.delete_key(auth_context.owner, key_id)
-        except KeypairNotFoundError:
+            keypair = Keypair.objects.get(owner=auth_context.owner,
+                                          name=key_id)
+        except me.DoesNotExist:
             report[key_id] = 'not_found'
         else:
-            report[key_id] = 'deleted'
-    # if no script id was valid raise exception
+            keypair_tags = mist.core.methods.get_keypair_tags(
+                auth_context.owner,
+                key_id)
+            if not auth_context.has_perm('key',
+                                         'remove',
+                                         keypair.id,
+                                         keypair_tags):
+                report[key_id] = 'unauthorized'
+            else:
+                methods.delete_key(auth_context.owner, key_id)
+                report[key_id] = 'deleted'
+
+    # if no key id was valid raise exception
     if len(filter(lambda key_id: report[key_id] == 'not_found',
                   report)) == len(key_ids):
-        raise NotFoundError('No valid script id provided')
+        raise NotFoundError('No valid key id provided')
+    # if user was unauthorized for all keys
+    if len(filter(lambda key_id: report[key_id] == 'deleted',
+                  report)) == len(key_ids):
+        raise NotFoundError('Unauthorized to modify any of the keys')
     return report
 
 
@@ -842,6 +856,7 @@ def associate_key(request):
 
     return assoc_machines
 
+
 @view_config(route_name='api_v1_key_association', request_method='DELETE', renderer='json')
 @view_config(route_name='key_association', request_method='DELETE', renderer='json')
 def disassociate_key(request):
@@ -898,7 +913,7 @@ def disassociate_key(request):
     # FIX filter machines based on auth_context
 
     return assoc_machines
-# TODO
+
 
 @view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
 @view_config(route_name='machines', request_method='GET', renderer='json')
