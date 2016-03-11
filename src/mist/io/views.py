@@ -12,6 +12,7 @@ be performed inside the corresponding method functions.
 import re
 import requests
 import json
+import mongoengine as me
 
 from pyramid.response import Response
 
