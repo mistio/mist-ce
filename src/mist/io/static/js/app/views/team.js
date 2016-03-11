@@ -72,14 +72,14 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 saveRulesClicked: function() {
-
+                    console.log('save');
                 },
 
                 addRulesClicked: function() {
-                    this.team.policy.rules.addObject({
+                    this.team.policy.rules.unshiftObject({
                         'operator': 'DENY',
-                        'action': '',
-                        'rtype': '',
+                        'action': 'All',
+                        'rtype': 'All',
                         'rid': '',
                         'rtags': ''
                     });

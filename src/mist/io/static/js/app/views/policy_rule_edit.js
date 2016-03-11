@@ -21,16 +21,19 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
             resourceTypesOptions: [
                 {
                     type: 'Machine',
-                    actions: ['Create', 'Read', 'Edit', 'EditTags', 'EditRules', 'EditGraphs', 'EditCustomMetrics', 'Start', 'Stop', 'Reboot', 'Destroy', 'RunScript', 'OpenShell', 'AssociateKey', 'DisassociateKey']
+                    actions: ['All', 'Create', 'Read', 'Edit', 'EditTags', 'EditRules', 'EditGraphs', 'EditCustomMetrics', 'Start', 'Stop', 'Reboot', 'Destroy', 'RunScript', 'OpenShell', 'AssociateKey', 'DisassociateKey']
                 }, {
                     type: 'Script',
-                    actions: ['Add', 'Read', 'Edit', 'Run', 'Remove']
+                    actions: ['All', 'Add', 'Read', 'Edit', 'Run', 'Remove']
                 }, {
                     type: 'Network',
-                    actions: ['Create', 'Read', 'Edit', 'Remove', 'AllocateAddress']
+                    actions: ['All', 'Create', 'Read', 'Edit', 'Remove', 'AllocateAddress']
                 }, {
                     type: 'Key',
-                    actions: ['Add', 'Read', 'ReadPrivate', 'Remove', 'Edit']
+                    actions: ['All', 'Add', 'Read', 'ReadPrivate', 'Remove', 'Edit']
+                }, {
+                    type: 'All',
+                    actions: ['All', 'None']
                 }
             ],
             resourceActionsOptions: Ember.computed('rule.rtype', 'resourceTypesOptions', function() {
@@ -49,7 +52,7 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
 
                 // Get button on which to position the popup
                 var button = '#' + el + ' .policy-rule-button.policy-rule-' + property;
-console.log(button);
+
                 // Reposition popup on the button
                 $('#policy-rule-' + property)
                     .popup('option', 'positionTo', button);

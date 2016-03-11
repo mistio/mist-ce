@@ -72,6 +72,31 @@
     background-color: #faf9f4;
     border: none;
 }
+#single-team-page .info-table .rule-item .ui-btn,
+#single-team-page .info-table .policy-operator .ui-btn {
+    margin: 0 5px;
+}
+#single-team-page .info-table .rule-item .ui-btn:first-of-type,
+#single-team-page .info-table .policy-operator .ui-btn:first-of-type {
+    margin-left: 0;
+}
+#single-team-page .info-table .rule-item .ui-btn.icon-xx {
+    float: right;
+    padding: 5.5px 8px;
+    width: initial;
+    line-height: 21px;
+    text-indent: initial;
+    color: #d96557;
+    background-color: transparent;
+    border: none;
+}
+#single-team-page .info-table .rule-item .ui-btn.icon-xx:hover {
+    color: #d96557 !important;
+}
+#single-team-page .info-table .rule-item .ui-btn.icon-xx:after {
+    font-size: 14px;
+    margin-top: -5px;
+}
 #single-team-page .info-table .member-item,
 #single-team-page .info-table .rule-item {
     border-bottom: 1px solid #eeedeb;
@@ -93,10 +118,14 @@
     position: relative;
     top: 2px;
 }
-#single-team-page .info-table .member-header,
-#single-team-page .info-table .policy-operator {
+#single-team-page .info-table .member-header {
     background-color: #E4E4E4;
     border-bottom: 1px solid #E4E4E4;
+    color: #444;
+}
+#single-team-page .info-table .policy-operator {
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #f2f2f2;
     color: #444;
 }
 #single-team-page #member-invite,

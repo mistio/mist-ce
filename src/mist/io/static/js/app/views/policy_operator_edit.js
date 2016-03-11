@@ -28,7 +28,7 @@ define('app/views/policy_operator_edit', ['app/views/controlled'],
 
                 // Get button on which to position the popup
                 var button = '#' + el + ' .policy-operator-button.policy-' + property;
-console.log(button);
+
                 // Reposition popup on the button
                 $('#policy-operator')
                     .popup('option', 'positionTo', button);

@@ -41,6 +41,13 @@ define('app/views/policy_rule_item', ['ember'],
 
                 openRuleResourcePopup: function() {
                     Mist.policyRuleEditController.open(this.get('rule'), 'resource', null, this.elementId);
+                },
+
+                deleteRule: function() {
+                    Mist.teamsController.deleteRule({
+                        team: this.get('team'),
+                        rule: this.get('rule')
+                    });
                 }
             }
         });

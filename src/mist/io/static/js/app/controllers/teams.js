@@ -167,6 +167,27 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     });
             },
 
+            deleteRule: function(args) {
+                // DELETE /org/{org_id}/teams/{team_id}/policy/rules/{index}
+                console.log(args);
+                var that = this;
+                that._deleteRule(args.team, args.rule);
+                // that.set('deletingRule', true);
+                // Mist.ajax
+                //     .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id + '/rules', {})
+                //     .success(function() {
+                //         that._deleteRule(args.team, args.rule);
+                //     })
+                //     .error(function(message) {
+                //         Mist.notificationController.notify(message);
+                //     })
+                //     .complete(function(success) {
+                //         that.set('deletingRule', false);
+                //         if (args.callback)
+                //             args.callback(success);
+                //     });
+            },
+
             getTeam: function(teamId) {
                 console.log(teamId, this.get('model'), Mist.teamsController.model, this.model.findBy('id', teamId));
                 return this.model.findBy('id', teamId);
@@ -215,6 +236,12 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             _deleteMember: function(team, member) {
                 Ember.run(this, function() {
                     team.members.removeObject(member);
+                });
+            },
+
+            _deleteRule: function(team, rule) {
+                Ember.run(this, function() {
+                    team.policy.rules.removeObject(rule);
                 });
             }
         });
