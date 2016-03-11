@@ -37,8 +37,7 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                 var options = this.get('resourceTypesOptions').filter(function(resource) {
                     return resource.type.toLowerCase() == this.get('rule.rtype');
                 }, this);
-                console.log(this.get('rule.rtype'), options[0].actions);
-                return options[0].actions;
+                return options.length == 0 ? [] : options[0].actions;
             }),
 
             //

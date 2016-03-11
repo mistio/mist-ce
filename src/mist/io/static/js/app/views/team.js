@@ -75,6 +75,17 @@ define('app/views/team', ['app/views/page'],
 
                 },
 
+                addRulesClicked: function() {
+                    this.team.policy.rules.addObject({
+                        'operator': 'DENY',
+                        'action': '',
+                        'rtype': '',
+                        'rid': '',
+                        'rtags': ''
+                    });
+                    console.log(this.model, this.team, 'add rule');
+                },
+
                 renameClicked: function() {
                     var team = this.team;
                     Mist.teamEditController.open(team, function(success) {

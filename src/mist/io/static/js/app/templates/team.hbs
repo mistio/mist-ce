@@ -57,13 +57,14 @@
                     {{#each view.team.policy.rules as |rule index|}}
                         {{component "policy-rule-item" rule=rule team=view.team}}
                     {{/each}}
-                    
+
                     {{component "policy-operator-item" policy=view.team.policy team=view.team}}
                 </tbody>
             </table>
 
             <div class="text-center">
-                <a id="rule-add" class="ui-btn ui-shadow ui-caps ui-btn-d" {{action "saveRulesClicked" target=view}}>Save Rules</a>
+                <a id="rule-add" class="ui-btn ui-shadow ui-caps back" {{action "addRulesClicked" target=view}}>Add Rule</a>
+                <a id="rule-save" class="ui-btn ui-caps ui-shadow ui-btn-d" {{action "saveRulesClicked" target=view}}>Save Rules</a>
             </div>
         </div>
 
