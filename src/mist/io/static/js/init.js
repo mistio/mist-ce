@@ -46,6 +46,7 @@ var loadApp = function(
     MemberAddController,
     PolicyRuleEditController,
     PolicyOperatorEditController,
+    PolicyController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -149,6 +150,7 @@ var loadApp = function(
     App.set('memberAddController', MemberAddController.create());
     App.set('policyRuleEditController', PolicyRuleEditController.create());
     App.set('policyOperatorEditController', PolicyOperatorEditController.create());
+    App.set('policyController', PolicyController.create());
 
     // Ember custom widgets
     App.Select = Ember.Select.extend({

@@ -167,6 +167,20 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     });
             },
 
+            editRule: function(args) {
+                console.log(args);
+                args.rule.set('rtype', 'Key');
+                Ember.run(this, function() {
+                    var index = args.team.policy.rules.indexOf(args.rule);
+                    // var rule = args.team.policy.rules.find(function(rule) {
+                    //     return rule == args.rule;
+                    // });
+                    console.log(index, rule);
+                    // rule.set(args.properties.key, args.properties.value);
+                    // team.policy.rules.removeObject(rule);
+                });
+            },
+
             deleteRule: function(args) {
                 // DELETE /org/{org_id}/teams/{team_id}/policy/rules/{index}
                 console.log(args);

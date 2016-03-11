@@ -2,6 +2,6 @@
 <td>{{member.email}}</td>
 <td class="member-actions">
     {{#unless view.isOwners}}
-    <a class="ui-btn ui-shadow ui-caps no" {{action "removeMemberClicked" target=view}}>Remove</a>
+    <a {{action "removeMemberClicked" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
     {{/unless}}
 </td>

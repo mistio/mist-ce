@@ -26,9 +26,6 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                     type: 'Script',
                     actions: ['All', 'Add', 'Read', 'Edit', 'Run', 'Remove']
                 }, {
-                    type: 'Network',
-                    actions: ['All', 'Create', 'Read', 'Edit', 'Remove', 'AllocateAddress']
-                }, {
                     type: 'Key',
                     actions: ['All', 'Add', 'Read', 'ReadPrivate', 'Remove', 'Edit']
                 }, {
@@ -74,23 +71,26 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
             actions: {
                 operatorClicked: function (operator) {
                     console.log(operator);
-                    // Mist.policyRuleEditController.edit({
-                    //     metric: metric
-                    // });
+                    Mist.policyRuleEditController.edit({
+                        key: 'operator',
+                        value: operator
+                    });
                 },
 
                 actionClicked: function (action) {
                     console.log(action);
-                    // Mist.policyRuleEditController.edit({
-                    //     action: action
-                    // });
+                    Mist.policyRuleEditController.edit({
+                        key: 'action',
+                        value: action
+                    });
                 },
 
                 resourceClicked: function (resource) {
                     console.log(resource);
-                    // Mist.policyRuleEditController.edit({
-                    //     resource: resource
-                    // });
+                    Mist.policyRuleEditController.edit({
+                        key: 'rtype',
+                        value: resource
+                    });
                 }
             }
         });

@@ -24,11 +24,12 @@ define('app/controllers/policy_rule_edit', ['ember'],
             //  Methods
             //
 
-            open: function (rule, property, callback, el) {
-                console.log(rule, property, callback, el);
+            open: function (rule, team, property, callback, el) {
+                console.log(rule, team, property, callback, el);
                 this.clear();
                 this.setProperties({
                     'rule': rule,
+                    'team': team,
                     'property': property,
                     'callback': callback
                 });
@@ -43,18 +44,19 @@ define('app/controllers/policy_rule_edit', ['ember'],
             clear: function () {
                 this.setProperties({
                     'rule': null,
+                    'team': null,
                     'property': null,
                     'callback': null
                 });
             },
 
             edit: function (keyValuePairs) {
-                Mist.rulesController.editRule({
-                    rule      : this.rule,
-                    callback  : this.callback,
+                console.log(keyValuePairs, this.rule, this.team);
+                Mist.teamsController.editRule({
+                    team: this.team,
+                    rule: this.rule,
                     properties: keyValuePairs
                 });
-                this.close();
             }
         });
     }

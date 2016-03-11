@@ -50,9 +50,9 @@ define('app/views/policy_operator_edit', ['app/views/controlled'],
             actions: {
                 operatorClicked: function (operator) {
                     console.log(operator);
-                    // Mist.policyRuleEditController.edit({
-                    //     metric: metric
-                    // });
+                    Mist.policyOperatorEditController.edit({
+                        operator: operator
+                    });
                 }
             }
         });

@@ -26,7 +26,7 @@ define('app/views/policy_operator_item', ['ember'],
 
             actions: {
                 openPolicyOperatorPopup: function() {
-                    Mist.policyOperatorEditController.open(this.get('policy'), 'operator', null, this.elementId);
+                    Mist.policyOperatorEditController.open(this.get('policy'), this.get('team'), 'operator', null, this.elementId);
                 }
             }
         });

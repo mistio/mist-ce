@@ -192,6 +192,7 @@ var loadFiles = function (callback) {
         'app/controllers/member_add',
         'app/controllers/policy_rule_edit',
         'app/controllers/policy_operator_edit',
+        'app/controllers/policy',
 
         'app/routes/image',
         'app/routes/images',

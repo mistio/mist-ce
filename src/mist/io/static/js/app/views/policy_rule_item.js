@@ -32,15 +32,15 @@ define('app/views/policy_rule_item', ['ember'],
 
             actions: {
                 openRuleOperatorPopup: function() {
-                    Mist.policyRuleEditController.open(this.get('rule'), 'operator', null, this.elementId);
+                    Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'operator', null, this.elementId);
                 },
 
                 openRuleActionPopup: function() {
-                    Mist.policyRuleEditController.open(this.get('rule'), 'action', null, this.elementId);
+                    Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'action', null, this.elementId);
                 },
 
                 openRuleResourcePopup: function() {
-                    Mist.policyRuleEditController.open(this.get('rule'), 'resource', null, this.elementId);
+                    Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'resource', null, this.elementId);
                 },
 
                 deleteRule: function() {

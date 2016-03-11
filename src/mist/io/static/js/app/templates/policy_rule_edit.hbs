@@ -33,7 +33,7 @@
         <ul data-role="listview">
             {{#each view.resourceTypesOptions as |resource|}}
             <li data-icon="false">
-                <a class="ui-btn" {{action "resourceClicked" resource target=view}}>
+                <a class="ui-btn" {{action "resourceClicked" resource.type target=view}}>
                     {{resource.type}}
                 </a>
             </li>

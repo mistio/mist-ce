@@ -24,11 +24,12 @@ define('app/controllers/policy_operator_edit', ['ember'],
             //  Methods
             //
 
-            open: function (policy, property, callback, el) {
-                console.log(policy, property, callback, el);
+            open: function (policy, team, property, callback, el) {
+                console.log(policy, team, property, callback, el);
                 this.clear();
                 this.setProperties({
                     'policy': policy,
+                    'team': team,
                     'property': property,
                     'callback': callback
                 });
@@ -44,17 +45,18 @@ define('app/controllers/policy_operator_edit', ['ember'],
                 this.setProperties({
                     'policy': null,
                     'property': null,
+                    'team': null,
                     'callback': null
                 });
             },
 
             edit: function (keyValuePairs) {
-                Mist.policysController.editRule({
-                    policy      : this.policy,
-                    callback  : this.callback,
+                console.log(keyValuePairs, this.policy, this.team);
+                Mist.policyController.editOperator({
+                    team: this.team,
+                    policy: this.policy,
                     properties: keyValuePairs
                 });
-                this.close();
             }
         });
     }
