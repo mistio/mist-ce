@@ -323,7 +323,7 @@ class DockerShell(object):
     def autoconfigure(self, user, cloud_id, machine_id, **kwargs):
         log.info("autoconfiguring DockerShell for machine %s:%s",
                  cloud_id, machine_id)
-        cloud = Cloud.objects.get(owner=user, cloud=cloud_id)
+        cloud = Cloud.objects.get(owner=user, id=cloud_id)
         docker_port = cloud.docker_port
 
         # For basic auth

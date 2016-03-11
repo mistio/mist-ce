@@ -134,6 +134,7 @@ class ShellConnection(MistConnection):
             'ip': self.ip,
             'user_agent': self.user_agent,
             'email': self.user.email,
+            'owner_id': self.auth_context.owner.id,
             'provider': data.get('provider', '')
         }
         self.hub_client = ShellHubClient(worker_kwargs=self.ssh_info)
