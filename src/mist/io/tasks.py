@@ -108,7 +108,7 @@ def ssh_command(owner, cloud_id, machine_id, host, command,
 
 
 @app.task(bind=True, default_retry_delay=3*60)
-def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
+def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command='',
                       key_id=None, username=None, password=None, port=22,
                       script_id='', script_params='', job_id=None,
                       hostname='', plugins=None, script=None,
