@@ -515,7 +515,7 @@ def _add_cloud_ec2(user, title, params):
             raise RequiredParameterMissingError('region')
 
         if api_secret == 'getsecretfromdb':
-            clouds = Cloud.objects(owner=user, apikey=apikey)
+            clouds = Cloud.objects(owner=user, apikey=api_key)
             for cloud in clouds:
                 if api_key == cloud.apikey:
                     api_secret = cloud.apisecret
