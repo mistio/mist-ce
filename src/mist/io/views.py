@@ -677,7 +677,11 @@ def set_default_key(request):
     key_id = request.matchdict['key']
 
     auth_context = auth_context_from_request(request)
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    try:
+        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    except me.DoesNotExist:
+        raise NotFoundError('Key id does not exist')
+
     keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
                                                       key_id)
     if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
