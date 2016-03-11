@@ -1,0 +1,5 @@
+<td>
+<a class="ui-btn policy-rule-button policy-rule-operator ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleOperatorPopup" target=view}}>{{rule.operator}}</a>&nbsp;<a class="ui-btn policy-rule-button policy-rule-action ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleActionPopup" target=view}}>{{rule.action}}</a>&nbsp;ON&nbsp;<a class="ui-btn policy-rule-button policy-rule-resource ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleResourcePopup" target=view}}>{{rule.rtype}}</a>&nbsp;WHEN&nbsp;{{input value=rule.rid placeholder="resource id or tag"}}
+</td>
+
+{{component "policy-rule-edit" rule=rule}}
