@@ -711,7 +711,7 @@ def get_private_key(request):
         keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
-    
+
     keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
                                                       key_id)
     if not auth_context.has_perm('key', 'read_private', keypair.id,
@@ -738,7 +738,11 @@ def get_public_key(request):
         raise RequiredParameterMissingError("key_id")
 
     auth_context = auth_context_from_request(request)
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    try:
+        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    except me.DoesNotExist:
+        raise NotFoundError('Key id does not exist')
+
     keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
                                                       key_id)
     if not auth_context.has_perm('key', 'read', keypair.id, keypair_tags):
