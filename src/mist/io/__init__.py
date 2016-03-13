@@ -104,9 +104,13 @@ def add_routes(configurator):
     """
 
     configurator.add_route('home', '/')
-    configurator.add_route('machines', '/clouds/{cloud}/machines')
-    configurator.add_route('networks', '/clouds/{cloud}/networks')
+    configurator.add_route('machines', '/machines')
+    configurator.add_route('networks', '/networks')
     configurator.add_route('keys', '/keys')
+    configurator.add_route('machine', '/machines/{machine}')
+    configurator.add_route('images', '/images')
+    configurator.add_route('image', '/images/{image}')
+
 
     configurator.add_route('api_v1_providers', '/api/v1/providers')
     configurator.add_route('providers', '/providers')
@@ -117,7 +121,6 @@ def add_routes(configurator):
 
     configurator.add_route('api_v1_machines', '/api/v1/clouds/{cloud}/machines')
     configurator.add_route('api_v1_machine', '/api/v1/clouds/{cloud}/machines/{machine}')
-    configurator.add_route('machine', '/clouds/{cloud}/machines/{machine}')
     configurator.add_route('api_v1_machine_rdp', '/api/v1/clouds/{cloud}/machines/{machine}/rdp')
     configurator.add_route('machine_rdp', '/clouds/{cloud}/machines/{machine}/rdp')
     configurator.add_route('api_v1_machine_tags', '/api/v1/clouds/{cloud}/machines/{machine}/tags')
@@ -141,9 +144,8 @@ def add_routes(configurator):
     configurator.add_route('deploy_plugin', '/clouds/{cloud}/machines/{machine}/plugins/{plugin}')
 
     configurator.add_route('api_v1_images', '/api/v1/clouds/{cloud}/images')
-    configurator.add_route('images', '/clouds/{cloud}/images')
+
     configurator.add_route('api_v1_image', '/api/v1/clouds/{cloud}/images/{image:.*}')
-    configurator.add_route('image', '/clouds/{cloud}/images/{image:.*}')
     configurator.add_route('api_v1_sizes', '/api/v1/clouds/{cloud}/sizes')
     configurator.add_route('sizes', '/clouds/{cloud}/sizes')
     configurator.add_route('api_v1_locations', '/api/v1/clouds/{cloud}/locations')

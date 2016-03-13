@@ -26,7 +26,7 @@ Polymer({
         );
 
         // Connect the receiver
-        var receiver = this.messageReceived.bind(this);
+        var receiver = this.receive.bind(this);
         this.socket.onmessage = function(e) {
             receiver(e.data);
         };
@@ -35,110 +35,95 @@ Polymer({
         this.socket.onerror = this.connectionError;
         this.socket.onclose = this.connectionClosed;
 
-        // When socket connects create mux and prepare channels
+        // Initialize main handlers
         var that = this;
+        this.handlers = {
+            main: {
+                list_clouds: function (data) {
+                    that.debounce(that._updateClouds(data), function(){
+                        // console.debug('list_clouds', data);
+                    }, 250); },
+                list_keys: function (data) {
+                    that.debounce(that._updateKeys(data), function(){
+                        // console.debug('list_keys', data);
+                    }, 250);
+                },
+                list_scripts: function (data) {
+                    that.debounce(that._updateScripts(data), function(){
+                        // console.debug('list_scripts', data);
+                    }, 250);
+                },
+                list_machines: function (data) {
+                    that.debounce(that._updateMachines(data), function(){
+                        // console.debug('list_machines', data);
+                    }, 250);
+                },
+                list_images: function (data) {
+                    that.debounce(that._updateImages(data), function(){
+                        // console.debug('list_images', data);
+                    }, 250);
+                },
+                list_sizes: function (data) {
+                    that.debounce(that._updateSizes(data), function(){
+                        // console.debug('list_sizes', data);
+                    }, 250);
+                },
+                list_locations: function (data) {
+                    that.debounce(that._updateLocations(data), function(){
+                    // console.debug('list_locations', data);
+                    }, 250);
+                },
+                list_networks: function (data) {
+                    that.debounce(that._updateNetworks(data), function(){
+                    // console.debug('list_networks', data);
+                    }, 250);
+                },
+                list_projects: function (data) {
+                    that.debounce(that._updateProjects(data), function(){
+                    // console.debug('list_projects', data);
+                    }, 250);
+                },
+                ping: function (data) {
+                    // console.debug('ping', data);
+                    that._ping(data);
+                },
+                probe: function (data) {
+                    // console.debug('probe', data);
+                    that._probe(data);
+                },
+                monitoring: function (data) {
+                    that.debounce(that._updateMonitoring(data), function () {
+                      // console.debug('monitoring', data);
+                    }, 250);
+                },
+            },
+            logs: {
+                logs: function (data) {
+                    console.log('got logs', data);
+                },
+                open_incidents: function (data){
+                    console.log('got incidents', data);
+                },
+                open_jobs: function (data) {
+                    console.log('got jobs', data);
+                },
+                open_sessions: function (data) {
+                    console.log('got sessions', data);
+                },
+                open_shells: function (data) {
+                    console.log('got shells', data);
+                }
+           }
+        };
+
+        // When socket connects prepare channels
         this.socket.onopen = function () {
             console.log('CONNECTION ESTABLISHED');
-            this.mux = new MultiplexedWebSocket(this);
-            that.setupChannel('main', function() {
-                console.log('Channel main initialized')
-            });
-            that.setupChannel('logs', function() {
-                console.log('Channel logs initialized')
-            });
+            that.send('sub', 'main');
+            that.send('msg', 'main', 'ready');
+            that.send('sub', 'logs');
+            that.send('msg', 'logs', 'ready');
         };
-    },
-
-    setupChannel: function (namespace, callback) {
-        var channel = this.socket.mux.channel(namespace);
-        var that = this;
-        console.info('Connecting', namespace)
-        channel.onopen = function(e){
-            that.setupChannelEvents(namespace, function () {
-                console.info('Connected', namespace);
-                if (callback instanceof Function)
-                    callback();
-                if (that.onConnect instanceof Function)
-                    that.onConnect(that);
-            });
-        }
-    },
-
-    setupChannelEvents: function (namespace, callback) {
-        var channel = this.socket.mux.channel(namespace),
-            that = this;
-        channel.on('open', function () {
-            console.log('Channel %s opened', namespace);
-        });
-
-        if (namespace == 'main') {
-            channel.on('list_keys', function (data) {
-                that.debounce(that._updateKeys(data), function(){
-                // console.debug('list_keys', data);
-                }, 250);
-            });
-            channel.on('list_scripts', function (data) {
-                that.debounce(that._updateScripts(data), function(){
-                // console.debug('list_scripts', data);
-                }, 250);
-            });
-            channel.on('list_clouds', function (data) {
-                that.debounce(that._updateClouds(data), function(){
-                // console.debug('list_clouds', data);
-                }, 250);
-            });
-            channel.on('list_machines', function (data) {
-                that.debounce(that._updateMachines(data), function(){
-                // console.debug('list_machines', data);
-                }, 250);
-            });
-            channel.on('list_sizes', function (data) {
-                that.debounce(that._updateSizes(data), function(){
-                // console.debug('list_sizes', data);
-                }, 250);
-            });
-            channel.on('list_locations', function (data) {
-                that.debounce(that._updateLocations(data), function(){
-                // console.debug('list_locations', data);
-                }, 250);
-            });
-            channel.on('list_images', function (data) {
-                that.debounce(that._updateImages(data), function(){
-                // console.debug('list_images', data);
-                }, 250);
-            });
-            channel.on('list_networks', function (data) {
-                that.debounce(that._updateNetworks(data), function(){
-                // console.debug('list_networks', data);
-                }, 250);
-            });
-            channel.on('list_projects', function (data) {
-                that.debounce(that._updateProjects(data), function(){
-                // console.debug('list_projects', data);
-                }, 250);
-            });
-            channel.on('probe', function (data) {
-                // console.debug('probe', data);
-                that._probe(data);
-            });
-            channel.on('ping', function (data) {
-                // console.debug('ping', data);
-                that._ping(data);
-            });
-            channel.on('monitoring', function (data) {
-                that.debounce(that._updateMonitoring(data), function () {
-                  // console.debug('monitoring', data);
-                }, 250);
-            });
-        } else if (namespace == 'logs') {
-            console.warn('setup log handler');
-            channel.on('logs', function (data) {
-                console.error('got logs', data);
-            });
-        }
-        channel.send('ready');
-        if (callback)
-            callback();
     },
 
     connectionClosed: function () {
@@ -151,15 +136,36 @@ Polymer({
         // TODO: try to reconnect
     },
 
-    messageReceived: function (message) {
+    send: function (type, namespace, body, params) {
+        if (namespace == undefined)
+            namespace = 'main';
+
+        var payload = type + ',' + namespace;
+
+        if (body !== undefined)
+            payload += ',' + body;
+
+        if (params !== undefined)
+            payload += ',' + JSON.stringify([params]);
+
+        this.socket.send(payload);
         if (DEBUG_SOCKET)
-            console.log('RECEIVED: ' + message);
+            console.debug('SENT: ' + payload);
     },
 
-    sendMessage: function (message) {
-        this.sock.send(message);
+    receive: function (message) {
         if (DEBUG_SOCKET)
-            console.log('SENT: ' + message);
+            console.debug('RECEIVED: ' + message);
+        var parts = message.split(',');
+        var type = parts[0], namespace = parts[1];
+        var body = JSON.parse(parts.splice(2).join(','));
+        if (this.handlers[namespace] === undefined)
+            console.warn('Unknown namespace', namespace);
+        var endpoint = this.handlers[namespace][Object.keys(body)[0]];
+        if (endpoint === undefined)
+            console.warn('Unknown endpoint', Object.keys(body)[0], 'in namespace', namespace);
+        else
+            endpoint(body[Object.keys(body)[0]]);
     },
 
     _updateClouds: function (data) {
@@ -167,17 +173,28 @@ Polymer({
     },
 
     _updateModel: function (section, data) {
-        var changed = false,
+        var changed = false, // we wont update the model if it hasn't changed
             pending = this.get('model.' + section + '.pending');
+
+        // if the received data array has different length than the respective
+        // model array, then things must have changed since last update
+        if (data.length != this.get('model.' + section + 'Array.length')) {
+            changed = true;
+        }
 
         // For each item in the received data array
         for (var i=0; i < data.length; i++) {
+            // If we know things have changed no need to keep checking
+            if (changed)
+                break;
+
             // Check if item exists in respective model
             var item = this.get('model.' + section + '.' + data[i].id);
             if (!item) { // If does not exist then model needs to be updated
                 changed = true;
                 break;
             }
+
             // check if all fields of the data item exist in the model item
             var dataKeys = Object.keys(data[i]), modelKeys = Object.keys(item);
             for (var k=0; k < dataKeys.length; k++){
@@ -186,8 +203,9 @@ Polymer({
                     changed = true;
                     break;
                 }
-                // If something changed the model needs to be updated
-                if (JSON.stringify(data[i][dataKeys[k]]).localeCompare(JSON.stringify(item[dataKeys[k]]))) {
+                // If some field changed the model needs to be updated
+                if (JSON.stringify(data[i][dataKeys[k]])
+                      .localeCompare(JSON.stringify(item[dataKeys[k]]))) {
                     console.debug('property ', dataKeys[k], ' changed in ', item);
                     var oldVal = JSON.stringify(item[dataKeys[k]]),
                         newVal = JSON.stringify(data[i][dataKeys[k]]);
@@ -197,6 +215,7 @@ Polymer({
                     break;
                 }
             }
+
             if (changed)
                 break;
         }
@@ -324,119 +343,13 @@ Polymer({
         }
         return keywords;
     }
-
-
 });
 
 var _generateMap = function(list) {
-  var out = {};
-  for (var i = 0; i < list.length; i++) {
-    out[list[i].id] = list[i];
-  }
-  return out;
-};
-
-// ****
-
-var DumbEventTarget = function() {
-    this._listeners = {};
-};
-DumbEventTarget.prototype._ensure = function(type) {
-    if(!(type in this._listeners)) this._listeners[type] = [];
-};
-DumbEventTarget.prototype.addEventListener = function(type, listener) {
-    this._ensure(type);
-    this._listeners[type].push(listener);
-};
-DumbEventTarget.prototype.on = function(type, listener) {
-    console.info("Adding listener to " + this.name + " for event " + type);
-    this.addEventListener(type, listener);
-};
-DumbEventTarget.prototype.off = function(type, listener) {
-    console.info("Removing listener to " + this.name + " for event " + type);
-    this.removeEventListener(type, listener);
-};
-DumbEventTarget.prototype.emit = function(type) {
-    var args = Array.prototype.slice.call(arguments, 1);
-    if (args.length == 1) {
-        var data = args[0]
-        if (data.data){
-            var keys = Object.keys(data.data);
-            if (keys.length == 1) {
-                type = keys[0];
-                data = data.data[type];
-                args = [data];
-            }
-        }
+    var out = {};
+    for (var i = 0; i < list.length; i++) {
+        out[list[i].id] = list[i];
     }
-    // console.debug("Channel " + this.name + " got event '" + type + "'.");
-    this._ensure(type);
-    if (!(('on' + type in this) || (this._listeners[type].length))) {
-        // console.warn("No listeners for '" + type + "' in " + this.name + ".");
-    }
-    if (this['on' + type]) this['on' + type].apply(this, args);
-    for (var i=0; i < this._listeners[type].length; i++) {
-        this._listeners[type][i].apply(this, args);
-    }
-};
-
-
-/**** Mux ****/
-
-var MultiplexedWebSocket = function(ws) {
-    var that = this;
-    this.ws = ws;
-    this.channels = {};
-    this.ws.addEventListener('message', function(e) {
-        var t = e.data.split(',');
-        var type = t.shift(), name = t.shift(), payload = t.join();
-        if(!(name in that.channels)) {
-            return;
-        }
-        var sub = that.channels[name];
-
-        switch(type) {
-        case 'uns':
-            delete that.channels[name];
-            sub.emit('close', {});
-            break;
-        case 'msg':
-            sub.emit('message', {data: JSON.parse(payload)});
-            break
-        }
-    });
-};
-
-MultiplexedWebSocket.prototype.channel = function(raw_name) {
-    return this.channels[escape(raw_name)] =
-        new Channel(this.ws, escape(raw_name), this.channels);
-};
-
-var Channel = function(ws, name, channels) {
-    DumbEventTarget.call(this);
-    var that = this;
-    this.ws = ws;
-    this.name = name;
-    this.channels = channels;
-    var onopen = function() {
-        that.ws.send('sub,' + that.name);
-        that.emit('open');
-    };
-    if(ws.readyState > 0) {
-        setTimeout(onopen, 0);
-    } else {
-        this.ws.addEventListener('open', onopen);
-    }
-};
-
-Channel.prototype = new DumbEventTarget();
-Channel.prototype.send = function(data) {
-    this.ws.send('msg,' + this.name + ',' + data);
-};
-Channel.prototype.close = function() {
-    var that = this;
-    this.ws.send('uns,' + this.name);
-    delete this.channels[this.name];
-    setTimeout(function(){that.emit('close', {})},0);
+    return out;
 };
 </script>
