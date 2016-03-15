@@ -1169,10 +1169,10 @@ def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
 
     log.info("Disassociating key, undeploy = %s" % host)
     key = Keypair.objects.get(owner=user, name=key_id)
-    cloud = Cloud.objects.get(onwer=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
     machine = Machine.objects.get(cloud=cloud,
                                   key_associations__keypair__exact=key,
-                                  id=machine_id)
+                                  machine_id=machine_id)
     # key not associated
     if not machine:
         raise BadRequestError("Keypair '%s' is not associated with "
