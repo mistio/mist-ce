@@ -308,7 +308,7 @@ class ParamikoShell(object):
                 machine.save()
 
                 if trigger_session_update_flag:
-                    trigger_session_update(user.email, ['keys'])
+                    trigger_session_update(user.id, ['keys'])
                 return key.name, ssh_user
 
         raise MachineUnauthorizedError("%s:%s" % (cloud_id, machine_id))
