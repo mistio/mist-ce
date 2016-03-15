@@ -1512,7 +1512,7 @@ def list_machines(user, cloud_id):
             keys = Keypair.objects(owner=user)
             machine = Machine.objects(owner=user,
                                       key_associations__keypair__in=keys,
-                                      id=machine_id)
+                                      machine_id=machine_id)
             if machine:
                 can_reboot = True
             m.extra['can_reboot'] = can_reboot
@@ -2559,7 +2559,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     port = 22
 
                 machine = Machine.objects.get(cloud=cloud,
-                                              id=machine_id)
+                                              machine_id=machine_id)
                 for key_assoc in machine.key_associations:
                     key_assoc.port = port
                 machine.save()
@@ -2618,7 +2618,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     except KeyError:
                         port = 22
                     machine = Machine.objects.get(cloud=cloud,
-                                                  id=machine_id)
+                                                  machine_id=machine_id)
                     for key_assoc in machine.key_associations:
                         key_assoc.port = port
                     machine.save()
