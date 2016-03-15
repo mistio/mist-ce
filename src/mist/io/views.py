@@ -1088,7 +1088,7 @@ def create_machine(request):
             if key not in params:
                 raise RequiredParameterMissingError(key)
 
-        cronjob= {
+        cronjob = {
             'name': params.get('cronjob_name'),
             'description': params.get('description', ''),
             'action': params.get('cronjob_action', ''),
@@ -1098,7 +1098,7 @@ def create_machine(request):
             'expires': params.get('expires', ''),
             'enabled': bool(params.get('cronjob_enabled', False)),
             'run_immediately': params.get('run_immediately', False),
-            }
+        }
 
     auth_context = auth_context_from_request(request)
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
@@ -1110,7 +1110,8 @@ def create_machine(request):
     if not auth_context.has_perm("machine", "create"):
         raise UnauthorizedError()
     if script_id:
-        script_tags = mist.core.methods.get_script_tags(script_id)
+        script_tags = mist.core.methods.get_script_tags(auth_context.owner,
+                                                        script_id)
         if auth_context.has_perm("script", "run", script_id, script_tags):
             raise UnauthorizedError()
     if key_id:
