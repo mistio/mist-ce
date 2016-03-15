@@ -37,6 +37,7 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                 var options = this.get('resourceTypesOptions').filter(function(resource) {
                     return resource.type.toLowerCase() == this.get('rule.rtype');
                 }, this);
+                console.log(this.get('rule.rtype'));
                 return options.length == 0 ? [] : options[0].actions;
             }),
 
@@ -70,7 +71,6 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
 
             actions: {
                 operatorClicked: function (operator) {
-                    console.log(operator);
                     Mist.policyRuleEditController.edit({
                         key: 'operator',
                         value: operator
@@ -78,7 +78,6 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                 },
 
                 actionClicked: function (action) {
-                    console.log(action);
                     Mist.policyRuleEditController.edit({
                         key: 'action',
                         value: action
@@ -86,7 +85,6 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                 },
 
                 resourceClicked: function (resource) {
-                    console.log(resource);
                     Mist.policyRuleEditController.edit({
                         key: 'rtype',
                         value: resource

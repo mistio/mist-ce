@@ -19,7 +19,6 @@ define('app/controllers/policy_rule_edit', ['ember'],
             property: null,
             callback: null,
 
-
             //
             //  Methods
             //
@@ -51,7 +50,6 @@ define('app/controllers/policy_rule_edit', ['ember'],
             },
 
             edit: function (keyValuePairs) {
-                console.log(keyValuePairs, this.rule, this.team);
                 Mist.teamsController.editRule({
                     team: this.team,
                     rule: this.rule,

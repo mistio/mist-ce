@@ -167,18 +167,37 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     });
             },
 
-            editRule: function(args) {
-                console.log(args);
-                args.rule.set('rtype', 'Key');
-                Ember.run(this, function() {
-                    var index = args.team.policy.rules.indexOf(args.rule);
-                    // var rule = args.team.policy.rules.find(function(rule) {
-                    //     return rule == args.rule;
-                    // });
-                    console.log(index, rule);
-                    // rule.set(args.properties.key, args.properties.value);
-                    // team.policy.rules.removeObject(rule);
+            addRule: function(team) {
+                team.policy.rules.pushObject({
+                    'operator': 'DENY',
+                    'action': 'All',
+                    'rtype': 'All',
+                    'rid': '',
+                    'rtags': ''
                 });
+            },
+
+            editRule: function(args) {
+                var index = args.team.policy.rules.indexOf(args.rule),
+                rule = args.team.policy.rules.objectAt(index);
+                Ember.set(rule, args.properties.key, args.properties.value);
+            },
+
+            moveUpRule: function(rule, team) {
+                var index = team.policy.rules.indexOf(rule);
+
+                if (index !== 0) {
+                    team.policy.rules.removeAt(index).insertAt(index - 1, rule);
+                }
+            },
+
+            moveDownRule: function(rule, team) {
+                var index = team.policy.rules.indexOf(rule),
+                len = team.policy.rules.length;
+
+                if (index !== len - 1) {
+                    team.policy.rules.removeAt(index).insertAt(index + 1, rule);
+                }
             },
 
             deleteRule: function(args) {
@@ -200,6 +219,10 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 //         if (args.callback)
                 //             args.callback(success);
                 //     });
+            },
+
+            saveRules: function(team) {
+                console.log('save');
             },
 
             getTeam: function(teamId) {

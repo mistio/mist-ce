@@ -55,7 +55,7 @@
             <table class="info-table">
                 <tbody>
                     {{#each view.team.policy.rules as |rule index|}}
-                        {{component "policy-rule-item" rule=rule team=view.team}}
+                        {{component "policy-rule-item" index=index rule=rule team=view.team}}
                     {{/each}}
 
                     {{component "policy-operator-item" policy=view.team.policy team=view.team}}
@@ -74,6 +74,10 @@
     {{component "dialog-popup"}}
 
     {{component "team-edit"}}
+
+    {{component "policy-rule-edit"}}
+
+    {{component "policy-operator-edit" team=view.team}}
 
     {{component "member-add" team=view.team}}
 

@@ -17,9 +17,9 @@ define('app/views/team', ['app/views/page'],
             // Computed Properties
             //
 
-            model: function () {
+            model: Ember.computed('controller.model', function() {
                 return this.get('controller').get('model');
-            }.property('controller.model'),
+            }),
 
             isOwners: Ember.computed('team.name', function() {
                 return this.get('team.name') == 'Owners';
@@ -72,18 +72,11 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 saveRulesClicked: function() {
-                    console.log('save');
+                    Mist.teamsController.saveRules(this.get('team'));
                 },
 
                 addRulesClicked: function() {
-                    this.team.policy.rules.unshiftObject({
-                        'operator': 'DENY',
-                        'action': 'All',
-                        'rtype': 'All',
-                        'rid': '',
-                        'rtags': ''
-                    });
-                    console.log(this.model, this.team, 'add rule');
+                    Mist.teamsController.addRule(this.get('team'));
                 },
 
                 renameClicked: function() {
@@ -94,7 +87,6 @@ define('app/views/team', ['app/views/page'],
                         }
                     });
                 },
-
 
                 deleteClicked: function() {
                     var team = this.get('team');
@@ -112,7 +104,7 @@ define('app/views/team', ['app/views/page'],
                                 Mist.teamsController.deleteTeam(team, function(success) {
                                     if (success)
                                         console.log(123);
-                                        Mist.__container__.lookup('router:main').transitionTo('teams');
+                                    Mist.__container__.lookup('router:main').transitionTo('teams');
                                 });
                             }
                         }

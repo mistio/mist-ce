@@ -19,6 +19,30 @@ define('app/views/policy_rule_item', ['ember'],
             classNames: ['rule-item'],
             rule: null,
             team: null,
+            index: null,
+
+            //
+            // Computed Properties
+            //
+
+            orderIndex: Ember.computed('index', function() {
+                return this.get('index') + 1 + '.';
+            }),
+
+            isLast: Ember.computed('rule', 'team.policy.rules.[]', function() {
+                var rules = this.get('team.policy.rules'),
+                len = rules.length;
+                return rules.indexOf(this.get('rule')) == len - 1;
+            }),
+
+            isFirst: Ember.computed('rule', 'team.policy.rules.[]', function() {
+                var rules = this.get('team.policy.rules');
+                return rules.indexOf(this.get('rule')) === 0;
+            }),
+
+            //
+            // Initialization
+            //
 
             load: function() {
                 Ember.run.scheduleOnce('afterRender', this, function() {
@@ -41,6 +65,14 @@ define('app/views/policy_rule_item', ['ember'],
 
                 openRuleResourcePopup: function() {
                     Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'resource', null, this.elementId);
+                },
+
+                moveUpRule: function() {
+                    Mist.teamsController.moveUpRule(this.get('rule'), this.get('team'));
+                },
+
+                moveDownRule: function() {
+                    Mist.teamsController.moveDownRule(this.get('rule'), this.get('team'));
                 },
 
                 deleteRule: function() {

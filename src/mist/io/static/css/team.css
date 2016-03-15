@@ -109,12 +109,27 @@
 #single-team-page .info-table .rule-item {
     border-bottom: 1px solid #eeedeb;
 }
+#single-team-page .info-table tr.rule-item td {
+    padding-left: 50px;
+}
 #single-team-page .info-table .rule-item .ui-input-text {
     display: inline-table;
+}
+#single-team-page .info-table .rule-item .policy-rule-arrow {
+    padding: 12px 5px 6px;
+    color: #7f7f7f;
+    border: none;
+}
+#single-team-page .info-table .rule-item .policy-rule-arrow:hover {
+    background-color: transparent;
+    color: #444 !important;
 }
 #single-team-page .info-table .member-item:hover,
 #single-team-page .info-table .rule-item:hover {
     background-color: #f2f2f2;
+}
+#single-team-page .info-table .rule-item:hover .policy-rule-arrow {
+    background-color: transparent;
 }
 #single-team-page .info-table td.member-actions {
     padding: 0 12px;
@@ -140,6 +155,9 @@
 #single-team-page #rule-save {
     display: inline-block;
     margin: 8px auto 20px;
+}
+#single-team-page #member-invite {
+    margin: 20px auto;
 }
 #single-team-page #rule-add {
     display: block;

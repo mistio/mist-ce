@@ -1,5 +1,6 @@
 <td>
-<a class="ui-btn policy-rule-button policy-rule-operator ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleOperatorPopup" target=view}}>{{rule.operator}}</a>&nbsp;<a class="ui-btn policy-rule-button policy-rule-action ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleActionPopup" target=view}}>{{rule.action}}</a>&nbsp;ON&nbsp;<a class="ui-btn policy-rule-button policy-rule-resource ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleResourcePopup" target=view}}>{{rule.rtype}}</a>&nbsp;WHERE&nbsp;{{input value=rule.rid placeholder="resource id or tag"}} <a {{action "deleteRule" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
+{{view.orderIndex}}
+<a class="ui-btn policy-rule-arrow icon-up ui-btn-inline {{if view.isFirst 'ui-state-disabled'}}" {{action "moveUpRule" target=view}}></a>
+<a class="ui-btn policy-rule-arrow icon-down ui-btn-inline {{if view.isLast 'ui-state-disabled'}}" {{action "moveDownRule" target=view}}></a>
+<a class="ui-btn policy-rule-button policy-rule-operator ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleOperatorPopup" target=view}}>{{rule.operator}}</a>&nbsp;<a class="ui-btn policy-rule-button policy-rule-resource ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleResourcePopup" target=view}}>{{rule.rtype}}</a>&nbsp;<a class="ui-btn policy-rule-button policy-rule-action ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleActionPopup" target=view}}>{{rule.action}}</a>&nbsp;WHERE&nbsp;{{input value=rule.rid placeholder="resource id or tag"}} <a {{action "deleteRule" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
 </td>
-
-{{component "policy-rule-edit" rule=rule}}
