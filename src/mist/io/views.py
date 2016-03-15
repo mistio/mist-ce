@@ -74,8 +74,8 @@ def exception_handler_mist(exc, request):
 @view_config(context='pyramid.httpexceptions.HTTPNotFound',
              renderer='templates/404.pt')
 def not_found(self, request):
-
     return pyramid.httpexceptions.HTTPFound(request.host_url + "/#" + request.path)
+
 
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
