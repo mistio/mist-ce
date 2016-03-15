@@ -66,7 +66,7 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
 
             loadMetrics: function () {
 
-                var url = '/clouds/' + this.machine.cloud.id +
+                var url = '/api/v1/clouds/' + this.machine.cloud.id +
                           '/machines/' + this.machine.id + '/metrics';
 
                 var that = this;

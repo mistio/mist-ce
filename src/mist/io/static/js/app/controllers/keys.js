@@ -90,7 +90,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             addKey: function(args) {
                 var that = this;
                 this.set('addingKey', true);
-                Mist.ajax.PUT('/keys', {
+                Mist.ajax.PUT('/api/v1/keys', {
                     'id': args.keyId,
                     'priv': args.keyPrivate
                 }).success(function (key) {
@@ -108,7 +108,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             renameKey: function(keyId, newKeyId, callback) {
                 var that = this;
                 this.set('renamingKey', true);
-                Mist.ajax.PUT('/keys/' + keyId, {
+                Mist.ajax.PUT('/api/v1/keys/' + keyId, {
                     'new_id': newKeyId
                 }).success(function() {
                     that._renameKey(keyId, newKeyId);
@@ -124,7 +124,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             deleteKey: function(keyId, callback) {
                 var that = this;
                 this.set('deletingKey', true);
-                Mist.ajax.DELETE('/keys/' + keyId, {
+                Mist.ajax.DELETE('/api/v1/keys/' + keyId, {
                 }).success(function() {
                     that._deleteKey(keyId);
                 }).error(function() {
@@ -139,7 +139,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             setDefaultKey: function(keyId, callback) {
                 var that = this;
                 this.set('settingDefaultKey', true);
-                Mist.ajax.POST('/keys/' + keyId, {
+                Mist.ajax.POST('/api/v1/keys/' + keyId, {
                 }).success(function() {
                     that._setDefaultKey(keyId);
                 }).error(function() {
@@ -157,7 +157,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
                 var that = this;
                 this.set('associatingKey', true);
-                Mist.ajax.PUT('/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/keys/' + keyId, {
+                Mist.ajax.PUT('/api/v1/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/keys/' + keyId, {
                     'host': machine.getHost(),
                     'user': user,
                     'port': port
@@ -177,7 +177,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                 var cloud_id = machine.cloud.id ? machine.cloud.id : machine.cloud;
                 var that = this;
                 this.set('disassociatingKey', true);
-                Mist.ajax.DELETE('/clouds/' + cloud_id + '/machines/' + machine.id + '/keys/' + keyId, {
+                Mist.ajax.DELETE('/api/v1/clouds/' + cloud_id + '/machines/' + machine.id + '/keys/' + keyId, {
                     'host': machine.getHost()
                 }).success(function() {
                     that._disassociateKey(keyId, machine);
@@ -193,7 +193,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             generateKey: function(args) {
                 var that = this;
                 this.set('generatingKey', true);
-                Mist.ajax.POST('/keys', {
+                Mist.ajax.POST('/api/v1/keys', {
                 }).error(function () {
                     Mist.notificationController.notify(
                         'Failed to generate key');
@@ -207,7 +207,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             getPrivateKey: function(keyId, callback) {
                 var that = this;
                 this.set('gettingPrivateKey', true);
-                Mist.ajax.GET('/keys/' + keyId + '/private', {
+                Mist.ajax.GET('/api/v1/keys/' + keyId + '/private', {
                 }).error(function() {
                     Mist.notificationController.notify('Failed to get private key');
                 }).complete(function(success, keyPriv) {
@@ -220,7 +220,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             getPublicKey: function(keyId, callback) {
                 var that = this;
                 this.set('gettingPublicKey', true);
-                Mist.ajax.GET('/keys/' + keyId + '/public', {
+                Mist.ajax.GET('/api/v1/keys/' + keyId + '/public', {
                 }).error(function() {
                     Mist.notificationController.notify('Failed to get public key');
                 }).complete(function(success, keyPub) {
