@@ -116,7 +116,7 @@ define('app/controllers/clouds', ['app/models/cloud', 'ember'],
                 var key = Mist.keysController.keyExists(args.payload.key) ? args.payload.key : null;
                 var that = this;
                 this.set('addingCloud', true);
-                Mist.ajax.POST('/clouds', args.payload)
+                Mist.ajax.POST('/api/v1/clouds', args.payload)
                 .success(function (cloud) {
                     that._addCloud(cloud, key);
                 }).error(function (message) {
@@ -131,7 +131,7 @@ define('app/controllers/clouds', ['app/models/cloud', 'ember'],
             renameCloud: function (args) {
                 var that = this;
                 this.set('renamingCloud', true);
-                Mist.ajax.PUT('/clouds/' + args.cloud.id, {
+                Mist.ajax.PUT('/api/v1/clouds/' + args.cloud.id, {
                     'new_name': args.newTitle
                 }).success(function () {
                     that._renameCloud(args.cloud, args.newTitle);
@@ -148,7 +148,7 @@ define('app/controllers/clouds', ['app/models/cloud', 'ember'],
             deleteCloud: function(args) {
                 var that = this;
                 this.set('deletingCloud', true);
-                Mist.ajax.DELETE('/clouds/' + args.cloud.id, {
+                Mist.ajax.DELETE('/api/v1/clouds/' + args.cloud.id, {
                 }).success(function() {
                     that._deleteCloud(args.cloud);
                 }).error(function() {
@@ -163,7 +163,7 @@ define('app/controllers/clouds', ['app/models/cloud', 'ember'],
             toggleCloud: function(args) {
                 var that = this;
                 this.set('togglingCloud', true);
-                Mist.ajax.POST('/clouds/' + args.cloud.id, {
+                Mist.ajax.POST('/api/v1/clouds/' + args.cloud.id, {
                     'new_state': args.newState.toString()
                 }).success(function () {
                     that._toggleCloud(args.cloud, args.newState);
@@ -194,7 +194,7 @@ define('app/controllers/clouds', ['app/models/cloud', 'ember'],
                 }
                 var that = this;
                 var uptime = null;
-                Mist.ajax.POST('/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/probe', {
+                Mist.ajax.POST('/api/v1/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/probe', {
                     'host': host,
                     'key': keyId
                 }).success(function (data) {

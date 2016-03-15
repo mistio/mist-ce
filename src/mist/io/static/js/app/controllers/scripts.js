@@ -67,7 +67,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
             addScript: function (args) {
                 var that = this;
                 that.set('addingScript', true);
-                Mist.ajax.POST('/scripts', {
+                Mist.ajax.POST('/api/v1/scripts', {
                     'name': args.script.name,
                     'exec_type': args.script.type.value,
                     'location_type': args.script.source.value,
@@ -88,7 +88,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
             deleteScript: function (args) {
                 var that = this;
                 that.set('deletingScript', true);
-                Mist.ajax.DELETE('/scripts/' + args.script.id, {
+                Mist.ajax.DELETE('/api/v1/scripts/' + args.script.id, {
                 }).success(function () {
                     that._deleteObject(args.script);
                 }).error(function (message) {
@@ -103,7 +103,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
             renameScript: function (args) {
                 var that = this;
                 that.set('renamingScript', true);
-                Mist.ajax.PUT('/scripts/' + args.script.id, {
+                Mist.ajax.PUT('/api/v1/scripts/' + args.script.id, {
                     new_name: args.newName,
                     new_description: args.newDescription
                 }).success(function () {
@@ -120,7 +120,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
             runScript: function (args) {
                 var that = this;
                 that.set('runningScript', true);
-                Mist.ajax.POST('/scripts/' + args.script.script.id, {
+                Mist.ajax.POST('/api/v1/scripts/' + args.script.script.id, {
                     'machine_id': args.script.machine.id,
                     'cloud_id': args.script.machine.cloud.id,
                     'params': args.script.parameters

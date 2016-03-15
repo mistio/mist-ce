@@ -81,7 +81,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
             add: function () {
 
-                var url = '/clouds/' + this.machine.cloud.id +
+                var url = '/api/v1/clouds/' + this.machine.cloud.id +
                           '/machines/' + this.machine.id +
                           '/plugins/' + this.metric.pluginId;
 

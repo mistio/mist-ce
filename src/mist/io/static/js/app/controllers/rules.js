@@ -68,7 +68,7 @@ define('app/controllers/rules',
             newRule: function (machine, callback) {
                 var that = this;
                 this.set('creationPending', true);
-                Mist.ajax.POST('/rules', {
+                Mist.ajax.POST('/api/v1/rules', {
                     'cloudId': machine.cloud.id,
                     'machineId': machine.id,
                     'metric': 'load.shortterm',
@@ -113,7 +113,7 @@ define('app/controllers/rules',
             deleteRule: function (rule) {
                 var that = this;
                 rule.set('pendingAction', true);
-                Mist.ajax.DELETE('/rules/' + rule.id, {
+                Mist.ajax.DELETE('/api/v1/rules/' + rule.id, {
                 }).success(function(){
                     that._deleteObject(rule);
                 }).error(function(message) {
@@ -136,7 +136,7 @@ define('app/controllers/rules',
 
                 var that = this;
                 args.rule.set('pendingAction', true);
-                Mist.ajax.POST('/rules',
+                Mist.ajax.POST('/api/v1/rules',
                     payload
                 ).success(function (data) {
                     that._updateObject(data);
