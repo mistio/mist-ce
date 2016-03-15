@@ -179,8 +179,13 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
 
             editRule: function(args) {
                 var index = args.team.policy.rules.indexOf(args.rule),
-                rule = args.team.policy.rules.objectAt(index);
+                    rule = args.team.policy.rules.objectAt(index);
                 Ember.set(rule, args.properties.key, args.properties.value);
+            },
+
+            editOperator: function(args) {
+                console.log(args);
+                Ember.set(args.team.policy, 'operator', args.operator);
             },
 
             moveUpRule: function(rule, team) {
@@ -193,7 +198,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
 
             moveDownRule: function(rule, team) {
                 var index = team.policy.rules.indexOf(rule),
-                len = team.policy.rules.length;
+                    len = team.policy.rules.length;
 
                 if (index !== len - 1) {
                     team.policy.rules.removeAt(index).insertAt(index + 1, rule);
@@ -201,28 +206,39 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             },
 
             deleteRule: function(args) {
-                // DELETE /org/{org_id}/teams/{team_id}/policy/rules/{index}
-                console.log(args);
-                var that = this;
-                that._deleteRule(args.team, args.rule);
-                // that.set('deletingRule', true);
-                // Mist.ajax
-                //     .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id + '/rules', {})
-                //     .success(function() {
-                //         that._deleteRule(args.team, args.rule);
-                //     })
-                //     .error(function(message) {
-                //         Mist.notificationController.notify(message);
-                //     })
-                //     .complete(function(success) {
-                //         that.set('deletingRule', false);
-                //         if (args.callback)
-                //             args.callback(success);
-                //     });
+                args.team.policy.rules.removeObject(args.rule);
             },
 
             saveRules: function(team) {
-                console.log('save');
+                var newRules = team.policy.rules.filter(function(rule, index) {
+                    return rule.rid || rule.rtags;
+                }, this);
+                console.log(newRules);
+
+                if (newRules.length) {
+                    var that = this;
+                    that.set('updatingRules', true);
+                    Mist.ajax
+                        .PUT('/org/' + team.organization.id + '/teams/' + team.id + '/policy', {
+                            policy: {
+                                operator: team.policy.operator,
+                                rules: newRules
+                            }
+                        })
+                        .success(function() {
+                            that._updateRules(team, newRules);
+                        })
+                        .error(function(message) {
+                            Mist.notificationController.notify(message);
+                        })
+                        .complete(function(success) {
+                            that.set('updatingRules', false);
+                            if (args.callback)
+                                args.callback(success);
+                        });
+                } else {
+                    this._updateRules(team, newRules);
+                }
             },
 
             getTeam: function(teamId) {
@@ -276,9 +292,9 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 });
             },
 
-            _deleteRule: function(team, rule) {
+            _updateRules: function(team, newRules) {
                 Ember.run(this, function() {
-                    team.policy.rules.removeObject(rule);
+                    team.policy.rules.setObjects(newRules);
                 });
             }
         });

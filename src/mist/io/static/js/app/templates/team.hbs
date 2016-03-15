@@ -64,6 +64,9 @@
 
             <div class="text-center">
                 <a id="rule-add" class="ui-btn ui-shadow ui-caps back" {{action "addRulesClicked" target=view}}>Add Rule</a>
+                {{#if Mist.teamsController.updatingRules}}
+                    <div class="ajax-loader"></div>
+                {{/if}}
                 <a id="rule-save" class="ui-btn ui-caps ui-shadow ui-btn-d" {{action "saveRulesClicked" target=view}}>Save Rules</a>
             </div>
         </div>

@@ -51,11 +51,9 @@ define('app/controllers/policy_operator_edit', ['ember'],
             },
 
             edit: function (keyValuePairs) {
-                console.log(keyValuePairs, this.policy, this.team);
-                Mist.policyController.editOperator({
+                Mist.teamsController.editOperator({
                     team: this.team,
-                    policy: this.policy,
-                    properties: keyValuePairs
+                    operator: keyValuePairs.operator
                 });
             }
         });
