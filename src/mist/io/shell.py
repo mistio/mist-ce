@@ -15,6 +15,7 @@ import uuid
 import thread
 import ssl
 import tempfile
+import mongoengine as me
 
 from mist.io.exceptions import CloudNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
@@ -229,28 +230,36 @@ class ParamikoShell(object):
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
-        machine = Machine.objects(cloud=cloud, machine_id=machine_id)
-        machine = machine.modify(upsert=True, new=True, machine_id=machine_id)
+        try:
+            machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+        except me.DoesNotExist:
+            machine = Machine(cloud=cloud, machine_id=machine_id)
+
         users = []
         if key_id:
             keys = [Keypair.objects.get(owner=user, name=key_id)]
         else:
             keys = [key_assoc.keypair
-                    for key_assoc in machine.key_associations]
+                    for key_assoc in machine.key_associations
+                    if isinstance(key_assoc.keypair, Keypair)]
             users = [key_assoc.ssh_user
-                     for key_assoc in machine.key_associations]
+                     for key_assoc in machine.key_associations
+                     if key_assoc.ssh_user]
         if username:
             users = [username]
         if not users:
             users = [key_assoc.ssh_user
-                     for key_assoc in machine.key_associations]
+                     for key_assoc in machine.key_associations
+                     if key_assoc.ssh_user]
             for key_assoc in machine.key_associations:
                 if key_assoc.port:
                     port = key_assoc.port
             for name in ['root', 'ubuntu', 'ec2-user', 'user', 'azureuser',
                          'core', 'centos', 'cloud-user', 'fedora']:
-                    if name not in users:
+                    if not name in users:
                         users.append(name)
+        if not port:
+            port = 22
         for key in keys:
             for ssh_user in users:
                 try:
