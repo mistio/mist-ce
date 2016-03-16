@@ -81,9 +81,8 @@ def check_machine_tags(context, name, key, value):
     for machine in machines:
         machine_name = machine.find_element_by_class_name('machine-name')
         if safe_get_element_text(machine_name).lower() == name.lower():
-            tags = machine.find_elements_by_class_name('tag')
-            for tag in tags:
-                if safe_get_element_text(tag).lower() == tag_text:
-                    return
+            tag = machine.find_element_by_css_selector('.pairs')
+            if safe_get_element_text(tag).lower() == tag_text:
+                return
             assert False, "Machine %s has no tag %s=%s" % (name, key, value)
     assert False, "Machine %s is not in the list" % name

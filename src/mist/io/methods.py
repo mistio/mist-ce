@@ -4217,7 +4217,13 @@ def get_deploy_collectd_command_unix(uuid, password, monitor, port=25826):
 
 
 def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
-     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:%s"""""") -interval 10'"''' % (uuid, password, monitor, port)
+    return 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned ' \
+           '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
+           'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
+           'deploy_collectm/master/collectm.remote.install.ps1\',' \
+           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
+           '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
+           '-servers @("%s:%s")\''  % (uuid, password, monitor, port)
 
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
