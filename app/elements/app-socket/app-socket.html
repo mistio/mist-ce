@@ -99,19 +99,44 @@ Polymer({
             },
             logs: {
                 logs: function (data) {
-                    console.log('got logs', data);
+                    if (DEBUG_SOCKET)
+                        console.debug('received log entries', data);
+                    var loglist = document.querySelector('log-list');
+                    if (loglist) {
+                        loglist.logsReceived(data);
+                    } else {
+                        console.warn('No log-list found in DOM to consume logs');
+                    }
+                },
+                event: function (data) {
+                    if (DEBUG_SOCKET)
+                        console.debug('received log event', data);
+                    var loglist = document.querySelector('log-list');
+                    if (loglist) {
+                        loglist.eventReceived(data);
+                    } else {
+                        console.warn('No log-list found in DOM to consume log event');
+                    }
                 },
                 open_incidents: function (data){
-                    console.log('got incidents', data);
+                    if (DEBUG_SOCKET)
+                        console.debug('got incidents', data);
+                    that.set('model.incidents', data);
                 },
                 open_jobs: function (data) {
-                    console.log('got jobs', data);
+                    if (DEBUG_SOCKET)
+                        console.debug('got jobs', data);
+                    that.set('model.jobs', data);
                 },
                 open_sessions: function (data) {
-                    console.log('got sessions', data);
+                    if (DEBUG_SOCKET)
+                        console.debug('got sessions', data);
+                    that.set('model.sessions', data);
                 },
                 open_shells: function (data) {
-                    console.log('got shells', data);
+                    if (DEBUG_SOCKET)
+                        console.debug('got shells', data);
+                    that.set('model.shells', data);
                 }
            }
         };
@@ -225,7 +250,8 @@ Polymer({
             this.set('model.' + section, _generateMap(data));
             this.set('model.' + section + 'Array', data);
         } else {
-            console.debug('no need to update', section);
+            if (DEBUG_SOCKET)
+                console.debug('no need to update', section);
         }
 
         if (pending) {
