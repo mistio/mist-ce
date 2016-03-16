@@ -91,7 +91,8 @@
             <!-- keys -->
             <!-- <page-list model="[[model]]" elements="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]"></page-list> -->
             <keys-list-element model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" keys="[[model.keysArray]]"></keys-list-element>
-            <page-key model="[[model]]" params="[[params]]" key="[[getKey(params)]]" elements="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]"></page-key>
+            <key-page-element model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page-element>
+            <!-- <page-key model="[[model]]" params="[[params]]" key="[[getKey(params)]]" elements="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]"></page-key> -->
             <!-- networks -->
             <page-list model="[[model]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-list>
 
@@ -208,16 +209,7 @@ var app = Polymer({
                 user: "marios@mist.io",
             }],
             imagesArray: [],
-            keysArray: [{
-                id: "test2",
-                isDefault: false
-            }, {
-                id: "primary",
-                isDefault: true
-            }, {
-                id: "kvm",
-                isDefault: false
-            }],
+            keysArray: [],
             networksArray: [],
             templatesArray:[],
             teamsArray:[],
@@ -342,21 +334,6 @@ var app = Polymer({
         // var index = params.id;
         // return this.model.images.index;
     },
-    getKey: function(params) {
-        var ka = this.model.keysArray;
-        var p = params.id;
-        var k = {};
-        for (var i = 0; i < ka.length; i++) {
-            if (ka[i].id == p)
-                return k = ka[i];
-        };
-        //return key object with the right 'id' from model.keysArray
-        return k;
-
-        // //altertenative way to get object from map
-        // var index = params.id;
-        // return this.model.keys.index;
-    },
     getNetwork: function(params) {
         var na = this.model.networksArray;
         var p = params.name;
@@ -367,17 +344,6 @@ var app = Polymer({
         };
         //return network object with the right 'name' from model.networksArray
         return n;
-    },
-    getScript: function(params) {
-        var sa = this.model.scriptsArray;
-        var p = params.id;
-        var s = {};
-        for (var i = 0; i < sa.length; i++) {
-            if (sa[i].id == p)
-                return s = sa[i];
-        };
-        //return script object with the right 'id' (???) from model.scriptsArray
-        return s;
     },
     updateDocTitle: function(e, details) {
         if (details.item.title && details.item.title.length) {

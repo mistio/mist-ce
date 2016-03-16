@@ -310,7 +310,7 @@
                     type: Array
                 },
                 presentedKeys: {
-                    type: Array
+                    type: Array                    
                 },
                 selectedKey: {
                     type: Object,
@@ -367,6 +367,9 @@
                 'addKey': '_addKey',
                 'updateSelectedKey': '_updateSelectedKey',
                 'confirmation': '_deleteSelectedResponse'
+            },
+            ready: function (){
+                this.presentedKeys = this.keys;
             },
             _getHeaderStyle: function(color) {
                 return 'background-color: ' + color + '; color: #fff;';
