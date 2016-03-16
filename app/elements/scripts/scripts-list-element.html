@@ -202,7 +202,7 @@
                             </div>
                         </div>
                         <div class="info-body">
-                            <iron-list items="[[presentedScripts]]" as="script" selected-items="{{selectedScripts}}" multi-selection>
+                            <iron-list items="[[presentedScripts]]" as="script" selected-items="{{selectedScripts}}" multi-selection style$="[[vpHeight]]">
                                 <template>
                                     <div class="row">
                                         <script-item-element selected="[[selected]]" script="[[script]]" index="[[index]]" count="[[presentedScripts.length]]">
@@ -289,7 +289,12 @@
                 sortByTerm: {
                     type: String,
                     value: 'name'
-                }
+                },
+                vpHeight: String
+            },
+            ready: function() {
+                var wh = window.innerHeight;
+                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
             observers: [
                 '_scriptsChanged(scripts.*, selectedScripts.*)',

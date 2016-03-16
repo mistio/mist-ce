@@ -144,6 +144,11 @@
         #actions element-action-menu {
             right: 0;
         }
+        .iron-list {
+            /*position: relative;
+            height: 100vh;
+            overflow: auto;*/
+        }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
@@ -181,7 +186,7 @@
             no data yet
         </div>
         <template is="dom-if" if="[[ismachines]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="{{selectedMachines}}">
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="{{selectedMachines}}" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
                         <machine-list-item section="[[section]]" item="[[item]]"></machine-list-item>
@@ -190,7 +195,7 @@
             </iron-list>
         </template>
         <template is="dom-if" if="[[isimages]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedImages]]">
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedImages]]" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
                         <image-list-item section="[[section]]" item="[[item]]"></image-list-item>
@@ -199,7 +204,7 @@
             </iron-list>
         </template>
         <template is="dom-if" if="[[iskeys]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedKeys]]">
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedKeys]]" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
                         <key-list-item section="[[section]]" item="[[item]]"></key-list-item>
@@ -208,7 +213,7 @@
             </iron-list>
         </template>
         <template is="dom-if" if="[[isnetworks]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedNetworks]]">
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedNetworks]]" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
                         <network-list-item section="[[section]]" item="[[item]]"></network-list-item>
@@ -217,7 +222,7 @@
             </iron-list>
         </template>
         <template is="dom-if" if="[[isscripts]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedScripts]]">
+            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedScripts]]" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
                         <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
@@ -311,8 +316,8 @@ Polymer({
         isscripts: {
             type: Boolean,
             computed: "isScripts(section)"
-        }
-
+        },
+        vpHeight: String
     },
 
     listeners: {
@@ -322,7 +327,8 @@ Polymer({
     },
 
     ready: function() {
-        //console.warn('element-table is ready');
+        var wh = window.innerHeight;
+        this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
     },
 
     isMachines: function(section) {
@@ -503,4 +509,5 @@ Polymer({
 
     }
 });
+
 </script>

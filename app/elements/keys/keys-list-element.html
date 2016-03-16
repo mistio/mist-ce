@@ -262,7 +262,7 @@
                             </div>
                         </div>
                         <div class="info-body">
-                        <iron-list items="[[presentedKeys]]" as="key" selected-items="{{selectedKeys}}" multi-selection>
+                        <iron-list items="[[presentedKeys]]" as="key" selected-items="{{selectedKeys}}" multi-selection style$="[[vpHeight]]">
                             <template>
                                 <div class="row">
                                     <key-item-element selected="{{selected}}" key="[[key]]" index="[[index]]" count="[[presentedKeys.length]]">
@@ -356,7 +356,12 @@
                 sortByTerm: {
                     type: String,
                     value: 'default'
-                }
+                },
+                vpHeight: String
+            },
+            ready: function() {
+                var wh = window.innerHeight;
+                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
             observers: [
                 '_keysChanged(keys.*, selectedKeys.*)',
