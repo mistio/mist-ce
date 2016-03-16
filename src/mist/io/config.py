@@ -238,21 +238,6 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider': Provider.SOFTLAYER,
         'regions': []
     },
-    #HP Cloud
-    {
-        'title': 'HP Helion Cloud',
-        'provider': Provider.HPCLOUD,
-        'regions': [
-            {
-                'location': 'US West',
-                'id': 'region-a.geo-1'
-            },
-            {
-                'location': 'US East',
-                'id': 'region-b.geo-1'
-            }
-        ]
-    },
     # Docker
     {
         'title': 'Docker',
@@ -420,15 +405,6 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'SoftLayer',
         'provider' : Provider.SOFTLAYER
-    },
-    #HP Cloud
-    {
-        'title': 'HP Helion Cloud - US West',
-        'provider' : "%s:%s" % (Provider.HPCLOUD,'region-a.geo-1')
-    },
-    {
-        'title': 'HP Helion Cloud - US East',
-        'provider' : "%s:%s" % (Provider.HPCLOUD,'region-b.geo-1')
     },
     # Docker
     {
