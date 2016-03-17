@@ -6,7 +6,9 @@
             :host {
                 display: block;
             }
-
+            :host[selected] {
+                background-color: #f5f5f5;
+            }
             paper-card {
                 display: block;
             }
@@ -49,6 +51,7 @@
                 </span>
             </div>
             <div class="flexchild">{{isDefaultText}}</div>
+            <div class="flexchild">[[key.machines.length]]</div>
             <div>
                 <content></content>
             </div>
@@ -68,7 +71,8 @@
                     selected: {
                         type: Boolean,
                         value: false,
-                        notify: true
+                        notify: true,
+                        reflectToAttribute: true
                     },
                     index: {
                         type: Number,

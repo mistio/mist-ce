@@ -369,13 +369,31 @@
 <dom-module id="lists">
     <template>
         <style>
+        .check {
+            border: 1px solid #ddd;
+        }
+        /* none of the two below works */
+        paper-input >::content div[pseudo="-webkit-search-cancel-button"] {
+            opacity: 0 !important;
+            display: none; !important;
+        }
+        key-item-element ::content .paper-item:focus:before {
+            background-color: none !important;
+            opacity: 0 !important;
+        }
         .list-head {
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06),
+                0 2px 0 rgba(0, 0, 0, 0.075),
+                0 3px 0 rgba(0, 0, 0, 0.05),
+                0 4px 0 rgba(0, 0, 0, 0.015);
             background-color: #f2f2f2;
             border-bottom: 1px solid #e5e5e5;
             padding: 0 16px;
             font-weight: 400;
             font-size: 0.9em;
             color: inherit;
+            position: relative;
+            z-index: 2;
         }
         
         .list-head > * {
@@ -384,14 +402,15 @@
         }
         
         ::content paper-item {
-            padding: 16px;
-            border-bottom: 1px solid #e5e5e5;
+            padding: 8px 16px;
+            border-bottom: 1px solid #ddd;
             min-height: inherit;
             cursor: pointer;
+            font-size: 15px;
         }
         
         ::content paper-item .name {
-            font-weight: 700;
+            font-weight: 500;
         }
         
         ::content paper-item paper-checkbox[disabled] ~ .name {
@@ -470,11 +489,12 @@
         
         .row {
             overflow: hidden;
+            background-color: #fff;
         }
         
         .row-actions {
             position: absolute;
-            top: 16px;
+            top: 8px;
             right: 8px;
             z-index: 3;
             display: none;

@@ -3,7 +3,117 @@
 <dom-module id="grid-list-element">
     <template>
         <style is="custom-style" include="lists"></style>
-        <style include="shared-styles">
+        <style is="custom-style" include="shared-styles">
+
+
+        /* vaadin grid specifc styling */
+        vaadin-grid {
+            --default-primary-color: var(--mist-blue);
+        }
+          /* Input styles */
+  vaadin-grid ::content input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+  }
+
+  vaadin-grid ::content input[type="checkbox"] + label {
+    position: relative;
+    left: 0;    
+    box-sizing: border-box;
+    display: block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #7a7a7a;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 120ms, border-color 120ms;
+
+
+    background-color: #ddd;
+    border: 0 none !important;
+    border-radius: 50% !important;
+    width: 24px !important;
+    height: 24px !important;
+
+  }
+
+  vaadin-grid ::content input[type="checkbox"]:focus {
+    outline: none;
+  }
+
+  vaadin-grid ::content input[type="checkbox"] + label:after {
+    content: url(img/tick.svg);
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    display: block;
+    width: 16px;
+    height: 17px;
+    transition: all 200ms;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+    -webkit-transform-origin: 40% 80%;
+    transform-origin: 40% 80%;
+
+
+    top: 4px !important;
+    left: 4px !important;
+  }
+
+  vaadin-grid :;content input[type="checkbox"]:checked + label {
+    background-color: var(--default-primary-color, #03A9F4);
+    border-color: transparent;
+  }
+
+  vaadin-grid ::content input[type="checkbox"]:checked + label:after {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+
+  vaadin-grid ::content input[type="checkbox"]:indeterminate + label:after {
+    content: "–";
+    font-family: arial;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 1;
+    text-align: center;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    transition: none;
+  }
+
+
+  /* Activation "splash" */
+  vaadin-grid ::content input[type="checkbox"] + label:before {
+    content: "";
+    position: absolute;
+    /*top: -13px;
+    left: -13px;*/
+    width: 41px;
+    height: 41px;
+    border-radius: 50%;
+    background-color: #666;
+    opacity: 0;
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+    transition: all 180ms cubic-bezier(0.75,.0,0.25,1);
+
+    top: -9px !important;
+    left: -9px !important;
+  }
+
+  vaadin-grid ::content input[type="checkbox"] + label:active:before {
+    transform: scale(1.1);
+    opacity: 0.15;
+    transition-duration: 80ms;
+    transition-property: all;
+  }
+
+  input[type="checkbox"]:checked + label:before {
+    background-color: var(--default-primary-color, #03A9F4);
+  }
+
+        
         :host {
             display: block;
             background: #fafafa;

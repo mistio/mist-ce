@@ -100,6 +100,9 @@
             top: 305px;
             z-index: 10;
         }
+        #selectAllBtn .check > iron-icon {
+            color: red;
+        }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -114,7 +117,7 @@
                     <div hidden$="[[!hasScripts]]" class="list-options">
                         <div id="search" class$="option search [[showSearchOption]]">
                             <paper-icon-button id="searchScriptBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
-                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm::keyup}}" placeholder="" no-label-float class="search"></paper-input>
+                            <paper-input id="searchinput" hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm::keyup}}" placeholder="" no-label-float class="search"></paper-input>
                             <paper-icon-button hidden$="[[!showSearchOption]]" icon="close" on-tap="_toggleSearchSelected"></paper-icon-button>
                             <span hidden$="[[showSearchOption]]" class="label">Search scripts</span>                            
                         </div>
@@ -245,7 +248,8 @@
             },
             observers: [
                 '_scriptsChanged(scripts.*, selectedScripts.*)',
-                '_presentedScriptsChanged(scripts.*, searchTerm, sortByTerm)'
+                '_presentedScriptsChanged(scripts.*, searchTerm, sortByTerm)',
+                '_giveFocusWhenSearchOn(showSearchOption)'
             ],
             listeners: {
                 'toggleSelectedScript': '_toggleSelectedScript',
@@ -258,7 +262,13 @@
             _getHeaderStyle: function(color) {
                 return 'background-color: ' + color + '; color: #fff;';
             },
-
+            _giveFocusWhenSearchOn: function(){
+                if (this.showSearchOption) {
+                    this.async(function() {
+                        this.$.searchinput.focus();
+                    });
+                }
+            },
             _computeFilteredScripts: function(scripts, searchTerm) {
                 var searchTerm = searchTerm.toLowerCase();
                 return scripts.base.filter(function(script) {
