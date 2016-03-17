@@ -1507,12 +1507,15 @@ def list_machines(user, cloud_id):
             m.extra['can_reboot'] = can_reboot
 
         if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
-            if 'windows' in m.extra.get('image', '').lower():
-                os_type = 'windows'
-            else:
-                os_type = 'linux'
-            m.extra['os_type'] = os_type
-
+            try:
+                if 'windows' in m.extra.get('image', '').lower():
+                    os_type = 'windows'
+                else:
+                    os_type = 'linux'
+                m.extra['os_type'] = os_type
+            except:
+                # in case this breaks
+                pass
         if m.driver.type in config.EC2_PROVIDERS:
             # this is windows for windows servers and None for Linux
             m.extra['os_type'] = m.extra.get('platform', 'linux')
