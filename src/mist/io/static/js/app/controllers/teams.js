@@ -70,6 +70,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             //
 
             addTeam: function(args) {
+                console.log(args);
                 var that = this;
                 that.set('addingTeam', true);
                 Mist.ajax
@@ -280,11 +281,15 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             //
 
             _addTeam: function(team, newTeam) {
+                console.log(team, newTeam);
                 var team = Ember.Object.create({
                     id: newTeam.id,
                     name: team.name,
                     description: team.description,
-                    organization: team.organization,
+                    organization: {
+                        id: Mist.organization.id,
+                        name: Mist.organization.name
+                    },
                     members: [],
                     policy: newTeam.policy
                 });
