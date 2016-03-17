@@ -684,7 +684,10 @@ def edit_key(request):
         raise RequiredParameterMissingError("new_id")
 
     auth_context = auth_context_from_request(request)
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=old_id)
+    try:
+        keypair = Keypair.objects.get(owner=auth_context.owner, name=old_id)
+    except me.DoesNotExist:
+        raise NotFoundError('Key with that id does not exist')
     keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, old_id)
     if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
         raise UnauthorizedError()
