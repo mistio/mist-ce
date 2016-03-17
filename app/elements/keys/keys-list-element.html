@@ -88,9 +88,9 @@
                 </paper-toolbar>
                 <div class="list">
                     <div hidden$="[[!hasKeys]]" class="list-options">
-                        <div class$="option search [[showSearchOption]]">
+                        <div id="search" class$="option search [[showSearchOption]]">
                             <paper-icon-button id="searchKeyBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
-                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm}}" no-label-float class="search"></paper-input>
+                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm::keyup}}" no-label-float class="search"></paper-input>
                             <paper-icon-button hidden$="[[!showSearchOption]]" icon="close" on-tap="_toggleSearchSelected"></paper-icon-button>
                             <span hidden$="[[showSearchOption]]" class="label">Search keys</span>
                         </div>
@@ -232,7 +232,8 @@
                 'toggleSelectedKey': '_toggleSelectedKey',
                 'addKey': '_addKey',
                 'updateSelectedKey': '_updateSelectedKey',
-                'confirmation': '_deleteSelectedResponse'
+                'confirmation': '_deleteSelectedResponse',
+                keyup: 'hotkeys'
             },
             ready: function (){
                 this.presentedKeys = this.keys;
@@ -401,6 +402,13 @@
                 var notification = document.querySelector('notification-element');
                 notification.title = title;
                 notification._openToast();
+            },
+            hotkeys: function(e) {
+                var inpath = e.path.indexOf(this.$.search);
+                // ESC
+                if (e.keyCode === 27 && inpath > 0 ) {
+                    this.showSearchOption = false;
+                }
             }
         });
     })();
