@@ -20,13 +20,15 @@
     
     .check {
         border-radius: 50%;
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         transition: transform 350ms ease-in-out;
         background-color: rgba(158, 158, 158, 0.13);
         color: white;
         will-change: transform;
         cursor: pointer;
+        box-sizing: border-box;
+        
     }
     
     .unchecked {
@@ -43,8 +45,8 @@
         will-change: opacity;
         transform: rotate3d(0, 1, 0, -180deg) scale(0);
         position: absolute !important;
-        top: 20%;
-        left: 20%;
+        top: 15%;
+        left: 15%;
         opacity: 0;
     }
 

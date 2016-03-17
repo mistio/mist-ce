@@ -76,6 +76,9 @@
             top: 305px;
             z-index: 10;
         }
+        #selectAllBtn .check > iron-icon {
+            color: red;
+        }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -120,6 +123,10 @@
                             <div class="flexchild">Default
                                 <paper-tooltip for="sortByDefault" position="top">Sort by default</paper-tooltip>
                                 <paper-icon-button id="sortByDefault" class$="[[_computeIsActiveSort(sortByTerm, 'default')]]" icon="icons:arrow-upward" on-tap="_sortKeys" sort-option="default"></paper-icon-button>
+                            </div>
+                            <div class="flexchild">Associated machines
+                                <paper-tooltip for="sortByMachines" position="top">Sort by amount of machines</paper-tooltip>
+                                <paper-icon-button id="sortByMachines" class$="[[_computeIsActiveSort(sortByTerm, 'machines')]]" icon="icons:arrow-upward" on-tap="_sortKeys" sort-option="machines"></paper-icon-button>
                             </div>
                         </div>
                         <div class="info-body">
@@ -262,6 +269,8 @@
                     presentedKeys = filteredKeys.sort(this._computeSort('id', 1));
                 } else if (sortByTerm == 'default') {
                     presentedKeys = filteredKeys.sort(this._computeSort('isDefault', -1));
+                } else if (sortByTerm == 'machines') {
+                    presentedKeys = filteredKeys.sort(this._computeSort('machines', 1));
                 } else {
                     presentedKeys = filteredKeys;
                 }

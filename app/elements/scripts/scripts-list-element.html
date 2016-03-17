@@ -100,6 +100,9 @@
             top: 305px;
             z-index: 10;
         }
+        #selectAllBtn .check > iron-icon {
+            color: red;
+        }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
