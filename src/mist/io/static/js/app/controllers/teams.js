@@ -183,6 +183,14 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     rule = args.team.policy.rules.objectAt(index);
                 Ember.set(rule, args.properties.key, args.properties.value);
 
+                // When resource type changes force
+                // action to be All since bad combinations should be avoided
+                if (args.properties.key == 'rtype') {
+                    Ember.set(rule, 'action', 'All');
+                }
+
+                // When identification changes
+                // reset rid & rtags to prevent both to be set
                 if (args.properties.key == 'identification') {
                     Ember.setProperties(rule, {
                         rid: null,
@@ -248,7 +256,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                             }
                         })
                         .success(function() {
-                            that._updateRules(team, payloadRules);
+                            // that._updateRules(team, payloadRules);
                         })
                         .error(function(message) {
                             Mist.notificationController.notify(message);

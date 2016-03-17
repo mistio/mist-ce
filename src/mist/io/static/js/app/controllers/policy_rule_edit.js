@@ -24,7 +24,6 @@ define('app/controllers/policy_rule_edit', ['ember'],
             //
 
             open: function (rule, team, property, callback, el) {
-                console.log(rule, team, property, callback, el);
                 this.clear();
                 this.setProperties({
                     'rule': rule,

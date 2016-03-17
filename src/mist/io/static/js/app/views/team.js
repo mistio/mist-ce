@@ -80,12 +80,7 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 renameClicked: function() {
-                    var team = this.team;
-                    Mist.teamEditController.open(team, function(success) {
-                        if (success) {
-                            Mist.__container__.lookup('router:main').transitionTo('team', Mist.teamEditController.newTeamId);
-                        }
-                    });
+                    Mist.teamEditController.open(this.get('team'));
                 },
 
                 deleteClicked: function() {
