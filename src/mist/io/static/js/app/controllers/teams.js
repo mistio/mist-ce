@@ -178,7 +178,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     'action': 'All',
                     'rtype': 'All',
                     'rid': '',
-                    'rtags': ''
+                    'rtags': {}
                 });
             },
 
@@ -236,7 +236,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var team = args.team,
                 payloadRules = team.policy.rules
                     .filter(function(rule, index) {
-                        return rule.rid || rule.rtags;
+                        return rule.rid || Object.keys(rule.rtags).length;
                     }, this)
                     .map(function(rule, index) {
                         return {

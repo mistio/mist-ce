@@ -51,7 +51,7 @@ define('app/views/policy_rule_item', ['ember'],
                     return 'id';
                 }
 
-                if (rtags) {
+                if (Object.keys(rtags).length) {
                     return 'tags';
                 }
 
