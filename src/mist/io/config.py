@@ -75,6 +75,7 @@ STATES = {
 # All EC2 providers, useful for type checking
 EC2_PROVIDERS = (
     Provider.EC2_US_EAST,
+    Provider.EC2_AP_NORTHEAST,
     Provider.EC2_AP_NORTHEAST1,
     Provider.EC2_AP_NORTHEAST2,
     Provider.EC2_EU_WEST,
@@ -534,6 +535,7 @@ EC2_IMAGES[Provider.EC2_US_WEST_OREGON] = EC2_IMAGES['us-west-2']
 EC2_IMAGES[Provider.EC2_US_EAST] = EC2_IMAGES['us-east-1']
 EC2_IMAGES[Provider.EC2_EU_CENTRAL] = EC2_IMAGES['eu-central-1']
 EC2_IMAGES[Provider.EC2_AP_NORTHEAST2] = EC2_IMAGES['ap-northeast-2']
+EC2_IMAGES[Provider.EC2_AP_NORTHEAST1] = EC2_IMAGES['ap-northeast-1']
 
 # Provider.EC2_EU_WEST etc naming is deprecated by libcloud.
 #

@@ -2999,7 +2999,7 @@ def list_networks(user, cloud_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret['public'].append(gce_network_to_dict(network))
-    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST,
+    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_NORTHEAST1, Provider.EC2_AP_NORTHEAST2,
                        Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
                        Provider.EC2_EU, Provider.EC2_EU_WEST,
                        Provider.EC2_SA_EAST, Provider.EC2_US_EAST,
