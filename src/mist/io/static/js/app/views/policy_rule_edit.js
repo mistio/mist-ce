@@ -21,16 +21,16 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
             resourceTypesOptions: [
                 {
                     type: 'Machine',
-                    actions: ['All', 'Create', 'Read', 'Edit', 'EditTags', 'EditRules', 'EditGraphs', 'EditCustomMetrics', 'Start', 'Stop', 'Reboot', 'Destroy', 'RunScript', 'OpenShell', 'AssociateKey', 'DisassociateKey']
+                    actions: ['all', 'create', 'read', 'edit', 'edit_tags', 'edit_rules', 'edit_graphs', 'edit_custom_metrics', 'start', 'stop', 'reboot', 'destroy', 'run_script', 'open_shell', 'associate_key', 'disassociate_key']
                 }, {
-                    type: 'Script',
-                    actions: ['All', 'Add', 'Read', 'Edit', 'Run', 'Remove']
+                    type: 'script',
+                    actions: ['all', 'add', 'read', 'edit', 'run', 'remove']
                 }, {
-                    type: 'Key',
-                    actions: ['All', 'Add', 'Read', 'ReadPrivate', 'Remove', 'Edit']
+                    type: 'key',
+                    actions: ['all', 'add', 'read', 'read_private', 'remove', 'edit']
                 }, {
-                    type: 'All',
-                    actions: ['All', 'None']
+                    type: 'all',
+                    actions: ['all']
                 }
             ],
             resourceIdentificationOptions: ['id', 'tags'],

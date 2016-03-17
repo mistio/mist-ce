@@ -198,7 +198,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 if (args.properties.key == 'identification') {
                     Ember.setProperties(rule, {
                         rid: null,
-                        rtags: null
+                        rtags: {}
                     });
                 }
             },
@@ -232,8 +232,9 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 args.team.policy.rules.removeObject(args.rule);
             },
 
-            saveRules: function(team) {
-                var payloadRules = team.policy.rules
+            saveRules: function(args) {
+                var team = args.team,
+                payloadRules = team.policy.rules
                     .filter(function(rule, index) {
                         return rule.rid || rule.rtags;
                     }, this)

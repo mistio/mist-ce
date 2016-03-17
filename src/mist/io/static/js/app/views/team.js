@@ -72,7 +72,7 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 saveRulesClicked: function() {
-                    Mist.teamsController.saveRules(this.get('team'));
+                    Mist.teamsController.saveRules({team: this.get('team')});
                 },
 
                 addRulesClicked: function() {
