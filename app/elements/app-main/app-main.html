@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/image-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/device-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/social-icons.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-routes/iron-routes.html" />
@@ -19,15 +20,15 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
+<link rel="import" href="../app-rest/app-rest.html">
+
 <link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../app-styles/app-styles.html">
 <link rel="import" href="../app-logo/app-logo.html">
 <link rel="import" href="../app-user-menu/app-user-menu.html">
 <link rel="import" href="../app-icons/app-icons.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
-<link rel="import" href="../dialog-element/dialog-element.html">
 <link rel="import" href="../pages/page-dashboard.html">
-<link rel="import" href="../pages/page-list.html">
 <link rel="import" href="../pages/page-machine.html">
 <link rel="import" href="../pages/page-image.html">
 <link rel="import" href="../pages/page-key.html">
@@ -59,20 +60,20 @@
         <iron-routes for="app-main" selected="[[section]]">
             <iron-route path="/" title=""></iron-route>
             <!-- 1 -->
-            <iron-route path="/machines" title="machines"></iron-route>
+            <iron-route path="/machines" title="machines" href="../pages/page-list.html"></iron-route>
             <!-- 2 -->
             <iron-route path="/machines/:uuid" title="machine"></iron-route>
             <!-- 3 -->
-            <iron-route path="/images" title="images"></iron-route>
+            <iron-route path="/images" title="images" href="../pages/page-list.html"></iron-route>
             <!-- 4 -->
-            <iron-route path="/images/:id" title="images"></iron-route>
+            <iron-route path="/images/:id" title="image"></iron-route>
             <!-- 5 -->
             <iron-route path="/keys" title="keys"></iron-route>
             <iron-route path="/keys/:id" title="keys"></iron-route>
-            <iron-route path="/networks" title="networks"></iron-route>
-            <iron-route path="/networks/:name" title="networks"></iron-route>
+            <iron-route path="/networks" title="networks" href="../pages/page-list.html"></iron-route>
+            <iron-route path="/networks/:name" title="network"></iron-route>
             <iron-route path="/scripts" title="scripts"></iron-route>
-            <iron-route path="/scripts/:id" title="scripts"></iron-route>
+            <iron-route path="/scripts/:id" title="script"></iron-route>
             <iron-route path="/add-script" title="add scripts"></iron-route>
             <!-- id? -->
             <iron-route path="/elements" title="elements"></iron-route>
@@ -109,6 +110,7 @@
 <script>
 var app = Polymer({
     is: 'app-main',
+
     properties: {
         model: {
             type: Object,
@@ -136,9 +138,11 @@ var app = Polymer({
         'iron-activate': 'updateDocTitle',
         'iron-activate': 'updateCount',
         'page-meta': 'updateTitle',
-        'toast': 'showToast'
+        'toast': 'showToast',
+        'subscribeLogEvents': 'subscribeLogEvents'
     },
     _toast: null,
+
     ready: function() {
         this.onb = [
             {
@@ -175,250 +179,7 @@ var app = Polymer({
         this.model = {
             cloudsArray: [],
             machinesArray: [],
-            scriptsArray:  [{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }, {
-                description: "test",
-                entrypoint: "",
-                id: "576bf98fe7e14d87b2b9075f099eeebe",
-                name: "runner",
-                script: "owner/repo",
-                source: "github",
-                type: "executable",
-                user: "marios@mist.io"
-            }, {
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "install scipt",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            },{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }, {
-                description: "test",
-                entrypoint: "",
-                id: "576bf98fe7e14d87b2b9075f099eeebe",
-                name: "runner",
-                script: "owner/repo",
-                source: "github",
-                type: "executable",
-                user: "marios@mist.io"
-            }, {
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "install scipt",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            },{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }, {
-                description: "test",
-                entrypoint: "",
-                id: "576bf98fe7e14d87b2b9075f099eeebe",
-                name: "runner",
-                script: "owner/repo",
-                source: "github",
-                type: "executable",
-                user: "marios@mist.io"
-            }, {
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "install scipt",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            },{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }, {
-                description: "test",
-                entrypoint: "",
-                id: "576bf98fe7e14d87b2b9075f099eeebe",
-                name: "runner",
-                script: "owner/repo",
-                source: "github",
-                type: "executable",
-                user: "marios@mist.io"
-            }, {
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "install scipt",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            },{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }, {
-                description: "test",
-                entrypoint: "",
-                id: "576bf98fe7e14d87b2b9075f099eeebe",
-                name: "runner",
-                script: "owner/repo",
-                source: "github",
-                type: "executable",
-                user: "marios@mist.io"
-            }, {
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "install scipt",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            },{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }, {
-                description: "test",
-                entrypoint: "",
-                id: "576bf98fe7e14d87b2b9075f099eeebe",
-                name: "runner",
-                script: "owner/repo",
-                source: "github",
-                type: "executable",
-                user: "marios@mist.io"
-            }, {
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "install scipt",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            },{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }, {
-                description: "test",
-                entrypoint: "",
-                id: "576bf98fe7e14d87b2b9075f099eeebe",
-                name: "runner",
-                script: "owner/repo",
-                source: "github",
-                type: "executable",
-                user: "marios@mist.io"
-            }, {
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "install scipt",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            },{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }, {
-                description: "test",
-                entrypoint: "",
-                id: "576bf98fe7e14d87b2b9075f099eeebe",
-                name: "runner",
-                script: "owner/repo",
-                source: "github",
-                type: "executable",
-                user: "marios@mist.io"
-            }, {
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "install scipt",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            },{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }, {
-                description: "test",
-                entrypoint: "",
-                id: "576bf98fe7e14d87b2b9075f099eeebe",
-                name: "runner",
-                script: "owner/repo",
-                source: "github",
-                type: "executable",
-                user: "marios@mist.io"
-            }, {
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "install scipt",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
-            }],
+            scriptsArray:  [],
             imagesArray: [],
             keysArray: [],
             networksArray: [],
@@ -457,7 +218,7 @@ var app = Polymer({
             }, {
                 id: 'templates',
                 color: '#0097A7',
-                icon: 'image:crop-landscape',
+                icon: 'av:art-track',
                 count: '0'
             }, {
                 id: 'teams',
@@ -465,14 +226,19 @@ var app = Polymer({
                 icon: 'social:people',
                 count: '0'
             }
-            /*,
-                      {id: 'templates',
-                      color: '',
-                      icon: 'device:widgets'}*/
         ];
 
         this.sections = _generateMap(this.sectionsArray);
     },
+
+    subscribeLogEvents: function(searchFilter){
+        console.log('subscribeLogEvents', searchFilter.detail);
+        var socket = this.querySelector('app-socket');
+        socket.send('sub', 'logs');
+        socket.send('msg', 'logs', 'ready');
+        socket.send('msg', 'logs', 'get_logs', searchFilter.detail);
+    },
+
     _computeOnbState: function(model) {
         if (model) {
             var clouds      = model.cloudsArray.length;

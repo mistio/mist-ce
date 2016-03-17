@@ -3,6 +3,7 @@
 <link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
 <link rel="import" href="../app-fab/app-fab.html">
+<link rel="import" href="../logs/log-list.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
@@ -266,42 +267,7 @@
                             </google-chart>
                         </paper-material>
                     </div>
-                    <div class="logs">
-                      <paper-input id="filter" label="Filter logs"></paper-input>
-                      <vaadin-grid id="sort">
-                        <table>
-                          <colgroup>
-                            <col>
-                            <col>
-                            <col>
-                          </colgroup>
-                          <thead>
-                            <tr>
-                              <th>Action</th>
-                              <th>Type</th>
-                              <th>Time</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Connect</td>
-                              <td>session</td>
-                              <td>1 min ago</td>
-                            </tr>
-                            <tr>
-                              <td>Disonnect</td>
-                              <td>session</td>
-                              <td>30 mins ago</td>
-                            </tr>
-                            <tr>
-                              <td>Create Machine</td>
-                              <td>request</td>
-                              <td>1 hour ago</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </vaadin-grid>
-                    </div>
+                    <log-list></log-list>
                 </div>
         </paper-header-panel>
     </template>

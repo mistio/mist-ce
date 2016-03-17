@@ -1,0 +1,156 @@
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+<dom-module id="log-list">
+    <template>
+      <style>
+          paper-input {display: inline-block}
+          .logdetailswrapper td {width: 50%}
+      </style>
+      <paper-material>
+        <paper-menu-button>
+          <paper-icon-button icon="menu" class="dropdown-trigger" alt="multi select"></paper-icon-button>
+          <paper-menu class="dropdown-content" selected="0">
+            <paper-item>All</paper-item>
+            <paper-item>Requests</paper-item>
+            <paper-item>Jobs</paper-item>
+            <paper-item>Incidents</paper-item>
+            <paper-item>Sessions</paper-item>
+            <paper-item>Shells</paper-item>
+            <paper-item>Errors</paper-item>
+          </paper-menu>
+        </paper-menu-button>
+        <paper-input type="search" label="All logs" no-label-float></paper-input>
+        <vaadin-grid size="10000">
+        </vaadin-grid>
+      </paper-material>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'log-list',
+
+    properties: {
+        items: {
+            type: Array,
+            value: []
+        },
+        eventTypes: {
+            type: Array
+        },
+        stop: {
+            type: Number,
+            value: 0
+        },
+        limit: {
+            type: Number,
+            value: 50
+        }
+    },
+
+    ready: function() {
+        var socket = document.querySelector('app-socket'), that = this, requestPending = false;
+        if (!socket || !socket.get('initialized')) {
+            setTimeout(function() {
+              that.ready();
+            }, 1000);
+            console.debug('postpone log-list init until socket is ready');
+            return
+        }
+        this.grid = this.querySelector('vaadin-grid');
+        this.grid.items = function(params, callback) {
+            if (params.index + params.count < that.get('items.length')) {
+                callback(that.get('items').slice(params.index, params.index + params.count));
+            } else if (!requestPending) {
+                var pending = false;
+                // Fetch the JSON data from a URL
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    requestPending = false;
+                    if (xhr.readyState == XMLHttpRequest.DONE) {
+                        if (xhr.status == 200) {
+                            var entries = JSON.parse(xhr.responseText);
+                            for (i=0; i < entries.length; i++)
+                                that.push('items', entries[i]);
+                            var items = that.get('items');
+                            callback(items.slice(params.index, params.index + params.count));
+                            if (items.length > that.grid.size)
+                                that.grid.size=2*that.grid.size;
+                            if (items.length) {
+                                var stop = Math.floor(items[items.length-1].time);
+                                that.set('stop', stop);
+                            }
+                        }
+                    }
+                }
+                xhr.open("GET", '/api/v1/logs?stop=' + that.get('stop') + "&limit=" + that.get('limit'), true);
+                xhr.send();
+                requestPending = true;
+            };
+        };
+
+        this.grid.columns = [
+          {name: 'action', },
+          {name: 'type'},
+          {name: 'email', hidable: true},
+
+          {name: 'session_id', hidden: true, hidable: true},
+          {name: 'time', hidable: true, renderer:
+              function(cell) {
+                  var dt = new Date(cell.data * 1000);
+                  var hours = dt.getHours();
+                  var minutes = dt.getMinutes();
+                  var seconds = dt.getSeconds();
+                  if (hours < 10)
+                   hours = '0' + hours;
+
+                  if (minutes < 10)
+                   minutes = '0' + minutes;
+
+                  if (seconds < 10)
+                   seconds = '0' + seconds;
+
+                  cell.element.innerHTML = hours + ":" + minutes + ":" + seconds;
+              }
+          }
+        ];
+        // Add a row details generator
+        this.grid.rowDetailsGenerator = function(rowIndex) {
+          var elem = document.createElement('div');
+          elem.setAttribute('class', 'logdetailswrapper');
+
+          that.grid.getItem(rowIndex, function(error, item) {
+              if (!error) {
+                  // Start with the special fields
+                  var rows = "<tr><td>Date</td><td>" + item.time + "</td></tr>";
+                  var keys = Object.keys(item);
+                  for (var i=0;i<keys.length;i++) {
+                        // Display non special fields only
+                        if (['time','$H'].indexOf(keys[i]) > -1)
+                            continue
+                      rows += "<tr><td>" + keys[i] + "</td><td>" + item[keys[i]] + "</td>";
+                  }
+                  elem.innerHTML = "<table>" + rows + "</table>";
+              }
+          });
+
+          return elem;
+        };
+
+        var detailsOpenIndex = -1;
+
+        // Show details for the selected row
+        this.grid.addEventListener('selected-items-changed', function() {
+          that.grid.setRowDetailsVisible(detailsOpenIndex, false);
+          var selected = that.grid.selection.selected();
+          if (selected.length == 1) {
+            that.grid.setRowDetailsVisible(selected[0], true);
+            detailsOpenIndex = selected[0];
+          }
+        });
+      },
+
+      eventReceived: function(entry) {
+          this.unshift('items', entry);
+          this.grid.refreshItems();
+      }
+});
+</script>

@@ -13,6 +13,10 @@ Polymer({
         model: {
             type: Object,
             notify: true
+        },
+        initialized: {
+            type: Boolean,
+            value: false
         }
     },
 
@@ -99,14 +103,7 @@ Polymer({
             },
             logs: {
                 logs: function (data) {
-                    if (DEBUG_SOCKET)
-                        console.debug('received log entries', data);
-                    var loglist = document.querySelector('log-list');
-                    if (loglist) {
-                        loglist.logsReceived(data);
-                    } else {
-                        console.warn('No log-list found in DOM to consume logs');
-                    }
+                    console.warn('received log entries from socket', data);
                 },
                 event: function (data) {
                     if (DEBUG_SOCKET)
@@ -148,6 +145,7 @@ Polymer({
             that.send('msg', 'main', 'ready');
             that.send('sub', 'logs');
             that.send('msg', 'logs', 'ready');
+            that.set('initialized', true);
         };
     },
 
