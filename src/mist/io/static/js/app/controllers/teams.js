@@ -286,7 +286,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     description: team.description,
                     organization: team.organization,
                     members: [],
-                    policy: {}
+                    policy: newTeam.policy
                 });
                 Ember.run(this, function() {
                     this.model.pushObject(team);
