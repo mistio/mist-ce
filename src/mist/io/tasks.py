@@ -5,6 +5,7 @@ import tempfile
 import functools
 
 import libcloud.security
+from libcloud.compute.types import NodeState
 
 from time import time, sleep
 from uuid import uuid4
@@ -138,6 +139,10 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
             host = ips[0]
         else:
             tmp_log('ip not found, retrying')
+            raise self.retry(exc=Exception(), countdown=60, max_retries=20)
+
+        if node.state != NodeState.RUNNING:
+            tmp_log('not running state')
             raise self.retry(exc=Exception(), countdown=60, max_retries=20)
 
         try:
@@ -851,8 +856,8 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          disk_size=None, disk_path=None,
                          cloud_init='', associate_floating_ip=False,
                          associate_floating_ip_subnet=None, project_id=None,
+                         bare_metal=False, hourly=True,
                          cronjob={}):
-
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
