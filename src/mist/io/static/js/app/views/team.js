@@ -101,10 +101,11 @@ define('app/views/team', ['app/views/page'],
                         callback: function(didConfirm) {
                             if (didConfirm) {
                                 console.log(123);
-                                Mist.teamsController.deleteTeam(team, function(success) {
-                                    if (success)
+                                Mist.teamsController.deleteTeam({team: team}, function(success) {
+                                    if (success) {
                                         console.log(123);
-                                    Mist.__container__.lookup('router:main').transitionTo('teams');
+                                        Mist.__container__.lookup('router:main').transitionTo('teams');
+                                    }
                                 });
                             }
                         }
