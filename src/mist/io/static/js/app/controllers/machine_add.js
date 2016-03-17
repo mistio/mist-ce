@@ -35,6 +35,27 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             newMachineLibvirtDiskSize: 4,
             newMachineLibvirtImagePath: null,
 
+            //
+            // Computed properties
+            //
+
+            newMachineSizesOptions: Ember.computed('newMachineProvider', 'newMachineImage', function() {
+                var provider = this.get('newMachineProvider.provider'),
+                    image = this.get('newMachineImage');
+
+                if (provider && provider.indexOf('ec2') > -1 && image && image.extra) {
+                    var virtualization_type = image.extra.virtualization_type;
+                    if (virtualization_type) {
+                        var filteredSizes = this.get('newMachineProvider.sizes.model').filter(function(size, index) {
+                            return size.extra.virtualizationTypes.indexOf(virtualization_type) > -1;
+                        }, this);
+
+                        return filteredSizes;
+                    }
+                }
+
+                return this.get('newMachineProvider.sizes.model');
+            }),
 
             //
             //  Methods

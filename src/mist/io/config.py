@@ -65,13 +65,19 @@ STATES = {
     NodeState.ERROR: 'error',
     NodeState.PAUSED: 'paused',
     NodeState.SUSPENDED: 'suspended',
+    NodeState.STARTING: 'starting',
+    NodeState.STOPPING: 'stopping',
+    NodeState.RECONFIGURING: 'reconfiguring'
 }
+
 
 
 # All EC2 providers, useful for type checking
 EC2_PROVIDERS = (
     Provider.EC2_US_EAST,
     Provider.EC2_AP_NORTHEAST,
+    Provider.EC2_AP_NORTHEAST1,
+    Provider.EC2_AP_NORTHEAST2,
     Provider.EC2_EU_WEST,
     Provider.EC2_EU_CENTRAL,
     Provider.EC2_US_WEST,
@@ -127,6 +133,10 @@ SUPPORTED_PROVIDERS_V_2 = [
             {
                 'location': 'Tokyo',
                 'id': Provider.EC2_AP_NORTHEAST
+            },
+            {
+                'location': 'Seoul',
+                'id': Provider.EC2_AP_NORTHEAST2
             },
             {
                 'location': 'Singapore',
@@ -238,21 +248,6 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider': Provider.SOFTLAYER,
         'regions': []
     },
-    #HP Cloud
-    {
-        'title': 'HP Helion Cloud',
-        'provider': Provider.HPCLOUD,
-        'regions': [
-            {
-                'location': 'US West',
-                'id': 'region-a.geo-1'
-            },
-            {
-                'location': 'US East',
-                'id': 'region-b.geo-1'
-            }
-        ]
-    },
     # Docker
     {
         'title': 'Docker',
@@ -321,8 +316,12 @@ SUPPORTED_PROVIDERS = [
     },
     # EC2
     {
-        'title': 'EC2 AP NORTHEAST',
-        'provider': Provider.EC2_AP_NORTHEAST
+        'title': 'EC2 AP Tokyo',
+        'provider': Provider.EC2_AP_NORTHEAST1
+    },
+    {
+        'title': 'EC2 AP Seoul',
+        'provider': Provider.EC2_AP_NORTHEAST2
     },
     {
         'title': 'EC2 AP SOUTHEAST',
@@ -421,15 +420,6 @@ SUPPORTED_PROVIDERS = [
         'title': 'SoftLayer',
         'provider' : Provider.SOFTLAYER
     },
-    #HP Cloud
-    {
-        'title': 'HP Helion Cloud - US West',
-        'provider' : "%s:%s" % (Provider.HPCLOUD,'region-a.geo-1')
-    },
-    {
-        'title': 'HP Helion Cloud - US East',
-        'provider' : "%s:%s" % (Provider.HPCLOUD,'region-b.geo-1')
-    },
     # Docker
     {
         'title': 'Docker',
@@ -446,87 +436,92 @@ SUPPORTED_PROVIDERS = [
 # Base AMIs
 EC2_IMAGES = {
     'eu-central-1': {
-        'ami-a8221fb5': 'Amazon Linux AMI 2015.03 (HVM), SSD Volume Type',
-        'ami-a22610bf': 'SUSE Linux Enterprise Server 12 (HVM), SSD Volume Type',
-        'ami-fc0033e1': 'SUSE Linux Enterprise Server 11 SP3 (PV), SSD Volume Type',
-        'ami-dafdcfc7': 'Red Hat Enterprise Linux 7.1 (HVM), SSD Volume Type',
-        'ami-accff2b1': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-ac221fb1': 'Amazon Linux AMI 2015.03 (PV)',
-        'ami-b6cff2ab': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-d22932be': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-6bd2ce07': 'SUSE Linux Enterprise Server 12 SP1 (HVM), SSD Volume Type',
+        'ami-2eaeb342': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
+        'ami-e8233884': 'Amazon Linux AMI 2015.09.2 (PV)',
+        'ami-875042eb': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-87564feb': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+        'ami-d0574ebc': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
     },
     'us-east-1': {
-        'ami-1ecae776': 'Amazon Linux AMI 2015.03 (HVM), SSD Volume Type',
-        'ami-aeb532c6': 'SUSE Linux Enterprise Server 12 (HVM), SSD Volume Type',
-        'ami-c08fcba8': 'SUSE Linux Enterprise Server 11 SP3 (PV), SSD Volume Type',
-        'ami-12663b7a': 'Red Hat Enterprise Linux 7.1 (HVM), SSD Volume Type',
-        'ami-d05e75b8': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-1ccae774': 'Amazon Linux AMI 2015.03 (PV)',
-        'ami-d85e75b0': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-8fcee4e5': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-b7b4fedd': 'SUSE Linux Enterprise Server 12 SP1 (HVM), SSD Volume Type',
+        'ami-7f2e6015': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
+        'ami-d4f7ddbe': 'Amazon Linux AMI 2015.09.2 (PV)',
+        'ami-2051294a': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-fce3c696': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+        'ami-b2e3c6d8': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
     },
     'us-west-2': {
-        'ami-e7527ed7': 'Amazon Linux AMI 2015.03 (HVM), SSD Volume Type',
-        'ami-d7450be7': 'SUSE Linux Enterprise Server 12 (HVM), SSD Volume Type',
-        'ami-5df2ab6d': 'SUSE Linux Enterprise Server 11 SP3 (PV), SSD Volume Type',
-        'ami-4dbf9e7d': 'Red Hat Enterprise Linux 7.1 (HVM), SSD Volume Type',
-        'ami-5189a661': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-ff527ecf': 'Amazon Linux AMI 2015.03 (PV)',
-        'ami-6989a659': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-63b25203': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-d2627db3': 'SUSE Linux Enterprise Server 12 SP1 (HVM), SSD Volume Type',
+        'ami-86fae7e7': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
+        'ami-a9ae4ec9': 'Amazon Linux AMI 2015.09.2 (PV)',
+        'ami-775e4f16': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-9abea4fb': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+        'ami-9dbea4fc': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
     },
     'us-west-1': {
-        'ami-d114f295': 'Amazon Linux AMI 2015.03 (HVM), SSD Volume Type',
-        'ami-b95b4ffc': 'SUSE Linux Enterprise Server 12 (HVM), SSD Volume Type',
-        'ami-fe8891bb': 'SUSE Linux Enterprise Server 11 SP3 (PV), SSD Volume Type',
-        'ami-a540a5e1': 'Red Hat Enterprise Linux 7.1 (HVM), SSD Volume Type',
-        'ami-df6a8b9b': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-d514f291': 'Amazon Linux AMI 2015.03 (PV)',
-        'ami-d16a8b95': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-d1f482b1': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-6d701b0d': 'SUSE Linux Enterprise Server 12 SP 1 (HVM), SSD Volume Type',
+        'ami-e7a4cc87': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
+        'ami-14f68074': 'Amazon Linux AMI 2015.09.2 (PV)',
+        'ami-d1315fb1': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-06116566': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+        'ami-42116522': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
     },
     'eu-west-1': {
-        'ami-a10897d6': 'Amazon Linux AMI 2015.03 (HVM), SSD Volume Type',
-        'ami-e801af9f': 'SUSE Linux Enterprise Server 12 (HVM), SSD Volume Type',
-        'ami-17c44860': 'SUSE Linux Enterprise Server 11 SP3 (PV), SSD Volume Type',
-        'ami-25158352': 'Red Hat Enterprise Linux 7.1 (HVM), SSD Volume Type',
-        'ami-47a23a30': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-bf0897c8': 'Amazon Linux AMI 2015.03 (PV)',
-        'ami-5da23a2a': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-e1398992': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-f4278487': 'SUSE Linux Enterprise Server 12 SP1 (HVM), SSD Volume Type',
+        'ami-fa7cdd89': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
+        'ami-a93484da': 'Amazon Linux AMI 2015.09.2 (PV)',
+        'ami-8b8c57f8': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-f95ef58a': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+        'ami-be5cf7cd': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
     },
     'ap-southeast-1': {
-        'ami-68d8e93a': 'Amazon Linux AMI 2015.03 (HVM), SSD Volume Type',
-        'ami-84b392d6': 'SUSE Linux Enterprise Server 12 (HVM), SSD Volume Type',
-        'ami-3cbe956e': 'SUSE Linux Enterprise Server 11 SP3 (PV), SSD Volume Type',
-        'ami-dc1c2b8e': 'Red Hat Enterprise Linux 7.1 (HVM), SSD Volume Type',
-        'ami-96f1c1c4': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-acd9e8fe': 'Amazon Linux AMI 2015.03 (PV)',
-        'ami-e8f1c1ba': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-0103cd62': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-2a19da49': 'SUSE Linux Enterprise Server 12 SP 1 (HVM), SSD Volume Type',
+        'ami-1a5f9f79': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
+        'ami-6702cc04': 'Amazon Linux AMI 2015.09.2 (PV)',
+        'ami-3f03c55c': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-25c00c46': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+        'ami-a2c10dc1': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
     },
     'ap-northeast-1': {
-        'ami-cbf90ecb': 'Amazon Linux AMI 2015.03 (HVM), SSD Volume Type',
-        'ami-d54a79d4': 'SUSE Linux Enterprise Server 12 (HVM), SSD Volume Type',
-        'ami-5cb8a65d': 'SUSE Linux Enterprise Server 11 SP3 (PV), SSD Volume Type',
-        'ami-b1b458b1': 'Red Hat Enterprise Linux 7.1 (HVM), SSD Volume Type',
-        'ami-936d9d93': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-27f90e27': 'Amazon Linux AMI 2015.03 (PV)',
-        'ami-8d6d9d8d': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-59bdb937': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-f8220896': 'SUSE Linux Enterprise Server 12 SP1 (HVM), SSD Volume Type',
+        'ami-27fed749': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
+        'ami-c8aca8a6': 'Amazon Linux AMI 2015.09.2 (PV)',
+        'ami-0dd8f963': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-a21529cc': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+        'ami-d91428b7': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
     },
     'ap-southeast-2': {
-        'ami-fd9cecc7': 'Amazon Linux AMI 2015.03 (HVM), SSD Volume Type',
-        'ami-b90e6283': 'SUSE Linux Enterprise Server 12 (HVM), SSD Volume Type',
-        'ami-ad0d7997': 'SUSE Linux Enterprise Server 11 SP3 (PV), SSD Volume Type',
-        'ami-d3daace9': 'Red Hat Enterprise Linux 7.1 (HVM), SSD Volume Type',
-        'ami-69631053': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-ff9cecc5': 'Amazon Linux AMI 2015.03 (PV)',
-        'ami-7163104b': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-11032472': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-0f510a6c': 'SUSE Linux Enterprise Server 12 SP 1 (HVM), SSD Volume Type',
+        'ami-8ea3fbed': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
+        'ami-4f04232c': 'Amazon Linux AMI 2015.09.2 (PV)',
+        'ami-e0c19f83': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-6c14310f': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+        'ami-530b2e30': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
     },
     'sa-east-1': {
-        'ami-b52890a8': 'Amazon Linux AMI 2015.03 (HVM), SSD Volume Type',
-        'ami-f102b6ec': 'SUSE Linux Enterprise Server 12 (HVM), SSD Volume Type',
-        'ami-23912d3e': 'SUSE Linux Enterprise Server 11 SP3 (PV), SSD Volume Type',
-        'ami-09e25b14': 'Red Hat Enterprise Linux 7.1 (HVM), SSD Volume Type',
-        'ami-4d883350': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-bb2890a6': 'Amazon Linux AMI 2015.03 (PV)',
-        'ami-55883348': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-f0f4779c': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-4ede5922': 'SUSE Linux Enterprise Server 12 SP 1 (HVM), SSD Volume Type',
+        'ami-029a1e6e': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
+        'ami-daf477b6': 'Amazon Linux AMI 2015.09.2 (PV)',
+        'ami-27b3094b': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-0fb83963': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+        'ami-feb73692': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
     },
-
+    'ap-northeast-2': {
+        'ami-4d1fd123': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
+        'ami-e9985687': 'SUSE Linux Enterprise Server 12 SP1 (HVM), SSD Volume Type',
+        'ami-44db152a': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
+        'ami-09dc1267': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
+    },
 }
 
 
@@ -539,7 +534,8 @@ EC2_IMAGES[Provider.EC2_US_WEST] = EC2_IMAGES['us-west-1']
 EC2_IMAGES[Provider.EC2_US_WEST_OREGON] = EC2_IMAGES['us-west-2']
 EC2_IMAGES[Provider.EC2_US_EAST] = EC2_IMAGES['us-east-1']
 EC2_IMAGES[Provider.EC2_EU_CENTRAL] = EC2_IMAGES['eu-central-1']
-
+EC2_IMAGES[Provider.EC2_AP_NORTHEAST2] = EC2_IMAGES['ap-northeast-2']
+EC2_IMAGES[Provider.EC2_AP_NORTHEAST1] = EC2_IMAGES['ap-northeast-1']
 
 # Provider.EC2_EU_WEST etc naming is deprecated by libcloud.
 #
