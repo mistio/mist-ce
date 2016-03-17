@@ -55,6 +55,7 @@ define('app/controllers/policy_rule_edit', ['ember'],
                     rule: this.rule,
                     properties: keyValuePairs
                 });
+                this.close();
             }
         });
     }

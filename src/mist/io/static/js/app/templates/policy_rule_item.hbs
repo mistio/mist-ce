@@ -1,6 +1,15 @@
 <td>
 {{view.orderIndex}}
-<a class="ui-btn policy-rule-arrow icon-up ui-btn-inline {{if view.isFirst 'ui-state-disabled'}}" {{action "moveUpRule" target=view}}></a>
-<a class="ui-btn policy-rule-arrow icon-down ui-btn-inline {{if view.isLast 'ui-state-disabled'}}" {{action "moveDownRule" target=view}}></a>
-<a class="ui-btn policy-rule-button policy-rule-operator ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleOperatorPopup" target=view}}>{{rule.operator}}</a>&nbsp;<a class="ui-btn policy-rule-button policy-rule-resource ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleResourcePopup" target=view}}>{{rule.rtype}}</a>&nbsp;<a class="ui-btn policy-rule-button policy-rule-action ui-btn-a ui-btn-inline ui-shadow" {{action "openRuleActionPopup" target=view}}>{{rule.action}}</a>&nbsp;WHERE&nbsp;{{input value=rule.rid placeholder="resource id or tag"}} <a {{action "deleteRule" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
+<a class="ui-btn policy-rule-arrow icon-up ui-btn-inline ui-caps {{if view.isFirst 'ui-state-disabled'}}" {{action "moveUpRule" target=view}}></a>
+<a class="ui-btn policy-rule-arrow icon-down ui-btn-inline ui-caps {{if view.isLast 'ui-state-disabled'}}" {{action "moveDownRule" target=view}}></a>
+<a class="ui-btn policy-rule-button policy-rule-operator ui-btn-a ui-btn-inline ui-caps ui-shadow" {{action "openRuleOperatorPopup" target=view}}>{{rule.operator}}</a>
+<a class="ui-btn policy-rule-button policy-rule-resource ui-btn-a ui-btn-inline ui-caps ui-shadow" {{action "openRuleResourcePopup" target=view}}>{{rule.rtype}}</a>
+<a class="ui-btn policy-rule-button policy-rule-action ui-btn-a ui-btn-inline ui-caps ui-shadow" {{action "openRuleActionPopup" target=view}}>{{rule.action}}</a>
+&nbsp;WHERE&nbsp;
+<a class="ui-btn policy-rule-button policy-rule-identification ui-btn-a ui-btn-inline ui-caps ui-shadow" {{action "openRuleResourceIdentificationPopup" target=view}}>{{view.identification}}</a>&nbsp;
+{{#if view.isID}}
+{{input value=rule.rid placeholder="resource id"}}
+{{else}}
+{{input value=rule.rtags placeholder="resource tags"}}
+{{/if}}<a {{action "deleteRule" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
 </td>

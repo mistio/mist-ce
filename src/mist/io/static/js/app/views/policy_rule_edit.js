@@ -33,6 +33,7 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                     actions: ['All', 'None']
                 }
             ],
+            resourceIdentificationOptions: ['id', 'tags'],
             resourceActionsOptions: Ember.computed('rule.rtype', 'resourceTypesOptions', function() {
                 var options = this.get('resourceTypesOptions').filter(function(resource) {
                     return resource.type.toLowerCase() == this.get('rule.rtype');
@@ -47,7 +48,6 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
 
             open: function (property, el) {
                 this.set('rule', Mist.policyRuleEditController.rule);
-
                 // Get button on which to position the popup
                 var button = '#' + el + ' .policy-rule-button.policy-rule-' + property;
 
@@ -88,6 +88,13 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                     Mist.policyRuleEditController.edit({
                         key: 'rtype',
                         value: resource
+                    });
+                },
+
+                identificationClicked: function(identification) {
+                    Mist.policyRuleEditController.edit({
+                        key: 'identification',
+                        value: identification
                     });
                 }
             }

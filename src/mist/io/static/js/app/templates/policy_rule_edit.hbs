@@ -63,3 +63,25 @@
         </ul>
     </div>
 </div>
+
+<div id="policy-rule-identification-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
+<div id="policy-rule-identification-popup"
+     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow">
+
+    <div id="policy-rule-identification"
+         class="ui-popup"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip">
+
+        <ul data-role="listview">
+            {{#each view.resourceIdentificationOptions as |option|}}
+            <li data-icon="false">
+                <a class="ui-btn" {{action "identificationClicked" option target=view}}>
+                    {{option}}
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+</div>

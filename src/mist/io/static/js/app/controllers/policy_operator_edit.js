@@ -55,6 +55,7 @@ define('app/controllers/policy_operator_edit', ['ember'],
                     team: this.team,
                     operator: keyValuePairs.operator
                 });
+                this.close();
             }
         });
     }

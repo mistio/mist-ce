@@ -40,15 +40,45 @@ define('app/views/policy_rule_item', ['ember'],
                 return rules.indexOf(this.get('rule')) === 0;
             }),
 
+            identification: Ember.computed('rule.rid', 'rule.rtags', 'rule.identification', function() {
+                var rid = this.get('rule.rid'),
+                rtags = this.get('rule.rtags');
+                if (this.get('rule.identification')) {
+                    return this.get('rule.identification');
+                }
+
+                if (rid) {
+                    return 'id';
+                }
+
+                if (rtags) {
+                    return 'tags';
+                }
+
+                return 'id';
+            }),
+
+            isID: Ember.computed('identification', function() {
+                return this.get('identification') == 'id';
+            }),
+
             //
             // Initialization
             //
 
             load: function() {
+                this._updateView();
+            }.on('didInsertElement'),
+
+            //
+            // Private Methods
+            //
+
+            _updateView: function() {
                 Ember.run.scheduleOnce('afterRender', this, function() {
                     $('body').enhanceWithin();
                 });
-            }.on('didInsertElement'),
+            },
 
             //
             // Actions
@@ -60,11 +90,20 @@ define('app/views/policy_rule_item', ['ember'],
                 },
 
                 openRuleActionPopup: function() {
-                    Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'action', null, this.elementId);
+                    console.log(this.get('rule'));
+                    if (this.get('rule.action').toLowerCase() == 'all' && this.get('rule.rtype').toLowerCase()) {
+                        Mist.notificationController.notify('Please select resource type first');
+                    } else {
+                        Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'action', null, this.elementId);
+                    }
                 },
 
                 openRuleResourcePopup: function() {
                     Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'resource', null, this.elementId);
+                },
+
+                openRuleResourceIdentificationPopup: function() {
+                    Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'identification', null, this.elementId);
                 },
 
                 moveUpRule: function() {
@@ -80,7 +119,16 @@ define('app/views/policy_rule_item', ['ember'],
                         team: this.get('team'),
                         rule: this.get('rule')
                     });
-                }
+                },
+
+                //
+                // Observers
+                //
+
+                identificationObserver: function() {
+                    console.log(this.get(123123123));
+                    Ember.run.once(this, '_updateView');
+                }.observes('identification')
             }
         });
     }

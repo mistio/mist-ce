@@ -105,19 +105,17 @@ def home(request):
             'policy': {
                 'operator': 'DENY',
                 'rules': [{
-                    'id': 1,
                     'operator': 'DENY',
                     'action': 'abc',
                     'rtype': 'machine',
-                    'rid': '',
+                    'rid': '123',
                     'rtags': ''
                 }, {
-                    'id': 2,
                     'operator': 'ALLOW',
                     'action': 'abc',
                     'rtype': 'script',
                     'rid': '',
-                    'rtags': ''
+                    'rtags': 'key:value'
                 }]
             }
         }, {
