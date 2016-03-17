@@ -237,28 +237,28 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
 
                 console.log(payloadRules);
 
-                // if (payloadRules.length) {
-                //     var that = this;
-                //     that.set('updatingRules', true);
-                //     Mist.ajax
-                //         .PUT('/org/' + team.organization.id + '/teams/' + team.id + '/policy', {
-                //             policy: {
-                //                 operator: team.policy.operator,
-                //                 rules: newRules
-                //             }
-                //         })
-                //         .success(function() {
-                //             that._updateRules(team, payloadRules);
-                //         })
-                //         .error(function(message) {
-                //             Mist.notificationController.notify(message);
-                //         })
-                //         .complete(function(success) {
-                //             that.set('updatingRules', false);
-                //             if (args.callback)
-                //                 args.callback(success);
-                //         });
-                // }
+                if (payloadRules.length) {
+                    var that = this;
+                    that.set('updatingRules', true);
+                    Mist.ajax
+                        .PUT('/org/' + team.organization.id + '/teams/' + team.id + '/policy', {
+                            policy: {
+                                operator: team.policy.operator,
+                                rules: newRules
+                            }
+                        })
+                        .success(function() {
+                            that._updateRules(team, payloadRules);
+                        })
+                        .error(function(message) {
+                            Mist.notificationController.notify(message);
+                        })
+                        .complete(function(success) {
+                            that.set('updatingRules', false);
+                            if (args.callback)
+                                args.callback(success);
+                        });
+                }
             },
 
             getTeam: function(teamId) {
