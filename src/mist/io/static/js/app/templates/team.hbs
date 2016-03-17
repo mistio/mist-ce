@@ -54,16 +54,20 @@
 
             <table class="info-table">
                 <tbody>
-                    {{#each view.team.policy.rules as |rule|}}
-                    <tr>
-                        <td>{{rule.operator}} {{rule.action}} ON {{rule.rtype}} WHEN {{rule.rid}}</td>
-                    </tr>
+                    {{#each view.team.policy.rules as |rule index|}}
+                        {{component "policy-rule-item" index=index rule=rule team=view.team}}
                     {{/each}}
+
+                    {{component "policy-operator-item" policy=view.team.policy team=view.team}}
                 </tbody>
             </table>
 
             <div class="text-center">
-                <a id="rule-add" class="ui-btn ui-shadow ui-caps ui-btn-d" {{action "saveRulesClicked" target=view}}>Save Rules</a>
+                <a id="rule-add" class="ui-btn ui-shadow ui-caps back" {{action "addRulesClicked" target=view}}>Add Rule</a>
+                {{#if Mist.teamsController.updatingRules}}
+                    <div class="ajax-loader"></div>
+                {{/if}}
+                <a id="rule-save" class="ui-btn ui-caps ui-shadow ui-btn-d" {{action "saveRulesClicked" target=view}}>Save Rules</a>
             </div>
         </div>
 
@@ -73,6 +77,10 @@
     {{component "dialog-popup"}}
 
     {{component "team-edit"}}
+
+    {{component "policy-rule-edit"}}
+
+    {{component "policy-operator-edit" team=view.team}}
 
     {{component "member-add" team=view.team}}
 

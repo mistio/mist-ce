@@ -21,8 +21,8 @@ define('app/views/team_list', ['app/views/page'],
             // Computed Properties
             //
 
-            hasOrganization: Ember.computed('Mist.organizationsController.model', 'Mist.org_create', function() {
-                return !!Mist.organizationsController.model && Mist.org_create;
+            hasOrganization: Ember.computed('Mist.organizationsController.model', function() {
+                return !!Mist.organizationsController.model;
             }),
 
             canRename: Ember.computed('Mist.teamsController.model.@each.selected', function() {

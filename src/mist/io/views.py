@@ -108,6 +108,48 @@ def home(request):
             'description': '',
             'members': [1],
             'policy': {
+                'operator': 'DENY',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': 'abc',
+                    'rtype': 'machine',
+                    'rid': '123',
+                    'rtags': ''
+                }, {
+                    'operator': 'ALLOW',
+                    'action': 'abc',
+                    'rtype': 'script',
+                    'rid': '',
+                    'rtags': 'key:value'
+                }]
+            }
+        }, {
+            'id': 2,
+            'name': 'Frontend Team',
+            'description': '',
+            'members': [1, 2],
+            'policy': {
+                'operator': 'DENY',
+                'rules': [{
+                    'operator': 'DENY',
+                    'action': 'abc',
+                    'rtype': 'machine',
+                    'rid': '',
+                    'rtags': ''
+                }, {
+                    'operator': 'ALLOW',
+                    'action': 'abc',
+                    'rtype': 'script',
+                    'rid': '',
+                    'rtags': ''
+                }]
+            }
+        }, {
+            'id': 3,
+            'name': 'QA Team',
+            'description': '',
+            'members': [3],
+            'policy': {
                 'operator': 'ALLOW',
                 'rules': [{
                     'operator': 'DENY',
@@ -124,36 +166,6 @@ def home(request):
                 }]
             }
         }, {
-            'id': 2,
-            'name': 'Frontend Team',
-            'description': '',
-            'members': [1, 2],
-            'policy': {
-                'operator': 'ALLOW',
-                'rules': [{
-                    'operator': 'DENY',
-                    'action': '',
-                    'rtype': '',
-                    'rid': '',
-                    'rtags': ''
-                }]
-            }
-        }, {
-            'id': 3,
-            'name': 'QA Team',
-            'description': '',
-            'members': [3],
-            'policy': {
-                'operator': 'ALLOW',
-                'rules': [{
-                    'operator': 'DENY',
-                    'action': '',
-                    'rtype': '',
-                    'rid': '',
-                    'rtags': ''
-                }]
-            }
-        }, {
             'id': 4,
             'name': 'Backend Team',
             'description': '',
@@ -162,8 +174,14 @@ def home(request):
                 'operator': 'ALLOW',
                 'rules': [{
                     'operator': 'DENY',
-                    'action': '',
-                    'rtype': '',
+                    'action': 'abc',
+                    'rtype': 'machine',
+                    'rid': '',
+                    'rtags': ''
+                }, {
+                    'operator': 'ALLOW',
+                    'action': 'abc',
+                    'rtype': 'script',
                     'rid': '',
                     'rtags': ''
                 }]
@@ -188,7 +206,6 @@ def home(request):
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
         'last_build': config.LAST_BUILD,
-        'org_create': json.dumps(True),
         'organization': json.dumps(organization)
     }
 
