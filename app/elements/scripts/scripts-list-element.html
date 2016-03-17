@@ -85,7 +85,7 @@
         [size=xs] > * {
             display: none;
         }
-        
+
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
             padding: 0 16px;
         }
@@ -112,9 +112,9 @@
                 </paper-toolbar>
                 <div class="list">
                     <div hidden$="[[!hasScripts]]" class="list-options">
-                        <div class$="option search [[showSearchOption]]">
+                        <div id="search" class$="option search [[showSearchOption]]">
                             <paper-icon-button id="searchScriptBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
-                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm}}" placeholder="" no-label-float class="search"></paper-input>
+                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm::keyup}}" placeholder="" no-label-float class="search"></paper-input>
                             <paper-icon-button hidden$="[[!showSearchOption]]" icon="close" on-tap="_toggleSearchSelected"></paper-icon-button>
                             <span hidden$="[[showSearchOption]]" class="label">Search scripts</span>                            
                         </div>
@@ -251,7 +251,8 @@
                 'toggleSelectedScript': '_toggleSelectedScript',
                 'addScript': '_addScript',
                 'updateSelectedScript': '_updateSelectedScript',
-                'confirmation': '_deleteSelectedResponse'
+                'confirmation': '_deleteSelectedResponse',
+                keyup: 'hotkeys'
             },
 
             _getHeaderStyle: function(color) {
@@ -417,6 +418,13 @@
             _actualView: function(view, force) {
                 return force ? 'cards' : view;
             },
+            hotkeys: function(e) {
+                var inpath = e.path.indexOf(this.$.search);
+                // ESC
+                if (e.keyCode === 27 && inpath > 0 ) {
+                    this.showSearchOption = false;
+                }
+            }
         });
     })();
     </script>
