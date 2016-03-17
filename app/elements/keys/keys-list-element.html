@@ -6,6 +6,7 @@
         <style include="shared-styles">
         :host {
             display: block;
+            background: #fafafa;
         }
         
         paper-card {
@@ -19,63 +20,11 @@
         .flexchild {
             @apply(--layout-flex);
         }
-        
-        :host {
-            background: #fafafa;
-        }
-        
-        a {
-            color: black;
-            text-decoration: none;
-        }
-        
+
         #container {
             background: #fafafa;
         }
-        
-        .paper-header [paper-drawer-toggle] {
-            margin-left: 10px;
-        }
-        
-        .paper-header {
-            @apply(--layout-horizontal);
-        }
-        
-        .paper-header {
-            height: 60px;
-            font-size: 24px;
-            line-height: 60px;
-            padding: 0 10px;
-            color: white;
-            transition: height 0.2s;
-            transition: font-size 0.2s;
-        }
-        
-        .paper-header.tall {
-            height: 320px;
-            font-size: 16px;
-        }
-        
-        .paper-header h2 {
-            margin-left: 20px;
-            @apply(--layout-flex);
-            text-transform: capitalize;
-        }
-        
-        .paper-header .toggleViewButton {
-            --paper-icon-button-ink-color: transparent;
-        }
-        
-        .paper-header .cartButton {
-            margin-right: 10px;
-        }
-        
-        #content {
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 0 10px;
-        }
-        
+
         paper-icon-button {
             transition: all 200ms;
         }
@@ -96,25 +45,6 @@
             margin-right: 15px;
         }
         
-        .elements-title h2 {
-            @apply(--paper-font-title);
-            color: #424242;
-        }
-        
-        .elements-title iron-icon {
-            cursor: pointer;
-            margin-left: 16px;
-        }
-        
-        .elements-title > [paper-drawer-toggle] {
-            margin: 0 16px 0 0;
-        }
-        
-        #section-heading .description {
-            font-size: 16px;
-            color: var(--paper-grey-600);
-        }
-        
         app-check {
             margin-right: 16px;
             display: inline-block;
@@ -122,26 +52,15 @@
         }
         
         #element-cards,
-        element-table,
-        .elements-title,
-        #section-heading {
+        element-table {
             max-width: 1500px;
             margin: 20px auto;
-        }
-        
-        #section-heading {
-            margin: 0px auto 16px;
         }
         
         [size=xs] > * {
             display: none;
         }
-        
-        responsive-element[size=xs].layout {
-            -ms-flex-direction: column;
-            -webkit-flex-direction: column;
-            flex-direction: column;
-        }
+
         
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
             padding: 0 16px;
@@ -158,64 +77,6 @@
             z-index: 10;
         }
         </style>
-        <!-- <paper-card heading="Keys">
-            <div class="card-content">
-                <div hidden$="[[!hasKeys]]" class="list-options flex-horizontal-with-ratios">
-                    <h2 class="list-title flexchild">[[presentedKeys.length]] Keys</h2>
-                    <paper-tooltip for="searchKeyBtn" position="top">Toggle Search</paper-tooltip>
-                    <paper-icon-button id="searchKeyBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
-                    <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm}}" placeholder="Search..." no-label-float class="search"></paper-input>
-                    <span hidden$="[[showSearchOption]]" class="label">Search keys</span>
-                    <paper-tooltip for="makeDefaultKeyBtn" position="top">Make Default</paper-tooltip>
-                    <paper-icon-button id="makeDefaultKeyBtn" hidden$="[[!showMakeDefaultOption]]" on-tap="_starSelected" icon="[[makeDefaultIcon]]"></paper-icon-button>
-                    <paper-tooltip for="editKeyBtn" position="top">Rename</paper-tooltip>
-                    <paper-icon-button id="editKeyBtn" hidden$="[[!showEditOption]]" on-tap="_editSelected" icon="image:edit"></paper-icon-button>
-                    <paper-tooltip for="deleteKeyBtn" position="top">Delete All Selected
-                    </paper-tooltip>
-                    <paper-icon-button id="deleteKeyBtn" hidden$="[[!showDeleteOption]]" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
-                    <span hidden$="[[!showDeleteOption]]" class="label">
-                    Delete [[selectedKeys.length]] key<span hidden$="[[!moreThanOneSelected]]">s</span> </span>
-                    </span>
-                </div>
-                <div hidden$="[[!hasKeys]]" class="info-list">
-                    <div class="info-head flex-horizontal-with-ratios machines">
-                        <div class="flexchild">
-                            <paper-tooltip for="selectAllBtn" position="top">Select all</paper-tooltip>
-                            <paper-checkbox id="selectAllBtn" checked="[[selectAll]]" on-tap="_selectAllChanged"></paper-checkbox>
-                            Νame
-                            <paper-tooltip for="sortById" position="top">Sort by name</paper-tooltip>
-                            <paper-icon-button id="sortById" class$="[[_computeIsActiveSort(sortByTerm, 'id')]]" icon="expand-more" on-tap="_sortKeys" sort-option="id"></paper-icon-button>
-                        </div>
-                        <div class="flexchild">Default
-                            <paper-tooltip for="sortByDefault" position="top">Sort by default</paper-tooltip>
-                            <paper-icon-button id="sortByDefault" class$="[[_computeIsActiveSort(sortByTerm, 'default')]]" icon="expand-more" on-tap="_sortKeys" sort-option="default"></paper-icon-button>
-                        </div>
-                    </div>
-                    <div class="info-body">
-                        <iron-list items="[[presentedKeys]]" as="key" selected-items="{{selectedKeys}}" multi-selection>
-                            <template>
-                                <div class="row">
-                                    <key-item-element selected="{{selected}}" key="[[key]]" index="[[index]]" count="[[presentedKeys.length]]">
-                                        <div class="row-actions">
-                                            <paper-tooltip for="makeDefaultKeyBtn" position="top">Make Default</paper-tooltip>
-                                            <paper-icon-button id="makeDefaultKeyBtn" on-tap="_starThis" icon="[[makeDefaultIcon]]"></paper-icon-button>
-                                            <paper-tooltip for="editKeyBtn" position="top">Rename</paper-tooltip>
-                                            <paper-icon-button id="editKeyBtn" on-tap="_editSelected" icon="image:edit"></paper-icon-button>
-                                            <paper-tooltip for="deleteKeyBtn" position="top">Delete All Selected
-                                            </paper-tooltip>
-                                            <paper-icon-button id="deleteKeyBtn" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
-                                        </div>
-                                    </key-item-element>
-                                </div>
-                            </template>
-                        </iron-list>
-                    </div>
-                </div>
-                <p hidden$="[[hasKeys]]">
-                    No keys found here. You can add some by using the action button!
-                </p>
-            </div>
-        </paper-card> -->
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
             <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
@@ -227,9 +88,9 @@
                 </paper-toolbar>
                 <div class="list">
                     <div hidden$="[[!hasKeys]]" class="list-options">
-                        <div class$="option search [[showSearchOption]]">
+                        <div id="search" class$="option search [[showSearchOption]]">
                             <paper-icon-button id="searchKeyBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
-                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm}}" no-label-float class="search"></paper-input>
+                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm::keyup}}" no-label-float class="search"></paper-input>
                             <paper-icon-button hidden$="[[!showSearchOption]]" icon="close" on-tap="_toggleSearchSelected"></paper-icon-button>
                             <span hidden$="[[showSearchOption]]" class="label">Search keys</span>
                         </div>
@@ -262,7 +123,7 @@
                             </div>
                         </div>
                         <div class="info-body">
-                        <iron-list items="[[presentedKeys]]" as="key" selected-items="{{selectedKeys}}" multi-selection>
+                        <iron-list items="[[presentedKeys]]" as="key" selected-items="{{selectedKeys}}" multi-selection style$="[[vpHeight]]">
                             <template>
                                 <div class="row">
                                     <key-item-element selected="{{selected}}" key="[[key]]" index="[[index]]" count="[[presentedKeys.length]]">
@@ -310,7 +171,7 @@
                     type: Array
                 },
                 presentedKeys: {
-                    type: Array
+                    type: Array                    
                 },
                 selectedKey: {
                     type: Object,
@@ -356,7 +217,12 @@
                 sortByTerm: {
                     type: String,
                     value: 'default'
-                }
+                },
+                vpHeight: String
+            },
+            ready: function() {
+                var wh = window.innerHeight;
+                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';                
             },
             observers: [
                 '_keysChanged(keys.*, selectedKeys.*)',
@@ -366,7 +232,11 @@
                 'toggleSelectedKey': '_toggleSelectedKey',
                 'addKey': '_addKey',
                 'updateSelectedKey': '_updateSelectedKey',
-                'confirmation': '_deleteSelectedResponse'
+                'confirmation': '_deleteSelectedResponse',
+                keyup: 'hotkeys'
+            },
+            ready: function (){
+                this.presentedKeys = this.keys;
             },
             _getHeaderStyle: function(color) {
                 return 'background-color: ' + color + '; color: #fff;';
@@ -532,6 +402,13 @@
                 var notification = document.querySelector('notification-element');
                 notification.title = title;
                 notification._openToast();
+            },
+            hotkeys: function(e) {
+                var inpath = e.path.indexOf(this.$.search);
+                // ESC
+                if (e.keyCode === 27 && inpath > 0 ) {
+                    this.showSearchOption = false;
+                }
             }
         });
     })();

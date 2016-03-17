@@ -27,49 +27,12 @@
         }
 
         a {
-            color: black;
+            color: rgba(0,0,0,0.87) !important;
             text-decoration: none;
         }
 
         #container {
             background: #fafafa;
-        }
-
-        .paper-header [paper-drawer-toggle] {
-            margin-left: 10px;
-        }
-
-        .paper-header {
-            @apply(--layout-horizontal);
-        }
-
-        .paper-header {
-            height: 60px;
-            font-size: 24px;
-            line-height: 60px;
-            padding: 0 10px;
-            color: white;
-            transition: height 0.2s;
-            transition: font-size 0.2s;
-        }
-
-        .paper-header.tall {
-            height: 320px;
-            font-size: 16px;
-        }
-
-        .paper-header h2 {
-            margin-left: 20px;
-            @apply(--layout-flex);
-            text-transform: capitalize;
-        }
-
-        .paper-header .toggleViewButton {
-            --paper-icon-button-ink-color: transparent;
-        }
-
-        .paper-header .cartButton {
-            margin-right: 10px;
         }
 
         #content {
@@ -107,11 +70,6 @@
         .elements-title > [paper-drawer-toggle] {
             margin: 0 16px 0 0;
         }
-
-        #section-heading .description {
-            font-size: 16px;
-            color: var(--paper-grey-600);
-        }
         app-check {
             margin-right: 16px;
             display: inline-block;
@@ -119,24 +77,13 @@
         }
         #element-cards,
         element-table,
-        .elements-title,
-        #section-heading {
+        .elements-title {
             max-width: 1500px;
             margin: 20px auto;
         }
 
-        #section-heading {
-            margin: 0px auto 16px;
-        }
-
         [size=xs] > * {
             display: none;
-        }
-
-        responsive-element[size=xs].layout {
-            -ms-flex-direction: column;
-            -webkit-flex-direction: column;
-            flex-direction: column;
         }
 
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
@@ -165,9 +112,9 @@
                 </paper-toolbar>
                 <div class="list">
                     <div hidden$="[[!hasScripts]]" class="list-options">
-                        <div class$="option search [[showSearchOption]]">
+                        <div id="search" class$="option search [[showSearchOption]]">
                             <paper-icon-button id="searchScriptBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
-                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm}}" placeholder="" no-label-float class="search"></paper-input>
+                            <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm::keyup}}" placeholder="" no-label-float class="search"></paper-input>
                             <paper-icon-button hidden$="[[!showSearchOption]]" icon="close" on-tap="_toggleSearchSelected"></paper-icon-button>
                             <span hidden$="[[showSearchOption]]" class="label">Search scripts</span>                            
                         </div>
@@ -202,7 +149,7 @@
                             </div>
                         </div>
                         <div class="info-body">
-                            <iron-list items="[[presentedScripts]]" as="script" selected-items="{{selectedScripts}}" multi-selection>
+                            <iron-list items="[[presentedScripts]]" as="script" selected-items="{{selectedScripts}}" multi-selection style$="[[vpHeight]]">
                                 <template>
                                     <div class="row">
                                         <script-item-element selected="[[selected]]" script="[[script]]" index="[[index]]" count="[[presentedScripts.length]]">
@@ -289,7 +236,12 @@
                 sortByTerm: {
                     type: String,
                     value: 'name'
-                }
+                },
+                vpHeight: String
+            },
+            ready: function() {
+                var wh = window.innerHeight;
+                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
             observers: [
                 '_scriptsChanged(scripts.*, selectedScripts.*)',
@@ -299,7 +251,8 @@
                 'toggleSelectedScript': '_toggleSelectedScript',
                 'addScript': '_addScript',
                 'updateSelectedScript': '_updateSelectedScript',
-                'confirmation': '_deleteSelectedResponse'
+                'confirmation': '_deleteSelectedResponse',
+                keyup: 'hotkeys'
             },
 
             _getHeaderStyle: function(color) {
@@ -465,6 +418,13 @@
             _actualView: function(view, force) {
                 return force ? 'cards' : view;
             },
+            hotkeys: function(e) {
+                var inpath = e.path.indexOf(this.$.search);
+                // ESC
+                if (e.keyCode === 27 && inpath > 0 ) {
+                    this.showSearchOption = false;
+                }
+            }
         });
     })();
     </script>

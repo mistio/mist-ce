@@ -16,6 +16,7 @@
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
 <link rel="import" href="../app-sidebar/app-sidebar.html">
@@ -45,7 +46,7 @@
 <link rel="import" href="../keys/key-item-element.html">
 <link rel="import" href="../keys/key-page-element.html">
 <link rel="import" href="../keys/keys-list-element.html">
-<link rel="import" href="../pages/page-test.html">
+<link rel="import" href="../grid-list-element/grid-list-element.html">
 
 <dom-module id="app-main">
     <style>
@@ -89,20 +90,15 @@
             <page-list model="[[model]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-list>
             <page-image params="[[params]]" model="[[model]]" image="[[getImage(params)]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-image>
             <!-- keys -->
-            <!-- <page-list model="[[model]]" elements="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]"></page-list> -->
             <keys-list-element model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" keys="[[model.keysArray]]"></keys-list-element>
-            <page-key model="[[model]]" params="[[params]]" key="[[getKey(params)]]" elements="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]"></page-key>
+            <key-page-element model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page-element>
             <!-- networks -->
             <page-list model="[[model]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-list>
-
             <page-network model="[[model]]" params="[[params]]" network="[[getNetwork(params)]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-network>
             <!-- scripts -->
+            <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
             <scripts-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-element>
-            <!-- <page-list model="{{model}}" sections="{{sectionsArray}}" section="[[sections.scripts]]"></page-list> -->
-            <!-- <page-script model="[[model]]" params="[[params]]" script="[[getScript(params)]]" elements="[[model.scriptsArray]]" sections="[[sectionsArray]]" section="[[sections.scripts]]"></page-script> -->
-
             <script-page-element model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page-element>
-
             <script-add-element model="{{model}}" sections="[[sections]]" section="[[sections.scripts]]"></script-add-element>
             <page-elements></page-elements>
             <page-account></page-account>
@@ -208,16 +204,7 @@ var app = Polymer({
                 user: "marios@mist.io",
             }],
             imagesArray: [],
-            keysArray: [{
-                id: "test2",
-                isDefault: false
-            }, {
-                id: "primary",
-                isDefault: true
-            }, {
-                id: "kvm",
-                isDefault: false
-            }],
+            keysArray: [],
             networksArray: [],
             templatesArray:[],
             teamsArray:[],
@@ -342,21 +329,6 @@ var app = Polymer({
         // var index = params.id;
         // return this.model.images.index;
     },
-    getKey: function(params) {
-        var ka = this.model.keysArray;
-        var p = params.id;
-        var k = {};
-        for (var i = 0; i < ka.length; i++) {
-            if (ka[i].id == p)
-                return k = ka[i];
-        };
-        //return key object with the right 'id' from model.keysArray
-        return k;
-
-        // //altertenative way to get object from map
-        // var index = params.id;
-        // return this.model.keys.index;
-    },
     getNetwork: function(params) {
         var na = this.model.networksArray;
         var p = params.name;
@@ -367,17 +339,6 @@ var app = Polymer({
         };
         //return network object with the right 'name' from model.networksArray
         return n;
-    },
-    getScript: function(params) {
-        var sa = this.model.scriptsArray;
-        var p = params.id;
-        var s = {};
-        for (var i = 0; i < sa.length; i++) {
-            if (sa[i].id == p)
-                return s = sa[i];
-        };
-        //return script object with the right 'id' (???) from model.scriptsArray
-        return s;
     },
     updateDocTitle: function(e, details) {
         if (details.item.title && details.item.title.length) {

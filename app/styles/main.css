@@ -246,11 +246,6 @@ iron-dropdown paper-material {
     color: #0099cc !important; /*var(--mist-blue);*/
 }
 
-a {
-    color: black;
-    text-decoration: none;
-}
-
 #container {
     background: #fafafa;
 }
