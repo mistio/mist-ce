@@ -390,7 +390,7 @@ var setupMainChannel = function(socket, callback) {
 
     // Fast implementation for teams modelling
     var organization = Mist.organization, teams = [];
-    if (organization) {
+    if (Object.keys(organization).length) {
         organization.teams.forEach(function(team) {
             team.organization = {
                 id: organization.id,
@@ -403,9 +403,7 @@ var setupMainChannel = function(socket, callback) {
             team.members = members;
             teams.pushObject(team);
         });
-    }
 
-    if (organization) {
         Mist.organizationsController.load({
             id: organization.id,
             name: organization.name
