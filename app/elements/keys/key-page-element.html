@@ -265,12 +265,14 @@
             </paper-header-panel>
         </paper-drawer-panel>
 
-
-        <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
-        
+        <template is="dom-if" if="{{key.id}}">
+            <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
+        </template>
         <key-edit-element key="[[key]]"></key-edit-element>
         <dialog-element></dialog-element>
-        <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
+        <template is="dom-if" if="{{key.id}}">
+            <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
+        </template>
         <iron-ajax id="keyMakeDefaultRequest" url="{{baseUrl}}" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyEditRequest" url="{{baseUrl}}" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyDeleteRequest" url="{{baseUrl}}" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
@@ -294,7 +296,8 @@
                 },
                 id: {
                     type: String,
-                    computed: '_computeId(params)'
+                    computed: '_computeId(params)',
+                    notify: true
                 },
                 isDefault: {
                     type: String,
@@ -339,7 +342,9 @@
                 'paramsChanged' : 'update'
             },
             update: function(params){
-                this.$.keyPublicRequest.generateRequest();
+                if (this.$.keyPublicRequest) {
+                    this.$.keyPublicRequest.generateRequest();
+                }
                 this.visiblePrivateKey = false;
                 this.set('privateKey', null);
                 // console.log('update-params',params);
