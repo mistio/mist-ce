@@ -91,7 +91,8 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             },
 
             deleteTeam: function(args) {
-                var that = this;
+                var team = args,
+                that = this;
                 that.set('deletingTeam', true);
                 Mist.ajax
                     .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id, {})
@@ -154,14 +155,118 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     .POST('/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members', {
                         'email': args.member.email
                     })
-                    .success(function() {
+                    .success(function(userID) {
                         Mist.notificationController.notify('An invitation was sent to user with email: ' + args.member.email);
+                        that._addMember(args.team, {
+                            id: userID,
+                            email: args.member.email
+                        });
                     })
                     .error(function(message) {
                         Mist.notificationController.notify(message);
                     })
                     .complete(function(success) {
                         that.set('invitingMember', false);
+                        if (args.callback)
+                            args.callback(success);
+                    });
+            },
+
+            addRule: function(team) {
+                team.policy.rules.pushObject({
+                    'operator': 'DENY',
+                    'action': 'All',
+                    'rtype': 'All',
+                    'rid': '',
+                    'rtags': ''
+                });
+            },
+
+            editRule: function(args) {
+                var index = args.team.policy.rules.indexOf(args.rule),
+                    rule = args.team.policy.rules.objectAt(index);
+                Ember.set(rule, args.properties.key, args.properties.value);
+
+                // When resource type changes force
+                // action to be All since bad combinations should be avoided
+                if (args.properties.key == 'rtype') {
+                    Ember.set(rule, 'action', 'All');
+                }
+
+                // When identification changes
+                // reset rid & rtags to prevent both to be set
+                if (args.properties.key == 'identification') {
+                    Ember.setProperties(rule, {
+                        rid: null,
+                        rtags: {}
+                    });
+                }
+            },
+
+            editOperator: function(args) {
+                Ember.set(args.team.policy, 'operator', args.operator);
+            },
+
+            moveUpRule: function(rule, team) {
+                var index = team.policy.rules.indexOf(rule);
+
+                if (index !== 0) {
+                    team.policy.rules
+                        .removeAt(index)
+                        .insertAt(index - 1, rule);
+                }
+            },
+
+            moveDownRule: function(rule, team) {
+                var index = team.policy.rules.indexOf(rule),
+                    len = team.policy.rules.length;
+
+                if (index !== len - 1) {
+                    team.policy.rules
+                        .removeAt(index)
+                        .insertAt(index + 1, rule);
+                }
+            },
+
+            deleteRule: function(args) {
+                args.team.policy.rules.removeObject(args.rule);
+            },
+
+            saveRules: function(args) {
+                var team = args.team,
+                payloadRules = team.policy.rules
+                    .filter(function(rule, index) {
+                        return rule.rid || rule.rtags;
+                    }, this)
+                    .map(function(rule, index) {
+                        return {
+                            operator: rule.operator,
+                            action: rule.action,
+                            rtype: rule.rtype,
+                            rid: rule.rid,
+                            rtags: rule.rtags
+                        };
+                    }, this);
+
+                console.log(payloadRules);
+
+                var that = this;
+                that.set('updatingRules', true);
+                Mist.ajax
+                    .PUT('/org/' + team.organization.id + '/teams/' + team.id + '/policy', {
+                        policy: {
+                            operator: team.policy.operator,
+                            rules: payloadRules
+                        }
+                    })
+                    .success(function() {
+                        // that._updateRules(team, payloadRules);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('updatingRules', false);
                         if (args.callback)
                             args.callback(success);
                     });
@@ -191,9 +296,12 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     id: newTeam.id,
                     name: team.name,
                     description: team.description,
-                    organization: team.organization,
+                    organization: {
+                        id: Mist.organization.id,
+                        name: Mist.organization.name
+                    },
                     members: [],
-                    policy: {}
+                    policy: newTeam.policy
                 });
                 Ember.run(this, function() {
                     this.model.pushObject(team);
@@ -212,9 +320,26 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 });
             },
 
+            _addMember: function(team, member) {
+                var newMember = Ember.Object.create({
+                    id: member.id,
+                    name: member.email,
+                    email: member.email
+                });
+                Ember.run(this, function() {
+                    team.members.pushObject(newMember);
+                });
+            },
+
             _deleteMember: function(team, member) {
                 Ember.run(this, function() {
                     team.members.removeObject(member);
+                });
+            },
+
+            _updateRules: function(team, payloadRules) {
+                Ember.run(this, function() {
+                    team.policy.rules.setObjects(payloadRules);
                 });
             }
         });

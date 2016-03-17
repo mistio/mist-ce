@@ -56,7 +56,7 @@ define('app/controllers/member_add', ['ember'],
             //
 
             _updateFormReady: function() {
-                this.set('formReady', !!this.get('newMember.email'));
+                this.set('formReady', /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$/.test(this.get('newMember.email')));
             },
 
             //

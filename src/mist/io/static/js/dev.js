@@ -191,6 +191,9 @@ var loadFiles = function (callback) {
         'app/controllers/organizations',
         'app/controllers/organization_add',
         'app/controllers/member_add',
+        'app/controllers/policy_rule_edit',
+        'app/controllers/policy_operator_edit',
+        'app/controllers/policy',
 
         'app/routes/image',
         'app/routes/images',
@@ -273,6 +276,10 @@ var loadFiles = function (callback) {
         'app/views/member_item',
         'app/views/member_add',
         'app/views/organization_add',
+        'app/views/policy_rule_item',
+        'app/views/policy_rule_edit',
+        'app/views/policy_operator_item',
+        'app/views/policy_operator_edit',
 
         'app/helpers/forIn'
     ], callback);

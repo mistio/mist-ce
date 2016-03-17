@@ -13,9 +13,13 @@ define('app/views/team', ['app/views/page'],
 
             templateName: 'team',
 
-            model: function () {
+            //
+            // Computed Properties
+            //
+
+            model: Ember.computed('controller.model', function() {
                 return this.get('controller').get('model');
-            }.property('controller.model'),
+            }),
 
             isOwners: Ember.computed('team.name', function() {
                 return this.get('team.name') == 'Owners';
@@ -68,18 +72,16 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 saveRulesClicked: function() {
+                    Mist.teamsController.saveRules({team: this.get('team')});
+                },
 
+                addRulesClicked: function() {
+                    Mist.teamsController.addRule(this.get('team'));
                 },
 
                 renameClicked: function() {
-                    var team = this.team;
-                    Mist.teamEditController.open(team, function(success) {
-                        if (success) {
-                            Mist.__container__.lookup('router:main').transitionTo('team', Mist.teamEditController.newTeamId);
-                        }
-                    });
+                    Mist.teamEditController.open(this.get('team'));
                 },
-
 
                 deleteClicked: function() {
                     var team = this.get('team');
@@ -93,11 +95,13 @@ define('app/views/team', ['app/views/page'],
                         }],
                         callback: function(didConfirm) {
                             if (didConfirm) {
-                                console.log(123);
-                                Mist.teamsController.deleteTeam(team, function(success) {
-                                    if (success)
-                                        console.log(123);
-                                        Mist.__container__.lookup('router:main').transitionTo('teams');
+                                Mist.teamsController.deleteTeam({
+                                    team: team,
+                                    callback: function(success) {
+                                        if (success) {
+                                            Mist.__container__.lookup('router:main').transitionTo('teams');
+                                        }
+                                    }
                                 });
                             }
                         }

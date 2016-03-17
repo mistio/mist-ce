@@ -29,8 +29,8 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 return Mist.cloudsController.machineCount;
             }),
 
-            hasOrganization: Ember.computed('Mist.org_create', function() {
-                return Mist.org_create;
+            hasOrganization: Ember.computed('Mist.organizationsController.model', function() {
+                return !!Mist.organizationsController.model;
             }),
 
             //
