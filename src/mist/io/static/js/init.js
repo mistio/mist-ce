@@ -384,7 +384,7 @@ var setupMainChannel = function(socket, callback) {
         //     Mist.teamsController.setModel(teams);
         // });
         Mist.ajax.GET('/scripts').success(function(scripts) {
-            Mist.scriptsController.setModel(scripts);
+            Mist.scriptsController.setModel(scripts, true);
         });
     }
 
@@ -410,7 +410,7 @@ var setupMainChannel = function(socket, callback) {
         });
     }
 
-    Mist.teamsController.setModel(teams);
+    Mist.teamsController.setModel(teams, true);
     // Fast implementation for teams modelling
 
     socket
