@@ -76,7 +76,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     var filteredImages = this.get('newMachineProvider.images.model').filter(function(image, index) {
                         return bare_metal ? image.name.toLowerCase().indexOf('bare metal') > -1 : image.name.toLowerCase().indexOf('bare metal') == -1;
                     }, this);
-                    console.log(filteredImages);
+
                     return filteredImages;
                 }
 
