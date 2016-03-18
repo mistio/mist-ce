@@ -19,9 +19,10 @@
             Description
         -->
         <div id="team-add-description" class="form-field">
-          <label>Description (optional)</label>
+          <label  for="team-description">Description (optional)</label>
           {{view Mist.TextArea
               data-theme="a"
+              id="team-description"
               value=Mist.teamAddController.newTeam.description}}
         </div>
 
