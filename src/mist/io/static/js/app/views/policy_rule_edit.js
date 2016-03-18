@@ -4,7 +4,7 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
     //
     //  @returns Class
     //
-    function (ControlledComponent) {
+    function(ControlledComponent) {
 
         'use strict';
 
@@ -18,21 +18,22 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
             controllerName: 'policyRuleEditController',
             rule: null,
             operatorOptions: ['ALLOW', 'DENY'],
-            resourceTypesOptions: [
-                {
-                    type: 'Machine',
-                    actions: ['all', 'create', 'read', 'edit', 'edit_tags', 'edit_rules', 'edit_graphs', 'edit_custom_metrics', 'start', 'stop', 'reboot', 'destroy', 'run_script', 'open_shell', 'associate_key', 'disassociate_key']
-                }, {
-                    type: 'script',
-                    actions: ['all', 'add', 'read', 'edit', 'run', 'remove']
-                }, {
-                    type: 'key',
-                    actions: ['all', 'add', 'read', 'read_private', 'remove', 'edit']
-                }, {
-                    type: 'all',
-                    actions: ['all']
-                }
-            ],
+            resourceTypesOptions: [{
+                type: 'Cloud',
+                actions: ['add', 'read', 'edit', 'remove', 'create_resources']
+            }, {
+                type: 'Machine',
+                actions: ['all', 'create', 'read', 'edit', 'edit_tags', 'edit_rules', 'edit_graphs', 'edit_custom_metrics', 'start', 'stop', 'reboot', 'destroy', 'run_script', 'open_shell', 'associate_key', 'disassociate_key']
+            }, {
+                type: 'script',
+                actions: ['all', 'add', 'read', 'edit', 'run', 'remove']
+            }, {
+                type: 'key',
+                actions: ['all', 'add', 'read', 'read_private', 'remove', 'edit']
+            }, {
+                type: 'all',
+                actions: ['all']
+            }],
             resourceIdentificationOptions: ['id', 'tags'],
             resourceActionsOptions: Ember.computed('rule.rtype', 'resourceTypesOptions', function() {
                 var options = this.get('resourceTypesOptions').filter(function(resource) {
@@ -46,7 +47,7 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
             //  Methods
             //
 
-            open: function (property, el) {
+            open: function(property, el) {
                 this.set('rule', Mist.policyRuleEditController.rule);
                 // Get button on which to position the popup
                 var button = '#' + el + ' .policy-rule-button.policy-rule-' + property;
@@ -56,12 +57,12 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                     .popup('option', 'positionTo', button);
 
                 // Open the popup
-                Ember.run.next(function () {
-                   $('#policy-rule-' + property).popup('open');
+                Ember.run.next(function() {
+                    $('#policy-rule-' + property).popup('open');
                 });
             },
 
-            close: function (property) {
+            close: function(property) {
                 $('#policy-rule-' + property).popup('close');
             },
 
@@ -70,21 +71,21 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
             //
 
             actions: {
-                operatorClicked: function (operator) {
+                operatorClicked: function(operator) {
                     Mist.policyRuleEditController.edit({
                         key: 'operator',
                         value: operator
                     });
                 },
 
-                actionClicked: function (action) {
+                actionClicked: function(action) {
                     Mist.policyRuleEditController.edit({
                         key: 'action',
                         value: action
                     });
                 },
 
-                resourceClicked: function (resource) {
+                resourceClicked: function(resource) {
                     Mist.policyRuleEditController.edit({
                         key: 'rtype',
                         value: resource
