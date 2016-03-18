@@ -260,6 +260,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                         }
                     })
                     .success(function() {
+                        Mist.notificationController.notify('Team\'s ' + team.name + ' policy was updated successfully!');
                         // that._updateRules(team, payloadRules);
                     })
                     .error(function(message) {
