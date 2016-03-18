@@ -370,7 +370,14 @@ define('app/views/machine_add', ['app/views/controlled'],
                         })
                         .shift();
 
-                    Mist.machineAddController.set('newMachineProviderType', selectedType);
+                    Mist.machineAddController
+                        .set('newMachineProviderType', selectedType)
+                        .set('newMachineImage', {
+                            'name': 'Select Image'
+                        })
+                        .set('newMachineSize', {
+                            'name': 'Select Size'
+                        });
                 },
 
                 selectProviderBilling: function(type) {
@@ -386,7 +393,6 @@ define('app/views/machine_add', ['app/views/controlled'],
                 },
 
                 selectImage: function(image) {
-
                     if (this.fieldIsReady) {
                         this.fieldIsReady('image');
                     }
@@ -497,6 +503,7 @@ define('app/views/machine_add', ['app/views/controlled'],
             }.observes('Mist.machineAddController.newMachineSize',
                 'Mist.machineAddController.newMachineImage',
                 'Mist.machineAddController.newMachineProvider',
+                'Mist.machineAddController.newMachineProviderType',
                 'Mist.machineAddController.newMachineLocation'),
 
             providerObserver: function() {

@@ -92,7 +92,7 @@
 
                     {{#unless Mist.machineAddController.selectedImage}}
                     <ul data-role="listview" >
-                        {{#each Mist.machineAddController.newMachineProvider.images.model as |image|}}
+                        {{#each Mist.machineAddController.newMachineImagesOptions as |image|}}
                             {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
                                 <li data-icon="false">
                                     <span class="image-icon-small">
