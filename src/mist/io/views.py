@@ -1315,94 +1315,99 @@ def machine_rdp(request):
                     body=rdp_content)
 
 
-@view_config(route_name='api_v1_machine_tags', request_method='POST', renderer='json')
-@view_config(route_name='machine_tags', request_method='POST', renderer='json')
-def set_machine_tags(request):
-    """
-    Set tags on a machine
-    Set tags for a machine, given the cloud and machine id.
-    ---
-    cloud:
-      in: path
-      required: true
-      type: string
-    machine:
-      in: path
-      required: true
-      type: string
-    tags:
-      items:
-        type: object
-      type: array
-    """
-    cloud_id = request.matchdict['cloud']
-    machine_id = request.matchdict['machine']
-    try:
-        tags = request.json_body['tags']
-    except:
-        raise BadRequestError('tags should be list of tags')
-    if type(tags) != list:
-        raise BadRequestError('tags should be list of tags')
-
-    auth_context = auth_context_from_request(request)
-    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
-    if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
-        raise UnauthorizedError()
-    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
-                                                      cloud_id, machine_id)
-    try:
-        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-        machine_uuid = machine.id
-    except me.DoesNotExist:
-        machine_uuid = ""
-    if not auth_context.has_perm("machine", "edit_tags", machine_uuid,
-                                 machine_tags):
-        raise UnauthorizedError()
-
-    methods.set_machine_tags(auth_context.owner, cloud_id, machine_id, tags)
-    return OK
-
-
-@view_config(route_name='api_v1_machine_tag', request_method='DELETE', renderer='json')
-@view_config(route_name='machine_tag', request_method='DELETE', renderer='json')
-def delete_machine_tag(request):
-    """
-    Delete a tag
-    Delete tag in the db for specified resource_type
-    ---
-    tag:
-      in: path
-      required: true
-      type: string
-    cloud:
-      in: path
-      required: true
-      type: string
-    machine:
-      in: path
-      required: true
-      type: string
-    """
-
-    cloud_id = request.matchdict['cloud']
-    machine_id = request.matchdict['machine']
-    tag = request.matchdict['tag']
-    auth_context = auth_context_from_request(request)
-    cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
-    if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
-        raise UnauthorizedError()
-    machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
-                                                      cloud_id, machine_id)
-    try:
-        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-        machine_uuid = machine.id
-    except me.DoesNotExist:
-        machine_uuid = ""
-    if not auth_context.has_perm("machine", "edit_tags", machine_uuid,
-                                 machine_tags):
-        raise UnauthorizedError()
-    methods.delete_machine_tag(auth_context.owner, cloud_id, machine_id, tag)
-    return OK
+# Views set_machine_tags and delete_machine_tags are defined in core.views
+#
+# @view_config(route_name='api_v1_machine_tags', request_method='POST',
+#              renderer='json')
+# @view_config(route_name='machine_tags', request_method='POST', renderer='json')
+# def set_machine_tags(request):
+#     """
+#     Set tags on a machine
+#     Set tags for a machine, given the cloud and machine id.
+#     ---
+#     cloud:
+#       in: path
+#       required: true
+#       type: string
+#     machine:
+#       in: path
+#       required: true
+#       type: string
+#     tags:
+#       items:
+#         type: object
+#       type: array
+#     """
+#     cloud_id = request.matchdict['cloud']
+#     machine_id = request.matchdict['machine']
+#     try:
+#         tags = request.json_body['tags']
+#     except:
+#         raise BadRequestError('tags should be list of tags')
+#     if type(tags) != list:
+#         raise BadRequestError('tags should be list of tags')
+#
+#     auth_context = auth_context_from_request(request)
+#     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+#     if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
+#         raise UnauthorizedError()
+#     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+#                                                       cloud_id, machine_id)
+#     try:
+#         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+#         machine_uuid = machine.id
+#     except me.DoesNotExist:
+#         machine_uuid = ""
+#     if not auth_context.has_perm("machine", "edit_tags", machine_uuid,
+#                                  machine_tags):
+#         raise UnauthorizedError()
+#
+#     methods.set_machine_tags(auth_context.owner, cloud_id, machine_id, tags)
+#     return OK
+#
+#
+# @view_config(route_name='api_v1_machine_tag', request_method='DELETE',
+#              renderer='json')
+# @view_config(route_name='machine_tag', request_method='DELETE',
+#              renderer='json')
+# def delete_machine_tag(request):
+#     """
+#     Delete a tag
+#     Delete tag in the db for specified resource_type
+#     ---
+#     tag:
+#       in: path
+#       required: true
+#       type: string
+#     cloud:
+#       in: path
+#       required: true
+#       type: string
+#     machine:
+#       in: path
+#       required: true
+#       type: string
+#     """
+#
+#     cloud_id = request.matchdict['cloud']
+#     machine_id = request.matchdict['machine']
+#     tag = request.matchdict['tag']
+#     auth_context = auth_context_from_request(request)
+#     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+#     if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
+#         raise UnauthorizedError()
+#     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
+#                                                       cloud_id, machine_id)
+#     try:
+#         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+#         machine_uuid = machine.id
+#     except me.DoesNotExist:
+#         machine_uuid = ""
+#     if not auth_context.has_perm("machine", "edit_tags", machine_uuid,
+#                                  machine_tags):
+#         raise UnauthorizedError()
+#     methods.delete_machine_tag(auth_context.owner, cloud_id, machine_id, tag)
+#     return OK
 
 
 @view_config(route_name='api_v1_images', request_method='POST', renderer='json')
