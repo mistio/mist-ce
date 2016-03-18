@@ -41,9 +41,10 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             // Computed properties
             //
 
-            newMachineSizesOptions: Ember.computed('newMachineProvider', 'newMachineImage', function() {
+            newMachineSizesOptions: Ember.computed('newMachineProvider', 'newMachineProviderType', 'newMachineImage', function() {
                 var provider = this.get('newMachineProvider.provider'),
-                    image = this.get('newMachineImage');
+                    image = this.get('newMachineImage'),
+                    bare_metal = this.get('newMachineProviderType.val');
 
                 if (provider && provider.indexOf('ec2') > -1 && image && image.extra) {
                     var virtualization_type = image.extra.virtualization_type;
@@ -54,6 +55,14 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
 
                         return filteredSizes;
                     }
+                }
+
+                if (provider && provider == 'softlayer') {
+                    var filteredSizes = this.get('newMachineProvider.sizes.model').filter(function(size, index) {
+                        return bare_metal ? size.name.toLowerCase().indexOf('bare metal') > -1 : size.name.toLowerCase().indexOf('bare metal') == -1;
+                    }, this);
+
+                    return filteredSizes;
                 }
 
                 return this.get('newMachineProvider.sizes.model');
