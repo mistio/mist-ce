@@ -24,6 +24,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
+            newMachineProviderType: null,
             newMachineProject: null,
             newMachineMonitoring: null,
             newMachineAssociateFloatingIp: true,
@@ -34,6 +35,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             newMachineLibvirtDiskPath: '/var/lib/libvirt/',
             newMachineLibvirtDiskSize: 4,
             newMachineLibvirtImagePath: null,
+            newMachineBilling: null,
 
             //
             // Computed properties
@@ -136,6 +138,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                 var that = this;
                 this.newMachineProvider.machines.newMachine(
                     this.newMachineProvider.provider,
+                    this.newMachineProviderType.val,
                     this.newMachineName,
                     this.newMachineImage,
                     this.newMachineSize,
@@ -154,6 +157,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     this.newMachineLibvirtDiskSize,
                     this.newMachineLibvirtDiskPath,
                     this.newMachineLibvirtImagePath,
+                    this.newMachineBilling.val,
 
                     function(success, machine) {
                         that._giveCallback(success, machine);
@@ -171,6 +175,22 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             _clear: function() {
                 this.set('callback', null)
                     .set('newMachineName', '')
+                    .set('newMachineProvider', {
+                        'title': 'Select Provider'
+                    })
+                    .set('newMachineImage', {
+                        'name': 'Select Image'
+                    })
+                    .set('newMachineSize', {
+                        'name': 'Select Size'
+                    })
+                    .set('newMachineLocation', {
+                        'name': 'Select Location'
+                    })
+                    .set('newMachineProviderType', {
+                        'title': 'Virtual Cloud Server',
+                        'val': false
+                    })
                     .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {
@@ -179,18 +199,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineProject', '')
                     .set('newMachineKey', {
                         'title': 'Select Key'
-                    })
-                    .set('newMachineSize', {
-                        'name': 'Select Size'
-                    })
-                    .set('newMachineImage', {
-                        'name': 'Select Image'
-                    })
-                    .set('newMachineLocation', {
-                        'name': 'Select Location'
-                    })
-                    .set('newMachineProvider', {
-                        'title': 'Select Provider'
                     })
                     .set('newMachineMonitoring', Mist.email ? true : false)
                     .set('newMachineAssociateFloatingIp', true)
@@ -201,7 +209,11 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineAzurePorts', '')
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
-                    .set('newMachineLibvirtImagePath', '');
+                    .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineBilling', {
+                        'title': 'Hourly',
+                        'val': true
+                    });
                 this.view.clear();
             },
 
@@ -259,21 +271,25 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
 
             _resetProvider: function() {
                 this.set('callback', null)
-                    .set('newMachineCloudInit', '')
-                    .set('newMachineScript', '')
-                    .set('newMachineProject', '')
+                    .set('newMachineProviderType', {
+                        'title': 'Virtual Cloud Server',
+                        'val': false
+                    })
+                    .set('newMachineImage', {
+                        'name': 'Select Image'
+                    })
                     .set('newMachineKey', {
                         'title': 'Select Key'
                     })
                     .set('newMachineSize', {
                         'name': 'Select Size'
                     })
-                    .set('newMachineImage', {
-                        'name': 'Select Image'
-                    })
                     .set('newMachineLocation', {
                         'name': 'Select Location'
                     })
+                    .set('newMachineCloudInit', '')
+                    .set('newMachineScript', '')
+                    .set('newMachineProject', '')
                     .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
@@ -282,7 +298,11 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineAzurePorts', '')
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
-                    .set('newMachineLibvirtImagePath', '');
+                    .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineBilling', {
+                        'title': 'Hourly',
+                        'val': true
+                    });
             },
 
             _selectUnique: function() {

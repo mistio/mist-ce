@@ -38,6 +38,11 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider && provider.provider == 'packet' ? true : false) : false;
             }),
 
+            hasSoftlayer: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider && provider.provider == 'softlayer' ? true : false) : false;
+            }),
+
             hasKey: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
                 var provider = Mist.machineAddController.newMachineProvider;
                 return provider ? (provider.provider ? true : false) : false;
@@ -82,6 +87,24 @@ define('app/views/machine_add', ['app/views/controlled'],
             hasMonitoring: Ember.computed(function() {
                 return Mist.email ? true : false;
             }),
+
+            // We check here if it is Bare Metal or not
+            newMachineProviderTypeOptions: [{
+                title: 'Bare Metal',
+                val: true
+            }, {
+                title: 'Virtual Cloud Server',
+                val: false
+            }],
+
+            // We check here if it is Hourly or not
+            newMachineBillingOptions: [{
+                title: 'Hourly',
+                val: true
+            }, {
+                title: 'Monthly',
+                val: false
+            }],
 
             helpOptions: [{
                 field: 'disk-path',
@@ -337,6 +360,30 @@ define('app/views/machine_add', ['app/views/controlled'],
                     if (!Mist.machineAddController.get('selectedImage')) this.set('changeProviderFlag', true);
                 },
 
+
+                selectProviderType: function(type) {
+                    this.fieldIsReady('provider-type');
+
+                    var selectedType = this.get('newMachineProviderTypeOptions')
+                        .filter(function(option) {
+                            return option.val == type;
+                        })
+                        .shift();
+
+                    Mist.machineAddController.set('newMachineProviderType', selectedType);
+                },
+
+                selectProviderBilling: function(type) {
+                    this.fieldIsReady('billing');
+
+                    var selectedBilling = this.get('newMachineBillingOptions')
+                        .filter(function(option) {
+                            return option.val == type;
+                        })
+                        .shift();
+
+                    Mist.machineAddController.set('newMachineBilling', selectedBilling);
+                },
 
                 selectImage: function(image) {
 
