@@ -341,7 +341,8 @@ def add_cloud(request):
       type: string
     """
     auth_context = auth_context_from_request(request)
-    if not auth_context.has_perm('cloud', 'add'):
+    cloud_tags = auth_context.get_tags("cloud", "add")
+    if cloud_tags is None:
         raise UnauthorizedError()
     owner = auth_context.owner
     params = params_from_request(request)
@@ -399,7 +400,6 @@ def add_cloud(request):
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
-    cloud_tags = auth_context.get_tags("cloud", "add")
     if cloud_tags:
         mist.core.methods.set_cloud_tags(owner, cloud_tags, cloud_id)
 
@@ -543,10 +543,10 @@ def add_key(request):
     private_key = params.get('priv', '')
 
     auth_context = auth_context_from_request(request)
-    if not auth_context.has_perm('key', 'add'):
+    key_tags = auth_context.get_tags("key", "add")
+    if key_tags is None:
         raise UnauthorizedError()
     key_id = methods.add_key(auth_context.owner, key_id, private_key)
-    key_tags = auth_context.get_tags("key", "add")
     if key_tags:
         mist.core.methods.set_keypair_tags(auth_context.owner, key_tags, key_id)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
@@ -953,7 +953,8 @@ def list_machines(request):
     return mist.core.methods.filter_list_machines(auth_context, cloud_id)
 
 
-@view_config(route_name='api_v1_machines', request_method='POST', renderer='json')
+@view_config(route_name='api_v1_machines', request_method='POST',
+             renderer='json')
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
     """
@@ -1125,7 +1126,8 @@ def create_machine(request):
     if not auth_context.has_perm("cloud", "create_resources", cloud_id,
                                  cloud_tags):
         raise UnauthorizedError("Can't create resources.")
-    if not auth_context.has_perm("machine", "create"):
+    tags = auth_context.get_tags("machine", "create")
+    if tags is None:
         raise UnauthorizedError("Can't create machine.")
     if script_id:
         script_tags = mist.core.methods.get_script_tags(auth_context.owner,
@@ -1138,8 +1140,6 @@ def create_machine(request):
         keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
         if not auth_context.has_perm("key", "read", keypair.id, key_tags):
             raise UnauthorizedError("Can't access key.")
-
-    tags = auth_context.get_tags("machine", "create")
 
     import uuid
     job_id = uuid.uuid4().hex
