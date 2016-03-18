@@ -19,10 +19,10 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
             rule: null,
             operatorOptions: ['ALLOW', 'DENY'],
             resourceTypesOptions: [{
-                type: 'Cloud',
+                type: 'cloud',
                 actions: ['add', 'read', 'edit', 'remove', 'create_resources']
             }, {
-                type: 'Machine',
+                type: 'machine',
                 actions: ['all', 'create', 'read', 'edit', 'edit_tags', 'edit_rules', 'edit_graphs', 'edit_custom_metrics', 'start', 'stop', 'reboot', 'destroy', 'run_script', 'open_shell', 'associate_key', 'disassociate_key']
             }, {
                 type: 'script',
