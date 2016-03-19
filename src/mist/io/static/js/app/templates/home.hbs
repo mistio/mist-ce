@@ -101,7 +101,6 @@
                                 Scripts
                             {{/link-to}}
                         </li>
-                        {{/if}}
 
                         {{#if view.hasOrganization}}
                         <!-- Teams link -->
@@ -118,6 +117,7 @@
                             {{/link-to}}
                         </li>
                         {{/if}}
+                        {{/if}}
                     </ul>
                 </div>
             </div>
@@ -125,7 +125,7 @@
             {{#if Mist.isCore}}
             <div class="ui-block-b">
                 <div class="ui-body ui-shadow">
-                    <div class="incidents {{if view.hasIncidents '' 'no-incidents'}} {{if Mist.isCore 'is-core' '' }} {{if Mist.cloudsController.hasNetworks 'has-networks' ''}}">
+                    <div class="incidents {{if view.hasIncidents '' 'no-incidents'}} {{if Mist.isCore 'is-core' '' }} {{if Mist.cloudsController.hasNetworks 'has-networks' ''}} {{if view.hasOrganization 'has-org' ''}}">
                         <h4 class="ui-caps">Incidents</h4>
                         {{#if view.loadingIncidents}}
                             <div class="no-incident">
