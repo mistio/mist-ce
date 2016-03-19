@@ -1,10 +1,10 @@
-define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'],
+define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team', 'app/models/policy_rule'],
     //
     //  Teams Controller
     //
     //  @returns Class
     //
-    function(BaseArrayController, TeamModel) {
+    function(BaseArrayController, TeamModel, PolicyRuleModel) {
 
         'use strict';
 
@@ -92,7 +92,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
 
             deleteTeam: function(args) {
                 var team = args,
-                that = this;
+                    that = this;
                 that.set('deletingTeam', true);
                 Mist.ajax
                     .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id, {})
@@ -173,30 +173,31 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             },
 
             addRule: function(team) {
-                team.policy.rules.pushObject({
+                var rule = PolicyRuleModel.create({
                     'operator': 'DENY',
                     'action': 'All',
                     'rtype': 'All',
                     'rid': '',
                     'rtags': {}
                 });
+                team.policy.rules.pushObject(rule);
             },
 
             editRule: function(args) {
                 var index = args.team.policy.rules.indexOf(args.rule),
                     rule = args.team.policy.rules.objectAt(index);
-                Ember.set(rule, args.properties.key, args.properties.value);
+                rule.set(args.properties.key, args.properties.value);
 
                 // When resource type changes force
                 // action to be All since bad combinations should be avoided
                 if (args.properties.key == 'rtype') {
-                    Ember.set(rule, 'action', 'All');
+                    rule.set('action', 'All');
                 }
 
                 // When identification changes
                 // reset rid & rtags to prevent both to be set
                 if (args.properties.key == 'identification') {
-                    Ember.setProperties(rule, {
+                    rule.setProperties({
                         rid: null,
                         rtags: {}
                     });
@@ -234,9 +235,9 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
 
             saveRules: function(args) {
                 var team = args.team,
-                payloadRules = team.policy.rules
+                    payloadRules = team.policy.rules
                     .filter(function(rule, index) {
-                        return rule.rid || Object.keys(rule.rtags).length;
+                        return rule.rid || rule.get('tagsText');
                     }, this)
                     .map(function(rule, index) {
                         return {
@@ -244,7 +245,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                             action: rule.action,
                             rtype: rule.rtype,
                             rid: rule.rid,
-                            rtags: rule.rtags
+                            rtags: this._transformRuleTags(rule.get('tagsText'))
                         };
                     }, this);
 
@@ -342,6 +343,20 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 Ember.run(this, function() {
                     team.policy.rules.setObjects(payloadRules);
                 });
+            },
+
+            _transformRuleTags: function(tagsText) {
+                var tagsArray = tagsText.split(','),
+                    rtags = {};
+
+                tagsArray.forEach(function(pair) {
+                    if (pair) {
+                        var parts = pair.split('=');
+                        rtags[parts[0].trim()] = parts[1] === undefined ? null : parts[1].trim();
+                    }
+                });
+
+                return rtags;
             }
         });
     }

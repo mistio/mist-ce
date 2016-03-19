@@ -31,7 +31,7 @@ define('app/views/policy_rule_item', ['ember'],
 
             isLast: Ember.computed('rule', 'team.policy.rules.[]', function() {
                 var rules = this.get('team.policy.rules'),
-                len = rules.length;
+                    len = rules.length;
                 return rules.indexOf(this.get('rule')) == len - 1;
             }),
 
@@ -40,26 +40,8 @@ define('app/views/policy_rule_item', ['ember'],
                 return rules.indexOf(this.get('rule')) === 0;
             }),
 
-            identification: Ember.computed('rule.rid', 'rule.rtags', 'rule.identification', function() {
-                var rid = this.get('rule.rid'),
-                rtags = this.get('rule.rtags');
-                if (this.get('rule.identification')) {
-                    return this.get('rule.identification');
-                }
-
-                if (rid) {
-                    return 'id';
-                }
-
-                if (Object.keys(rtags).length) {
-                    return 'tags';
-                }
-
-                return 'id';
-            }),
-
-            isID: Ember.computed('identification', function() {
-                return this.get('identification') == 'id';
+            isID: Ember.computed('rule.identification', function() {
+                return this.get('rule.identification') == 'id';
             }),
 
             //
@@ -119,16 +101,15 @@ define('app/views/policy_rule_item', ['ember'],
                         rule: this.get('rule')
                     });
                 },
+            },
 
-                //
-                // Observers
-                //
+            //
+            // Observers
+            //
 
-                identificationObserver: function() {
-                    console.log(this.get(123123123));
-                    Ember.run.once(this, '_updateView');
-                }.observes('identification')
-            }
+            identificationObserver: function() {
+                Ember.run.once(this, '_updateView');
+            }.observes('rule.identification')
         });
     }
 )

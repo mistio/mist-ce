@@ -108,6 +108,9 @@
 #single-key-page .info-table tr td:nth-child(1) {
 	padding-left: 70px;
 }
+#single-key-page .info-table tr td:nth-child(2) {
+    color: #7f7f7f;
+}
 #single-key-page .info-table .key-id {
     word-break: break-all;
 }

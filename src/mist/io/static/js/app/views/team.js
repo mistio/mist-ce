@@ -22,7 +22,7 @@ define('app/views/team', ['app/views/page'],
             }),
 
             isOwners: Ember.computed('team.name', function() {
-                return this.get('team.name') == 'Owners';
+                return this.get('team') && this.get('team.name').toLowerCase() == 'owners';
             }),
 
             //
