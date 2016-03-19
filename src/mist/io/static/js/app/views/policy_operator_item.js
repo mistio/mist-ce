@@ -21,6 +21,14 @@ define('app/views/policy_operator_item', ['ember'],
             team: null,
 
             //
+            // Computed Properties
+            //
+
+            operatorText: Ember.computed('team.policy.rules.[]', function() {
+                return this.get('team') && this.get('team.policy.rules').length ? 'every other action ON any other resource' : 'every action ON any resource';
+            }),
+
+            //
             // Actions
             //
 
