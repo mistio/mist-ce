@@ -1232,6 +1232,16 @@ ul.checkbox-list .ui-grid-b {
     text-transform: uppercase;
 }
 
+.org-name {
+    font-weight: bold;
+    font-size: 11px;
+    opacity: 0.54;
+    text-transform: uppercase;
+}
+#me-btn .owner.org {
+    margin-top: 17px;
+}
+
 @media only screen and (max-width: 600px) {
     #me-btn .owner {
         display: none;

@@ -25,6 +25,9 @@ define('app/views/user_menu', ['ember', 'md5'],
             gravatarName: Ember.computed('hasName', function() {
                 return this.get('hasName') ? FIRST_NAME + ' ' + LAST_NAME : EMAIL;
             }),
+            hasOrganization: Ember.computed('Mist.organizationsController.model', function() {
+                return !!Mist.organizationsController.model;
+            }),
 
             //
             //  Actions
