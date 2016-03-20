@@ -34,7 +34,7 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                 type: 'all',
                 actions: ['read', 'edit']
             }],
-            resourceIdentificationOptions: ['id', 'tags'],
+            resourceIdentificationOptions: ['-', 'where id', 'where tags'],
             resourceActionsOptions: Ember.computed('rule.rtype', 'resourceTypesOptions', function() {
                 var options = this.get('resourceTypesOptions').filter(function(resource) {
                     return resource.type == this.get('rule.rtype');

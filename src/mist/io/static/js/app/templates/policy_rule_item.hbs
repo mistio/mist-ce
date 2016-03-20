@@ -5,11 +5,13 @@
 <a class="ui-btn policy-rule-button policy-rule-operator ui-btn-a ui-btn-inline ui-caps ui-shadow" {{action "openRuleOperatorPopup" target=view}}>{{rule.operator}}</a>
 <a class="ui-btn policy-rule-button policy-rule-resource ui-btn-a ui-btn-inline ui-caps ui-shadow" {{action "openRuleResourcePopup" target=view}}>{{rule.rtype}}</a>
 <a class="ui-btn policy-rule-button policy-rule-action ui-btn-a ui-btn-inline ui-caps ui-shadow" {{action "openRuleActionPopup" target=view}}>{{rule.action}}</a>
-&nbsp;WHERE&nbsp;
 <a class="ui-btn policy-rule-button policy-rule-identification ui-btn-a ui-btn-inline ui-caps ui-shadow" {{action "openRuleResourceIdentificationPopup" target=view}}>{{rule.identification}}</a>&nbsp;
-{{#if view.isID}}
-{{input value=rule.rid placeholder="resource id"}}
-{{else}}
-{{input value=rule.tagsText placeholder="resource tags"}}
-{{/if}}<a {{action "deleteRule" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
+{{#if view.hasInput}}
+    {{#if view.isID}}
+        {{input value=rule.rid placeholder="resource id"}}
+    {{else}}
+        {{input value=rule.tagsText placeholder="resource tags"}}
+    {{/if}}
+{{/if}}
+<a {{action "deleteRule" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
 </td>

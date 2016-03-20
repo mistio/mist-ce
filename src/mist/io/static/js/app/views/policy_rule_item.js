@@ -41,7 +41,11 @@ define('app/views/policy_rule_item', ['ember'],
             }),
 
             isID: Ember.computed('rule.identification', function() {
-                return this.get('rule.identification') == 'id';
+                return this.get('rule.identification') == 'where id';
+            }),
+
+            hasInput: Ember.computed('rule.identification', function() {
+                return this.get('rule.identification') != '-';
             }),
 
             //

@@ -21,14 +21,14 @@ define('app/models/policy_rule', ['app/models/base'],
                     rtags = this.get('rtags');
 
                 if (rid) {
-                    return 'id';
+                    return 'where id';
                 }
 
                 if (Object.keys(rtags).length) {
-                    return 'tags';
+                    return 'where tags';
                 }
 
-                return 'id';
+                return '-';
             }),
 
             isID: Ember.computed('identification', function() {
