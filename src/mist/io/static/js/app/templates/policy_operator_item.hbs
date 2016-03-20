@@ -1,3 +1,7 @@
-<td>
-<a class="ui-btn policy-operator-button policy-operator ui-btn-a ui-btn-inline ui-shadow" {{action "openPolicyOperatorPopup" target=view}}>{{policy.operator}}</a>&nbsp; {{view.operatorText}}
-</td>
+{{#if view.isOwners}}
+    <td>ALLOW every action ON any resource</td>
+{{else}}
+    <td>
+    <a class="ui-btn policy-operator-button policy-operator ui-btn-a ui-btn-inline ui-shadow" {{action "openPolicyOperatorPopup" target=view}}>{{policy.operator}}</a>&nbsp; {{view.operatorText}}
+    </td>
+{{/if}}

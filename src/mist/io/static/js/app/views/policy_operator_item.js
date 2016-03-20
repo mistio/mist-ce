@@ -28,6 +28,10 @@ define('app/views/policy_operator_item', ['ember'],
                 return this.get('team') && this.get('team.policy.rules').length ? 'every other action ON any other resource' : 'every action ON any resource';
             }),
 
+            isOwners: Ember.computed('team.name', function() {
+                return this.get('team') && this.get('team.name').toLowerCase() == 'owners';
+            }),
+
             //
             // Actions
             //

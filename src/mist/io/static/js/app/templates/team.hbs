@@ -54,14 +54,17 @@
 
             <table class="info-table">
                 <tbody>
-                    {{#each view.team.policy.rules as |rule index|}}
-                        {{component "policy-rule-item" index=index rule=rule team=view.team}}
-                    {{/each}}
+                    {{#unless view.isOwners}}
+                        {{#each view.team.policy.rules as |rule index|}}
+                            {{component "policy-rule-item" index=index rule=rule team=view.team}}
+                        {{/each}}
+                    {{/unless}}
 
                     {{component "policy-operator-item" policy=view.team.policy team=view.team}}
                 </tbody>
             </table>
 
+            {{#unless view.isOwners}}
             <div class="text-center">
                 <a id="rule-add" class="ui-btn ui-shadow ui-caps back" {{action "addRulesClicked" target=view}}>Add Rule</a>
                 {{#if Mist.teamsController.updatingRules}}
@@ -69,6 +72,7 @@
                 {{/if}}
                 <a id="rule-save" class="ui-btn ui-caps ui-shadow ui-btn-d" {{action "saveRulesClicked" target=view}}>Save Rules</a>
             </div>
+            {{/unless}}
         </div>
 
         <div class="mid-padding"></div>
