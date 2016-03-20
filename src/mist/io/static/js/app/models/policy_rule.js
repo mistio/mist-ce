@@ -28,7 +28,7 @@ define('app/models/policy_rule', ['app/models/base'],
                     return 'where tags';
                 }
 
-                return '-';
+                return '...';
             }),
 
             isID: Ember.computed('identification', function() {

@@ -45,7 +45,7 @@ define('app/views/policy_rule_item', ['ember'],
             }),
 
             hasInput: Ember.computed('rule.identification', function() {
-                return this.get('rule.identification') != '-';
+                return this.get('rule.identification') != '...';
             }),
 
             //
