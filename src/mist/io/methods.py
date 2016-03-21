@@ -2736,13 +2736,15 @@ def list_images(user, cloud_id, term=None):
         ec2_images = []
         rest_images = []
         images = []
-        if conn.type in config.EC2_PROVIDERS:
+        if conn.type in config.EC2_PROVIDERS and not term:
             imgs = config.EC2_IMAGES[conn.type].keys() + starred
             ec2_images = conn.list_images(None, imgs)
             for image in ec2_images:
                 image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
-            ec2_images += conn.list_images(ex_owner="amazon")
             ec2_images += conn.list_images(ex_owner="self")
+            ec2_images += conn.list_images(ex_owner="amazon")
+        elif conn.type in config.EC2_PROVIDERS and term:
+            ec2_images += conn.list_images()
         elif conn.type == Provider.GCE:
             rest_images = conn.list_images()
             for gce_image in rest_images:
@@ -2771,25 +2773,24 @@ def list_images(user, cloud_id, term=None):
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
                               if image.id in starred]
-        if term and conn.type in config.EC2_PROVIDERS:
-            ec2_images += conn.list_images(ex_owner="aws-marketplace")
 
         images = starred_images + ec2_images + rest_images
         images = [img for img in images
                   if img.name and img.id[:3] not in ['aki', 'ari']
                   and 'windows' not in img.name.lower()]
 
-        if term and conn.type == Provider.LIBVIRT:
+        if term and term is not None:
+            term = term.lower()
+            if conn.type == Provider.LIBVIRT:
             # fetch a new listing of the images and search for the term
-            images = conn.list_images()
-
-        if term and conn.type == 'docker':
-            images = conn.search_images(term=term)[:40]
-        #search directly on docker registry for the query
-        elif term:
-            images = [img for img in images
-                      if term in img.id.lower()
-                      or term in img.name.lower()][:40]
+                images = conn.list_images()
+            elif conn.type == 'docker':
+                images = conn.search_images(term=term)[:100]
+            #search directly on docker registry for the query
+            elif conn.type in config.EC2_PROVIDERS:
+                images = [img for img in images
+                          if term in img.id.lower()
+                          or img.name and term in img.name.lower()][:100]
     except Exception as e:
         log.error(repr(e))
         raise CloudUnavailableError(cloud_id, e)
