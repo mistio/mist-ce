@@ -2,7 +2,7 @@
 	{{#if Mist.authenticated}}
 		<span class="owner {{if view.hasName 'name'}} {{if view.hasOrganization 'org'}}">{{view.gravatarName}}
 		{{#if view.hasOrganization}}
-			<br/><span class="org-name">{{Mist.organizationsController.model.name}}</span> | <span class="org-team-name">{{view.memberTeam}}</span>
+			<br/><span class="org-name">{{Mist.organizationsController.model.name}}</span> &middot; <span class="org-team-name">{{view.memberTeam}}</span>
 		{{/if}}
 		</span>
 	{{/if}}

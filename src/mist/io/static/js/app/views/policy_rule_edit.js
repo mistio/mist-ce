@@ -32,14 +32,13 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
                 actions: ['all', 'add', 'read', 'read_private', 'remove', 'edit']
             }, {
                 type: 'all',
-                actions: ['read', 'edit']
+                actions: ['all', 'read', 'edit']
             }],
             resourceIdentificationOptions: ['...', 'where id', 'where tags'],
             resourceActionsOptions: Ember.computed('rule.rtype', 'resourceTypesOptions', function() {
                 var options = this.get('resourceTypesOptions').filter(function(resource) {
                     return resource.type == this.get('rule.rtype');
                 }, this);
-                console.log(this.get('rule.rtype'), options);
                 return options.length ? options.shift().actions : [];
             }),
 

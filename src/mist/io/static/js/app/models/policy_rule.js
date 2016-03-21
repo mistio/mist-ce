@@ -4,7 +4,7 @@ define('app/models/policy_rule', ['app/models/base'],
     //
     //  @returns Class
     //
-    function (BaseModel) {
+    function(BaseModel) {
 
         'use strict';
 
@@ -15,6 +15,10 @@ define('app/models/policy_rule', ['app/models/base'],
             rtype: null,
             rid: null,
             rtags: {},
+
+            //
+            // Computed Properties
+            //
 
             identification: Ember.computed('rid', 'rtags', function() {
                 var rid = this.get('rid'),
@@ -52,7 +56,14 @@ define('app/models/policy_rule', ['app/models/base'],
                 }
 
                 return '';
-            })
+            }),
+
+            init: function() {
+                var rtype = this.get('rtype'),
+                action = this.get('action');
+                this.set('rtype', rtype === '' ? 'all' : rtype);
+                this.set('action', action === '' ? 'all' : action);
+            }
         });
     }
 );

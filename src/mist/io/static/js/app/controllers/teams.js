@@ -175,8 +175,8 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             addRule: function(team) {
                 var rule = PolicyRuleModel.create({
                     'operator': 'DENY',
-                    'action': 'All',
-                    'rtype': 'All',
+                    'action': 'all',
+                    'rtype': 'all',
                     'rid': '',
                     'rtags': {}
                 });
@@ -191,7 +191,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 // When resource type changes force
                 // action to be All since bad combinations should be avoided
                 if (args.properties.key == 'rtype') {
-                    rule.set('action', 'All');
+                    rule.set('action', 'all');
                 }
 
                 // When identification changes
@@ -236,14 +236,11 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             saveRules: function(args) {
                 var team = args.team,
                     payloadRules = team.policy.rules
-                    .filter(function(rule, index) {
-                        return rule.rid || rule.get('tagsText');
-                    }, this)
                     .map(function(rule, index) {
                         return {
                             operator: rule.operator,
-                            action: rule.action,
-                            rtype: rule.rtype,
+                            action: rule.action == 'all' || rule.action === '' ? '' : rule.action,
+                            rtype: rule.rtype == 'all' || rule.rtype === '' ? '' : rule.rtype,
                             rid: rule.rid,
                             rtags: this._transformRuleTags(rule.get('tagsText'))
                         };

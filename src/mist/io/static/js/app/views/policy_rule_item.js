@@ -76,11 +76,7 @@ define('app/views/policy_rule_item', ['ember'],
                 },
 
                 openRuleActionPopup: function() {
-                    if (this.get('rule.action').toLowerCase() == 'all' && this.get('rule.rtype').toLowerCase() == 'all') {
-                        Mist.notificationController.notify('Please select resource type first');
-                    } else {
-                        Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'action', null, this.elementId);
-                    }
+                    Mist.policyRuleEditController.open(this.get('rule'), this.get('team'), 'action', null, this.elementId);
                 },
 
                 openRuleResourcePopup: function() {
