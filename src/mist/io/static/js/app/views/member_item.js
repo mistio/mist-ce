@@ -24,10 +24,6 @@ define('app/views/member_item', ['ember', 'md5'],
             //  Computed Properties
             //
 
-            isOwners: Ember.computed('team.name', function() {
-                return this.get('team.name') == 'Owners';
-            }),
-
             gravatarURL: Ember.computed('member.email', function() {
                 var email = this.get('member.email');
                 return 'https://www.gravatar.com/avatar/' + md5(email) + '?d=' +

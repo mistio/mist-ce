@@ -54,7 +54,7 @@
 
             <table class="info-table">
                 <tbody>
-                    {{#unless view.isOwners}}
+                    {{#unless view.team.isOwners}}
                         {{#each view.team.policy.rules as |rule index|}}
                             {{component "policy-rule-item" index=index rule=rule team=view.team}}
                         {{/each}}
@@ -64,7 +64,7 @@
                 </tbody>
             </table>
 
-            {{#unless view.isOwners}}
+            {{#unless view.team.isOwners}}
             <div class="text-center">
                 <a id="rule-add" class="ui-btn ui-shadow ui-caps back" {{action "addRulesClicked" target=view}}>Add Rule</a>
                 {{#if Mist.teamsController.updatingRules}}
@@ -88,7 +88,7 @@
 
     {{component "member-add" team=view.team}}
 
-    {{#unless view.isOwners}}
+    {{#unless view.team.isOwners}}
     <div class="dual-action-footer" data-role="footer" data-theme="b">
         <div class="ui-grid-a">
             <div class="ui-block-a">

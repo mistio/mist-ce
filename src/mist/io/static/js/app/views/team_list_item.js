@@ -27,8 +27,8 @@ define('app/views/team_list_item', ['app/views/list_item'],
                 return len + (len == 1 ? ' Member' : ' Members');
             }),
 
-            isDisabled: Ember.computed('team.name', function() {
-                return this.get('team.name') == 'Owners';
+            isDisabled: Ember.computed('team.isOwners', function() {
+                return this.get('team.isOwners');
             }),
 
             //

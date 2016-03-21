@@ -13,6 +13,14 @@ define('app/models/team', ['app/models/base', 'app/models/policy_rule'],
             name: null,
 
             //
+            // Computed Properties
+            //
+
+            isOwners: Ember.computed('name', function() {
+                return this.get('name').toLowerCase() == 'owners';
+            }),
+
+            //
             //  Methods
             //
 
