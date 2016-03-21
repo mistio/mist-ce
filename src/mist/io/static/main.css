@@ -1232,8 +1232,9 @@ ul.checkbox-list .ui-grid-b {
     text-transform: uppercase;
 }
 
-.org-name {
-    font-weight: bold;
+.org-name,
+.org-team-name {
+    font-weight: 400;
     font-size: 11px;
     opacity: 0.54;
     text-transform: uppercase;

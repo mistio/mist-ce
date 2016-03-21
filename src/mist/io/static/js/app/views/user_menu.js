@@ -28,6 +28,9 @@ define('app/views/user_menu', ['ember', 'md5'],
             hasOrganization: Ember.computed('Mist.organizationsController.model', function() {
                 return !!Mist.organizationsController.model;
             }),
+            memberTeam: Ember.computed('hasOrganization', function() {
+                return this.get('hasOrganization') ? Mist.teamsController.model.slice().shift().name : null;
+            }),
 
             //
             //  Actions
