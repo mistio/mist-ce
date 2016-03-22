@@ -58,8 +58,7 @@ define('app/controllers/team_edit', ['ember'],
 
             _updateFormReady: function() {
                 var formReady = false;
-                if (this.team &&
-                    (this.newName != this.team.name)) {
+                if ((this.newName != this.team.name) || (this.newDescription != this.team.description)) {
                     formReady = true;
                 }
                 this.set('formReady', formReady);
@@ -71,7 +70,7 @@ define('app/controllers/team_edit', ['ember'],
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newName')
+            }.observes('newName', 'newDescription')
         });
     }
 );
