@@ -177,7 +177,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     'operator': 'DENY',
                     'action': 'all',
                     'rtype': 'all',
-                    'rid': '',
+                    'rid': null,
                     'rtags': {}
                 });
                 team.policy.rules.pushObject(rule);

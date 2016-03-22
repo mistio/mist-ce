@@ -17,9 +17,10 @@ define('app/views/team', ['app/views/page'],
             // Computed Properties
             //
 
-            model: Ember.computed('controller.model', function() {
+            model: function () {
+                console.log(this.get('controller').get('model'));
                 return this.get('controller').get('model');
-            }),
+            }.property('controller.model'),
 
             //
             // Initialization
@@ -27,14 +28,14 @@ define('app/views/team', ['app/views/page'],
 
             load: function() {
                 // Add event listeners
-                Mist.teamsController.on('onTeamListChange', this, 'updateView');
-                Ember.run.next(this, this.updateView);
+                Mist.teamsController.on('onChange', this, 'updateView');
+                this.updateView();
             }.on('didInsertElement'),
 
 
             unload: function() {
                 // Remove event listeners
-                Mist.teamsController.off('onTeamListChange', this, 'updateView');
+                Mist.teamsController.off('onChange', this, 'updateView');
             }.on('willDestroyElement'),
 
             //
@@ -50,11 +51,11 @@ define('app/views/team', ['app/views/page'],
                 // Check if user has requested a specific team
                 // through the address bar and retrieve it
                 var team = Mist.teamsController.getRequestedTeam();
-
                 if (team)
                     this.get('controller').set('model', team);
                 // Get a reference of team model
                 this.set('team', this.get('controller').get('model'));
+                this.set('model', team);
             },
 
             //
