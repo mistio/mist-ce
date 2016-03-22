@@ -1547,9 +1547,9 @@ def list_machines(user, cloud_id):
 
 
 def create_machine(user, cloud_id, key_id, machine_name, location_id,
-                   image_id, size_id, script, image_extra, disk, image_name,
+                   image_id, size_id, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
-                   docker_env=[], docker_command=None, ssh_port=22,
+                   docker_env=[], docker_command=None, ssh_port=22, script='',
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
