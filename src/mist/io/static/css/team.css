@@ -51,6 +51,12 @@
     font-size: 14px;
     padding: 10px 12px;
 }
+#single-team-page #team-basic-info .info-table td {
+    border-bottom: 1px solid #eeedeb;
+}
+#single-team-page #team-basic-info .info-table tr:last-child td {
+    border-bottom: none;
+}
 #single-team-page #team-policy-list .info-table td {
     width: 100%;
 }
