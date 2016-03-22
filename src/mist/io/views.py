@@ -782,10 +782,6 @@ def create_machine(request):
       items:
         type: string
       type: array
-    post_script_id:
-      type: string
-    post_script_params:
-      type: string
     script:
       type: string
     script_id:
@@ -835,9 +831,13 @@ def create_machine(request):
     docker_env = params.get('docker_env', [])
     docker_command = params.get('docker_command', None)
     script_id = params.get('script_id', '')
+    if not script_id:
+        # backwards compatibility
+        script_id = params.get('post_script_id', '')
     script_params = params.get('script_params', '')
-    post_script_id = params.get('post_script_id', '')
-    post_script_params = params.get('post_script_params', '')
+    if not script_params:
+        # backwards compatibility
+        script_params = params.get('post_script_params', '')
     async = params.get('async', False)
     quantity = params.get('quantity', 1)
     persist = params.get('persist', False)
@@ -885,17 +885,16 @@ def create_machine(request):
     job_id = uuid.uuid4().hex
     from mist.io import tasks
     args = (cloud_id, key_id, machine_name,
-            location_id, image_id, size_id, script,
+            location_id, image_id, size_id,
             image_extra, disk, image_name, size_name,
             location_name, ips, monitoring, networks,
             docker_env, docker_command)
-    kwargs = {'script_id': script_id, 'script_params': script_params,
+    kwargs = {'script_id': script_id, 'script_params': script_params, 'script': script,
               'job_id': job_id, 'docker_port_bindings': docker_port_bindings,
               'docker_exposed_ports': docker_exposed_ports,
               'azure_port_bindings': azure_port_bindings,
               'hostname': hostname, 'plugins': plugins,
-              'post_script_id': post_script_id,
-              'post_script_params': post_script_params, 'disk_size': disk_size,
+              'disk_size': disk_size,
               'disk_path': disk_path,
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
