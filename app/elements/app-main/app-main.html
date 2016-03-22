@@ -20,7 +20,7 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
-<link rel="import" href="../app-rest/app-rest.html">
+<!-- <link rel="import" href="../app-rest/app-rest.html"> -->
 
 <link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../app-styles/app-styles.html">
@@ -81,7 +81,7 @@
             <iron-route path="*"></iron-route>
         </iron-routes>
         <iron-pages id="app-main">
-            <page-dashboard model="[[model]]" sections="[[sections]]">
+            <page-dashboard model="[[model]]" sections="[[sections]]" onbstate="{{onbvalue}}">
                 <title>Dashboard</title>
             </page-dashboard>
             <!-- machines -->
@@ -97,8 +97,8 @@
             <page-list model="[[model]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-list>
             <page-network model="[[model]]" params="[[params]]" network="[[getNetwork(params)]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-network>
             <!-- scripts -->
-            <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element>
-            <!-- <scripts-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-element> -->
+            <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
+            <scripts-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-element>
             <script-page-element model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page-element>
             <script-add-element model="{{model}}" sections="[[sections]]" section="[[sections.scripts]]"></script-add-element>
             <page-elements></page-elements>
@@ -114,7 +114,23 @@ var app = Polymer({
     properties: {
         model: {
             type: Object,
-            notify: true
+            notify: true,
+            value: {
+                cloudsArray: [],
+                machinesArray: [],
+                scriptsArray:  [
+
+                ],
+                imagesArray: [],
+                keysArray: [],
+                networksArray: [],
+                templatesArray:[],
+                teamsArray:[],
+                pending: {
+                    clouds: true,
+                    monitoring: true
+                }
+            }
         },
         sections: {
             type: Object
@@ -123,16 +139,19 @@ var app = Polymer({
             type: Array,
             notify: true
         },
-        onb: {
-            type: Array,
+        hasMonitoring: {
+            type: Boolean,
+            value: 0 // if user has enabled monitoring
         },
+        
         onbvalue : {
             type: Number,
-            computed: "_computeOnbState(model)"
+            value: '100',
+            notify: true
         }
     },
     observers: [
-
+        "_updateOnbState(model.cloudsArray.*, model.machinesArray.*, model.scriptsArray.*, model.imagesArray.*, model.keysArray.*, model.networksArray.*, model.templatesArray.*, model.teamsArray.*)",
     ],
     listeners: {
         'iron-activate': 'updateDocTitle',
@@ -144,52 +163,6 @@ var app = Polymer({
     _toast: null,
 
     ready: function() {
-        this.onb = [
-            {
-                state : 0,
-                description : 'user is onboard',
-                textMessage: '',
-                promptButton: ''
-            },
-            {
-                state : 10,
-                description : 'user has no data at all',
-                textMessage: "You have no data.",
-                promptButton: 'Add your first cloud'
-            },
-            {
-                state : 20,
-                description : 'user has added a cloud, has no monitoring, no rules',
-                textMessage: "You have added your first cloud.",
-                promptButton: 'Add monitoring'
-            },
-            {
-                state : 21,
-                description : 'user has added cloud and monitoring, has no rules',
-                textMessage: "You have added monitoring.",
-                promptButton: 'Set your rules'
-            },
-            {
-                state : 30,
-                description : 'user has added other, but no clouds',
-                textMessage: "You have no clouds.",
-                promptButton: 'Add your first cloud'
-            }
-        ];
-        this.model = {
-            cloudsArray: [],
-            machinesArray: [],
-            scriptsArray:  [],
-            imagesArray: [],
-            keysArray: [],
-            networksArray: [],
-            templatesArray:[],
-            teamsArray:[],
-            pending: {
-                clouds: true,
-                monitoring: true
-            }
-        };
         this.sectionsArray = [{
                 id: 'machines',
                 color: '#8c76d1',
@@ -227,7 +200,6 @@ var app = Polymer({
                 count: '0'
             }
         ];
-
         this.sections = _generateMap(this.sectionsArray);
     },
 
@@ -238,32 +210,39 @@ var app = Polymer({
         socket.send('msg', 'logs', 'ready');
         socket.send('msg', 'logs', 'get_logs', searchFilter.detail);
     },
-
-    _computeOnbState: function(model) {
+    _updateOnbState: function(model) {
         if (model) {
-            var clouds      = model.cloudsArray.length;
-            var scripts     = model.scriptsArray.length;
-            var keys        = model.keysArray.length;
-            var templates   = model.templatesArray.length;
-            var teams       = model.teamsArray.length;
+            var clouds      = this.model.cloudsArray.length;
+            var scripts     = this.model.scriptsArray.length;
+            var keys        = this.model.keysArray.length;
+            var templates   = this.model.templatesArray.length;
+            var teams       = this.model.teamsArray.length;
+            var hasMonitoring = this.hasMonitoring;
 
             var all = clouds + scripts + keys + templates + teams;
 
+            console.log(clouds, scripts, keys, templates, teams);
+
+            var updatedOnbVal;
+
             if ( all == 0){
-                return 10;
+                updatedOnbVal = 10;
             }
             else if ( all > 0 && clouds == 0){
-                return 30;
+                updatedOnbVal = 30;
             }
             else if ( clouds > 0 ){
                 if (hasMonitoring)
-                    return 21;
+                    updatedOnbVal = 21;
                 else
-                    return 20;
+                    updatedOnbVal = 20;
             }
         }
         else
-            return 0;
+            updatedOnbVal = 0;
+
+
+        this.onbvalue = updatedOnbVal;
     },
     attributeChanged: function(attrName, oldVal, newVal) {
         console.warn('attrChanged', attrName, oldVal, newVal);

@@ -197,6 +197,28 @@
                 order: 2;
             }
         }
+        .onb {
+            @apply(--layout-vertical);
+            justify-content: stretch;
+            background-color: #f1f1f1;
+        }
+        .onb .clouds-image {
+            background: url(../../images/onboarding/clouds.svg) center center no-repeat transparent;
+            background-size: 50%;
+            width: 100%;
+            height: 215px;
+        }
+        .onb .call-onboard {
+            text-align: center;
+        }
+        .onb .mounts-image {
+            background: url(../../images/onboarding/mount.svg)  center bottom no-repeat transparent;
+            width: 100%;
+            height: 250px;
+        }
+        .onb-area {
+            padding: 8px;
+        }
         </style>
         <paper-header-panel mode="standard" class="fit">
             <paper-toolbar class="paper-header">
@@ -226,7 +248,23 @@
                     <app-fab></app-fab>
                 </div>
                 <div class="container flex-horizontal-with-ratios">
-                    <app-incidents id="right" class="flex2child incidents top right"></app-incidents>
+                    <!-- FIXME: dom-if needs to be there -->
+                    <!-- <template is="dom-if" if="[[onbstate]]"> -->  
+                        <div class="onb-area flex2child top right">
+                            <paper-material elevation="1">
+                                <div class="onb">
+                                    <div class="clouds-image"></div>
+                                    <div class="call-onboard">
+                                        <h2 id="onbtext"></h2>                                        
+                                        <paper-button id="onbbutton" class="blue"></paper-button>
+                                    </div>
+                                    <div class="mounts-image"></div>
+                                </div>
+                            </paper-material>
+                        </div>
+                    <!-- </template> -->
+                    <app-incidents hidden$="[[onbstate]]" id="right" class="flex2child incidents top right">
+                    </app-incidents>
                     <div id="left" class="flex3child top left">
                         <div class="sections layout horizontal wrap">
                             <a href="/machines" class="main-section flex" is="pushstate-anchor">
@@ -299,18 +337,77 @@ Polymer({
             type: Object,
             notify: true
         },
+        onb: {
+            type: Array,
+            value: [
+            {
+                state : 0,
+                description : 'user is onboard',
+                textMessage: '',
+                promptButton: ''
+            },
+            {
+                state : 10,
+                description : 'user has no data at all',
+                textMessage: "You have no data.",
+                promptButton: 'Add your first cloud'
+            },
+            {
+                state : 20,
+                description : 'user has added a cloud, has no monitoring, no rules',
+                textMessage: "You have added your first cloud!",
+                promptButton: 'Add monitoring'
+            },
+            {
+                state : 21,
+                description : 'user has added cloud and monitoring, has no rules',
+                textMessage: "You have added monitoring.",
+                promptButton: 'Set your rules'
+            },
+            {
+                state : 30,
+                description : 'user has added other, but no clouds',
+                textMessage: "You have no clouds.",
+                promptButton: 'Add your first cloud'
+            }
+        ]
+        },
+        onbstate : {
+            type: Number,
+            value: 0,
+            notify: true
+        },
+        state: {
+            type:Object,
+            value: {},
+            computed: 'getStateFromNum(onbstate)',
+            notify: true
+        },
         q: {
             type: String,
             notify: true
-        }
+        }        
     },
+    observers: [
+             'updateOnbTexts(state)'
+    ],
     ready: function() {},
+    getStateFromNum : function(onbstate){
+        var statenum = onbstate;
+        var state = this.onb.find(function(st, statenum) {
+            return st.state == onbstate;
+        });
+        return state;
+    },
+    updateOnbTexts: function(state){
+        this.$.onbtext.textContent = this.state.textMessage;
+        this.$.onbbutton.textContent = this.state.promptButton;
+    },
     attached: function() {
         // reset page title since this is the default page
         this.fire('page-meta', {
             title: null
         });
-
     },
     isOnline: function(cloud) {
         return cloud.state == 'online';
