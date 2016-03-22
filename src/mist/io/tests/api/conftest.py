@@ -47,3 +47,22 @@ def expires():
 @pytest.fixture
 def expired():
     return (date.fromtimestamp(time()) + timedelta(days=-1, hours=1)).strftime("%Y-%m-%d %H:%M:%S")
+
+
+@pytest.fixture
+def owner_email():
+    return config.OWNER_EMAIL
+
+
+@pytest.fixture
+def owner_password():
+    return config.OWNER_PASSWORD
+
+
+@pytest.fixture
+def member_email():
+    return config.MEMBER1_EMAIL
+
+@pytest.fixture
+def member_password():
+    return config.MEMBER1_PASSWORD

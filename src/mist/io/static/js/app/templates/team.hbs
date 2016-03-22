@@ -26,7 +26,25 @@
     </div>
 
     <div role="main" class="ui-content" data-theme="c">
-        <div id="member-list-container" class="ui-shadow" data-role="collapsible" data-collapsed="false">
+        <div id="team-basic-info" class="ui-shadow" data-role="collapsible" data-collapsed="false">
+            <h4>Basic Info</h4>
+            <table class="info-table">
+                <tbody>
+                    {{#if view.team.description}}
+                    <tr>
+                        <td>Description</td>
+                        <td>{{view.team.description}}</td>
+                    </tr>
+                    {{/if}}
+                    <tr>
+                        <td>Organization</td>
+                        <td>{{view.team.organization.name}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="team-members-list" class="ui-shadow" data-role="collapsible" data-collapsed="false">
             <h4>Members</h4>
 
             {{#if view.team.members.length}}
@@ -49,7 +67,7 @@
             </div>
         </div>
 
-        <div id="policy-list-container" class="ui-shadow" data-role="collapsible" data-collapsed="false">
+        <div id="team-policy-list" class="ui-shadow" data-role="collapsible" data-collapsed="false">
             <h4>Policy</h4>
 
             <table class="info-table">
@@ -92,7 +110,7 @@
     <div class="dual-action-footer" data-role="footer" data-theme="b">
         <div class="ui-grid-a">
             <div class="ui-block-a">
-                <a class="ui-btn ui-btn-icon-right ui-caps icon-edit" {{action "renameClicked" target=view}}>Rename</a>
+                <a class="ui-btn ui-btn-icon-right ui-caps icon-edit" {{action "renameClicked" target=view}}>Edit</a>
             </div>
             <div class="ui-block-b">
                 <a class="ui-btn ui-btn-icon-right ui-caps icon-xx" {{action "deleteClicked" target=view}}>Delete</a>
