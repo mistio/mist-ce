@@ -782,6 +782,10 @@ def create_machine(request):
       items:
         type: string
       type: array
+    post_script_id:
+      type: string
+    post_script_params:
+      type: string
     script:
       type: string
     script_id:
@@ -831,13 +835,9 @@ def create_machine(request):
     docker_env = params.get('docker_env', [])
     docker_command = params.get('docker_command', None)
     script_id = params.get('script_id', '')
-    if not script_id:
-        # backwards compatibility
-        script_id = params.get('post_script_id', '')
     script_params = params.get('script_params', '')
-    if not script_params:
-        # backwards compatibility
-        script_params = params.get('post_script_params', '')
+    post_script_id = params.get('post_script_id', '')
+    post_script_params = params.get('post_script_params', '')
     async = params.get('async', False)
     quantity = params.get('quantity', 1)
     persist = params.get('persist', False)
@@ -894,6 +894,8 @@ def create_machine(request):
               'docker_exposed_ports': docker_exposed_ports,
               'azure_port_bindings': azure_port_bindings,
               'hostname': hostname, 'plugins': plugins,
+              'post_script_id': post_script_id,
+              'post_script_params': post_script_params,
               'disk_size': disk_size,
               'disk_path': disk_path,
               'cloud_init': cloud_init,
@@ -903,7 +905,6 @@ def create_machine(request):
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
-
         args = (user.email, ) + args
         kwargs.update({'quantity': quantity, 'persist': persist})
         tasks.create_machine_async.apply_async(args, kwargs, countdown=2)

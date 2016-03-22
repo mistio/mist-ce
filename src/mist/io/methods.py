@@ -1554,7 +1554,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
                    disk_size=None, disk_path=None,
-                   cloud_init='',
+                   post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False,
                    associate_floating_ip_subnet=None, project_id=None,
                    bare_metal=False, hourly=True,
@@ -1580,9 +1580,13 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     through mist.io and those from the Linode interface.
 
     """
-    # script is only a command
-    # script_id is the id of the script - for mist.core
-    # script_params - extra params, only when script_id in use
+    # script: a command that is given once
+    # script_id: id of a script that exists - for mist.core
+    # script_params: extra params, for script_id
+    # post_script_id: id of a script that exists - for mist.core. If script_id
+    # or monitoring are supplied, this will run after both finish
+    # post_script_params: extra params, for post_script_id
+
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
 
 
@@ -1720,8 +1724,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script=script,
             script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
-            cronjob=cronjob,
+            hostname=hostname, plugins=plugins, post_script_id=post_script_id,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
@@ -1731,6 +1735,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                 node.extra.get('username'), node.extra.get('password'),
                 public_key, script=script, script_id=script_id, script_params=script_params,
                 job_id = job_id, hostname=hostname, plugins=plugins,
+                post_script_params=post_script_params,
                 networks=networks, cronjob=cronjob,
             )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
@@ -1742,7 +1747,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             node.extra.get('password'), public_key, script=script,
             script_id=script_id, script_params=script_params,
             job_id = job_id, hostname=hostname, plugins=plugins,
-            cronjob=cronjob
+            post_script_id=post_script_id,
+            post_script_params=post_script_params, cronjob=cronjob
         )
 
     elif key_id:
@@ -1750,7 +1756,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             user.email, cloud_id, node.id, monitoring, script=script,
             key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
-            cronjob=cronjob,
+            post_script_id=post_script_id,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
 
     ret = {'id': node.id,
