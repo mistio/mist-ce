@@ -885,7 +885,7 @@ def create_machine(request):
     job_id = uuid.uuid4().hex
     from mist.io import tasks
     args = (cloud_id, key_id, machine_name,
-            location_id, image_id, size_id, script,
+            location_id, image_id, size_id,
             image_extra, disk, image_name, size_name,
             location_name, ips, monitoring, networks,
             docker_env, docker_command)

@@ -98,7 +98,7 @@ def ssh_command(email, cloud_id, machine_id, host, command,
 def post_deploy_steps(self, email, cloud_id, machine_id, monitoring,
                       key_id=None, username=None, password=None, port=22,
                       script_id='', script_params='', job_id=None,
-                      hostname='', plugins=None, script=None,
+                      hostname='', plugins=None, script='',
                       cronjob={}):
 
 
@@ -198,7 +198,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring,
                 log_event(action='deployment_script_started', command=script, **log_dict)
                 start_time = time()
                 retval, output = shell.command(script)
-                tmp_log('executed command %s', script)
+                tmp_log('executed script %s', script)
                 execution_time = time() - start_time
                 output = output.decode('utf-8','ignore')
                 title = "Deployment script %s" % ('failed' if retval
@@ -350,7 +350,7 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                     ip = conn.ex_create_floating_ip(ext_net_id, machine_port_id)
 
                 post_deploy_steps.delay(
-                    email, cloud_id, machine_id, monitoring, command, key_id,script=script,
+                    email, cloud_id, machine_id, monitoring, key_id,script=script,
                     script_id=script_id, script_params=script_params,
                     job_id=job_id, hostname=hostname, plugins=plugins,
                 )
@@ -421,7 +421,7 @@ def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
             ssh.close()
 
             post_deploy_steps.delay(
-                email, cloud_id, machine_id, monitoring, command, key_id,script=script,
+                email, cloud_id, machine_id, monitoring, key_id,script=script,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 cronjob=cronjob,
@@ -479,7 +479,7 @@ def rackspace_first_gen_post_create_steps(
             ssh.close()
 
             post_deploy_steps.delay(
-                email, cloud_id, machine_id, monitoring, command, key_id,script=script,
+                email, cloud_id, machine_id, monitoring, key_id,script=script,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 cronjob=cronjob
