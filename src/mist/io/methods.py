@@ -1545,7 +1545,7 @@ def list_machines(user, cloud_id):
         conn.disconnect()
     return ret
 
-# command is not an arg into function, but in post deploy steps there is?
+
 def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
@@ -1554,11 +1554,11 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
                    disk_size=None, disk_path=None,
-                   post_script_id='', post_script_params='', cloud_init='',
+                   cloud_init='',
                    associate_floating_ip=False,
                    associate_floating_ip_subnet=None, project_id=None,
                    bare_metal=False, hourly=True,
-                   cronjob={}, command=None):
+                   cronjob={}):
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1580,6 +1580,9 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     through mist.io and those from the Linode interface.
 
     """
+    # script is only a command
+    # script_id is the id of the script - for mist.core
+    # script_params - extra params, only when script_id in use
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
 
 
@@ -1708,29 +1711,26 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                       username=node.extra.get('username'), port=ssh_port)
     elif key_id:
         associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
-
     # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
+            user.email, cloud_id, node.id, monitoring, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
+            script=script,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params, cronjob=cronjob,
+            cronjob=cronjob,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
             networks = list_networks(user, cloud_id)
             mist.io.tasks.openstack_post_create_steps.delay(
-                user.email, cloud_id, node.id, monitoring, script, key_id,
+                user.email, cloud_id, node.id, monitoring, key_id,
                 node.extra.get('username'), node.extra.get('password'),
-                public_key, script_id=script_id, script_params=script_params,
+                public_key, script=script, script_id=script_id, script_params=script_params,
                 job_id = job_id, hostname=hostname, plugins=plugins,
-                post_script_id=post_script_id,
-                post_script_params=post_script_params,
                 networks=networks, cronjob=cronjob,
             )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
@@ -1738,21 +1738,19 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
-            node.extra.get('password'), public_key,
+            user.email, cloud_id, node.id, monitoring, key_id,
+            node.extra.get('password'), public_key, script=script,
             script_id=script_id, script_params=script_params,
             job_id = job_id, hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params, cronjob=cronjob
+            cronjob=cronjob
         )
 
-    elif key_id:   # there is a problem here with command and script
+    elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
             user.email, cloud_id, node.id, monitoring, script=script,
             key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params, cronjob=cronjob,
+            cronjob=cronjob,
         )
 
     ret = {'id': node.id,
