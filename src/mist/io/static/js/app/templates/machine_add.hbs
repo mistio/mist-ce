@@ -323,6 +323,17 @@
         </div>
         {{/if}}
 
+        <!-- Softlayer VLAN ID -->
+        {{#if view.hasSoftlayer}}
+            <div id="vlan-id">
+                <label>Backend VLAN ID</label>
+                {{view Mist.TextField
+                       id="create-machine-vlan-id"
+                       placeholder="optional"
+                       value=Mist.machineAddController.newMachineVlanID}}
+            </div>
+        {{/if}}
+
         <!-- Select Cloud Init Script -->
         {{#if view.hasCloudInit}}
         <div id="cloud-init">

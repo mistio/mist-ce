@@ -34,6 +34,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             newMachineLibvirtDiskPath: '/var/lib/libvirt/',
             newMachineLibvirtDiskSize: 4,
             newMachineLibvirtImagePath: null,
+            newMachineVlanID: null,
 
             //
             // Computed properties
@@ -154,6 +155,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     this.newMachineLibvirtDiskSize,
                     this.newMachineLibvirtDiskPath,
                     this.newMachineLibvirtImagePath,
+                    this.newMachineVlanID,
 
                     function(success, machine) {
                         that._giveCallback(success, machine);
@@ -201,7 +203,8 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineAzurePorts', '')
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
-                    .set('newMachineLibvirtImagePath', '');
+                    .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineVlanID', '');
                 this.view.clear();
             },
 
@@ -282,7 +285,8 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineAzurePorts', '')
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
-                    .set('newMachineLibvirtImagePath', '');
+                    .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineVlanID', '');
             },
 
             _selectUnique: function() {

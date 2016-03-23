@@ -38,6 +38,11 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return provider ? (provider.provider && provider.provider == 'packet' ? true : false) : false;
             }),
 
+            hasSoftlayer: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
+                var provider = Mist.machineAddController.newMachineProvider;
+                return provider ? (provider.provider && provider.provider == 'softlayer' ? true : false) : false;
+            }),
+
             hasKey: Ember.computed('Mist.machineAddController.newMachineProvider', function() {
                 var provider = Mist.machineAddController.newMachineProvider;
                 return provider ? (provider.provider ? true : false) : false;
