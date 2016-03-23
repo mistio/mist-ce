@@ -46,7 +46,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             newMachine: function(provider, providerType, name, image, size, location, key, cloud_init, script, project, monitoring, associateFloatingIp,
-                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtDiskSize, libvirtDiskPath, libvirtImagePath, billing. vlanID) {
+                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtDiskSize, libvirtDiskPath, libvirtImagePath, vlanID, billing) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
                 // the server
