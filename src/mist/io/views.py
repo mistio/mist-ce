@@ -793,7 +793,7 @@ def create_machine(request):
     script_params:
       type: string
     size_id:
-      description: ' If of the size of the machine'
+      description: ' Id of the size of the machine'
       required: true
       type: string
     size_name:
@@ -803,6 +803,15 @@ def create_machine(request):
     softlayer_backend_vlan_id:
       description: 'Specify id of a backend(private) vlan'
       type: integer
+    project_id:
+      description: ' Needed only by Packet.net cloud'
+      type: string
+    billing:
+      description: ' Needed only by SoftLayer cloud'
+      type: string
+    bare_metal:
+      description: ' Needed only by SoftLayer cloud'
+      type: string
     """
     params = params_from_request(request)
     cloud_id = request.matchdict['cloud']
@@ -861,8 +870,8 @@ def create_machine(request):
     # whule bare_metal False creates a virtual cloud server
     # hourly True is the default setting for SoftLayer hardware
     # servers, while False means the server has montly pricing
-    hourly = params.get('hourly', True)
     softlayer_backend_vlan_id = params.get('softlayer_backend_vlan_id', None)
+    hourly = params.get('billing', True)
 
     # only for mist.core, parameters for cronjob
     if not params.get('cronjob_type'):

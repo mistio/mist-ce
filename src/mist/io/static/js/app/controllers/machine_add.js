@@ -24,6 +24,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             newMachineScript: null,
             newMachineLocation: null,
             newMachineProvider: null,
+            newMachineProviderType: null,
             newMachineProject: null,
             newMachineMonitoring: null,
             newMachineAssociateFloatingIp: true,
@@ -35,27 +36,52 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             newMachineLibvirtDiskSize: 4,
             newMachineLibvirtImagePath: null,
             newMachineVlanID: null,
+            newMachineBilling: null,
 
             //
             // Computed properties
             //
 
-            newMachineSizesOptions: Ember.computed('newMachineProvider', 'newMachineImage', function() {
+            newMachineSizesOptions: Ember.computed('newMachineProvider', 'newMachineProviderType', 'newMachineImage', function() {
                 var provider = this.get('newMachineProvider.provider'),
-                    image = this.get('newMachineImage');
+                    image = this.get('newMachineImage'),
+                    bare_metal = this.get('newMachineProviderType.val');
 
                 if (provider && provider.indexOf('ec2') > -1 && image && image.extra) {
                     var virtualization_type = image.extra.virtualization_type;
                     if (virtualization_type) {
                         var filteredSizes = this.get('newMachineProvider.sizes.model').filter(function(size, index) {
-                            return size.extra.virtualizationTypes.indexOf(virtualization_type) > -1;
+                            return size.extra && size.extra.virtualizationTypes.indexOf(virtualization_type) > -1;
                         }, this);
 
                         return filteredSizes;
                     }
                 }
 
+                if (provider && provider == 'softlayer') {
+                    var filteredSizes = this.get('newMachineProvider.sizes.model').filter(function(size, index) {
+                        return bare_metal ? size.name.toLowerCase().indexOf('bare metal') > -1 : size.name.toLowerCase().indexOf('bare metal') == -1;
+                    }, this);
+
+                    return filteredSizes;
+                }
+
                 return this.get('newMachineProvider.sizes.model');
+            }),
+
+            newMachineImagesOptions: Ember.computed('newMachineProvider', 'newMachineProviderType', function() {
+                var provider = this.get('newMachineProvider.provider'),
+                    bare_metal = this.get('newMachineProviderType.val');
+
+                if (provider && provider == 'softlayer') {
+                    var filteredImages = this.get('newMachineProvider.images.model').filter(function(image, index) {
+                        return bare_metal ? image.name.toLowerCase().indexOf('bare metal') > -1 : image.name.toLowerCase().indexOf('bare metal') == -1;
+                    }, this);
+
+                    return filteredImages;
+                }
+
+                return this.get('newMachineProvider.images.model');
             }),
 
             //
@@ -137,6 +163,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                 var that = this;
                 this.newMachineProvider.machines.newMachine(
                     this.newMachineProvider.provider,
+                    this.newMachineProviderType.val,
                     this.newMachineName,
                     this.newMachineImage,
                     this.newMachineSize,
@@ -156,6 +183,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     this.newMachineLibvirtDiskPath,
                     this.newMachineLibvirtImagePath,
                     this.newMachineVlanID,
+                    this.newMachineBilling.val,
 
                     function(success, machine) {
                         that._giveCallback(success, machine);
@@ -173,6 +201,22 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             _clear: function() {
                 this.set('callback', null)
                     .set('newMachineName', '')
+                    .set('newMachineProvider', {
+                        'title': 'Select Provider'
+                    })
+                    .set('newMachineImage', {
+                        'name': 'Select Image'
+                    })
+                    .set('newMachineSize', {
+                        'name': 'Select Size'
+                    })
+                    .set('newMachineLocation', {
+                        'name': 'Select Location'
+                    })
+                    .set('newMachineProviderType', {
+                        'title': 'Virtual Cloud Server',
+                        'val': false
+                    })
                     .set('newMachineCloudInit', '')
                     .set('newMachineScript', '')
                     .set('newMachineKey', {
@@ -181,18 +225,6 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineProject', '')
                     .set('newMachineKey', {
                         'title': 'Select Key'
-                    })
-                    .set('newMachineSize', {
-                        'name': 'Select Size'
-                    })
-                    .set('newMachineImage', {
-                        'name': 'Select Image'
-                    })
-                    .set('newMachineLocation', {
-                        'name': 'Select Location'
-                    })
-                    .set('newMachineProvider', {
-                        'title': 'Select Provider'
                     })
                     .set('newMachineMonitoring', Mist.email ? true : false)
                     .set('newMachineAssociateFloatingIp', true)
@@ -205,6 +237,10 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
                     .set('newMachineLibvirtImagePath', '')
                     .set('newMachineVlanID', '');
+                    .set('newMachineBilling', {
+                        'title': 'Hourly',
+                        'val': true
+                    });
                 this.view.clear();
             },
 
@@ -262,21 +298,25 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
 
             _resetProvider: function() {
                 this.set('callback', null)
-                    .set('newMachineCloudInit', '')
-                    .set('newMachineScript', '')
-                    .set('newMachineProject', '')
+                    .set('newMachineProviderType', {
+                        'title': 'Virtual Cloud Server',
+                        'val': false
+                    })
+                    .set('newMachineImage', {
+                        'name': 'Select Image'
+                    })
                     .set('newMachineKey', {
                         'title': 'Select Key'
                     })
                     .set('newMachineSize', {
                         'name': 'Select Size'
                     })
-                    .set('newMachineImage', {
-                        'name': 'Select Image'
-                    })
                     .set('newMachineLocation', {
                         'name': 'Select Location'
                     })
+                    .set('newMachineCloudInit', '')
+                    .set('newMachineScript', '')
+                    .set('newMachineProject', '')
                     .set('newMachineAssociateFloatingIp', true)
                     .set('newMachineDockerEnvironment', '')
                     .set('newMachineDockerCommand', '')
@@ -287,6 +327,10 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
                     .set('newMachineLibvirtImagePath', '')
                     .set('newMachineVlanID', '');
+                    .set('newMachineBilling', {
+                        'title': 'Hourly',
+                        'val': true
+                    });
             },
 
             _selectUnique: function() {

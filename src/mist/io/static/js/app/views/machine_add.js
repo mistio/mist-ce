@@ -88,6 +88,24 @@ define('app/views/machine_add', ['app/views/controlled'],
                 return Mist.email ? true : false;
             }),
 
+            // We check here if it is Bare Metal or not
+            newMachineProviderTypeOptions: [{
+                title: 'Bare Metal',
+                val: true
+            }, {
+                title: 'Virtual Cloud Server',
+                val: false
+            }],
+
+            // We check here if it is Hourly or not
+            newMachineBillingOptions: [{
+                title: 'Hourly',
+                val: true
+            }, {
+                title: 'Monthly',
+                val: false
+            }],
+
             helpOptions: [{
                 field: 'disk-path',
                 helpText: 'Where the VM disk file will be created',
@@ -343,8 +361,38 @@ define('app/views/machine_add', ['app/views/controlled'],
                 },
 
 
-                selectImage: function(image) {
+                selectProviderType: function(type) {
+                    this.fieldIsReady('provider-type');
 
+                    var selectedType = this.get('newMachineProviderTypeOptions')
+                        .filter(function(option) {
+                            return option.val == type;
+                        })
+                        .shift();
+
+                    Mist.machineAddController
+                        .set('newMachineProviderType', selectedType)
+                        .set('newMachineImage', {
+                            'name': 'Select Image'
+                        })
+                        .set('newMachineSize', {
+                            'name': 'Select Size'
+                        });
+                },
+
+                selectProviderBilling: function(type) {
+                    this.fieldIsReady('billing');
+
+                    var selectedBilling = this.get('newMachineBillingOptions')
+                        .filter(function(option) {
+                            return option.val == type;
+                        })
+                        .shift();
+
+                    Mist.machineAddController.set('newMachineBilling', selectedBilling);
+                },
+
+                selectImage: function(image) {
                     if (this.fieldIsReady) {
                         this.fieldIsReady('image');
                     }
@@ -455,6 +503,7 @@ define('app/views/machine_add', ['app/views/controlled'],
             }.observes('Mist.machineAddController.newMachineSize',
                 'Mist.machineAddController.newMachineImage',
                 'Mist.machineAddController.newMachineProvider',
+                'Mist.machineAddController.newMachineProviderType',
                 'Mist.machineAddController.newMachineLocation'),
 
             providerObserver: function() {
