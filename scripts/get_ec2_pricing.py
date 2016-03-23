@@ -46,47 +46,65 @@ EC2_REGIONS = [
     "ap-southeast-1",
     "ap-southeast-2",
     "ap-northeast-1",
+    "ap-northeast-2",
+    "us-gov-west-1",
     "sa-east-1"
 ]
 
 EC2_INSTANCE_TYPES = ['hs1.4xlarge',
  'm3.large',
- 'i2.8xlarge',
- 't2.micro',
- 'hs1.8xlarge',
- 'c1.xlarge',
  'r3.4xlarge',
- 't2.medium',
- 'g2.2xlarge',
- 'm1.small',
- 'c1.medium',
+ 't2.large',
  'm3.2xlarge',
- 'r3.8xlarge',
- 'i2.2xlarge',
+ 'cr1.8xlarge',
+ 'c4.8xlarge',
+ 'c4.xlarge',
+ 'i2.8xlarge',
+ 'd2.4xlarge',
+ 'd2.8xlarge',
+ 'c4.4xlarge',
+ 'c1.xlarge',
+ 'g2.2xlarge',
+ 'c4.2xlarge',
  't2.small',
- 'm2.xlarge',
- 'r3.2xlarge',
- 't1.micro',
- 'c3.8xlarge',
- 'c3.large',
  'cc1.4xlarge',
- 'm1.medium',
- 'r3.large',
- 'c3.xlarge',
  'i2.xlarge',
  'm3.medium',
- 'cc2.8xlarge',
- 'm1.large',
- 'cg1.4xlarge',
- 'cr1.8xlarge',
- 'c3.2xlarge',
- 'i2.4xlarge',
- 'c3.4xlarge',
  'r3.xlarge',
- 'm1.xlarge',
- 'm2.4xlarge',
+ 'm4.2xlarge',
+ 'c3.large',
+ 'cc2.8xlarge',
+ 'm3.xlarge',
+ 'd2.2xlarge',
+ 'g2.8xlarge',
+ 'cg1.4xlarge',
+ 'm1.small',
+ 'c1.medium',
+ 'r3.2xlarge',
+ 't1.micro',
+ 'c3.2xlarge',
+ 'c3.xlarge',
+ 'm1.large',
+ 'hs1.8xlarge',
+ 'c3.8xlarge',
+ 'c3.4xlarge',
+ 'm4.large',
+ 't2.medium',
+ 't2.micro',
  'm2.2xlarge',
- 'm3.xlarge']
+ 'm4.xlarge',
+ 'd2.xlarge',
+ 'r3.8xlarge',
+ 'm2.xlarge',
+ 'm4.4xlarge',
+ 'm1.medium',
+ 'r3.large',
+ 'i2.4xlarge',
+ 'c4.large',
+ 'i2.2xlarge',
+ 'm1.xlarge',
+ 'm4.10xlarge',
+ 'm2.4xlarge']
 
 
 EC2_OS_TYPES = [
@@ -113,6 +131,8 @@ JSON_NAME_TO_EC2_REGIONS_API = {
     "apac-syd" : "ap-southeast-2",
     "apac-tokyo" : "ap-northeast-1",
     "ap-northeast-1" : "ap-northeast-1",
+    "apac-seoul" : "ap-northeast-2",
+    "ap-northeast-2" : "ap-northeast-2",
     "sa-east-1" : "sa-east-1",
     "us-gov-west-1" : "us-gov-west-1"
 }
@@ -126,6 +146,7 @@ EC2_REGIONS_API_TO_JSON_NAME = {
     "ap-southeast-1" : "apac-sin",
     "ap-southeast-2" : "apac-syd",
     "ap-northeast-1" : "apac-tokyo",
+    "ap-northeast-2" : "apac-seoul",
     "sa-east-1" : "sa-east-1"
 }
 
@@ -311,7 +332,7 @@ def _load_data(url, use_cache=False, cache_class=SimpleResultsCache):
             return result
 
     f = requests.get(url)
-    
+
     if re.match('.*?\.json$', url):
         result = f.json()
     elif re.match('.*?\.js$', url):
@@ -442,10 +463,11 @@ if __name__ == "__main__":
     ec2_providers['ap-southeast-1'] = {}
     ec2_providers['ap-southeast-2'] = {}
     ec2_providers['ap-northeast-1'] = {}
+    ec2_providers['ap-northeast-2'] = {}
     ec2_providers['sa-east-1'] = {}
     ec2_providers['us-gov-west-1'] = {}
 
-    for reg in data['regions']: 
+    for reg in data['regions']:
         region = reg['region']
         image_types = reg['instanceTypes']
         for image_type in image_types:
@@ -464,20 +486,21 @@ if __name__ == "__main__":
 
     ec2_providers[Provider.EC2_EU_WEST] = ec2_providers['eu-west-1']
     ec2_providers[Provider.EC2_SA_EAST] = ec2_providers['sa-east-1']
-    ec2_providers[Provider.EC2_AP_NORTHEAST] = ec2_providers['ap-northeast-1']
+    ec2_providers[Provider.EC2_AP_NORTHEAST1] = ec2_providers['ap-northeast-1']
+    ec2_providers[Provider.EC2_AP_NORTHEAST2] = ec2_providers['ap-northeast-2']
     ec2_providers[Provider.EC2_AP_SOUTHEAST2] = ec2_providers['ap-southeast-2']
     ec2_providers[Provider.EC2_AP_SOUTHEAST] = ec2_providers['ap-southeast-1']
     ec2_providers[Provider.EC2_US_WEST] = ec2_providers['us-west-1']
     ec2_providers[Provider.EC2_US_WEST_OREGON] = ec2_providers['us-west-2']
-    ec2_providers[Provider.EC2_US_EAST] = ec2_providers['us-east-1'] 
-    ec2_providers[Provider.EC2_EU_CENTRAL] = ec2_providers['eu-central-1'] 
+    ec2_providers[Provider.EC2_US_EAST] = ec2_providers['us-east-1']
+    ec2_providers[Provider.EC2_EU_CENTRAL] = ec2_providers['eu-central-1']
 
-    #formatting for easy copy/paste to mist.io/config.py             
-    for provider in [Provider.EC2_EU_CENTRAL, Provider.EC2_EU_WEST, Provider.EC2_SA_EAST, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_SOUTHEAST2, Provider.EC2_AP_SOUTHEAST, Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON, Provider.EC2_US_EAST]:        
-        print "        \"%s\": {" % provider         
+    #formatting for easy copy/paste to mist.io/config.py
+    for provider in [Provider.EC2_EU_CENTRAL, Provider.EC2_EU_WEST, Provider.EC2_SA_EAST, Provider.EC2_AP_NORTHEAST1, Provider.EC2_AP_NORTHEAST2, Provider.EC2_AP_SOUTHEAST2, Provider.EC2_AP_SOUTHEAST, Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON, Provider.EC2_US_EAST]:
+        print "        \"%s\": {" % provider
         for key in ec2_providers[provider].keys()[:-1]:
             print "            \"%s\": %s," % (key, json.dumps(ec2_providers[provider][key]))
-        key = ec2_providers[provider].keys()[-1]            
-        print "            \"%s\": %s" % (key, json.dumps(ec2_providers[provider][key]))            
+        key = ec2_providers[provider].keys()[-1]
+        print "            \"%s\": %s" % (key, json.dumps(ec2_providers[provider][key]))
         #don't use a comma for the last key, for valid JSON
-        print '        },\n'                  
+        print '        },\n'

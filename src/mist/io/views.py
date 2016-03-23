@@ -990,6 +990,12 @@ def create_machine(request):
     associate_floating_ip = params.get('associate_floating_ip', False)
     associate_floating_ip_subnet = params.get('attach_floating_ip_subnet', None)
     project_id = params.get('project', None)
+    bare_metal = params.get('bare_metal', False)
+    # bare_metal True creates a hardware server in SoftLayer,
+    # whule bare_metal False creates a virtual cloud server
+    # hourly True is the default setting for SoftLayer hardware
+    # servers, while False means the server has montly pricing
+    hourly = params.get('hourly', True)
 
     # only for mist.core, parameters for cronjob
     if not params.get('cronjob_type'):
@@ -1052,9 +1058,9 @@ def create_machine(request):
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet,
-              'project_id': project_id,
-              'cronjob': cronjob,
-              'tags': tags}
+              'tags': tags,
+              'project_id': project_id, 'bare_metal': bare_metal,
+              'hourly': hourly, 'cronjob': cronjob}
     if not async:
         ret = methods.create_machine(auth_context.owner, *args, **kwargs)
     else:
