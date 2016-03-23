@@ -35,6 +35,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
             newMachineLibvirtDiskPath: '/var/lib/libvirt/',
             newMachineLibvirtDiskSize: 4,
             newMachineLibvirtImagePath: null,
+            newMachineVlanID: null,
             newMachineBilling: null,
 
             //
@@ -181,6 +182,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     this.newMachineLibvirtDiskSize,
                     this.newMachineLibvirtDiskPath,
                     this.newMachineLibvirtImagePath,
+                    this.newMachineVlanID,
                     this.newMachineBilling.val,
 
                     function(success, machine) {
@@ -234,6 +236,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
                     .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineVlanID', '')
                     .set('newMachineBilling', {
                         'title': 'Hourly',
                         'val': true
@@ -323,6 +326,7 @@ define('app/controllers/machine_add', ['ember', 'yamljs'],
                     .set('newMachineLibvirtDiskSize', 4)
                     .set('newMachineLibvirtDiskPath', '/var/lib/libvirt/')
                     .set('newMachineLibvirtImagePath', '')
+                    .set('newMachineVlanID', '')
                     .set('newMachineBilling', {
                         'title': 'Hourly',
                         'val': true
