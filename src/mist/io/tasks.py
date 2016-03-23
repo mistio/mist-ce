@@ -143,7 +143,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring,
 
         if node.state != NodeState.RUNNING:
             tmp_log('not running state')
-            raise self.retry(exc=Exception(), countdown=60, max_retries=20)
+            raise self.retry(exc=Exception(), countdown=120, max_retries=30)
 
         try:
             from mist.io.shell import Shell
