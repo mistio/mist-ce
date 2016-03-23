@@ -95,10 +95,10 @@ def ssh_command(email, cloud_id, machine_id, host, command,
 
 
 @app.task(bind=True, default_retry_delay=3*60)
-def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
+def post_deploy_steps(self, email, cloud_id, machine_id, monitoring,
                       key_id=None, username=None, password=None, port=22,
                       script_id='', script_params='', job_id=None,
-                      hostname='', plugins=None, script=None,
+                      hostname='', plugins=None, script='',
                       post_script_id='', post_script_params='', cronjob={}):
 
 
@@ -167,7 +167,6 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
                     'key_id': key_id,
                     'ssh_user': ssh_user,
                 }
-
             log_event(action='probe', result=result, **log_dict)
             cloud = user.clouds[cloud_id]
             msg = "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title,
@@ -194,12 +193,12 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
                 )
                 error = ret['error']
                 tmp_log('executed script_id %s', script_id)
-            elif command:
-                tmp_log('will run command %s', command)
-                log_event(action='deployment_script_started', command=command, **log_dict)
+            elif script:
+                tmp_log('will run script')
+                log_event(action='deployment_script_started', command=script, **log_dict)
                 start_time = time()
-                retval, output = shell.command(command)
-                tmp_log('executed command %s', command)
+                retval, output = shell.command(script)
+                tmp_log('executed script %s', script)
                 execution_time = time() - start_time
                 output = output.decode('utf-8','ignore')
                 title = "Deployment script %s" % ('failed' if retval
@@ -209,7 +208,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
                             cloud_id=cloud_id,
                             machine_id=machine_id,
                             machine_name=node.name,
-                            command=command,
+                            command=script,
                             output=output,
                             duration=execution_time,
                             retval=retval,
@@ -217,7 +216,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
                 log_event(action='deployment_script_finished',
                           error=retval > 0,
                           return_value=retval,
-                          command=command,
+                          command=script,
                           stdout=output,
                           **log_dict)
 
@@ -249,7 +248,8 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
                     action_prefix='post_',
                 )
                 error = ret['error']
-                tmp_log('executed post_script_id %s', script_id)
+                tmp_log('executed post_script_id %s', post_script_id)
+
 
             # only for mist.core, set cronjob entry as a post deploy step
             if cronjob:
@@ -289,7 +289,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
             cloud_id=cloud_id,
             machine_id=machine_id,
             enable_monitoring=bool(monitoring),
-            command=command,
+            command=script,
             error="Couldn't connect to run post deploy steps.",
             job_id=job_id
         )
@@ -297,7 +297,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring, command='',
 
 @app.task(bind=True, default_retry_delay=2*60)
 def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
-                                command, key_id, username, password, public_key,
+                                key_id, username, password, public_key, script='',
                                 script_id='', script_params='', job_id=None,
                                 hostname='', plugins=None,
                                 post_script_id='', post_script_params='',
@@ -322,8 +322,8 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
             host = ips[0]
 
             post_deploy_steps.delay(
-                email, cloud_id, machine_id, monitoring, command, key_id,
-                script_id=script_id, script_params=script_params,
+                email, cloud_id, machine_id, monitoring, key_id,
+                script=script, script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
                 post_script_params=post_script_params, cronjob=cronjob
@@ -363,7 +363,7 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
                     ip = conn.ex_create_floating_ip(ext_net_id, machine_port_id)
 
                 post_deploy_steps.delay(
-                    email, cloud_id, machine_id, monitoring, command, key_id,
+                    email, cloud_id, machine_id, monitoring, key_id,script=script,
                     script_id=script_id, script_params=script_params,
                     job_id=job_id, hostname=hostname, plugins=plugins,
                     post_script_id=post_script_id,
@@ -379,7 +379,7 @@ def openstack_post_create_steps(self, email, cloud_id, machine_id, monitoring,
 
 @app.task(bind=True, default_retry_delay=2*60)
 def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
-                            command, key_id, username, password, public_key,
+                            key_id, username, password, public_key, script='',
                             script_id='', script_params='', job_id=None,
                             hostname='', plugins=None,
                             post_script_id='', post_script_params='',cronjob={}):
@@ -436,7 +436,7 @@ def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
             ssh.close()
 
             post_deploy_steps.delay(
-                email, cloud_id, machine_id, monitoring, command, key_id,
+                email, cloud_id, machine_id, monitoring, key_id,script=script,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
@@ -452,8 +452,8 @@ def azure_post_create_steps(self, email, cloud_id, machine_id, monitoring,
 
 @app.task(bind=True, default_retry_delay=2*60)
 def rackspace_first_gen_post_create_steps(
-    self, email, cloud_id, machine_id, monitoring, command, key_id,
-    password, public_key, username='root', script_id='', script_params='',
+    self, email, cloud_id, machine_id, monitoring, key_id,
+    password, public_key, username='root', script='', script_id='', script_params='',
     job_id=None, hostname='', plugins=None, post_script_id='',
     post_script_params='', cronjob={}
 ):
@@ -496,7 +496,7 @@ def rackspace_first_gen_post_create_steps(
             ssh.close()
 
             post_deploy_steps.delay(
-                email, cloud_id, machine_id, monitoring, command, key_id,
+                email, cloud_id, machine_id, monitoring, key_id,script=script,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
@@ -845,9 +845,9 @@ def undeploy_collectd(email, cloud_id, machine_id):
 
 @app.task
 def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
-                         image_id, size_id, script, image_extra, disk,
+                         image_id, size_id, image_extra, disk,
                          image_name, size_name, location_name, ips, monitoring,
-                         networks, docker_env, docker_command,
+                         networks, docker_env, docker_command, script='',
                          script_id='', script_params='',
                          post_script_id='', post_script_params='',
                          quantity=1, persist=False, job_id=None,
