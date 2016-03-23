@@ -52,13 +52,7 @@
     display: inline-block;
     width: 120px;
     height: 54px;
-    background: transparent url(images/logo.png) no-repeat left center;
-}
-@media (min-device-pixel-ratio: 2), (-webkit-min-resolution: 192dpi), (min-resolution: 192dpi) {
-    #banner-logo {
-        background: url(images/logo@2x.png) no-repeat left center;
-        background-size: 120px;
-    }
+    background: transparent url(images/logo.svg) no-repeat left center;
 }
 
 .user-menu {
@@ -349,10 +343,10 @@ textarea.ui-input-text,
 .mist-logo {
     width: 280px;
     height: 280px;
-    background: url("/resources/logo_splash.png") center no-repeat;
+    background: url("/resources/logo_splash.svg") center no-repeat;
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 40%;
     margin-left: -140px;
     margin-top: -140px;
 }
@@ -367,7 +361,7 @@ textarea.ui-input-text,
 .mist-progress-wrapper {
     border: 1px solid #fff;
     border-radius: .2em;
-    bottom: 32px;
+    bottom: -32px;
     box-shadow: 0 0 2px #444;
     height: 2px;
     left: 72px;
@@ -889,7 +883,7 @@ ul.checkbox-list .ui-grid-b {
 .ui-footer {
     position: fixed;
     display: none;
-    z-index: 2000;
+    z-index: 800;
     width: 100%;
     bottom: 0;
 }

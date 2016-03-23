@@ -67,7 +67,6 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
-HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
 
 
 def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -180,9 +179,6 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
             cloud.apiurl = cloud.apiurl.rstrip('/')
 
-        #for HP Cloud
-        if 'hpcloudsvc' in apiurl:
-            cloud.apiurl = HPCLOUD_AUTH_URL
 
         if provider == 'vcloud':
             for prefix in ['https://', 'http://']:
@@ -248,12 +244,12 @@ def add_cloud_v_2(user, title, provider, params):
 
     if provider == 'bare_metal':
         cloud_id, mon_dict = _add_cloud_bare_metal(user, title, provider, params)
-        log.info("Cloud with id '%s' added succesfully.", cloud_id)
+        log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user.email, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'coreos':
         cloud_id, mon_dict = _add_cloud_coreos(user, title, provider, params)
-        log.info("Cloud with id '%s' added succesfully.", cloud_id)
+        log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user.email, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'ec2':
@@ -274,8 +270,6 @@ def add_cloud_v_2(user, title, provider, params):
         cloud_id, cloud = _add_cloud_linode(title, provider, params)
     elif provider == 'docker':
         cloud_id, cloud = _add_cloud_docker(title, provider, params)
-    elif provider == 'hpcloud':
-        cloud_id, cloud = _add_cloud_hp(user, title, provider, params)
     elif provider == 'openstack':
         cloud_id, cloud = _add_cloud_openstack(title, provider, params)
     elif provider in ['vcloud', 'indonesian_vcloud']:
@@ -783,47 +777,6 @@ def _add_cloud_libvirt(user, title, provider, params):
     return cloud_id, cloud
 
 
-def _add_cloud_hp(user, title, provider, params):
-    username = params.get('username', '')
-    if not username:
-        raise RequiredParameterMissingError('username')
-
-    password = params.get('password', '')
-    if not password:
-        raise RequiredParameterMissingError('password')
-
-    tenant_name = params.get('tenant_name', '')
-    if not tenant_name:
-        raise RequiredParameterMissingError('tenant_name')
-
-    apiurl = params.get('apiurl') or ''
-    if 'hpcloudsvc' in apiurl:
-            apiurl = HPCLOUD_AUTH_URL
-
-    region = params.get('region', '')
-    if not region:
-        raise RequiredParameterMissingError('region')
-
-    if password == 'getsecretfromdb':
-        for cloud_id in user.clouds:
-            if username == user.clouds[cloud_id].apikey:
-                password = user.clouds[cloud_id].apisecret
-                break
-
-    cloud = model.Cloud()
-    cloud.title = title
-    cloud.provider = provider
-    cloud.apikey = username
-    cloud.apisecret = password
-    cloud.apiurl = apiurl
-    cloud.region = region
-    cloud.tenant_name = tenant_name
-    cloud.enabled = True
-    cloud_id = cloud.get_id()
-
-    return cloud_id, cloud
-
-
 def _add_cloud_openstack(title, provider, params):
     username = params.get('username', '')
     if not username:
@@ -1276,31 +1229,15 @@ def connect_provider(cloud):
         temp_key_file.close()
         conn = driver(cloud.apikey, temp_key_file.name)
     elif cloud.provider == Provider.OPENSTACK:
-        #keep this for cloud compatibility, however we now use HPCLOUD
-        #as separate provider
-        if 'hpcloudsvc' in cloud.apiurl:
-            conn = driver(
-                cloud.apikey,
-                cloud.apisecret,
-                ex_force_auth_version=cloud.auth_version or '2.0_password',
-                ex_force_auth_url=cloud.apiurl,
-                ex_tenant_name=cloud.tenant_name or cloud.apikey,
-                ex_force_service_region = cloud.region,
-                ex_force_service_name='Compute'
-            )
-        else:
-            conn = driver(
-                cloud.apikey,
-                cloud.apisecret,
-                ex_force_auth_version=cloud.auth_version or '2.0_password',
-                ex_force_auth_url=cloud.apiurl,
-                ex_tenant_name=cloud.tenant_name,
-                ex_force_service_region=cloud.region,
-                ex_force_base_url=cloud.compute_endpoint,
-            )
-    elif cloud.provider == Provider.HPCLOUD:
-        conn = driver(cloud.apikey, cloud.apisecret, cloud.tenant_name,
-                      region=cloud.region)
+        conn = driver(
+            cloud.apikey,
+            cloud.apisecret,
+            ex_force_auth_version=cloud.auth_version or '2.0_password',
+            ex_force_auth_url=cloud.apiurl,
+            ex_tenant_name=cloud.tenant_name,
+            ex_force_service_region=cloud.region,
+            ex_force_base_url=cloud.compute_endpoint,
+        )
     elif cloud.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR]:
         conn = driver(cloud.apisecret)
     elif cloud.provider == Provider.PACKET:
@@ -1570,12 +1507,15 @@ def list_machines(user, cloud_id):
             m.extra['can_reboot'] = can_reboot
 
         if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
-            if 'windows' in m.extra.get('image', '').lower():
-                os_type = 'windows'
-            else:
-                os_type = 'linux'
-            m.extra['os_type'] = os_type
-
+            try:
+                if 'windows' in m.extra.get('image', '').lower():
+                    os_type = 'windows'
+                else:
+                    os_type = 'linux'
+                m.extra['os_type'] = os_type
+            except:
+                # in case this breaks
+                pass
         if m.driver.type in config.EC2_PROVIDERS:
             # this is windows for windows servers and None for Linux
             m.extra['os_type'] = m.extra.get('platform', 'linux')
@@ -1607,15 +1547,18 @@ def list_machines(user, cloud_id):
 
 
 def create_machine(user, cloud_id, key_id, machine_name, location_id,
-                   image_id, size_id, script, image_extra, disk, image_name,
+                   image_id, size_id, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
-                   docker_env=[], docker_command=None, ssh_port=22,
+                   docker_env=[], docker_command=None, ssh_port=22, script='',
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
                    disk_size=None, disk_path=None,
                    post_script_id='', post_script_params='', cloud_init='',
-                   associate_floating_ip=False, associate_floating_ip_subnet=None, project_id=None):
+                   associate_floating_ip=False,
+                   associate_floating_ip_subnet=None, project_id=None,
+                   bare_metal=False, hourly=True,
+                   cronjob={}):
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1637,7 +1580,15 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     through mist.io and those from the Linode interface.
 
     """
+    # script: a command that is given once
+    # script_id: id of a script that exists - for mist.core
+    # script_params: extra params, for script_id
+    # post_script_id: id of a script that exists - for mist.core. If script_id
+    # or monitoring are supplied, this will run after both finish
+    # post_script_params: extra params, for post_script_id
+
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
+
 
     if cloud_id not in user.clouds:
         raise CloudNotFoundError(cloud_id)
@@ -1693,9 +1644,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif conn.type in [Provider.OPENSTACK]:
         node = _create_machine_openstack(conn, private_key, public_key,
                                          machine_name, image, size, location, networks, cloud_init)
-    elif conn.type is Provider.HPCLOUD:
-        node = _create_machine_hpcloud(conn, private_key, public_key,
-                                       machine_name, image, size, location, networks)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
         for loc in locations:
@@ -1719,7 +1667,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
                                          machine_name, image, size,
-                                         location)
+                                         location, bare_metal, cloud_init, hourly)
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(conn, key_id, private_key,
                                              public_key, machine_name,
@@ -1767,68 +1715,58 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                       username=node.extra.get('username'), port=ssh_port)
     elif key_id:
         associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
-
+    # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
-        # when this is ok, it calss post_deploy for script/monitoring
+        # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
+            user.email, cloud_id, node.id, monitoring, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
+            script=script,
             script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params,
-        )
-    elif conn.type == Provider.HPCLOUD:
-        mist.io.tasks.hpcloud_post_create_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
-            node.extra.get('username'), node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            hostname=hostname, plugins=plugins, post_script_id=post_script_id,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
             networks = list_networks(user, cloud_id)
             mist.io.tasks.openstack_post_create_steps.delay(
-                user.email, cloud_id, node.id, monitoring, script, key_id,
-                node.extra.get('username'), node.extra.get('password'), public_key,
-                script_id=script_id, script_params=script_params, job_id = job_id,
-                hostname=hostname, plugins=plugins,
-                post_script_id=post_script_id,
+                user.email, cloud_id, node.id, monitoring, key_id,
+                node.extra.get('username'), node.extra.get('password'),
+                public_key, script=script, script_id=script_id, script_params=script_params,
+                job_id = job_id, hostname=hostname, plugins=plugins,
                 post_script_params=post_script_params,
-                networks=networks
+                networks=networks, cronjob=cronjob,
             )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
-            node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
+            user.email, cloud_id, node.id, monitoring, key_id,
+            node.extra.get('password'), public_key, script=script,
+            script_id=script_id, script_params=script_params,
+            job_id = job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob
         )
+
     elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
-            user.email, cloud_id, node.id, monitoring, script, key_id,
-            script_id=script_id, script_params=script_params,
+            user.email, cloud_id, node.id, monitoring, script=script,
+            key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params,
+            post_script_params=post_script_params, cronjob=cronjob,
         )
 
-
     ret = {'id': node.id,
-            'name': node.name,
-            'extra': node.extra,
-            'public_ips': node.public_ips,
-            'private_ips': node.private_ips,
-            'job_id': job_id,
-            }
+           'name': node.name,
+           'extra': node.extra,
+           'public_ips': node.public_ips,
+           'private_ips': node.private_ips,
+           'job_id': job_id,
+           }
 
     return ret
 
@@ -1921,59 +1859,6 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
                 ex_userdata=user_data)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e, e)
-    return node
-
-
-def _create_machine_hpcloud(conn, private_key, public_key, machine_name,
-                             image, size, location, networks):
-    """Create a machine in HP Cloud.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = str(public_key).replace('\n','')
-
-    try:
-        server_key = ''
-        keys = conn.ex_list_keypairs()
-        for k in keys:
-            if key == k.public_key:
-                server_key = k.name
-                break
-        if not server_key:
-            server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
-            server_key = server_key.name
-    except:
-        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
-        server_key = server_key.name
-
-    #FIXME: Neutron API not currently supported by libcloud
-    #need to pass the network on create node - can only omitted if one network only exists
-
-    # select the right OpenStack network object
-    available_networks = conn.ex_list_networks()
-    try:
-        chosen_networks = []
-        for net in available_networks:
-            if net.id in networks:
-                chosen_networks.append(net)
-    except:
-            chosen_networks = []
-
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(name=machine_name,
-                image=image,
-                size=size,
-                location=location,
-                ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                max_tries=1,
-                ex_keyname=server_key,
-                networks=chosen_networks)
-        except Exception as e:
-            raise MachineCreationError("HP Cloud, got exception %s" % e, e)
     return node
 
 
@@ -2104,14 +1989,13 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key,
 
 
 def _create_machine_softlayer(conn, key_name, private_key, public_key,
-                             machine_name, image, size, location):
+                             machine_name, image, size, location, bare_metal, cloud_init, hourly):
     """Create a machine in Softlayer.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
 
     """
-
     key = str(public_key).replace('\n','')
     try:
         server_key = ''
@@ -2135,6 +2019,12 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
         domain = None
         name = machine_name
 
+    # FIXME: SoftLayer allows only bash/script, no actual cloud-init
+    # Also need to upload this on a public https url...
+    if cloud_init:
+        postInstallScriptUri = ''
+    else:
+        postInstallScriptUri = None
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -2143,7 +2033,10 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
                 image=image,
                 size=size,
                 location=location,
-                sshKeys=server_key
+                sshKeys=server_key,
+                bare_metal=bare_metal,
+                postInstallScriptUri=postInstallScriptUri,
+                ex_hourly=hourly
             )
         except Exception as e:
             raise MachineCreationError("Softlayer, got exception %s" % e, e)
@@ -2567,11 +2460,11 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
         log.error("Error while connecting to cloud")
         raise CloudUnavailableError(exc=exc)
 
-    #GCE needs machine.extra as well, so we need the real machine object
+    # GCE needs machine.extra as well, so we need the real machine object
     machine = None
     try:
         if conn.type == 'azure':
-            #Azure needs the cloud service specified as well as the node
+            # Azure needs the cloud service specified as well as the node
             cloud_service = conn.get_cloud_service_from_node_id(machine_id)
             nodes = conn.list_nodes(ex_cloud_service_name=cloud_service)
             for node in nodes:
@@ -2584,7 +2477,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     machine = node
                     break
         if machine is None:
-            #did not find the machine_id on the list of nodes, still do not fail
+            # did not find the machine_id on the list of nodes, still do not fail
             raise MachineUnavailableError("Error while attempting to %s machine"
                                   % action)
     except:
@@ -2663,8 +2556,10 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
 
                     else:
                        machine.reboot()
-                if conn.type == 'azure':
+                elif conn.type == 'azure':
                     conn.reboot_node(machine, ex_cloud_service_name=cloud_service)
+                elif conn.type == 'softlayer':
+                    conn.reboot_node(machine)
                 else:
                     machine.reboot()
                 if conn.type is Provider.DOCKER:
@@ -2690,6 +2585,8 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 machine.destroy()
             elif conn.type == 'azure':
                 conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
+            elif conn.type == 'softlayer':
+                conn.destroy_node(machine)
             else:
                 machine.destroy()
     except AttributeError:
@@ -3013,6 +2910,7 @@ def list_sizes(user, cloud_id):
                     'driver': size.driver.name,
                     'name': size.name,
                     'price': size.price,
+                    'extra': size.extra,
                     'ram': size.ram})
     if conn.type == 'libvirt':
         # close connection with libvirt
@@ -3093,7 +2991,7 @@ def list_networks(user, cloud_id):
                 'name': network.name,
                 'extra': network.extra,
             })
-    elif conn.type in (Provider.OPENSTACK, Provider.HPCLOUD):
+    elif conn.type in (Provider.OPENSTACK,):
         networks = conn.ex_list_networks()
         subnets = conn.ex_list_subnets()
         routers = conn.ex_list_routers()
@@ -3121,7 +3019,7 @@ def list_networks(user, cloud_id):
         networks = conn.ex_list_networks()
         for network in networks:
             ret['public'].append(gce_network_to_dict(network))
-    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST,
+    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_NORTHEAST1, Provider.EC2_AP_NORTHEAST2,
                        Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
                        Provider.EC2_EU, Provider.EC2_EU_WEST,
                        Provider.EC2_SA_EAST, Provider.EC2_US_EAST,
@@ -3286,13 +3184,11 @@ def create_network(user, cloud_id, network, subnet, router):
     cloud = user.clouds[cloud_id]
 
     conn = connect_provider(cloud)
-    if conn.type not in (Provider.OPENSTACK, Provider.HPCLOUD):
+    if conn.type not in (Provider.OPENSTACK,):
         raise NetworkActionNotSupported()
 
     if conn.type is Provider.OPENSTACK:
         ret = _create_network_openstack(conn, network, subnet, router)
-    elif conn.type is Provider.HPCLOUD:
-        ret = _create_network_hpcloud(conn, network, subnet, router)
 
     task = mist.io.tasks.ListNetworks()
     task.clear_cache(user.email, cloud_id)
@@ -3303,6 +3199,8 @@ def create_network(user, cloud_id, network, subnet, router):
 def _create_network_hpcloud(conn, network, subnet, router):
     """
     Create hpcloud network
+    NOT used anymore, stays for reference
+
     """
     try:
         network_name = network.get('name')
@@ -3438,11 +3336,6 @@ def delete_network(user, cloud_id, network_id):
 
     conn = connect_provider(cloud)
     if conn.type is Provider.OPENSTACK:
-        try:
-            conn.ex_delete_network(network_id)
-        except Exception as e:
-            raise NetworkError(e)
-    elif conn.type is Provider.HPCLOUD:
         try:
             conn.ex_delete_network(network_id)
         except Exception as e:
@@ -4344,7 +4237,13 @@ def get_deploy_collectd_command_unix(uuid, password, monitor, port=25826):
 
 
 def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
-     return '''powershell.exe -command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force;(New-Object System.Net.WebClient).DownloadFile('https://github.com/mistio/collectm/blob/build_issues/scripts/collectm.remote.install.ps1?raw=true', '.\collectm.remote.install.ps1');.\collectm.remote.install.ps1 -gitBranch ""build_issues"" -SetupConfigFile -setupArgs '-username """"%s"""""" -password """"""%s"""""" -servers @(""""""%s:%s"""""") -interval 10'"''' % (uuid, password, monitor, port)
+    return 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned ' \
+           '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
+           'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
+           'deploy_collectm/master/collectm.remote.install.ps1\',' \
+           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
+           '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
+           '-servers @("%s:%s")\''  % (uuid, password, monitor, port)
 
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
@@ -4363,8 +4262,6 @@ def machine_name_validator(provider, name):
     elif provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
         pass
     elif provider in [Provider.OPENSTACK]:
-        pass
-    elif provider is Provider.HPCLOUD:
         pass
     elif provider in config.EC2_PROVIDERS:
         if len(name) > 255:

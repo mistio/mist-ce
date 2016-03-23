@@ -1,5 +1,8 @@
 import pytest
 
+from time import time
+from datetime import date, timedelta
+
 from mist.io.tests import config
 from mist.io.tests.api.io import MistIoApi
 
@@ -34,3 +37,13 @@ def password2():
 @pytest.fixture
 def mist_io():
     return MistIoApi(config.MIST_URL)
+
+
+@pytest.fixture
+def expires():
+    return (date.fromtimestamp(time()) + timedelta(days=1, hours=1)).strftime("%Y-%m-%d %H:%M:%S")
+
+
+@pytest.fixture
+def expired():
+    return (date.fromtimestamp(time()) + timedelta(days=-1, hours=1)).strftime("%Y-%m-%d %H:%M:%S")

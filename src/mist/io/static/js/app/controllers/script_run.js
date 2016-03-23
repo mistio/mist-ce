@@ -13,13 +13,33 @@ define('app/controllers/script_run', ['ember'],
             scriptToRun: Ember.Object.create({
                 script: {},
                 machine: '',
-                parameters: ''
+                parameters: '',
+                scheduler: '',
+                interval: {
+                    every: '',
+                    period: ''
+                },
+                crontab: {
+                    minute: '',
+                    hour: '',
+                    day_of_week: '',
+                    day_of_month: '',
+                    month_of_year: ''
+                },
+                run_at: '',
+                last_run_at: ''
             }),
+
+            load: function() {
+                Ember.run.next(function() {
+                    $('#datetimepicker').datetimepicker();
+                });
+            }.on('didInsertElement'),
 
             open: function (script) {
                 this.clear();
                 this.get('scriptToRun').set('script', script);
-                
+
                 this.view.open();
             },
 
@@ -33,6 +53,20 @@ define('app/controllers/script_run', ['ember'],
                     script: {},
                     machine: '',
                     parameters: '',
+                    scheduler: '',
+                    interval: {
+                        every: '',
+                        period: ''
+                    },
+                    crontab: {
+                        minute: '',
+                        hour: '',
+                        day_of_week: '',
+                        day_of_month: '',
+                        month_of_year: ''
+                    },
+                    run_at: '',
+                    last_run_at: ''
                 });
             },
 
@@ -46,6 +80,27 @@ define('app/controllers/script_run', ['ember'],
                     }
                 });
             },
+
+            //
+            // Observers
+            //
+
+            schedulerObserver: function() {
+                this.get('scriptToRun').setProperties({
+                    interval: {
+                        every: '',
+                        period: ''
+                    },
+                    crontab: {
+                        minute: '',
+                        hour: '',
+                        day_of_week: '',
+                        day_of_month: '',
+                        month_of_year: ''
+                    },
+                    last_run_at: ''
+                });
+            }.observes('scriptToRun.scheduler')
 
         });
     }

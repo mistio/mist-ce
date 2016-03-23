@@ -13,6 +13,7 @@ machine_states_ordering = {
     'unknown': 2,
     'suspended': 2,
     'terminated': 1,
+    'undefined': 1,
     'stopped': 0
 }
 
@@ -47,6 +48,8 @@ def check_sorting(context, sorting_field):
             machine.find_element_by_class_name('machine-name')).lower()
         state = safe_get_element_text(
             machine.find_element_by_class_name('machine-state')).lower()
+        if state == '':
+            state = 'unknown'
         cloud = safe_get_element_text(machine.find_element_by_css_selector(
             '.machine-tags .tag:first-child')).lower()
         machines.append((name, state, cloud, machine.location['y']))
