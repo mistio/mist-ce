@@ -45,8 +45,8 @@ define('app/controllers/machines', ['app/models/machine'],
             //
 
 
-            newMachine: function(provider, name, image, size, location, key, cloud_init, script, project, monitoring, associateFloatingIp,
-                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtDiskSize, libvirtDiskPath, libvirtImagePath) {
+            newMachine: function(provider, providerType, name, image, size, location, key, cloud_init, script, project, monitoring, associateFloatingIp,
+                dockerEnv, dockerCommand, scriptParams, dockerPorts, azurePorts, libvirtDiskSize, libvirtDiskPath, libvirtImagePath, vlanID, billing) {
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
                 // the server
@@ -107,7 +107,12 @@ define('app/controllers/machines', ['app/models/machine'],
                         'script_params': scriptParams,
                         'image': image.id,
                         'location': location.id,
+                        // Softlayer specific
+                        'softlayer_backend_vlan_id': vlanID,
                         //Packet.net
+                        'bare_metal': providerType,
+                        'billing': billing,
+                        //Packet.net specific
                         'project': project.id || undefined,
                         // Linode specific
                         'disk': size.disk,

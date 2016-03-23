@@ -143,7 +143,7 @@ def post_deploy_steps(self, email, cloud_id, machine_id, monitoring,
 
         if node.state != NodeState.RUNNING:
             tmp_log('not running state')
-            raise self.retry(exc=Exception(), countdown=60, max_retries=20)
+            raise self.retry(exc=Exception(), countdown=120, max_retries=30)
 
         try:
             from mist.io.shell import Shell
@@ -857,7 +857,7 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          cloud_init='', associate_floating_ip=False,
                          associate_floating_ip_subnet=None, project_id=None,
                          bare_metal=False, hourly=True,
-                         cronjob={}):
+                         cronjob={},softlayer_backend_vlan_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -902,7 +902,8 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
              'disk_size': disk_size,
              'disk_path': disk_path,
              'project_id': project_id,
-             'cronjob': cronjob}
+             'cronjob': cronjob,
+             'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
         ))
 
     def create_machine_wrapper(args_kwargs):
