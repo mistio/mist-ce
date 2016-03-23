@@ -857,7 +857,7 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
                          cloud_init='', associate_floating_ip=False,
                          associate_floating_ip_subnet=None, project_id=None,
                          bare_metal=False, hourly=True,
-                         cronjob={}):
+                         cronjob={},softlayer_backend_vlan_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -902,7 +902,8 @@ def create_machine_async(email, cloud_id, key_id, machine_name, location_id,
              'disk_size': disk_size,
              'disk_path': disk_path,
              'project_id': project_id,
-             'cronjob': cronjob}
+             'cronjob': cronjob,
+             'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
         ))
 
     def create_machine_wrapper(args_kwargs):

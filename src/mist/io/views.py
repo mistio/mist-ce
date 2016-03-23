@@ -800,6 +800,9 @@ def create_machine(request):
       type: string
     ssh_port:
       type: integer
+    softlayer_backend_vlan_id:
+      description: 'Specify id of a backend(private) vlan'
+      type: integer
     """
     params = params_from_request(request)
     cloud_id = request.matchdict['cloud']
@@ -859,6 +862,7 @@ def create_machine(request):
     # hourly True is the default setting for SoftLayer hardware
     # servers, while False means the server has montly pricing
     hourly = params.get('hourly', True)
+    softlayer_backend_vlan_id = params.get('softlayer_backend_vlan_id', None)
 
     # only for mist.core, parameters for cronjob
     if not params.get('cronjob_type'):
@@ -901,7 +905,8 @@ def create_machine(request):
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet,
-              'project_id': project_id, 'bare_metal': bare_metal, 'hourly': hourly, 'cronjob': cronjob}
+              'project_id': project_id, 'bare_metal': bare_metal, 'hourly': hourly, 'cronjob': cronjob,
+              'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
