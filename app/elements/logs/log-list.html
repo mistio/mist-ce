@@ -1,29 +1,23 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../../bower_components/vaadin-combo-box/vaadin-combo-box.html">
 <dom-module id="log-list">
     <template>
       <style>
-          paper-input {display: inline-block}
-          .logdetailswrapper td {width: 50%}
+          vaadin-combo-box {
+            margin: 0px auto 32px;
+            width: 96%;
+            text-align: center;
+          }
       </style>
       <paper-material>
-        <paper-menu-button>
-          <paper-icon-button icon="menu" class="dropdown-trigger" alt="multi select"></paper-icon-button>
-          <paper-menu class="dropdown-content" selected="0">
-            <paper-item>All</paper-item>
-            <paper-item>Requests</paper-item>
-            <paper-item>Jobs</paper-item>
-            <paper-item>Incidents</paper-item>
-            <paper-item>Sessions</paper-item>
-            <paper-item>Shells</paper-item>
-            <paper-item>Errors</paper-item>
-          </paper-menu>
-        </paper-menu-button>
-        <paper-input type="search" label="All logs" no-label-float></paper-input>
+        <vaadin-combo-box label="Filter logs" items="[[logFilterSuggestions]]" allow-custom-value on-value-change="_updateFilter"></vaadin-combo-box>
         <vaadin-grid size="10000">
         </vaadin-grid>
       </paper-material>
     </template>
 </dom-module>
+<script type="text/javascript" src="../../bower_components/swiftSet/swiftSet.js"></script>
+
 <script>
 Polymer({
     is: 'log-list',
@@ -33,16 +27,29 @@ Polymer({
             type: Array,
             value: []
         },
-        eventTypes: {
-            type: Array
+
+        filteredItems: {
+            type: Array,
+            value: []
         },
+
         stop: {
             type: Number,
             value: 0
         },
+
         limit: {
             type: Number,
             value: 50
+        },
+
+        filter: {
+            type: Object,
+        },
+
+        logFilterSuggestions: {
+            type: Array,
+            value: ['type:job', 'type:request', 'type:incident', 'type:session', 'type:shell', 'error']
         }
     },
 
@@ -57,8 +64,9 @@ Polymer({
         }
         this.grid = this.querySelector('vaadin-grid');
         this.grid.items = function(params, callback) {
-            if (params.index + params.count < that.get('items.length')) {
-                callback(that.get('items').slice(params.index, params.index + params.count));
+            that.filteredItems = that.items.filter(that._filter.bind(that));
+            if (params.index + params.count < that.get('filteredItems.length')) {
+                callback(that.get('filteredItems').slice(params.index, params.index + params.count));
             } else if (!requestPending) {
                 var pending = false;
                 // Fetch the JSON data from a URL
@@ -70,14 +78,16 @@ Polymer({
                             var entries = JSON.parse(xhr.responseText);
                             for (i=0; i < entries.length; i++)
                                 that.push('items', entries[i]);
-                            var items = that.get('items');
-                            callback(items.slice(params.index, params.index + params.count));
-                            if (items.length > that.grid.size)
+                            that.filteredItems = that.items.filter(that._filter.bind(that));
+                            callback(that.filteredItems.slice(params.index, params.index + params.count));
+                            if (that.filteredItems.length > that.grid.size)
                                 that.grid.size=2*that.grid.size;
-                            if (items.length) {
-                                var stop = Math.floor(items[items.length-1].time);
+
+                            if (that.items.length) {
+                                var stop = Math.floor(that.items[that.items.length-1].time);
                                 that.set('stop', stop);
                             }
+                            that._updateColumns(items);
                         }
                     }
                 }
@@ -90,25 +100,10 @@ Polymer({
         this.grid.columns = [
           {name: 'action', },
           {name: 'type'},
-          {name: 'email', hidable: true},
-
-          {name: 'session_id', hidden: true, hidable: true},
-          {name: 'time', hidable: true, renderer:
+          {name: 'time', renderer:
               function(cell) {
                   var dt = new Date(cell.data * 1000);
-                  var hours = dt.getHours();
-                  var minutes = dt.getMinutes();
-                  var seconds = dt.getSeconds();
-                  if (hours < 10)
-                   hours = '0' + hours;
-
-                  if (minutes < 10)
-                   minutes = '0' + minutes;
-
-                  if (seconds < 10)
-                   seconds = '0' + seconds;
-
-                  cell.element.innerHTML = hours + ":" + minutes + ":" + seconds;
+                  cell.element.innerHTML = dt.getTimeFromNow();
               }
           }
         ];
@@ -146,11 +141,119 @@ Polymer({
             detailsOpenIndex = selected[0];
           }
         });
+
+        var combobox = this.querySelector('vaadin-combo-box');
+        combobox.addEventListener('value-changed', this._updateRemoteFilter);
+        combobox.addEventListener('keydown', this._updateLocalFilter);
+
+        setInterval(function() {that.grid.refreshItems()}, 10000);
+
       },
 
       eventReceived: function(entry) {
           this.unshift('items', entry);
           this.grid.refreshItems();
+          this._updateColumns([entry]);
+      },
+
+      _updateColumns: function(items) {
+          var Set = swiftSet.Set;
+          var allKeys = new Set(), allTypes = new Set(), allActions = new Set();
+          for (var i=0;i<items.length;i++) {
+              allKeys.addItems(Object.keys(items[i]));
+              allTypes.add('type:' + items[i].type);
+              allActions.add('action:' + items[i].action);
+          }
+
+          var existingColumns = new Set();
+          for (var i=0;i<this.grid.columns.length;i++) {
+              existingColumns.add(this.grid.columns[i].name);
+          }
+
+          var keyItems = allKeys.items()
+          for (var i=0;i<keyItems.length;i++)
+              if (!existingColumns.has(keyItems[i]))
+                  this.grid.addColumn({name: keyItems[i], hidden: true, hidable: true})
+
+          var logFilterSuggestions = new Set(this.get('logFilterSuggestions')).union(allActions);
+
+          this.set('logFilterSuggestions', logFilterSuggestions);
+      },
+
+      _updateRemoteFilter: function(data) {
+          var value = this.querySelector('input').value;
+
+          console.warn('_updateRemoteFilter', data);
+      },
+
+      _updateLocalFilter: function(data) {
+          var value = this.querySelector('input').value;
+          if (this.grid)
+              this.grid.refreshItems();
+          console.warn('_updateLocalFilter', data, this);
+      },
+
+      _filter(item) {
+          var filterString = this.querySelector('input').value,
+              filterArray = filterString.split(' ');
+              for (var i=0;i<filterArray.length;i++){
+                  if (filterArray[i].indexOf(':')>-1){
+                      var filterMap = filterArray[i].split(':');
+                      if (item[filterMap[0]] && item[filterMap[0]].indexOf(filterMap[1]) == -1)
+                          return false
+                  } else {
+                      if (JSON.stringify(item).indexOf(filterArray[i]) == -1)
+                          return false
+                  }
+              }
+          return true
       }
 });
+
+var TIME_MAP = {
+    SECOND: 1000,
+    MINUTE: 60 * 1000,
+    HOUR: 60 * 60 * 1000,
+    DAY: 24 * 60 * 60 * 1000,
+    WEEK: 7 * 24 * 60 * 60 * 1000,
+    MONTH: 30 * 24 * 60 * 60 * 1000,
+    YEAR: 12 * 30 * 24 * 60 * 60 * 1000,
+};
+
+Date.prototype.getTimeFromNow = function () {
+    var now = new Date();
+    var diff = now - this;
+    var ret = '';
+
+    if (diff < 10 * TIME_MAP.SECOND)
+        ret = 'Now';
+
+    else if (diff < TIME_MAP.MINUTE)
+        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
+
+    else if (diff < TIME_MAP.HOUR)
+        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
+
+    else if (diff < TIME_MAP.DAY)
+        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
+
+    else if (diff < 2 * TIME_MAP.DAY)
+        ret = 'Yesterday';
+
+    else if (diff < TIME_MAP.YEAR)
+        ret = this.getMonthName(true) +  ' ' + this.getDate();
+
+    if (ret.indexOf('sec') > -1 ||
+        ret.indexOf('min') > -1 ||
+        ret.indexOf('hour') > -1) {
+
+        // Add 's' for plural
+        if (ret.split(' ')[0] != '1')
+            ret = ret + 's';
+
+        ret = ret + ' ago';
+    }
+
+    return ret;
+}
 </script>
