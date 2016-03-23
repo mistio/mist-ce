@@ -336,10 +336,21 @@ def click_button_within_modal(context, text, modal_title):
     for modal in modals:
         title = safe_get_element_text(modal.find_element_by_class_name('md-title'))
         if modal_title.lower() in title.lower():
-            buttons = modal.find_elements_by_class_name("ui-btn")
-            click_button_from_collection(context, text, buttons,
-                                         'Could not find %s button in %s '
-                                         'modal' % (text, modal_title))
+            if text == '_x_':
+                buttons = modal.find_elements_by_class_name("close")
+                assert len(buttons) > 0, "Could not find the close button"
+                for i in range(0, 2):
+                    try:
+                        clicketi_click(context, buttons[0])
+                        return
+                    except WebDriverException:
+                        sleep(1)
+                assert False, 'Could not click the close button'
+            else:
+                buttons = modal.find_elements_by_class_name("ui-btn")
+                click_button_from_collection(context, text, buttons,
+                                             'Could not find %s button in %s '
+                                             'modal' % (text, modal_title))
             return
     assert False, "Could not find modal with title %s" % modal_title
 
