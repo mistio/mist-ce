@@ -1,6 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<dom-module id="networks-list-element">
+<link rel="import" href="network-item.html">
+<link rel="import" href="network-add.html">
+<link rel="import" href="subnet-item.html">
+
+<dom-module id="networks-list">
     <template>
         <style is="custom-style" include="lists"></style>
         <style include="shared-styles">
@@ -86,7 +90,7 @@
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
             <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
-                <paper-toolbar class="tall" style$="[[_getHeaderStyle(section.color)]]">
+                <paper-toolbar class="tall" style$="[[_getHeaderStyle()]]">
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -137,14 +141,14 @@
                             <iron-list items="[[presentedNetworks]]" as="network" selected-items="{{selectedNetworks}}" multi-selection style$="[[vpHeight]]">
                                 <template>
                                     <div class="row">
-                                        <network-item-element selected="{{selected}}" network="[[network]]" index="[[index]]" count="[[presentedNetworks.length]]">
+                                        <network-item selected="{{selected}}" network="[[network]]" index="[[index]]" count="[[presentedNetworks.length]]">
                                             <div class="row-actions">                       
                                                 <paper-tooltip for="editNetworkBtn" position="top">Edit</paper-tooltip>
                                                 <paper-icon-button id="editNetworkBtn" on-tap="_editSelected" icon="image:edit"></paper-icon-button>
                                                 <paper-tooltip for="deleteNetworkBtn" position="top">Delete</paper-tooltip>
                                                 <paper-icon-button id="deleteNetworkBtn" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
                                             </div>
-                                        </network-item-element>
+                                        </network-item>
                                     </div>
                                 </template>
                             </iron-list>
@@ -159,69 +163,18 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-
-        <!-- <paper-card heading="Networks">
-            <div class="card-content"> -->
-                <!-- <div hidden$="[[!hasNetworks]]" class="list-options flex-horizontal-with-ratios">
-                    <h2 class="list-title flexchild">[[presentedNetworks.length]] Networks</h2>
-                    <paper-tooltip for="searchNetworkBtn" position="top">Toggle Search</paper-tooltip>
-                    <paper-icon-button id="searchNetworkBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
-                    <paper-input hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm}}" placeholder="Search..." no-label-float class="search"></paper-input>
-                    <span hidden$="[[showSearchOption]]" class="label">Search networks</span>
-                    <paper-tooltip for="deleteNetworkBtn" position="top">Delete</paper-tooltip>
-                    <paper-icon-button id="deleteNetworkBtn" hidden$="[[!showDeleteOption]]" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
-                    <span hidden$="[[!showDeleteOption]]" class="label">
-                    Delete [[selectedNetworks.length]] network<span hidden$="[[!moreThanOneSelected]]">s</span> </span>
-                    </span>
-                </div> -->
-                <!-- <div hidden$="[[!hasNetworks]]" class="info-list">
-                    <div class="info-head flex-horizontal-with-ratios">
-                        <div class="flexchild">
-                            <paper-tooltip for="selectAllBtn" position="top">Select all</paper-tooltip>
-                            <paper-checkbox id="selectAllBtn" disabled$="[[!hasSelectableNetworks]]" checked="[[selectAll]]" on-tap="_selectAllChanged"></paper-checkbox> Νame
-                            <paper-tooltip for="sortByName" position="top">Sort by name</paper-tooltip>
-                            <paper-icon-button id="sortByName" class$="[[_computeIsActiveSort(sortByTerm, 'name')]]" icon="expand-more" on-tap="_sortNetworks" sort-option="name"></paper-icon-button>
-                        </div>
-                        <div class="flexchild">Type
-                            <paper-tooltip for="sortByType" position="top">Sort by type</paper-tooltip>
-                            <paper-icon-button id="sortByType" class$="[[_computeIsActiveSort(sortByTerm, 'type')]]" icon="expand-more" on-tap="_sortNetworks" sort-option="type"></paper-icon-button>
-                        </div>
-                        <div class="flexchild">Provider
-                            <paper-tooltip for="sortByProvider" position="top">Sort by provider</paper-tooltip>
-                            <paper-icon-button id="sortByProvider" class$="[[_computeIsActiveSort(sortByTerm, 'provider')]]" icon="expand-more" on-tap="_sortNetworks" sort-option="provider"></paper-icon-button>
-                        </div>
-                    </div>
-                    <div class="info-body">
-                        <iron-list items="[[presentedNetworks]]" as="network" selected-items="{{selectedNetworks}}" multi-selection>
-                            <template>
-                                <div class="row">
-                                    <network-item-element selected="{{selected}}" network="[[network]]" index="[[index]]" count="[[presentedNetworks.length]]">
-                                        <div class="row-actions">
-                                            <paper-tooltip for="deleteNetworkBtn" position="top">Delete</paper-tooltip>
-                                            <paper-icon-button id="deleteNetworkBtn" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
-                                        </div>
-                                    </network-item-element>
-                                </div>
-                            </template>
-                        </iron-list>
-                    </div>
-                </div>
-                <p hidden$="[[hasNetworks]]">
-                    No networks found here. You can add some by using the action button!
-                </p> -->
-            <!-- </div>
-        </paper-card> -->
-        <!-- <paper-fab id="addBtn" icon="add" on-tap="_openAddNetworkPage"></paper-fab>
-        <dialog-element></dialog-element> -->
     </template>
     <script>
         (function() {
             'use strict';
 
             Polymer({
-                is: 'networks-list-element',
+                is: 'networks-list',
 
                 properties: {
+                    sections: {
+                        type: Object
+                    },
                     networks: {
                         type: Array
                     },
@@ -284,8 +237,8 @@
                     var wh = window.innerHeight;
                     this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
                 },                
-                _getHeaderStyle: function(color) {
-                    return 'background-color: ' + color + '; color: #fff;';
+                _getHeaderStyle: function() {
+                    return 'background-color: ' + this.section.color + '; color: #fff;';
                 },
                 _computeSelectableNetworks: function(networks) {
                     return networks.base.filter(function(network) {
@@ -362,7 +315,7 @@
                 },
                 _selectAllChanged: function(e) {
                     var selectAll = !this.selectAll,
-                        els = this.querySelectorAll('network-item-element');
+                        els = this.querySelectorAll('network-item');
 
                     this.set('selectAll', selectAll);
                     [].forEach.call(els, function(el, index) {

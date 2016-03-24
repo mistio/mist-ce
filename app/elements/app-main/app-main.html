@@ -58,8 +58,8 @@
             <!-- 5 -->
             <iron-route path="/keys" title="keys" href="../keys/keys-list.html"></iron-route>
             <iron-route path="/keys/:id" title="keys" href="../keys/key-page.html"></iron-route>
-            <iron-route path="/networks" title="networks" href="../pages/page-list.html"></iron-route>
-            <iron-route path="/networks/:name" title="network"></iron-route>
+            <iron-route path="/networks" title="networks" href="../networks/networks-list.html"></iron-route>
+            <iron-route path="/networks/:id" title="network" href="../networks/network-page.html"></iron-route>
             <iron-route path="/scripts" title="scripts" href="../scripts/scripts-list.html"></iron-route>
             <iron-route path="/scripts/:id" title="script" href="../scripts/script-page.html"></iron-route>
             <iron-route path="/add-script" title="add scripts" href="../scripts/script-add.html"></iron-route>
@@ -82,8 +82,11 @@
             <keys-list model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" keys="[[model.keysArray]]"></keys-list>
             <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
             <!-- networks -->
-            <page-list model="[[model]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-list>
-            <page-network model="[[model]]" params="[[params]]" network="[[getNetwork(params)]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-network>
+            <!-- <page-list model="[[model]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-list> -->
+            <networks-list model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list>
+            <!-- <page-network model="[[model]]" params="[[params]]" network="[[getNetwork(params)]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-network> -->
+            <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
+            <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
             <!-- scripts -->
             <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
             <scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list>
@@ -131,7 +134,7 @@ var app = Polymer({
             //scriptsArray:  [],
             imagesArray: [],
             keysArray: [],
-            networksArray: [],
+            // networksArray: [],
             templatesArray:[],
             teamsArray:[],
             pending: {
@@ -167,7 +170,253 @@ var app = Polymer({
                             type: "executable",
                             user: "marios@mist.io"
                         }
-                    ]
+                    ],
+            networksArray: [{
+        domain_type: 0,
+        id: "59887",
+        is_default: true,
+        name: "default_public_network",
+        subnets: [{
+            announce_cidr: false,
+            cidr_str: "198.100.164.72/29",
+            id: 236649,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: true,
+            name: "198.100.164.72/29",
+            routing_prefix: "198.100.164.72",
+            uri: "https://api.nephoscale.com/network/cidr/236649/"
+        }, {
+            announce_cidr: false,
+            cidr_str: "198.100.164.72/28",
+            id: 254479,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: false,
+            name: "198.100.164.72/28",
+            routing_prefix: "198.100.161.224",
+            uri: "https://api.nephoscale.com/network/cidr/254479/"
+        }, {
+            announce_cidr: false,
+            cidr_str: "69.50.244.0/28",
+            id: 727453,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: false,
+            name: "69.50.244.0/28",
+            routing_prefix: "69.50.244.0",
+            uri: "https://api.nephoscale.com/network/cidr/727453/"
+        }, {
+            announce_cidr: false,
+            cidr_str: "69.50.244.192/28",
+            id: 738519,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: false,
+            name: "69.50.244.192/28",
+            routing_prefix: "69.50.244.192",
+            uri: "https://api.nephoscale.com/network/cidr/738519/"
+        }, {
+            announce_cidr: true,
+            cidr_str: "69.50.244.208/28",
+            id: 738521,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: false,
+            name: "69.50.244.208/28",
+            routing_prefix: "69.50.244.208",
+            uri: "https://api.nephoscale.com/network/cidr/738521/"
+        }],
+        cloud: {
+            id: "418XPpTRLsNEpJeJ62jnGs8z7VJu",
+            title: "Nephoscale",
+            provider: "nephoscale",
+            enabled: true
+        }
+    }, {
+        domain_type: 1,
+        id: "59889",
+        is_default: true,
+        name: "default_private_network",
+        subnets: [],
+        cloud: {
+            id: "418XPpTRLsNEpJeJ62jnGs8z7VJu",
+            title: "Nephoscale",
+            provider: "nephoscale",
+            enabled: true
+        }
+    }, {
+        dhcp_options_id: "dopt-3e35ea5b",
+        id: "vpc-c20824a7",
+        instance_tenancy: "default",
+        is_default: false,
+        name: "vpc-c20824a7",
+        state: "available",
+        subnets: [{
+            name: "172.30.0.0/16"
+        }],
+        cloud: {
+            id: "d98cBYrPqjpAcybzriwznme1a9d",
+            title: "EC2 Ireland",
+            provider: "ec2_eu_west",
+            enabled: true
+        }
+    }, {
+        id: "ad3da031-634c-4606-a790-524b0dfb5783",
+        name: "public",
+        public: true,
+        router_external: true,
+        subnets: [{
+            announce_cidr: false,
+            cidr_str: "198.100.164.72/29",
+            id: 236649,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: true,
+            name: "198.100.164.72/29",
+            routing_prefix: "198.100.164.72",
+            uri: "https://api.nephoscale.com/network/cidr/236649/"
+        }, {
+            announce_cidr: false,
+            cidr_str: "198.100.164.72/28",
+            id: 254479,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: false,
+            name: "198.100.164.72/28",
+            routing_prefix: "198.100.161.224",
+            uri: "https://api.nephoscale.com/network/cidr/254479/"
+        }, {
+            announce_cidr: false,
+            cidr_str: "69.50.244.0/28",
+            id: 727453,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: false,
+            name: "69.50.244.0/28",
+            routing_prefix: "69.50.244.0",
+            uri: "https://api.nephoscale.com/network/cidr/727453/"
+        }, {
+            announce_cidr: false,
+            cidr_str: "69.50.244.192/28",
+            id: 738519,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: false,
+            name: "69.50.244.192/28",
+            routing_prefix: "69.50.244.192",
+            uri: "https://api.nephoscale.com/network/cidr/738519/"
+        }, {
+            announce_cidr: true,
+            cidr_str: "69.50.244.208/28",
+            id: 738521,
+            ip_type: 0,
+            ip_version: 4,
+            is_primary: false,
+            name: "69.50.244.208/28",
+            routing_prefix: "69.50.244.208",
+            uri: "https://api.nephoscale.com/network/cidr/738521/"
+        }],
+        status: "ACTIVE",
+        extra: {
+            admin_state_up: true,
+            mtu: 0,
+            "provider:network_type": "vxlan",
+            "provider:physical_network": null,
+            "provider:segmentation_id": 72,
+            shared: false,
+            tenant_id: "45ebca827956466eb48499c4331825b8"
+        },
+        subnets: [{
+            id: "9db08cdc-97d5-43cc-b842-9abb910015cd",
+            name: "public_subnet",
+            cidr: "69.50.244.208/28",
+            dns_nameservers: [],
+            allocation_pools: [{
+                end: "69.50.244.222",
+                start: "69.50.244.217"
+            }],
+            enable_dhcp: false,
+            gateway_ip: "69.50.244.209",
+            ip_version: 4
+        }],
+        cloud: {
+            id: "Lyx7GdQXyLi7RqKb3vehY4Y3y2c",
+            title: "Openstack",
+            provider: "openstack",
+            enabled: true
+        }
+    }, {
+        id: "020a9a4d-fbf3-4a5c-862e-3dec9bc48341",
+        name: "test",
+        public: false,
+        router_external: false,
+        subnets: [],
+        status: "ACTIVE",
+        extra: {
+            admin_state_up: true,
+            mtu: 0,
+            "provider:network_type": "vxlan",
+            "provider:physical_network": null,
+            "provider:segmentation_id": 72,
+            shared: false,
+            tenant_id: "45ebca827956466eb48499c4331825b8"
+        },
+        subnets: [{
+            id: "9db08cdc-97d5-43cc-b842-9abb910015cd",
+            name: "public_subnet",
+            cidr: "69.50.244.208/28",
+            dns_nameservers: [],
+            allocation_pools: [{
+                end: "69.50.244.222",
+                start: "69.50.244.217"
+            }],
+            enable_dhcp: false,
+            gateway_ip: "69.50.244.209",
+            ip_version: 4
+        }],
+        cloud: {
+            id: "Lyx7GdQXyLi7RqKb3vehY4Y3y2c",
+            title: "Openstack",
+            provider: "openstack",
+            enabled: true
+        }
+    }, {
+        id: "20322be8-66e6-4669-af4c-2caefa0391bc",
+        name: "papaki",
+        public: false,
+        router_external: false,
+        subnets: [],
+        status: "ACTIVE",
+        extra: {
+            admin_state_up: true,
+            mtu: 0,
+            "provider:network_type": "vxlan",
+            "provider:physical_network": null,
+            "provider:segmentation_id": 72,
+            shared: false,
+            tenant_id: "45ebca827956466eb48499c4331825b8"
+        },
+        subnets: [{
+            id: "9db08cdc-97d5-43cc-b842-9abb910015cd",
+            name: "public_subnet",
+            cidr: "69.50.244.208/28",
+            dns_nameservers: [],
+            allocation_pools: [{
+                end: "69.50.244.222",
+                start: "69.50.244.217"
+            }],
+            enable_dhcp: false,
+            gateway_ip: "69.50.244.209",
+            ip_version: 4
+        }],
+        cloud: {
+            id: "Lyx7GdQXyLi7RqKb3vehY4Y3y2c",
+            title: "Openstack",
+            provider: "openstack",
+            enabled: true
+        }
+    }]
         };
         this.sectionsArray = [{
                 id: 'machines',
