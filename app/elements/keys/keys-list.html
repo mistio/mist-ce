@@ -1,6 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<dom-module id="keys-list-element">
+
+<link rel="import" href="key-add.html">
+<link rel="import" href="key-edit.html">
+<link rel="import" href="key-item.html">
+
+<dom-module id="keys-list">
     <template>
         <style is="custom-style" include="lists"></style>
         <style include="shared-styles">
@@ -8,15 +13,15 @@
             display: block;
             background: #fafafa;
         }
-        
+
         paper-card {
             display: block;
         }
-        
+
         .flex-horizontal-with-ratios {
             @apply(--layout-horizontal);
         }
-        
+
         .flexchild {
             @apply(--layout-flex);
         }
@@ -28,11 +33,11 @@
         paper-icon-button {
             transition: all 200ms;
         }
-        
+
         paper-icon-button.active-sort {
             transform: rotate(180deg);
         }
-        
+
         paper-icon-button.active-sort::content iron-icon {
             color: #009688;
         }
@@ -40,32 +45,32 @@
         iron-icon#KeyDefault {
             padding: 8px;
         }
-        
+
         app-bar .menu-icon {
             margin-right: 15px;
         }
-        
+
         app-check {
             margin-right: 16px;
             display: inline-block;
             vertical-align: middle;
         }
-        
+
         #element-cards,
         element-table {
             max-width: 1500px;
             margin: 20px auto;
         }
-        
+
         [size=xs] > * {
             display: none;
         }
 
-        
+
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
             padding: 0 16px;
         }
-        
+
         [size=xs] app-sidebar {
             min-width: 100%;
             height: auto;
@@ -80,10 +85,10 @@
             color: red;
         }
         </style>
-        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
+        <paper-drawer-panel id="drawerPanel" responsive-width="900px" drawer-width="272px" disable-edge-swipe selected="[[section]]">
+            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="keys" drawer></app-sidebar>
             <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
-                <paper-toolbar class="tall" style$="[[_getHeaderStyle(section.color)]]">
+                <paper-toolbar class="tall" style$="[[_getHeaderStyle()]]">
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -97,7 +102,7 @@
                             <paper-icon-button hidden$="[[!showSearchOption]]" icon="close" on-tap="_toggleSearchSelected"></paper-icon-button>
                             <span hidden$="[[showSearchOption]]" class="label">Search keys</span>
                         </div>
-                    
+
                         <paper-tooltip for="makeDefaultKeyBtn" position="bottom">Make Default</paper-tooltip>
                         <paper-icon-button id="makeDefaultKeyBtn" hidden$="[[!showMakeDefaultOption]]" on-tap="_starSelected" icon="[[makeDefaultIcon]]"></paper-icon-button>
                         <paper-tooltip for="editKeyBtn" position="bottom">Rename</paper-tooltip>
@@ -133,7 +138,7 @@
                         <iron-list items="[[presentedKeys]]" as="key" selected-items="{{selectedKeys}}" multi-selection style$="[[vpHeight]]">
                             <template>
                                 <div class="row">
-                                    <key-item-element selected="{{selected}}" key="[[key]]" index="[[index]]" count="[[presentedKeys.length]]">
+                                    <key-item selected="{{selected}}" key="[[key]]" index="[[index]]" count="[[presentedKeys.length]]">
                                         <div class="row-actions">
                                             <paper-tooltip hidden$="[[!key.isDefault]]" for="KeyDefault" position="top">Key is Default</paper-tooltip>
                                             <iron-icon hidden$="[[!key.isDefault]]" id="KeyDefault" icon="star"></iron-icon>
@@ -147,7 +152,7 @@
                                             </paper-tooltip>
                                             <paper-icon-button id="deleteKeyBtn" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
                                         </div>
-                                    </key-item-element>
+                                    </key-item>
                                 </div>
                             </template>
                         </iron-list>
@@ -162,8 +167,8 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <key-add-element></key-add-element>
-        <key-edit-element key="[[selectedKey]]"></key-edit-element>
+        <key-add></key-add>
+        <key-edit key="[[selectedKey]]"></key-edit>
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -171,14 +176,17 @@
         'use strict';
 
         Polymer({
-            is: 'keys-list-element',
+            is: 'keys-list',
 
             properties: {
+                sections: {
+                    type: Object
+                },
                 keys: {
                     type: Array
                 },
                 presentedKeys: {
-                    type: Array                    
+                    type: Array
                 },
                 selectedKey: {
                     type: Object,
@@ -247,7 +255,7 @@
                 this.presentedKeys = this.keys;
             },
             _getHeaderStyle: function(color) {
-                return 'background-color: ' + color + '; color: #fff;';
+                return 'background-color: ' + this.get('section.color') + '; color: #fff;';
             },
             _giveFocusWhenSearchOn: function(){
                 if (this.showSearchOption) {
@@ -318,7 +326,7 @@
             },
             _selectAllChanged: function(e) {
                 var selectAll = !this.selectAll,
-                    els = this.querySelectorAll('key-item-element');
+                    els = this.querySelectorAll('key-item');
 
                 this.set('selectAll', selectAll);
                 [].forEach.call(els, function(el, index) {
@@ -377,7 +385,7 @@
                 //make cklicked key default
             },
             _editSelected: function(e) {
-                var el = this.querySelector('key-edit-element');
+                var el = this.querySelector('key-edit');
                 el._openEditKeyModal();
             },
             _updateSelectedKey: function(e) {
@@ -387,7 +395,7 @@
                 this.querySelector('iron-list').selectItem(key);
             },
             _openAddKeyModal: function(e) {
-                var el = this.querySelector('key-add-element');
+                var el = this.querySelector('key-add');
                 el._openAddKeyModal();
             },
             _addKey: function(e) {

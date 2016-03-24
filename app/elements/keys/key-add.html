@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
-<dom-module id="key-add-element">
+<dom-module id="key-add">
     <template>
         <style is="custom-style" include="dialogs"></style>
         <style include="shared-styles">
@@ -42,7 +42,7 @@
                     <paper-button class="purple" raised on-tap="_generateKeyAjax">Generate</paper-button>
                     <paper-button class="purple" raised on-tap="_uploadKey">Upload</paper-button>
                     <input type="file" name="file" value="{{key.file}}" on-change="_uploadFile" hidden id="keyUpload" />
-                
+
                     <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
                 </div>
             </paper-dialog-scrollable>
@@ -57,7 +57,7 @@
             'use strict';
 
             Polymer({
-                is: 'key-add-element',
+                is: 'key-add',
 
                 properties: {
                     key: {

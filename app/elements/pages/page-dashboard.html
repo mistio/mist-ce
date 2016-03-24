@@ -231,8 +231,8 @@
                 </div>
                 <div class="container flex-horizontal-with-ratios">
                     <!-- FIXME: dom-if needs to be here but gives error -->
-                    <template is="dom-if" if="[[onbstate]]">  
-                        <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>                        
+                    <template is="dom-if" if="[[onbstate]]">
+                        <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>
                     </template>
                     <app-incidents hidden$="[[onbstate]]" id="right" class="flex2child incidents top right">
                     </app-incidents>
@@ -276,7 +276,7 @@
                             </google-chart>
                         </paper-material>
                     </div>
-                    <!-- <log-list></log-list> -->
+                    <log-list></log-list>
                 </div>
         </paper-header-panel>
     </template>
@@ -314,7 +314,7 @@ Polymer({
         q: {
             type: String,
             notify: true
-        }        
+        }
     },
     ready: function() {},
     attached: function() {

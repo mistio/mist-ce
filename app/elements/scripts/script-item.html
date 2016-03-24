@@ -1,14 +1,16 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<dom-module id="key-item-element">
+<dom-module id="script-item">
     <template>
         <style include="shared-styles">
             :host {
                 display: block;
             }
-            :host[selected] {
-                background-color: #f5f5f5;
+
+            paper-card {
+                display: block;
             }
+
             .flex-horizontal-with-ratios {
                 @apply(--layout-horizontal);
             }
@@ -16,8 +18,8 @@
             .flexchild {
                 @apply(--layout-flex);
             }
-            
-            #check {                
+
+            #check {
                 display: inline-block;
                 vertical-align: middle;
             }
@@ -25,32 +27,22 @@
             app-check {
                 margin-right: 16px;
             }
-            
-            paper-checkbox {
-                display: none;
-            }
-            
+
             :host:hover paper-checkbox,
             paper-checkbox[checked] {
-                display: inline-block;
+              display: inline-block;
             }
-
         </style>
         <paper-item class$="info-item flex-horizontal-with-ratios [[indexClass]]">
             <div class="flexchild">
                 <span class="check">
-                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectKey"></app-check>
+                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectScript"></app-check>
                     <paper-tooltip for="check" position="right">Select item</paper-tooltip>
                 </span>
-                <span class="name">
-                    <a class="regular" href="keys/[[key.id]]">[[key.id]]</a>
-                </span>
+                <span class="name"><a class="regular" href="scripts/[[script.id]]">[[script.name]]</a></span>
             </div>
-            <div class="flexchild">{{isDefaultText}}</div>
-            <div class="flexchild">[[key.machines.length]] <span hidden="[[!key.machines.length]]">machine<span hidden="[[key.machines.length = 1]]">s</span><span></div>
-            <div>
-                <content></content>
-            </div>
+            <div class="flexchild">[[script.type]]</div>
+            <content></content>
         </paper-item>
     </template>
     <script>
@@ -58,21 +50,19 @@
             'use strict';
 
             Polymer({
-                is: 'key-item-element',
+                is: 'script-item',
 
                 properties: {
-                    key: {
+                    script: {
                         type: Object
                     },
                     selected: {
                         type: Boolean,
                         value: false,
-                        notify: true,
-                        reflectToAttribute: true
+                        notify: true
                     },
                     index: {
-                        type: Number,
-                        reflectToAttribute: true
+                        type: Number
                     },
                     count: {
                         type: Number
@@ -83,15 +73,11 @@
                     },
                     isDefaultText: {
                         type: String,
-                        computed: '_computeIsDefaultText(key.isDefault)',
-                        notify: true
+                        computed: '_computeIsDefaultText(script.isDefault)'
                     }
                 },
                 listeners: {
-                    'selected-changed': '_selectKeyChanged'
-                },
-                _computeIsDefaultText: function(isDefault) {
-                    return isDefault ? 'Default' : null;
+                    'selected-changed': '_selectScriptChanged'
                 },
                 _computeIsIndexClass: function(index, count) {
                     var classes = [];
@@ -101,17 +87,20 @@
                     );
                     return classes.join(' ');
                 },
-                _selectKeyChanged: function(e) {
+                _selectScriptChanged: function(e) {
                     var selected = e.detail.value;
-                    this.fire('toggleSelectedKey', {
-                        key: this.key,
+                    this.fire('toggleSelectedScript', {
+                        script: this.script,
                         selected: selected
                     });
                 },
-                _viewKey: function(e) {
-                    page.show('/keys/' + this.key.id);
+                _scriptUrl: function(script){
+                    return "/scripts/"+script.id;
                 },
-                _selectKey: function(e) {
+                _viewScript: function(e) {
+                    page.show('/scripts/' + this.script.id);
+                },
+                _selectScript: function(e) {
                     // This is used to prevent event bubbling
                     e.stopPropagation();
                     if (Polymer.dom(e).localTarget === this.$.check) {
@@ -120,6 +109,9 @@
                             item: this
                         });
                     }
+                },
+                _computeIsDefaultText: function(isDefault) {
+                    return isDefault ? 'Default' : null;
                 }
             });
         })();

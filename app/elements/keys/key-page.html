@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<dom-module id="key-page-element">
+<link rel="import" href="key-edit.html">
+
+<dom-module id="key-page">
     <template>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
@@ -8,37 +10,37 @@
             display: block;
             background: #fafafa;
         }
-        
+
         paper-material {
             display: block;
-            padding: 20px;            
+            padding: 20px;
         }
-        
+
         paper-menu-button paper-button {
             display: block;
-        }        
+        }
         a.machine {
             color: var(--mist-blue) !important;
         }
         .machine-info {
-            font-size: 0.9rem; 
+            font-size: 0.9rem;
             color: rgba(0,0,0,0.54);
         }
-        
+
         #container {
             background: #fafafa;
             overflow: auto;
             -webkit-overflow-scrolling: touch;
         }
-        
+
         .paper-header [paper-drawer-toggle] {
             margin-left: 10px;
         }
-        
+
         .paper-header {
             @apply(--layout-horizontal);
         }
-        
+
         .paper-header {
             height: 60px;
             font-size: 24px;
@@ -48,22 +50,22 @@
             transition: height 0.2s;
             transition: font-size 0.2s;
         }
-        
+
         .paper-header.tall {
             height: 320px;
             font-size: 16px;
         }
-        
+
         .paper-header h2 {
             margin-left: 20px;
             @apply(--layout-flex);
             text-transform: capitalize;
         }
-        
+
         .paper-header .toggleViewButton {
             --paper-icon-button-ink-color: transparent;
         }
-        
+
         .paper-header .cartButton {
             margin-right: 10px;
         }
@@ -71,42 +73,42 @@
         .content {
             margin: 36px 36px 80px 36px;
         }
-        
+
         paper-icon-button {
             transition: all 200ms;
         }
-        
+
         paper-icon-button.active-sort {
             transform: rotate(180deg);
         }
-        
+
         paper-icon-button.active-sort::content iron-icon {
             color: #D48900 !important;
         }
-        
+
         app-bar .menu-icon {
             margin-right: 15px;
         }
-        
+
         [size=xs] > * {
             display: none;
         }
-        
+
         responsive-element[size=xs].layout {
             -ms-flex-direction: column;
             -webkit-flex-direction: column;
             flex-direction: column;
         }
-        
+
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
             padding: 0 16px;
         }
-        
+
         [size=xs] app-sidebar {
             min-width: 100%;
             height: auto;
         }
-        
+
         paper-icon-bottom.bottom,
         iron-icon.bottom {
             padding-right: 8px;
@@ -125,26 +127,26 @@
             border-color: #eeedeb;
             color: rgba(0,0,0,0.54);
         }
-        
+
         #keyPublicContainer textarea {
             height: 120px;
         }
-        
+
         #keyPrivateContainer {
             text-align: center;
         }
-        
+
         #keyPrivateContainer textarea {
             height: 440px;
         }
-        
+
         #keyPrivateContainer #showPrivateKeybtn {
             margin: 20px 0;
         }
         paper-button.right {
             text-align: right;
         }
-        paper-button.link, 
+        paper-button.link,
         paper-button.link iron-icon {
             background-color: transparent !important;
             color: var(--mist-blue)     !important;
@@ -164,7 +166,7 @@
             display: inline-block;
         }
         paper-button.right, #showPrivateKeybtn  {
-            font-size: 0.9rem;            
+            font-size: 0.9rem;
         }
         #showPrivateKeybtn  {
             padding-left: 16px;
@@ -191,7 +193,7 @@
         }
         .wide {
             display: none;
-        }        
+        }
         @media (min-width: 1339px) {
             .wide {
                 display: inline;
@@ -216,14 +218,14 @@
                     <paper-icon-button id="deleteKey" class="bottom" icon="icons:delete" on-tap="_deleteKey"></paper-icon-button>
                 </paper-toolbar>
                 <div class="subhead">
-                    <div class="no-machines-list" hidden$="[[keyHasMachines]]"> 
+                    <div class="no-machines-list" hidden$="[[keyHasMachines]]">
                         <h5>No machines are using this key</h5>
                     </div>
-                    <div class="machines-list" hidden$="[[!keyHasMachines]]"> 
+                    <div class="machines-list" hidden$="[[!keyHasMachines]]">
                         <h5><span>[[keyMachines.length]]</span> machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key</h5>
                     </div>
                 </div>
-                <div class="content">                    
+                <div class="content">
                     <paper-material>
                         <div class="head">
                             <h4 class="key">Public Key</h4>
@@ -254,7 +256,7 @@
                         <ul>
                             <template is="dom-repeat" items="[[key.machines]]" as="machine">
                                 <li>
-                                    <iron-icon icon='hardware:laptop'></iron-icon> <a href="[[getMachineUrl(machine)]]" class="machine">[[getMachineName(machine)]]</a> 
+                                    <iron-icon icon='hardware:laptop'></iron-icon> <a href="[[getMachineUrl(machine)]]" class="machine">[[getMachineName(machine)]]</a>
                                     <span class="machine-info">: id: [[machine.1]], image: [[machine.3]]</span>
                                     <!--  [[machine.0]] ,  [[machine.2]],  [[machine.4]], ,  [[machine.5]] -->
                                 </li>
@@ -268,7 +270,7 @@
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
         </template>
-        <key-edit-element key="[[key]]"></key-edit-element>
+        <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
@@ -283,7 +285,7 @@
         'use strict';
 
         Polymer({
-            is: 'key-page-element',
+            is: 'key-page',
 
             properties: {
                 params: {
@@ -310,7 +312,7 @@
                 privateKey: {
                     type: String,
                     value: null
-                },                
+                },
                 keyMachines: {
                     type: Array,
                     computed: '_computeKeyMachines(key)'
@@ -370,7 +372,7 @@
                 return keyMachines.length > 0 ? true : false;
             },
             _keyHasMachinesMoreThanOne: function(keyMachines){
-                return keyMachines.length > 1 ? true : false;  
+                return keyMachines.length > 1 ? true : false;
             },
             getMachineUrl: function(keymachine){
                 var url;
@@ -431,7 +433,7 @@
                 this.$.toast.open();
             },
             _editKey: function(e) {
-                var el = this.querySelector('key-edit-element');
+                var el = this.querySelector('key-edit');
                 el._openEditKeyModal();
             },
             _updateKey: function(e) {
@@ -439,7 +441,7 @@
                 this.set('key.id', key.id);
             },
             _makeDefaultKey: function(e) {
-                var isDefault = this.key.isDefault;                
+                var isDefault = this.key.isDefault;
                 this.$.keyMakeDefaultRequest.generateRequest();
                 this.set('key.isDefault', true);
             },

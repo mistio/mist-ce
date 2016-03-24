@@ -1,19 +1,19 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<dom-module id="script-add-element">
+<dom-module id="script-add">
     <template>
         <style is="custom-style" include="forms"></style>
         <style include="shared-styles">
         :host {
             display: block;
         }
-        
+
         paper-material {
             display: block;
             padding: 20px;
             margin: 36px;
         }
-        
+
         paper-progress {
             position: absolute;
             bottom: 85px;
@@ -26,7 +26,7 @@
             padding-top: 16px;
             padding-bottom: 16px;
         }
-        
+
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -89,7 +89,7 @@
         'use strict';
 
         Polymer({
-            is: 'script-add-element',
+            is: 'script-add',
 
             properties: {
                 script: {

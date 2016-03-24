@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
-<dom-module id="script-edit-element">
+<dom-module id="script-edit">
     <template>
         <style is="custom-style" include="dialogs"></style>
         <style include="shared-styles">
@@ -12,7 +12,7 @@
             paper-card {
                 display: block;
             }
-            
+
             .submit-btn {
                 background-color: var(--mist-blue);
                 color: #fff;
@@ -30,7 +30,7 @@
                 </p>
                 <div class="clearfix btn-group">
                     <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
-                </div>                
+                </div>
             </paper-dialog-scrollable>
         </paper-dialog>
 
@@ -42,7 +42,7 @@
             'use strict';
 
             Polymer({
-                is: 'script-edit-element',
+                is: 'script-edit',
 
                 properties: {
                     script: {

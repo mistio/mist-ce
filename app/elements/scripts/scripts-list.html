@@ -2,7 +2,10 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
-<dom-module id="scripts-list-element">
+<link rel="import" href="script-edit.html">
+<link rel="import" href="script-item.html">
+<link rel="import" href="script-run.html">
+<dom-module id="scripts-list">
     <template>
         <style is="custom-style" include="lists"></style>
         <style include="shared-styles">
@@ -89,9 +92,9 @@
         }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
+            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="scripts" drawer></app-sidebar>
             <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
-                <paper-toolbar class="tall" style$="[[_getHeaderStyle(section.color)]]">
+                <paper-toolbar class="tall" style$="[[_getHeaderStyle()]]">
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -103,15 +106,15 @@
                             <paper-icon-button id="searchScriptBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
                             <paper-input id="searchinput" hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm::keyup}}" placeholder="" no-label-float class="search"></paper-input>
                             <paper-icon-button hidden$="[[!showSearchOption]]" icon="close" on-tap="_toggleSearchSelected"></paper-icon-button>
-                            <span hidden$="[[showSearchOption]]" class="label">Search scripts</span>                            
+                            <span hidden$="[[showSearchOption]]" class="label">Search scripts</span>
                         </div>
-                    
+
                         <paper-tooltip for="runScriptBtn" position="bottom">Run Script</paper-tooltip>
                         <paper-icon-button id="runScriptBtn" hidden$="[[!showRunOption]]" on-tap="_runSelected" icon="schedule"></paper-icon-button>
-                    
+
                         <paper-tooltip for="editScriptBtn" position="bottom">Edit</paper-tooltip>
-                        <paper-icon-button id="editScriptBtn" hidden$="[[!showEditOption]]" on-tap="_editSelected" icon="image:edit"></paper-icon-button>                        
-                    
+                        <paper-icon-button id="editScriptBtn" hidden$="[[!showEditOption]]" on-tap="_editSelected" icon="image:edit"></paper-icon-button>
+
                         <paper-tooltip for="deleteScriptBtn" position="bottom">Delete</paper-tooltip>
                         <paper-icon-button id="deleteScriptBtn" hidden$="[[!showDeleteOption]]" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
                         <span hidden$="[[!showDeleteOption]]" class="label">
@@ -139,7 +142,7 @@
                             <iron-list items="[[presentedScripts]]" as="script" selected-items="{{selectedScripts}}" multi-selection style$="[[vpHeight]]">
                                 <template>
                                     <div class="row">
-                                        <script-item-element selected="[[selected]]" script="[[script]]" index="[[index]]" count="[[presentedScripts.length]]">
+                                        <script-item selected="[[selected]]" script="[[script]]" index="[[index]]" count="[[presentedScripts.length]]">
                                             <div class="row-actions">
                                                 <paper-tooltip for="runScriptBtn" position="top">Run Script</paper-tooltip>
                                                 <paper-icon-button id="runScriptBtn" on-tap="_runSelected" icon="schedule"></paper-icon-button>
@@ -148,7 +151,7 @@
                                                 <paper-tooltip for="deleteScriptBtn" position="top">Delete</paper-tooltip>
                                                 <paper-icon-button id="deleteScriptBtn" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
                                             </div>
-                                        </script-item-element>
+                                        </script-item>
                                     </div>
                                 </template>
                             </iron-list>
@@ -163,7 +166,7 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <script-edit-element script="[[selectedScript]]"></script-edit-element>
+        <script-edit script="[[selectedScript]]"></script-edit>
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -171,9 +174,12 @@
         'use strict';
 
         Polymer({
-            is: 'scripts-list-element',
+            is: 'scripts-list',
 
             properties: {
+                sections: {
+                    type: Object
+                },
                 scripts: {
                     type: Array
                 },
@@ -243,7 +249,7 @@
                 keyup: 'hotkeys'
             },
             _getHeaderStyle: function(color) {
-                return 'background-color: ' + color + '; color: #fff;';
+                return 'background-color: ' + this.section.color + '; color: #fff;';
             },
             _giveFocusWhenSearchOn: function(){
                 if (this.showSearchOption) {
@@ -292,7 +298,7 @@
             },
             _computeIsActiveSort: function(sortByTerm, sortOption) {
                 return sortByTerm == sortOption ? 'active-sort' : null;
-            },                        
+            },
             _scriptsChanged: function(scripts, selectedScripts) {
                 this.set('showDeleteOption', selectedScripts.base.length > 0);
 
@@ -316,7 +322,7 @@
             },
             _selectAllChanged: function(e) {
                 var selectAll = !this.selectAll,
-                    els = this.querySelectorAll('script-item-element');
+                    els = this.querySelectorAll('script-item');
 
                 this.set('selectAll', selectAll);
                 [].forEach.call(els, function(el, index) {
@@ -362,7 +368,7 @@
                 }
             },
             _editSelected: function(e) {
-                var el = this.querySelector('script-edit-element');
+                var el = this.querySelector('script-edit');
                 el._openEditScriptModal();
             },
             _runSelected: function(e) {

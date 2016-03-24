@@ -20,8 +20,6 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
-<!-- <link rel="import" href="../app-rest/app-rest.html"> -->
-
 <link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../app-styles/app-styles.html">
 <link rel="import" href="../app-logo/app-logo.html">
@@ -36,22 +34,7 @@
 <link rel="import" href="../pages/page-elements.html">
 <link rel="import" href="../pages/page-account.html">
 <link rel="import" href="../pages/page-not-found.html">
-<link rel="import" href="../scripts/script-add-element.html">
-<link rel="import" href="../scripts/script-edit-element.html">
-<link rel="import" href="../scripts/script-item-element.html">
-<link rel="import" href="../scripts/script-page-element.html">
-<link rel="import" href="../scripts/script-run-element.html">
-<link rel="import" href="../scripts/scripts-list-element.html">
-<link rel="import" href="../keys/key-add-element.html">
-<link rel="import" href="../keys/key-edit-element.html">
-<link rel="import" href="../keys/key-item-element.html">
-<link rel="import" href="../keys/key-page-element.html">
-<link rel="import" href="../keys/keys-list-element.html">
-<link rel="import" href="../networks/networks-list-element.html">
-<link rel="import" href="../networks/network-item-element.html">
-<link rel="import" href="../networks/network-add-element.html">
-<link rel="import" href="../networks/subnet-item-element.html">
-<link rel="import" href="../networks/network-page-element.html">
+
 <link rel="import" href="../grid-list-element/grid-list-element.html">
 
 <dom-module id="app-main">
@@ -73,21 +56,20 @@
             <!-- 4 -->
             <iron-route path="/images/:id" title="image"></iron-route>
             <!-- 5 -->
-            <iron-route path="/keys" title="keys"></iron-route>
-            <iron-route path="/keys/:id" title="keys"></iron-route>
+            <iron-route path="/keys" title="keys" href="../keys/keys-list.html"></iron-route>
+            <iron-route path="/keys/:id" title="keys" href="../keys/key-page.html"></iron-route>
             <iron-route path="/networks" title="networks" href="../pages/page-list.html"></iron-route>
-            <iron-route path="/networks/:id" title="network"></iron-route>
-            <iron-route path="/add-network" title="add network"></iron-route>
-            <iron-route path="/scripts" title="scripts"></iron-route>
-            <iron-route path="/scripts/:id" title="script"></iron-route>
-            <iron-route path="/add-script" title="add scripts"></iron-route>
+            <iron-route path="/networks/:name" title="network"></iron-route>
+            <iron-route path="/scripts" title="scripts" href="../scripts/scripts-list.html"></iron-route>
+            <iron-route path="/scripts/:id" title="script" href="../scripts/script-page.html"></iron-route>
+            <iron-route path="/add-script" title="add scripts" href="../scripts/script-add.html"></iron-route>
             <!-- id? -->
             <iron-route path="/elements" title="elements"></iron-route>
             <iron-route path="/account" title="account"></iron-route>
             <iron-route path="*"></iron-route>
         </iron-routes>
         <iron-pages id="app-main">
-            <page-dashboard model="[[model]]" sections="[[sections]]" onbstate="{{onbvalue}}">
+            <page-dashboard model="[[model]]" sections="[[sections]]">
                 <title>Dashboard</title>
             </page-dashboard>
             <!-- machines -->
@@ -97,21 +79,16 @@
             <page-list model="[[model]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-list>
             <page-image params="[[params]]" model="[[model]]" image="[[getImage(params)]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-image>
             <!-- keys -->
-            <keys-list-element model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" keys="[[model.keysArray]]"></keys-list-element>
-            <key-page-element model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page-element>
+            <keys-list model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" keys="[[model.keysArray]]"></keys-list>
+            <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
             <!-- networks -->
-            <!-- <page-list model="[[model]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-list> -->
-            <networks-list-element model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list-element>
-            <!-- <page-network model="[[model]]" params="[[params]]" network="[[getNetwork(params)]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-network> -->
-
-            <network-page-element model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page-element>
-
-            <network-add-element model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add-element>
+            <page-list model="[[model]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-list>
+            <page-network model="[[model]]" params="[[params]]" network="[[getNetwork(params)]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-network>
             <!-- scripts -->
             <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
-            <scripts-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-element>
-            <script-page-element model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page-element>
-            <script-add-element model="{{model}}" sections="[[sections]]" section="[[sections.scripts]]"></script-add-element>
+            <scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list>
+            <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
+            <script-add model="{{model}}" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
             <page-elements></page-elements>
             <page-account></page-account>
             <page-not-found></page-not-found>
@@ -125,296 +102,7 @@ var app = Polymer({
     properties: {
         model: {
             type: Object,
-            notify: true,
-            value: {
-                cloudsArray: [],
-                machinesArray: [],
-                scriptsArray:  [
-                    {
-                        description: "",
-                        entrypoint: "",
-                        id: "448082e761c94660acfe54427c5ca461",
-                        name: "test",
-                        script: "#!/bin/bash\necho 'hello world '",
-                        source: "inline",
-                        type: "executable",
-                        user: "marios@mist.io",
-                    }, {
-                        description: "test",
-                        entrypoint: "",
-                        id: "576bf98fe7e14d87b2b9075f099eeebe",
-                        name: "runner",
-                        script: "owner/repo",
-                        source: "github",
-                        type: "executable",
-                        user: "marios@mist.io"
-                    }, {
-                        description: "",
-                        entrypoint: "",
-                        id: "448082e761c94660acfe54427c5ca461",
-                        name: "install scipt",
-                        script: "#!/bin/bash\necho 'hello world '",
-                        source: "inline",
-                        type: "executable",
-                        user: "marios@mist.io",
-                    }
-                ],
-                imagesArray: [],
-                keysArray: [],
-                networksArray: [{
-                    domain_type: 0,
-                    id: "59887",
-                    is_default: true,
-                    name: "default_public_network",
-                    subnets: [{
-                        announce_cidr: false,
-                        cidr_str: "198.100.164.72/29",
-                        id: 236649,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: true,
-                        name: "198.100.164.72/29",
-                        routing_prefix: "198.100.164.72",
-                        uri: "https://api.nephoscale.com/network/cidr/236649/"
-                    }, {
-                        announce_cidr: false,
-                        cidr_str: "198.100.164.72/28",
-                        id: 254479,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: false,
-                        name: "198.100.164.72/28",
-                        routing_prefix: "198.100.161.224",
-                        uri: "https://api.nephoscale.com/network/cidr/254479/"
-                    }, {
-                        announce_cidr: false,
-                        cidr_str: "69.50.244.0/28",
-                        id: 727453,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: false,
-                        name: "69.50.244.0/28",
-                        routing_prefix: "69.50.244.0",
-                        uri: "https://api.nephoscale.com/network/cidr/727453/"
-                    }, {
-                        announce_cidr: false,
-                        cidr_str: "69.50.244.192/28",
-                        id: 738519,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: false,
-                        name: "69.50.244.192/28",
-                        routing_prefix: "69.50.244.192",
-                        uri: "https://api.nephoscale.com/network/cidr/738519/"
-                    }, {
-                        announce_cidr: true,
-                        cidr_str: "69.50.244.208/28",
-                        id: 738521,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: false,
-                        name: "69.50.244.208/28",
-                        routing_prefix: "69.50.244.208",
-                        uri: "https://api.nephoscale.com/network/cidr/738521/"
-                    }],
-                    cloud: {
-                        id: "418XPpTRLsNEpJeJ62jnGs8z7VJu",
-                        title: "Nephoscale",
-                        provider: "nephoscale",
-                        enabled: true
-                    }
-                }, {
-                    domain_type: 1,
-                    id: "59889",
-                    is_default: true,
-                    name: "default_private_network",
-                    subnets: [],
-                    cloud: {
-                        id: "418XPpTRLsNEpJeJ62jnGs8z7VJu",
-                        title: "Nephoscale",
-                        provider: "nephoscale",
-                        enabled: true
-                    }
-                }, {
-                    dhcp_options_id: "dopt-3e35ea5b",
-                    id: "vpc-c20824a7",
-                    instance_tenancy: "default",
-                    is_default: false,
-                    name: "vpc-c20824a7",
-                    state: "available",
-                    subnets: [{
-                        name: "172.30.0.0/16"
-                    }],
-                    cloud: {
-                        id: "d98cBYrPqjpAcybzriwznme1a9d",
-                        title: "EC2 Ireland",
-                        provider: "ec2_eu_west",
-                        enabled: true
-                    }
-                }, {
-                    id: "ad3da031-634c-4606-a790-524b0dfb5783",
-                    name: "public",
-                    public: true,
-                    router_external: true,
-                    subnets: [{
-                        announce_cidr: false,
-                        cidr_str: "198.100.164.72/29",
-                        id: 236649,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: true,
-                        name: "198.100.164.72/29",
-                        routing_prefix: "198.100.164.72",
-                        uri: "https://api.nephoscale.com/network/cidr/236649/"
-                    }, {
-                        announce_cidr: false,
-                        cidr_str: "198.100.164.72/28",
-                        id: 254479,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: false,
-                        name: "198.100.164.72/28",
-                        routing_prefix: "198.100.161.224",
-                        uri: "https://api.nephoscale.com/network/cidr/254479/"
-                    }, {
-                        announce_cidr: false,
-                        cidr_str: "69.50.244.0/28",
-                        id: 727453,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: false,
-                        name: "69.50.244.0/28",
-                        routing_prefix: "69.50.244.0",
-                        uri: "https://api.nephoscale.com/network/cidr/727453/"
-                    }, {
-                        announce_cidr: false,
-                        cidr_str: "69.50.244.192/28",
-                        id: 738519,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: false,
-                        name: "69.50.244.192/28",
-                        routing_prefix: "69.50.244.192",
-                        uri: "https://api.nephoscale.com/network/cidr/738519/"
-                    }, {
-                        announce_cidr: true,
-                        cidr_str: "69.50.244.208/28",
-                        id: 738521,
-                        ip_type: 0,
-                        ip_version: 4,
-                        is_primary: false,
-                        name: "69.50.244.208/28",
-                        routing_prefix: "69.50.244.208",
-                        uri: "https://api.nephoscale.com/network/cidr/738521/"
-                    }],
-                    status: "ACTIVE",
-                    extra: {
-                        admin_state_up: true,
-                        mtu: 0,
-                        "provider:network_type": "vxlan",
-                        "provider:physical_network": null,
-                        "provider:segmentation_id": 72,
-                        shared: false,
-                        tenant_id: "45ebca827956466eb48499c4331825b8"
-                    },
-                    subnets: [{
-                        id: "9db08cdc-97d5-43cc-b842-9abb910015cd",
-                        name: "public_subnet",
-                        cidr: "69.50.244.208/28",
-                        dns_nameservers: [],
-                        allocation_pools: [{
-                            end: "69.50.244.222",
-                            start: "69.50.244.217"
-                        }],
-                        enable_dhcp: false,
-                        gateway_ip: "69.50.244.209",
-                        ip_version: 4
-                    }],
-                    cloud: {
-                        id: "Lyx7GdQXyLi7RqKb3vehY4Y3y2c",
-                        title: "Openstack",
-                        provider: "openstack",
-                        enabled: true
-                    }
-                }, {
-                    id: "020a9a4d-fbf3-4a5c-862e-3dec9bc48341",
-                    name: "test",
-                    public: false,
-                    router_external: false,
-                    subnets: [],
-                    status: "ACTIVE",
-                    extra: {
-                        admin_state_up: true,
-                        mtu: 0,
-                        "provider:network_type": "vxlan",
-                        "provider:physical_network": null,
-                        "provider:segmentation_id": 72,
-                        shared: false,
-                        tenant_id: "45ebca827956466eb48499c4331825b8"
-                    },
-                    subnets: [{
-                        id: "9db08cdc-97d5-43cc-b842-9abb910015cd",
-                        name: "public_subnet",
-                        cidr: "69.50.244.208/28",
-                        dns_nameservers: [],
-                        allocation_pools: [{
-                            end: "69.50.244.222",
-                            start: "69.50.244.217"
-                        }],
-                        enable_dhcp: false,
-                        gateway_ip: "69.50.244.209",
-                        ip_version: 4
-                    }],
-                    cloud: {
-                        id: "Lyx7GdQXyLi7RqKb3vehY4Y3y2c",
-                        title: "Openstack",
-                        provider: "openstack",
-                        enabled: true
-                    }
-                }, {
-                    id: "20322be8-66e6-4669-af4c-2caefa0391bc",
-                    name: "papaki",
-                    public: false,
-                    router_external: false,
-                    subnets: [],
-                    status: "ACTIVE",
-                    extra: {
-                        admin_state_up: true,
-                        mtu: 0,
-                        "provider:network_type": "vxlan",
-                        "provider:physical_network": null,
-                        "provider:segmentation_id": 72,
-                        shared: false,
-                        tenant_id: "45ebca827956466eb48499c4331825b8"
-                    },
-                    subnets: [{
-                        id: "9db08cdc-97d5-43cc-b842-9abb910015cd",
-                        name: "public_subnet",
-                        cidr: "69.50.244.208/28",
-                        dns_nameservers: [],
-                        allocation_pools: [{
-                            end: "69.50.244.222",
-                            start: "69.50.244.217"
-                        }],
-                        enable_dhcp: false,
-                        gateway_ip: "69.50.244.209",
-                        ip_version: 4
-                    }],
-                    cloud: {
-                        id: "Lyx7GdQXyLi7RqKb3vehY4Y3y2c",
-                        title: "Openstack",
-                        provider: "openstack",
-                        enabled: true
-                    }
-                }
-                ],
-                templatesArray:[],
-                teamsArray:[],
-                pending: {
-                    clouds: true,
-                    monitoring: true
-                }
-            }
+            notify: true
         },
         sections: {
             type: Object
@@ -422,20 +110,10 @@ var app = Polymer({
         sectionsArray: {
             type: Array,
             notify: true
-        },
-        hasMonitoring: {
-            type: Boolean,
-            value: 0 // if user has enabled monitoring
-        },
-        
-        onbvalue : {
-            type: Number,
-            value: '100',
-            notify: true
         }
     },
     observers: [
-        "_updateOnbState(model.cloudsArray.*, model.machinesArray.*, model.scriptsArray.*, model.imagesArray.*, model.keysArray.*, model.networksArray.*, model.templatesArray.*, model.teamsArray.*)",
+
     ],
     listeners: {
         'iron-activate': 'updateDocTitle',
@@ -447,6 +125,50 @@ var app = Polymer({
     _toast: null,
 
     ready: function() {
+        this.model = {
+            cloudsArray: [],
+            machinesArray: [],
+            //scriptsArray:  [],
+            imagesArray: [],
+            keysArray: [],
+            networksArray: [],
+            templatesArray:[],
+            teamsArray:[],
+            pending: {
+                clouds: true,
+                monitoring: true
+            },
+            scriptsArray: [
+                        {
+                            description: "",
+                            entrypoint: "",
+                            id: "448082e761c94660acfe54427c5ca461",
+                            name: "test",
+                            script: "#!/bin/bash\necho 'hello world '",
+                            source: "inline",
+                            type: "executable",
+                            user: "marios@mist.io",
+                        }, {
+                            description: "test",
+                            entrypoint: "",
+                            id: "576bf98fe7e14d87b2b9075f099eeebe",
+                            name: "runner",
+                            script: "owner/repo",
+                            source: "github",
+                            type: "executable",
+                            user: "marios@mist.io"
+                        }, {
+                            description: "",
+                            entrypoint: "",
+                            id: "448082e761c94660acfe54427c5ca461",
+                            name: "install scipt",
+                            script: "#!/bin/bash\necho 'hello world '",
+                            source: "inline",
+                            type: "executable",
+                            user: "marios@mist.io"
+                        }
+                    ]
+        };
         this.sectionsArray = [{
                 id: 'machines',
                 color: '#8c76d1',
@@ -484,6 +206,7 @@ var app = Polymer({
                 count: '0'
             }
         ];
+
         this.sections = _generateMap(this.sectionsArray);
     },
 
@@ -494,43 +217,11 @@ var app = Polymer({
         socket.send('msg', 'logs', 'ready');
         socket.send('msg', 'logs', 'get_logs', searchFilter.detail);
     },
-    _updateOnbState: function(model) {
-        if (model) {
-            var clouds      = this.model.cloudsArray.length;
-            var scripts     = this.model.scriptsArray.length;
-            var keys        = this.model.keysArray.length;
-            var templates   = this.model.templatesArray.length;
-            var teams       = this.model.teamsArray.length;
-            var hasMonitoring = this.hasMonitoring;
 
-            var all = clouds + scripts + keys + templates + teams;
-
-            console.log(clouds, scripts, keys, templates, teams);
-
-            var updatedOnbVal;
-
-            if ( all == 0){
-                updatedOnbVal = 10;
-            }
-            else if ( all > 0 && clouds == 0){
-                updatedOnbVal = 30;
-            }
-            else if ( clouds > 0 ){
-                if (hasMonitoring)
-                    updatedOnbVal = 21;
-                else
-                    updatedOnbVal = 20;
-            }
-        }
-        else
-            updatedOnbVal = 0;
-
-
-        this.onbvalue = updatedOnbVal;
-    },
     attributeChanged: function(attrName, oldVal, newVal) {
         console.warn('attrChanged', attrName, oldVal, newVal);
     },
+
     updateCount: function() {
         var sec = this.sectionsArray;
         var mod = this.model;
@@ -542,6 +233,7 @@ var app = Polymer({
             this.notifyPath(sec[i].count, c);
         }
     },
+
     updateTitle: function(_, detail) {
         if (detail.title && detail.title.length) {
             document.title = detail.title + " - mist.io";
@@ -549,6 +241,7 @@ var app = Polymer({
             document.title = "mist.io";
         }
     },
+
     getMachine: function(params) {
         var ma = this.model.machinesArray;
         var p = params.uuid;
@@ -560,6 +253,7 @@ var app = Polymer({
         //return machine object with the right 'uuid' from model.machinesArray
         return m;
     },
+
     getImage: function(params) {
         var ima = this.model.imagesArray;
         var p = params.id;
@@ -574,6 +268,7 @@ var app = Polymer({
         // var index = params.id;
         // return this.model.images.index;
     },
+
     getNetwork: function(params) {
         var na = this.model.networksArray;
         var p = params.name;
@@ -585,6 +280,7 @@ var app = Polymer({
         //return network object with the right 'name' from model.networksArray
         return n;
     },
+
     updateDocTitle: function(e, details) {
         if (details.item.title && details.item.title.length) {
             document.title = details.item.title + " - mist.io";
@@ -592,6 +288,7 @@ var app = Polymer({
             document.title = "mist.io";
         }
     },
+
     showToast: function(e, detail) {
         if (!this._toast) {
             this._toast = document.createElement('paper-toast');
@@ -600,6 +297,7 @@ var app = Polymer({
         this._toast.text = detail.text;
         this.async(this._toast.show.bind(this._toast), 1);
     },
+
     trackPageview: function(e, detail) {
         return;
         this.debounce('pageview', function() {
